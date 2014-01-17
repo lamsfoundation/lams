@@ -22,13 +22,9 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -43,7 +39,6 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -76,8 +71,6 @@ public interface IVoteService {
      * @param leader
      */
     void copyAnswersFromLeader(VoteQueUsr user, VoteQueUsr leader);
-
-    void configureContentRepository() throws VoteApplicationException;
 
     void createVote(VoteContent voteContent) throws VoteApplicationException;
 
@@ -234,10 +227,6 @@ public interface IVoteService {
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException;
-
-    void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException;
-
     void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException;
 
@@ -262,27 +251,9 @@ public interface IVoteService {
 
     List getToolSessionsForContent(VoteContent vote);
 
-    ITicket getRepositoryLoginTicket() throws VoteApplicationException;
-
-    void deleteFromRepository(Long uuid, Long versionID);
-
-    NodeKey uploadFileToRepository(InputStream stream, String fileName) throws VoteApplicationException;
-
-    InputStream downloadFile(Long uuid, Long versionID) throws VoteApplicationException;
-
-    void cleanUploadedFilesMetaData() throws VoteApplicationException;
-
-    void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent)
-	    throws VoteApplicationException;
-
     List getAttemptsForUser(final Long userUid) throws VoteApplicationException;
 
     int countSessionComplete() throws VoteApplicationException;
-
-    NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
-	    throws RepositoryCheckedException;
-
-    NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
 
     List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException;
 
@@ -294,12 +265,6 @@ public interface IVoteService {
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
-    void removeFile(Long submissionId) throws VoteApplicationException;
-
-    void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException;
-
-    List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException;
 
     void removeNominationsFromCache(VoteContent voteContent);
 

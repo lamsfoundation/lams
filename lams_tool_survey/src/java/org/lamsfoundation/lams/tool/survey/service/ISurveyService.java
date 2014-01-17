@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
-import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -89,23 +88,6 @@ public interface ISurveyService {
     // ******************************************************************************************
     // *************** Instruction file methods **********************
     // ******************************************************************************************
-    /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadSurveyFileException
-     */
-    SurveyAttachment uploadInstructionFile(FormFile file, String type) throws UploadSurveyFileException;
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteSurveyAttachment(Long attachmentUid);
 
     // ******************************************************************************************
     // *************** Questions and Answers methods **********************
@@ -184,14 +166,6 @@ public interface ISurveyService {
      * @return
      */
     List<SurveyUser> getSessionUsers(Long sessionId);
-
-    // ******************************************************************************************
-    // ********** Repository methods ***********************
-    // ******************************************************************************************
-    /**
-     * Delete file from repository.
-     */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException;
 
     // ******************************************************************************************
     // ********** Session methods ***********************

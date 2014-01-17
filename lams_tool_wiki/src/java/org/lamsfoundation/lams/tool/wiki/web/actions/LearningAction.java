@@ -77,7 +77,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm" validate="false"
  * @struts.action-forward name="wiki" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
  * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
@@ -141,11 +140,6 @@ public class LearningAction extends WikiPageAction {
 	
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-	
-	// check runOffline
-	if (wiki.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 
 	// get the user
 	WikiUser wikiUser;

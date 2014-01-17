@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -152,17 +151,11 @@ public abstract class VoteUtils implements VoteAppConstants {
 	voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish() ? "1" : "0");
 	voteAuthoringForm.setReflect(defaultVoteContent.isReflect() ? "1" : "0");
 
-	voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
-	voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
-
 	voteGeneralAuthoringDTO
 		.setUseSelectLeaderToolOuput(defaultVoteContent.isUseSelectLeaderToolOuput() ? "1" : "0");
 	voteGeneralAuthoringDTO.setAllowText(defaultVoteContent.isAllowText() ? "1" : "0");
 	voteGeneralAuthoringDTO.setLockOnFinish(defaultVoteContent.isLockOnFinish() ? "1" : "0");
 	voteAuthoringForm.setReflect(defaultVoteContent.isReflect() ? "1" : "0");
-
-	voteGeneralAuthoringDTO.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
-	voteGeneralAuthoringDTO.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
 
 	String maxNomcount = defaultVoteContent.getMaxNominationCount();
 	if (maxNomcount.equals(""))
@@ -236,24 +229,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	if (richTextInstructions != null) {
 	    voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 	}
-
-	String richTextOfflineInstructions = request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-
-	if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0)) {
-	    voteGeneralAuthoringDTO.setRichTextOfflineInstructions(richTextOfflineInstructions);
-	    sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, richTextOfflineInstructions);
-	}
-
-	String richTextOnlineInstructions = request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-
-	if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0)) {
-	    voteGeneralAuthoringDTO.setRichTextOnlineInstructions(richTextOnlineInstructions);
-	    sessionMap.put(ONLINE_INSTRUCTIONS_KEY, richTextOnlineInstructions);
-	}
-    }
-
-    public static void configureContentRepository(HttpServletRequest request, IVoteService voteService) {
-	voteService.configureContentRepository();
     }
 
     /**
@@ -362,17 +337,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	return voteContent.isDefineLater();
     }
 
-    /**
-     * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed
-     * about that.. isRubnOffline(VoteContent voteContent)
-     * 
-     * @param voteContent
-     * @return boolean
-     */
-    public static boolean isRunOffline(VoteContent voteContent) {
-	return voteContent.isRunOffline();
-    }
-
     public static String getDestination(String sourceVoteStarter) {
 
 	if ((sourceVoteStarter != null) && !sourceVoteStarter.equals("monitoring")) {
@@ -435,7 +399,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
 	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
 	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED);
-	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE);
 	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
 	request.getSession().removeAttribute(USER_EXCEPTION_QUESTION_EMPTY);
 	request.getSession().removeAttribute(USER_EXCEPTION_ANSWER_EMPTY);
@@ -444,7 +407,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	request.getSession().removeAttribute(USER_EXCEPTION_CHKBOXES_EMPTY);
 	request.getSession().removeAttribute(USER_EXCEPTION_SUBMIT_NONE);
 	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-	request.getSession().removeAttribute(USER_EXCEPTION_FILENAME_EMPTY);
 	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
 	request.getSession().removeAttribute(USER_EXCEPTION_SINGLE_OPTION);
     }
@@ -492,14 +454,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	String reflectionSubject = request.getParameter("reflectionSubject");
 	voteAuthoringForm.setReflectionSubject(reflectionSubject);
 	voteGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
-
-	String offlineInstructions = request.getParameter(OFFLINE_INSTRUCTIONS);
-	voteAuthoringForm.setOfflineInstructions(offlineInstructions);
-	voteGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	String onlineInstructions = request.getParameter(ONLINE_INSTRUCTIONS);
-	voteAuthoringForm.setOnlineInstructions(onlineInstructions);
-	voteGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
     }
 
     public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
@@ -511,58 +465,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    voteContent.setDefineLater(value);
 	    voteService.updateVote(voteContent);
 	}
-    }
-
-    /**
-     * If this file exists in attachments map, move it to the deleted attachments map. Returns the updated
-     * deletedAttachments map, creating a new one if needed. If uuid supplied then tries to match on that, otherwise
-     * uses filename and isOnline.
-     */
-    public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    VoteUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		VoteUploadedFile value = (VoteUploadedFile) iter.next();
-
-		if (uuid.equals(value.getUuid())) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
-    }
-
-    public static List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    VoteUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		VoteUploadedFile value = (VoteUploadedFile) iter.next();
-		if (filename.equals(value.getFileName()) && isOnline == value.isFileOnline()) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
     }
 
 }

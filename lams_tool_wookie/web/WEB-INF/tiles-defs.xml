@@ -86,10 +86,6 @@
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/wookie.jsp" />
 	</definition>
-
-	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">
-		<put name="body" value="/pages/learning/runOffline.jsp" />
-	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/defineLater.jsp" />

@@ -25,12 +25,8 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.servlet;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,21 +36,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
@@ -111,29 +99,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				, directoryName, FILENAME, cookies);
 
 		return FILENAME;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-        	ITaskListService service = TaskListServiceProxy.getTaskListService(getServletContext());
-        	TaskList content = null;
-            if ( toolContentID != null ) {
-            	content = service.getTaskListByContentId(toolContentID);
-            } else {
-            	TaskListSession session=service.getTaskListSessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		content = session.getTaskList();
-            }
-            if ( content != null ) {
-            	activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
 	}
 
 	/**

@@ -38,10 +38,7 @@ import org.lamsfoundation.lams.tool.wookie.service.WookieService;
  */
 
 public class Wookie implements java.io.Serializable, Cloneable {
-
-    /**
-     * 
-     */
+    
     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(WookieService.class.getName());
@@ -62,25 +59,17 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean contentInUse;
 
     private boolean defineLater;
 
     private Long toolContentId;
-
-    private Set<WookieAttachment> wookieAttachments;
 
     private Set<WookieSession> wookieSessions;
     
@@ -90,38 +79,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
     Integer widgetWidth;
     Boolean widgetMaximise;
     String widgetIdentifier;
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
-
-    // Constructors
-
-    /** default constructor */
-    public Wookie() {
-    }
-
-    /** full constructor */
-    public Wookie(Date createDate, Date updateDate, Integer createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    Long toolContentId, String reflectInstructions, Set<WookieAttachment> wookieAttachments,
-	    Set<WookieSession> wookieSessions, String imageFileName, Long imageWidth, Long imageHeight) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.runOffline = runOffline;
-	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.wookieAttachments = wookieAttachments;
-	this.wookieSessions = wookieSessions;
-	this.reflectInstructions = reflectInstructions;
-    }
 
     // Property accessors
     /**
@@ -203,19 +160,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -237,31 +181,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -301,23 +220,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-    
-    
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="wookie_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wookie.model.WookieAttachment"
-     * 
-     */
-
-    public Set<WookieAttachment> getWookieAttachments() {
-	return wookieAttachments;
-    }
-
-    public void setWookieAttachments(Set<WookieAttachment> wookieAttachments) {
-	this.wookieAttachments = wookieAttachments;
     }
 
     /**
@@ -377,9 +279,8 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Wookie newInstance(Wookie fromContent, Long toContentId, IToolContentHandler wookieToolContentHandler) {
+    public static Wookie newInstance(Wookie fromContent, Long toContentId) {
 	Wookie toContent = new Wookie();
-	fromContent.toolContentHandler = wookieToolContentHandler;
 	toContent = (Wookie) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -394,17 +295,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	    wookie = (Wookie) super.clone();
 	    wookie.setUid(null);
 
-	    if (wookieAttachments != null) {
-		// create a copy of the attachments
-		Iterator<WookieAttachment> iter = wookieAttachments.iterator();
-		Set<WookieAttachment> set = new HashSet<WookieAttachment>();
-		while (iter.hasNext()) {
-		    WookieAttachment originalFile = (WookieAttachment) iter.next();
-		    WookieAttachment newFile = (WookieAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		wookie.wookieAttachments = set;
-	    }
 	    // create an empty set for the wookieSession
 	    wookie.wookieSessions = new HashSet<WookieSession>();
 
@@ -412,14 +302,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	    Wookie.log.error("Error cloning " + Wookie.class);
 	}
 	return wookie;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

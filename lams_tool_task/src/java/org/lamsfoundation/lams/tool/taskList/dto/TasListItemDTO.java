@@ -23,16 +23,12 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.dto;  
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
  * DTO object which contains data for displaying learning stuff. 

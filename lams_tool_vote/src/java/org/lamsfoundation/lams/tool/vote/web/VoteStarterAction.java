@@ -19,110 +19,6 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-
-/**
- * @author Ozgur Demirtas
- * 
- * VoteStarterAction loads the default content and initializes the presentation Map.
- * Initializes the tool's authoring mode
- * Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen.
- * 
- * 
- * <THIS SECTION IS COPIED FROM: http://lamscvs.melcoe.mq.edu.au:8090/display/lams/Tool+Contract>
- * Authoring URL 
- *
- * The tool must supply an authoring module, which will be called to create new content or edit existing content. It will be called by an authoring URL using the following format:
-
- * <lams base path>/<tool's authoringurl>&toolContentID=123
-
-
- * The initial data displayed on the authoring screen for a new tool content id may be the default tool content.
- *
- * Authoring UI data consists of general Activity data fields and the Tool specific data fields.
- * The authoring interface will have three tabs. The mandatory (and suggested) fields are given. 
- * Each tool will have its own fields which it will add on any of the three tabs, as appropriate to the tabs' function.
-
- * Basic: Displays the basic set of fields that are needed for the tool, and it could be expected that a new LAMS user would use. 
- * Mandatory fields: Title, Instructions.
- * 
- * Advanced: Displays the extra fields that would be used by experienced LAMS users. Optional fields: Lock On Finish, Make Responses Anonymous
- * Instructions: Displays the "instructions" fields for teachers. Mandatory fields: Online instructions, Offline instructions, Document upload. 
- * See Instructions. The standard LAMS tools will use a DHTML layout for the Authoring tabs. For consistency of look and feel, 
- * we prefer all tools to use the DHTML, or at least make the tabs look and behave like the DHTML layout. The javascript for the tabs is 
- * available as "/include/javascript/tabcontroller.js" from the central web app (e.g. http://blah.org/lams/include/javascript/tabcontroller.js).
- *
- * The "Define Later" and "Run Offline" options are set on the Flash authoring part, and not on the tool's authoring screens.
- * Preview The tool must be able to show the specified content as if it was running in a lesson. It will be the learner url with tool access 
- * mode set to ToolAccessMode.AUTHOR.
- *
- * Export The tool must be able to export its tool content for part of the overall learning design export.
- * The format of the serialization for export is XML. Tool will define extra namespace inside the <Content> element to add a new data element (type).
- *  Inside the data element, it can further define more structures and types as it seems fit.
-
- * The data elements must be "version" aware. The data elements must be "type" aware if they are to be shared between Tools.
- * LAMS Xpress (Ernie, could you put something in here. You explain it better than I do!)
- *
- * Data Exchange At present, there is no data exchange format between tools. Therefore if..  
- * 
- * 
- * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.  
- * 
-
- The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.
-
- <!--Authoring Starter Action: initializes the authoring module -->
- <action path="/authoringStarter" 
- type="org.lamsfoundation.lams.tool.vote.web.VoteStarterAction" 
- name="VoteAuthoringForm" 
- scope="request"
- input="/index.jsp"> 
-
- <forward
- name="load"
- path="/authoring/AuthoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="loadMonitoring"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="loadMonitoringEditActivity"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="loadLearner"
- path="/learning/AnswersContent.jsp"
- redirect="false"
- />
-
- <forward
- name="starter"
- path="/index.jsp"
- redirect="false"
- />
-
- <forward
- name="preview"
- path="/learning/Preview.jsp"
- redirect="false"
- />
-
- <forward
- name="errorList"
- path="/VoteErrorBox.jsp"
- redirect="false"
- />
- </action>  
-
-
- */
-
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
@@ -160,6 +56,13 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
+/**
+ * @author Ozgur Demirtas
+ * 
+ * VoteStarterAction loads the default content and initializes the presentation Map.
+ * Initializes the tool's authoring mode
+ * Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen.
+ */
 public class VoteStarterAction extends Action implements VoteAppConstants {
     /*
      * This class is reused by defineLater and monitoring modules as well.
@@ -211,11 +114,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	}
 
-	initialiseAttributes(request, voteGeneralAuthoringDTO, voteService);
-
 	SessionMap sessionMap = new SessionMap();
-	sessionMap.put(VoteAppConstants.ATTACHMENT_LIST_KEY, new ArrayList());
-	sessionMap.put(VoteAppConstants.DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
 	sessionMap.put(VoteAppConstants.ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	voteAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
@@ -326,26 +225,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	return mapping.findForward(destination);
-    }
-
-    protected void initialiseAttributes(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO,
-	    IVoteService voteService) {
-
-	/* for development: needs to run only once per tool */
-	/* VoteUtils.configureContentRepository(request, voteService); */
-
-	/* these two are for Instructions jsp */
-	LinkedList listUploadedOfflineFileNames = new LinkedList();
-	LinkedList listUploadedOnlineFileNames = new LinkedList();
-
-	voteGeneralAuthoringDTO.setListUploadedOfflineFileNames(listUploadedOfflineFileNames);
-	voteGeneralAuthoringDTO.setListUploadedOnlineFileNames(listUploadedOnlineFileNames);
-
-	LinkedList listOfflineFilesMetaData = new LinkedList();
-	LinkedList listOnlineFilesMetaData = new LinkedList();
-
-	voteGeneralAuthoringDTO.setListOfflineFilesMetadata(listOfflineFilesMetaData);
-	voteGeneralAuthoringDTO.setListOnlineFilesMetadata(listOnlineFilesMetaData);
     }
 
     /**
@@ -484,39 +363,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	int maxIndex = mapOptionsContent.size();
 	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
 
-	voteGeneralAuthoringDTO.setRichTextOfflineInstructions(voteContent.getOfflineInstructions());
-	voteGeneralAuthoringDTO.setRichTextOnlineInstructions(voteContent.getOnlineInstructions());
-
-	voteAuthoringForm.setOfflineInstructions(voteContent.getOfflineInstructions());
-	voteAuthoringForm.setOnlineInstructions(voteContent.getOnlineInstructions());
-
 	Short maxInputs = voteContent.getMaxExternalInputs();
 	if (maxInputs == null) {
 	    maxInputs = 0;
 	}
 	voteAuthoringForm.setMaxInputs(maxInputs);
-
-	if (voteContent.getOnlineInstructions() == null || voteContent.getOnlineInstructions().length() == 0) {
-	    voteGeneralAuthoringDTO.setRichTextOnlineInstructions(VoteAppConstants.DEFAULT_ONLINE_INST);
-	    voteAuthoringForm.setOnlineInstructions(VoteAppConstants.DEFAULT_ONLINE_INST);
-	    sessionMap.put(VoteAppConstants.ONLINE_INSTRUCTIONS_KEY, VoteAppConstants.DEFAULT_ONLINE_INST);
-	}
-
-	if (voteContent.getOfflineInstructions() == null || voteContent.getOfflineInstructions().length() == 0) {
-	    voteGeneralAuthoringDTO.setRichTextOfflineInstructions(VoteAppConstants.DEFAULT_OFFLINE_INST);
-	    voteAuthoringForm.setOfflineInstructions(VoteAppConstants.DEFAULT_OFFLINE_INST);
-	    sessionMap.put(VoteAppConstants.OFFLINE_INSTRUCTIONS_KEY, VoteAppConstants.DEFAULT_OFFLINE_INST);
-	}
-
-	sessionMap.put(VoteAppConstants.ONLINE_INSTRUCTIONS_KEY, voteContent.getOnlineInstructions());
-	sessionMap.put(VoteAppConstants.OFFLINE_INSTRUCTIONS_KEY, voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	voteGeneralAuthoringDTO.setDeletedAttachmentList(new ArrayList());
-
-	sessionMap.put(VoteAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(VoteAppConstants.DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
 
 	voteAuthoringForm.resetUserAction();
     }

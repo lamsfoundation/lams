@@ -19,7 +19,6 @@
 			<lams:Tab id="1" key="button.basic" />
 			<c:if test="${sessionMap.mode == 'author'}">
 				<lams:Tab id="2" key="button.advanced" />
-				<lams:Tab id="3" key="button.instructions" />
 			</c:if>
 		</lams:Tabs>
 	
@@ -38,9 +37,6 @@
 		<html:hidden property="historyPageContentId" styleId="historyPageContentId"/>
 		
 		<div id="message" style="text-align: center;">
-			<c:if test="${unsavedChanges}">
-				<fmt:message key="message.unsavedChanges" />
-			</c:if>
 			<c:if test="${currentWikiPage.deleted}">
 				<p class="warning"><fmt:message key="label.wiki.removed" /></p>
 			</c:if>
@@ -61,8 +57,6 @@
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
 		<c:if test="${sessionMap.mode == 'author'}">
 			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.instructions"
-				page="instructions.jsp" />
 		</c:if>
 
 		<div id="finishButtonDiv">

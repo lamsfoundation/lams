@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.wiki.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -35,20 +33,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -67,30 +53,25 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.wiki.dao.IWikiAttachmentDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiPageContentDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiPageDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiSessionDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiUserDAO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
-import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
-import org.lamsfoundation.lams.tool.wiki.util.WikiToolContentHandler;
 import org.lamsfoundation.lams.tool.wiki.util.diff.Diff;
 import org.lamsfoundation.lams.tool.wiki.util.diff.Difference;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the IWikiService interface.
@@ -111,17 +92,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     private IWikiUserDAO wikiUserDAO = null;
 
-    private IWikiAttachmentDAO wikiAttachmentDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
     private IToolContentHandler wikiToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
-
-    private IAuditService auditService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -137,7 +112,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public WikiService() {
 	super();
-	// TODO Auto-generated constructor stub
     }
 
     /* ************ Methods from ToolSessionManager ************* */
@@ -292,27 +266,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Wiki toContent = Wiki.newInstance(fromContent, toContentId, wikiToolContentHandler);
+	Wiki toContent = Wiki.newInstance(fromContent, toContentId);
 
 	insertUnsavedWikiContent(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Wiki wiki = wikiDAO.getByContentId(toolContentId);
-	if (wiki == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	wiki.setDefineLater(value);
-	wikiDAO.saveOrUpdate(wiki);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Wiki wiki = wikiDAO.getByContentId(toolContentId);
-	if (wiki == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	wiki.setRunOffline(value);
-	wikiDAO.saveOrUpdate(wiki);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -339,8 +295,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	wiki = Wiki.newInstance(wiki, toolContentId, null);
-	wiki.setToolContentHandler(null);
+	wiki = Wiki.newInstance(wiki, toolContentId);
 	wiki.setWikiSessions(null);
 
 	// Go through each page add page content and remove parent references
@@ -361,13 +316,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	mainPage.setTitle(wiki.getMainPage().getTitle());
 	wiki.setMainPage(mainPage);
 
-	Set<WikiAttachment> atts = wiki.getWikiAttachments();
-	for (WikiAttachment att : atts) {
-	    att.setWiki(null);
-	}
 	try {
-	    exportContentService
-		    .registerFileClassForExport(WikiAttachment.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, wiki, wikiToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -383,9 +332,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(WikiAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(WikiContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, wikiToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Wiki)) {
@@ -566,7 +515,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 
 	Wiki defaultContent = getDefaultContent();
-	Wiki newContent = Wiki.newInstance(defaultContent, newContentID, wikiToolContentHandler);
+	Wiki newContent = Wiki.newInstance(defaultContent, newContentID);
 
 	insertUnsavedWikiContent(newContent);
 
@@ -635,27 +584,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public WikiUser getUserByUID(Long uid) {
 	return wikiUserDAO.getByUID(uid);
-    }
-
-    public WikiAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new WikiException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	WikiAttachment attachment = new WikiAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws WikiException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new WikiException("Exception occured while deleting files from" + " the repository " + e.getMessage());
-	}
     }
 
     /**
@@ -751,11 +679,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wikiPageDAO.saveOrUpdate(wikiPage);
     }
 
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	wikiDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
     public void saveOrUpdateWiki(Wiki wiki) {
 	wikiDAO.saveOrUpdate(wiki);
     }
@@ -807,14 +730,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	saveOrUpdateWikiUser(wikiUser);
 	return wikiUser;
     }
-
-    public IAuditService getAuditService() {
-	return auditService;
-    }
-
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
     
     @Override
     public boolean isGroupedActivity(long toolContentID) {
@@ -824,53 +739,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
-    }
-
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getWikiToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			type);
-	    } catch (InvalidParameterException e) {
-		throw new WikiException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new WikiException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new WikiException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new WikiException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the Wiki Tool and gives it the <code>Ticket</code> to login and access
-     * the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws WikiException {
-	ICredentials credentials = new SimpleCredentials(WikiToolContentHandler.repositoryUser,
-		WikiToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, WikiToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new WikiException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new WikiException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new WikiException("Login failed." + e.getMessage());
-	}
     }
 
     /**
@@ -934,9 +802,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wiki.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	wiki.setLockOnFinished(Boolean.TRUE);
-	wiki.setOfflineInstructions(null);
-	wiki.setOnlineInstructions(null);
-	wiki.setRunOffline(Boolean.FALSE);
 	wiki.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	wiki.setToolContentId(toolContentId);
 	wiki.setUpdateDate(now);
@@ -948,9 +813,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wiki.setMaximumEdits(0);
 	wiki.setMinimumEdits(0);
 
-	// leave as empty, no need to set them to anything.
-	// setWikiAttachments(Set wikiAttachments);
-	// setWikiSessions(Set wikiSessions);
 	wikiDAO.saveOrUpdate(wiki);
     }
 
@@ -973,14 +835,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public IWikiAttachmentDAO getWikiAttachmentDAO() {
-	return wikiAttachmentDAO;
-    }
-
-    public void setWikiAttachmentDAO(IWikiAttachmentDAO attachmentDAO) {
-	wikiAttachmentDAO = attachmentDAO;
-    }
 
     public IWikiDAO getWikiDAO() {
 	return wikiDAO;
@@ -1104,14 +958,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

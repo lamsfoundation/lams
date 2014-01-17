@@ -73,7 +73,6 @@ public class SurveyForm extends ActionForm  {
     	if(!StringUtils.equals(param,"start") && !StringUtils.equals(param,"initPage")){
 	    	survey.setLockWhenFinished(false);
 	    	survey.setDefineLater(false);
-	    	survey.setRunOffline(false);
 	    	survey.setReflectOnActivity(false);
 	    	survey.setShowOnePage(false);
 	    	

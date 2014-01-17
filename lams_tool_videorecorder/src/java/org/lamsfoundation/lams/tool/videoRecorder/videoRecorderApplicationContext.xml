@@ -26,7 +26,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService">
-				<property name="videoRecorderAttachmentDAO"><ref bean="videoRecorderAttachmentDAO"/></property>
 				<property name="videoRecorderSessionDAO"><ref bean="videoRecorderSessionDAO"/></property>
 				<property name="videoRecorderUserDAO"><ref bean="videoRecorderUserDAO"/></property>
 				<property name="videoRecorderDAO"><ref bean="videoRecorderDAO"/></property>
@@ -35,13 +34,11 @@
 				<property name="videoRecorderCommentDAO"><ref bean="videoRecorderCommentDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="videoRecorderToolContentHandler"><ref bean="videoRecorderToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="videoRecorderOutputFactory"><ref bean="videoRecorderOutputFactory"/></property>
-		   		<property name="messageService"><ref bean="videoRecorderMessageService"/></property>  
-		   		<property name="repositoryService"><ref bean="repositoryService" /></property>
+		   		<property name="messageService"><ref bean="videoRecorderMessageService"/></property> 
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -55,10 +52,7 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
-
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
@@ -81,10 +75,6 @@
 	</bean>
 
 	<bean id="videoRecorderRecordingDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderRecordingDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="videoRecorderAttachmentDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 

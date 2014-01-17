@@ -59,7 +59,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     protected String allowTextEntry;
     protected String showResults;
     protected String lockOnFinish;
-    protected String activityRunOffline;
     protected String activityRetries;
     protected String activityTitle;
     protected String activityInstructions;
@@ -614,21 +613,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     }
 
     /**
-     * @return Returns the activityRunOffline.
-     */
-    public String getActivityRunOffline() {
-	return activityRunOffline;
-    }
-
-    /**
-     * @param activityRunOffline
-     *            The activityRunOffline to set.
-     */
-    public void setActivityRunOffline(String activityRunOffline) {
-	this.activityRunOffline = activityRunOffline;
-    }
-
-    /**
      * @return Returns the lockOnFinish.
      */
     public String getLockOnFinish() {
@@ -952,7 +936,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 		.append("activityTitle: ", activityTitle).append("revisitingUser: ", revisitingUser)
 		.append("userEntry: ", userEntry).append("castVoteCount: ", castVoteCount)
 		.append("maxNominationCountReached: ", maxNominationCountReached)
-		.append("activityRunOffline: ", activityRunOffline).append("toolSessionID: ", toolSessionID)
+		.append("toolSessionID: ", toolSessionID)
 		.append("learningMode: ", learningMode).append("toolContentID: ", toolContentID)
 		.append("nominationsSubmited: ", nominationsSubmited).append("toolContentUID: ", toolContentUID)
 		.append("previewOnly: ", previewOnly).append("reportViewOnly: ", reportViewOnly)

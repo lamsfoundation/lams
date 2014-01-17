@@ -85,8 +85,6 @@ public interface VoteAppConstants {
     public static final String CURRENT_SESSION_NAME = "currentSessionName";
     public static final String REVISITED_ALL_NOMINATIONS = "revisitedAllNominations";
 
-    public static final String ATTACHMENT_LIST_KEY = "attachmentListKey";
-    public static final String DELETED_ATTACHMENT_LIST_KEY = "deletedAttachmentListKey";
     public static final String ACTIVITY_TITLE_KEY = "activityTitleKey";
     public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
     public static final String VOTE_GENERAL_MONITORING_DTO = "voteGeneralMonitoringDTO";
@@ -108,12 +106,6 @@ public interface VoteAppConstants {
     public static final String LIST_NOMINATION_CONTENT_DTO = "listNominationContentDTO";
     public static final String LIST_NOMINATION_CONTENT_DTO_KEY = "listNominationContentDTOKey";
 
-    public static final String DEFAULT_ONLINE_INST = "";
-    public static final String DEFAULT_OFFLINE_INST = "";
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
-    public static final String ONLINE_INSTRUCTIONS_KEY = "onlineInstructionsKey";
-    public static final String OFFLINE_INSTRUCTIONS_KEY = "offlineInstructionsKey";
     public static final String TOTAL_NOMINATION_COUNT = "totalNominationCount";
     public static final String MAX_INPUTS = "maxInputs";
 
@@ -142,8 +134,6 @@ public interface VoteAppConstants {
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT = "removeToolContent";
     public static final String OPT_INDEX = "optIndex";
-
-    public static final String RUN_OFFLINE = "runOffline";
     
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
@@ -218,24 +208,10 @@ public interface VoteAppConstants {
     public static final String RICHTEXT_INCORRECT_FEEDBACK = "richTextIncorrectFeedback";
     public static final String RICHTEXT_CORRECT_FEEDBACK = "richTextCorrectFeedback";
     public static final String RICHTEXT_FEEDBACK_INCORRECT = "richTextFeedbackInCorrect";
-    public static final String RICHTEXT_OFFLINEINSTRUCTIONS = "richTextOfflineInstructions";
-    public static final String RICHTEXT_ONLINEINSTRUCTIONS = "richTextOnlineInstructions";
     public static final String RICHTEXT_TITLE = "richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
     public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
-    public static final String SUBMIT_OFFLINE_FILE = "submitOfflineFile";
-    public static final String SUBMIT_ONLINE_FILE = "submitOnlineFile";
-    public static final String LIST_UPLOADED_OFFLINE_FILENAMES = "listUploadedOfflineFileNames";
-    public static final String LIST_UPLOADED_OFFLINE_FILENAMES_KEY = "listUploadedOfflineFileNamesKey";
-    public static final String LIST_UPLOADED_ONLINE_FILENAMES = "listUploadedOnlineFileNames";
-    public static final String LIST_UPLOADED_ONLINE_FILENAMES_KEY = "listUploadedOnlineFileNamesKey";
-    public static final String LIST_OFFLINEFILES_METADATA = "listOfflineFilesMetadata";
-    public static final String LIST_OFFLINEFILES_METADATA_KEY = "listOfflineFilesMetadataKey";
-    public static final String LIST_ONLINEFILES_METADATA = "listOnlineFilesMetadata";
-    public static final String LIST_ONLINEFILES_METADATA_KEY = "listOnlineFilesMetadataKey";
     public static final String LIST_VOTE_ALLSESSIONS_DTO = "listVoteAllSessionsDTO";
-    public static final String ATTACHMENT_LIST = "attachmentList";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 
     public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
     public static final String COUNT_ALL_USERS = "countAllUsers";
@@ -276,7 +252,6 @@ public interface VoteAppConstants {
     public static final String CURRENT_ANSWER = "currentAnswer";
     public static final String REPORT_TITLE_LEARNER = "reportTitleLearner";
 
-    public static final String IS_TOOL_ACTIVITY_OFFLINE = "isToolActivityOffline";
     public static final String IS_CONTENT_IN_USE = "isContentInUse";
     public static final String IS_MONITORED_CONTENT_IN_USE = "isMonitoredContentInUse";
     public static final String IS_ALL_SESSIONS_COMPLETED = "isAllSessionsCompleted";
@@ -343,7 +318,6 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_MODE_REQUIRED = "userExceptionModeRequired";
     public static final String USER_EXCEPTION_CONTENT_IN_USE = "userExceptionContentInUse";
     public static final String USER_EXCEPTION_CONTENT_BEING_MODIFIED = "userExceptionContentBeingModified";
-    public static final String USER_EXCEPTION_CONTENT_RUNOFFLINE = "userExceptionContentRunOffline";
     public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTION_EMPTY = "userExceptionQuestionEmpty";
     public static final String USER_EXCEPTION_ANSWER_EMPTY = "userExceptionAnswerEmpty";
@@ -351,7 +325,6 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_OPTIONS_COUNT_ZERO = "userExceptionOptionsCountZero";
     public static final String USER_EXCEPTION_CHKBOXES_EMPTY = "userExceptionChkboxesEmpty";
     public static final String USER_EXCEPTION_SUBMIT_NONE = "userExceptionSubmitNone";
-    public static final String USER_EXCEPTION_FILENAME_EMPTY = "userExceptionFilenameEmpty";
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100 = "userExceptionWeightMustEqual100";
     public static final String USER_EXCEPTION_SINGLE_OPTION = "userExceptionSingleOption";
     public static final String USER_EXCEPTION_OPTIONS_DUPLICATE = "userExceptionOptionsDuplicate";

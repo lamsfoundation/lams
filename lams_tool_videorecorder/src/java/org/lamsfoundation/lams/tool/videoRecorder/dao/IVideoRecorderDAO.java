@@ -37,8 +37,6 @@ public interface IVideoRecorderDAO extends IBaseDAO {
 
     void saveOrUpdate(VideoRecorder toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 
 }

@@ -44,8 +44,6 @@ public class SurveyConstants {
 
     public static final String DEFINE_LATER = "definelater";
 
-    public static final String RUN_OFFLINE = "runOffline";
-
     public static final String FORWARD_RESULT = "result";
     
     // for submission deadline
@@ -60,8 +58,6 @@ public class SurveyConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
 
     public static final String PARAM_ITEM_INDEX = "itemIndex";
-
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
 
     public static final String PARAM_TITLE = "title";
 
@@ -117,10 +113,6 @@ public class SurveyConstants {
     public static final String ATTR_STATISTIC_LIST = "statistic";
 
     public static final String ATTR_INSTRUCTION_LIST = "instructionList";
-
-    public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
-
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_QUESTION_LIST = "questionList";
 

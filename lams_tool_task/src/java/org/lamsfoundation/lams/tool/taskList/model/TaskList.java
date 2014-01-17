@@ -23,21 +23,15 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.taskList.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 
 /**
  * The main entity class of TaskList tool. Contains all the data related to the whole tool.
@@ -65,17 +59,10 @@ public class TaskList implements Cloneable{
 	private boolean allowContributeTasks;
 	private boolean monitorVerificationRequired;
 
-	private boolean runOffline;
 	private boolean defineLater;
 	private boolean contentInUse;
-	
-	// LDEV-2657
 	private Date submissionDeadline;
 	
-	//instructions
-	private String onlineInstructions;
-	private String offlineInstructions;
-	private Set attachments;
 	//conditions
 	private Set conditions;
 	
@@ -91,17 +78,12 @@ public class TaskList implements Cloneable{
 	private String reflectInstructions;
 	
 	//*************** NON Persist Fields ********************
-	private IToolContentHandler toolContentHandler;
-
-	private List<TaskListAttachment> onlineFileList;
-	private List<TaskListAttachment> offlineFileList;
 	private String minimumNumberTasksErrorStr; 
 	
 	/**
 	 * Default contructor. 
 	 */
   	public TaskList(){
-  		attachments = new HashSet();
   		conditions = new HashSet();
   		taskListItems = new HashSet();
   	}
@@ -110,9 +92,8 @@ public class TaskList implements Cloneable{
   	//		Function method for TaskList
   	//  **********************************************************
   	
-	public static TaskList newInstance(TaskList defaultContent, Long contentId, TaskListToolContentHandler taskListToolContentHandler) {
+	public static TaskList newInstance(TaskList defaultContent, Long contentId) {
 		TaskList toContent = new TaskList();
-		defaultContent.toolContentHandler = taskListToolContentHandler;
 		toContent = (TaskList) defaultContent.clone();
 		toContent.setContentId(contentId);
 		
@@ -145,20 +126,6 @@ public class TaskList implements Cloneable{
 					set.add(newItem);
   				}
   				taskList.taskListItems = set;
-  			}
-  			
-  			//clone attachment
-  			if(attachments != null){
-  				Iterator iter = attachments.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					TaskListAttachment file = (TaskListAttachment)iter.next(); 
-  					TaskListAttachment newFile = (TaskListAttachment) file.clone();
-  					//just clone old file without duplicate it in repository
-  					
-					set.add(newFile);
-  				}
-  				taskList.attachments = set;
   			}
   			
   			//clone conditions
@@ -219,8 +186,6 @@ public class TaskList implements Cloneable{
       	.append(this.uid,genericEntity.uid)
       	.append(this.title,genericEntity.title)
       	.append(this.instructions,genericEntity.instructions)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
       	.append(this.created,genericEntity.created)
       	.append(this.updated,genericEntity.updated)
       	.append(this.createdBy,genericEntity.createdBy)
@@ -229,8 +194,7 @@ public class TaskList implements Cloneable{
 
 	public int hashCode() {
 		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created)
+		.append(instructions).append(created)
 		.append(updated).append(createdBy)
 		.toHashCode();
 	}
@@ -245,23 +209,6 @@ public class TaskList implements Cloneable{
 			this.setCreated (new Date(now));
 		}
 		this.setUpdated(new Date(now));
-	}
-
-	/**
-	 * Method to support exporting.
-	 */
-	public void toDTO(){
-		onlineFileList = new ArrayList<TaskListAttachment>();
-		offlineFileList = new ArrayList<TaskListAttachment>();
-		Set<TaskListAttachment> fileSet = this.getAttachments();
-		if(fileSet != null){
-			for(TaskListAttachment file:fileSet){
-				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-					offlineFileList.add(file);
-				else
-					onlineFileList.add(file);
-			}
-		}
 	}
 	
 	//**********************************************************
@@ -366,26 +313,6 @@ public class TaskList implements Cloneable{
 		this.title = title;
 	}
 
-	/**
-	 *  Returns either the tasklist should run offline.
-	 * 
-	 * @return runOffline flag
-	 *
-	 * @hibernate.property 
-	 * 		column="run_offline"
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
-	/**
-	 * Sets if the tasklist should run offline.
-	 * 
-	 * @param runOffline The forceOffLine to set.
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		this.runOffline = forceOffline;
-	}
-
     /**
      * Returns tasklist instructions set by teacher.
      * 
@@ -406,73 +333,6 @@ public class TaskList implements Cloneable{
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
-
-    /**
-     * Returns tasklist onlineInstructions set by teacher.
-     * 
-     * @return tasklist onlineInstructions set by teacher
-     *
-     * @hibernate.property
-     * 		column="online_instructions"
-     *      type="text"
-     */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
-    }
-    /**
-     * Sets tasklist instructions. Usually done by teacher.
-     * 
-     * @param onlineInstructions tasklist onlineInstructions
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * Returns tasklist offlineInstructions set by teacher.
-     * 
-     * @return tasklist offlineInstructions set by teacher
-     *
-     * @hibernate.property
-     * 		column="offline_instructions"
-     *      type="text"
-     */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-    /**
-     * Sets tasklist offlineInstructions. Usually done by teacher.
-     * 
-     * @param instructions tasklist offlineInstructions
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
-    }
-
-	/**
-	 * Returns a set of Attachments belong to this tasklist.
-     *
-     * @return a set of Attachments belong to this tasklist.
-     *
-     * @hibernate.set   lazy="true"
-     * 					cascade="all"
-     * 					inverse="false"
-     * 					order-by="create_date desc"
-     * @hibernate.collection-key column="taskList_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment"
-     */
-	public Set getAttachments() {
-		return attachments;
-	}
-    /**
-     * Sets a set of Attachments belong to this tasklist
-     * 
-     * @param attachments The attachments to set
-     */
-    public void setAttachments(Set attachments) {
-		this.attachments = attachments;
-	}
     
 	/**
 	 * Returns a set of conditions belong to this tasklist.
@@ -707,28 +567,6 @@ public class TaskList implements Cloneable{
 	
 	public void setSubmissionDeadline(Date submissionDeadline) {
 		this.submissionDeadline = submissionDeadline;
-	}
-
-	/**
-	 * For display use
-	 * @return
-	 */
-	public List<TaskListAttachment> getOfflineFileList() {
-		return offlineFileList;
-	}
-	public void setOfflineFileList(List<TaskListAttachment> offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-	
-	public List<TaskListAttachment> getOnlineFileList() {
-		return onlineFileList;
-	}
-	public void setOnlineFileList(List<TaskListAttachment> onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
-	
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 	
 	/**

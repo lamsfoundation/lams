@@ -64,9 +64,6 @@ public class VoteContent implements Serializable {
     private boolean defineLater;
 
     /** nullable persistent field */
-    private boolean runOffline;
-
-    /** nullable persistent field */
     private Date creationDate;
 
     /** nullable persistent field */
@@ -91,12 +88,6 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private boolean contentInUse;
 
-    /** nullable persistent field */
-    private String offlineInstructions;
-
-    /** nullable persistent field */
-    private String onlineInstructions;
-
     private boolean showResults;
 
     /** persistent field */
@@ -104,9 +95,6 @@ public class VoteContent implements Serializable {
 
     /** persistent field */
     private Set voteSessions;
-
-    /** persistent field */
-    private Set voteAttachments;
     
     private Date submissionDeadline;
 
@@ -123,17 +111,15 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
-	    boolean runOffline, Date creationDate, Date updateDate, boolean allowText,
-	    boolean useSelectLeaderToolOuput, boolean reflect, String reflectionSubject, String maxNominationCount,
-	    String minNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse,
-	    String offlineInstructions, String onlineInstructions, boolean showResults, Short maxExternalInputs,
-	    Short externalInputsAdded, Set voteQueContents, Set voteSessions, Set voteAttachments) {
+	    Date creationDate, Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
+	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
+	    boolean lockOnFinish, boolean contentInUse, boolean showResults, Short maxExternalInputs,
+	    Short externalInputsAdded, Set voteQueContents, Set voteSessions) {
 	this.voteContentId = voteContentId;
 	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.defineLater = defineLater;
-	this.runOffline = runOffline;
 	this.creationDate = creationDate;
 	this.updateDate = updateDate;
 	this.maxNominationCount = maxNominationCount;
@@ -145,12 +131,9 @@ public class VoteContent implements Serializable {
 	this.createdBy = createdBy;
 	this.lockOnFinish = lockOnFinish;
 	this.contentInUse = contentInUse;
-	this.offlineInstructions = offlineInstructions;
-	this.onlineInstructions = onlineInstructions;
 	this.showResults = showResults;
 	this.voteQueContents = voteQueContents;
 	this.voteSessions = voteSessions;
-	this.voteAttachments = voteAttachments;
 	this.maxExternalInputs = maxExternalInputs;
 	this.externalInputsAdded = externalInputsAdded;
     }
@@ -180,15 +163,13 @@ public class VoteContent implements Serializable {
      */
     public static VoteContent newInstance(IToolContentHandler toolContentHandler, VoteContent vote, Long newContentId)
 	    throws ItemNotFoundException, RepositoryCheckedException {
-	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(), vote
-		.getInstructions(), vote.isDefineLater(), vote.isRunOffline(), vote.getCreationDate(), vote
-		.getUpdateDate(), vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(), vote
-		.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
-		vote.isContentInUse(), vote.getOfflineInstructions(), vote.getOnlineInstructions(), vote
-			.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
-		new TreeSet(), new TreeSet());
+	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(),
+		vote.getInstructions(), vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(),
+		vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
+		vote.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
+		vote.isContentInUse(), vote.isShowResults(), vote.getMaxExternalInputs(),
+		vote.getExternalInputsAdded(), new TreeSet(), new TreeSet());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
-	newContent.setVoteAttachments(vote.deepCopyMcAttachments(toolContentHandler, newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
 
 	return newContent;
@@ -209,26 +190,6 @@ public class VoteContent implements Serializable {
 		int displayOrder = queContent.getDisplayOrder();
 		VoteQueContent mcQueContent = VoteQueContent.newInstance(queContent, displayOrder, newMcContent);
 		newMcQueContent.add(mcQueContent);
-	    }
-	}
-	return newMcQueContent;
-    }
-
-    /**
-     * gets called as part of the copyToolContent
-     * 
-     * @param newMcContent
-     * @return Set
-     */
-    public Set deepCopyMcAttachments(IToolContentHandler toolContentHandler, VoteContent newMcContent)
-	    throws ItemNotFoundException, RepositoryCheckedException {
-	Set newMcQueContent = new TreeSet();
-	for (Iterator i = this.getVoteAttachments().iterator(); i.hasNext();) {
-	    VoteUploadedFile mcUploadedFile = (VoteUploadedFile) i.next();
-	    if (mcUploadedFile.getVoteContent() != null) {
-		VoteUploadedFile newMcUploadedFile = VoteUploadedFile.newInstance(toolContentHandler, mcUploadedFile,
-			newMcContent);
-		newMcQueContent.add(newMcUploadedFile);
 	    }
 	}
 	return newMcQueContent;
@@ -266,14 +227,6 @@ public class VoteContent implements Serializable {
 	this.defineLater = defineLater;
     }
 
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
     public Date getUpdateDate() {
 	return updateDate;
     }
@@ -296,22 +249,6 @@ public class VoteContent implements Serializable {
 
     public void setContentInUse(boolean contentInUse) {
 	this.contentInUse = contentInUse;
-    }
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
     }
 
     /**
@@ -354,25 +291,6 @@ public class VoteContent implements Serializable {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
-    }
-
-    /**
-     * @return Returns the voteAttachments.
-     */
-    public Set getVoteAttachments() {
-	if (voteAttachments == null) {
-	    voteAttachments = new TreeSet();
-	}
-
-	return voteAttachments;
-    }
-
-    /**
-     * @param voteAttachments
-     *            The voteAttachments to set.
-     */
-    public void setVoteAttachments(Set voteAttachments) {
-	this.voteAttachments = voteAttachments;
     }
 
     /**

@@ -113,29 +113,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		return FILENAME;
 	}
-
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-    		if (videoRecorderService == null) {
-    			videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServletContext());
-    		}
-
-        	VideoRecorder content = null;
-            if ( toolContentID != null ) {
-            	content = videoRecorderService.getVideoRecorderByContentId(toolContentID);
-            } else {
-            	VideoRecorderSession session=videoRecorderService.getSessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		content = session.getVideoRecorder();
-            }
-            if ( content != null ) {
-            	activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
-	}
 	
 	private void doLearnerExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)

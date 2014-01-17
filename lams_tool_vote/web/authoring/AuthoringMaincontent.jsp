@@ -32,7 +32,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		Set tabs = new LinkedHashSet();
 		tabs.add("label.basic");
 		tabs.add("label.advanced");
-		tabs.add("label.instructions");
 		pageContext.setAttribute("tabs", tabs);
 		
 		Set tabsBasic = new LinkedHashSet();
@@ -198,10 +197,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
 			<!-- end of content (Advanced) -->
-			
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
-			<!-- end of content (Instructions) -->
 
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
 			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 

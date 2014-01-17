@@ -37,6 +37,4 @@ public interface IWikiDAO extends IBaseDAO {
 
     void saveOrUpdate(Wiki toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
 }

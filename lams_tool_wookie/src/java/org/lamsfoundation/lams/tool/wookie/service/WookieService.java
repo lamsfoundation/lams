@@ -29,16 +29,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -70,14 +65,12 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.wookie.dao.IWookieAttachmentDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieConfigItemDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieSessionDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieUserDAO;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
-import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
 import org.lamsfoundation.lams.tool.wookie.model.WookieConfigItem;
 import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
@@ -91,13 +84,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * An implementation of the IWookieService interface.
@@ -117,17 +103,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	private IWookieUserDAO wookieUserDAO = null;
 
-	private IWookieAttachmentDAO wookieAttachmentDAO = null;
-
 	private ILearnerService learnerService;
 
 	private ILamsToolService toolService;
 
 	private IToolContentHandler wookieToolContentHandler = null;
-
-	private IRepositoryService repositoryService = null;
-
-	private IAuditService auditService = null;
 
 	private IExportToolContentService exportContentService;
 
@@ -283,8 +263,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 			// create the fromContent using the default tool content
 			fromContent = getDefaultContent();
 		}
-		Wookie toContent = Wookie.newInstance(fromContent, toContentId,
-				wookieToolContentHandler);
+		Wookie toContent = Wookie.newInstance(fromContent, toContentId);
 
 		// Clone the wookie widget on the external server
 		String wookieUrl = getWookieURL();
@@ -359,28 +338,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	}
 
-	public void setAsDefineLater(Long toolContentId, boolean value)
-			throws DataMissingException, ToolException {
-		Wookie wookie = wookieDAO.getByContentId(toolContentId);
-		if (wookie == null) {
-			throw new ToolException("Could not find tool with toolContentID: "
-					+ toolContentId);
-		}
-		wookie.setDefineLater(value);
-		wookieDAO.saveOrUpdate(wookie);
-	}
-
-	public void setAsRunOffline(Long toolContentId, boolean value)
-			throws DataMissingException, ToolException {
-		Wookie wookie = wookieDAO.getByContentId(toolContentId);
-		if (wookie == null) {
-			throw new ToolException("Could not find tool with toolContentID: "
-					+ toolContentId);
-		}
-		wookie.setRunOffline(value);
-		wookieDAO.saveOrUpdate(wookie);
-	}
-
 	public void removeToolContent(Long toolContentId, boolean removeSessionData)
 			throws SessionDataExistsException, ToolException {
 		// TODO Auto-generated method stub
@@ -409,18 +366,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 		// set ResourceToolContentHandler as null to avoid copy file node in
 		// repository again.
-		wookie = Wookie.newInstance(wookie, toolContentId, null);
-		wookie.setToolContentHandler(null);
+		wookie = Wookie.newInstance(wookie, toolContentId);
 		wookie.setWookieSessions(null);
 
-		Set<WookieAttachment> atts = wookie.getWookieAttachments();
-		for (WookieAttachment att : atts) {
-			att.setWookie(null);
-		}
 		try {
-			exportContentService.registerFileClassForExport(
-					WookieAttachment.class.getName(), "fileUuid",
-					"fileVersionId");
 			exportContentService.exportToolContent(toolContentId, wookie,
 					wookieToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
@@ -439,10 +388,9 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 			String toolContentPath, String fromVersion, String toVersion)
 			throws ToolException {
 		try {
-			exportContentService.registerFileClassForImport(
-					WookieAttachment.class.getName(), "fileUuid",
-					"fileVersionId", "fileName", "fileType", null, null);
-
+		    // register version filter class
+		    exportContentService.registerImportVersionFilterClass(WookieContentVersionFilter.class);
+		
 			Object toolPOJO = exportContentService.importToolContent(
 					toolContentPath, wookieToolContentHandler, fromVersion,
 					toVersion);
@@ -592,8 +540,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		Wookie defaultContent = getDefaultContent();
 		// create new wookie using the newContentID
 		Wookie newContent = new Wookie();
-		newContent = Wookie.newInstance(defaultContent, newContentID,
-				wookieToolContentHandler);
+		newContent = Wookie.newInstance(defaultContent, newContentID);
 		wookieDAO.saveOrUpdate(newContent);
 		return newContent;
 	}
@@ -634,38 +581,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		return wookieUserDAO.getByUID(uid);
 	}
 
-	public WookieAttachment uploadFileToContent(Long toolContentId,
-			FormFile file, String type) {
-		if (file == null || StringUtils.isEmpty(file.getFileName())) {
-			throw new WookieException("Could not find upload file: " + file);
-		}
-
-		NodeKey nodeKey = processFile(file, type);
-
-		WookieAttachment attachment = new WookieAttachment(
-				nodeKey.getVersion(), type, file.getFileName(), nodeKey
-						.getUuid(), new Date());
-		return attachment;
-	}
-
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws WookieException {
-		ITicket ticket = getRepositoryLoginTicket();
-		try {
-			repositoryService.deleteVersion(ticket, uuid, versionID);
-		} catch (Exception e) {
-			throw new WookieException(
-					"Exception occured while deleting files from"
-							+ " the repository " + e.getMessage());
-		}
-	}
-
-	public void deleteInstructionFile(Long contentID, Long uuid,
-			Long versionID, String type) {
-		wookieDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-	}
-
 	public void saveOrUpdateWookie(Wookie wookie) {
 		wookieDAO.saveOrUpdate(wookie);
 	}
@@ -682,72 +597,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		WookieUser wookieUser = new WookieUser(user, wookieSession);
 		saveOrUpdateWookieUser(wookieUser);
 		return wookieUser;
-	}
-
-	public IAuditService getAuditService() {
-		return auditService;
-	}
-
-	public void setAuditService(IAuditService auditService) {
-		this.auditService = auditService;
-	}
-
-	private NodeKey processFile(FormFile file, String type) {
-		NodeKey node = null;
-		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-			String fileName = file.getFileName();
-			try {
-				node = getWookieToolContentHandler().uploadFile(
-						file.getInputStream(), fileName, file.getContentType(),
-						type);
-			} catch (InvalidParameterException e) {
-				throw new WookieException(
-						"InvalidParameterException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new WookieException(
-						"FileNotFoundException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (RepositoryCheckedException e) {
-				throw new WookieException(
-						"RepositoryCheckedException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (IOException e) {
-				throw new WookieException(
-						"IOException occured while trying to upload File"
-								+ e.getMessage());
-			}
-		}
-		return node;
-	}
-
-	/**
-	 * This method verifies the credentials of the SubmitFiles Tool and gives it
-	 * the <code>Ticket</code> to login and access the Content Repository.
-	 * 
-	 * A valid ticket is needed in order to access the content from the
-	 * repository. This method would be called evertime the tool needs to
-	 * upload/download files from the content repository.
-	 * 
-	 * @return ITicket The ticket for repostory access
-	 * @throws SubmitFilesException
-	 */
-	private ITicket getRepositoryLoginTicket() throws WookieException {
-		ICredentials credentials = new SimpleCredentials(
-				WookieToolContentHandler.repositoryUser,
-				WookieToolContentHandler.repositoryId);
-		try {
-			ITicket ticket = repositoryService.login(credentials,
-					WookieToolContentHandler.repositoryWorkspaceName);
-			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new WookieException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new WookieException("Workspace not found." + we.getMessage());
-		} catch (LoginException e) {
-			throw new WookieException("Login failed." + e.getMessage());
-		}
 	}
 
 	public WookieConfigItem getConfigItem(String key) {
@@ -802,9 +651,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		wookie.setInstructions(WebUtil.convertNewlines((String) importValues
 				.get(ToolContentImport102Manager.CONTENT_BODY)));
 		wookie.setLockOnFinished(Boolean.TRUE);
-		wookie.setOfflineInstructions(null);
-		wookie.setOnlineInstructions(null);
-		wookie.setRunOffline(Boolean.FALSE);
 		wookie.setTitle((String) importValues
 				.get(ToolContentImport102Manager.CONTENT_TITLE));
 		wookie.setToolContentId(toolContentId);
@@ -835,14 +681,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	// =========================================================================================
 	/* ********** Used by Spring to "inject" the linked objects ************* */
-
-	public IWookieAttachmentDAO getWookieAttachmentDAO() {
-		return wookieAttachmentDAO;
-	}
-
-	public void setWookieAttachmentDAO(IWookieAttachmentDAO attachmentDAO) {
-		wookieAttachmentDAO = attachmentDAO;
-	}
 
 	public IWookieDAO getWookieDAO() {
 		return wookieDAO;
@@ -924,14 +762,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	public void setWookieConfigItemDAO(IWookieConfigItemDAO wookieConfigItemDAO) {
 		this.wookieConfigItemDAO = wookieConfigItemDAO;
-	}
-
-	public IRepositoryService getRepositoryService() {
-		return repositoryService;
-	}
-
-	public void setRepositoryService(IRepositoryService repositoryService) {
-		this.repositoryService = repositoryService;
 	}
 
 	public MessageService getMessageService() {

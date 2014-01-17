@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.wookie.service;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
-import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
 import org.lamsfoundation.lams.tool.wookie.model.WookieConfigItem;
 import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
@@ -64,28 +63,6 @@ public interface IWookieService {
      * @return
      */
     public Wookie getWookieByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public WookieAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws WookieException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param wookie

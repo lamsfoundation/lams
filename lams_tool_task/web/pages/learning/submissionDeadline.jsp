@@ -11,7 +11,7 @@
 	<!--
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
+			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
 		function continueReflect(){
@@ -24,53 +24,39 @@
 
 <body class="stripes">
 	<div id="content">
-
 		<h1>
 			${sessionMap.title}
 		</h1>
-		
-		<c:choose>
-			<c:when test="${empty sessionMap.submissionDeadline}">
-				<p>
-					<fmt:message key="run.offline.message" />
-				</p>			
-			</c:when>
-			<c:otherwise>
-				<div class="warning">
-					<fmt:message key="authoring.info.teacher.set.restriction" >
-						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
-					</fmt:message>
-				</div>
-			</c:otherwise>
-		</c:choose>
 
+		<div class="warning">
+			<fmt:message key="authoring.info.teacher.set.restriction" >
+				<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+			</fmt:message>
+		</div>	
+		
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>
-					${sessionMap.reflectInstructions}
-				</h2>
-
+				<h2>${sessionMap.reflectInstructions}</h2>
+			
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
+							<em>
+								<fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
 					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
+						<p> <lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />  </p>				
 					</c:otherwise>
 				</c:choose>
-
-				<html:button property="ContinueButton"
+				
+				<html:button property="FinishButton"
 					onclick="return continueReflect()" styleClass="button">
 					<fmt:message key="label.edit" />
-				</html:button>
+				</html:button>											
 			</div>
 		</c:if>
-
 
 		<div class="space-bottom-top align-right">
 			<c:choose>
@@ -86,19 +72,22 @@
 						onclick="return finishSession()" styleClass="button">
 						<span class="nextActivity">
 							<c:choose>
-			 					<c:when test="${sessionMap.activityPosition.last}">
-			 						<fmt:message key="label.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="label.finished" />
-			 					</c:otherwise>
-			 				</c:choose>
-			 			</span>
+								<c:when test="${sessionMap.activityPosition.last}">
+									<fmt:message key="label.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="label.finished" />
+								</c:otherwise>
+							</c:choose>
+						</span>
 					</html:link>
 				</c:otherwise>
 			</c:choose>
 		</div>
 	</div>
+	<div id="footer">
+	</div>
 	<!--closes footer-->
+
 </body>
 </lams:html>

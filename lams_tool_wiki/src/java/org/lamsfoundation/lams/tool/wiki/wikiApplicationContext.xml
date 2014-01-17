@@ -16,7 +16,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.wiki.service.WikiService">
-				<property name="wikiAttachmentDAO"><ref bean="wikiAttachmentDAO"/></property>
 				<property name="wikiSessionDAO"><ref bean="wikiSessionDAO"/></property>
 				<property name="wikiUserDAO"><ref bean="wikiUserDAO"/></property>
 				<property name="wikiDAO"><ref bean="wikiDAO"/></property>
@@ -24,14 +23,12 @@
 				<property name="wikiPageContentDAO"><ref bean="wikiPageContentDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="wikiToolContentHandler"><ref bean="wikiToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 		   		<property name="messageService"><ref bean="wikiMessageService"/></property>
-		   		<property name="lessonService"><ref bean="lessonService"/></property> 
-		   		<property name="repositoryService"><ref bean="repositoryService"/></property> 
+		   		<property name="lessonService"><ref bean="lessonService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -45,8 +42,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
@@ -75,10 +70,6 @@
 	</bean>
 	
 	<bean id="wikiUserDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="wikiAttachmentDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

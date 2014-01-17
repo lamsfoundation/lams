@@ -26,18 +26,12 @@
 package org.lamsfoundation.lams.tool.videoRecorder.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;

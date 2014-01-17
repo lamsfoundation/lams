@@ -72,12 +72,6 @@ public class VoteGeneralMonitoringDTO implements Comparable
 	protected List listUserEntries;
 	protected String selectedToolSessionId;
 	
-	protected String richTextOnlineInstructions;
-	protected String richTextOfflineInstructions;
-	protected List listOfflineFilesMetadata;
-	protected List listUploadedOfflineFileNames;
-	protected List listOnlineFilesMetadata;
-	protected List listUploadedOnlineFileNames;
 	protected String showOpenVotesSection;
 	
 	protected List listVoteAllSessionsDTO;
@@ -93,89 +87,8 @@ public class VoteGeneralMonitoringDTO implements Comparable
     protected String completedSessionUserPercent;
     protected List mapStudentsVoted;
     
-    protected String onlineInstructions;
-    protected String offlineInstructions;
-    protected List attachmentList;
-    protected List deletedAttachmentList;
-    
     protected String contentFolderID;
 
-
-    
-    /**
-     * @return Returns the listOfflineFilesMetadata.
-     */
-    public List getListOfflineFilesMetadata() {
-        return listOfflineFilesMetadata;
-    }
-    /**
-     * @param listOfflineFilesMetadata The listOfflineFilesMetadata to set.
-     */
-    public void setListOfflineFilesMetadata(List listOfflineFilesMetadata) {
-        this.listOfflineFilesMetadata = listOfflineFilesMetadata;
-    }
-    /**
-     * @return Returns the listOnlineFilesMetadata.
-     */
-    public List getListOnlineFilesMetadata() {
-        return listOnlineFilesMetadata;
-    }
-    /**
-     * @param listOnlineFilesMetadata The listOnlineFilesMetadata to set.
-     */
-    public void setListOnlineFilesMetadata(List listOnlineFilesMetadata) {
-        this.listOnlineFilesMetadata = listOnlineFilesMetadata;
-    }
-    /**
-     * @return Returns the listUploadedOfflineFileNames.
-     */
-    public List getListUploadedOfflineFileNames() {
-        return listUploadedOfflineFileNames;
-    }
-    /**
-     * @param listUploadedOfflineFileNames The listUploadedOfflineFileNames to set.
-     */
-    public void setListUploadedOfflineFileNames(
-            List listUploadedOfflineFileNames) {
-        this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
-    }
-    /**
-     * @return Returns the listUploadedOnlineFileNames.
-     */
-    public List getListUploadedOnlineFileNames() {
-        return listUploadedOnlineFileNames;
-    }
-    /**
-     * @param listUploadedOnlineFileNames The listUploadedOnlineFileNames to set.
-     */
-    public void setListUploadedOnlineFileNames(List listUploadedOnlineFileNames) {
-        this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
-    }
-    /**
-     * @return Returns the richTextOfflineInstructions.
-     */
-    public String getRichTextOfflineInstructions() {
-        return richTextOfflineInstructions;
-    }
-    /**
-     * @param richTextOfflineInstructions The richTextOfflineInstructions to set.
-     */
-    public void setRichTextOfflineInstructions(
-            String richTextOfflineInstructions) {
-        this.richTextOfflineInstructions = richTextOfflineInstructions;
-    }
-    /**
-     * @return Returns the richTextOnlineInstructions.
-     */
-    public String getRichTextOnlineInstructions() {
-        return richTextOnlineInstructions;
-    }
-    /**
-     * @param richTextOnlineInstructions The richTextOnlineInstructions to set.
-     */
-    public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-        this.richTextOnlineInstructions = richTextOnlineInstructions;
-    }
     /**
      * @return Returns the userExceptionContentDoesNotExist.
      */
@@ -714,7 +627,6 @@ public class VoteGeneralMonitoringDTO implements Comparable
             .append("isToolSessionChanged: ", isToolSessionChanged)
             .append("currentTab: ", currentTab)
             .append("sbmtSuccess: ", sbmtSuccess)
-            .append("defineLaterInEditMode: ", defineLaterInEditMode)
             .append("requestLearningReport: ", requestLearningReport)
             .append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
             .append("userExceptionContentDoesNotExist: ", userExceptionContentDoesNotExist)
@@ -736,12 +648,6 @@ public class VoteGeneralMonitoringDTO implements Comparable
             .append("existsOpenVotes: ", existsOpenVotes)
             .append("selectedToolSessionId: ", selectedToolSessionId)
             .append("listVoteAllSessionsDTO: ", listVoteAllSessionsDTO)
-			.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
-			.append("richTextOfflineInstructions: ", richTextOfflineInstructions)
-			.append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
-			.append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)
-			.append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
-			.append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
 			.append("showOpenVotesSection: ", showOpenVotesSection)
 			.append("mapStudentsVoted: ", mapStudentsVoted)
 			.append("responseId: ", responseId)
@@ -774,44 +680,6 @@ public class VoteGeneralMonitoringDTO implements Comparable
     public void setMonitoredContentInUse(String monitoredContentInUse) {
         this.monitoredContentInUse = monitoredContentInUse;
     }
-    
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-    /**
-     * @param offlineInstructions The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
-    }
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
-    }
-    /**
-     * @param onlineInstructions The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
-    }
-    
-    /**
-     * @return Returns the attachmentList.
-     */
-    public List getAttachmentList() {
-        return attachmentList;
-    }
-    /**
-     * @param attachmentList The attachmentList to set.
-     */
-    public void setAttachmentList(List attachmentList) {
-        this.attachmentList = attachmentList;
-    }
     /**
      * @return Returns the contentFolderID.
      */
@@ -823,17 +691,5 @@ public class VoteGeneralMonitoringDTO implements Comparable
      */
     public void setContentFolderID(String contentFolderID) {
         this.contentFolderID = contentFolderID;
-    }
-    /**
-     * @return Returns the deletedAttachmentList.
-     */
-    public List getDeletedAttachmentList() {
-        return deletedAttachmentList;
-    }
-    /**
-     * @param deletedAttachmentList The deletedAttachmentList to set.
-     */
-    public void setDeletedAttachmentList(List deletedAttachmentList) {
-        this.deletedAttachmentList = deletedAttachmentList;
     }
 }

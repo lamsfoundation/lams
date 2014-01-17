@@ -72,7 +72,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm"
  * @struts.action-forward name="videoRecorder" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
 public class LearningAction extends LamsDispatchAction {
@@ -169,11 +168,6 @@ public class LearningAction extends LamsDispatchAction {
 		
         	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
         		.getServletContext());
-
-		// check runOffline
-		if (videoRecorder.isRunOffline()) {
-			return mapping.findForward("runOffline");
-		}
 		
 		// get any existing videoRecorder entry
 		

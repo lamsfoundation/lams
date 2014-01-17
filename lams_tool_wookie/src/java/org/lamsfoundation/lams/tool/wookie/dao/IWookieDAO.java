@@ -37,8 +37,6 @@ public interface IWookieDAO extends IBaseDAO {
 
     void saveOrUpdate(Wookie toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 
 }

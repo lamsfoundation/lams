@@ -23,19 +23,10 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.model;  
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
  
 /**
  * The main entity class of TaskList tool. Contains all the data related to the whole tool.

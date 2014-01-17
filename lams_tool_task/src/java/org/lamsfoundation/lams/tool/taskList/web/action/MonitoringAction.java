@@ -25,8 +25,8 @@
 package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -43,21 +43,19 @@ import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -103,7 +101,6 @@ public class MonitoringAction extends Action {
 
 		ITaskListService service = getTaskListService();
 		TaskList taskList = service.getTaskListByContentId(contentId);
-		taskList.toDTO();
 		
 		List<Summary> summaryList = service.getSummary(contentId);
 		

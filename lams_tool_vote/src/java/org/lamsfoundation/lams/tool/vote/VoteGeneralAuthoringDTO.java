@@ -48,16 +48,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     protected String activityInstructions;
     protected int maxOptionIndex;
     protected String defaultOptionContent;
-    protected String richTextOfflineInstructions;
-    protected String richTextOnlineInstructions;
-
-    protected List listUploadedOfflineFileNames;
-    protected List listUploadedOnlineFileNames;
-    protected List listOfflineFilesMetadata;
-    protected List listOnlineFilesMetadata;
-
-    protected String onlineInstructions;
-    protected String offlineInstructions;
 
     protected String useSelectLeaderToolOuput;
     protected String allowText;
@@ -151,30 +141,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public String getActiveModule() {
 	return activeModule;
-    }
-
-    /**
-     * @param listOfflineFilesMetadata
-     *            The listOfflineFilesMetadata to set.
-     */
-    public void setListOfflineFilesMetadata(List listOfflineFilesMetadata) {
-	this.listOfflineFilesMetadata = listOfflineFilesMetadata;
-    }
-
-    /**
-     * @param listOnlineFilesMetadata
-     *            The listOnlineFilesMetadata to set.
-     */
-    public void setListOnlineFilesMetadata(List listOnlineFilesMetadata) {
-	this.listOnlineFilesMetadata = listOnlineFilesMetadata;
-    }
-
-    /**
-     * @param listUploadedOnlineFileNames
-     *            The listUploadedOnlineFileNames to set.
-     */
-    public void setListUploadedOnlineFileNames(List listUploadedOnlineFileNames) {
-	this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
     }
 
     /**
@@ -321,21 +287,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the listUploadedOfflineFileNames.
-     */
-    public List getListUploadedOfflineFileNames() {
-	return listUploadedOfflineFileNames;
-    }
-
-    /**
-     * @param listUploadedOfflineFileNames
-     *            The listUploadedOfflineFileNames to set.
-     */
-    public void setListUploadedOfflineFileNames(List listUploadedOfflineFileNames) {
-	this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
-    }
-
-    /**
      * @return Returns the maxOptionIndex.
      */
     public int getMaxOptionIndex() {
@@ -348,36 +299,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setMaxOptionIndex(int maxOptionIndex) {
 	this.maxOptionIndex = maxOptionIndex;
-    }
-
-    /**
-     * @return Returns the richTextOfflineInstructions.
-     */
-    public String getRichTextOfflineInstructions() {
-	return richTextOfflineInstructions;
-    }
-
-    /**
-     * @param richTextOfflineInstructions
-     *            The richTextOfflineInstructions to set.
-     */
-    public void setRichTextOfflineInstructions(String richTextOfflineInstructions) {
-	this.richTextOfflineInstructions = richTextOfflineInstructions;
-    }
-
-    /**
-     * @return Returns the richTextOnlineInstructions.
-     */
-    public String getRichTextOnlineInstructions() {
-	return richTextOnlineInstructions;
-    }
-
-    /**
-     * @param richTextOnlineInstructions
-     *            The richTextOnlineInstructions to set.
-     */
-    public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-	this.richTextOnlineInstructions = richTextOnlineInstructions;
     }
 
     /**
@@ -423,57 +344,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
-    }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *            The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *            The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the listOfflineFilesMetadata.
-     */
-    public List getListOfflineFilesMetadata() {
-	return listOfflineFilesMetadata;
-    }
-
-    /**
-     * @return Returns the listOnlineFilesMetadata.
-     */
-    public List getListOnlineFilesMetadata() {
-	return listOnlineFilesMetadata;
-    }
-
-    /**
-     * @return Returns the listUploadedOnlineFileNames.
-     */
-    public List getListUploadedOnlineFileNames() {
-	return listUploadedOnlineFileNames;
     }
     
     /**
@@ -638,25 +508,17 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     public String toString() {
 	return new ToStringBuilder(this).append("activeModule: ", activeModule)
 		.append("contentFolderID: ", contentFolderID).append("editableQuestionText: ", editableQuestionText)
-		.append("defineLaterInEditMode: ", defineLaterInEditMode)
 		.append("reflectionSubject: ", reflectionSubject).append("submissionAttempt: ", submissionAttempt)
 		.append("mapNominationContent: ", mapNominationContent).append("sbmtSuccess: ", sbmtSuccess)
 		.append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
 		.append("toolContentID: ", toolContentID).append("defaultContentId: ", defaultContentId)
 		.append("defaultContentIdStr: ", defaultContentIdStr).append("reflect: ", reflect)
-		.append("isDefineLater: ", isDefineLater).append("allowText: ", allowText)
+		.append("allowText: ", allowText)
 		.append("showResults: ", showResults).append("lockOnFinish: ", lockOnFinish)
 		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount)
 		.append("activityTitle: ", activityTitle).append("activityInstructions: ", activityInstructions)
 		.append("maxOptionIndex: ", maxOptionIndex).append("defaultOptionContent: ", defaultOptionContent)
-		.append("richTextOfflineInstructions: ", richTextOfflineInstructions)
-		.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
-		.append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)
-		.append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
-		.append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
-		.append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
-		.append("mapOptionsContent: ", mapOptionsContent).append("onlineInstructions: ", onlineInstructions)
-		.append("offlineInstructions: ", offlineInstructions)
+		.append("mapOptionsContent: ", mapOptionsContent)
 		.append("userExceptionMaxNominationInvalid: ", userExceptionMaxNominationInvalid)
 		.append("userExceptionFilenameEmpty: ", userExceptionFilenameEmpty)
 		.append("isMonitoredContentInUse: ", isMonitoredContentInUse)

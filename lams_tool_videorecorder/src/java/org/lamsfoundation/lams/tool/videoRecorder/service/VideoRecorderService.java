@@ -64,7 +64,6 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderAttachmentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderCommentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRatingDAO;
@@ -75,7 +74,6 @@ import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
@@ -110,8 +108,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
     private IVideoRecorderUserDAO videoRecorderUserDAO = null;
 
-    private IVideoRecorderAttachmentDAO videoRecorderAttachmentDAO = null;
-
     private IVideoRecorderRatingDAO videoRecorderRatingDAO = null;
 
     private IVideoRecorderCommentDAO videoRecorderCommentDAO = null;
@@ -121,10 +117,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     private ILamsToolService toolService;
 
     private IToolContentHandler videoRecorderToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
-
-    private IAuditService auditService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -235,26 +227,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    fromContent = getDefaultContent();
 	}
 
-	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId, videoRecorderToolContentHandler);
+	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId);
 	videoRecorderDAO.saveOrUpdate(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
-	if (videoRecorder == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	videoRecorder.setDefineLater(value);
-	videoRecorderDAO.saveOrUpdate(videoRecorder);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
-	if (videoRecorder == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	videoRecorder.setRunOffline(value);
-	videoRecorderDAO.saveOrUpdate(videoRecorder);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -282,9 +256,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	videoRecorder = VideoRecorder.newInstance(videoRecorder, toolContentId, null);
+	videoRecorder = VideoRecorder.newInstance(videoRecorder, toolContentId);
 	videoRecorder.setToolContentId(null);
-	videoRecorder.setToolContentHandler(null);
 	videoRecorder.setVideoRecorderSessions(null);
 
 	VideoRecorderRecording authorRecording = (VideoRecorderRecording) getFirstRecordingByToolContentId(toolContentId);
@@ -298,14 +271,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
 
 	videoRecorder.setAuthorRecording(authorRecording);
-
-	Set<VideoRecorderAttachment> atts = videoRecorder.getVideoRecorderAttachments();
-	for (VideoRecorderAttachment att : atts) {
-	    att.setVideoRecorder(null);
-	}
 	try {
-	    exportContentService.registerFileClassForExport(VideoRecorderAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, videoRecorder, videoRecorderToolContentHandler,
 		    rootPath);
 	} catch (ExportToolContentException e) {
@@ -322,9 +288,9 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(VideoRecorderAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(VideoRecorderImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, videoRecorderToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof VideoRecorder)) {
@@ -423,7 +389,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	VideoRecorder defaultContent = getDefaultContent();
 	// create new videoRecorder using the newContentID
 	VideoRecorder newContent = new VideoRecorder();
-	newContent = VideoRecorder.newInstance(defaultContent, newContentID, videoRecorderToolContentHandler);
+	newContent = VideoRecorder.newInstance(defaultContent, newContentID);
 	videoRecorderDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -521,32 +487,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
     }
 
-    public VideoRecorderAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new VideoRecorderException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	VideoRecorderAttachment attachment = new VideoRecorderAttachment(nodeKey.getVersion(), type,
-		file.getFileName(), nodeKey.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws VideoRecorderException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new VideoRecorderException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	videoRecorderDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-    }
-
     public void saveOrUpdateVideoRecorder(VideoRecorder videoRecorder) {
 	videoRecorderDAO.saveOrUpdate(videoRecorder);
     }
@@ -577,63 +517,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return videoRecorderUser;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
-    }
-
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getVideoRecorderToolContentHandler().uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), type);
-	    } catch (InvalidParameterException e) {
-		throw new VideoRecorderException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new VideoRecorderException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new VideoRecorderException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new VideoRecorderException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws VideoRecorderException {
-	ICredentials credentials = new SimpleCredentials(VideoRecorderToolContentHandler.repositoryUser,
-		VideoRecorderToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    VideoRecorderToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new VideoRecorderException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new VideoRecorderException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new VideoRecorderException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -649,15 +532,9 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	videoRecorder.setLockOnFinished(Boolean.TRUE);
-	videoRecorder.setOfflineInstructions(null);
-	videoRecorder.setOnlineInstructions(null);
-	videoRecorder.setRunOffline(Boolean.FALSE);
 	videoRecorder.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	videoRecorder.setToolContentId(toolContentId);
 	videoRecorder.setUpdateDate(now);
-	// leave as empty, no need to set them to anything.
-	// setVideoRecorderAttachments(Set videoRecorderAttachments);
-	// setVideoRecorderSessions(Set videoRecorderSessions);
 	videoRecorderDAO.saveOrUpdate(videoRecorder);
     }
 
@@ -678,14 +555,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public IVideoRecorderAttachmentDAO getVideoRecorderAttachmentDAO() {
-	return videoRecorderAttachmentDAO;
-    }
-
-    public void setVideoRecorderAttachmentDAO(IVideoRecorderAttachmentDAO attachmentDAO) {
-	videoRecorderAttachmentDAO = attachmentDAO;
-    }
 
     public IVideoRecorderDAO getVideoRecorderDAO() {
 	return videoRecorderDAO;
@@ -789,14 +658,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
     public void setVideoRecorderOutputFactory(VideoRecorderOutputFactory videoRecorderOutputFactory) {
 	this.videoRecorderOutputFactory = videoRecorderOutputFactory;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public void releaseConditionsFromCache(VideoRecorder videoRecorder) {

@@ -22,7 +22,6 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -35,20 +34,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
@@ -81,14 +69,12 @@ import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
-import org.lamsfoundation.lams.tool.vote.dao.IVoteUploadedFileDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -115,20 +101,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 {
     static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 
-    private static String repositoryWorkspaceName = "vote11";
-    private final String repositoryUser = "vote11";
-    private final char[] repositoryId = { 'v', 'o', 't', 'e', '_', '1', '1' };
-
-    private IRepositoryService repositoryService;
-    private ICredentials cred;
-
     private IVoteContentDAO voteContentDAO;
     private IVoteQueContentDAO voteQueContentDAO;
     private IVoteSessionDAO voteSessionDAO;
     private IVoteUserDAO voteUserDAO;
     private IVoteUsrAttemptDAO voteUsrAttemptDAO;
 
-    private IVoteUploadedFileDAO voteUploadedFileDAO;
     private IUserManagementService userManagementService;
     private ILearnerService learnerService;
     private IAuditService auditService;
@@ -293,22 +271,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	//remove redundant ones
 	for (VoteUsrAttempt redundantUserAttempt : userAttempts) {
 	    this.removeAttempt(redundantUserAttempt);
-	}
-    }
-
-    public void configureContentRepository() throws VoteApplicationException {
-	cred = new SimpleCredentials(repositoryUser, repositoryId);
-	try {
-	    repositoryService.createCredentials(cred);
-	    repositoryService.addWorkspace(cred, VoteServicePOJO.repositoryWorkspaceName);
-	} catch (ItemExistsException ie) {
-	    VoteServicePOJO.logger.warn("Tried to configure repository but it "
-		    + " appears to be already configured. Exception thrown by repository being ignored. ", ie);
-	} catch (RepositoryCheckedException e) {
-	    String error = "Error occured while trying to configure repository." + " Unable to recover from error: "
-		    + e.getMessage();
-	    VoteServicePOJO.logger.error(error, e);
-	    throw new VoteApplicationException(error, e);
 	}
     }
 
@@ -1147,20 +1109,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
 
 	if (voteContent != null) {
-	    Iterator filesIterator = voteContent.getVoteAttachments().iterator();
-	    while (filesIterator.hasNext()) {
-		VoteUploadedFile voteUploadedFile = (VoteUploadedFile) filesIterator.next();
-		String filesUuid = voteUploadedFile.getUuid();
-		if (filesUuid != null && filesUuid.length() > 0) {
-		    try {
-			voteToolContentHandler.deleteFile(new Long(filesUuid));
-		    } catch (RepositoryCheckedException e) {
-			VoteServicePOJO.logger.error("exception occured deleting files from content repository : " + e);
-			throw new ToolException("undeletable file in the content repository");
-		    }
-		}
-	    }
-
 	    Iterator sessionIterator = voteContent.getVoteSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		if (removeSessionData == false) {
@@ -1219,7 +1167,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    for (VoteQueContent que : ques) {
 		que.setMcUsrAttempts(null);
 	    }
-	    exportContentService.registerFileClassForExport(VoteUploadedFile.class.getName(), "uuid", null);
 	    exportContentService.exportToolContent(toolContentID, toolContentObj, voteToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -1239,9 +1186,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(VoteUploadedFile.class.getName(), "uuid", null, "fileName",
-		    "fileProperty", null, null);
-
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(VoteImportContentVersionFilter.class);
 
@@ -1261,51 +1205,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
-    }
-
-    /**
-     * Implemented as part of the tool contract. Sets the defineLater to true on this content. setAsDefineLater(Long
-     * toolContentID) throws DataMissingException, ToolException
-     * 
-     * @param toolContentID
-     * @return
-     * @throws ToolException
-     */
-    public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
-	    throw new DataMissingException("toolContentID is missing");
-	}
-
-	VoteContent voteContent = retrieveVote(toolContentID);
-	if (voteContent == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
-	    throw new DataMissingException("voteContent is missing");
-	}
-	voteContent.setDefineLater(value);
-	saveVoteContent(voteContent);
-    }
-
-    /**
-     * Implemented as part of the tool contract. Sets the runOffline to true on this content. setAsRunOffline(Long
-     * toolContentID) throws DataMissingException, ToolException
-     * 
-     * @param toolContentID
-     *                return
-     * @throws ToolException
-     */
-    public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
-	    throw new DataMissingException("toolContentID is missing");
-	}
-	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
-	if (voteContent == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
-	    throw new DataMissingException("voteContent is missing");
-	}
-	voteContent.setRunOffline(value);
-	saveVoteContent(voteContent);
     }
 
     /**
@@ -1517,131 +1416,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	List listToolSessionIds = voteSessionDAO.getSessionsFromContent(vote);
 	return listToolSessionIds;
     }
-
-    public void removeAttachment(VoteContent content, VoteUploadedFile attachment) throws RepositoryCheckedException {
-	try {
-	    attachment.setVoteContent(null);
-	    content.getVoteAttachments().remove(attachment);
-	    voteToolContentHandler.deleteFile(new Long(attachment.getUuid()));
-	    saveVoteContent(content);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this attachment" + e.getMessage(), e);
-	}
-    }
-
-    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
-	    throws RepositoryCheckedException {
-	return voteToolContentHandler.uploadFile(istream, filename, contentType, fileType);
-    }
-
-    public NodeKey copyFile(Long uuid) throws RepositoryCheckedException {
-	return voteToolContentHandler.copyFile(uuid);
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    public ITicket getRepositoryLoginTicket() throws VoteApplicationException {
-	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, VoteServicePOJO.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException e) {
-	    throw new VoteApplicationException("Access Denied to repository." + e.getMessage());
-	} catch (WorkspaceNotFoundException e) {
-	    throw new VoteApplicationException("Workspace not found." + e.getMessage());
-	} catch (LoginException e) {
-	    throw new VoteApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
-    /**
-     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
-     * repository
-     * 
-     * @param uuid
-     *                The <code>uuid</code> of the node to be deleted
-     * @param versionID
-     *                The <code>version_id</code> of the node to be deleted.
-     * @throws SubmitFilesException
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws VoteApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    String files[] = repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new VoteApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * This method is called everytime a new content has to be added to the repository. In order to do so first of all a
-     * valid ticket is obtained from the Repository hence authenticating the tool(SubmitFiles) and then the
-     * corresponding file is added to the repository.
-     * 
-     * @param stream
-     *                The <code>InputStream</code> representing the data to be added
-     * @param fileName
-     *                The name of the file being added
-     * @param mimeType
-     *                The MIME type of the file (eg. TXT, DOC, GIF etc)
-     * @return NodeKey Represents the two part key - UUID and Version.
-     * @throws SubmitFilesException
-     */
-    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws VoteApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-
-	try {
-	    NodeKey nodeKey = repositoryService.addFileItem(ticket, stream, fileName, null, null);
-	    return nodeKey;
-	} catch (Exception e) {
-	    throw new VoteApplicationException("Exception occured while trying to" + " upload file into the repository"
-		    + e.getMessage());
-	}
-    }
-
-    public InputStream downloadFile(Long uuid, Long versionID) throws VoteApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    return node.getFile();
-	} catch (AccessDeniedException e) {
-	    throw new VoteApplicationException("AccessDeniedException occured while trying to download file "
-		    + e.getMessage());
-	} catch (FileException e) {
-	    throw new VoteApplicationException("FileException occured while trying to download file " + e.getMessage());
-	} catch (ItemNotFoundException e) {
-	    throw new VoteApplicationException("ItemNotFoundException occured while trying to download file "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * adds a new entry to the uploaded files table
-     */
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent)
-	    throws VoteApplicationException {
-
-	VoteUploadedFile voteUploadedFile = new VoteUploadedFile(uuid, isOnlineFile, fileName, voteContent);
-	voteUploadedFileDAO.saveUploadFile(voteUploadedFile);
-    }
-
-    /**
-     * 
-     * removes all the entries in the uploaded files table
-     */
-    public void cleanUploadedFilesMetaData() throws VoteApplicationException {
-	voteUploadedFileDAO.cleanUploadedFilesMetaData();
-    }
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
@@ -1699,12 +1473,9 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	toolContentObj.setDefineLater(false);
 	toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setOfflineInstructions(null);
-	toolContentObj.setOnlineInstructions(null);
 	toolContentObj.setReflectionSubject(null);
 	toolContentObj.setReflect(false);
 	toolContentObj.setUseSelectLeaderToolOuput(false);
-	toolContentObj.setRunOffline(false);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 
 	toolContentObj.setContent(null);
@@ -1739,7 +1510,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 
 	// leave as empty, no need to set them to anything.
-	// setVoteUploadedFiles(Set voteAttachments);
 	// setVoteSessions(Set voteSessions);
 
 	// set up question from body
@@ -1798,55 +1568,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    throw new VoteApplicationException("Exception occured when lams is getting all question entries: "
 		    + e.getMessage(), e);
 	}
-    }
-
-    public void removeFile(Long submissionId) throws VoteApplicationException {
-	voteUploadedFileDAO.removeUploadFile(submissionId);
-    }
-
-    public void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException {
-	content.getVoteAttachments().add(file);
-	file.setVoteContent(content);
-	voteContentDAO.saveOrUpdateVote(content);
-
-    }
-
-    public List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException {
-	try {
-	    return voteUploadedFileDAO.retrieveVoteUploadedFiles(Vote);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is loading Vote uploaded files: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @return Returns the cred.
-     */
-    public ICredentials getCred() {
-	return cred;
-    }
-
-    /**
-     * @param cred
-     *                The cred to set.
-     */
-    public void setCred(ICredentials cred) {
-	this.cred = cred;
-    }
-
-    /**
-     * @return Returns the repositoryId.
-     */
-    public char[] getRepositoryId() {
-	return repositoryId;
-    }
-
-    /**
-     * @return Returns the repositoryUser.
-     */
-    public String getRepositoryUser() {
-	return repositoryUser;
     }
 
     /**
@@ -1908,42 +1629,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	this.voteUsrAttemptDAO = voteUsrAttemptDAO;
     }
 
-    /**
-     * @return Returns the repositoryService.
-     */
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    /**
-     * @param repositoryService
-     *                The repositoryService to set.
-     */
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    /**
-     * @return Returns the voteUploadedFileDAO.
-     */
-    public IVoteUploadedFileDAO getvoteUploadedFileDAO() {
-	return voteUploadedFileDAO;
-    }
-
-    /**
-     * @param voteUploadedFileDAO
-     *                The voteUploadedFileDAO to set.
-     */
-    public void setvoteUploadedFileDAO(IVoteUploadedFileDAO voteUploadedFileDAO) {
-	this.voteUploadedFileDAO = voteUploadedFileDAO;
     }
 
     /**
@@ -2049,21 +1740,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void setVoteSessionDAO(IVoteSessionDAO voteSessionDAO) {
 	this.voteSessionDAO = voteSessionDAO;
-    }
-
-    /**
-     * @return Returns the voteUploadedFileDAO.
-     */
-    public IVoteUploadedFileDAO getVoteUploadedFileDAO() {
-	return voteUploadedFileDAO;
-    }
-
-    /**
-     * @param voteUploadedFileDAO
-     *                The voteUploadedFileDAO to set.
-     */
-    public void setVoteUploadedFileDAO(IVoteUploadedFileDAO voteUploadedFileDAO) {
-	this.voteUploadedFileDAO = voteUploadedFileDAO;
     }
 
     /**

@@ -24,24 +24,13 @@
 package org.lamsfoundation.lams.tool.taskList.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
@@ -105,27 +94,16 @@ public interface ITaskListService {
 	 */
 	List getAuthoredItems(Long taskListUid);
 	
-	/**
-	 * Upload instruciton file into repository.
-	 * 
-	 * @param file
-	 * @param type
-	 * @return
-	 * @throws UploadTaskListFileException
-	 */
-	TaskListAttachment uploadInstructionFile(FormFile file, String type) throws UploadTaskListFileException;
-	
 	
 	/**
 	 * Upload tasklistItem file to repository.
 	 * 
 	 * @param uploadFile
-	 * @param fileType
 	 * @param userLogin
 	 * @return
 	 * @throws UploadTaskListFileException
 	 */
-	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, TaskListUser user) throws UploadTaskListFileException; 
+	TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user) throws UploadTaskListFileException; 
 	
 	/**
 	 * Returns Message service. It makes available to have access to message resources files. 
@@ -183,14 +161,6 @@ public interface ITaskListService {
 	TaskListUser getUser(Long uid);
 
 	//********** Repository methods ***********************
-	/**
-	 * Delete file from the repository.
-	 * 
-	 * @param fileUuid
-	 * @param fileVersionId
-	 * @throws TaskListException
-	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListException ;
 
 	/**
 	 * Save or update taskList into database.
@@ -198,14 +168,6 @@ public interface ITaskListService {
 	 * @param TaskList
 	 */
 	void saveOrUpdateTaskList(TaskList TaskList);
-	
-	/**
-	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
-	 * delete the file from repository.
-	 * 
-	 * @param attachmentUid
-	 */
-	void deleteTaskListAttachment(Long attachmentUid);
 	
 	/**
 	 * Delete resoruce item from database.

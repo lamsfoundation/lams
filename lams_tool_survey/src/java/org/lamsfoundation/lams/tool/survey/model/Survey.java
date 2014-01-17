@@ -65,14 +65,9 @@ public class Survey implements Cloneable {
     private String reflectInstructions;
 
     private boolean defineLater;
-    private boolean runOffline;
     private boolean contentInUse;
 
     private boolean notifyTeachersOnAnswerSumbit;
-    // instructions
-    private String onlineInstructions;
-    private String offlineInstructions;
-    private Set<SurveyAttachment> attachments;
 
     // general infomation
     private Date created;
@@ -86,28 +81,19 @@ public class Survey implements Cloneable {
     // conditions
     private Set<SurveyCondition> conditions = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
 
-    // *************** NON Persist Fields ********************
-    private IToolContentHandler toolContentHandler;
-
-    private List<SurveyAttachment> onlineFileList;
-    private List<SurveyAttachment> offlineFileList;
-
     /**
      * Default contruction method.
      * 
      */
     public Survey() {
-	attachments = new HashSet<SurveyAttachment>();
 	questions = new HashSet<SurveyQuestion>();
     }
 
     // **********************************************************
     // Function method for Survey
     // **********************************************************
-    public static Survey newInstance(Survey defaultContent, Long contentId,
-	    SurveyToolContentHandler surveyToolContentHandler) {
+    public static Survey newInstance(Survey defaultContent, Long contentId) {
 	Survey toContent = new Survey();
-	defaultContent.toolContentHandler = surveyToolContentHandler;
 	toContent = (Survey) defaultContent.clone();
 	toContent.setContentId(contentId);
 
@@ -147,19 +133,6 @@ public class Survey implements Cloneable {
 		survey.setConditions(set);
 	    }
 
-	    // clone attachment
-	    if (attachments != null) {
-		Iterator iter = attachments.iterator();
-		Set set = new HashSet();
-		while (iter.hasNext()) {
-		    SurveyAttachment file = (SurveyAttachment) iter.next();
-		    SurveyAttachment newFile = (SurveyAttachment) file.clone();
-		    // clone old file without duplicate it in repository
-
-		    set.add(newFile);
-		}
-		survey.attachments = set;
-	    }
 	    // clone ReourceUser as well
 	    if (createdBy != null) {
 		survey.setCreatedBy((SurveyUser) createdBy.clone());
@@ -183,15 +156,13 @@ public class Survey implements Cloneable {
 	final Survey genericEntity = (Survey) o;
 
 	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions)
-		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
+		instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-		offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
     }
 
     /**
@@ -204,21 +175,6 @@ public class Survey implements Cloneable {
 	    this.setCreated(new Date(now));
 	}
 	this.setUpdated(new Date(now));
-    }
-
-    public void toDTO() {
-	onlineFileList = new ArrayList<SurveyAttachment>();
-	offlineFileList = new ArrayList<SurveyAttachment>();
-	Set<SurveyAttachment> fileSet = this.getAttachments();
-	if (fileSet != null) {
-	    for (SurveyAttachment file : fileSet) {
-		if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-		    offlineFileList.add(file);
-		} else {
-		    onlineFileList.add(file);
-		}
-	    }
-	}
     }
 
     // **********************************************************
@@ -310,26 +266,6 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @return Returns the runOffline.
-     * 
-     * @hibernate.property column="run_offline"
-     * 
-     */
-    public boolean getRunOffline() {
-	return runOffline;
-    }
-
-    /**
-     * @param runOffline
-     *                The forceOffLine to set.
-     * 
-     * 
-     */
-    public void setRunOffline(boolean forceOffline) {
-	runOffline = forceOffline;
-    }
-
-    /**
      * @return Returns the lockWhenFinish.
      * 
      * @hibernate.property column="lock_on_finished"
@@ -358,51 +294,6 @@ public class Survey implements Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="online_instructions" type="text"
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="offline_instructions" type="text"
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * 
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
-     * @hibernate.collection-key column="survey_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyAttachment"
-     * 
-     * @return a set of Attachments to this Message.
-     */
-    public Set getAttachments() {
-	return attachments;
-    }
-
-    /*
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
-	this.attachments = attachments;
     }
 
     /**
@@ -456,26 +347,6 @@ public class Survey implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    public List<SurveyAttachment> getOfflineFileList() {
-	return offlineFileList;
-    }
-
-    public void setOfflineFileList(List<SurveyAttachment> offlineFileList) {
-	this.offlineFileList = offlineFileList;
-    }
-
-    public List<SurveyAttachment> getOnlineFileList() {
-	return onlineFileList;
-    }
-
-    public void setOnlineFileList(List<SurveyAttachment> onlineFileList) {
-	this.onlineFileList = onlineFileList;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

@@ -48,13 +48,8 @@
  * When the user is completed with tool, then the tool notifies the progress engine by calling 
  * org.lamsfoundation.lams.learning.service.completeToolSession(Long toolSessionID, User learner).
  *
- * If the tool's content DefineLater flag is set to true, then the learner should see a "Please wait for the teacher to define this part...." 
- * style message.
- * If the tool's content RunOffline flag is set to true, then the learner should see a "This activity is not being done on the computer. 
- * Please see your instructor for details."
  *
- * ?? Would it be better to define a run offline message in the tool? We have instructions for the teacher but not the learner. ??
- * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
+  * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
  * If they return to the activity (e.g. via the progress bar) then the entries should be read only.
  * 
 
@@ -88,12 +83,6 @@
  <forward
  name="redoQuestions"
  path="/learning/RedoQuestions.jsp"
- redirect="false"
- />
-
- <forward
- name="runOffline"
- path="/learning/RunOffline.jsp"
  redirect="false"
  />
 
@@ -231,13 +220,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setUserEntry("");
 	voteLearningForm.setCastVoteCount(0);
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
-	voteLearningForm.setActivityRunOffline(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setRevisitingUser(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setUserEntry("");
 	voteGeneralLearnerFlowDTO.setCastVoteCount("0");
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
-	voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(false).toString());
 
 	/*
 	 * save time zone information to session scope.
@@ -332,31 +319,14 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 	    voteGeneralLearnerFlowDTO.setSubmissionDeadline(tzSubmissionDeadline);
 
-	    // calculate whether deadline has passed, and if so forward to "runOffline"
+	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward(RUN_OFFLINE);
-
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
 		.getServletContext());
-
-	/*
-	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
-	 * informed about that.
-	 */
-	boolean isRunOffline = VoteUtils.isRunOffline(voteContent);
-	if (isRunOffline == true) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
-	    // warning to learner: the activity is offline
-	    voteLearningForm.setActivityRunOffline(new Boolean(true).toString());
-	    voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(true).toString());
-
-	    request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	    // return (mapping.findForward(ERROR_LIST));
-	    return mapping.findForward(VoteAppConstants.RUN_OFFLINE);
-	}
 
 	/* find out if the content is being modified at the moment. */
 	boolean isDefineLater = VoteUtils.isDefineLater(voteContent);
@@ -545,13 +515,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	Map mapGeneralCheckedOptionsContent = new TreeMap(new VoteComparator());
 	request.setAttribute(VoteAppConstants.MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-	/*
-	 * Is the tool activity been checked as Run Offline in the property inspector?
-	 */
 
 	voteLearningForm.setActivityTitle(voteContent.getTitle());
 	voteLearningForm.setActivityInstructions(voteContent.getInstructions());
-	voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
 	voteLearningForm.setMinNominationCount(voteContent.getMinNominationCount());
 	voteLearningForm.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput()).toString());
@@ -561,7 +527,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
-	voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
 	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());
 	voteGeneralLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput())

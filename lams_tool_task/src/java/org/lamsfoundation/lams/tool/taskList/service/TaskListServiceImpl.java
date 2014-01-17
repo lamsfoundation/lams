@@ -23,13 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.service;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -40,17 +37,9 @@ import java.util.SortedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -69,7 +58,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dao.TaskListAttachmentDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
@@ -84,7 +72,6 @@ import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.Summary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
@@ -97,7 +84,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * Class implements <code>org.lamsfoundation.lams.tool.taskList.service.ITaskListService</code>.
@@ -111,7 +97,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
     private TaskListDAO taskListDao;
     private TaskListItemDAO taskListItemDao;
-    private TaskListAttachmentDAO taskListAttachmentDao;
     private TaskListConditionDAO taskListConditionDAO;
     private TaskListUserDAO taskListUserDao;
     private TaskListSessionDAO taskListSessionDao;
@@ -123,10 +108,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     private MessageService messageService;
     private TaskListOutputFactory taskListOutputFactory;
     // system services
-    private IRepositoryService repositoryService;
     private ILamsToolService toolService;
     private ILearnerService learnerService;
-    private IAuditService auditService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
@@ -159,7 +142,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	TaskList defaultContent = getDefaultTaskList();
 	// save default content by given ID.
 	TaskList content = new TaskList();
-	content = TaskList.newInstance(defaultContent, contentId, taskListToolContentHandler);
+	content = TaskList.newInstance(defaultContent, contentId);
 	return content;
     }
 
@@ -173,7 +156,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     /**
      * {@inheritDoc}
      */
-    public TaskListAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
+    public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
 	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
 	    throw new UploadTaskListFileException(messageService.getMessage("error.msg.upload.file.not.found",
@@ -181,35 +164,10 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 
 	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	TaskListAttachment file = new TaskListAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, String fileType, TaskListUser user)
-	    throws UploadTaskListFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadTaskListFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
+	NodeKey nodeKey = processFile(uploadFile);
 
 	// create new attachement
 	TaskListItemAttachment file = new TaskListItemAttachment();
-	file.setFileType(fileType);
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
 	file.setFileName(uploadFile.getFileName());
@@ -250,28 +208,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     /**
      * {@inheritDoc}
      */
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws TaskListException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new TaskListException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void saveOrUpdateTaskList(TaskList taskList) {
 	taskListDao.saveObject(taskList);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void deleteTaskListAttachment(Long attachmentUid) {
-	taskListAttachmentDao.removeObject(TaskListAttachment.class, attachmentUid);
     }
 
     /**
@@ -710,10 +648,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     // Set methods for Spring Bean
     // *****************************************************************************
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
@@ -730,12 +664,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	this.taskListOutputFactory = taskListOutputFactory;
     }
 
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setTaskListAttachmentDao(TaskListAttachmentDAO taskListAttachmentDao) {
-	this.taskListAttachmentDao = taskListAttachmentDao;
+    public void setTaskListAttachmentDao(TaskListItemAttachmentDAO taskListItemAttachmentDao) {
+	this.taskListItemAttachmentDao = taskListItemAttachmentDao;
     }
 
     public void setTaskListConditionDao(TaskListConditionDAO taskListConditionDAO) {
@@ -822,10 +752,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 
 	// set TaskListToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = TaskList.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = TaskList.newInstance(toolContentObj, toolContentId);
 	Set<TaskListItem> taskListItems = toolContentObj.getTaskListItems();
 	for (TaskListItem taskListItem : taskListItems) {
 	    taskListItem.setComments(null);
@@ -833,8 +760,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 
 	try {
-	    exportContentService.registerFileClassForExport(TaskListAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, taskListToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -848,9 +773,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(TaskListAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(TaskListImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, taskListToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof TaskList)) {
@@ -927,7 +852,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    }
 	}
 
-	TaskList toContent = TaskList.newInstance(taskList, toContentId, taskListToolContentHandler);
+	TaskList toContent = TaskList.newInstance(taskList, toContentId);
 	taskListDao.saveObject(toContent);
 
 	// save taskList items as well
@@ -939,28 +864,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 		// createRootTopic(toContent.getUid(),null,msg);
 	    }
 	}
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	TaskList taskList = taskListDao.getByContentId(toolContentId);
-	if (taskList == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	taskList.setDefineLater(value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	TaskList taskList = taskListDao.getByContentId(toolContentId);
-	if (taskList == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	taskList.setRunOffline(value);
     }
 
     /**
@@ -1166,13 +1069,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadTaskListFileException {
+    private NodeKey processFile(FormFile file) throws UploadTaskListFileException {
 	NodeKey node = null;
 	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
-		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
+		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
 		throw new UploadTaskListFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	    } catch (FileNotFoundException e) {
@@ -1186,127 +1088,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return node;
     }
 
-    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadTaskListFileException {
-	NodeKey node = null;
-	try {
-	    node = taskListToolContentHandler.uploadPackage(packageDirectory, initFile);
-	} catch (InvalidParameterException e) {
-	    throw new UploadTaskListFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	} catch (RepositoryCheckedException e) {
-	    throw new UploadTaskListFileException(messageService.getMessage("error.msg.repository"));
-	}
-	return node;
-    }
-
-    /**
-     * Find out default.htm/html or index.htm/html in the given directory folder
-     * 
-     * @param packageDirectory
-     * @return
-     */
-    private String findWebsiteInitialItem(String packageDirectory) {
-	File file = new File(packageDirectory);
-	if (!file.isDirectory()) {
-	    return null;
-	}
-
-	File[] initFiles = file.listFiles(new FileFilter() {
-	    public boolean accept(File pathname) {
-		if (pathname == null || pathname.getName() == null) {
-		    return false;
-		}
-		String name = pathname.getName();
-		if (name.endsWith("default.html") || name.endsWith("default.htm") || name.endsWith("index.html")
-			|| name.endsWith("index.htm")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-	if (initFiles != null && initFiles.length > 0) {
-	    return initFiles[0].getName();
-	} else {
-	    return null;
-	}
-    }
-
-    private class ReflectDTOComparator implements Comparator<ReflectDTO> {
-	public int compare(ReflectDTO o1, ReflectDTO o2) {
-
-	    if (o1 != null && o2 != null) {
-		return o1.getFullName().compareTo(o2.getFullName());
-	    } else if (o1 != null) {
-		return 1;
-	    } else {
-		return -1;
-	    }
-	}
-    }
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws TaskListException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    TaskListServiceImpl.log.error(error);
-	    throw new TaskListException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    TaskListServiceImpl.log.error(error);
-	    throw new TaskListException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the TaskList Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws TaskListException
-     */
-    private ITicket getRepositoryLoginTicket() throws TaskListException {
-	ICredentials credentials = new SimpleCredentials(taskListToolContentHandler.getRepositoryUser(),
-		taskListToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, taskListToolContentHandler
-		    .getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new TaskListException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new TaskListException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new TaskListException("Login failed." + e.getMessage());
-	}
-    }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getTaskListOutputFactory().getSupportedDefinitionClasses(definitionType);

@@ -44,7 +44,6 @@ public class TaskListConstants {
 	public static final String PARAM_SEQUENCE_ID = "sequenceId";
 	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
 	public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
-	public static final String PARAM_RUN_OFFLINE = "runOffline";
 	public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 	public static final String PARAM_TITLE = "title";
 	
@@ -53,11 +52,8 @@ public class TaskListConstants {
 	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String ATTR_RESOURCE_ITEM_LIST = "taskListList";
 	public static final String ATTR_CONDITION_LIST = "conditionList";
-	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteTaskListList";
 	public static final String ATTR_DELETED_CONDITION_LIST = "deleteConditionList";
-	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
-	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST =  "deletedItemAttachmmentList";;
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	public static final String ATTR_RESOURCE_REVIEW_URL = "taskListItemReviewUrl";
 	public static final String ATTR_RESOURCE = "taskList";
@@ -87,7 +83,7 @@ public class TaskListConstants {
 	public static final String ATTR_TASK_LIST_ITEM_DTOS = "itemDTOs";
 	public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 	
-	//  for submission deadline LDEV-2657
+	//  for submission deadline
 	public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 	public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 	

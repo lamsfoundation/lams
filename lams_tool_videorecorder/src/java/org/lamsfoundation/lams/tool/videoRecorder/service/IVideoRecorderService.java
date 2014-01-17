@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.tool.videoRecorder.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +33,6 @@ import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
@@ -74,28 +72,6 @@ public interface IVideoRecorderService {
      * @return
      */
     public VideoRecorder getVideoRecorderByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public VideoRecorderAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws VideoRecorderException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param videoRecorder

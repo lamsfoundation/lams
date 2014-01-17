@@ -101,14 +101,6 @@
         column="created_by"
         length="20"
     />
-    
-   <property
-        name="runOffline"
-        type="boolean"
-        access="property"
-        column="run_offline"
-        length="1"        
-   />
 
    <property
         name="defineLater"
@@ -117,22 +109,6 @@
         column="define_later"
         length="1"        
    />
-
-    <property
-        name="offlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="offline_instructions"
-        length="65535"
-    />
-    
-    <property
-        name="onlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="online_instructions"
-        length="65535"
-    />
 
     <property
         name="contentInUse"
@@ -241,23 +217,6 @@
                   class="org.lamsfoundation.lams.tool.vote.pojos.VoteSession"
               />
 
-    </set>
-    
-    	<set
-            name="voteAttachments"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-              <key
-                  column="vote_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile"
-              />
     </set>
 	
 </class>

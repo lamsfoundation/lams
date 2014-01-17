@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
-import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
 import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 
 public class WookieDTO {
@@ -45,10 +44,6 @@ public class WookieDTO {
 
     public String instructions;
 
-    public String onlineInstructions;
-
-    public String offlineInstructions;
-
     public boolean defineLater;
 
     public boolean contentInUse;
@@ -56,10 +51,6 @@ public class WookieDTO {
     public boolean reflectOnActivity;
 
     public boolean lockOnFinish;
-
-    public Set<WookieAttachmentDTO> onlineInstructionsFiles;
-
-    public Set<WookieAttachmentDTO> offlineInstructionsFiles;
 
     public Set<WookieSessionDTO> sessionDTOs = new TreeSet<WookieSessionDTO>();
 
@@ -77,28 +68,10 @@ public class WookieDTO {
 	this.toolContentId = wookie.getToolContentId();
 	this.title = wookie.getTitle();
 	this.instructions = wookie.getInstructions();
-	this.onlineInstructions = wookie.getOnlineInstructions();
-	this.offlineInstructions = wookie.getOfflineInstructions();
 	this.contentInUse = wookie.isContentInUse();
 	this.reflectOnActivity = wookie.isReflectOnActivity();
 	this.lockOnFinish = wookie.isLockOnFinished();
 	this.reflectInstructions = wookie.getReflectInstructions();
-	this.onlineInstructionsFiles = new TreeSet<WookieAttachmentDTO>();
-	this.offlineInstructionsFiles = new TreeSet<WookieAttachmentDTO>();
-
-	for (Iterator<WookieAttachment> i = wookie.getWookieAttachments().iterator(); i.hasNext();) {
-	    WookieAttachment att = (WookieAttachment) i.next();
-	    if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-		WookieAttachmentDTO attDTO = new WookieAttachmentDTO(att);
-		offlineInstructionsFiles.add(attDTO);
-	    } else if (att.getFileType().equals(IToolContentHandler.TYPE_ONLINE)) {
-		WookieAttachmentDTO attDTO = new WookieAttachmentDTO(att);
-		onlineInstructionsFiles.add(attDTO);
-	    } else {
-		// something is wrong. Ignore file, log error
-		logger.error("File with uid " + att.getFileUuid() + " contains invalid fileType: " + att.getFileType());
-	    }
-	}
 
 	for (Iterator<WookieSession> iter = wookie.getWookieSessions().iterator(); iter.hasNext();) {
 	    WookieSession session = (WookieSession) iter.next();
@@ -123,38 +96,6 @@ public class WookieDTO {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public Set<WookieAttachmentDTO> getOfflineInstructionsFiles() {
-	return offlineInstructionsFiles;
-    }
-
-    public void setOfflineInstructionsFiles(Set<WookieAttachmentDTO> offlineInstructionsFiles) {
-	this.offlineInstructionsFiles = offlineInstructionsFiles;
-    }
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    public Set<WookieAttachmentDTO> getOnlineInstructionsFiles() {
-	return onlineInstructionsFiles;
-    }
-
-    public void setOnlineInstructionsFiles(Set<WookieAttachmentDTO> onlineInstructionsFiles) {
-	this.onlineInstructionsFiles = onlineInstructionsFiles;
     }
 
     public String getTitle() {

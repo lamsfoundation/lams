@@ -76,7 +76,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyAnswerDAO;
-import org.lamsfoundation.lams.tool.survey.dao.SurveyAttachmentDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyQuestionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveySessionDAO;
@@ -85,7 +84,6 @@ import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
-import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
@@ -123,8 +121,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     private SurveyAnswerDAO surveyAnswerDao;
 
-    private SurveyAttachmentDAO surveyAttachmentDao;
-
     private SurveyUserDAO surveyUserDao;
 
     private SurveySessionDAO surveySessionDao;
@@ -135,13 +131,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     private MessageService messageService;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
-
-    private IAuditService auditService;
 
     private IUserManagementService userManagementService;
 
@@ -182,29 +175,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 	// save default content by given ID.
 	Survey content = new Survey();
-	content = Survey.newInstance(defaultContent, contentId, surveyToolContentHandler);
+	content = Survey.newInstance(defaultContent, contentId);
 	return content;
-    }
-
-    public SurveyAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadSurveyFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadSurveyFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	SurveyAttachment file = new SurveyAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public void createUser(SurveyUser surveyUser) {
@@ -223,23 +195,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     }
 
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new SurveyApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
     public void saveOrUpdateSurvey(Survey survey) {
 	surveyDao.saveObject(survey);
-    }
-
-    public void deleteSurveyAttachment(Long attachmentUid) {
-	surveyAttachmentDao.removeObject(SurveyAttachment.class, attachmentUid);
-
     }
 
     public Survey getSurveyBySessionId(Long sessionId) {
@@ -608,61 +565,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws SurveyApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadSurveyFileException {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = surveyToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadSurveyFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadSurveyFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadSurveyFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadSurveyFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the Share Survey Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SurveyApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws SurveyApplicationException {
-	ICredentials credentials = new SimpleCredentials(surveyToolContentHandler.getRepositoryUser(),
-		surveyToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService
-		    .login(credentials, surveyToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new SurveyApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new SurveyApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new SurveyApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
@@ -681,13 +583,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	// set SurveyToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Survey.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Survey.newInstance(toolContentObj, toolContentId);
 	try {
-	    exportContentService.registerFileClassForExport(SurveyAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, surveyToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -698,9 +595,9 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(SurveyAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(SurveyImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, surveyToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Survey)) {
@@ -773,7 +670,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    }
 	}
 
-	Survey toContent = Survey.newInstance(survey, toContentId, surveyToolContentHandler);
+	Survey toContent = Survey.newInstance(survey, toContentId);
 	surveyDao.saveObject(toContent);
 
 	// save survey items as well
@@ -789,22 +686,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     
     public String getToolContentTitle(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).getTitle();
-    }
-    
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Survey survey = surveyDao.getByContentId(toolContentId);
-	if (survey == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	survey.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Survey survey = surveyDao.getByContentId(toolContentId);
-	if (survey == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	survey.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -920,9 +801,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    toolContentObj.setDefineLater(Boolean.FALSE);
 	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		    .get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setOfflineInstructions(null);
-	    toolContentObj.setOnlineInstructions(null);
-	    toolContentObj.setRunOffline(Boolean.FALSE);
 	    toolContentObj.setUpdated(now);
 
 	    Boolean isReusable = WDDXProcessor.convertToBoolean(importValues,
@@ -1037,9 +915,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
@@ -1047,14 +922,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setSurveyAttachmentDao(SurveyAttachmentDAO surveyAttachmentDao) {
-	this.surveyAttachmentDao = surveyAttachmentDao;
     }
 
     public void setSurveyDao(SurveyDAO surveyDao) {

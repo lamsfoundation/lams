@@ -32,8 +32,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 
 public class VideoRecorderDTO {
 
@@ -44,10 +42,6 @@ public class VideoRecorderDTO {
 	public String title;
 
 	public String instructions;
-
-	public String onlineInstructions;
-
-	public String offlineInstructions;
 	
 	public boolean reflectOnActivity;
 	
@@ -72,10 +66,6 @@ public class VideoRecorderDTO {
     public boolean exportOffline;
     
     public boolean exportAll;
-	
-	public Set<VideoRecorderAttachmentDTO> onlineInstructionsFiles;
-
-	public Set<VideoRecorderAttachmentDTO> offlineInstructionsFiles;
 
 	public Set<VideoRecorderSessionDTO> sessionDTOs = new TreeSet<VideoRecorderSessionDTO>();
 	
@@ -90,8 +80,6 @@ public class VideoRecorderDTO {
 		toolContentId = videoRecorder.getToolContentId();
 		title = videoRecorder.getTitle();
 		instructions = videoRecorder.getInstructions();
-		onlineInstructions = videoRecorder.getOnlineInstructions();
-		offlineInstructions = videoRecorder.getOfflineInstructions();
 		contentInUse = videoRecorder.isContentInUse();
 		lockOnFinish = videoRecorder.isLockOnFinished();
 		allowUseVoice = videoRecorder.isAllowUseVoice();
@@ -103,27 +91,9 @@ public class VideoRecorderDTO {
 		exportOffline = videoRecorder.isExportOffline();
 		reflectOnActivity = videoRecorder.isReflectOnActivity();
 		reflectInstructions = videoRecorder.getReflectInstructions();
-		onlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
-		offlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 
 		if(videoRecorder.getAuthorRecording() != null){
 			authorRecording = new VideoRecorderRecordingDTO();
-		}
-		
-		for (Iterator i = videoRecorder.getVideoRecorderAttachments().iterator(); i.hasNext();) {
-			VideoRecorderAttachment att = (VideoRecorderAttachment) i.next();
-			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-				VideoRecorderAttachmentDTO attDTO = new VideoRecorderAttachmentDTO(att);
-				offlineInstructionsFiles.add(attDTO);
-			} else if (att.getFileType()
-					.equals(IToolContentHandler.TYPE_ONLINE)) {
-				VideoRecorderAttachmentDTO attDTO = new VideoRecorderAttachmentDTO(att);
-				onlineInstructionsFiles.add(attDTO);
-			} else {
-				// something is wrong. Ignore file, log error
-				logger.error("File with uid " + att.getFileUuid()
-						+ " contains invalid fileType: " + att.getFileType());
-			}
 		}
 	}
 
@@ -144,46 +114,12 @@ public class VideoRecorderDTO {
 		this.instructions = instructions;
 	}
 
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	public Set<VideoRecorderAttachmentDTO> getOfflineInstructionsFiles() {
-		return offlineInstructionsFiles;
-	}
-
 	public VideoRecorderRecordingDTO getAuthorRecording() {
 		return authorRecording;
 	}
 
 	public void setAuthorRecording(VideoRecorderRecordingDTO authorRecording) {
 		this.authorRecording = authorRecording;
-	}
-	
-	public void setOfflineInstructionsFiles(
-			Set<VideoRecorderAttachmentDTO> offlineInstructionsFiles) {
-		this.offlineInstructionsFiles = offlineInstructionsFiles;
-	}
-
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	public Set<VideoRecorderAttachmentDTO> getOnlineInstructionsFiles() {
-		return onlineInstructionsFiles;
-	}
-
-	public void setOnlineInstructionsFiles(
-			Set<VideoRecorderAttachmentDTO> onlineInstructionsFiles) {
-		this.onlineInstructionsFiles = onlineInstructionsFiles;
 	}
 
 	public boolean isReflectOnActivity() {

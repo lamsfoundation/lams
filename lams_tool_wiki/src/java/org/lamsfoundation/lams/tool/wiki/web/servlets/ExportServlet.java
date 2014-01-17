@@ -113,35 +113,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     /**
-     * Do an offline export
-     */
-    @Override
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    ExportServlet.logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-	    if (wikiService == null) {
-		wikiService = WikiServiceProxy.getWikiService(getServletContext());
-	    }
-
-	    Wiki content = null;
-	    if (toolContentID != null) {
-		content = wikiService.getWikiByContentId(toolContentID);
-	    } else {
-		WikiSession session = wikiService.getSessionBySessionId(toolSessionID);
-		if (session != null) {
-		    content = session.getWiki();
-		}
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
-    }
-
-    /**
      * Do export for learners, outputs the wiki pages into one page which seperates each page into divs which are
      * displayed onclick
      * 

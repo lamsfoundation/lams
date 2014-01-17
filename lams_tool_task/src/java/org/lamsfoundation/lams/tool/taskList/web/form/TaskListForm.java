@@ -77,7 +77,6 @@ public class TaskListForm extends ActionForm  {
 	    	taskList.setAllowContributeTasks(false);
 	    	taskList.setMonitorVerificationRequired(false);
 	    	taskList.setDefineLater(false);
-	    	taskList.setRunOffline(false);
 	    	taskList.setReflectOnActivity(false);
     	}
     }

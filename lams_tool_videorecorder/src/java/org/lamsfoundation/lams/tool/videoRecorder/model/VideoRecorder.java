@@ -68,8 +68,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	
 	String reflectInstructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean allowUseVoice;
@@ -85,10 +83,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     private boolean exportOffline;
     
     private boolean exportAll;
-    
-    private String onlineInstructions;
-
-    private String offlineInstructions;
 
     private boolean contentInUse;
 
@@ -96,53 +90,11 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     private Long toolContentId;
 
-    private Set videoRecorderAttachments;
-
     private Set videoRecorderSessions;
 
     private VideoRecorderRecording authorRecording;
     
     private Set<VideoRecorderCondition> conditions = new TreeSet<VideoRecorderCondition>(new TextSearchConditionComparator());
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
-
-    // Constructors
-
-    /** default constructor */
-    public VideoRecorder() {
-    }
-
-    /** full constructor */
-    public VideoRecorder(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    boolean allowUseVoice, boolean allowUseCamera, boolean allowLearnerVideoExport, boolean allowLearnerVideoVisibility,
-	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions, VideoRecorderRecording authorRecording,
-	    boolean exportAll, boolean exportOffline, boolean reflectOnActivity, String reflectInstructions) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.runOffline = runOffline;
-	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.videoRecorderAttachments = videoRecorderAttachments;
-	this.videoRecorderSessions = videoRecorderSessions;
-	this.authorRecording = authorRecording;
-	this.allowUseVoice = allowUseVoice;
-	this.allowUseCamera = allowUseCamera;
-	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
-	this.exportOffline = exportOffline;
-	this.exportAll = exportAll;
-	this.reflectOnActivity = reflectOnActivity;
-	this.reflectInstructions = reflectInstructions;
-    }
 
     // Property accessors
     /**
@@ -243,20 +195,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
-	}    
-    
-    /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
+	}
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
@@ -353,32 +292,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setExportAll(boolean exportAll) {
 	this.exportAll = exportAll;
-    }  
-    
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -418,21 +331,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="videoRecorder_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment"
-     * 
-     */
-
-    public Set getVideoRecorderAttachments() {
-	return videoRecorderAttachments;
-    }
-
-    public void setVideoRecorderAttachments(Set videoRecorderAttachments) {
-	this.videoRecorderAttachments = videoRecorderAttachments;
     }
 
     /**
@@ -527,10 +425,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static VideoRecorder newInstance(VideoRecorder fromContent, Long toContentId,
-	    IToolContentHandler videoRecorderToolContentHandler) {
+    public static VideoRecorder newInstance(VideoRecorder fromContent, Long toContentId) {
 	VideoRecorder toContent = new VideoRecorder();
-	fromContent.toolContentHandler = videoRecorderToolContentHandler;
 	toContent = (VideoRecorder) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -545,17 +441,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    videoRecorder = (VideoRecorder) super.clone();
 	    videoRecorder.setUid(null);
 
-	    if (videoRecorderAttachments != null) {
-		// create a copy of the attachments
-		Iterator iter = videoRecorderAttachments.iterator();
-		Set<VideoRecorderAttachment> set = new HashSet<VideoRecorderAttachment>();
-		while (iter.hasNext()) {
-		    VideoRecorderAttachment originalFile = (VideoRecorderAttachment) iter.next();
-		    VideoRecorderAttachment newFile = (VideoRecorderAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		videoRecorder.videoRecorderAttachments = set;
-	    }
 	    // create an empty set for the videoRecorderSession
 	    videoRecorder.videoRecorderSessions = new HashSet();
 
@@ -571,14 +456,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    VideoRecorder.log.error("Error cloning " + VideoRecorder.class);
 	}
 	return videoRecorder;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
 }

@@ -46,7 +46,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetDefinition;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
-import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
 import org.lamsfoundation.lams.tool.wookie.service.IWookieService;
 import org.lamsfoundation.lams.tool.wookie.service.WookieServiceProxy;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
@@ -83,11 +82,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
 	private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
 	private static final String KEY_MODE = "mode";
-	private static final String KEY_ONLINE_FILES = "onlineFiles";
-	private static final String KEY_OFFLINE_FILES = "offlineFiles";
-	private static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
-	private static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
-	private static final String KEY_DELETED_FILES = "deletedFiles";
 
 	/**
 	 * Default method when no dispatch parameter is specified. It is expected
@@ -286,27 +280,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		// update wookie content using form inputs.
 		updateWookie(wookie, authForm, mode);
 
-		// remove attachments marked for deletion.
-		Set<WookieAttachment> attachments = wookie.getWookieAttachments();
-		if (attachments == null) {
-			attachments = new HashSet<WookieAttachment>();
-		}
-
-		for (WookieAttachment att : getAttList(
-				AuthoringAction.KEY_DELETED_FILES, map)) {
-			// remove from db, leave in repository
-			attachments.remove(att);
-		}
-
-		// add unsaved attachments
-		attachments.addAll(getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES,
-				map));
-		attachments.addAll(getAttList(
-				AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map));
-
-		// set attachments in case it didn't exist
-		wookie.setWookieAttachments(attachments);
-
 		// set the update date
 		wookie.setUpdateDate(new Date());
 
@@ -333,172 +306,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		return mapping.findForward("success");
 	}
 
-	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return uploadFile(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_ONLINE, request);
-	}
-
-	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return uploadFile(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_OFFLINE, request);
-	}
-
-	public ActionForward deleteOnline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_ONLINE, request);
-	}
-
-	public ActionForward deleteOffline(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_OFFLINE, request);
-	}
-
-	public ActionForward removeUnsavedOnline(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		return removeUnsaved(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_ONLINE, request);
-	}
-
-	public ActionForward removeUnsavedOffline(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		return removeUnsaved(mapping, (AuthoringForm) form,
-				IToolContentHandler.TYPE_OFFLINE, request);
-	}
-
 	/* ========== Private Methods ********** */
-
-	private ActionForward uploadFile(ActionMapping mapping,
-			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-		FormFile file;
-		List<WookieAttachment> unsavedFiles;
-		List<WookieAttachment> savedFiles;
-		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			file = authForm.getOfflineFile();
-			unsavedFiles = getAttList(
-					AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map);
-
-			savedFiles = getAttList(AuthoringAction.KEY_OFFLINE_FILES, map);
-		} else {
-			file = authForm.getOnlineFile();
-			unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES,
-					map);
-
-			savedFiles = getAttList(AuthoringAction.KEY_ONLINE_FILES, map);
-		}
-
-		// validate file max size
-		ActionMessages errors = new ActionMessages();
-		FileValidatorUtil.validateFileSize(file, true, errors);
-		if (!errors.isEmpty()) {
-			request.setAttribute(WookieConstants.ATTR_SESSION_MAP, map);
-			this.saveErrors(request, errors);
-			return mapping.findForward("success");
-		}
-
-		if (file.getFileName().length() != 0) {
-
-			// upload file to repository
-			WookieAttachment newAtt = wookieService.uploadFileToContent(
-					(Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID), file,
-					type);
-
-			// Add attachment to unsavedFiles
-			// check to see if file with same name exists
-			WookieAttachment currAtt;
-			Iterator<WookieAttachment> iter = savedFiles.iterator();
-			while (iter.hasNext()) {
-				currAtt = (WookieAttachment) iter.next();
-				if (StringUtils.equals(currAtt.getFileName(), newAtt
-						.getFileName())
-						&& StringUtils.equals(currAtt.getFileType(), newAtt
-								.getFileType())) {
-					// move from this this list to deleted list.
-					getAttList(AuthoringAction.KEY_DELETED_FILES, map).add(
-							currAtt);
-					iter.remove();
-					break;
-				}
-			}
-			unsavedFiles.add(newAtt);
-
-			request.setAttribute(WookieConstants.ATTR_SESSION_MAP, map);
-			request.setAttribute("unsavedChanges", new Boolean(true));
-		}
-		return mapping.findForward("success");
-	}
-
-	private ActionForward deleteFile(ActionMapping mapping,
-			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-		List<WookieAttachment> fileList;
-		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			fileList = getAttList(AuthoringAction.KEY_OFFLINE_FILES, map);
-		} else {
-			fileList = getAttList(AuthoringAction.KEY_ONLINE_FILES, map);
-		}
-
-		Iterator<WookieAttachment> iter = fileList.iterator();
-
-		while (iter.hasNext()) {
-			WookieAttachment att = (WookieAttachment) iter.next();
-
-			if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
-				// move to delete file list, deleted at next updateContent
-				getAttList(AuthoringAction.KEY_DELETED_FILES, map).add(att);
-
-				// remove from this list
-				iter.remove();
-				break;
-			}
-		}
-
-		request.setAttribute(WookieConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
-
-		return mapping.findForward("success");
-	}
-
-	private ActionForward removeUnsaved(ActionMapping mapping,
-			AuthoringForm authForm, String type, HttpServletRequest request) {
-		SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-		List<WookieAttachment> unsavedFiles;
-
-		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			unsavedFiles = getAttList(
-					AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map);
-		} else {
-			unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES,
-					map);
-		}
-
-		Iterator<WookieAttachment> iter = unsavedFiles.iterator();
-		while (iter.hasNext()) {
-			WookieAttachment att = (WookieAttachment) iter.next();
-
-			if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
-				// delete from repository and list
-				wookieService.deleteFromRepository(att.getFileUuid(), att
-						.getFileVersionId());
-				iter.remove();
-				break;
-			}
-		}
-
-		request.setAttribute(WookieConstants.ATTR_SESSION_MAP, map);
-		request.setAttribute("unsavedChanges", new Boolean(true));
-
-		return mapping.findForward("success");
-	}
 
 	/**
 	 * Updates Wookie content using AuthoringForm inputs.
@@ -512,8 +320,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		wookie.setTitle(authForm.getTitle());
 		wookie.setInstructions(authForm.getInstructions());
 		if (mode.isAuthor()) { // Teacher cannot modify following
-			wookie.setOfflineInstructions(authForm.getOnlineInstruction());
-			wookie.setOnlineInstructions(authForm.getOfflineInstruction());
 			wookie.setLockOnFinished(authForm.isLockOnFinished());
 			wookie.setReflectOnActivity(authForm.isReflectOnActivity());
 			wookie.setReflectInstructions(authForm.getReflectInstructions());
@@ -535,8 +341,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	private void updateAuthForm(AuthoringForm authForm, Wookie wookie) {
 		authForm.setTitle(wookie.getTitle());
 		authForm.setInstructions(wookie.getInstructions());
-		authForm.setOnlineInstruction(wookie.getOnlineInstructions());
-		authForm.setOfflineInstruction(wookie.getOfflineInstructions());
 		authForm.setLockOnFinished(wookie.isLockOnFinished());
 		authForm.setReflectOnActivity(wookie.isReflectOnActivity());
 		authForm.setReflectInstructions(wookie.getReflectInstructions());
@@ -563,31 +367,6 @@ public class AuthoringAction extends LamsDispatchAction {
 		map.put(AuthoringAction.KEY_MODE, mode);
 		map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
 		map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
-		map.put(AuthoringAction.KEY_ONLINE_FILES,
-				new LinkedList<WookieAttachment>());
-		map.put(AuthoringAction.KEY_OFFLINE_FILES,
-				new LinkedList<WookieAttachment>());
-		map.put(AuthoringAction.KEY_UNSAVED_ONLINE_FILES,
-				new LinkedList<WookieAttachment>());
-		map.put(AuthoringAction.KEY_UNSAVED_OFFLINE_FILES,
-				new LinkedList<WookieAttachment>());
-		map.put(AuthoringAction.KEY_DELETED_FILES,
-				new LinkedList<WookieAttachment>());
-
-		Iterator<WookieAttachment> iter = wookie.getWookieAttachments()
-				.iterator();
-		while (iter.hasNext()) {
-			WookieAttachment attachment = (WookieAttachment) iter.next();
-			String type = attachment.getFileType();
-			if (type.equals(IToolContentHandler.TYPE_OFFLINE)) {
-				getAttList(AuthoringAction.KEY_OFFLINE_FILES, map).add(
-						attachment);
-			}
-			if (type.equals(IToolContentHandler.TYPE_ONLINE)) {
-				getAttList(AuthoringAction.KEY_ONLINE_FILES, map).add(
-						attachment);
-			}
-		}
 
 		return map;
 	}
@@ -609,20 +388,6 @@ public class AuthoringAction extends LamsDispatchAction {
 			mode = ToolAccessMode.AUTHOR;
 		}
 		return mode;
-	}
-
-	/**
-	 * Retrieves a List of attachments from the map using the key.
-	 * 
-	 * @param key
-	 * @param map
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private List<WookieAttachment> getAttList(String key,
-			SessionMap<String, Object> map) {
-		List<WookieAttachment> list = (List<WookieAttachment>) map.get(key);
-		return list;
 	}
 
 	/**

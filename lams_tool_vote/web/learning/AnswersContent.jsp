@@ -175,12 +175,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
-				<div class="warning">
-					<fmt:message key="label.learning.forceOfflineMessage" />
-				</div>
-			</c:if>
-
 			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
 				<div class="warning">
 					<fmt:message key="error.maxNominationCount.reached" />
@@ -189,56 +183,51 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}">
+			<p>
+				<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+			</p>
 
+			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
+				<p>&nbsp;</p>
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}"
-						escapeXml="false" />
+					<fmt:message key="label.nominations.available">
+						<fmt:param>
+							<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
+						</fmt:param>
+					</fmt:message>
 				</p>
-
-				<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
-					<p>&nbsp;</p>
-					<p>
-						<fmt:message key="label.nominations.available">
-							<fmt:param>
-								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
-							</fmt:param>
-						</fmt:message>
-					</p>
-				</c:if>
-
-				<table class="shading-bg">
-					<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
-
-						<tr>
-							<td width="1px">
-								<input type="checkbox" name="checkedVotes" class="noBorder"
-									value="${subEntry.key}" onClick="updateCount(this);">
-							</td>
-
-							<td>
-								<c:out value="${subEntry.value}" escapeXml="false" />
-							</td>
-						</tr>
-						
-					</c:forEach>
-				</table>
-
-				<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
-					<strong> <fmt:message key="label.other" />: </strong>
-					<html:text property="userEntry" size="30" maxlength="100" />
-				</c:if>
-
-				<html:hidden property="donePreview" />
-
-				<div class="space-bottom-top">
-						<html:submit property="continueOptionsCombined" styleClass="button">
-							<fmt:message key="label.submit.vote" />
-						</html:submit>
-				</div>
-				
 			</c:if>
 
+			<table class="shading-bg">
+				<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+
+					<tr>
+						<td width="1px">
+							<input type="checkbox" name="checkedVotes" class="noBorder"
+								value="${subEntry.key}" onClick="updateCount(this);">
+						</td>
+
+						<td>
+							<c:out value="${subEntry.value}" escapeXml="false" />
+						</td>
+					</tr>
+						
+				</c:forEach>
+			</table>
+
+			<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
+				<strong> <fmt:message key="label.other" />: </strong>
+				<html:text property="userEntry" size="30" maxlength="100" />
+			</c:if>
+
+			<html:hidden property="donePreview" />
+
+			<div class="space-bottom-top">
+				<html:submit property="continueOptionsCombined" styleClass="button">
+					<fmt:message key="label.submit.vote" />
+				</html:submit>
+			</div>
+				
 		</html:form>
 	</div>
 

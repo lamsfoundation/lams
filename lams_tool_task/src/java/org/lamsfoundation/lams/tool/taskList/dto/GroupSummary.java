@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.tool.taskList.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-
 /**
  * DTO object used in a monitoring. Contains information for group.
  * 

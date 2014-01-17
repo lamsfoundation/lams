@@ -61,8 +61,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     // BEGIN ADVANCED OPTIONS------------------
 
     // Lock the wiki after learner is finished
@@ -94,54 +92,17 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     // END ADVANCED OPTIONS------------------
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean contentInUse;
 
     private boolean defineLater;
 
     private Long toolContentId;
 
-    private Set<WikiAttachment> wikiAttachments;
-
     private Set<WikiSession> wikiSessions;
 
     private Set<WikiPage> wikiPages;
 
     private WikiPage mainPage;
-
-    // *********** NON Persist fields
-    private IToolContentHandler toolContentHandler;
-
-    // Constructors
-
-    /** default constructor */
-    public Wiki() {
-    }
-
-    /** full constructor */
-    public Wiki(Date createDate, Date updateDate, Long createBy, String title, String instructions, boolean runOffline,
-	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, String onlineInstructions,
-	    String offlineInstructions, boolean contentInUse, boolean defineLater, Long toolContentId,
-	    Set<WikiAttachment> wikiAttachments, Set<WikiSession> wikiSessions, Set<WikiPage> wikiPages) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.runOffline = runOffline;
-	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.wikiAttachments = wikiAttachments;
-	this.wikiSessions = wikiSessions;
-	this.wikiPages = wikiPages;
-    }
 
     // Property accessors
     /**
@@ -220,19 +181,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return this.runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
     }
 
     /**
@@ -341,32 +289,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-
-    public String getOnlineInstructions() {
-	return this.onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return this.offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
      * @hibernate.property column="content_in_use" length="1"
      * 
      */
@@ -403,21 +325,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="wiki_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiAttachment"
-     * 
-     */
-
-    public Set<WikiAttachment> getWikiAttachments() {
-	return this.wikiAttachments;
-    }
-
-    public void setWikiAttachments(Set<WikiAttachment> wikiAttachments) {
-	this.wikiAttachments = wikiAttachments;
     }
 
     /**
@@ -500,9 +407,8 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Wiki newInstance(Wiki fromContent, Long toContentId, IToolContentHandler wikiToolContentHandler) {
+    public static Wiki newInstance(Wiki fromContent, Long toContentId) {
 	Wiki toContent = new Wiki();
-	fromContent.toolContentHandler = wikiToolContentHandler;
 	toContent = (Wiki) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -515,18 +421,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	try {
 	    wiki = (Wiki) super.clone();
 	    wiki.setUid(null);
-
-	    if (wikiAttachments != null) {
-		// create a copy of the attachments
-		Iterator<WikiAttachment> iter = wikiAttachments.iterator();
-		Set<WikiAttachment> set = new HashSet<WikiAttachment>();
-		while (iter.hasNext()) {
-		    WikiAttachment originalFile = (WikiAttachment) iter.next();
-		    WikiAttachment newFile = (WikiAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		wiki.wikiAttachments = set;
-	    }
 
 	    if (wikiPages != null) {
 		Set<WikiPage> newPages = new HashSet<WikiPage>();
@@ -551,13 +445,5 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	    log.error("Error cloning " + Wiki.class);
 	}
 	return wiki;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 }

@@ -26,14 +26,12 @@ package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +49,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -63,7 +60,6 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
@@ -328,15 +324,8 @@ public class LearningAction extends Action {
         	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
         		request, getServlet().getServletContext());
         	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-
-		//add run offline support
-		if(taskList.getRunOffline()){
-			sessionMap.put(TaskListConstants.PARAM_RUN_OFFLINE, true);
-			return mapping.findForward("runOffline");
-		}else
-			sessionMap.put(TaskListConstants.PARAM_RUN_OFFLINE, false);
 		
-		//  check if there is submission deadline LDEV-2657
+		//  check if there is submission deadline
 		Date submissionDeadline = taskList.getSubmissionDeadline();
 		if (submissionDeadline != null) {
 			HttpSession ss = SessionManager.getSession();
@@ -346,9 +335,9 @@ public class LearningAction extends Action {
 			Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 			sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline);
 			
-			//calculate whether deadline has passed, and if so forward to "runOffline"
+			//calculate whether deadline has passed, and if so forward to "submissionDeadline"
 			if (currentLearnerDate.after(tzSubmissionDeadline)) {
-				return mapping.findForward("runOffline");
+				return mapping.findForward("submissionDeadline");
 			}
 			
 		}
@@ -574,7 +563,7 @@ public class LearningAction extends Action {
 		ITaskListService service = getTaskListService();
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
-		TaskListItemAttachment  att = service.uploadTaskListItemFile(file, IToolContentHandler.TYPE_ONLINE, taskListUser);
+		TaskListItemAttachment  att = service.uploadTaskListItemFile(file, taskListUser);
 		
 		//persist TaskListItem changes in DB 
 		Long itemUid =  new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
@@ -727,9 +716,7 @@ public class LearningAction extends Action {
 		int numberCompletedTasks = service.getNumTasksCompletedByUser(sessionId, userID);
 		int minimumNumberTasks = service.getTaskListBySessionId(sessionId).getMinimumNumberTasks();
 		//if current user view less than reqired view count number, then just return error message.
-		//if it is runOffline content, then need not check minimum view count
-		Boolean runOffline = (Boolean) sessionMap.get(TaskListConstants.PARAM_RUN_OFFLINE);
-		if((minimumNumberTasks - numberCompletedTasks) > 0 && !runOffline){
+		if((minimumNumberTasks - numberCompletedTasks) > 0){
 			ActionErrors errors = new ActionErrors();
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number",minimumNumberTasks, numberCompletedTasks));
 			this.addErrors(request,errors);

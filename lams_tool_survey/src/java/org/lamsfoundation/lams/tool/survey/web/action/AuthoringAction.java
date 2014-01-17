@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,6 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
-import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
@@ -135,18 +135,6 @@ public class AuthoringAction extends Action {
 
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
 	}
 	// ----------------------- Add survey item function ---------------------------
 	if (param.equals("newItemInit")) {
@@ -461,11 +449,6 @@ public class AuthoringAction extends Action {
 
 	surveyForm.setSurvey(survey);
 
-	// initialize instruction attachment list
-	List attachmentList = getAttachmentList(sessionMap);
-	attachmentList.clear();
-	attachmentList.addAll(survey.getAttachments());
-
 	// init it to avoid null exception in following handling
 	if (questions == null) {
 	    questions = new ArrayList();
@@ -598,51 +581,11 @@ public class AuthoringAction extends Action {
 	}
 
 	surveyPO.setCreatedBy(surveyUser);
-
-	// **********************************Handle Authoring Instruction Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
-	Set attPOSet = surveyPO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    SurveyAttachment newAtt = (SurveyAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    SurveyAttachment delAtt = (SurveyAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    SurveyAttachment att = (SurveyAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteSurveyAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-
-	// copy back
-	surveyPO.setAttachments(attPOSet);
 	
 	// ************************* Handle survey questions *******************
 	Set questionList = new LinkedHashSet();
 	SortedSet topics = getSurveyItemList(sessionMap);
-	iter = topics.iterator();
+	Iterator iter = topics.iterator();
 	while (iter.hasNext()) {
 	    SurveyQuestion item = (SurveyQuestion) iter.next();
 	    if (item != null) {
@@ -696,9 +639,6 @@ public class AuthoringAction extends Action {
 	// finally persist surveyPO again
 	service.saveOrUpdateSurvey(surveyPO);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(survey.getAttachments());
 	surveyForm.setSurvey(surveyPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -707,165 +647,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadSurveyFileException
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadSurveyFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadSurveyFileException
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadSurveyFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadSurveyFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-	    throws UploadSurveyFileException {
-
-	SurveyForm surveyForm = (SurveyForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(surveyForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = surveyForm.getOfflineFile();
-	} else {
-	    file = surveyForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(SurveyConstants.SUCCESS);
-	}
-
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward("success");
-	}
-
-	ISurveyService service = getSurveyService();
-	// upload to repository
-	SurveyAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	SurveyAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (SurveyAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(SurveyConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current Survey authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Survey authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, SurveyConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, SurveyConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	SurveyAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (SurveyAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(SurveyConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(SurveyConstants.SUCCESS);
-
     }
 
     // *************************************************************************************
@@ -878,22 +659,6 @@ public class AuthoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, SurveyConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_ATTACHMENT_LIST);
     }
 
     /**

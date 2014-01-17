@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.taskList.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 

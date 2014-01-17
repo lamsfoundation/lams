@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
-import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
@@ -90,16 +89,6 @@ public class AuthoringAction extends WikiPageAction {
     private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
 
     private static final String KEY_MODE = "mode";
-
-    private static final String KEY_ONLINE_FILES = "onlineFiles";
-
-    private static final String KEY_OFFLINE_FILES = "offlineFiles";
-
-    private static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
-
-    private static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
-
-    private static final String KEY_DELETED_FILES = "deletedFiles";
 
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
@@ -264,24 +253,6 @@ public class AuthoringAction extends WikiPageAction {
 	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
 	updateWiki(wiki, authForm, mode);
 
-	// remove attachments marked for deletion.
-	Set<WikiAttachment> attachments = wiki.getWikiAttachments();
-	if (attachments == null) {
-	    attachments = new HashSet<WikiAttachment>();
-	}
-
-	for (WikiAttachment att : getAttList(AuthoringAction.KEY_DELETED_FILES, map)) {
-	    // remove from db, leave in repository
-	    attachments.remove(att);
-	}
-
-	// add unsaved attachments
-	attachments.addAll(getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES, map));
-	attachments.addAll(getAttList(AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map));
-
-	// set attachments in case it didn't exist
-	wiki.setWikiAttachments(attachments);
-
 	// set the update date
 	wiki.setUpdateDate(new Date());
 
@@ -300,167 +271,6 @@ public class AuthoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return uploadFile(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return uploadFile(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    public ActionForward deleteOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    public ActionForward deleteOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    public ActionForward removeUnsavedOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return removeUnsaved(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    public ActionForward removeUnsavedOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return removeUnsaved(mapping, (AuthoringForm) form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /* ========== Private Methods ********** */
-
-    /**
-     * Upload a file
-     */
-    private ActionForward uploadFile(ActionMapping mapping, AuthoringForm authForm, String type,
-	    HttpServletRequest request) {
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-	FormFile file;
-	List<WikiAttachment> unsavedFiles;
-	List<WikiAttachment> savedFiles;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = authForm.getOfflineFile();
-	    unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map);
-
-	    savedFiles = getAttList(AuthoringAction.KEY_OFFLINE_FILES, map);
-	} else {
-	    file = authForm.getOnlineFile();
-	    unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES, map);
-
-	    savedFiles = getAttList(AuthoringAction.KEY_ONLINE_FILES, map);
-	}
-
-	// validate file max size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	    this.saveErrors(request, errors);
-	    return mapping.findForward("success");
-	}
-
-	if (file.getFileName().length() != 0) {
-
-	    // upload file to repository
-	    WikiAttachment newAtt = wikiService.uploadFileToContent(
-		    (Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID), file, type);
-
-	    // Add attachment to unsavedFiles
-	    // check to see if file with same name exists
-	    WikiAttachment currAtt;
-	    Iterator iter = savedFiles.iterator();
-	    while (iter.hasNext()) {
-		currAtt = (WikiAttachment) iter.next();
-		if (StringUtils.equals(currAtt.getFileName(), newAtt.getFileName())
-			&& StringUtils.equals(currAtt.getFileType(), newAtt.getFileType())) {
-		    // move from this this list to deleted list.
-		    getAttList(AuthoringAction.KEY_DELETED_FILES, map).add(currAtt);
-		    iter.remove();
-		    break;
-		}
-	    }
-	    unsavedFiles.add(newAtt);
-
-	    request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	    request.setAttribute("unsavedChanges", new Boolean(true));
-	}
-	return mapping.findForward("success");
-    }
-
-    /**
-     * Delete a file
-     * 
-     * @param mapping
-     * @param authForm
-     * @param type
-     * @param request
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, AuthoringForm authForm, String type,
-	    HttpServletRequest request) {
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-	List fileList;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    fileList = getAttList(AuthoringAction.KEY_OFFLINE_FILES, map);
-	} else {
-	    fileList = getAttList(AuthoringAction.KEY_ONLINE_FILES, map);
-	}
-
-	Iterator iter = fileList.iterator();
-
-	while (iter.hasNext()) {
-	    WikiAttachment att = (WikiAttachment) iter.next();
-
-	    if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
-		// move to delete file list, deleted at next updateContent
-		getAttList(AuthoringAction.KEY_DELETED_FILES, map).add(att);
-
-		// remove from this list
-		iter.remove();
-		break;
-	    }
-	}
-
-	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	request.setAttribute("unsavedChanges", new Boolean(true));
-
-	return mapping.findForward("success");
-    }
-
-    private ActionForward removeUnsaved(ActionMapping mapping, AuthoringForm authForm, String type,
-	    HttpServletRequest request) {
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
-
-	List unsavedFiles;
-
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, map);
-	} else {
-	    unsavedFiles = getAttList(AuthoringAction.KEY_UNSAVED_ONLINE_FILES, map);
-	}
-
-	Iterator iter = unsavedFiles.iterator();
-	while (iter.hasNext()) {
-	    WikiAttachment att = (WikiAttachment) iter.next();
-
-	    if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
-		// delete from repository and list
-		wikiService.deleteFromRepository(att.getFileUuid(), att.getFileVersionId());
-		iter.remove();
-		break;
-	    }
-	}
-
-	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	request.setAttribute("unsavedChanges", new Boolean(true));
-
-	return mapping.findForward("success");
-    }
 
     /**
      * Updates Wiki content using AuthoringForm inputs.
@@ -481,8 +291,6 @@ public class AuthoringAction extends WikiPageAction {
 	wiki.setMainPage(mainPage);
 
 	if (mode.isAuthor()) { // Teacher cannot modify following
-	    wiki.setOfflineInstructions(authForm.getOfflineInstruction());
-	    wiki.setOnlineInstructions(authForm.getOnlineInstruction());
 	    wiki.setLockOnFinished(authForm.isLockOnFinished());
 	    wiki.setAllowLearnerAttachImages(authForm.isAllowLearnerAttachImages());
 	    wiki.setAllowLearnerCreatePages(authForm.isAllowLearnerCreatePages());
@@ -503,8 +311,6 @@ public class AuthoringAction extends WikiPageAction {
      * @return
      */
     private void updateAuthForm(AuthoringForm authForm, Wiki wiki) {
-	authForm.setOnlineInstruction(wiki.getOnlineInstructions());
-	authForm.setOfflineInstruction(wiki.getOfflineInstructions());
 	authForm.setLockOnFinished(wiki.isLockOnFinished());
 	authForm.setAllowLearnerAttachImages(wiki.isAllowLearnerAttachImages());
 	authForm.setAllowLearnerCreatePages(wiki.isAllowLearnerCreatePages());
@@ -531,23 +337,6 @@ public class AuthoringAction extends WikiPageAction {
 	map.put(AuthoringAction.KEY_MODE, mode);
 	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
 	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
-	map.put(AuthoringAction.KEY_ONLINE_FILES, new LinkedList<WikiAttachment>());
-	map.put(AuthoringAction.KEY_OFFLINE_FILES, new LinkedList<WikiAttachment>());
-	map.put(AuthoringAction.KEY_UNSAVED_ONLINE_FILES, new LinkedList<WikiAttachment>());
-	map.put(AuthoringAction.KEY_UNSAVED_OFFLINE_FILES, new LinkedList<WikiAttachment>());
-	map.put(AuthoringAction.KEY_DELETED_FILES, new LinkedList<WikiAttachment>());
-
-	Iterator iter = wiki.getWikiAttachments().iterator();
-	while (iter.hasNext()) {
-	    WikiAttachment attachment = (WikiAttachment) iter.next();
-	    String type = attachment.getFileType();
-	    if (type.equals(IToolContentHandler.TYPE_OFFLINE)) {
-		getAttList(AuthoringAction.KEY_OFFLINE_FILES, map).add(attachment);
-	    }
-	    if (type.equals(IToolContentHandler.TYPE_ONLINE)) {
-		getAttList(AuthoringAction.KEY_ONLINE_FILES, map).add(attachment);
-	    }
-	}
 
 	return map;
     }
@@ -564,18 +353,6 @@ public class AuthoringAction extends WikiPageAction {
 	    return ToolAccessMode.TEACHER;
 	}
 	return ToolAccessMode.AUTHOR;
-    }
-
-    /**
-     * Retrieves a List of attachments from the map using the key.
-     * 
-     * @param key
-     * @param map
-     * @return
-     */
-    private List<WikiAttachment> getAttList(String key, SessionMap<String, Object> map) {
-	List<WikiAttachment> list = (List<WikiAttachment>) map.get(key);
-	return list;
     }
 
     /**

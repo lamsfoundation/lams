@@ -43,10 +43,6 @@
 	<bean id="voteUsrAttemptDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-
-	<bean id="voteUploadedFileDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUploadedFileDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
 	
 	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler">
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -67,11 +63,9 @@
 					<property name="voteSessionDAO"><ref bean="voteSessionDAO"/></property>
 					<property name="voteUserDAO"><ref bean="voteUserDAO"/></property>
 					<property name="voteQueContentDAO"><ref bean="voteQueContentDAO"/></property>
-					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>													
-			 		<property name="voteUploadedFileDAO"><ref bean="voteUploadedFileDAO"/></property>
+					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>
 			 		<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
-			 		<property name="repositoryService"><ref bean="repositoryService"/></property> 
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>			 		
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		

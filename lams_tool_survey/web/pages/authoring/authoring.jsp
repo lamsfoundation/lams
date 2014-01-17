@@ -27,20 +27,8 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
-        } 
-
-        function doUploadOnline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
-        	myForm.submit();
-        }
-        function doUploadOffline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
-        	myForm.submit();
         }
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
 </lams:head>
 <body class="stripes" onLoad="init()">
@@ -52,8 +40,7 @@
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-			<lams:Tab id="3" key="label.authoring.heading.instructions" />
-			<lams:Tab id="4" key="label.authoring.heading.conditions" />
+			<lams:Tab id="3" key="label.authoring.heading.conditions" />
 		</lams:Tabs>
 </div>
 		<!-- start tabs -->
@@ -76,22 +63,12 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 			<!-- end of content (Advanced) -->
-
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
 			
 			<!-- tab content 4 (Conditions) -->
-			<lams:TabBody id="4" titleKey="label.authoring.heading.conditions.desc" page="conditions.jsp" />
+			<lams:TabBody id="3" titleKey="label.authoring.heading.conditions.desc" page="conditions.jsp" />
 			<!-- end of content (Conditions) -->
 
 			<!-- Button Row -->
-			<%--  Default value 
-				cancelButtonLabelKey="label.authoring.cancel.button"
-				saveButtonLabelKey="label.authoring.save.button"
-				cancelConfirmMsgKey="authoring.msg.cancel.save"
-				accessMode="author"
-			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 				toolSignature="<%=SurveyConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.survey.contentId}" 
 				 customiseSessionID="${formBean.sessionMapID}"

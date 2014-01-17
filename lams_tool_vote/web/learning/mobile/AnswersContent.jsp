@@ -182,12 +182,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
-				<div class="warning">
-					<fmt:message key="label.learning.forceOfflineMessage" />
-				</div>
-			</c:if>
-
 			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
 				<div class="warning">
 					<fmt:message key="error.maxNominationCount.reached" />
@@ -196,57 +190,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}">
+			<p>
+				<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+			</p>
 
+			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
+				<p>&nbsp;</p>
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}"
-						escapeXml="false" />
+					<fmt:message key="label.nominations.available">
+						<fmt:param>
+							<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
+						</fmt:param>
+					</fmt:message>
 				</p>
-
-				<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
-					<p>&nbsp;</p>
-					<p>
-						<fmt:message key="label.nominations.available">
-							<fmt:param>
-								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
-							</fmt:param>
-						</fmt:message>
-					</p>
-				</c:if>
-
-				<ul data-role="listview" data-inset="true">
-					<table class="alternative-color" style="margin-top: 20px; margin-bottom: 10px;">
-	
-						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
-	
-							<tr>
-								<td width="1px" style="font-size: 13px;">
-									<input type="checkbox" name="checkedVotes" class="noBorder"
-										value="${subEntry.key}" onClick="updateCount(this);">
-								</td>
-	
-								<td>
-									<c:out value="${subEntry.value}" escapeXml="false" />
-								</td>
-							</tr>
-						</c:forEach>
-					</table>
-				</ul>
-
-				<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
-					<strong> <fmt:message key="label.other" />: </strong>
-					<html:text property="userEntry" size="30" maxlength="100" />
-				</c:if>
-
-				<html:hidden property="donePreview" />
-
-				<div class="space-top button-inside" id="continue-options-combined-button">
-					<button onclick="javascript:submitMethod();return false;" name="continueOptionsCombined" class="button" data-icon="arrow-r" data-theme="b">
-						<fmt:message key="label.submit.vote" />
-					</button>
-				</div>
-				
 			</c:if>
+
+			<ul data-role="listview" data-inset="true">
+				<table class="alternative-color" style="margin-top: 20px; margin-bottom: 10px;">
+	
+					<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+	
+						<tr>
+							<td width="1px" style="font-size: 13px;">
+								<input type="checkbox" name="checkedVotes" class="noBorder"
+									value="${subEntry.key}" onClick="updateCount(this);">
+							</td>
+	
+							<td>
+								<c:out value="${subEntry.value}" escapeXml="false" />
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</ul>
+
+			<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
+				<strong> <fmt:message key="label.other" />: </strong>
+				<html:text property="userEntry" size="30" maxlength="100" />
+			</c:if>
+
+			<html:hidden property="donePreview" />
+
+			<div class="space-top button-inside" id="continue-options-combined-button">
+				<button onclick="javascript:submitMethod();return false;" name="continueOptionsCombined" class="button" data-icon="arrow-r" data-theme="b">
+					<fmt:message key="label.submit.vote" />
+				</button>
+			</div>
 
 		</html:form>
 	</div>

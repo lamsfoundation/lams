@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
-import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 
 public class WikiDTO {
@@ -44,10 +43,6 @@ public class WikiDTO {
     public String title;
 
     public String instructions;
-
-    public String onlineInstructions;
-
-    public String offlineInstructions;
 
     public boolean defineLater;
 
@@ -71,10 +66,6 @@ public class WikiDTO {
 
     private Integer maximumEdits;
 
-    public Set<WikiAttachmentDTO> onlineInstructionsFiles;
-
-    public Set<WikiAttachmentDTO> offlineInstructionsFiles;
-
     public Set<WikiSessionDTO> sessionDTOs = new TreeSet<WikiSessionDTO>();
 
     public Long currentTab;
@@ -87,8 +78,6 @@ public class WikiDTO {
 	toolContentId = wiki.getToolContentId();
 	title = wiki.getTitle();
 	instructions = wiki.getInstructions();
-	onlineInstructions = wiki.getOnlineInstructions();
-	offlineInstructions = wiki.getOfflineInstructions();
 	contentInUse = wiki.isContentInUse();
 	lockOnFinish = wiki.isLockOnFinished();
 	allowLearnerCreatePages = wiki.isAllowLearnerCreatePages();
@@ -99,23 +88,6 @@ public class WikiDTO {
 	reflectInstructions = wiki.getReflectInstructions();
 	minimumEdits = wiki.getMinimumEdits();
 	maximumEdits = wiki.getMaximumEdits();
-
-	onlineInstructionsFiles = new TreeSet<WikiAttachmentDTO>();
-	offlineInstructionsFiles = new TreeSet<WikiAttachmentDTO>();
-
-	for (Iterator<WikiAttachment> i = wiki.getWikiAttachments().iterator(); i.hasNext();) {
-	    WikiAttachment att = (WikiAttachment) i.next();
-	    if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-		WikiAttachmentDTO attDTO = new WikiAttachmentDTO(att);
-		offlineInstructionsFiles.add(attDTO);
-	    } else if (att.getFileType().equals(IToolContentHandler.TYPE_ONLINE)) {
-		WikiAttachmentDTO attDTO = new WikiAttachmentDTO(att);
-		onlineInstructionsFiles.add(attDTO);
-	    } else {
-		// something is wrong. Ignore file, log error
-		logger.error("File with uid " + att.getFileUuid() + " contains invalid fileType: " + att.getFileType());
-	    }
-	}
 
 	for (Iterator<WikiSession> iter = wiki.getWikiSessions().iterator(); iter.hasNext();) {
 	    WikiSession session = (WikiSession) iter.next();
@@ -140,38 +112,6 @@ public class WikiDTO {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public Set<WikiAttachmentDTO> getOfflineInstructionsFiles() {
-	return offlineInstructionsFiles;
-    }
-
-    public void setOfflineInstructionsFiles(Set<WikiAttachmentDTO> offlineInstructionsFiles) {
-	this.offlineInstructionsFiles = offlineInstructionsFiles;
-    }
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    public Set<WikiAttachmentDTO> getOnlineInstructionsFiles() {
-	return onlineInstructionsFiles;
-    }
-
-    public void setOnlineInstructionsFiles(Set<WikiAttachmentDTO> onlineInstructionsFiles) {
-	this.onlineInstructionsFiles = onlineInstructionsFiles;
     }
 
     public String getTitle() {

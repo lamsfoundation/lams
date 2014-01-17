@@ -144,7 +144,7 @@ public class LearningAction extends Action {
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-	// it will be use when runOffline or lock on finish page.
+	// it will be use when submissionDeadline or lock on finish page.
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	// get back the survey and question list and display them on page
@@ -205,14 +205,6 @@ public class LearningAction extends Action {
 	survey.setDefineLater(false);
 	service.saveOrUpdateSurvey(survey);
 
-	// add run offline support
-	if (survey.getRunOffline()) {
-	    sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, true);
-	    return mapping.findForward(SurveyConstants.RUN_OFFLINE);
-	} else {
-	    sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, false);
-	}
-
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
@@ -228,9 +220,9 @@ public class LearningAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward(SurveyConstants.RUN_OFFLINE);
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 

@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -286,16 +285,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		{
 		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
 		}
-	
-		
-		/**getting instructions screen content from here... */
-		voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-		voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-		
-        List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-        voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        /** ...till here **/
 
 	MonitoringUtil.buildVoteStatsDTO(request, voteService, voteContent);
 
@@ -317,7 +306,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    {
 	    	try
 			{
-	    		long toolContentID=new Long(strToolContentId).longValue();
 		    	voteMonitoringForm.setToolContentID(strToolContentId);
 			}
 	    	catch(NumberFormatException e)

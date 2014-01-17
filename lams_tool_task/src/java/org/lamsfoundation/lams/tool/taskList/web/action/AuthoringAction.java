@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -52,26 +51,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
-import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListConditionComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListPedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -125,18 +119,6 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
 	}
 
 	// ----------------------- Add taskListItem methods ---------------------------
@@ -220,11 +202,6 @@ public class AuthoringAction extends Action {
 	    }
 
 	    taskListForm.setTaskList(taskList);
-
-	    // initialize instruction attachment list
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(taskList.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -361,45 +338,6 @@ public class AuthoringAction extends Action {
 	}
 
 	taskListPO.setCreatedBy(taskListUser);
-
-	// **********************************Handle Authoring Instruction Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
-	Set attPOSet = taskListPO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    TaskListAttachment newAtt = (TaskListAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    TaskListAttachment delAtt = (TaskListAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    TaskListAttachment att = (TaskListAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteTaskListAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-	// copy back
-	taskListPO.setAttachments(attPOSet);
 	
 	// ************************* Handle taskList items *******************
 	Set itemList = new LinkedHashSet();
@@ -436,7 +374,7 @@ public class AuthoringAction extends Action {
 	taskListPO.setConditions(conditions);
 
 	// delete TaskListConditions from database.
-	iter = delConditions.iterator();
+	Iterator iter = delConditions.iterator();
 	while (iter.hasNext()) {
 	    TaskListCondition condition = (TaskListCondition) iter.next();
 	    iter.remove();
@@ -470,9 +408,6 @@ public class AuthoringAction extends Action {
 
 	service.getTaskListByContentId(taskListPO.getContentId());
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(taskList.getAttachments());
 	taskListForm.setTaskList(taskListPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -481,166 +416,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadTaskListFileException
-     */
-    private ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadTaskListFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadTaskListFileException
-     */
-    private ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadTaskListFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadTaskListFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-	    throws UploadTaskListFileException {
-
-	TaskListForm taskListForm = (TaskListForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(taskListForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = taskListForm.getOfflineFile();
-	} else {
-	    file = taskListForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(TaskListConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(TaskListConstants.SUCCESS);
-	}
-
-	ITaskListService service = getTaskListService();
-	// upload to repository
-	TaskListAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	TaskListAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (TaskListAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(TaskListConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current TaskList authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current TaskList authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, TaskListConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, TaskListConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	TaskListAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (TaskListAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(TaskListConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(TaskListConstants.SUCCESS);
-
     }
 
     // **********************************************************
@@ -845,22 +620,6 @@ public class AuthoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, TaskListConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_ATTACHMENT_LIST);
     }
 
     /**

@@ -67,7 +67,7 @@ public class SurveyQuestion  implements Cloneable{
     	SurveyQuestion obj = null;
 		try {
 			obj = (SurveyQuestion) super.clone();
-//			clone attachment
+//			clone options
   			if(options != null){
   				Iterator iter = options.iterator();
   				Set set = new HashSet();

@@ -30,7 +30,6 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
-import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
@@ -74,34 +73,6 @@ public interface IWikiService {
      * @return
      */
     public Wiki getWikiByContentId(Long toolContentID);
-
-    /**
-     * Uploads a file to a wiki
-     * 
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public WikiAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * Deletes a file from the repository
-     * 
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws WikiException;
-
-    /**
-     * Deletes an instruction file from the repository
-     * 
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * Saves or updates a wiki instance

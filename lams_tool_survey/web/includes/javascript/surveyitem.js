@@ -2,7 +2,6 @@
 	 This is Survey Item instrcution area.
 	 */
     var instructionTargetDiv = "instructionArea";
-    var itemAttachmentTargetDiv = "itemAttachmentArea";
 // Please set these 2 variables in JSP file for using tag reason:
 //    var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
 //    var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";

@@ -29,25 +29,13 @@
 	    	// end optional tab controller stuff
 	    	
 	    	//if we're leaving Condition tab its addCondition area should be closed
-	    	if (tabId != 4)	window.parent.hideConditionMessage();
+	    	if (tabId != 3)	window.parent.hideConditionMessage();
 	    	
 	    	selectTab(tabId);
 	    	
 	    	//for advanceTab
 	    	if(tabId == 2)
 	    		changeMinTasks(-1);
-        } 
-
-        function doUploadOnline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
-        	myForm.submit();
-        }
-        
-        function doUploadOffline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
-        	myForm.submit();
         }
         
         function changeMinTasks(initVal){
@@ -94,8 +82,7 @@
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-			<lams:Tab id="3" key="label.authoring.heading.instructions" />
-			<lams:Tab id="4" key="label.authoring.heading.conditions" />
+			<lams:Tab id="3" key="label.authoring.heading.conditions" />
 		</lams:Tabs></div>
 		<!-- start tabs -->
 <div id="content">
@@ -120,12 +107,8 @@
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 			<!-- end of content (Advanced) -->
 
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
-
-			<!-- tab content 4 (Conditions) -->
-			<lams:TabBody id="4" titleKey="label.authoring.heading.conditions.desc" page="conditions.jsp" />
+			<!-- tab content 3 (Conditions) -->
+			<lams:TabBody id="3" titleKey="label.authoring.heading.conditions.desc" page="conditions.jsp" />
 			<!-- end of content (Instructions) -->
 
 			<!-- Button Row -->

@@ -81,13 +81,6 @@ public class AuthoringForm extends ActionForm {
     
     String mode;
     
-    // flag of this item has attachment or not
-    private boolean hasFile;
-    private Long fileUuid;
-    private Long fileVersionId;
-    private String fileName;
-    private FormFile file;
-    
     // Wookie widget paramerters
     String widgetAuthorUrl;
     Integer widgetHeight;
@@ -206,46 +199,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
         this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public boolean isHasFile() {
-        return hasFile;
-    }
-
-    public void setHasFile(boolean hasFile) {
-        this.hasFile = hasFile;
-    }
-
-    public Long getFileUuid() {
-        return fileUuid;
-    }
-
-    public void setFileUuid(Long fileUuid) {
-        this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-        return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-        this.fileVersionId = fileVersionId;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public FormFile getFile() {
-        return file;
-    }
-
-    public void setFile(FormFile file) {
-        this.file = file;
     }
 
     public String getContentFolderID() {

@@ -107,26 +107,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		return FILENAME;
 	}
 
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-        	
-        	Survey content = null;
-            if ( toolContentID != null ) {
-            	content = service.getSurveyByContentId(toolContentID);
-            } else {
-            	SurveySession session=service.getSurveySessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		content = session.getSurvey();
-            }
-            if ( content != null ) {
-            	activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
-	}
-
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
 			throws SurveyApplicationException {
 

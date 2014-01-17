@@ -25,7 +25,3 @@ function doSelectTab(tabId) {
 		finishButtonDiv.style.display = "block";
 	}
 }
-function deleteAttachment(dispatch, uuid) {
-	document.authoringForm.deleteFileUuid.value = uuid;
-	submitWiki(dispatch);
-}

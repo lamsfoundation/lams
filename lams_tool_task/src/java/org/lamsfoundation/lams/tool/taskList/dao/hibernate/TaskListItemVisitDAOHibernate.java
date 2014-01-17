@@ -23,14 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
-import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 
 /**
  * Hibernate implementation of <code>TaskListItemVisitDAO</code>.

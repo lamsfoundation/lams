@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -186,15 +185,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
@@ -317,15 +307,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -483,15 +464,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	}
 	request.setAttribute(VoteAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	voteGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
@@ -538,15 +510,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
 	request.setAttribute(VoteAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	voteGeneralMonitoringDTO.setCurrentMonitoringTab("stats");
 
@@ -660,15 +623,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	voteGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
 	voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	if (voteContent != null) {
@@ -748,15 +702,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	    }
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -859,15 +804,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
@@ -957,15 +893,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -1179,15 +1106,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	List listNominationContentDTO = new LinkedList();
@@ -1391,15 +1309,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	if (voteContent != null) {
@@ -1597,15 +1506,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	/* find out if there are any reflection entries, from here */
@@ -1738,15 +1638,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	/* find out if there are any reflection entries, from here */
@@ -1843,15 +1734,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -1965,15 +1847,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
@@ -2121,15 +1994,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	if (notebookEntriesExist) {
@@ -2255,15 +2119,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	if (notebookEntriesExist) {
@@ -2388,15 +2243,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	voteGeneralMonitoringDTO.setOnlineInstructions(voteContent.getOnlineInstructions());
-	voteGeneralMonitoringDTO.setOfflineInstructions(voteContent.getOfflineInstructions());
-
-	List attachmentList = voteService.retrieveVoteUploadedFiles(voteContent);
-	voteGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	voteGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 

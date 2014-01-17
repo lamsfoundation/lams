@@ -62,19 +62,11 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String maxNominationCount;
     protected String minNominationCount;
 
-    protected String fileItem;
-    protected String uuid;
-
-    protected FormFile receivedFile;
-    protected String offlineFile;
-
     protected String addContent;
     protected String removeContent;
     protected String removeAllContent;
     protected String submitAllContent;
     protected String submitTabDone;
-    protected String submitOfflineFile;
-    protected String submitOnlineFile;
 
     /* tab controller, these may go away once the Flash wraps the jsp */
     protected String choice;
@@ -91,15 +83,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String isRemoveContent;
     protected String toolContentID;
     protected String editableNominationIndex;
-
-    /* instructions content */
-    protected String onlineInstructions;
-    protected String offlineInstructions;
-    protected FormFile theOfflineFile;
-    protected FormFile theOnlineFile;
-
-    protected String richTextOfflineInstructions;
-    protected String richTextOnlineInstructions;
 
     protected String defineLaterInEditMode;
 
@@ -141,15 +124,11 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	addOptionContent = null;
 	removeOptionContent = null;
 
-	fileItem = null;
-
 	addContent = null;
 	removeContent = null;
 	removeAllContent = null;
 	submitAllContent = null;
 	submitTabDone = null;
-	submitOfflineFile = null;
-	submitOnlineFile = null;
 
 	summaryMonitoring = null;
 	instructionsMonitoring = null;
@@ -164,18 +143,11 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	addOptionContent = null;
 	removeOptionContent = null;
 
-	fileItem = null;
-	uuid = null;
-	receivedFile = null;
-
 	addContent = null;
 	removeContent = null;
 	removeAllContent = null;
 	submitAllContent = null;
 	submitTabDone = null;
-	submitOfflineFile = null;
-	submitOnlineFile = null;
-	offlineFile = null;
 
 	choice = null;
 	choiceBasic = null;
@@ -191,12 +163,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	deletableOptionIndex = null;
 	isRemoveContent = null;
 	toolContentID = null;
-
-	onlineInstructions = null;
-	offlineInstructions = null;
-
-	richTextOfflineInstructions = null;
-	richTextOnlineInstructions = null;
 
 	useSelectLeaderToolOuput = null;
 	reflect = null;
@@ -379,36 +345,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *                The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *                The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
      * @return Returns the choiceAdvanced.
      */
     public String getChoiceAdvanced() {
@@ -559,96 +495,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     /**
-     * @return Returns the submitOfflineFile.
-     */
-    public String getSubmitOfflineFile() {
-	return submitOfflineFile;
-    }
-
-    /**
-     * @param submitOfflineFile
-     *                The submitOfflineFile to set.
-     */
-    public void setSubmitOfflineFile(String submitOfflineFile) {
-	this.submitOfflineFile = submitOfflineFile;
-    }
-
-    /**
-     * @param theOfflineFile
-     *                The theOfflineFile to set.
-     */
-    public void setTheOfflineFile(FormFile theOfflineFile) {
-	this.theOfflineFile = theOfflineFile;
-    }
-
-    /**
-     * @param theOnlineFile
-     *                The theOnlineFile to set.
-     */
-    public void setTheOnlineFile(FormFile theOnlineFile) {
-	this.theOnlineFile = theOnlineFile;
-    }
-
-    /**
-     * @return Returns the theOfflineFile.
-     */
-    public FormFile getTheOfflineFile() {
-	return theOfflineFile;
-    }
-
-    /**
-     * @return Returns the theOnlineFile.
-     */
-    public FormFile getTheOnlineFile() {
-	return theOnlineFile;
-    }
-
-    /**
-     * @return Returns the submitOnlineFile.
-     */
-    public String getSubmitOnlineFile() {
-	return submitOnlineFile;
-    }
-
-    /**
-     * @param submitOnlineFile
-     *                The submitOnlineFile to set.
-     */
-    public void setSubmitOnlineFile(String submitOnlineFile) {
-	this.submitOnlineFile = submitOnlineFile;
-    }
-
-    /**
-     * @return Returns the richTextOfflineInstructions.
-     */
-    public String getRichTextOfflineInstructions() {
-	return richTextOfflineInstructions;
-    }
-
-    /**
-     * @param richTextOfflineInstructions
-     *                The richTextOfflineInstructions to set.
-     */
-    public void setRichTextOfflineInstructions(String richTextOfflineInstructions) {
-	this.richTextOfflineInstructions = richTextOfflineInstructions;
-    }
-
-    /**
-     * @return Returns the richTextOnlineInstructions.
-     */
-    public String getRichTextOnlineInstructions() {
-	return richTextOnlineInstructions;
-    }
-
-    /**
-     * @param richTextOnlineInstructions
-     *                The richTextOnlineInstructions to set.
-     */
-    public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-	this.richTextOnlineInstructions = richTextOnlineInstructions;
-    }
-
-    /**
      * @return Returns the editDefaultQuestion.
      */
     public String getEditDefaultQuestion() {
@@ -738,66 +584,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setDeletableOptionIndex(String deletableOptionIndex) {
 	this.deletableOptionIndex = deletableOptionIndex;
-    }
-
-    /**
-     * @return Returns the fileItem.
-     */
-    public String getFileItem() {
-	return fileItem;
-    }
-
-    /**
-     * @param fileItem
-     *                The fileItem to set.
-     */
-    public void setFileItem(String fileItem) {
-	this.fileItem = fileItem;
-    }
-
-    /**
-     * @return Returns the receivedFile.
-     */
-    public FormFile getReceivedFile() {
-	return receivedFile;
-    }
-
-    /**
-     * @param receivedFile
-     *                The receivedFile to set.
-     */
-    public void setReceivedFile(FormFile receivedFile) {
-	this.receivedFile = receivedFile;
-    }
-
-    /**
-     * @return Returns the offlineFile.
-     */
-    public String getOfflineFile() {
-	return offlineFile;
-    }
-
-    /**
-     * @param offlineFile
-     *                The offlineFile to set.
-     */
-    public void setOfflineFile(String offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    /**
-     * @return Returns the uuid.
-     */
-    public String getUuid() {
-	return uuid;
-    }
-
-    /**
-     * @param uuid
-     *                The uuid to set.
-     */
-    public void setUuid(String uuid) {
-	this.uuid = uuid;
     }
 
     /**
@@ -1057,9 +843,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		.append("defaultContentId: ", defaultContentId).append("defaultContentIdStr: ", defaultContentIdStr)
 		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount).append("defaultOptionContent: ",
 			defaultOptionContent).append("activityTitle: ", activityTitle).append("activityInstructions: ",
-			activityInstructions).append("richTextOfflineInstructions: ", richTextOfflineInstructions)
-		.append("richTextOnlineInstructions: ", richTextOnlineInstructions).append("onlineInstructions: ",
-			onlineInstructions).append("offlineInstructions: ", offlineInstructions).toString();
+			activityInstructions).toString();
     }
     
     /**

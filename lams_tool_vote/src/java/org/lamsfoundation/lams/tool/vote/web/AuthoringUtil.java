@@ -22,9 +22,6 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -36,18 +33,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -186,221 +177,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	    mapTempOptionsContent = mapOptionsContent;
 	}
 	return mapTempOptionsContent;
-    }
-
-    /**
-     * 
-     * Used in uploading offline and online files
-     * 
-     * @param request
-     * @param voteAuthoringForm
-     * @param isOfflineFile
-     * @return VoteAttachmentDTO
-     * @throws RepositoryCheckedException
-     */
-    public static VoteAttachmentDTO uploadFile(HttpServletRequest request, IVoteService voteService,
-	    VoteAuthoringForm voteAuthoringForm, boolean isOfflineFile, SessionMap sessionMap)
-	    throws RepositoryCheckedException {
-
-	InputStream stream = null;
-	String fileName = null;
-	String mimeType = null;
-	String fileProperty = null;
-
-	if (isOfflineFile) {
-	    FormFile theOfflineFile = voteAuthoringForm.getTheOfflineFile();
-
-	    try {
-		stream = theOfflineFile.getInputStream();
-		fileName = theOfflineFile.getFileName();
-		if (fileName.length() == 0) {
-		    return null;
-		}
-		fileProperty = "OFFLINE";
-
-	    } catch (FileNotFoundException e) {
-		AuthoringUtil.logger
-			.error("filenotfound exception occured in accessing the repository server for the offline file : "
-				+ e.getMessage());
-	    } catch (IOException e) {
-		AuthoringUtil.logger
-			.error("io exception occured in accessing the repository server for the offline file : "
-				+ e.getMessage());
-	    }
-
-	    if (fileName.length() > 0) {
-		List listUploadedOfflineFileNames = (List) sessionMap
-			.get(VoteAppConstants.LIST_UPLOADED_OFFLINE_FILENAMES_KEY);
-		int index = findFileNameIndex(listUploadedOfflineFileNames, fileName);
-		if (index == 0) {
-		    listUploadedOfflineFileNames.add(fileName);
-		    sessionMap.put(VoteAppConstants.LIST_UPLOADED_OFFLINE_FILENAMES_KEY, listUploadedOfflineFileNames);
-		}
-	    }
-
-	} else {
-	    FormFile theOnlineFile = voteAuthoringForm.getTheOnlineFile();
-
-	    try {
-		stream = theOnlineFile.getInputStream();
-		fileName = theOnlineFile.getFileName();
-
-		if (fileName.length() == 0) {
-		    return null;
-		}
-
-		fileProperty = "ONLINE";
-
-	    } catch (FileNotFoundException e) {
-		AuthoringUtil.logger
-			.error("filenotfound exception occured in accessing the repository server for the online file : "
-				+ e.getMessage());
-	    } catch (IOException e) {
-		AuthoringUtil.logger
-			.error("io exception occured in accessing the repository server for the online file : "
-				+ e.getMessage());
-	    }
-
-	    if (fileName.length() > 0) {
-		List listUploadedOnlineFileNames = (List) sessionMap
-			.get(VoteAppConstants.LIST_UPLOADED_ONLINE_FILENAMES_KEY);
-		int index = findFileNameIndex(listUploadedOnlineFileNames, fileName);
-		if (index == 0) {
-		    listUploadedOnlineFileNames.add(fileName);
-		    sessionMap.put(VoteAppConstants.LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
-		}
-	    }
-	}
-
-	NodeKey nodeKey = null;
-	try {
-	    nodeKey = voteService.uploadFile(stream, fileName, mimeType, fileProperty);
-	} catch (FileException e) {
-	    AuthoringUtil.logger.error("exception writing raw data:" + e);
-	    /* return a null dto */
-	    return null;
-	}
-
-	VoteAttachmentDTO voteAttachmentDTO = new VoteAttachmentDTO();
-	voteAttachmentDTO.setUid(null);
-	voteAttachmentDTO.setUuid(nodeKey.getUuid().toString());
-	voteAttachmentDTO.setFilename(fileName);
-	voteAttachmentDTO.setOfflineFile(isOfflineFile);
-
-	return voteAttachmentDTO;
-    }
-
-    /**
-     * returns a list of Vote attachements for listing of online and offline file information
-     * 
-     * @param listOfflineFilesMetaData
-     * @return
-     */
-    public static List populateMetaDataAsAttachments(List listOfflineFilesMetaData) {
-	List listAttachments = new LinkedList();
-
-	Iterator itList = listOfflineFilesMetaData.iterator();
-	while (itList.hasNext()) {
-	    VoteUploadedFile voteUploadedFile = (VoteUploadedFile) itList.next();
-
-	    VoteAttachmentDTO voteAttachmentDTO = new VoteAttachmentDTO();
-	    voteAttachmentDTO.setUid(voteUploadedFile.getSubmissionId().toString());
-	    voteAttachmentDTO.setUuid(voteUploadedFile.getUuid());
-	    voteAttachmentDTO.setFilename(voteUploadedFile.getFileName());
-	    voteAttachmentDTO.setOfflineFile(!voteUploadedFile.isFileOnline());
-
-	    listAttachments.add(voteAttachmentDTO);
-	}
-	return listAttachments;
-    }
-
-    /**
-     * @param listFilesMetaData
-     * @return
-     */
-    public static List populateMetaDataAsFilenames(List listFilesMetaData) {
-	List listFilenames = new LinkedList();
-
-	Iterator itList = listFilesMetaData.iterator();
-	while (itList.hasNext()) {
-	    VoteAttachmentDTO voteAttachmentDTO = (VoteAttachmentDTO) itList.next();
-	    listFilenames.add(voteAttachmentDTO.getFilename());
-	}
-	return listFilenames;
-    }
-
-    /**
-     * used in removing a file item listed in the jsp
-     * 
-     * @param request
-     * @param filename
-     * @param offlineFile
-     */
-    public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile,
-	    SessionMap sessionMap) {
-	if (offlineFile.equals("1")) {
-	    List listUploadedOfflineFileNames = (List) sessionMap
-		    .get(VoteAppConstants.LIST_UPLOADED_OFFLINE_FILENAMES_KEY);
-
-	    listUploadedOfflineFileNames.remove(filename);
-
-	    sessionMap.put(VoteAppConstants.LIST_UPLOADED_OFFLINE_FILENAMES_KEY, listUploadedOfflineFileNames);
-	} else {
-	    List listUploadedOnlineFileNames = (List) sessionMap
-		    .get(VoteAppConstants.LIST_UPLOADED_ONLINE_FILENAMES_KEY);
-
-	    listUploadedOnlineFileNames.remove(filename);
-
-	    sessionMap.put(VoteAppConstants.LIST_UPLOADED_ONLINE_FILENAMES_KEY, listUploadedOnlineFileNames);
-	}
-    }
-
-    /**
-     * @param listUploadedFileNames
-     * @param filename
-     * @return int
-     */
-    public static int findFileNameIndex(List listUploadedFileNames, String filename) {
-	Iterator itListUploadedFileNames = listUploadedFileNames.iterator();
-	int mainIndex = 0;
-	while (itListUploadedFileNames.hasNext()) {
-	    mainIndex++;
-	    String currentFilename = (String) itListUploadedFileNames.next();
-	    if (currentFilename.equals(filename)) {
-		return mainIndex;
-	    }
-	}
-	return 0;
-    }
-
-    public static List removeFileItem(List listFilesMetaData, String uuid) {
-	VoteAttachmentDTO deletableAttachmentDTO = null;
-
-	Iterator itList = listFilesMetaData.iterator();
-	while (itList.hasNext()) {
-	    VoteAttachmentDTO currentAttachmentDTO = (VoteAttachmentDTO) itList.next();
-
-	    if (currentAttachmentDTO.getUuid().equals(uuid)) {
-		deletableAttachmentDTO = currentAttachmentDTO;
-		break;
-	    }
-	}
-
-	listFilesMetaData.remove(deletableAttachmentDTO);
-
-	return listFilesMetaData;
-    }
-
-    public static List extractFileNames(List listFilesMetaData) {
-	Iterator itList = listFilesMetaData.iterator();
-	LinkedList listFilenames = new LinkedList();
-
-	while (itList.hasNext()) {
-	    VoteAttachmentDTO voteAttachmentDTO = (VoteAttachmentDTO) itList.next();
-	    String filename = voteAttachmentDTO.getFilename();
-	    listFilenames.add(filename);
-	}
-	return listFilenames;
     }
 
     protected Map reconstructOptionContentMapForAdd(Map mapOptionsContent, HttpServletRequest request) {
@@ -549,10 +325,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	String maxNomcount = voteAuthoringForm.getMaxNominationCount();
 
         String minNomcount= voteAuthoringForm.getMinNominationCount();
-	    
-	String richTextOfflineInstructions = (String) sessionMap.get(VoteAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-
-	String richTextOnlineInstructions = (String) sessionMap.get(VoteAppConstants.ONLINE_INSTRUCTIONS_KEY);
 
 	String activeModule = voteAuthoringForm.getActiveModule();
 
@@ -626,9 +398,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setReflectionSubject(reflectionSubject);
 	    voteContent.setMaxNominationCount(maxNomcount);
-	    voteContent.setMinNominationCount(minNomcount);	    
-	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
-	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
+	    voteContent.setMinNominationCount(minNomcount);
 	    voteContent.setMaxExternalInputs(maxInputsShort);
 	}
 
@@ -989,9 +759,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	
         String minNomcount= voteAuthoringForm.getMinNominationCount();
 
-	String richTextOfflineInstructions = request.getParameter(VoteAppConstants.OFFLINE_INSTRUCTIONS);
-	String richTextOnlineInstructions = request.getParameter(VoteAppConstants.ONLINE_INSTRUCTIONS);
-
 	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 
 	boolean setCommonContent = true;
@@ -1068,9 +835,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setMaxNominationCount(maxNomcount);
 	    voteContent.setMinNominationCount(minNomcount);
-
-	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
-	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
 
 	    voteContent.setReflectionSubject(reflectionSubject);
 

@@ -26,26 +26,37 @@ import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 
 /**
- * Import filter class for different versions of Q&A content.
+ * Import filter class for different versions of Vote content.
  */
-public class VoteImportContentVersionFilter extends ToolContentVersionFilter{
+public class VoteImportContentVersionFilter extends ToolContentVersionFilter {
 
-	/**
-	 * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
-	 * field.
-	 */
-	public void up20061102To20061113(){
-		this.removeField(VoteContent.class, "voteChangable");
-	}
+    /**
+     * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish field.
+     */
+    public void up20061102To20061113() {
+	this.removeField(VoteContent.class, "voteChangable");
+    }
 
-	/** Version 2.1 added a showResults column and this should default to true. 20080108 was an pre-release version
-	 * of 2.1, but using 20080108 will cover the prerelease 2.1 + 2.0.4 created import files. */
-	public void up20080108To20080326(){
-		this.addField(VoteContent.class, "showResults", true);
-	}
+    /**
+     * Version 2.1 added a showResults column and this should default to true. 20080108 was an pre-release version of
+     * 2.1, but using 20080108 will cover the prerelease 2.1 + 2.0.4 created import files.
+     */
+    public void up20080108To20080326() {
+	this.addField(VoteContent.class, "showResults", true);
+    }
 
-	/** Version 2.3.4 added a minNominationCount column and this should default to "1". */
-	public void up20090726To20100309(){
-		this.addField(VoteContent.class, "minNominationCount", "1");
-	}
+    /** Version 2.3.4 added a minNominationCount column and this should default to "1". */
+    public void up20090726To20100309() {
+	this.addField(VoteContent.class, "minNominationCount", "1");
+    }
+
+    /**
+     * Import 20131227 version content to 20140102 version tool server.
+     */
+    public void up20131227To20140102() {
+	this.removeField(VoteContent.class, "runOffline");
+	this.removeField(VoteContent.class, "onlineInstructions");
+	this.removeField(VoteContent.class, "offlineInstructions");
+	this.removeField(VoteContent.class, "voteAttachments");
+    }
 }

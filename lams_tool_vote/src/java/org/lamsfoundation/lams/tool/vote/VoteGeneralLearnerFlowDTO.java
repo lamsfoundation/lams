@@ -52,8 +52,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected String minNominationCountReached;
 
-    protected String activityRunOffline;
-
     protected String toolSessionID;
 
     protected String toolContentID;
@@ -113,21 +111,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     protected List listMonitoredAnswersContainerDto;
 
     protected List listUserEntries;
-
-    /**
-     * @return Returns the activityRunOffline.
-     */
-    public String getActivityRunOffline() {
-	return activityRunOffline;
-    }
-
-    /**
-     * @param activityRunOffline
-     *            The activityRunOffline to set.
-     */
-    public void setActivityRunOffline(String activityRunOffline) {
-	this.activityRunOffline = activityRunOffline;
-    }
 
     /**
      * @return Returns the castVoteCount.
@@ -443,7 +426,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 		.append("activityTitle: ", activityTitle).append("revisitingUser: ", revisitingUser)
 		.append("userEntry: ", userEntry).append("castVoteCount: ", castVoteCount)
 		.append("maxNominationCountReached: ", maxNominationCountReached)
-		.append("activityRunOffline: ", activityRunOffline).append("toolSessionID: ", toolSessionID)
 		.append("learningMode: ", learningMode).append("maxNominationCount: ", maxNominationCount)
 		.append("allowTextEntry: ", allowTextEntry).append("showResults: ", showResults)
 		.append("lockOnFinish: ", lockOnFinish).append("toolContentID: ", toolContentID)
