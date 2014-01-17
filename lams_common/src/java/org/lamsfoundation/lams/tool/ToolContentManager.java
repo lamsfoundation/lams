@@ -53,40 +53,10 @@ public interface ToolContentManager {
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
     /**
-     * This tool content should be define later, that is, the teacher will define the content at runtime. The
-     * toolContentId should already exist in the tool. This method will normally be called after copyToolContent.
-     * 
-     * @param toolContentId
-     *                the tool content id of the tool content to be changed.
-     * @param value
-     *                whether to set or unset define later.
-     * @throws DataMissingException
-     *                 if no tool content matches the toolContentId
-     * @throws ToolException
-     *                 if any other error occurs
-     */
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
-    /**
-     * This tool content should be setup to run offline, that is, the activity will be done offline. The toolContentId
-     * should already exist in the tool. This method will normally be called after copyToolContent.
-     * 
-     * @param toolContentId
-     *                the tool content id of the tool content to be changed.
-     * @param value
-     *                whether to set or unset run offline.
-     * @throws DataMissingException
-     *                 if no tool content matches the toolContentId
-     * @throws ToolException
-     *                 if any other error occurs
-     */
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
-    /**
      * Remove tool's content according specified the content id. It will be needed by lams to modify the learning
      * design.
      * 
-     * If the tool content includes files in the content repository (e.g. online and offline instructions) then the
+     * If the tool content includes files in the content repository then the
      * files should be removed from the repository.
      * 
      * If session data for this toolContentId exists and removeSessionData = true, then the tool should delete the

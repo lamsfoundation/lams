@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
@@ -54,12 +53,10 @@ import org.springframework.transaction.UnexpectedRollbackException;
  * @struts:action path="/LoadToolActivity" name="activityForm" validate="false" scope="request"
  * 
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
- * @struts:action-forward name="previewDefineLater" path=".previewDefineLater"
  * 
  */
 public class LoadToolActivityAction extends ActivityAction {
 
-    public static final String DEFINE_LATER = "previewDefineLater";
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";
 
@@ -113,17 +110,7 @@ public class LoadToolActivityAction extends ActivityAction {
 
 	    String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), activity,
 		    learnerProgress.getUser());
-
-	    if (activity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson()) {
-		// preview define later
-		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
-		request.setAttribute(PARAM_ACTIVITY_URL, url);
-		request.setAttribute(PARAM_IS_BRANCHING, activity.isBranchingActivity());
-		mappingName = "previewDefineLater";
-	    } else {
-		// normal case
-		form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
-	    }
+	    form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
 
 	} else {
 	    log.error(className + ": activity not ToolActivity");

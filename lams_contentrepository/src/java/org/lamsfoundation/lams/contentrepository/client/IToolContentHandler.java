@@ -48,14 +48,6 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
  * @author Fiona Malikoff
  */
 public interface IToolContentHandler {
-    /** File is for Online Instructions */
-    public final static String TYPE_ONLINE = "ONLINE";
-
-    /** File is for Offline Instructions */
-    public final static String TYPE_OFFLINE = "OFFLINE";
-
-    /** The "name" used to store the online/offline property in the repository */
-    public final static String FILE_TYPE_PROPERTY_NAME = "TYPE";
 
     /**
      * @return Returns the repositoryWorkspaceName.
@@ -87,19 +79,22 @@ public interface IToolContentHandler {
     /**
      * Save a file in the content repository.
      * 
-     * @param stream Input filestream. Mandatory.
-     * @param fileName Input filename. Mandatory.
-     * @param mimeType Mimetype of file. Optional.
-     * @param fileProperty is this for online or offline instructions? Should be TYPE_ONLINE or TYPE_OFFLINE. Mandatory.
+     * @param stream
+     *            Input filestream. Mandatory.
+     * @param fileName
+     *            Input filename. Mandatory.
+     * @param mimeType
+     *            Mimetype of file. Optional.
      * @return key to the new content repository node
-     * @throws InvalidParameterException One of the mandatory parameters is missing.
-     * @throws FileException An error occured writing the input stream to disk.
-     * @throws RepositoryCheckedException Some other error occured.
+     * @throws InvalidParameterException
+     *             One of the mandatory parameters is missing.
+     * @throws FileException
+     *             An error occured writing the input stream to disk.
+     * @throws RepositoryCheckedException
+     *             Some other error occured.
      */
-    public abstract NodeKey uploadFile(InputStream stream, String fileName,
-            String mimeType, String fileProperty)
-            throws RepositoryCheckedException, InvalidParameterException,
-            RepositoryCheckedException;
+    public abstract NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
+	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Save a directory of files in the content repository.
@@ -157,10 +152,6 @@ public interface IToolContentHandler {
     public abstract Set getFileProperties(Long uuid)
             throws ItemNotFoundException, FileException,
             RepositoryCheckedException;
-
-    public abstract boolean isOffline(IVersionedNode node);
-
-    public abstract boolean isOnline(IVersionedNode node);
 
     public abstract IRepositoryService getRepositoryService();
 

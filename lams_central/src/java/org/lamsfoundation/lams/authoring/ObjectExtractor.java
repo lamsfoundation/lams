@@ -413,12 +413,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (keyExists(table, WDDXTAGS.DATE_READ_ONLY)) {
 	    learningDesign.setDateReadOnly(WDDXProcessor.convertToDate(table, WDDXTAGS.DATE_READ_ONLY));
 	}
-	if (keyExists(table, WDDXTAGS.OFFLINE_INSTRUCTIONS)) {
-	    learningDesign.setOfflineInstructions(WDDXProcessor.convertToString(table, WDDXTAGS.OFFLINE_INSTRUCTIONS));
-	}
-	if (keyExists(table, WDDXTAGS.ONLINE_INSTRUCTIONS)) {
-	    learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table, WDDXTAGS.ONLINE_INSTRUCTIONS));
-	}
 	if (keyExists(table, WDDXTAGS.HELP_TEXT)) {
 	    learningDesign.setHelpText(WDDXProcessor.convertToString(table, WDDXTAGS.HELP_TEXT));
 	}
@@ -1736,10 +1730,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setDescription((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.DESCRIPTION));
 	activity.setTitle((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
 	activity.setHelpText((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.HELP_TEXT));
-	
-	// to be removed soon
-	activity.setDefineLater(false);
-	activity.setRunOffline(false);
 
 	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
 	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));
@@ -1850,9 +1840,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (keyExists(activityDetails, WDDXTAGS.ORDER_ID)) {
 	    activity.setOrderId(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ORDER_ID));
 	}
-	if (keyExists(activityDetails, WDDXTAGS.DEFINE_LATER)) {
-	    activity.setDefineLater(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.DEFINE_LATER));
-	}
 
 	activity.setLearningDesign(learningDesign);
 
@@ -1871,9 +1858,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	    activity.setCreateDateTime(modificationDate);
 	}
 
-	if (keyExists(activityDetails, WDDXTAGS.RUN_OFFLINE)) {
-	    activity.setRunOffline(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.RUN_OFFLINE));
-	}
 	if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID)) {
 	    activity.setActivityCategoryID(WDDXProcessor.convertToInteger(activityDetails,
 		    WDDXTAGS.ACTIVITY_CATEGORY_ID));

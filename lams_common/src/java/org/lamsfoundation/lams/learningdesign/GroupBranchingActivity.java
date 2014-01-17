@@ -33,162 +33,109 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
-/** 
+/**
  * @author Mitchell Seaton
  * @version 2.1
  * 
- * @hibernate.class 
-*/
+ * @hibernate.class
+ */
 public class GroupBranchingActivity extends BranchingActivity implements Serializable {
 
-	private static final long serialVersionUID = 7426228060060498158L;
+    private static final long serialVersionUID = 7426228060060498158L;
 
-	/** full constructor */
-    public GroupBranchingActivity(Long activityId, 
-            Integer id, 
-            String description, 
-            String title, 
-            Integer xcoord, 
-            Integer ycoord, 
-            Integer orderId, 
-            Boolean defineLater, 
-            java.util.Date createDateTime, 
-            LearningLibrary learningLibrary, 
-            Activity parentActivity,
-            Activity libraryActivity,
-			Integer parentUIID,
-            LearningDesign learningDesign, 
-            Grouping grouping, 
-            Integer activityTypeId,  
-            Transition transitionTo,
-            Transition transitionFrom,
-            String languageFile,
-            Integer startXcoord,
-            Integer startYcoord,
-            Integer endXcoord,
-            Integer endYcoord,
-			Boolean stopAfterActivity,
-			Set inputActivities,
-            Set activities,
-			Activity defaultActivity,
-            SystemTool systemTool,
-            Set branchActivityEntries) {
-        super(activityId, 
-                id, 
-                description, 
-                title, 
-                xcoord, 
-                ycoord, 
-                orderId, 
-                defineLater, 
-                createDateTime, 
-                learningLibrary, 
-                parentActivity, 
-				libraryActivity,
-				parentUIID,
-                learningDesign, 
-                grouping, 
-                activityTypeId,  
-                transitionTo,
-				transitionFrom,
-				languageFile,
-	            startXcoord,
-	            startYcoord,
-	            endXcoord,
-	            endYcoord,
-	            stopAfterActivity,
-				inputActivities,
-                activities,
-    			defaultActivity,
-                systemTool,
-                branchActivityEntries);
+    /** full constructor */
+    public GroupBranchingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
+	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
+	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
+	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
+	    String languageFile, Integer startXcoord, Integer startYcoord, Integer endXcoord, Integer endYcoord,
+	    Boolean stopAfterActivity, Set inputActivities, Set activities, Activity defaultActivity,
+	    SystemTool systemTool, Set branchActivityEntries) {
+	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
+		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
+		transitionFrom, languageFile, startXcoord, startYcoord, endXcoord, endYcoord, stopAfterActivity,
+		inputActivities, activities, defaultActivity, systemTool, branchActivityEntries);
     }
 
     /** default constructor */
     public GroupBranchingActivity() {
-        super();
+	super();
     }
 
     /** minimal constructor */
-    public GroupBranchingActivity(Long activityId, 
-            Boolean defineLater, 
-            java.util.Date createDateTime, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
-            Integer activityTypeId,  
-            Transition transitionTo,
-            Transition transitionFrom,
-            Set activities) {
-      super(activityId, 
-              defineLater, 
-              createDateTime, 
-              learningLibrary, 
-              parentActivity, 
-              learningDesign, 
-              grouping, 
-              activityTypeId, 
-              transitionTo,
-			  transitionFrom,
-              activities);
+    public GroupBranchingActivity(Long activityId, java.util.Date createDateTime,
+	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
+	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
+	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
+	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
+	    Transition transitionFrom, Set activities) {
+	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
+		transitionTo, transitionFrom, activities);
     }
+
     /**
-     * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment 
+     * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment
+     * 
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
-    public Activity createCopy(int uiidOffset){
-    	
-    	GroupBranchingActivity newBranchingActivity = new GroupBranchingActivity();
-    	copyBranchingFields(newBranchingActivity);
-    	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
-    	return newBranchingActivity;
+    public Activity createCopy(int uiidOffset) {
+
+	GroupBranchingActivity newBranchingActivity = new GroupBranchingActivity();
+	copyBranchingFields(newBranchingActivity);
+	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
+	return newBranchingActivity;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityId", getActivityId())
-            .toString();
+	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-	/**
-     * Validate the branching activity. A Grouping must be applied to the branching activity. 
-     * If Define Later == false, then there must be at least one group in the grouping.
-     * If Define Later == false then all groups must have a branch allocated to them
+    /**
+     * Validate the branching activity. A Grouping must be applied to the branching activity.
+     * 
      * @return error message key
      */
     public Vector validateActivity(MessageService messageService) {
-    	Vector listOfValidationErrors = new Vector();
-    	if ( getActivities() == null || getActivities().size() == 0 ) {
-			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this.getActivityUIID()));
-    	} 
-    	
-    	if ( getGrouping() == null ) {
-			listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
-    	} else if ( ! getDefineLater().booleanValue() ){
-   			Set<Group> groups = getGrouping().getGroups();
-   			if ( groups == null || groups.size() == 0 ) {
-   				listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
-   			} else {
-	  			for ( Group group : groups ) {
-   					boolean foundEntry = false;
-	   				if ( group.getBranchActivities() != null ) {
-	   					Iterator iter = group.getBranchActivities().iterator();
-	   					while (iter.hasNext() && ! foundEntry ) {
-							BranchActivityEntry entry = (BranchActivityEntry) iter.next();
-							foundEntry = entry.getBranchingActivity().equals(this);
-	   					}
-	   				}
-   					if ( ! foundEntry ) {
-	   					listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED), this.getActivityUIID()));
-	   					break;
-   					}
-	   			}
-   			}
-    	}
-    	return listOfValidationErrors;
-    }
-    
+	Vector listOfValidationErrors = new Vector();
+	if (getActivities() == null || getActivities().size() == 0) {
+	    listOfValidationErrors.add(new ValidationErrorDTO(
+		    ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService
+			    .getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this
+			    .getActivityUIID()));
+	}
 
+	if (getGrouping() == null) {
+	    listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE,
+		    messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
+	} else {
+	    Set<Group> groups = getGrouping().getGroups();
+	    if (groups == null || groups.size() == 0) {
+		listOfValidationErrors.add(new ValidationErrorDTO(
+			ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService
+				.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
+	    } else {
+		for (Group group : groups) {
+		    boolean foundEntry = false;
+		    if (group.getBranchActivities() != null) {
+			Iterator iter = group.getBranchActivities().iterator();
+			while (iter.hasNext() && !foundEntry) {
+			    BranchActivityEntry entry = (BranchActivityEntry) iter.next();
+			    foundEntry = entry.getBranchingActivity().equals(this);
+			}
+		    }
+		    if (!foundEntry) {
+			listOfValidationErrors
+				.add(new ValidationErrorDTO(
+					ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE,
+					messageService
+						.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED),
+					this.getActivityUIID()));
+			break;
+		    }
+		}
+	    }
+	}
+	return listOfValidationErrors;
+    }
 
 }

@@ -805,18 +805,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return redirectToURL(mapping, response, url);
     }
 
-    /** Calls the server to bring up the activity's define later page. Assumes destination is a new window */
-    public ActionForward getActivityDefineLaterURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, LamsToolServiceException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
-
-	String url = monitoringService.getActivityDefineLaterURL(lessonID, activityID, getUserId());
-	return redirectToURL(mapping, response, url);
-    }
-
     public ActionForward moveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
@@ -846,7 +834,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 	if ((lessonDTO.getCreateDateTime() != null) && (lessonDTO.getCreateDateTime() != WDDXTAGS.DATE_NULL_VALUE)) {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
@@ -866,11 +853,6 @@ public class MonitoringAction extends LamsDispatchAction {
 			    .getContributeEntries()) {
 			if (contributeEntry.getIsRequired()) {
 			    requiredContributeActivities.add(contributeActivity);
-			    if (ContributionTypes.DEFINE_LATER.equals(contributeEntry.getContributionType())) {
-				String url = WebUtil.appendParameterToURL(contributeEntry.getURL(),
-					AttributeNames.PARAM_CONTENT_FOLDER_ID, lessonDTO.getContentFolderID());
-				contributeEntry.setURL(url);
-			    }
 			}
 		    }
 		}

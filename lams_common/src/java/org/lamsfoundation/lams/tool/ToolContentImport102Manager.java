@@ -70,7 +70,6 @@ public interface ToolContentImport102Manager {
 	
 	public static final String CONTENT_BODY = "body"; // used
 	public static final String CONTENT_SHOW_USER = "contentShowUser"; // boolean
-	public static final String CONTENT_DEFINE_LATER = "contentDefineLater"; // boolean // used
 	public static final String CONTENT_TITLE = "title"; // used
 	public static final String CONTENT_ID = "id"; // used
 	public static final String CONTENT_REUSABLE = "isReusable"; //type boolean
@@ -157,12 +156,6 @@ public interface ToolContentImport102Manager {
      * 1.0.2 content record. The keys are WDDX tags, values are the WDDX values as strings.
      * The tools should call WDDXProcessor.convertToInteger(identifier, value) and similar
      * methods to convert the values to a valid type.
-     * 
-     * Tools should always set defineLater to false, even if the content indicates
-     * that defineLater is true. In 2.0, define later in the tool content is set up 
-     * by the LAMS engine when the design is copied for a lesson, not during authoring.
-     * So setting it in the tool data now will wreck preview as the workflow engine doesn't
-     * set define later on the tools for preview.
      * 
      * Does not set the "reflective" fields.
      * 

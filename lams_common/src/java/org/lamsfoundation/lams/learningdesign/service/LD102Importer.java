@@ -525,8 +525,6 @@ public class LD102Importer implements ApplicationContextAware{
 		ld.setReadOnly(Boolean.FALSE);
 		ld.setEditOverrideLock(Boolean.FALSE);
 		ld.setDateReadOnly(null);
-		ld.setOfflineInstructions(null);	
-		ld.setOnlineInstructions(null);
 		
 		// set up maxId locally and then save at the end of the process - the max id may need to be changed
 		// when setting up the transitions to accomodate the addition of permission and sync gates.
@@ -843,11 +841,6 @@ public class LD102Importer implements ApplicationContextAware{
 	}
 
 	private void processCommonActivityFields(Hashtable taskDetails, Integer xCoOrd, Integer yCoOrd, Activity activity) throws WDDXProcessorConversionException {
-		// define later will have already been set up for tool activities
-		if ( activity.getDefineLater() == null )  {
-			activity.setDefineLater(Boolean.FALSE);
-		}
-		
 		activity.setXcoord(xCoOrd);
 		activity.setYcoord(yCoOrd);
 		activity.setHelpText(null);
@@ -860,8 +853,6 @@ public class LD102Importer implements ApplicationContextAware{
 		
 		activity.setLearningDesign(ldInProgress);
 		activity.setCreateDateTime(createDate);
-		activity.setRunOffline(Boolean.FALSE);
-		
 	}
 
 	private Activity setupParallelActivity(Hashtable taskDetails, Integer contentId, Integer taskUIID, String parentTitle, String parentDescription) throws WDDXProcessorConversionException {
@@ -1058,12 +1049,9 @@ public class LD102Importer implements ApplicationContextAware{
 	    Hashtable content = contentMap.get(wddxContentId);
 	    if ( content != null ) {
 	    	try {
-	    		Boolean defineLater = WDDXProcessor.convertToBoolean(content, ToolContentImport102Manager.CONTENT_DEFINE_LATER);
-	    		defineLater = defineLater != null ? defineLater : Boolean.FALSE;
-	    		activity.setDefineLater(defineLater);
-	    		
-			    ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(tool.getServiceName());
-		    	toolService.import102ToolContent(toolContentId, importerDTO, content);
+		ToolContentImport102Manager toolService = (ToolContentImport102Manager) context.getBean(tool
+			.getServiceName());
+		toolService.import102ToolContent(toolContentId, importerDTO, content);
 	    	} catch ( Exception e ) {
 		    	String message = "Tool content for activity "+toolTitle+" cannot be set up due to an error. Activity will be use the default content. Activity is "+taskDetails; 
 				log.warn(message,e);
@@ -1389,9 +1377,7 @@ public class LD102Importer implements ApplicationContextAware{
 			gate.setApplyGrouping(false); // not nullable so default to false
 			gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
 			gate.setOrderId(null); 
-			gate.setDefineLater(Boolean.FALSE);
 			gate.setCreateDateTime(createDate);
-			gate.setRunOffline(Boolean.FALSE);
 			gate.setLearningDesign(ldInProgress);
 			
 		    ldInProgress.getActivities().add(gate);

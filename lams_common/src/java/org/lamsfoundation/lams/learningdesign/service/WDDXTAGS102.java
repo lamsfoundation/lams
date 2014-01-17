@@ -106,7 +106,6 @@ public class WDDXTAGS102 {
 	// content specific tags
 	public static final String CONTENT_BODY = "body";
 	public static final String CONTENT_SHOW_USER = "contentShowUser"; // boolean
-	public static final String CONTENT_DEFINE_LATER = "contentDefineLater"; // boolean
 	
 	// contentType is based on the content class used - doesn't persist
 	public static final String CONTENT_TYPE = "contentType";
@@ -180,7 +179,6 @@ public class WDDXTAGS102 {
 	public static final String CONTENT_IMGG_DIRECTORY = DIRECTORY_NAME;
 	public static final String CONTENT_IMGG_TITLE = TITLE;
 	public static final String CONTENT_IMGG_BODY = CONTENT_BODY;
-	public static final String CONTENT_IMGG_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
 	public static final String CONTENT_IMGG_GROUPING = TASK_GROUPING;
 	public static final String CONTENT_IMGG_SHOW_USER = CONTENT_SHOW_USER;
 	public static final String CONTENT_IMGG_MAX_IMAGES = "maxImages";
@@ -209,7 +207,6 @@ public class WDDXTAGS102 {
 	public static final String CONTENT_IMGR_DIRECTORY = DIRECTORY_NAME;
 	public static final String CONTENT_IMGR_TITLE = TITLE;
 	public static final String CONTENT_IMGR_BODY = CONTENT_BODY; // this is the description
-	public static final String CONTENT_IMGR_DEFINE_LATER = CONTENT_DEFINE_LATER;  //Bolean
 	public static final String CONTENT_IMGR_GROUPING = TASK_GROUPING;
 	public static final String CONTENT_IMGR_SHOW_USER = CONTENT_SHOW_USER;
 	public static final String CONTENT_IMGR_MAX_VOTE = CONTENT_VOTE_MAXCHOOSE;

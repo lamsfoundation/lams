@@ -80,9 +80,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
-    /**
-     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
-     */
+    @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
 	this.context = context;
     }
@@ -110,15 +108,16 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator) {
 	this.contentIDGenerator = contentIDGenerator;
     }
+    
+    public void setToolContentDAO(IToolContentDAO toolContentDAO) {
+	this.toolContentDAO = toolContentDAO;
+    }
 
     // ---------------------------------------------------------------------
     // Service Methods
     // ---------------------------------------------------------------------
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#createToolSession(org.lamsfoundation.lams.usermanagement.User,
-     *      org.lamsfoundation.lams.learningdesign.Activity)
-     */
+    @Override
     public synchronized ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
 	    throws LamsToolServiceException, DataIntegrityViolationException {
 	// look for an existing applicable tool session
@@ -145,10 +144,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#createToolSession(java.util.Set,
-     *      org.lamsfoundation.lams.learningdesign.Activity)
-     */
+    @Override
     public Set createToolSessions(Set learners, ToolActivity activity, Lesson lesson) throws LamsToolServiceException {
 	Iterator iter = learners.iterator();
 	Set newToolSessions = new HashSet();
@@ -165,38 +161,23 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return newToolSessions;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User,
-     *      org.lamsfoundation.lams.learningdesign.Activity)
-     */
+    @Override
     public ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException {
 	return toolSessionDAO.getToolSessionByLearner(learner, activity);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolSessionById(java.lang.Long)
-     */
+    @Override
     public ToolSession getToolSessionById(Long toolSessionId) {
 	return toolSessionDAO.getToolSession(toolSessionId);
     }
 
-    /**
-     * Get the tool session based on the activity id and the learner.
-     * 
-     * @throws LamsToolServiceException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolSessionByActivity(org.lamsfoundation.lams.usermanagement.User,
-     *      ToolActivity)
-     */
+    @Override
     public ToolSession getToolSessionByActivity(User learner, ToolActivity toolActivity)
 	    throws LamsToolServiceException {
 	return toolSessionDAO.getToolSessionByLearner(learner, toolActivity);
     }
 
-    /**
-     * @throws ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolsToCreateSession(
-     *      org.lamsfoundation.lams.tool.ToolSession, org.lamsfoundation.lams.learningdesign.ToolActivity)
-     */
+    @Override
     public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException {
 	try {
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity.getTool());
@@ -211,48 +192,22 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
-    /**
-     * Calls the tool to copy the content for an activity. Used when copying a learning design. If it is a preview
-     * lesson, we don't want to set define later to true - we will sidestep this in the progress engine.
-     * 
-     * @param toolActivity
-     *                the tool activity defined in the design.
-     * @param setDefineLater
-     *                whether or not to set the define later flag based on the activity in the design. If set to true
-     *                then will take the value fro the activity. If set to false, then define later will always be set
-     *                to false.
-     * @throws DataMissingException,
-     *                 ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
-     */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater, String customCSV)
-	    throws DataMissingException, ToolException {
-	return notifyToToolAboutContent(toolActivity, setDefineLater, true, customCSV);
-    }
-
-    private Long notifyToToolAboutContent(ToolActivity toolActivity, boolean setDefineLater, boolean copyToolContent,
-	    String customCSV) {
+    @Override
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV) throws DataMissingException,
+	    ToolException {
 	Long toolcontentID = toolActivity.getToolContentId();
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
 
-	    if (copyToolContent) {
-		toolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
+	    toolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
 
-		// If it is a tool adapter tool, call the special copyToolContent which takes the customCSV param
-		if (contentManager instanceof ToolAdapterContentManager) {
-		    ToolAdapterContentManager adapterContentManager = (ToolAdapterContentManager) contentManager;
-		    adapterContentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID, customCSV);
-		} else {
-		    contentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID);
-		}
+	    // If it is a tool adapter tool, call the special copyToolContent which takes the customCSV param
+	    if (contentManager instanceof ToolAdapterContentManager) {
+		ToolAdapterContentManager adapterContentManager = (ToolAdapterContentManager) contentManager;
+		adapterContentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID, customCSV);
+	    } else {
+		contentManager.copyToolContent(toolActivity.getToolContentId(), toolcontentID);
 	    }
-
-	    contentManager.setAsDefineLater(toolcontentID, setDefineLater && toolActivity.getDefineLater() != null
-		    && toolActivity.getDefineLater().booleanValue());
-
-	    contentManager.setAsRunOffline(toolcontentID, toolActivity.getRunOffline() != null
-		    && toolActivity.getRunOffline().booleanValue());
 
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy/update the tool content. ToolActivity "
@@ -264,36 +219,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return toolcontentID;
     }
 
-    /**
-     * Calls the tool to set up the define later and run offline flags.
-     * 
-     * This method is a subset of the functionality of notifyToolToCopyContent(ToolActivity toolActivity, boolean
-     * setDefineLater); so if you call notifyToolToCopyContent then you don't need to call this method. It is a separate
-     * method used by Live Edit.
-     * 
-     * @param toolActivity
-     *                the tool activity defined in the design.
-     * @throws DataMissingException,
-     *                 ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
-     */
-    public Long notifyToolOfStatusFlags(ToolActivity toolActivity) throws DataMissingException, ToolException {
-	return notifyToToolAboutContent(toolActivity, true, false, null);
-    }
-
-    /**
-     * Calls the tool to copy the content for an activity. Used when copying an activity in authoring. Can't use the
-     * notifyToolToCopyContent(ToolActivity, boolean) version in authoring as the tool activity won't exist if the user
-     * hasn't saved the sequence yet. But the tool content (as that is saved by the tool) may already exist.
-     * 
-     * @param toolContentId
-     *                the content to be copied.
-     * @param customCSV
-     *                the customCSV required if this is a tooladapter tool, otherwise null
-     * @throws DataMissingException,
-     *                 ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
-     */
+    @Override
     public Long notifyToolToCopyContent(Long toolContentId, String customCSV) throws DataMissingException,
 	    ToolException {
 	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
@@ -330,13 +256,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return newToolcontentID;
     }
 
-    /**
-     * Ask a tool to delete a tool content. If any related tool session data exists then it should be deleted.
-     * 
-     * @param toolActivity
-     *                the tool activity defined in the design.
-     * @throws ToolException
-     */
+    @Override
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException {
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
@@ -349,16 +269,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
-    /**
-     * Ask a tool for its OutputDefinitions, based on the given toolContentId. If the tool doesn't have any content
-     * matching the toolContentId then it should create the OutputDefinitions based on the tool's default content.
-     * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
-     * 
-     * @param toolContentId
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     * @throws ToolException
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
 	    throws ToolException {
 
@@ -395,16 +306,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     }
 
-    /**
-     * This method should be called to filter out definitions that are not supported. Currently used only in Data Flow
-     * between tools, when a receiving tool declares which Tool Output classes it supports.
-     * 
-     * @param outputToolContentId
-     * @param definitionType
-     * @param inputToolContentId
-     * @return
-     * @throws ToolException
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromToolFiltered(Long outputToolContentId,
 	    int definitionType, Long inputToolContentId) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitions = getOutputDefinitionsFromTool(outputToolContentId,
@@ -468,14 +370,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     }
 
-    /**
-     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't have any content
-     * matching the toolSessionId then should return an "empty" but valid set of data. e.g an empty mark would be 0.
-     * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
-     * 
-     * @throws ToolException
-     */
+    @Override
     public ToolOutput getOutputFromTool(String conditionName, Long toolSessionId, Integer learnerId)
 	    throws ToolException {
 
@@ -484,14 +379,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     }
 
-    /**
-     * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't have any content
-     * matching the toolSessionId then should return an "empty" but valid set of data. e.g an empty mark would be 0.
-     * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
-     * 
-     * @throws ToolException
-     */
+    @Override
     public ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId)
 	    throws ToolException {
 
@@ -526,44 +414,14 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
-    /**
-     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId.
-     * 
-     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the outputs to
-     * the given list. If it is empty, then no outputs will be returned.
-     * 
-     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the output is
-     * nonsense for all learners, then return an "empty" but valid answer. For example, for a mark you might return 0.
-     * 
-     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g an
-     * empty mark would be 0.
-     * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
-     * 
-     * @throws ToolException
-     */
+    @Override
     public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId)
 	    throws ToolException {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
 	return getOutputFromTool(names, session, learnerId);
     }
 
-    /**
-     * Ask a tool for a set of ToolOutputs, based on the given toolSessionId.
-     * 
-     * If conditionName array is null, then return all the outputs for the tool, otherwise just restrict the outputs to
-     * the given list. If it is empty, then no outputs will be returned.
-     * 
-     * If the learnerId is null, then return the outputs based on all learners in that toolSession. If the output is
-     * nonsense for all learners, then return an "empty" but valid answer. For example, for a mark you might return 0.
-     * 
-     * If there isn't any content matching the toolSessionId then should return an "empty" but valid set of data. e.g an
-     * empty mark would be 0.
-     * 
-     * This functionality relies on a method added to the Tool Contract in LAMS 2.1.
-     * 
-     * @throws ToolException
-     */
+    @Override
     public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession,
 	    Integer learnerId) throws ToolException {
 
@@ -598,23 +456,17 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
-     */
+    @Override
     public void updateToolSession(ToolSession toolSession) {
 	toolSessionDAO.updateToolSession(toolSession);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolSessionsByLesson(org.lamsfoundation.lams.lesson.Lesson)
-     */
+    @Override
     public List getToolSessionsByLesson(Lesson lesson) {
 	return toolSessionDAO.getToolSessionsByLesson(lesson);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#deleteToolSession(org.lamsfoundation.lams.tool.ToolSession)
-     */
+    @Override
     public void deleteToolSession(ToolSession toolSession) {
 	if (toolSession == null) {
 	    LamsCoreToolService.log.error("deleteToolSession: unable to delete tool session as tool session is null.");
@@ -640,10 +492,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerURL(java.lang.Long,
-     *      org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolLearnerURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException {
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
@@ -658,10 +507,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerPreviewURL(java.lang.Long,
-     *      org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolLearnerPreviewURL(Long lessonID, Activity activity, User authorLearner)
 	    throws LamsToolServiceException {
 	if (activity.isToolActivity()) {
@@ -677,10 +523,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerProgressURL(java.lang.Long,
-     *      org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolLearnerProgressURL(Long lessonID, Activity activity, User learner)
 	    throws LamsToolServiceException {
 	if (activity.isToolActivity()) {
@@ -698,10 +541,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolMonitoringURL(java.lang.Long,
-     *      org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolMonitoringURL(Long lessonID, Activity activity) throws LamsToolServiceException {
 
 	if (activity.isToolActivity()) {
@@ -719,10 +559,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolContributionURL(java.lang.Long,
-     *      org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException {
 
 	if (activity.isToolActivity()) {
@@ -740,26 +577,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getDefineLaterURL(org.lamsfoundation.lams.learningdesign.ToolActivity,
-     *      org.lamsfoundation.lams.usermanagement.User)
-     */
-    public String getToolDefineLaterURL(ToolActivity activity) throws LamsToolServiceException {
-
-	if (activity.isToolActivity()) {
-	    ToolActivity toolActivity = activity;
-	    String url = toolActivity.getTool().getDefineLaterUrl();
-	    if (url != null) {
-		return setupToolURLWithToolContent(toolActivity, url);
-	    }
-	}
-	return null;
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getModerateURL(org.lamsfoundation.lams.learningdesign.ToolActivity,
-     *      org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException {
 
 	if (activity.isToolActivity()) {
@@ -779,10 +597,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#setupToolURLWithToolSession(org.lamsfoundation.lams.learningdesign.ToolActivity,
-     *      org.lamsfoundation.lams.usermanagement.User, java.lang.String)
-     */
+    @Override
     public String setupToolURLWithToolSession(ToolActivity activity, User learner, String toolURL)
 	    throws LamsToolServiceException {
 	ToolSession toolSession = this.getToolSessionByActivity(learner, activity);
@@ -799,7 +614,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		.getToolSessionId().toString());
     }
 
-    public String setupURLWithActivityLessonUserID(Activity activity, Long lessonID, Integer userID, String learnerURL) {
+    private String setupURLWithActivityLessonUserID(Activity activity, Long lessonID, Integer userID, String learnerURL) {
 	String url = setupURLWithActivityLessonID(activity, lessonID, learnerURL);
 	if (url != null && userID != null) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_USER_ID, userID.toString());
@@ -807,7 +622,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return url;
     }
 
-    public String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {
+    private String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {
 	String url = learnerURL;
 	if (url != null && activity != null) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId()
@@ -819,35 +634,15 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return url;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#setupToolURLWithToolContent(org.lamsfoundation.lams.learningdesign.ToolActivity,
-     *      java.lang.String)
-     */
+    @Override
     public String setupToolURLWithToolContent(ToolActivity activity, String toolURL) {
 	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_TOOL_CONTENT_ID, activity.getToolContentId()
 		.toString());
     }
 
-    // ---------------------------------------------------------------------
-    // Helper Methods
-    // ---------------------------------------------------------------------
-
-    /**
-     * Find a tool's service registered inside lams. It is implemented using Spring now. We might need to extract this
-     * method to a proxy class to find different service such as EJB or Web service.
-     * 
-     * @param toolActivity
-     *                the tool activity defined in the design.
-     * @return the service object from tool.
-     * @throws NoSuchBeanDefinitionException
-     *                 if the tool is not the classpath or the supplied service name is wrong.
-     */
+    @Override
     public Object findToolService(Tool tool) throws NoSuchBeanDefinitionException {
 	return context.getBean(tool.getServiceName());
-    }
-
-    public void setToolContentDAO(IToolContentDAO toolContentDAO) {
-	this.toolContentDAO = toolContentDAO;
     }
 
 }

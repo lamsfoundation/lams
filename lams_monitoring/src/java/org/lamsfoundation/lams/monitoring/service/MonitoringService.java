@@ -2067,30 +2067,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityDefineLaterURL(java.lang.Long)
-     */
-    @Override
-    public String getActivityDefineLaterURL(Long lessonID, Long activityID, Integer userID) throws IOException,
-	    LamsToolServiceException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	checkOwnerOrStaffMember(userID, lesson, "get activity define later url");
-
-	Activity activity = activityDAO.getActivityByActivityId(activityID);
-	if (activity == null) {
-	    MonitoringService.log.error("getActivityMonitorURL activity missing. Activity ID " + activityID
-		    + " activity " + activity);
-
-	} else if (activity.isToolActivity()) {
-	    ToolActivity toolActivity = (ToolActivity) activity;
-	    return lamsCoreToolService.getToolDefineLaterURL(toolActivity);
-
-	}
-	return null;
-    }
-
-    /**
-     * (non-Javadoc)
-     * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
      */
     @Override
@@ -2887,7 +2863,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     /**
      * Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch. Use for
-     * Group Based Branching and define later.
+     * Group Based Branching.
      * 
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch

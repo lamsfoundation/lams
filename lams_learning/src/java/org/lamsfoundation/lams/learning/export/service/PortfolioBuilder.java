@@ -219,8 +219,6 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool,
 			    AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 		}
-		exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_OFFLINE,
-			activity.getRunOffline().toString());
 	    }
 
 	    ActivityPortfolio p = createActivityPortfolio(activity);
@@ -296,8 +294,6 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 		    activity.getActivityId().toString());
 	    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson
 		    .getLessonId().toString());
-	    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_OFFLINE, activity
-		    .getRunOffline().toString());
 	}
 	return exportUrlForTool;
     }

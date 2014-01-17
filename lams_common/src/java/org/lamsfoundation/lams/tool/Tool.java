@@ -54,9 +54,6 @@ public class Tool implements Serializable {
     /** nullable persistent field */
     private String authorUrl;
 
-    /** nullable persistent field */
-    private String defineLaterUrl;
-
     /** persistent field */
     private String exportPortfolioLearnerUrl;
 
@@ -80,9 +77,6 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private String adminUrl;
-
-    /** persistent field */
-    private boolean supportsRunOffline;
 
     /** persistent field */
     private boolean valid;
@@ -143,17 +137,16 @@ public class Tool implements Serializable {
 
     /** full constructor */
     public Tool(Long toolId, String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String authorUrl,
-	    String defineLaterUrl, String monitorUrl, String contributeUrl, String moderationUrl,
-	    String exportPortfolioLearnerUrl, String exportPortfolioClassUrl, boolean supportsGrouping,
-	    boolean supportsRunOffline, long defaultToolContentId, String toolSignature, String toolDisplayName,
-	    String description, String className, Set activities, Integer groupingSupportTypeId, Date createDateTime,
-	    String toolIdentifier, String toolVersion, String languageFile, boolean supportsOutputs, String extLmsId) {
+	    String monitorUrl, String contributeUrl, String moderationUrl, String exportPortfolioLearnerUrl,
+	    String exportPortfolioClassUrl, boolean supportsGrouping, long defaultToolContentId, String toolSignature,
+	    String toolDisplayName, String description, String className, Set activities,
+	    Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier, String toolVersion,
+	    String languageFile, boolean supportsOutputs, String extLmsId) {
 	this.toolId = toolId;
 	this.learnerUrl = learnerUrl;
 	this.learnerPreviewUrl = learnerPreviewUrl;
 	this.learnerProgressUrl = learnerProgressUrl;
 	this.authorUrl = authorUrl;
-	this.defineLaterUrl = defineLaterUrl;
 	this.monitorUrl = monitorUrl;
 	this.contributeUrl = contributeUrl;
 	this.moderationUrl = moderationUrl;
@@ -161,7 +154,6 @@ public class Tool implements Serializable {
 	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
 
 	this.supportsGrouping = supportsGrouping;
-	this.supportsRunOffline = supportsRunOffline;
 	this.defaultToolContentId = defaultToolContentId;
 	this.toolSignature = toolSignature;
 	this.toolDisplayName = toolDisplayName;
@@ -183,14 +175,13 @@ public class Tool implements Serializable {
     }
 
     /** minimal constructor */
-    public Tool(Long toolId, String learnerUrl, String authorUrl, boolean supportsGrouping, boolean supportsRunOffline,
-	    long defaultToolContentId, String toolSignature, String toolDisplayName, String className, Set activities,
+    public Tool(Long toolId, String learnerUrl, String authorUrl, boolean supportsGrouping, long defaultToolContentId,
+	    String toolSignature, String toolDisplayName, String className, Set activities,
 	    Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier, String toolVersion) {
 	this.toolId = toolId;
 	this.learnerUrl = learnerUrl;
 	this.authorUrl = authorUrl;
 	this.supportsGrouping = supportsGrouping;
-	this.supportsRunOffline = supportsRunOffline;
 	this.defaultToolContentId = defaultToolContentId;
 	this.toolSignature = toolSignature;
 	this.toolDisplayName = toolDisplayName;
@@ -252,42 +243,11 @@ public class Tool implements Serializable {
     }
 
     /**
-     * Does this tool support define later? Will be true if the defineLaterURL is not null/empty string.
-     */
-    public boolean getSupportsDefineLater() {
-	String url = getDefineLaterUrl();
-	return url != null && url.trim().length() > 0;
-    }
-
-    /**
      * Does this tool support moderation? Will be true if the moderateURL is not null/empty string.
      */
     public boolean getSupportsModeration() {
 	String url = getModerationUrl();
 	return url != null && url.trim().length() > 0;
-    }
-
-    /**
-     * @return Returns the supportsRunOffline.
-     */
-    public boolean getSupportsRunOffline() {
-	return supportsRunOffline;
-    }
-
-    /**
-     * @param supportsRunOffline
-     *                The supportsRunOffline to set.
-     */
-    public void setSupportsRunOffline(boolean supportsRunOffline) {
-	this.supportsRunOffline = supportsRunOffline;
-    }
-
-    public String getDefineLaterUrl() {
-	return defineLaterUrl;
-    }
-
-    public void setDefineLaterUrl(String defineLaterUrl) {
-	this.defineLaterUrl = defineLaterUrl;
     }
 
     public long getDefaultToolContentId() {
@@ -506,8 +466,8 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @param supportsRunOffline
-     *                The supportsRunOffline to set.
+     * @param supportsOutputs
+     *                The supportsOutputs to set.
      */
     public void setSupportsOutputs(boolean supportsOutputs) {
 	this.supportsOutputs = supportsOutputs;
@@ -549,10 +509,10 @@ public class Tool implements Serializable {
 
     public IToolVO createBasicToolVO() {
 	IToolVO vo = new BasicToolVO(toolId, supportsGrouping, learnerUrl, learnerPreviewUrl, learnerProgressUrl,
-		authorUrl, defineLaterUrl, exportPortfolioLearnerUrl, exportPortfolioClassUrl, monitorUrl,
-		contributeUrl, moderationUrl, helpUrl, supportsRunOffline, defaultToolContentId, toolSignature,
-		toolDisplayName, description, serviceName, createDateTime, groupingSupportTypeId, toolIdentifier,
-		toolVersion, languageFile, supportsOutputs, extLmsId);
+		authorUrl, exportPortfolioLearnerUrl, exportPortfolioClassUrl, monitorUrl, contributeUrl,
+		moderationUrl, helpUrl, defaultToolContentId, toolSignature, toolDisplayName, description, serviceName,
+		createDateTime, groupingSupportTypeId, toolIdentifier, toolVersion, languageFile, supportsOutputs,
+		extLmsId);
 	return vo;
     }
 

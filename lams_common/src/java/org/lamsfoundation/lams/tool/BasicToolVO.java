@@ -56,9 +56,6 @@ public class BasicToolVO implements Serializable, IToolVO {
     /** nullable persistent field */
     private String authorUrl;
 
-    /** nullable persistent field */
-    private String defineLaterUrl;
-
     /** persistent field */
     private String exportPortfolioLearnerUrl;
 
@@ -76,9 +73,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 
     /** persistent field */
     private String helpUrl;
-
-    /** persistent field */
-    private boolean supportsRunOffline;
     
     /** persistent field */
     private boolean valid;
@@ -127,14 +121,12 @@ public class BasicToolVO implements Serializable, IToolVO {
                 String learnerPreviewUrl, 
                 String learnerProgressUrl, 
                 String authorUrl, 
-                String defineLaterUrl, 
                 String exportPortfolioLearnerUrl, 
                 String exportPortfolioClassUrl, 
                 String monitorUrl,
                 String contributeUrl,
                 String moderationUrl,
                 String helpUrl,
-                boolean supportsRunOffline,
                 long defaultToolContentId, 
                 String toolSignature, 
                 String toolDisplayName, 
@@ -153,14 +145,12 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.learnerPreviewUrl=learnerPreviewUrl;
 		this.learnerProgressUrl=learnerProgressUrl;
 		this.authorUrl=authorUrl;
-		this.defineLaterUrl=defineLaterUrl;
 		this.exportPortfolioLearnerUrl=exportPortfolioLearnerUrl;
 		this.exportPortfolioClassUrl=exportPortfolioClassUrl;
 		this.monitorUrl=monitorUrl;
 		this.contributeUrl=contributeUrl;
 		this.moderationUrl=moderationUrl;
 		this.helpUrl = helpUrl;
-		this.supportsRunOffline=supportsRunOffline;
 		this.defaultToolContentId=defaultToolContentId;
 		this.toolSignature=toolSignature;
 		this.toolDisplayName=toolDisplayName;
@@ -184,7 +174,6 @@ public class BasicToolVO implements Serializable, IToolVO {
                 boolean supportsGrouping, 
                 String learnerUrl, 
                 String authorUrl, 
-                boolean supportsRunOffline,
                 String toolSignature, 
                 String toolDisplayName, 
                 String serviceName, 
@@ -196,7 +185,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.supportsGrouping=supportsGrouping;
 		this.learnerUrl=learnerUrl;
 		this.authorUrl=authorUrl;
-		this.supportsRunOffline=supportsRunOffline;
 		this.toolSignature=toolSignature;
 		this.toolDisplayName=toolDisplayName;
 		this.serviceName=serviceName;
@@ -277,20 +265,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 	 */
 	public void setDefaultToolContentId(long defaultToolContentId) {
 		this.defaultToolContentId = defaultToolContentId;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#getDefineLaterUrl()
-	 */
-	public String getDefineLaterUrl() {
-		return defineLaterUrl;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#setDefineLaterUrl(java.lang.String)
-	 */
-	public void setDefineLaterUrl(String defineLaterUrl) {
-		this.defineLaterUrl = defineLaterUrl;
 	}
 
 	/* (non-Javadoc)
@@ -423,17 +397,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 
 	public void setSupportsGrouping(boolean supportsGrouping) {
 		this.supportsGrouping = supportsGrouping;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#isSupportsRunOffline()
-	 */
-	public boolean isSupportsRunOffline() {
-		return supportsRunOffline;
-	}
-
-	public void setSupportsRunOffline(boolean supportsRunOffline) {
-		this.supportsRunOffline = supportsRunOffline;
 	}
 
 	/* (non-Javadoc)

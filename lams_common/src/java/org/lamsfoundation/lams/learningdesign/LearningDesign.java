@@ -154,12 +154,6 @@ public class LearningDesign implements Serializable {
 	/** persistent field*/
 	private Date lastModifiedDateTime;
 	
-	/** Offline Instruction for this activity*/
-	private String offlineInstructions;
-	
-	 /** Online Instructions for this activity*/
-    private String onlineInstructions;
-	
     /* If the values for createDateTime and/or lastModifiedDateTime
      * are null, then it will default to the current datetime.
      */
@@ -188,8 +182,6 @@ public class LearningDesign implements Serializable {
 			Long duration,
 			String licenseText,
 			License license,
-			String offlineInstructions,
-			String onlineInstructions,
 			String contentFolderID,
 			Boolean editOverrideLock,
 			User editOverrideUser,
@@ -219,8 +211,6 @@ public class LearningDesign implements Serializable {
 		this.duration = duration;
 		this.licenseText = licenseText;
 		this.license = license;
-		this.offlineInstructions = offlineInstructions;
-		this.onlineInstructions = onlineInstructions;
 		this.contentFolderID = contentFolderID;
 		this.lastModifiedDateTime = new Date();
 		this.editOverrideLock = editOverrideLock;
@@ -558,19 +548,6 @@ public class LearningDesign implements Serializable {
 	}
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime != null ? lastModifiedDateTime : new Date();
-	}
-	
-	public String getOfflineInstructions() {
-		return this.offlineInstructions;
-	}
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
 	}
 	public String getContentFolderID() {
 		return contentFolderID;

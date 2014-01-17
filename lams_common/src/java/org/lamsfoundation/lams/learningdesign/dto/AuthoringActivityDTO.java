@@ -114,11 +114,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     private Integer orderID;
 
-    /**
-     * Indicates whether the content of this activity would be defined later in the monitoring environment or not.
-     */
-    private Boolean defineLater;
-
     /** The LearningDesign to which this activity belongs */
     private Long learningDesignID;
 
@@ -127,9 +122,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     /** Date this activity was created */
     private Date createDateTime;
-
-    /** Indicates whether this activity is available offline */
-    private Boolean runOffline;
 
     /** Maximum number of activities to be attempted */
     private Integer maxOptions;
@@ -292,13 +284,11 @@ public class AuthoringActivityDTO extends BaseDTO {
 
 	groupingUIID = activity.getGroupingUIID();
 	orderID = activity.getOrderId();
-	defineLater = activity.getDefineLater();
 	learningDesignID = activity.getLearningDesign() != null ? activity.getLearningDesign().getLearningDesignId()
 		: null;
 	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary()
 		.getLearningLibraryId() : null;
 	createDateTime = activity.getCreateDateTime();
-	runOffline = activity.getRunOffline();
 	languageFile = activity.getLanguageFile();
 	activityCategoryID = activity.getActivityCategoryID();
 	libraryActivityUIImage = activity.getLibraryActivityUiImage();
@@ -529,13 +519,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     /**
-     * @return Returns the defineLater.
-     */
-    public Boolean getDefineLater() {
-	return defineLater;
-    }
-
-    /**
      * @return Returns the description.
      */
     public String getDescription() {
@@ -680,13 +663,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     public Integer getParentUIID() {
 	return parentUIID;
-    }
-
-    /**
-     * @return Returns the runOffline.
-     */
-    public Boolean getRunOffline() {
-	return runOffline;
     }
 
     /**
@@ -911,14 +887,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     /**
-     * @param defineLater
-     *                The defineLater to set.
-     */
-    public void setDefineLater(Boolean defineLater) {
-	this.defineLater = defineLater;
-    }
-
-    /**
      * @param description
      *                The description to set.
      */
@@ -1124,14 +1092,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 	if (!parentUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
 	    this.parentUIID = parentUIID;
 	}
-    }
-
-    /**
-     * @param runOffline
-     *                The runOffline to set.
-     */
-    public void setRunOffline(Boolean runOffline) {
-	this.runOffline = runOffline;
     }
 
     /**

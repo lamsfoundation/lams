@@ -95,10 +95,6 @@ public interface WDDXTAGS {
 
     public static final String ACTIVITY_CATEGORY_ID = "activityCategoryID";
 
-    public static final String DEFINE_LATER = "defineLater";
-    public static final String RUN_OFFLINE = "runOffline";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
     public static final String LIBRARY_IMAGE = "libraryActivityUIImage";
     public static final String LIBRARY_ACTIVITY = "libraryActivityID";
 

@@ -287,9 +287,6 @@
 							<tr>
 								<td colspan="2" class="contributeEntryCell">
 									<c:choose>
-										<c:when test="${entry.contributionType eq 2}">
-											<fmt:message key="lesson.task.define.later"/>
-										</c:when>
 										<c:when test="${entry.contributionType eq 3}">
 											<fmt:message key="lesson.task.gate"/>
 										</c:when>

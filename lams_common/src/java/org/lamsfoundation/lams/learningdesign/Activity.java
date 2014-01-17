@@ -145,14 +145,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      */
     private Integer orderId;
 
-    /**
-     * Indicates whether the content of this activity would be defined later in the monitoring environment or not.
-     */
-    private Boolean defineLater;
-
-    /** Indicates whether this activity is available offline */
-    private Boolean runOffline;
-
     /** Date this activity was created */
     private Date createDateTime;
 
@@ -250,10 +242,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /** full constructor */
     public Activity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
-	    Integer orderId, Boolean defineLater, Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
+	    Integer orderId, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
+	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
+	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
+	    Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
 	this.activityId = activityId;
 	activityUIID = id;
 	this.description = description;
@@ -261,7 +253,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.xcoord = xcoord;
 	this.ycoord = ycoord;
 	this.orderId = orderId;
-	this.defineLater = defineLater;
 	this.createDateTime = createDateTime != null ? createDateTime : new Date();
 	this.learningLibrary = learningLibrary;
 	this.parentActivity = parentActivity;
@@ -290,11 +281,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /** minimal constructor */
-    public Activity(Long activityId, Boolean defineLater, Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, LearningDesign learningDesign, Grouping grouping, Integer activityTypeId,
-	    Transition transitionTo, Transition transitionFrom) {
+    public Activity(Long activityId, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
+	    LearningDesign learningDesign, Grouping grouping, Integer activityTypeId, Transition transitionTo,
+	    Transition transitionFrom) {
 	this.activityId = activityId;
-	this.defineLater = defineLater;
 	this.createDateTime = createDateTime != null ? createDateTime : new Date();
 	this.learningLibrary = learningLibrary;
 	this.parentActivity = parentActivity;
@@ -436,14 +426,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     public void setOrderId(Integer orderId) {
 	this.orderId = orderId;
-    }
-
-    public Boolean getDefineLater() {
-	return defineLater;
-    }
-
-    public void setDefineLater(Boolean defineLater) {
-	this.defineLater = defineLater;
     }
 
     public Date getCreateDateTime() {
@@ -714,14 +696,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     public void setGroupingUIID(Integer groupingUIID) {
 	this.groupingUIID = groupingUIID;
-    }
-
-    public Boolean getRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(Boolean runOffline) {
-	this.runOffline = runOffline;
     }
 
     public Integer getActivityCategoryID() {
@@ -1009,9 +983,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	newActivity.setGrouping(this.getGrouping());
 	newActivity.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));
 
-	newActivity.setDefineLater(this.getDefineLater());
 	newActivity.setCreateDateTime(new Date());
-	newActivity.setRunOffline(this.getRunOffline());
 	newActivity.setLearningLibrary(this.getLearningLibrary());
 	newActivity.setLibraryActivity(this.getLibraryActivity());
 	newActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());

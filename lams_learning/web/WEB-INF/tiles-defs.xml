@@ -88,9 +88,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageTitleKey" value="error.title"/>
 		<put name="body" value="/progressBroken.jsp"/>
 	</definition>
-	<definition name=".previewDefineLater" extends=".layout">
-		<put name="body" value="/previewDefineLater.jsp"/>
-	</definition>
 	
 	<!-- Journal/Notebook definitions -->
 	

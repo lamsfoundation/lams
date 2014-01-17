@@ -125,20 +125,17 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
     
 
     /**
-     * Setup contribution type for chosen branching activities. 
-     * @param contributionTypes the list that holds contribution types.
+     * Setup contribution type for chosen branching activities.
+     * 
+     * @param contributionTypes
+     *            the list that holds contribution types.
      */
-   protected void setUpContributionType(ArrayList<Integer> contributionTypes)
-    {
-		if ( branchingActivity != null ) {
-			if ( branchingActivity.isChosenBranchingActivity() ) {
-			    contributionTypes.add(ContributionTypes.CHOSEN_BRANCHING);
-			} else if(branchingActivity.getDefineLater().booleanValue()) {
-				    contributionTypes.add(ContributionTypes.DEFINE_LATER);
-			}
-		}
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
+	if (branchingActivity != null) {
+	    if (branchingActivity.isChosenBranchingActivity()) {
+		contributionTypes.add(ContributionTypes.CHOSEN_BRANCHING);
+	    }
+	}
     }
-    
-
     
 }

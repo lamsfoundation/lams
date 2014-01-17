@@ -74,8 +74,6 @@ public class LearningDesignDTO extends BaseDTO {
     private Long licenseID;
     private Date lastModifiedDateTime;
     private String contentFolderID;
-    private String offlineInstructions;
-    private String onlineInstructions;
 
     /* Groupings Array which contain the groupings objects, which had been created by the grouping activities
      * in this learning design.
@@ -87,51 +85,6 @@ public class LearningDesignDTO extends BaseDTO {
     private ArrayList<CompetenceDTO> competences;
 
     public LearningDesignDTO() {
-    }
-
-    public LearningDesignDTO(Long learningDesignId, Integer learningDesignUIID, String description, String title,
-	    Long firstActivityID, Integer firstActivityUIID, Long floatingActivityID, Integer floatingActivityUIID,
-	    Integer maxId, Boolean validDesign, Boolean readOnly, Boolean editOverrideLock, Date dateReadOnly,
-	    Integer userID, Integer originalUserID, Integer editOverrideUserID, String editOverrideUserFullName,
-	    String helpText, Integer copyTypeID, Date createDateTime, String version, Integer designVersion,
-	    Long originalLearningDesignID, Integer workspaceFolderID, Long duration, String licenseText,
-	    Long licenseID, Date lastModifiedDateTime, String offlineInstructions, String onlineInstructions) {
-	super();
-	this.learningDesignID = learningDesignId;
-	this.learningDesignUIID = learningDesignUIID;
-	this.description = description;
-	this.title = title;
-	this.firstActivityID = firstActivityID;
-	this.firstActivityUIID = firstActivityUIID;
-	this.floatingActivityID = floatingActivityID;
-	this.floatingActivityUIID = floatingActivityUIID;
-	this.maxID = maxId;
-	this.validDesign = validDesign;
-	this.readOnly = readOnly;
-	this.editOverrideLock = editOverrideLock;
-	this.dateReadOnly = dateReadOnly;
-	this.offlineInstructions = offlineInstructions;
-	this.onlineInstructions = onlineInstructions;
-	this.userID = userID;
-	this.originalUserID = originalUserID;
-	this.editOverrideUserID = editOverrideUserID;
-	this.editOverrideUserFullName = editOverrideUserFullName;
-	this.helpText = helpText;
-	this.copyTypeID = copyTypeID;
-	this.createDateTime = createDateTime;
-	this.version = version;
-	this.designVersion = designVersion;
-	this.originalLearningDesignID = originalLearningDesignID;
-	this.workspaceFolderID = workspaceFolderID;
-	this.duration = duration;
-	this.licenseText = licenseText;
-	this.licenseID = licenseID;
-	this.lastModifiedDateTime = lastModifiedDateTime;
-	this.groupings = new ArrayList();
-	this.activities = new ArrayList();
-	this.transitions = new ArrayList();
-	this.branchMappings = new ArrayList();
-	this.competences = new ArrayList<CompetenceDTO>();
     }
 
     public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO,
@@ -155,9 +108,6 @@ public class LearningDesignDTO extends BaseDTO {
 	this.readOnly = learningDesign.getReadOnly();
 	this.editOverrideLock = learningDesign.getEditOverrideLock();
 	this.dateReadOnly = learningDesign.getDateReadOnly();
-
-	this.offlineInstructions = learningDesign.getOfflineInstructions();
-	this.onlineInstructions = learningDesign.getOnlineInstructions();
 
 	this.userID = learningDesign.getUser() != null ? learningDesign.getUser().getUserId() : null;
 	this.originalUserID = learningDesign.getOriginalUser() != null ? learningDesign.getOriginalUser().getUserId() : null;
@@ -754,38 +704,6 @@ public class LearningDesignDTO extends BaseDTO {
     public void setFloatingActivityUIID(Integer floatingActivityUIID) {
 	if (!floatingActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 	    this.floatingActivityUIID = floatingActivityUIID;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *                The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	if (!onlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *                The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	if (!offlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
     }
 
     /**

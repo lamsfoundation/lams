@@ -31,161 +31,103 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.FloatingActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
 
-
-/** 
+/**
  * @author Mitchell Seaton
  * @version 2.3
  * 
- * @hibernate.class 
-*/
+ * @hibernate.class
+ */
 public class FloatingActivity extends ComplexActivity implements Serializable {
 
-	/** preset value for maximum number of floating activities in a design */
-	public static final int MAX_NO_OF_ACTIVITIES = 6;
-	
+    /** preset value for maximum number of floating activities in a design */
+    public static final int MAX_NO_OF_ACTIVITIES = 6;
+
     /** nullable persistent field */
     private Integer maxNumberOfActivities;
-    private SystemTool systemTool; 
+    private SystemTool systemTool;
 
     /** full constructor */
-    public FloatingActivity(Long activityId, 
-            Integer id, 
-            String description, 
-            String title, 
-            Integer xcoord, 
-            Integer ycoord, 
-            Integer orderId, 
-            Boolean defineLater, 
-            java.util.Date createDateTime, 
-            LearningLibrary learningLibrary, 
-            Activity parentActivity, 
-            Activity libraryActivity,
-			Integer parentUIID,
-            LearningDesign learningDesign, 
-            Grouping grouping, 
-            Integer activityTypeId,  
-            Transition transitionTo,
-            Transition transitionFrom,
-            String languageFile,
-			Boolean stopAfterActivity,
-			Set inputActivities,
-			Set activities,
-			Activity defaultActivity,
-            Integer maxNumberOfActivities,
-            SystemTool sysTool,
-			Set branchActivityEntries) {
-        super(activityId, 
-                id, 
-                description, 
-                title, 
-                xcoord, 
-                ycoord, 
-                orderId, 
-                defineLater, 
-                createDateTime, 
-                learningLibrary, 
-                parentActivity, 
-				libraryActivity,
-				parentUIID,
-                learningDesign, 
-                grouping, 
-                activityTypeId,  
-                transitionTo,
-				transitionFrom,
-				languageFile,
-				stopAfterActivity,
-				inputActivities,
-                activities,
-                defaultActivity,
-                branchActivityEntries);
-        this.maxNumberOfActivities = maxNumberOfActivities;
-        this.systemTool = sysTool;
-        super.activityStrategy = new FloatingActivityStrategy(this);
+    public FloatingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
+	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
+	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
+	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
+	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
+	    Activity defaultActivity, Integer maxNumberOfActivities, SystemTool sysTool, Set branchActivityEntries) {
+	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
+		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
+		branchActivityEntries);
+	this.maxNumberOfActivities = maxNumberOfActivities;
+	this.systemTool = sysTool;
+	super.activityStrategy = new FloatingActivityStrategy(this);
     }
 
     /** default constructor */
     public FloatingActivity() {
-        super.activityStrategy = new FloatingActivityStrategy(this);
+	super.activityStrategy = new FloatingActivityStrategy(this);
     }
 
     /** minimal constructor */
-    public FloatingActivity(Long activityId, 
-            Boolean defineLater, 
-            java.util.Date createDateTime, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
-            Integer activityTypeId,  
-            Transition transitionTo,
-            Transition transitionFrom,
-            Set activities) {
-      super(activityId, 
-              defineLater, 
-              createDateTime, 
-              learningLibrary, 
-              parentActivity, 
-              learningDesign, 
-              grouping, 
-              activityTypeId, 
-              transitionTo,
-              transitionFrom,
-              activities);
-      super.activityStrategy = new FloatingActivityStrategy(this);
-    }
-    public Activity createCopy(int uiidOffset){
-    	FloatingActivity newFloatingActivity = new FloatingActivity();
-    	copyToNewComplexActivity(newFloatingActivity, uiidOffset);
-
-    	/** OptionsActivity Specific Attributes */
-    	newFloatingActivity.setMaxNumberOfActivities(this.getMaxNumberOfActivities());
-    	
-    	return newFloatingActivity;
+    public FloatingActivity(Long activityId, java.util.Date createDateTime,
+	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
+	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
+	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
+	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
+	    Transition transitionFrom, Set activities) {
+	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
+		transitionTo, transitionFrom, activities);
+	super.activityStrategy = new FloatingActivityStrategy(this);
     }
 
-    /** 
+    public Activity createCopy(int uiidOffset) {
+	FloatingActivity newFloatingActivity = new FloatingActivity();
+	copyToNewComplexActivity(newFloatingActivity, uiidOffset);
+
+	/** OptionsActivity Specific Attributes */
+	newFloatingActivity.setMaxNumberOfActivities(this.getMaxNumberOfActivities());
+
+	return newFloatingActivity;
+    }
+
+    /**
      * @hibernate.property column="max_number_of_options" length="5"
      */
     public Integer getMaxNumberOfActivities() {
-        return this.maxNumberOfActivities;
+	return this.maxNumberOfActivities;
     }
 
-    /** 
-     * Get the maximum number of activities, guaranteed not to return null. If the 
-     * value is null in the database, returns the number of activities
-     * in this floating activity.
+    /**
+     * Get the maximum number of activities, guaranteed not to return null. If the value is null in the database,
+     * returns the number of activities in this floating activity.
      */
     public Integer getMaxNumberOfActivitiesNotNull() {
-    	return maxNumberOfActivities!=null ? maxNumberOfActivities : getActivities().size();
+	return maxNumberOfActivities != null ? maxNumberOfActivities : getActivities().size();
     }
 
     public void setMaxNumberOfActivities(Integer maxNumberOfActivities) {
-        this.maxNumberOfActivities = maxNumberOfActivities;
+	this.maxNumberOfActivities = maxNumberOfActivities;
     }
-    
-    /**
-	 * @hibernate.many-to-one lazy="false"
-	 * @hibernate.column name="system_tool_id"
-	*/
-    public SystemTool getSystemTool() {
-		return systemTool;
-	}
 
-	public void setSystemTool(SystemTool systemTool) {
-		this.systemTool = systemTool;
-	}
-    
+    /**
+     * @hibernate.many-to-one lazy="false"
+     * @hibernate.column name="system_tool_id"
+     */
+    public SystemTool getSystemTool() {
+	return systemTool;
+    }
+
+    public void setSystemTool(SystemTool systemTool) {
+	this.systemTool = systemTool;
+    }
+
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityId", getActivityId())
-            .toString();
+	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
-    public boolean isNull()
-    {
-        return false;
+    public boolean isNull() {
+	return false;
     }
 }

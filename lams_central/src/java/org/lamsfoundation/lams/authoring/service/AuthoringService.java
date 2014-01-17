@@ -735,9 +735,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    gate.setApplyGrouping(false); // not nullable so default to false
 	    gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
 	    gate.setOrderId(null);
-	    gate.setDefineLater(Boolean.FALSE);
 	    gate.setCreateDateTime(new Date());
-	    gate.setRunOffline(Boolean.FALSE);
 	    gate.setReadOnly(Boolean.TRUE);
 	    gate.setLearningDesign(design);
 
@@ -901,21 +899,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Iterator i = activities.iterator(); i.hasNext();) {
 	    Activity activity = (Activity) i.next();
 
-	    if (activity.isInitialised()) {
-		if (!activity.isActivityReadOnly() && activity.isToolActivity()) {
-		    // Activity is initialised so it was set up previously. So
-		    // its tool content will be okay
-		    // but the run offline flags and define later flags might
-		    // have been changed, so they need to be updated
-		    // Content ID shouldn't change, but we update it in case it
-		    // does change while we update the status flags.
-		    ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity
-			    .getActivityId());
-		    Long newContentId = lamsCoreToolService.notifyToolOfStatusFlags(toolActivity);
-		    toolActivity.setToolContentId(newContentId);
-		}
-
-	    } else {
+	    if (! activity.isInitialised()) {
 		// this is a new activity - need to set up the content, do any
 		// scheduling, etc
 		// always have to copy the tool content, even though it may
@@ -931,7 +915,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if (activity.isToolActivity()) {
 		    ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity
 			    .getActivityId());
-		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, true, null);
+		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, null);
 		    toolActivity.setToolContentId(newContentId);
 
 		    // LDEV-2510 init tool sessions for support activities added during live edit
@@ -1142,10 +1126,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    String customCSV) {
 	try {
 	    ToolActivity toolActivity = (ToolActivity) activity;
-	    // copy the content, but don't set the define later flags if it is
-	    // preview
-	    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity,
-		    ldCopyType != LearningDesign.COPY_TYPE_PREVIEW, customCSV);
+	    // copy the content
+	    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, customCSV);
 	    toolActivity.setToolContentId(newContentId);
 
 	    // clear read only field
@@ -1241,11 +1223,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			&& (newSequenceActivity.getBranchEntries().size() > 0)) {
 
 		    Activity parentActivity = newSequenceActivity.getParentActivity();
-		    if (parentActivity.isChosenBranchingActivity()
-			    || (parentActivity.isGroupBranchingActivity() && (parentActivity.getDefineLater() != null) && parentActivity
-				    .getDefineLater().booleanValue())) {
-			// Don't have any preset up entries for a teacher chosen
-			// or a define later group based branching.
+		    if (parentActivity.isChosenBranchingActivity()) {
+			// Don't have any preset up entries for a teacher chosen.
 			// Must be copying a design that was run previously.
 			newSequenceActivity.getBranchEntries().clear();
 
@@ -2042,7 +2021,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	LearningDesign learningDesign = new LearningDesign(null, null, null, learningDesignTitle, null, null, 1, false,
 		false, null, null, null, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
-		user, null, null, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1);
+		user, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1);
 
 	WorkspaceFolder folder = null;
 

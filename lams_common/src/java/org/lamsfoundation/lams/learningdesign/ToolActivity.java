@@ -70,13 +70,13 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
-	    Integer orderId, Boolean defineLater, java.util.Date createDateTime, LearningLibrary learningLibrary,
+	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId,
 	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings,
 	    Set<ActivityEvaluation> activityEvaluations, Set<GradebookUserActivity> gradebookUserActivities) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, defineLater, createDateTime,
+	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime,
 		learningLibrary, parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
 	this.tool = tool;
@@ -93,14 +93,14 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     /** minimal constructor */
-    public ToolActivity(Long activityId, Boolean defineLater, java.util.Date createDateTime,
+    public ToolActivity(Long activityId, java.util.Date createDateTime,
 	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
 	    Transition transitionFrom, Tool tool, Long toolContentId) {
-	super(activityId, defineLater, createDateTime, learningLibrary, parentActivity, learningDesign, grouping,
-		activityTypeId, transitionTo, transitionFrom);
+	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
+		transitionTo, transitionFrom);
 	this.tool = tool;
 	this.toolContentId = toolContentId;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);

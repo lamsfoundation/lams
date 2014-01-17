@@ -1,0 +1,19 @@
+-- Turn off autocommit, so nothing is committed if there is an error
+
+SET AUTOCOMMIT = 0;
+SET FOREIGN_KEY_CHECKS=0;
+
+-- LDEV-3147 Simplify tools: get rid of instructions tab, define in monitor and run offline activity options
+ALTER TABLE lams_learning_activity DROP COLUMN define_later_flag;
+ALTER TABLE lams_learning_activity DROP COLUMN run_offline_flag;
+
+ALTER TABLE lams_tool DROP COLUMN supports_run_offline_flag;
+ALTER TABLE lams_tool DROP COLUMN define_later_url;
+
+ALTER TABLE lams_learning_design DROP COLUMN online_instructions;
+ALTER TABLE lams_learning_design DROP COLUMN offline_instructions;
+
+-- If there were no errors, commit and restore autocommit to on
+SET FOREIGN_KEY_CHECKS=0;
+COMMIT;
+SET AUTOCOMMIT = 1;

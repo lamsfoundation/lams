@@ -112,8 +112,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	if ((file != null) && !StringUtils.isEmpty(fileName)) {
 	    try {
 		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";		
-		node = getCentralToolContentHandler().uploadFile(is, fileName, file.getContentType(),
-			IToolContentHandler.TYPE_ONLINE);
+		node = getCentralToolContentHandler().uploadFile(is, fileName, file.getContentType());
 		is.close();
 	    } catch (Exception e) {
 		request.setAttribute("errorMessage", e.getMessage());
@@ -162,7 +161,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	// write to content repository
 	String fileName = user.getFullName() + " portrait.jpg";
-	NodeKey node = getCentralToolContentHandler().uploadFile(is, fileName, "image/jpeg", IToolContentHandler.TYPE_ONLINE);
+	NodeKey node = getCentralToolContentHandler().uploadFile(is, fileName, "image/jpeg");
 	is.close();
 
 	log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());

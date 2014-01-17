@@ -573,10 +573,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	     * branching mappings are not supposed to be included into the structure (LDEV-1825)
 	     */
 	    Set<Long> groupingsToSkip = new TreeSet<Long>();
-	    // for these branching activities there will be no branching
-	    // mappings saved into XML, since they will be
-	    // recreated in monitoring
-	    Set<Integer> branchingActivitiesToSkip = new TreeSet<Integer>();
 
 	    // iterator all activities in this learning design and export
 	    // their content to given folder.
@@ -604,11 +600,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    activity.setGroupingID(null);
 		    activity.setGroupingUIID(null);
 		    continue;
-		}
-		// for group based define later branching activities there
-		// should be no branching mappings saved to XML
-		if (activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE && activity.getDefineLater()) {
-		    branchingActivitiesToSkip.add(activity.getActivityUIID());
 		}
 		// skip non-tool activities
 		if (activityTypeID != Activity.TOOL_ACTIVITY_TYPE) {
@@ -650,13 +641,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    while (groupingIter.hasNext()) {
 		if (groupingsToSkip.contains(groupingIter.next().getGroupingID())) {
 		    groupingIter.remove();
-		}
-	    }
-
-	    Iterator<BranchActivityEntryDTO> branchMappingsIter = ldDto.getBranchMappings().iterator();
-	    while (branchMappingsIter.hasNext()) {
-		if (branchingActivitiesToSkip.contains(branchMappingsIter.next().getBranchingActivityUIID())) {
-		    branchMappingsIter.remove();
 		}
 	    }
 
@@ -1365,7 +1349,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // import learning design
 	    String fullFilePath = FileUtil.getFullPath(learningDesignPath,
 		    ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
-	    checkImportVersion(fullFilePath, toolsErrorMsgs);
+	    String importedFileVersion = checkImportVersion(fullFilePath, toolsErrorMsgs);
+	    filterCoreVersion(fullFilePath, importedFileVersion);
+
 	    LearningDesignDTO ldDto = (LearningDesignDTO) FileUtil.getObjectFromXML(null, fullFilePath);
 	    log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 
@@ -1481,7 +1467,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     }
 
-    private void checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException,
+    /**
+     * @param fullFilePath
+     * @param toolsErrorMsgs
+     * @return version of the server that exported this file
+     */
+    private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException,
 	    JDOMException {
 
 	SAXBuilder sax = new SAXBuilder();
@@ -1492,8 +1483,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	String currentVersionString = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	try {
-	    boolean isLaterVersion = VersionUtil.isSameOrLaterVersionAsServer(versionString, true);
-	    if (!isLaterVersion) {
+	    boolean isLaterVersion = !VersionUtil.isSameOrLaterVersionAsServer(versionString, true);
+	    if (isLaterVersion) {
 		log
 			.warn("Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
 				+ title + "\'. Version in import file " + versionString);
@@ -1506,6 +1497,32 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 		    new Object[] { versionString, currentVersionString }));
 	}
+	
+	return versionString;
+    }
+    
+    /**
+     * Transform main XML file to correct version format.
+     * 
+     * @param fullFilePath
+     * @param versionString
+     * @return
+     * @throws Exception
+     */
+    private void filterCoreVersion(String fullFilePath, String versionString) throws Exception {
+
+	ToolContentVersionFilter contentFilter = new ToolContentVersionFilter();
+
+	// all exported files from server version prior to 2.4.2 will require deletion of defineLater and runOffline
+	// flags
+	boolean isEarlierVersionThan242 = !VersionUtil.isSameOrLaterVersion("2.4.2", versionString, true);
+	if (isEarlierVersionThan242) {
+	    Class problemClass = Class.forName(AuthoringActivityDTO.class.getName());
+	    contentFilter.removeField(problemClass, "defineLater");
+	    contentFilter.removeField(problemClass, "runOffline");
+	    contentFilter.transformXML(fullFilePath);
+	}
+
     }
 
     private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid)
@@ -1616,7 +1633,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		    // more fields values for Repository upload use
 		    String fileName = BeanUtils.getProperty(fileNode.instance, fileNode.name.fileNameFieldName);
-		    String fileProperty = BeanUtils.getProperty(fileNode.instance, fileNode.name.filePropertyFieldName);
 		    // optional fields
 		    String mimeType = null;
 		    try {
@@ -1635,7 +1651,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    // upload to repository: file or pacakge
 		    NodeKey key;
 		    if (!isPackage) {
-			key = toolContentHandler.uploadFile(is, fileName, mimeType, fileProperty);
+			key = toolContentHandler.uploadFile(is, fileName, mimeType);
 		    } else {
 			String packageDirectory = ZipFileUtil.expandZip(is, realFileName);
 			key = toolContentHandler.uploadPackage(packageDirectory, initalItem);
@@ -2199,8 +2215,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	ld.setValidDesign(dto.getValidDesign());
 	ld.setReadOnly(dto.getReadOnly());
 	ld.setDateReadOnly(dto.getDateReadOnly());
-	ld.setOfflineInstructions(dto.getOfflineInstructions());
-	ld.setOnlineInstructions(dto.getOnlineInstructions());
 
 	ld.setHelpText(dto.getHelpText());
 	// set to 1
@@ -2549,7 +2563,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setActivityId(actDto.getActivityID());
 	act.setActivityTypeId(actDto.getActivityTypeID());
 	act.setApplyGrouping(actDto.getApplyGrouping());
-	act.setDefineLater(actDto.getDefineLater());
 	act.setDescription(actDto.getDescription());
 	act.setHelpText(actDto.getHelpText());
 	act.setLanguageFile(actDto.getLanguageFile());
@@ -2578,7 +2591,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setParentActivity(null);
 
 	act.setParentUIID(actDto.getParentUIID());
-	act.setRunOffline(actDto.getRunOffline());
 	act.setTitle(actDto.getActivityTitle());
 
 	// relation will be decide in Transition object.

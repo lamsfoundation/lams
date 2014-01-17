@@ -110,10 +110,6 @@ public class GateActivityDTO {
 		return gateActivity.getCreateDateTime();
 	}
 
-	public Boolean getDefineLater() {
-		return gateActivity.getDefineLater();
-	}
-
 	public String getDescription() {
 		return gateActivity.getDescription();
 	}
@@ -200,10 +196,6 @@ public class GateActivityDTO {
 
 	public Boolean getReadOnly() {
 		return gateActivity.getReadOnly();
-	}
-
-	public Boolean getRunOffline() {
-		return gateActivity.getRunOffline();
 	}
 
 	public SimpleActivityStrategy getSimpleActivityStrategy() {

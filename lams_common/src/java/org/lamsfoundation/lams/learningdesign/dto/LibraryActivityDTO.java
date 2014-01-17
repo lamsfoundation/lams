@@ -63,8 +63,6 @@ public class LibraryActivityDTO extends BaseDTO {
 	private Integer yCoord;
 	private String libraryActivityUIImage;
 	private Boolean applyGrouping;
-	private Boolean runOffline;
-	private Boolean defineLater;
 	private Date createDateTime;
 	private Integer groupingSupportType;
 	/** Name of the file (including the package) that contains the text strings for
@@ -77,8 +75,6 @@ public class LibraryActivityDTO extends BaseDTO {
 	private String toolDisplayName;
 	private String toolLanguageFile;
 	private String toolSignature;
-	private Boolean supportsDefineLater;
-	private Boolean supportsRunOffline;
 	private Boolean supportsModeration;
 	private Boolean supportsContribute;
 	private String authoringURL;
@@ -128,8 +124,6 @@ public class LibraryActivityDTO extends BaseDTO {
 		yCoord = activity.getYcoord();
 		libraryActivityUIImage = activity.getLibraryActivityUiImage();
 		applyGrouping = activity.getApplyGrouping();
-		runOffline = activity.getRunOffline();
-		defineLater = activity.getDefineLater();
 		createDateTime = activity.getCreateDateTime();
 		groupingSupportType = activity.getGroupingSupportType();
 		languageFile = activity.getLanguageFile();
@@ -203,8 +197,6 @@ public class LibraryActivityDTO extends BaseDTO {
 			toolDisplayName = tool.getToolDisplayName();
 			toolLanguageFile = tool.getLanguageFile();
 			toolSignature = tool.getToolSignature();
-			supportsDefineLater = new Boolean(tool.getSupportsDefineLater());
-			supportsRunOffline = new Boolean(tool.getSupportsRunOffline());
 			supportsModeration = new Boolean(tool.getSupportsModeration());
 			supportsContribute = new Boolean(tool.getSupportsContribute());
 			authoringURL = tool.getAuthorUrl();
@@ -305,13 +297,6 @@ public class LibraryActivityDTO extends BaseDTO {
 	}
 
 	/**
-	 * @return Returns the defineLater.
-	 */
-	public Boolean getDefineLater() {
-		return defineLater;
-	}
-
-	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
@@ -404,13 +389,6 @@ public class LibraryActivityDTO extends BaseDTO {
 	}
 
 	/**
-	 * @return Returns the runOffline.
-	 */
-	public Boolean getRunOffline() {
-		return runOffline;
-	}
-
-	/**
 	 * @return Returns the title.
 	 */
 	public String getActivityTitle() {
@@ -453,24 +431,10 @@ public class LibraryActivityDTO extends BaseDTO {
 	}
 
 	/**
-	 * @return Returns the supportsDefineLater.
-	 */
-	public Boolean getSupportsDefineLater() {
-		return supportsDefineLater;
-	}
-
-	/**
 	 * @return Returns the supportsModeration.
 	 */
 	public Boolean getSupportsModeration() {
 		return supportsModeration;
-	}
-
-	/**
-	 * @return Returns the supportsRunOffline.
-	 */
-	public Boolean getSupportsRunOffline() {
-		return supportsRunOffline;
 	}
 
 	/**

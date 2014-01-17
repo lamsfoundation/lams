@@ -131,8 +131,7 @@ public class ContributeActivityDTO {
 	public void setContributionType(Integer contributionType) {
 	    this.contributionType = contributionType;
 	    boolean isReq = contributionType != null
-		    && (contributionType.equals(ContributionTypes.DEFINE_LATER)
-			    || contributionType.equals(ContributionTypes.PERMISSION_GATE)
+		    && (contributionType.equals(ContributionTypes.PERMISSION_GATE)
 			    || contributionType.equals(ContributionTypes.CHOSEN_GROUPING) || contributionType
 				.equals(ContributionTypes.CHOSEN_BRANCHING));
 

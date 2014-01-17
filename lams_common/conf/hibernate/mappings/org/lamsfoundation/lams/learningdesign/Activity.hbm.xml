@@ -51,18 +51,10 @@
         <meta attribute="field-description">@hibernate.property column="order_id" length="11"</meta>    
     </property>
 
-    <property name="defineLater" type="java.lang.Boolean" column="define_later_flag" not-null="true" length="4">
-        <meta attribute="field-description">@hibernate.property column="define_later_flag" length="4" not-null="true"</meta>    
-    </property>
-
     <property name="createDateTime" type="java.sql.Timestamp" column="create_date_time" not-null="true" length="19">
         <meta attribute="field-description">@hibernate.property column="create_date_time" length="19" not-null="true"</meta>    
     </property>
 
-    <property name="runOffline" type="java.lang.Boolean" column="run_offline_flag" not-null="true" length="4">
-        <meta attribute="field-description">@hibernate.property column="run_offline_flag" length="4" not-null="true"</meta>    
-    </property>
-    
     <property name="parentUIID" type="java.lang.Integer" column="parent_ui_id" length="11">
         <meta attribute="field-description">@hibernate.property column="parent_ui_id" length="11" </meta>    
     </property>

@@ -140,21 +140,6 @@
             not-null="true"
         </meta>    
     </property>
-    
-    <property
-        name="supportsRunOffline"
-        type="java.lang.Boolean"
-        column="supports_run_offline_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_run_offline_flag"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property>    
        
     <property
         name="valid"
@@ -170,19 +155,7 @@
             not-null="true"
         </meta>    
     </property>
-        
-    <property
-        name="defineLaterUrl"
-        type="java.lang.String"
-        column="define_later_url"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="define_later_url"
-            length="65535"
-        </meta>    
-    </property>
+
     <property
         name="defaultToolContentId"
         type="long"

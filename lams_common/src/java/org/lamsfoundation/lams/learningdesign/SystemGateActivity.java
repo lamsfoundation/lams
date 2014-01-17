@@ -31,125 +31,65 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SystemGateActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
 
-
-/** 
+/**
  * @author Mitch Seaton
- * @hibernate.class 
-*/
+ * @hibernate.class
+ */
 public class SystemGateActivity extends PermissionGateActivity implements Serializable {
 
     /** full constructor */
-    public SystemGateActivity(Long activityId, 
-            Integer id, 
-            String description,
-            String title, 
-            Integer xcoord, 
-            Integer ycoord, 
-            Integer orderId, 
-            Boolean defineLater,
-            java.util.Date createDateTime, 
-            LearningLibrary learningLibrary, 
-            Activity parentActivity,  
-            Activity libraryActivity,
-			Integer parentUIID,
-            LearningDesign learningDesign, 
-            Grouping grouping, 
-            Integer activityTypeId, 
-            Transition transitionTo,
-            Transition transitionFrom,
-            String languageFile,
-            Boolean stopAfterActivity,
-			Set inputActivities,
-            Integer gateActivityLevelId,
-            Set waitingLearners,
-            SystemTool sysTool,
-            Set branchActivityEntries) {
-        super(activityId, 
-                id, 
-                description, 
-                title, 
-                xcoord, 
-                ycoord, 
-                orderId, 
-                defineLater, 
-                createDateTime, 
-                learningLibrary,  
-                parentActivity,
-				libraryActivity,
-				parentUIID,
-                learningDesign, 
-                grouping, 
-                activityTypeId,  
-                transitionTo,
-				transitionFrom,
-				languageFile,
-                stopAfterActivity,
-                inputActivities,
-                gateActivityLevelId,
-                waitingLearners,
-                sysTool,
-                branchActivityEntries);
-        super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
+    public SystemGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
+	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
+	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
+	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
+	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
+	    Set waitingLearners, SystemTool sysTool, Set branchActivityEntries) {
+	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
+		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, waitingLearners,
+		sysTool, branchActivityEntries);
+	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
     }
 
     /** default constructor */
     public SystemGateActivity() {
-        super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
+	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
     }
 
     /** minimal constructor */
-    public SystemGateActivity(Long activityId, 
-            Boolean defineLater,
-            java.util.Date createDateTime, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
-            Integer activityTypeId, 
-            Transition transitionTo,
-            Transition transitionFrom,
-            Integer gateActivityLevelId,
-            Set waitingLearners) 
-    {
-      super(activityId, 
-              defineLater, 
-              createDateTime, 
-              learningLibrary, 
-              parentActivity, 
-              learningDesign, 
-              grouping, 
-              activityTypeId,  
-              transitionTo,
-			  transitionFrom,
-              gateActivityLevelId,
-              waitingLearners);
-      super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
+    public SystemGateActivity(Long activityId, java.util.Date createDateTime,
+	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
+	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
+	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
+	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
+	    Transition transitionFrom, Integer gateActivityLevelId, Set waitingLearners) {
+	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
+		transitionTo, transitionFrom, gateActivityLevelId, waitingLearners);
+	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
     }
-    
+
     /**
-     * Makes a copy of the SystemGateActivity for authoring, preview and monitoring enviornment 
+     * Makes a copy of the SystemGateActivity for authoring, preview and monitoring enviornment
+     * 
      * @return SystemGateActivity Returns a deep-copy of the originalActivity
-     */    
+     */
     public Activity createCopy(int uiidOffset) {
-    	SystemGateActivity newSysGateActivity = new SystemGateActivity();
-    	copyToNewActivity(newSysGateActivity, uiidOffset);
-    	newSysGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
-    	newSysGateActivity.setGateOpen(new Boolean(false));
-    	return newSysGateActivity;    	
+	SystemGateActivity newSysGateActivity = new SystemGateActivity();
+	copyToNewActivity(newSysGateActivity, uiidOffset);
+	newSysGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
+	newSysGateActivity.setGateOpen(new Boolean(false));
+	return newSysGateActivity;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityId", getActivityId())
-            .toString();
+	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
-    public boolean isNull()
-    {
-        return false;
+    public boolean isNull() {
+	return false;
     }
 
 }

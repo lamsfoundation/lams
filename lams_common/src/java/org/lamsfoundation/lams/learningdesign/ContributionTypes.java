@@ -30,7 +30,8 @@ public class ContributionTypes {
 	// Class level constants - Contribution types
 	//---------------------------------------------------------------------
 	public static final Integer MODERATION = new Integer(1);
-	public static final Integer DEFINE_LATER = new Integer(2);
+	//the next one was removed and no longer used
+	//public static final Integer DEFINE_LATER = new Integer(2);
 	public static final Integer PERMISSION_GATE = new Integer(3);
 	public static final Integer SYNC_GATE = new Integer(4);
 	public static final Integer SCHEDULE_GATE = new Integer(5);

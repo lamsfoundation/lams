@@ -64,6 +64,24 @@ public class VersionUtil {
 		}
 		return versionParts;
 	}
+	
+	public static boolean isSameOrLaterVersion(String versionOneString, String versionTwoString, boolean compareOnlyFirstPart) throws NumberFormatException {
+		Long[] versionTwo = extractVersionParts(versionTwoString);
+		Long[] versionOne = extractVersionParts(versionOneString);
+		int compareRes = checkVersionPart(versionTwo[0],versionOne[0]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
+
+		compareRes = checkVersionPart(versionTwo[1],versionOne[1]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
+		
+		compareRes = checkVersionPart(versionTwo[2],versionOne[2]);
+		if ( compareRes < 0) return false;
+		if ( compareRes > 0 ) return true;
+		
+		return ( compareOnlyFirstPart || checkVersionPart(versionTwo[3],versionOne[3]) >= 0);
+	}
 
 	/**
 	 * Is the supplied version string the same as the current version? The comparison is done to the internal
@@ -74,21 +92,8 @@ public class VersionUtil {
 	 * @param compareOnlyFirstPart Set to true to only compare the Major and Minor version numbers (e.g. 2.0.4), set to false to compare the date part.
 	 */
 	public static boolean isSameOrLaterVersionAsServer(String versionString, boolean compareOnlyFirstPart) throws NumberFormatException {
-		Long[] serverVersion = extractSystemVersionParts();
-		Long[] compareVersion = extractVersionParts(versionString);
-		int compareRes = checkVersionPart(serverVersion[0],compareVersion[0]);
-		if ( compareRes < 0) return false;
-		if ( compareRes > 0 ) return true;
-
-		compareRes = checkVersionPart(serverVersion[1],compareVersion[1]);
-		if ( compareRes < 0) return false;
-		if ( compareRes > 0 ) return true;
-		
-		compareRes = checkVersionPart(serverVersion[2],compareVersion[2]);
-		if ( compareRes < 0) return false;
-		if ( compareRes > 0 ) return true;
-		
-		return ( compareOnlyFirstPart || checkVersionPart(serverVersion[3],compareVersion[3]) >= 0);
+	    	String serverVersion = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
+	    	return isSameOrLaterVersion(versionString, serverVersion, compareOnlyFirstPart);
 	}
 	
 	private static int checkVersionPart(Long version1, Long version2) {

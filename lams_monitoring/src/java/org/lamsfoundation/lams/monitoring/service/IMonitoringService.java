@@ -466,21 +466,6 @@ public interface IMonitoringService {
 	    throws IOException, LamsToolServiceException;
 
     /**
-     * This method returns the define later url for the given activity.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson for which the information has to be fetched.
-     * @param activityID
-     *            The activity_id of the Activity whose URL will be returned
-     * @param userID
-     *            The user id of the user requesting the url.
-     * @return String the url
-     * @throws IOException
-     */
-    public String getActivityDefineLaterURL(Long lessonID, Long activityID, Integer userID) throws IOException,
-	    LamsToolServiceException;
-
-    /**
      * This method returns the monitor url for the given activity
      * 
      * @param lessonID
@@ -710,7 +695,7 @@ public interface IMonitoringService {
 
     /**
      * Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch. Use for
-     * Group Based Branching and define later.
+     * Group Based Branching.
      * 
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch

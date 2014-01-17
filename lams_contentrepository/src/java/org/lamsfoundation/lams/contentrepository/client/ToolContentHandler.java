@@ -50,9 +50,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * Handles the connection to the content repository, and allows a file 
  * to be stored and retrieved. 
  * <p>
- * It can be used by LAMS tools to do the handling the files for
- * offline and online instructions. Every file that is stored needs
- * to be marked as either an Offline or Online file.
+ * It can be used by LAMS tools to do the handling the files.
  * <p>
  * It is a very simple client, in that
  * it only handles files (and not packages) and will not keep versions 
@@ -85,22 +83,18 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * <p>
  * The methods you are likely to use are:
  * <UL>
- * <LI>NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty)<BR>
- * 	Saves a file in the content repository, marking it as online or offline according to the fileProperty
+ * <LI>NodeKey uploadFile(InputStream stream, String fileName, String mimeType)<BR>
+ * 	Saves a file in the content repository
  * <LI>void deleteFile(Long uuid)<BR>
  *	Gets rid of a file you don't want any more
  * <LI>IVersionedNode getFileNode(Long uuid)<BR> 
  *  Gets the file node from the repository. To get the file stream, do getFileNode().getFile()
- * <LI>boolean isOffline(IVersionedNode node), boolean isOnline(IVersionedNode node)<BR>
- *  Is this an offline or offline file.
- * </UL>
  * For example:<BR>
  * <pre>
- * NodeKey offlineNodeKey = handler.uploadFile(istream, fileName, fileMimeType, ToolContentHandlerImpl.TYPE_OFFLINE);<BR>
- * Long uuid = offlineNodeKey.getUuid();<BR>
+ * NodeKey nodeKey = handler.uploadFile(istream, fileName, fileMimeType);<BR>
+ * Long uuid = nodeKey.getUuid();<BR>
  * IVersionedNode node = handler.getFileNode(uuid);<BR>
  * IStream fileStreamToWriteSomewhere = node.getFile());<BR>
- * boolean isOffline = handler.isOffline(node);<BR>
  * </pre><p>
  * Please read the javadoc on each method for more information on the exceptions thrown
  * and on the mandatory parameters.
@@ -121,7 +115,6 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 
     private IRepositoryService repositoryService;
     private ITicket ticket;
-    private boolean productionMode = true;
 	  
     protected Logger log = Logger.getLogger(ToolContentHandler.class.getName());
     
@@ -159,14 +152,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 		}
     }
 
-    /**
-     * Get the ticket to access the repository. If the workspace/credential
-     * hasn't been set up, then it will be set up automatically.
-     * 
-     * @param forceLogin set to true if tried to do something and got access denied. This may happen
-     * if the repository loses the ticket.
-     * @return the repository ticket 
-     */
+   @Override
     public ITicket getTicket( boolean forceLogin ) throws RepositoryCheckedException {
 		if ( ticket == null || forceLogin ) {
 			ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
@@ -187,47 +173,26 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 		return ticket;
 	}
 
-    /**
-     * Save a file in the content repository.
-     * 
-     * @param stream Input filestream. Mandatory.
-     * @param fileName Input filename. Mandatory.
-     * @param mimeType Mimetype of file. Optional.
-     * @param fileProperty is this for online or offline instructions? Should be TYPE_ONLINE or TYPE_OFFLINE. Mandatory.
-     * @return key to the new content repository node
-     * @throws InvalidParameterException One of the mandatory parameters is missing.
-     * @throws FileException An error occured writing the input stream to disk.
-     * @throws RepositoryCheckedException Some other error occured.
-     */
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
-        if ( fileProperty == null )
-            throw new InvalidParameterException("uploadFile: fileProperty parameter empty. Should be either TYPE_ONLINE or TYPE_OFFLINE");
-	    
-        NodeKey nodeKey = null;
-        try {
-		    try {
-		        nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
-		    } catch (AccessDeniedException e) {
-		        log.warn("Unable to access repository to add file "+fileName
-					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
-	            nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
-		    }
-	        
-		    try {
-			    getRepositoryService().setProperty(getTicket(false), nodeKey.getUuid(), nodeKey.getVersion(), FILE_TYPE_PROPERTY_NAME, fileProperty, PropertyType.STRING);
-		    } catch (AccessDeniedException e) {
-		        log.warn("Unable to access repository to set offline/online parameter "+fileName
-					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
-			    getRepositoryService().setProperty(getTicket(true), nodeKey.getUuid(), nodeKey.getVersion(), FILE_TYPE_PROPERTY_NAME, fileProperty, PropertyType.STRING);
-		    }
-
-	    } catch (RepositoryCheckedException e2) {
-	        log.warn("Unable to to uploadFile"+fileName
-					+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
-	        throw e2;
+   @Override
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType) throws RepositoryCheckedException,
+	    InvalidParameterException, RepositoryCheckedException {
+	NodeKey nodeKey = null;
+	try {
+	    try {
+		nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
+	    } catch (AccessDeniedException e) {
+		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
+			+ e.getMessage() + " Retrying login.");
+		nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
 	    }
 
-        return nodeKey;
+	} catch (RepositoryCheckedException e2) {
+	    log.warn("Unable to to uploadFile" + fileName + "Repository Exception: " + e2.getMessage()
+		    + " Retry not possible.");
+	    throw e2;
+	}
+
+	return nodeKey;
     }
 
     /**
@@ -249,7 +214,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * @throws FileException An error occured writing the files to disk.
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public NodeKey uploadPackage(String dirPath, String startFile, Integer userId) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+    private NodeKey uploadPackage(String dirPath, String startFile, Integer userId) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
         if ( dirPath == null )
             throw new InvalidParameterException("uploadFile: dirPath parameter empty. Directory containing files must be supplied");
          	    
@@ -271,19 +236,8 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 
         return nodeKey;
     }
-    /**
-     * Save content in repository into local file by given <code>toFileName</code>.
-     * 
-     * <p>
-     * If the <code>toFileName</code> is null, file name use original file name instead 
-     * and file save path will be system temporary directory.
-     * 
-     * @param uuid
-     * @param toFileName file name to save. Using the original file name instead if null value given.
-     * @throws ItemNotFoundException
-     * @throws RepositoryCheckedException
-     * @throws IOException
-     */
+    
+    @Override
     public void saveFile(Long uuid, String toFileName) throws ItemNotFoundException, RepositoryCheckedException, IOException {
          try {
  	        try {
@@ -318,7 +272,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * @throws ItemNotFoundException Node to copy cannot be found 
      * @throws RepositoryCheckedException Some other error occured.
      */
-    public NodeKey copyFile(Long uuid, Integer userId) throws ItemNotFoundException, RepositoryCheckedException {
+    private NodeKey copyFile(Long uuid, Integer userId) throws ItemNotFoundException, RepositoryCheckedException {
         NodeKey nodeKey = null;
         try {
 	        try {
@@ -340,12 +294,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
         return nodeKey;
     }
 
-    /** 
-     * Delete a file node.  If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown). 
-     * @param uuid id of the file node. Mandatory
-     * @throws InvalidParameterException One of the mandatory parameters is missing.
-     * @throws RepositoryCheckedException Some other error occured.
-     */
+    @Override
     public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException {
         try {
 		    try {
@@ -364,12 +313,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	    }
     }
 
-    /** Get a file or package node. 
-     * @param uuid id of the file/package node. Mandatory
-     * @throws FileException An error occured writing the input stream to disk.
-     * @throws ItemNotFoundException This file node does not exist, so cannot delete it.
-     * @throws RepositoryCheckedException Some other error occured.
-     */
+    @Override
     public IVersionedNode getFileNode(Long uuid) throws ItemNotFoundException, FileException, RepositoryCheckedException {
         try {
 	        try {
@@ -386,15 +330,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	    }
     }
 
-    /** Get just the properties of a file. Convenience method - equivalent of 
-     * calling getFileNode(uuid).getProperties(). Useful if all you want are 
-     * the properties and you don't want to access the file itself.
-     * 
-     * @param uuid id of the file node. Mandatory
-     * @throws FileException An error occured writing the input stream to disk.
-     * @throws ItemNotFoundException This file node does not exist, so cannot delete it.
-     * @throws RepositoryCheckedException Some other error occured.
-     */
+    @Override
     public Set getFileProperties(Long uuid) throws ItemNotFoundException, FileException, RepositoryCheckedException {
         try {
 	        try {
@@ -412,34 +348,6 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	        throw e2;
 	    }
     }
-
-    public boolean isOffline(IVersionedNode node) {
-        return checkType(node, TYPE_OFFLINE);
-    }
-    
-    public boolean isOnline(IVersionedNode node) {
-        return checkType(node, TYPE_ONLINE);
-    }
-    
-    /** Check the FILE_TYPE_PROPERTY_NAME property against the expectedType.
-     * 
-     * @param node should not be null
-     * @param expectedType must not be null
-     * @return true if match, false otherwise.
-     */
-    protected boolean checkType(IVersionedNode node, String expectedType) {
-        IValue property = node.getProperty(FILE_TYPE_PROPERTY_NAME);
-        String value = null;
-        try {
-            value = property != null ? property.getString() : null;
-        } catch (ValueFormatException e) {
-            // hmm, not expecting this - so need to return false...
-            // leave value as null;
-        }
-        return ( node != null && expectedType!= null && expectedType.equals(value));
-    }
-
-
     
 /*    protected File getFile(String fileName, InputStream is) throws FileNotFoundException, Exception {
         InputStream in = new BufferedInputStream(is, 500);

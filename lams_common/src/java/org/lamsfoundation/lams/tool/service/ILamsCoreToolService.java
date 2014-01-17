@@ -139,44 +139,23 @@ public interface ILamsCoreToolService {
     public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException;
 
     /**
-     * Calls the tool to copy the content for an activity. Used when copying a learning design. If it is a preview
-     * lesson, we don't want to set define later - we will sidestep this in the progress engine.
+     * Calls the tool to copy the content for an activity. Used when copying a learning design.
      * 
      * @param toolActivity
      *                the tool activity defined in the design.
-     * @param setDefineLater
-     *                whether or not to set the define later flag.
      * @param customCSV
      *                custom comma-separated values used for tool adapters
      * @throws DataMissingException,
      *                 ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater, String customCSV)
-	    throws DataMissingException, ToolException;
-
-    /**
-     * Calls the tool to set up the define later and run offline flags.
-     * 
-     * This method is a subset of the functionality of notifyToolToCopyContent(ToolActivity toolActivity, boolean
-     * setDefineLater); so if you call notifyToolToCopyContent then you don't need to call this method. It is a separate
-     * method used by Live Edit.
-     * 
-     * @param toolActivity
-     *                the tool activity defined in the design.
-     * @throws DataMissingException,
-     *                 ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
-     */
-    public Long notifyToolOfStatusFlags(ToolActivity toolActivity) throws DataMissingException, ToolException;
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV) throws DataMissingException,
+	    ToolException;
 
     /**
      * Calls the tool to copy the content for an activity. Used when copying an activity in authoring. Can't use the
      * notifyToolToCopyContent(ToolActivity, boolean) version in authoring as the tool activity won't exist if the user
      * hasn't saved the sequence yet. But the tool content (as that is saved by the tool) may already exist.
-     * 
-     * This doesn't set the define later and run offline flags from the design - it only copies the content stored in
-     * the tool.
      * 
      * @param toolContentId
      *                the content to be copied.
@@ -356,15 +335,6 @@ public interface ILamsCoreToolService {
      * @return the tool access url with tool session id or activity id
      */
     public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException;
-
-    /**
-     * Return the define later url for monitoring.
-     * 
-     * @param activity
-     *                the requested activity - must be a a ToolActivity. System Activities don't support define later.
-     * @return the tool access url with tool content id
-     */
-    public String getToolDefineLaterURL(ToolActivity activity) throws LamsToolServiceException;
 
     /**
      * Return the moderate url for monitoring.
