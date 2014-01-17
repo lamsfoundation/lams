@@ -61,14 +61,6 @@
    />
 
 
-   <property
-        name="runOffline"
-        type="boolean"
-        access="property"
-        column="run_offline"
-   />
-
-
     <property
         name="creationDate"
         type="java.util.Date"
@@ -185,23 +177,6 @@
         column="showOtherAnswers"
         length="1"
     />
-
-    
-    <property
-        name="offlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="offline_instructions"
-        length="65535"
-    />
-    
-    <property
-        name="onlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="online_instructions"
-        length="65535"
-    />
     
 
    	 <set
@@ -239,22 +214,6 @@
 
     </set>
     
-   	<set
-            name="qaUploadedFiles"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-              <key
-                  column="qa_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaUploadedFile"
-              />
-    </set>
     <set
             name="conditions"
             lazy="true"

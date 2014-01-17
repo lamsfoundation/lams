@@ -35,7 +35,6 @@ import java.util.Set;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**
@@ -45,234 +44,154 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
  */
 public class AuthoringDTO implements Serializable {
 
-	private static final long serialVersionUID = 3555065437595921234L;
+    private static final long serialVersionUID = 3555065437595921234L;
 
-	private Long contentID;
+    private Long contentID;
 
-	//basic tab
-	private String title;
+    // basic tab
+    private String title;
 
-	private String instruction;
+    private String instruction;
 
-	//instructions
-	private String onlineInstruction;
+    // advance
+    private boolean lockOnFinished;
 
-	private String offlineInstruction;
+    private boolean limitUpload;
 
-	private List onlineFiles;
+    private int limitUploadNumber;
 
-	private List offlineFiles;
+    private boolean reflectOnActivity;
 
-	//advance
-	private boolean lockOnFinished;
+    private String reflectInstructions;
 
-	private boolean limitUpload;
+    private boolean notifyLearnersOnMarkRelease;
 
-	private int limitUploadNumber;
+    private boolean notifyTeachersOnFileSubmit;
 
-	private boolean reflectOnActivity;
+    public AuthoringDTO() {
+    }
 
-	private String reflectInstructions;
-
-	private boolean notifyLearnersOnMarkRelease;
-
-	private boolean notifyTeachersOnFileSubmit;
-
-	public AuthoringDTO() {
+    public AuthoringDTO(SubmitFilesContent content) {
+	if (content == null) {
+	    return;
+	}
+	try {
+	    PropertyUtils.copyProperties(this, content);
+	} catch (IllegalAccessException e) {
+	    throw new DTOException(e);
+	} catch (InvocationTargetException e) {
+	    throw new DTOException(e);
+	} catch (NoSuchMethodException e) {
+	    throw new DTOException(e);
 	}
 
-	public AuthoringDTO(SubmitFilesContent content) {
-		if (content == null) {
-			return;
-		}
-		try {
-			PropertyUtils.copyProperties(this, content);
-		}
-		catch (IllegalAccessException e) {
-			throw new DTOException(e);
-		}
-		catch (InvocationTargetException e) {
-			throw new DTOException(e);
-		}
-		catch (NoSuchMethodException e) {
-			throw new DTOException(e);
-		}
+    }
 
-		onlineFiles = new ArrayList();
-		offlineFiles = new ArrayList();
-		Set fileSet = content.getInstructionFiles();
-		if (fileSet != null) {
-			Iterator iter = fileSet.iterator();
-			while (iter.hasNext()) {
-				InstructionFiles file = (InstructionFiles) iter.next();
-				if (StringUtils.equalsIgnoreCase(file.getType(), IToolContentHandler.TYPE_OFFLINE)) {
-					offlineFiles.add(file);
-				}
-				else {
-					onlineFiles.add(file);
-				}
-			}
-		}
+    /**
+     * @return Returns the contentID.
+     */
+    public Long getContentID() {
+	return contentID;
+    }
 
-	}
+    /**
+     * @param contentID
+     *            The contentID to set.
+     */
+    public void setContentID(Long contentID) {
+	this.contentID = contentID;
+    }
 
-	/**
-	 * @return Returns the contentID.
-	 */
-	public Long getContentID() {
-		return contentID;
-	}
+    /**
+     * @return Returns the instruction.
+     */
+    public String getInstruction() {
+	return instruction;
+    }
 
-	/**
-	 * @param contentID The contentID to set.
-	 */
-	public void setContentID(Long contentID) {
-		this.contentID = contentID;
-	}
+    /**
+     * @param instruction
+     *            The instruction to set.
+     */
+    public void setInstruction(String instruction) {
+	this.instruction = instruction;
+    }
 
-	/**
-	 * @return Returns the instruction.
-	 */
-	public String getInstruction() {
-		return instruction;
-	}
+    /**
+     * @return Returns the lockOnFinished.
+     */
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	/**
-	 * @param instruction The instruction to set.
-	 */
-	public void setInstruction(String instruction) {
-		this.instruction = instruction;
-	}
+    /**
+     * @param lockOnFinished
+     *            The lockOnFinished to set.
+     */
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	/**
-	 * @return Returns the lockOnFinished.
-	 */
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+    /**
+     * @return Returns the title.
+     */
+    public String getTitle() {
+	return title;
+    }
 
-	/**
-	 * @param lockOnFinished The lockOnFinished to set.
-	 */
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    /**
+     * @param title
+     *            The title to set.
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	/**
-	 * @return Returns the offlineFiles.
-	 */
-	public List getOfflineFiles() {
-		return offlineFiles;
-	}
+    public boolean isLimitUpload() {
+	return limitUpload;
+    }
 
-	/**
-	 * @param offlineFiles The offlineFiles to set.
-	 */
-	public void setOfflineFiles(List offlineFiles) {
-		this.offlineFiles = offlineFiles;
-	}
+    public void setLimitUpload(boolean limitUpload) {
+	this.limitUpload = limitUpload;
+    }
 
-	/**
-	 * @return Returns the offlineInstruction.
-	 */
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public int getLimitUploadNumber() {
+	return limitUploadNumber;
+    }
 
-	/**
-	 * @param offlineInstruction The offlineInstruction to set.
-	 */
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public void setLimitUploadNumber(int limitUploadNumber) {
+	this.limitUploadNumber = limitUploadNumber;
+    }
 
-	/**
-	 * @return Returns the onlineFiles.
-	 */
-	public List getOnlineFiles() {
-		return onlineFiles;
-	}
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
 
-	/**
-	 * @param onlineFiles The onlineFiles to set.
-	 */
-	public void setOnlineFiles(List onlineFiles) {
-		this.onlineFiles = onlineFiles;
-	}
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
 
-	/**
-	 * @return Returns the onlineInstruction.
-	 */
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	/**
-	 * @param onlineInstruction The onlineInstruction to set.
-	 */
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
-	/**
-	 * @return Returns the title.
-	 */
-	public String getTitle() {
-		return title;
-	}
+    public boolean isNotifyLearnersOnMarkRelease() {
+	return notifyLearnersOnMarkRelease;
+    }
 
-	/**
-	 * @param title The title to set.
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+    }
 
-	public boolean isLimitUpload() {
-		return limitUpload;
-	}
+    public boolean isNotifyTeachersOnFileSubmit() {
+	return notifyTeachersOnFileSubmit;
+    }
 
-	public void setLimitUpload(boolean limitUpload) {
-		this.limitUpload = limitUpload;
-	}
-
-	public int getLimitUploadNumber() {
-		return limitUploadNumber;
-	}
-
-	public void setLimitUploadNumber(int limitUploadNumber) {
-		this.limitUploadNumber = limitUploadNumber;
-	}
-
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
-
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
-
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
-
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-
-	public boolean isNotifyLearnersOnMarkRelease() {
-		return notifyLearnersOnMarkRelease;
-	}
-
-	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
-		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
-	}
-
-	public boolean isNotifyTeachersOnFileSubmit() {
-		return notifyTeachersOnFileSubmit;
-	}
-
-	public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
-		this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
-	}
+    public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
+	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
+    }
 }

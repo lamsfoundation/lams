@@ -23,11 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,108 +30,100 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 
 /**
- *
- * 	Resource Form.
- *	@struts.form name="resourceForm"
- *
- * User: Dapeng.Ni
+ * 
+ * Resource Form.
+ * 
+ * @struts.form name="resourceForm"
+ * 
+ *              User: Dapeng.Ni
  */
-public class ResourceForm extends ActionForm  {
-	private static final long serialVersionUID = 3599879328307492312L;
+public class ResourceForm extends ActionForm {
+    private static final long serialVersionUID = 3599879328307492312L;
 
-	private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
+    private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
 
-	//Forum fields
-	private String sessionMapID;
-	private String contentFolderID;
-	private int currentTab;
+    // Forum fields
+    private String sessionMapID;
+    private String contentFolderID;
+    private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
 
     private Resource resource;
-    
-    public ResourceForm(){
-    	resource = new Resource();
-    	resource.setTitle("Shared Resource");
-    	currentTab = 1;
-    }
-	
-	public void setResource(Resource resource) {
-        this.resource = resource;
-        //set Form special varaible from given forum
-        if(resource == null){
-        	logger.error("Initial ResourceForum failed by null value of Resource.");
-        }
-	}
-    public void reset(ActionMapping mapping, HttpServletRequest request){
-    	String param = mapping.getParameter();
-    	//if it is start page, all data read out from database or current session
-    	//so need not reset checkbox to refresh value!
-    	if(!StringUtils.equals(param,"start") && !StringUtils.equals(param,"initPage")){
-	    	resource.setAllowAddFiles(false);
-	    	resource.setAllowAddUrls(false);
-	    	resource.setLockWhenFinished(false);
-	    	resource.setDefineLater(false);
-	    	resource.setRunAuto(false);
-	    	resource.setRunOffline(false);
-	    	resource.setReflectOnActivity(false);
-    	}
+
+    public ResourceForm() {
+	resource = new Resource();
+	resource.setTitle("Shared Resource");
+	currentTab = 1;
     }
 
-	public int getCurrentTab() {
-		return currentTab;
+    public void setResource(Resource resource) {
+	this.resource = resource;
+	// set Form special varaible from given forum
+	if (resource == null) {
+	    logger.error("Initial ResourceForum failed by null value of Resource.");
 	}
+    }
 
-
-	public void setCurrentTab(int currentTab) {
-		this.currentTab = currentTab;
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
+	String param = mapping.getParameter();
+	// if it is start page, all data read out from database or current session
+	// so need not reset checkbox to refresh value!
+	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
+	    resource.setAllowAddFiles(false);
+	    resource.setAllowAddUrls(false);
+	    resource.setLockWhenFinished(false);
+	    resource.setDefineLater(false);
+	    resource.setRunAuto(false);
+	    resource.setReflectOnActivity(false);
 	}
+    }
 
+    public int getCurrentTab() {
+	return currentTab;
+    }
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    public void setCurrentTab(int currentTab) {
+	this.currentTab = currentTab;
+    }
 
+    public FormFile getOfflineFile() {
+	return offlineFile;
+    }
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+    public void setOfflineFile(FormFile offlineFile) {
+	this.offlineFile = offlineFile;
+    }
 
+    public FormFile getOnlineFile() {
+	return onlineFile;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public void setOnlineFile(FormFile onlineFile) {
+	this.onlineFile = onlineFile;
+    }
 
+    public Resource getResource() {
+	return resource;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public Resource getResource() {
-		return resource;
-	}
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
 
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
-
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
-
-	public String getContentFolderID() {
-		return contentFolderID;
-	}
-
-	public void setContentFolderID(String contentFolderID) {
-		this.contentFolderID = contentFolderID;
-	}
-
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
 }

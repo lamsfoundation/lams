@@ -177,13 +177,6 @@ public class LearningAction extends Action {
             	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
             		request, getServlet().getServletContext());
             	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-
-		//add run offline support
-		if(spreadsheet.getRunOffline()){
-			sessionMap.put(SpreadsheetConstants.PARAM_RUN_OFFLINE, true);
-			return mapping.findForward("runOffline");
-		}else
-			sessionMap.put(SpreadsheetConstants.PARAM_RUN_OFFLINE, false);
 				
 		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE,spreadsheet);
 		

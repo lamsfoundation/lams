@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -121,16 +120,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	request.setAttribute(SELECTION_CASE, new Long(2));
 	qaMonitoringForm.setActiveModule(MONITORING);
 	qaMonitoringForm.setEditResponse(new Boolean(false).toString());
-
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
 	boolean isContentInUse = qaContent.isContentLocked();

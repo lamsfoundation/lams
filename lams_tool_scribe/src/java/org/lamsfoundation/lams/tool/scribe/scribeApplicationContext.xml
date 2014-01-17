@@ -16,18 +16,15 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.scribe.service.ScribeService">
-				<property name="scribeAttachmentDAO"><ref bean="lascrbScribeAttachmentDAO"/></property>
 				<property name="scribeSessionDAO"><ref bean="lascrbScribeSessionDAO"/></property>
 				<property name="scribeUserDAO"><ref bean="lascrbScribeUserDAO"/></property>
 				<property name="scribeHeadingDAO"><ref bean="lascrbScribeHeadingDAO"/></property>
 				<property name="scribeDAO"><ref bean="lascrbScribeDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="auditService"><ref bean="auditService"/></property>		
- 				<property name="scribeToolContentHandler"><ref bean="lascrbScribeToolContentHandler"/></property>
+				<property name="scribeToolContentHandler"><ref bean="lascrbScribeToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -41,8 +38,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
@@ -66,9 +61,6 @@
 	</bean>
 	
 	<bean id="lascrbScribeHeadingDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeHeadingDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	<bean id="lascrbScribeAttachmentDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

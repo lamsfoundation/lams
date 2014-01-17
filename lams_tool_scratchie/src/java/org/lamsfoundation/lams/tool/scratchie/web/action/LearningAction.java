@@ -230,7 +230,6 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = (user != null) && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
-	sessionMap.put(ScratchieConstants.PARAM_RUN_OFFLINE, scratchie.getRunOffline());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
@@ -266,15 +265,6 @@ public class LearningAction extends Action {
 		toolSessionId, request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
-	// run offline support
-	if (scratchie.getRunOffline()) {
-	    if (LearningAction.log.isDebugEnabled()) {
-		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: leaving start()");
-	    }
-	    return mapping.findForward("runOffline");
-	}
-
 	// check if there is submission deadline
 	Date submissionDeadline = scratchie.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -287,13 +277,13 @@ public class LearningAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		if (LearningAction.log.isDebugEnabled()) {
 		    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 			    + "]: leaving start()");
 		}
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 

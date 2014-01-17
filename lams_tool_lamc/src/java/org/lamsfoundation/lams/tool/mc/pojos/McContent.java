@@ -61,8 +61,6 @@ public class McContent implements Serializable {
 
     private boolean defineLater;
 
-    private boolean runOffline;
-
     /** nullable persistent field */
     private boolean reflect;
 
@@ -82,12 +80,6 @@ public class McContent implements Serializable {
     private boolean contentInUse;
 
     /** nullable persistent field */
-    private String offlineInstructions;
-
-    /** nullable persistent field */
-    private String onlineInstructions;
-
-    /** nullable persistent field */
     private boolean retries;
 
     private boolean showReport;
@@ -102,7 +94,7 @@ public class McContent implements Serializable {
     
     private boolean prefixAnswersWithLetters;
     
-    /* LDEV-2657 */
+    /** nullable persistent field */
     private Date submissionDeadline;
 
     /** nullable persistent field */
@@ -116,30 +108,23 @@ public class McContent implements Serializable {
     /** persistent field */
     private Set mcSessions;
 
-    /** persistent field */
-    private Set mcAttachments;
-
     /** full constructor */
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater,
-	    boolean runOffline, Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy,
-	    boolean contentInUse, String offlineInstructions, String onlineInstructions, Integer passMark,
-	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
+	    Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy, boolean contentInUse,
+	    Integer passMark, boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
 	    boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries, boolean reflect,
-	    String reflectionSubject, Set mcQueContents, Set mcSessions, Set mcAttachments) {
-
+	    String reflectionSubject, Set mcQueContents, Set mcSessions) {
+	
 	this.mcContentId = mcContentId;
 	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.defineLater = defineLater;
-	this.runOffline = runOffline;
 	this.creationDate = creationDate;
 	this.updateDate = updateDate;
 	this.questionsSequenced = questionsSequenced;
 	this.createdBy = createdBy;
 	this.contentInUse = contentInUse;
-	this.offlineInstructions = offlineInstructions;
-	this.onlineInstructions = onlineInstructions;
 	this.retries = retries;
 	this.reflectionSubject = reflectionSubject;
 	this.reflect = reflect;
@@ -152,7 +137,6 @@ public class McContent implements Serializable {
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
 	this.mcQueContents = mcQueContents;
 	this.mcSessions = mcSessions;
-	this.mcAttachments = mcAttachments;
     }
 
     /** default constructor */
@@ -181,14 +165,12 @@ public class McContent implements Serializable {
     public static McContent newInstance(IToolContentHandler toolContentHandler, McContent mc, Long newContentId)
 	    throws ItemNotFoundException, RepositoryCheckedException {
 	McContent newContent = new McContent(newContentId, mc.getContent(), mc.getTitle(), mc.getInstructions(),
-		mc.isDefineLater(), mc.isRunOffline(), mc.getCreationDate(), mc.getUpdateDate(),
-		mc.isQuestionsSequenced(), mc.getCreatedBy(), mc.isContentInUse(), mc.getOfflineInstructions(),
-		mc.getOnlineInstructions(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(),
+		mc.isDefineLater(), mc.getCreationDate(), mc.getUpdateDate(),
+		mc.isQuestionsSequenced(), mc.getCreatedBy(), mc.isContentInUse(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(),
 		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
 		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
-		new TreeSet(), new TreeSet(), new TreeSet());
+		new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
-	newContent.setMcAttachments(mc.deepCopyMcAttachments(toolContentHandler, newContent));
 
 	return newContent;
     }
@@ -207,26 +189,6 @@ public class McContent implements Serializable {
 	    if (queContent.getMcContent() != null) {
 		McQueContent mcQueContent = McQueContent.newInstance(queContent, newMcContent);
 		newMcQueContent.add(mcQueContent);
-	    }
-	}
-	return newMcQueContent;
-    }
-
-    /**
-     * gets called as part of the copyToolContent
-     * 
-     * @param newMcContent
-     * @return Set
-     */
-    public Set deepCopyMcAttachments(IToolContentHandler toolContentHandler, McContent newMcContent)
-	    throws ItemNotFoundException, RepositoryCheckedException {
-	Set newMcQueContent = new TreeSet();
-	for (Iterator i = this.getMcAttachments().iterator(); i.hasNext();) {
-	    McUploadedFile mcUploadedFile = (McUploadedFile) i.next();
-	    if (mcUploadedFile.getMcContent() != null) {
-		McUploadedFile newMcUploadedFile = McUploadedFile.newInstance(toolContentHandler, mcUploadedFile,
-			newMcContent);
-		newMcQueContent.add(newMcUploadedFile);
 	    }
 	}
 	return newMcQueContent;
@@ -272,14 +234,6 @@ public class McContent implements Serializable {
 	this.defineLater = defineLater;
     }
 
-    public boolean isRunOffline() {
-	return this.runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
     public Date getUpdateDate() {
 	return this.updateDate;
     }
@@ -310,22 +264,6 @@ public class McContent implements Serializable {
 
     public void setContentInUse(boolean contentInUse) {
 	this.contentInUse = contentInUse;
-    }
-
-    public String getOfflineInstructions() {
-	return this.offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public String getOnlineInstructions() {
-	return this.onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
     }
 
     public Integer getPassMark() {
@@ -388,24 +326,6 @@ public class McContent implements Serializable {
      */
     public void setShowReport(boolean showReport) {
 	this.showReport = showReport;
-    }
-
-    /**
-     * @return Returns the mcAttachments.
-     */
-    public Set getMcAttachments() {
-	if (mcAttachments == null)
-	    mcAttachments = new TreeSet();
-
-	return mcAttachments;
-    }
-
-    /**
-     * @param mcAttachments
-     *            The mcAttachments to set.
-     */
-    public void setMcAttachments(Set mcAttachments) {
-	this.mcAttachments = mcAttachments;
     }
 
     /**

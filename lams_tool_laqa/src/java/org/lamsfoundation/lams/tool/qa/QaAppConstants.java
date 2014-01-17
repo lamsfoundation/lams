@@ -34,10 +34,6 @@ public interface QaAppConstants {
     public static final long DEFAULT_QUE_CONTENT_ID = 1;
     public static final String ERROR_QAAPPLICATION = "error.exception.QaApplication";
     public static final String TOOL_CONTENT_ID = "toolContentID";
-    public static final String ATTACHMENT_LIST_KEY = "attachmentListKey";
-    public static final String DELETED_ATTACHMENT_LIST_KEY = "deletedAttachmentListKey";
-    public static final String ONLINE_INSTRUCTIONS_KEY = "onlineInstructionsKey";
-    public static final String OFFLINE_INSTRUCTIONS_KEY = "offlineInstructionsKey";
     public static final String ACTIVITY_TITLE_KEY = "activityTitleKey";
     public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
     public static final String LIST_QUESTION_CONTENT_DTO = "listQuestionContentDTO";
@@ -70,8 +66,6 @@ public interface QaAppConstants {
     public static final String ERROR_LIST_LEARNER = "errorListLearner";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String DEFAULT_CONTENT_ID_STR = "defaultContentIdStr";
-    public static final String DEFAULT_ONLINE_INST = "";
-    public static final String DEFAULT_OFFLINE_INST = "";
     public static final String TOOL_SESSION_ID = "toolSessionID";
     public static final String EXPORT_USER_ID = "exportUserId";
     public static final String NOTEBOOK = "notebook";
@@ -102,7 +96,6 @@ public interface QaAppConstants {
     public static final String SOURCE_MC_STARTER = "sourceMcStarter";
     public static final Integer MAX_QUESTION_COUNT = new Integer(50);
 
-    public static final String RUN_OFFLINE = "runOffline";
     public static final String REFLECT = "reflect";
     public static final String REFLECTION_SUBJECT = "reflectionSubject";
 
@@ -139,20 +132,13 @@ public interface QaAppConstants {
      */
     public static final String MAP_QUESTION_CONTENT = "mapQuestionContent";
     public static final String DEFAULT_QUESTION_CONTENT = "defaultQuestionContent";
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
     public static final String END_LEARNING_MESSSAGE = "endLearningMessage";
     public static final String ON = "ON";
     public static final String OFF = "OFF";
-    public static final String RICHTEXT_OFFLINEINSTRUCTIONS = "richTextOfflineInstructions";
-    public static final String RICHTEXT_ONLINEINSTRUCTIONS = "richTextOnlineInstructions";
     public static final String RICHTEXT_TITLE = "richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
     public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
 
-    public static final String SUBMIT_OFFLINE_FILE = "submitOfflineFile";
-    public static final String SUBMIT_ONLINE_FILE = "submitOnlineFile";
-    public static final String POPULATED_UPLOADED_FILESDATA = "populateUploadedFilesData";
     public static final String USER_ID = "userID";
 
     public final long ONE_DAY = 60 * 60 * 1000 * 24;
@@ -184,7 +170,6 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS = "userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY = "userExceptionNoStudentActivity";
     public static final String USER_EXCEPTION_CONTENT_IN_USE = "userExceptionContentInUse";
-    public static final String USER_EXCEPTION_RUN_OFFLINE = "userExceptionRunOffline";
     public static final String USER_EXCEPTION_MODE_REQUIRED = "userExceptionModeRequired";
     public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTIONS_DUPLICATE = "userExceptionQuestionsDuplicate";
@@ -234,7 +219,6 @@ public interface QaAppConstants {
     public static final String MONITORING_REPORT_TITLE = "monitoringReportTitle";
     public static final String REPORT_TITLE_LEARNER = "reportTitleLearner";
     public static final String END_LEARNING_MESSAGE = "endLearningMessage";
-    public static final String IS_TOOL_ACTIVITY_OFFLINE = "isToolActivityOffline";
     public static final String CHECK_ALL_SESSIONS_COMPLETED = "checkAllSessionsCompleted";
     public static final String FROM_TOOL_CONTENT_ID = "fromToolContentId";
     public static final String TO_TOOL_CONTENT_ID = "toToolContentId";
@@ -254,7 +238,6 @@ public interface QaAppConstants {
     public static final String NO_AVAILABLE_SESSIONS = "noAvailableSessions";
     public static final String NO_TOOL_SESSIONS_AVAILABLE = "noToolSessionAvailable";
     public static final String ATTR_CONTENT = "content";
-    public static final String ATTR_RUN_OFFLINE = "runOffline";
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_GROUP_USERS = "groupUsers";
@@ -277,10 +260,7 @@ public interface QaAppConstants {
     public static final String FEEDBACK_TYPE_COMBINED = "You are being presented total of: ";
     public static final String QUESTIONS = " questions.";
 
-    public static final String ATTACHMENT_LIST = "attachmentList";
     public static final String SUBMIT_SUCCESS = "sbmtSuccess";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-    public static final String UUID = "uuid";
     // for condition management use
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     public static final Object ATTR_CONDITION_SET = "conditionList";

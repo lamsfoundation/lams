@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.mindmap.util.xmlmodel;
 
-import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 
 /**
  * XML Model Class for Notify Request (Actions sent by Flash) in Mindmap.

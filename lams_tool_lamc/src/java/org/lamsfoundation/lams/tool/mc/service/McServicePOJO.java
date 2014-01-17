@@ -96,7 +96,6 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
-import org.lamsfoundation.lams.tool.mc.dao.IMcUploadedFileDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -104,7 +103,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -132,20 +130,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McAppConstants {
     static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
 
-    /* repository access related constants */
-    private final String repositoryUser = "lamc11";
-    private final char[] repositoryId = { 'l', 'a', 'm', 'c', '_', '1', '1' };
-    private final String repositoryWorkspace = "lamc11";
-    private IRepositoryService repositoryService;
-    private ICredentials cred;
-
     private IMcContentDAO mcContentDAO;
     private IMcQueContentDAO mcQueContentDAO;
     private IMcOptionsContentDAO mcOptionsContentDAO;
     private IMcSessionDAO mcSessionDAO;
     private IMcUserDAO mcUserDAO;
     private IMcUsrAttemptDAO mcUsrAttemptDAO;
-    private IMcUploadedFileDAO mcUploadedFileDAO;
     private MCOutputFactory mcOutputFactory;
 
     private IAuditService auditService;
@@ -239,22 +229,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    user.setNumberOfAttempts(leader.getNumberOfAttempts());
 	    user.setLastAttemptTotalMark(leader.getLastAttemptTotalMark());
 	    this.updateMcQueUsr(user);
-	}
-    }
-
-    public void configureContentRepository() throws McApplicationException {
-	cred = new SimpleCredentials(repositoryUser, repositoryId);
-	try {
-	    repositoryService.createCredentials(cred);
-	    repositoryService.addWorkspace(cred, repositoryWorkspace);
-	} catch (ItemExistsException ie) {
-	    McServicePOJO.logger.warn("Tried to configure repository but it "
-		    + " appears to be already configured. Exception thrown by repository being ignored. ", ie);
-	} catch (RepositoryCheckedException e) {
-	    String error = "Error occured while trying to configure repository." + " Unable to recover from error: "
-		    + e.getMessage();
-	    McServicePOJO.logger.error(error, e);
-	    throw new McApplicationException(error, e);
 	}
     }
 
@@ -1355,20 +1329,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
 
 	if (mcContent != null) {
-	    Iterator filesIterator = mcContent.getMcAttachments().iterator();
-	    while (filesIterator.hasNext()) {
-		McUploadedFile mcUploadedFile = (McUploadedFile) filesIterator.next();
-		String filesUuid = mcUploadedFile.getUuid();
-		if (filesUuid != null && filesUuid.length() > 0) {
-		    try {
-			mcToolContentHandler.deleteFile(new Long(filesUuid));
-		    } catch (RepositoryCheckedException e) {
-			McServicePOJO.logger.error("exception occured deleting files from content repository : " + e);
-			throw new ToolException("undeletable file in the content repository");
-		    }
-		}
-	    }
-
 	    Iterator sessionIterator = mcContent.getMcSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		if (removeSessionData == false) {
@@ -1389,51 +1349,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    McServicePOJO.logger.error("Warning!!!, We should have not come here. mcContent is null.");
 	    throw new ToolException("toolContentId is missing");
 	}
-    }
-
-    /**
-     * Implemented as part of the tool contract. Sets the defineLater to true on this content. setAsDefineLater(Long
-     * toolContentId) throws DataMissingException, ToolException
-     * 
-     * @param toolContentId
-     * @return
-     * @throws ToolException
-     */
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	if (toolContentId == null) {
-	    McServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-	    throw new DataMissingException("toolContentId is missing");
-	}
-
-	McContent mcContent = retrieveMc(toolContentId);
-	if (mcContent == null) {
-	    McServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
-	    throw new DataMissingException("mcContent is missing");
-	}
-	mcContent.setDefineLater(value);
-	saveMcContent(mcContent);
-    }
-
-    /**
-     * Implemented as part of the tool contract. Sets the runOffline to true on this content. setAsRunOffline(Long
-     * toolContentId) throws DataMissingException, ToolException
-     * 
-     * @param toolContentId
-     *            return
-     * @throws ToolException
-     */
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	if (toolContentId == null) {
-	    McServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
-	    throw new DataMissingException("toolContentId is missing");
-	}
-	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-	if (mcContent == null) {
-	    McServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
-	    throw new DataMissingException("mcContent is missing");
-	}
-	mcContent.setRunOffline(value);
-	saveMcContent(mcContent);
     }
 
     /**
@@ -1459,11 +1374,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    // set ToolContentHandler as null to avoid copy file node in repository again.
 	    toolContentObj = McContent.newInstance(null, toolContentObj, toolContentId);
 	    toolContentObj.setMcSessions(null);
-	    Set<McUploadedFile> files = toolContentObj.getMcAttachments();
-	    for (McUploadedFile file : files) {
-		file.setMcContent(null);
-	    }
-	    exportContentService.registerFileClassForExport(McUploadedFile.class.getName(), "uuid", null);
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, mcToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -1483,10 +1393,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    // register File node class
-	    exportContentService.registerFileClassForImport(McUploadedFile.class.getName(), "uuid", null, "fileName",
-		    "fileProperty", null, null);
-
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(McImportContentVersionFilter.class);
 
@@ -1501,11 +1407,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    // reset it to new toolContentId
 	    toolContentObj.setMcContentId(toolContentId);
 	    toolContentObj.setCreatedBy(newUserUid);
-	    Set<McUploadedFile> files = toolContentObj.getMcAttachments();
-	    for (McUploadedFile file : files) {
-		// file.setMcContentId(toolContentId);
-		file.setMcContent(toolContentObj);
-	    }
 	    mcContentDAO.saveMcContent(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -1758,168 +1659,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return mcQueContent;
     }
 
-    public void removeAttachment(McContent content, McUploadedFile attachment) throws RepositoryCheckedException {
-	try {
-	    attachment.setMcContent(null);
-	    content.getMcAttachments().remove(attachment);
-	    mcToolContentHandler.deleteFile(new Long(attachment.getUuid()));
-	    saveMcContent(content);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this attachment" + e.getMessage(), e);
-	}
-    }
-
-    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
-	    throws RepositoryCheckedException {
-	return mcToolContentHandler.uploadFile(istream, filename, contentType, fileType);
-    }
-
-    public NodeKey copyFile(Long uuid) throws RepositoryCheckedException {
-	return mcToolContentHandler.copyFile(uuid);
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    public ITicket getRepositoryLoginTicket() throws McApplicationException {
-	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, repositoryWorkspace);
-	    return ticket;
-	} catch (AccessDeniedException e) {
-	    throw new McApplicationException("Access Denied to repository." + e.getMessage());
-	} catch (WorkspaceNotFoundException e) {
-	    throw new McApplicationException("Workspace not found." + e.getMessage());
-	} catch (LoginException e) {
-	    throw new McApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
-    /**
-     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
-     * repository
-     * 
-     * @param uuid
-     *            The <code>uuid</code> of the node to be deleted
-     * @param versionID
-     *            The <code>version_id</code> of the node to be deleted.
-     * @throws SubmitFilesException
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws McApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    String files[] = repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new McApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * This method is called everytime a new content has to be added to the repository. In order to do so first of all a
-     * valid ticket is obtained from the Repository hence authenticating the tool(SubmitFiles) and then the
-     * corresponding file is added to the repository.
-     * 
-     * @param stream
-     *            The <code>InputStream</code> representing the data to be added
-     * @param fileName
-     *            The name of the file being added
-     * @param mimeType
-     *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-     * @return NodeKey Represents the two part key - UUID and Version.
-     * @throws SubmitFilesException
-     */
-    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-
-	try {
-	    NodeKey nodeKey = repositoryService.addFileItem(ticket, stream, fileName, null, null);
-	    return nodeKey;
-	} catch (Exception e) {
-	    throw new McApplicationException("Exception occured while trying to" + " upload file into the repository"
-		    + e.getMessage());
-	}
-    }
-
-    public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    return node.getFile();
-	} catch (AccessDeniedException e) {
-	    throw new McApplicationException("AccessDeniedException occured while trying to download file "
-		    + e.getMessage());
-	} catch (FileException e) {
-	    throw new McApplicationException("FileException occured while trying to download file " + e.getMessage());
-	} catch (ItemNotFoundException e) {
-	    throw new McApplicationException("ItemNotFoundException occured while trying to download file "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * adds a new entry to the uploaded files table
-     */
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
-	    throws McApplicationException {
-
-	McUploadedFile mcUploadedFile = new McUploadedFile(uuid, isOnlineFile, fileName, mcContent);
-	mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
-    }
-
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
-    }
-
-    /**
-     * @return Returns the cred.
-     */
-    public ICredentials getCred() {
-	return cred;
-    }
-
-    /**
-     * @param cred
-     *            The cred to set.
-     */
-    public void setCred(ICredentials cred) {
-	this.cred = cred;
-    }
-
-    /*
-     * !!! COMPLETE THIS !!! public IMcUploadedFileDAO getMcUploadedFileDAO() { return mcUploadedFileDAO; }
-     * 
-     * public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) { this.mcUploadedFileDAO =
-     * mcUploadedFileDAO; }
-     */
-
-    /**
-     * @return Returns the repositoryId.
-     */
-    public char[] getRepositoryId() {
-	return repositoryId;
-    }
-
-    /**
-     * @return Returns the repositoryUser.
-     */
-    public String getRepositoryUser() {
-	return repositoryUser;
-    }
-
-    /**
-     * @return Returns the repositoryWorkspace.
-     */
-    public String getRepositoryWorkspace() {
-	return repositoryWorkspace;
     }
 
     /**
@@ -2026,42 +1767,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	this.mcUsrAttemptDAO = mcUsrAttemptDAO;
     }
 
-    /**
-     * @return Returns the repositoryService.
-     */
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    /**
-     * @param repositoryService
-     *            The repositoryService to set.
-     */
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    /**
-     * @return Returns the mcUploadedFileDAO.
-     */
-    public IMcUploadedFileDAO getMcUploadedFileDAO() {
-	return mcUploadedFileDAO;
-    }
-
-    /**
-     * @param mcUploadedFileDAO
-     *            The mcUploadedFileDAO to set.
-     */
-    public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) {
-	this.mcUploadedFileDAO = mcUploadedFileDAO;
     }
 
     /**
@@ -2128,11 +1839,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	toolContentObj.setDefineLater(false);
 	toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setOfflineInstructions(null);
-	toolContentObj.setOnlineInstructions(null);
 	toolContentObj.setReflect(false);
 	toolContentObj.setReflectionSubject(null);
-	toolContentObj.setRunOffline(false);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 
 	toolContentObj.setContent(null);
@@ -2295,32 +2003,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	toolContentObj.setReflect(true);
 	toolContentObj.setReflectionSubject(description);
-    }
-
-    public List<McUploadedFile> retrieveMcUploadedFiles(McContent mc) throws McApplicationException {
-	try {
-	    return mcUploadedFileDAO.retrieveMcUploadedFiles(mc);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is loading mc uploaded files: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    /**
-     * adds a new entry to the uploaded files table
-     */
-    public void persistFile(McContent content, McUploadedFile file) throws McApplicationException {
-
-	content.getMcAttachments().add(file);
-	file.setMcContent(content);
-	mcContentDAO.saveOrUpdateMc(content);
-    }
-
-    /**
-     * removes an entry from the uploaded files table
-     */
-    public void removeFile(Long submissionId) throws McApplicationException {
-	mcUploadedFileDAO.removeUploadFile(submissionId);
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

@@ -26,12 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -48,9 +45,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Ozgur Demirtas
@@ -82,7 +77,6 @@ public interface IMcService {
      */
     void copyAnswersFromLeader(McQueUsr user, McQueUsr leader);
     
-    void configureContentRepository() throws McApplicationException;
 
     void createMc(McContent mcContent) throws McApplicationException;
 
@@ -184,10 +178,6 @@ public interface IMcService {
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
-    void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
     void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException;
 
@@ -210,23 +200,7 @@ public interface IMcService {
 
     McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException;
 
-    ITicket getRepositoryLoginTicket() throws McApplicationException;
-
-    void deleteFromRepository(Long uuid, Long versionID);
-
-    NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException;
-
-    InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
-
-    void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
-	    throws McApplicationException;
-
     List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
-
-    NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
-	    throws RepositoryCheckedException;
-
-    NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
 
     List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
 
@@ -235,12 +209,6 @@ public interface IMcService {
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     void updateEntry(NotebookEntry notebookEntry);
-
-    void persistFile(McContent content, McUploadedFile file) throws McApplicationException;
-
-    void removeFile(Long submissionId) throws McApplicationException;
-
-    List<McUploadedFile> retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
 
     /**
      * Return the top, lowest and average mark for all learners for one particular tool session.

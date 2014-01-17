@@ -37,7 +37,6 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 
     /**
      * Import 20131130 version content to 20131212 version tool server.
-     * 
      */
     public void up20131130To20131212() {
 	this.removeField(ScratchieUser.class, "totalAttempts");
@@ -50,5 +49,15 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 	
 	this.addField(ScratchieSession.class, "mark", new Integer(0));
 	this.addField(ScratchieSession.class, "scratchingFinished", new Integer(0));
+    }
+    
+    /**
+     * Import 20131212 version content to 20140102 version tool server.
+     */
+    public void up20131212To20140102() {
+	this.removeField(Scratchie.class, "runOffline");
+	this.removeField(Scratchie.class, "onlineInstructions");
+	this.removeField(Scratchie.class, "offlineInstructions");
+	this.removeField(Scratchie.class, "attachments");
     }
 }

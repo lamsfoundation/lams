@@ -26,7 +26,7 @@
     		selectTab(tabId);
 	    		
 	    	//for statistic page change:
-	    	if(tabId == 4)
+	    	if(tabId == 3)
 	    		doStatistic();	  
         } 
         
@@ -64,9 +64,8 @@
 		<div id="header">
 			<lams:Tabs control="true">
 				<lams:Tab id="1" key="label.monitoring.heading.userlist" />
-				<lams:Tab id="2" key="label.monitoring.heading.instructions" />
-				<lams:Tab id="3" key="label.monitoring.heading.edit.activity" />
-				<lams:Tab id="4" key="label.monitoring.heading.stats" />
+				<lams:Tab id="2" key="label.monitoring.heading.edit.activity" />
+				<lams:Tab id="3" key="label.monitoring.heading.stats" />
 			</lams:Tabs>
 		</div>
 
@@ -82,16 +81,12 @@
 				<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="parts/summary.jsp" />
 				<!-- end of content (Summary) -->
 
-				<!-- tab content 2 (Instructions) -->
-				<lams:TabBody id="2" titleKey="label.monitoring.heading.instructions.desc" page="parts/instructions.jsp" />
-				<!-- end of content (Instructions) -->
-
-				<!-- tab content 3 (Edit Activity) -->
-				<lams:TabBody id="3" titleKey="label.monitoring.heading.edit.activity.desc" page="parts/activity.jsp" />
+				<!-- tab content 2 (Edit Activity) -->
+				<lams:TabBody id="2" titleKey="label.monitoring.heading.edit.activity.desc" page="parts/activity.jsp" />
 				<!-- end of content (Edit Activity) -->
 
-				<!-- tab content 4 (Stats) -->
-				<lams:TabBody id="4" titleKey="label.monitoring.heading.stats.desc" page="parts/statistic.jsp" />
+				<!-- tab content 3 (Stats) -->
+				<lams:TabBody id="3" titleKey="label.monitoring.heading.stats.desc" page="parts/statistic.jsp" />
 				<!-- end of content (Stats) -->
 			</html:form>
 		</div>

@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
@@ -44,16 +43,11 @@ public class AuthoringForm extends ActionForm {
 
     String title;
     String instructions;
-    String offlineInstruction;
-    String onlineInstruction;
     boolean lockOnFinished;
     boolean multiUserMode;
-    FormFile onlineFile;
-    FormFile offlineFile;
     String currentTab;
     String dispatch;
     String sessionMapID;
-    Long deleteFileUuid;
     SessionMap sessionMap;
     String mindmapContent;
     // reflection
@@ -108,38 +102,6 @@ public class AuthoringForm extends ActionForm {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    public FormFile getOfflineFile() {
-	return offlineFile;
-    }
-
-    public void setOfflineFile(FormFile offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    public String getOfflineInstruction() {
-	return offlineInstruction;
-    }
-
-    public void setOfflineInstruction(String offlineInstruction) {
-	this.offlineInstruction = offlineInstruction;
-    }
-
-    public FormFile getOnlineFile() {
-	return onlineFile;
-    }
-
-    public void setOnlineFile(FormFile onlineFile) {
-	this.onlineFile = onlineFile;
-    }
-
-    public String getOnlineInstruction() {
-	return onlineInstruction;
-    }
-
-    public void setOnlineInstruction(String onlineInstruction) {
-	this.onlineInstruction = onlineInstruction;
-    }
-
     public String getTitle() {
 	return title;
     }
@@ -154,14 +116,6 @@ public class AuthoringForm extends ActionForm {
 
     public SessionMap getSessionMap() {
 	return sessionMap;
-    }
-
-    public Long getDeleteFileUuid() {
-	return deleteFileUuid;
-    }
-
-    public void setDeleteFileUuid(Long deleteFile) {
-	this.deleteFileUuid = deleteFile;
     }
 
     public boolean isMultiUserMode() {

@@ -56,8 +56,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean contentInUse;
 
     private boolean defineLater;
@@ -137,18 +135,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
     }
 
     /**

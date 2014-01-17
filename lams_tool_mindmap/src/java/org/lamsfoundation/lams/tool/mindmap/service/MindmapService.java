@@ -24,30 +24,15 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -63,21 +48,18 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapAttachmentDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapRequestDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapSessionDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapUserDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
-import org.lamsfoundation.lams.tool.mindmap.model.MindmapAttachment;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapException;
-import org.lamsfoundation.lams.tool.mindmap.util.MindmapToolContentHandler;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -97,18 +79,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
-    boolean exp = false;
-
     private IMindmapDAO mindmapDAO = null;
     private IMindmapSessionDAO mindmapSessionDAO = null;
     private IMindmapUserDAO mindmapUserDAO = null;
-    private IMindmapAttachmentDAO mindmapAttachmentDAO = null;
     private IMindmapNodeDAO mindmapNodeDAO = null;
     private IMindmapRequestDAO mindmapRequestDAO = null;
     private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mindmapToolContentHandler = null;
-    private IRepositoryService repositoryService = null;
     private IAuditService auditService = null;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
@@ -215,7 +193,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    fromContent = getDefaultContent();
 	}
 
-	Mindmap toContent = Mindmap.newInstance(fromContent, toContentId, mindmapToolContentHandler);
+	Mindmap toContent = Mindmap.newInstance(fromContent, toContentId);
 	mindmapDAO.saveOrUpdate(toContent);
 
 	/* Copying Mindmap Nodes */
@@ -393,24 +371,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return languageOutput;
     }
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
-	if (mindmap == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	mindmap.setDefineLater(value);
-	mindmapDAO.saveOrUpdate(mindmap);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
-	if (mindmap == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	mindmap.setRunOffline(value);
-	mindmapDAO.saveOrUpdate(mindmap);
-    }
-
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub
@@ -451,20 +411,12 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    mindmapContent = xstream.toXML(currentNodeModel);
 	}
 
-	// set ResourceToolContentHandler as null to avoid copy file node in repository again.
-	mindmap = Mindmap.newInstance(mindmap, toolContentId, null);
+	mindmap = Mindmap.newInstance(mindmap, toolContentId);
 
 	mindmap.setMindmapExportContent(mindmapContent);
-	mindmap.setToolContentHandler(null);
 	mindmap.setMindmapSessions(null);
-	Set<MindmapAttachment> atts = mindmap.getMindmapAttachments();
-	for (MindmapAttachment att : atts) {
-	    att.setMindmap(null);
-	}
 
 	try {
-	    exportContentService.registerFileClassForExport(MindmapAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, mindmap, mindmapToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -480,9 +432,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(MindmapAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(MindmapImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, mindmapToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Mindmap)) {
@@ -596,7 +548,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	Mindmap defaultContent = getDefaultContent();
 	// create new mindmap using the newContentID
 	Mindmap newContent = new Mindmap();
-	newContent = Mindmap.newInstance(defaultContent, newContentID, mindmapToolContentHandler);
+	newContent = Mindmap.newInstance(defaultContent, newContentID);
 	mindmapDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -637,32 +589,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapUserDAO.getByUID(uid);
     }
 
-    public MindmapAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new MindmapException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-	MindmapAttachment attachment = new MindmapAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws MindmapException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new MindmapException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	mindmapDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
     public void saveOrUpdateMindmap(Mindmap mindmap) {
 	mindmapDAO.saveOrUpdate(mindmap);
     }
@@ -693,53 +619,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.auditService = auditService;
     }
 
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getMindmapToolContentHandler().uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), type);
-	    } catch (InvalidParameterException e) {
-		throw new MindmapException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new MindmapException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new MindmapException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new MindmapException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws MindmapException {
-	ICredentials credentials = new SimpleCredentials(MindmapToolContentHandler.repositoryUser,
-		MindmapToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, MindmapToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new MindmapException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new MindmapException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new MindmapException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -755,15 +634,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	mindmap.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	mindmap.setLockOnFinished(Boolean.TRUE);
-	mindmap.setOfflineInstructions(null);
-	mindmap.setOnlineInstructions(null);
-	mindmap.setRunOffline(Boolean.FALSE);
 	mindmap.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	mindmap.setToolContentId(toolContentId);
 	mindmap.setUpdateDate(now);
 	// mindmap.setAllowRichEditor(Boolean.FALSE);
 	// leave as empty, no need to set them to anything.
-	// setMindmapAttachments(Set mindmapAttachments);
 	// setMindmapSessions(Set mindmapSessions);
 	mindmapDAO.saveOrUpdate(mindmap);
     }
@@ -785,22 +660,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     // =========================================================================================
     /* Used by Spring to "inject" the linked objects */
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public IMindmapAttachmentDAO getMindmapAttachmentDAO() {
-	return mindmapAttachmentDAO;
-    }
-
-    public void setMindmapAttachmentDAO(IMindmapAttachmentDAO attachmentDAO) {
-	mindmapAttachmentDAO = attachmentDAO;
-    }
 
     public IMindmapDAO getMindmapDAO() {
 	return mindmapDAO;

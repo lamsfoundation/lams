@@ -65,7 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="notebook" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
+ * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
 public class LearningAction extends LamsDispatchAction {
@@ -128,11 +128,6 @@ public class LearningAction extends LamsDispatchAction {
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
 
-	// check runOffline
-	if (notebook.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
-
 	NotebookUser notebookUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
@@ -161,7 +156,7 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		notebookService.getLearnerContentFolder(toolSessionID, notebookUser.getUserId()));
 
-	// date and time restriction LDEV-2657
+	// date and time restriction
 	Date submissionDeadline = notebook.getSubmissionDeadline();
 	if (submissionDeadline != null) {
 	    HttpSession ss = SessionManager.getSession();
@@ -171,9 +166,9 @@ public class LearningAction extends LamsDispatchAction {
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 	    notebookDTO.submissionDeadline = tzSubmissionDeadline;
 
-	    // calculate whether deadline has passed, and if so forward to "runOffline"
+	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 

@@ -61,8 +61,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
     
     private boolean allowContributeVideos;
@@ -74,10 +72,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     private boolean allowComments;
 
     private boolean allowRatings;
-
-    private String onlineInstructions;
-
-    private String offlineInstructions;
 
     private boolean contentInUse;
 
@@ -91,39 +85,15 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     private String reflectInstructions;
 
-    private Set kalturaAttachments;
-
     private Set kalturaSessions;
 
     private Set kalturaItems;
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
-    
-    private List<KalturaAttachment> onlineFileList;
-
-    private List<KalturaAttachment> offlineFileList;
 
     // Constructors
 
     /** default constructor */
     public Kaltura() {
 	kalturaItems = new HashSet();
-    }
-    
-    public void toDTO() {
-	onlineFileList = new ArrayList<KalturaAttachment>();
-	offlineFileList = new ArrayList<KalturaAttachment>();
-	Set<KalturaAttachment> fileSet = this.getKalturaAttachments();
-	if (fileSet != null) {
-	    for (KalturaAttachment file : fileSet) {
-		if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-		    offlineFileList.add(file);
-		} else {
-		    onlineFileList.add(file);
-		}
-	    }
-	}
     }
 
     // Property accessors
@@ -200,17 +170,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     */
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      */
     public boolean isLockOnFinished() {
@@ -275,28 +234,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     public void setAllowRatings(boolean allowRatings) {
 	this.allowRatings = allowRatings;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -370,19 +307,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="kaltura_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.kaltura.model.KalturaAttachment"
-     */
-    public Set getKalturaAttachments() {
-	return kalturaAttachments;
-    }
-
-    public void setKalturaAttachments(Set kalturaAttachments) {
-	this.kalturaAttachments = kalturaAttachments;
-    }
-
-    /**
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="kaltura_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.kaltura.model.KalturaSession"
@@ -445,10 +369,8 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Kaltura newInstance(Kaltura fromContent, Long toContentId,
-	    IToolContentHandler kalturaToolContentHandler) {
+    public static Kaltura newInstance(Kaltura fromContent, Long toContentId) {
 	Kaltura toContent = new Kaltura();
-	fromContent.toolContentHandler = kalturaToolContentHandler;
 	toContent = (Kaltura) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -484,18 +406,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 		}
 		kaltura.kalturaItems = set;
 	    }
-
-	    if (kalturaAttachments != null) {
-		// create a copy of the attachments
-		Iterator iter = kalturaAttachments.iterator();
-		Set<KalturaAttachment> set = new HashSet<KalturaAttachment>();
-		while (iter.hasNext()) {
-		    KalturaAttachment originalFile = (KalturaAttachment) iter.next();
-		    KalturaAttachment newFile = (KalturaAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		kaltura.kalturaAttachments = set;
-	    }
 	    
 	    // clone KalturaUser as well
 	    if (createdBy != null) {
@@ -509,30 +419,6 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	    Kaltura.log.error("Error cloning " + Kaltura.class);
 	}
 	return kaltura;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
-    }
-    
-    public List<KalturaAttachment> getOfflineFileList() {
-	return offlineFileList;
-    }
-
-    public void setOfflineFileList(List<KalturaAttachment> offlineFileList) {
-	this.offlineFileList = offlineFileList;
-    }
-
-    public List<KalturaAttachment> getOnlineFileList() {
-	return onlineFileList;
-    }
-
-    public void setOnlineFileList(List<KalturaAttachment> onlineFileList) {
-	this.onlineFileList = onlineFileList;
     }
 
 }

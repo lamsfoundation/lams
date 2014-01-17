@@ -91,8 +91,8 @@
 		<put name="body" value="/pages/learning/reflect.jsp" />
 	</definition>
 	
-	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">
-		<put name="body" value="/pages/learning/runOffline.jsp" />
+	<definition name="tiles:/learning/submissionDeadline" extends="tiles:/layout:learning">
+		<put name="body" value="/pages/learning/submissionDeadline.jsp" />
 	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">

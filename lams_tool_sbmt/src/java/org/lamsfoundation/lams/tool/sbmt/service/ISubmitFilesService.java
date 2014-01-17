@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -36,7 +35,6 @@ import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -90,18 +88,6 @@ public interface ISubmitFilesService {
      * @throws SubmitFilesException
      */
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
-	    throws SubmitFilesException;
-
-    /**
-     * Upload file to repository and persist relative attributes into database.
-     * 
-     * @param contentID
-     * @param uploadFile
-     * @param fileType
-     * @return If successs, return an instance of <code>InstructionFile</code>. Otherwise, return null.
-     * @throws SubmitFilesException
-     */
-    public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType)
 	    throws SubmitFilesException;
 
     /**
@@ -238,13 +224,6 @@ public interface ISubmitFilesService {
      * @param notebookEntry
      */
     public void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Delete instruction file by UID
-     * 
-     * @param uid
-     */
-    public void deleteInstructionFile(Long uid);
 
     public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID);
 

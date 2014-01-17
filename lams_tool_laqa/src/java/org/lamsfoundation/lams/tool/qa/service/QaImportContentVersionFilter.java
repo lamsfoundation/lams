@@ -45,4 +45,14 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(QaQueContent.class, "isOptional");
 	this.addField(QaQueContent.class, "required", new Boolean(false));
     }
+    
+    /**
+     * Import 20140101 version content to 20140102 version tool server.
+     */
+    public void up20140101To20140102() {
+	this.removeField(QaContent.class, "runOffline");
+	this.removeField(QaContent.class, "onlineInstructions");
+	this.removeField(QaContent.class, "offlineInstructions");
+	this.removeField(QaContent.class, "qaUploadedFiles");
+    }
 }

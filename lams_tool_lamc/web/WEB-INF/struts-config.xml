@@ -217,8 +217,8 @@
 	  	/>
 
 	  	<forward
-		    name="runOffline"
-	        path="/learning/RunOffline.jsp"
+		    name="submissionDeadline"
+	        path="/learning/submissionDeadline.jsp"
 		    redirect="false"
 	  	/>
 

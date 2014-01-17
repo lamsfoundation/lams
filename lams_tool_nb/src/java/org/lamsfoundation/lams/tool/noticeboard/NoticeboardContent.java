@@ -57,16 +57,7 @@ public class NoticeboardContent implements Serializable {
 	private String content;
 	
 	/** nullable persistent field */
-	private String onlineInstructions;
-	
-	/** nullable persistent field */
-	private String offlineInstructions;
-	
-	/** nullable persistent field */
 	private boolean defineLater;
-	
-	/** nullable persistent field */
-	private boolean forceOffline;
 
 	private Boolean reflectOnActivity;
 	
@@ -87,8 +78,6 @@ public class NoticeboardContent implements Serializable {
 	/** persistent field */
 	private Set nbSessions = new HashSet();
 	
-	private Set nbAttachments = new HashSet();
-	
 	/** default constructor */
 	public NoticeboardContent()
 	{
@@ -98,10 +87,7 @@ public class NoticeboardContent implements Serializable {
 	public NoticeboardContent(Long nbContentId,
 							  String title,
 							  String content,
-							  String onlineInstructions,
-							  String offlineInstructions,
 							  boolean defineLater,
-							  boolean forceOffline,
 							  boolean reflectOnActivity,
 							  String reflectInstructions,
 							  boolean contentInUse,
@@ -112,10 +98,7 @@ public class NoticeboardContent implements Serializable {
 		this.nbContentId = nbContentId;
 		this.title = title;
 		this.content = content;
-		this.onlineInstructions = onlineInstructions;
-		this.offlineInstructions = offlineInstructions;
 		this.defineLater = defineLater;
-		this.forceOffline = forceOffline;
 		this.reflectOnActivity = reflectOnActivity;
 		this.reflectInstructions = reflectInstructions;
 		this.contentInUse = contentInUse;
@@ -132,17 +115,12 @@ public class NoticeboardContent implements Serializable {
 	public NoticeboardContent(Long nbContentId,
 	        				  String title,
 	        				  String content,
-	        				  String onlineInstructions,
-	        				  String offlineInstructions,
 	        				  Date dateCreated)
 	{
 	    this.nbContentId = nbContentId;
 		this.title = title;
 		this.content = content;
-		this.onlineInstructions = onlineInstructions;
-		this.offlineInstructions = offlineInstructions;
 		this.defineLater = false;
-		this.forceOffline = false;
 		this.reflectOnActivity = false;
 		this.contentInUse = false;
 		this.creatorUserId = null;
@@ -219,19 +197,6 @@ public class NoticeboardContent implements Serializable {
 	
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
-	}
-	
-	/** 
-	 *		@hibernate.property
-     *		column="force_offline"
-     *		length="1"
-     */
-	public boolean isForceOffline() {
-		return forceOffline;
-	}
-	
-	public void setForceOffline(boolean forceOffline) {
-		this.forceOffline = forceOffline;
 	}
 	
 	/** 
@@ -313,56 +278,6 @@ public class NoticeboardContent implements Serializable {
 	}
 	
 	/**
-     *  	@hibernate.set
-     *      lazy="true"
-     *      inverse="true"
-     *      cascade="all-delete-orphan"
-     *      @hibernate.collection-key
-     *      column="nb_content_uid"
-     * 		@hibernate.collection-one-to-many
-     *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
-     */
-    public Set getNbAttachments() {
-        return nbAttachments;
-    }
-    /**
-     * @param nbAttachments The nbAttachments to set.
-     */
-    public void setNbAttachments(Set nbAttachments) {
-        this.nbAttachments = nbAttachments;
-    }
-	
-	
-	
-	/**
-	 * 
-	 *		@hibernate.property
-     *		column="offline_instructions"
-     *		length="65535"
-     */	
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-	
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-	
-	/**
-	 * 
-	 *		@hibernate.property
-     *		column="online_instructions"
-     *		length="65535"
-     */	
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-	
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-	
-	/**
 	 * 		@hibernate.property
      *      column="title"
      *      length="65535"
@@ -392,56 +307,24 @@ public class NoticeboardContent implements Serializable {
 	
 
    
-    
-    
-    
-    
-	/** 
-	 * Creates a new NoticeboardContent object from the supplied object.
-	 * Assigns it the toContendId. Also copies all the items in the attachment set
-	 * to the new object's attachment set. So while the two contents have different
-	 * attachment records, they point to the same entries in the database.
-	 * 
-	 * @param nb			NoticeboardContent object containing the content to copy from
-	 * @param toContentId 	The new Id of the new noticeboard object
-	 * @return newContent	The new noticeboard content object
-	 * @throws RepositoryCheckedException 
-	 * @throws ItemNotFoundException 
-	 */
-	public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId, IToolContentHandler toolContentHandler) throws ItemNotFoundException, RepositoryCheckedException
-	{
-		NoticeboardContent newContent = new NoticeboardContent(toContentId,
-														nb.getTitle(),
-														nb.getContent(),
-														nb.getOnlineInstructions(),
-														nb.getOfflineInstructions(),
-														nb.isDefineLater(),
-														nb.isForceOffline(),
-														nb.getReflectOnActivity(),
-														nb.getReflectInstructions(),
-														nb.isContentInUse(),
-														nb.getCreatorUserId(),
-														nb.getDateCreated(),
-														nb.getDateUpdated());
-		
-		if ( nb.getNbAttachments() != null && nb.getNbAttachments().size() > 0 ) {
-			HashSet newAttachmentSet = new HashSet();
-			Iterator iter = nb.getNbAttachments().iterator();
-			while (iter.hasNext()) {
-				NoticeboardAttachment element = (NoticeboardAttachment) iter.next();
-				NoticeboardAttachment newAttachment = new NoticeboardAttachment(newContent, element.getFilename(), element.isOnlineFile());
-				//keep old value do not duplicate file
-				newAttachment.setUuid(element.getUuid());
-				newAttachment.setVersionId(element.getVersionId());
-				
-				newAttachmentSet.add(newAttachment);
-			} 
-			newContent.setNbAttachments(newAttachmentSet);
-		}
-		
-		return newContent;
-	}
-   
-	
- 
+    /**
+     * Creates a new NoticeboardContent object from the supplied object. Assigns it the toContendId. 
+     * 
+     * @param nb
+     *            NoticeboardContent object containing the content to copy from
+     * @param toContentId
+     *            The new Id of the new noticeboard object
+     * @return newContent The new noticeboard content object
+     * @throws RepositoryCheckedException
+     * @throws ItemNotFoundException
+     */
+    public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId) throws ItemNotFoundException,
+	    RepositoryCheckedException {
+	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
+		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(),
+		nb.isContentInUse(), nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated());
+
+	return newContent;
+    }
+
 }

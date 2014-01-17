@@ -82,30 +82,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	return FILENAME;
     }
 
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-	    if (leaderselectionService == null) {
-		leaderselectionService = LeaderselectionServiceProxy.getLeaderselectionService(getServletContext());
-	    }
-
-	    Leaderselection content = null;
-	    if (toolContentID != null) {
-		content = leaderselectionService.getContentByContentId(toolContentID);
-	    } else {
-		LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionID);
-		if (session != null)
-		    content = session.getLeaderselection();
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
-    }
-
     private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) throws LeaderselectionException {
 

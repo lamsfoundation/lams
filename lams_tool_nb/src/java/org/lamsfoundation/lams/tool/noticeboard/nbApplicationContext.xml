@@ -18,7 +18,6 @@
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
-				<property name="nbAttachmentDAO"><ref bean="nbAttachmentDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>			
 				<property name="nbToolContentHandler"><ref bean="nbToolContentHandler"/></property>			
@@ -37,8 +36,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
@@ -61,10 +58,6 @@
 	</bean>
 	
 	<bean id="nbUserDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="nbAttachmentDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

@@ -71,7 +71,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
-import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetAttachmentDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetMarkDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetSessionDAO;
@@ -81,7 +80,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
-import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
@@ -103,7 +101,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	ToolContentImport102Manager {
     static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
-    private SpreadsheetAttachmentDAO spreadsheetAttachmentDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
     private SpreadsheetSessionDAO spreadsheetSessionDao;
     private UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao;
@@ -112,10 +109,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private SpreadsheetToolContentHandler spreadsheetToolContentHandler;
     private MessageService messageService;
     // system services
-    private IRepositoryService repositoryService;
     private ILamsToolService toolService;
     private ILearnerService learnerService;
-    private IAuditService auditService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
@@ -123,70 +118,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
-	    throws SpreadsheetApplicationException {
 
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    SpreadsheetServiceImpl.log.error(error);
-	    throw new SpreadsheetApplicationException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    SpreadsheetServiceImpl.log.error(error);
-	    throw new SpreadsheetApplicationException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the Spreadsheet Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SpreadsheetApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws SpreadsheetApplicationException {
-	ICredentials credentials = new SimpleCredentials(spreadsheetToolContentHandler.getRepositoryUser(),
-		spreadsheetToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, spreadsheetToolContentHandler
-		    .getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new SpreadsheetApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new SpreadsheetApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new SpreadsheetApplicationException("Login failed." + e.getMessage());
-	}
-    }
 
     public Spreadsheet getSpreadsheetByContentId(Long contentId) {
 	Spreadsheet rs = spreadsheetDao.getByContentId(contentId);
@@ -206,29 +138,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	Spreadsheet defaultContent = getDefaultSpreadsheet();
 	// save default content by given ID.
 	Spreadsheet content = new Spreadsheet();
-	content = Spreadsheet.newInstance(defaultContent, contentId, spreadsheetToolContentHandler);
+	content = Spreadsheet.newInstance(defaultContent, contentId);
 	return content;
-    }
-
-    public SpreadsheetAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadSpreadsheetFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	SpreadsheetAttachment file = new SpreadsheetAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public void saveOrUpdateUser(SpreadsheetUser spreadsheetUser) {
@@ -252,23 +163,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return userList;
     }
 
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SpreadsheetApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new SpreadsheetApplicationException("Exception occured while deleting files from"
-		    + " the repository " + e.getMessage());
-	}
-    }
-
     public void saveOrUpdateSpreadsheet(Spreadsheet spreadsheet) {
 	spreadsheetDao.saveObject(spreadsheet);
-    }
-
-    public void deleteSpreadsheetAttachment(Long attachmentUid) {
-	spreadsheetAttachmentDao.removeObject(SpreadsheetAttachment.class, attachmentUid);
-
     }
 
     public List<Summary> exportForLearner(Long sessionId, SpreadsheetUser learner) {
@@ -320,7 +216,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	// for(SpreadsheetItem item:sessList){
 	// if(skipHide && item.isHide())
 	// continue;
-	//			
+	//
 	// //to skip all item create by author
 	// if(!item.isCreateByAuthor()){
 	// Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
@@ -509,7 +405,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    }
 	}
     }
-    
+
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -540,86 +436,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws SpreadsheetApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadSpreadsheetFileException {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = spreadsheetToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
-    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadSpreadsheetFileException {
-	NodeKey node = null;
-	try {
-	    node = spreadsheetToolContentHandler.uploadPackage(packageDirectory, initFile);
-	} catch (InvalidParameterException e) {
-	    throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	} catch (RepositoryCheckedException e) {
-	    throw new UploadSpreadsheetFileException(messageService.getMessage("error.msg.repository"));
-	}
-	return node;
-    }
-
-    /**
-     * Find out default.htm/html or index.htm/html in the given directory folder
-     * 
-     * @param packageDirectory
-     * @return
-     */
-    private String findWebsiteInitialItem(String packageDirectory) {
-	File file = new File(packageDirectory);
-	if (!file.isDirectory()) {
-	    return null;
-	}
-
-	File[] initFiles = file.listFiles(new FileFilter() {
-	    public boolean accept(File pathname) {
-		if (pathname == null || pathname.getName() == null) {
-		    return false;
-		}
-		String name = pathname.getName();
-		if (name.endsWith("default.html") || name.endsWith("default.htm") || name.endsWith("index.html")
-			|| name.endsWith("index.htm")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-	if (initFiles != null && initFiles.length > 0) {
-	    return initFiles[0].getName();
-	} else {
-	    return null;
-	}
-    }
-
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
@@ -630,14 +449,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public MessageService getMessageService() {
 	return messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setSpreadsheetAttachmentDao(SpreadsheetAttachmentDAO spreadsheetAttachmentDao) {
-	this.spreadsheetAttachmentDao = spreadsheetAttachmentDao;
     }
 
     public void setSpreadsheetDao(SpreadsheetDAO spreadsheetDao) {
@@ -686,13 +497,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
 
 	// set SpreadsheetToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Spreadsheet.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Spreadsheet.newInstance(toolContentObj, toolContentId);
 	try {
-	    exportContentService.registerFileClassForExport(SpreadsheetAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, spreadsheetToolContentHandler,
 		    rootPath);
 	} catch (ExportToolContentException e) {
@@ -704,9 +510,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(SpreadsheetAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(SpreadsheetImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, spreadsheetToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Spreadsheet)) {
@@ -766,28 +572,12 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    }
 	}
 
-	Spreadsheet toContent = Spreadsheet.newInstance(spreadsheet, toContentId, spreadsheetToolContentHandler);
+	Spreadsheet toContent = Spreadsheet.newInstance(spreadsheet, toContentId);
 	spreadsheetDao.saveObject(toContent);
     }
-    
+
     public String getToolContentTitle(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).getTitle();
-    }
-   
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
-	if (spreadsheet == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	spreadsheet.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
-	if (spreadsheet == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	spreadsheet.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

@@ -58,12 +58,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * what mode was set, it will trigger the corresponding action. If the mode parameter
  * is missing or a key is not found in the keymap, it will call the unspecified method
  * which defaults to the learner action. 
- *  
- * <p>The learner action, checks the defineLater and runOffline flags, and if required
- * it will show the learner the message screen indicating a reason why they cant see
- * the contents of the noticeboard.
- * If none of the flags are set, then the learner is able to see the noticeboard. 
- * </p>
+ * 
  * <p>The difference between author mode (which is basically the preview)
  * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
  * </p>
@@ -231,11 +226,10 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
      * In this noticeboard tool, there are 3 possible flags:
      * <li>defineLater</li>
      * <li>contentInUse</li>
-     * <li>runOffline</li>
      * <br>Returns true if the flag is set, false otherwise <p>
      * 
      * @param content The instance of NoticeboardContent
-     * @param flag The flag to check, can take the following set of values (defineLater, contentInUse, runOffline)
+     * @param flag The flag to check, can take the following set of values (defineLater, contentInUse)
      * @return Returns true if flag is set, false otherwise
      */
 	private boolean isFlagSet(NoticeboardContent content, int flag) throws NbApplicationException
@@ -248,9 +242,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	    	case NoticeboardConstants.FLAG_CONTENT_IN_USE:
 	    		return (content.isContentInUse());
 	    	//	break;
-	    	case NoticeboardConstants.FLAG_RUN_OFFLINE:
-	    		return(content.isForceOffline()); 
-	    //		break;
 	    	default:
 	    	    throw new NbApplicationException("Invalid flag");
 	    }
@@ -273,16 +264,11 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	private boolean displayMessageToUser(NoticeboardContent content, ActionMessages message)
 	{
 	    boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
-        boolean isRunOfflineSet = isFlagSet(content, NoticeboardConstants.FLAG_RUN_OFFLINE);
-        if(isDefineLaterSet || isRunOfflineSet)
+        if(isDefineLaterSet)
         {
             if (isDefineLaterSet)
             {
                 message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.defineLaterSet"));
-            }
-            if (isRunOfflineSet)
-            {
-                message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.runOfflineSet"));
             }
             return true;
         }

@@ -152,7 +152,6 @@ public class MonitoringAction extends Action {
 	List<List<Summary>> groupList = service.getSummary(contentId);
 
 	Resource resource = service.getResourceByContentId(contentId);
-	resource.toDTO();
 
 	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
 

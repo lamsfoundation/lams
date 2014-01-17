@@ -10,7 +10,6 @@
     <% 
 		Set tabs = new LinkedHashSet();
 		tabs.add("label.summary");
-		tabs.add("label.instructions");
 		tabs.add("label.editActivity");
 		tabs.add("label.stats");
 		pageContext.setAttribute("tabs", tabs);
@@ -123,20 +122,19 @@
 		    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 				<html:hidden property="dispatch"/>
 				<html:hidden property="toolContentID"/>
-				<html:hidden property="httpSessionID"/>		
+				<html:hidden property="httpSessionID"/>
 				<html:hidden property="currentTab" styleId="currentTab" />
-				<html:hidden property="contentFolderID"/>						
+				<html:hidden property="contentFolderID"/>
 				<html:hidden property="activeModule"/>
 				<html:hidden property="defineLaterInEditMode"/>
-				<html:hidden property="responseId"/>	 
+				<html:hidden property="responseId"/>
 				<html:hidden property="currentUid"/>
 			
 				<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
 			
 				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-				<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
-				<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
-				<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+				<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+				<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
 			</html:form>
 		</div>	
 	

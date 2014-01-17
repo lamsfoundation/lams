@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
- 
+
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
@@ -40,145 +39,95 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public class AuthoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 3950453134542135495L;
+    private static final long serialVersionUID = 3950453134542135495L;
 
-	// Properties
+    // Properties
 
-	String title;
+    String title;
 
-	String instructions;
+    String instructions;
 
-	String offlineInstruction;
+    boolean lockOnFinished;
 
-	String onlineInstruction;
+    boolean allowRichEditor;
 
-	boolean lockOnFinished;
-	
-	boolean allowRichEditor;
-	
-	FormFile onlineFile; 
+    String currentTab;
 
-	FormFile offlineFile;
+    String dispatch;
 
-	String currentTab;
+    String sessionMapID;
 
-	String dispatch;
-	
-	String sessionMapID;
-	
-	Long deleteFileUuid;
+    SessionMap sessionMap;
 
-	SessionMap sessionMap;
+    @Override
+    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+	ActionErrors ac = new ActionErrors();
+	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
 
-	@Override
-	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-		ActionErrors ac = new ActionErrors();
-		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-		
-		return ac;
-	}
-	
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+	return ac;
+    }
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public void setSessionMap(SessionMap sessionMap) {
+	this.sessionMap = sessionMap;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public SessionMap getSessionMap() {
+	return sessionMap;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
-	
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
 
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setSessionMap(SessionMap sessionMap) {
-		this.sessionMap = sessionMap;
-	}
-
-	public SessionMap getSessionMap() {
-		return sessionMap;
-	}
-
-	public Long getDeleteFileUuid() {
-		return deleteFileUuid;
-	}
-
-	public void setDeleteFileUuid(Long deleteFile) {
-		this.deleteFileUuid = deleteFile;
-	}
-
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
-
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
 }

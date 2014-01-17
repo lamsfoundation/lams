@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -79,7 +78,7 @@ import com.thoughtworks.xstream.XStream;
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm"
  * @struts.action-forward name="mindmap" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
+ * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="reflect" path="tiles:/learning/reflect"
  */
@@ -150,11 +149,6 @@ public class LearningAction extends LamsDispatchAction {
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-
-	// check runOffline
-	if (mindmap.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 		
 	// check if there is submission deadline
 	Date submissionDeadline = mindmap.getSubmissionDeadline();
@@ -168,9 +162,9 @@ public class LearningAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 

@@ -27,17 +27,6 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
-        } 
-
-        function doUploadOnline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
-        	myForm.submit();
-        }
-        function doUploadOffline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
-        	myForm.submit();
         }
         
     	function onSubmitHandler() {
@@ -60,7 +49,6 @@
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-			<lams:Tab id="3" key="label.authoring.heading.instructions" />
 		</lams:Tabs></div>
 		<!-- start tabs -->
 <div id="content">
@@ -85,17 +73,7 @@
 		<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 		<!-- end of content (Advanced) -->
 
-		<!-- tab content 3 (Instructions) -->
-		<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-		<!-- end of content (Instructions) -->
-
 		<!-- Button Row -->
-		<%--  Default value 
-			cancelButtonLabelKey="label.authoring.cancel.button"
-			saveButtonLabelKey="label.authoring.save.button"
-			cancelConfirmMsgKey="authoring.msg.cancel.save"
-			accessMode="author"
-		--%>
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 			toolSignature="<%=SpreadsheetConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.spreadsheet.contentId}" 
 			 customiseSessionID="${formBean.sessionMapID}"

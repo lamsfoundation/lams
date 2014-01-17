@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.qa.dto;
 
 
-import java.util.List;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -54,12 +52,6 @@ public class GeneralMonitoringDTO implements Comparable
     
     protected String defaultQuestionContent;
     
-    protected String onlineInstructions;
-    protected String offlineInstructions;
-
-    protected List attachmentList;
-    protected List deletedAttachmentList;
-    
     protected String contentFolderID;
     
 	
@@ -75,11 +67,7 @@ public class GeneralMonitoringDTO implements Comparable
             .append("editResponse: ", editResponse)
             .append("defaultQuestionContent: ", defaultQuestionContent)
             .append("countAllUsers: ", countAllUsers)
-            .append("countSessionComplete: ", countSessionComplete)
-			.append("onlineInstructions: ", onlineInstructions)
-			.append("offlineInstructions: ", offlineInstructions)
-            .append("attachmentList: ", attachmentList)
-            .append("deletedAttachmentList: ", deletedAttachmentList)            
+            .append("countSessionComplete: ", countSessionComplete)      
             .toString();
     }
 
@@ -153,54 +141,6 @@ public class GeneralMonitoringDTO implements Comparable
      */
     public void setDefaultQuestionContent(String defaultQuestionContent) {
         this.defaultQuestionContent = defaultQuestionContent;
-    }
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-    /**
-     * @param offlineInstructions The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
-    }
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
-    }
-    /**
-     * @param onlineInstructions The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
-    }
-    /**
-     * @return Returns the attachmentList.
-     */
-    public List getAttachmentList() {
-        return attachmentList;
-    }
-    /**
-     * @param attachmentList The attachmentList to set.
-     */
-    public void setAttachmentList(List attachmentList) {
-        this.attachmentList = attachmentList;
-    }
-    /**
-     * @return Returns the deletedAttachmentList.
-     */
-    public List getDeletedAttachmentList() {
-        return deletedAttachmentList;
-    }
-    /**
-     * @param deletedAttachmentList The deletedAttachmentList to set.
-     */
-    public void setDeletedAttachmentList(List deletedAttachmentList) {
-        this.deletedAttachmentList = deletedAttachmentList;
     }
     /**
      * @return Returns the userExceptionNoStudentActivity.

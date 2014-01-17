@@ -24,13 +24,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
-import java.io.InputStream;
 import java.util.List;
 
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
@@ -260,61 +256,6 @@ public interface INoticeboardService {
      * @return the total number of users for this tool activity
      */
     public int calculateTotalNumberOfUsers(Long toolContentId);
-    
-    //===================================================================
-    // NoticeboardAttachment access methods
-    //===================================================================
-    
-    /**
-	 * <p>Retrieve an instance of NoticeboardAttachment with the given
-     * attachment id <code>attachmentId</code> </p>
-     * @param attachmentId The id for the attachment file
-     * @return an instance of NoticeboardAttachment
-     */
-    public NoticeboardAttachment retrieveAttachment(Long attachmentId);
-    
-    /**
-	 * <p>Retrieve the file attachment with the given uuid </p>
-     * @param uuid The unique identifier for the file, corresponds to the uuid for the file stored in content repository
-     * @return an instance of NoticeboardAttachment
-     */
-    public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid);
-    
-    /**
-	 * <p>Retrieve an instance of NoticeboardAttachment with the 
-     * filename <code>filename</code> </p>
-     * @param filename The filename of the attachment that you want to retrieve
-     * @return an instance of NoticeboardAttachment
-     */
-    public NoticeboardAttachment retrieveAttachmentByFilename(String filename);
-    
-    /**
-     * <p>Retrieve the list of attachment ids with the given instance of NoticeboardContent</p>
-     * @param nbContent The given instance of NoticeboardContent
-     * @return List. the list of attachment ids (java.lang.Long)
-     */
-    public List getAttachmentIdsFromContent(NoticeboardContent nbContent);
-    
-    /**
-     * <p> Saves (persists) or update the NoticeboardAttachment object in the
-     * database.</p>
-     * @param content The overall noticeboard content object to which the attachment is to be added
-     * @param attachment The instance of NoticeboardAttachment to save
-     */
-    public void saveAttachment(NoticeboardContent content, NoticeboardAttachment attachment);
-    
-    /**
-     * Removes the NoticeboardAttachment object from the database.
-     * @param content The overall noticeboard content object to which the attachment is to be added
-     * @param attachment The instance of NoticeboardAttachment to delete.
-     */
-    public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment) throws RepositoryCheckedException;
-    
-	/** 
-	 * Add a file to the content repository. Does not add a record to the noticeboard tables.
-	 * @throws RepositoryCheckedException 
-	 */
-	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
 
     /**
      * This method retrieves the default content id.

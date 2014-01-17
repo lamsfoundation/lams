@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  * environment. Stores all values in the session scope.</p>
  * 
  * <p>The validate method does not check whether any of the input from
- * title, content, onlineInstructions, offlineInstructions are empty or not.
+ * title, content are empty or not.
  * This is because I have encountered a situation where even though the field is
  * empty, the FCKEditor places a <br/> tag and so the validate method doesnt work.
  * However, the validate method checks the length of the file that has been uploaded,
@@ -71,8 +71,6 @@ public class NbAuthoringForm extends ActionForm {
 
 	private String title;
 	private String basicContent;
-	private String onlineInstructions;
-	private String offlineInstructions;
 	
 	private String method;
 	private String toolContentID;
@@ -81,39 +79,9 @@ public class NbAuthoringForm extends ActionForm {
 	
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
-	
-	private FormFile onlineFile;
-	private FormFile offlineFile;
 
 	private String currentTab;
-	private String sessionMapID;
-	
-	private Long deleteFileUuid;
 
-	/**
-     * @return Returns the offlineFile.
-     */
-    public FormFile getOfflineFile() {
-        return offlineFile;
-    }
-    /**
-     * @param offlineFile The offlineFile to set.
-     */
-    public void setOfflineFile(FormFile offlineFile) {
-        this.offlineFile = offlineFile;
-    }
-    /**
-     * @return Returns the onlineFile.
-     */
-    public FormFile getOnlineFile() {
-        return onlineFile;
-    }
-    /**
-     * @param onlineFile The onlineFile to set.
-     */
-    public void setOnlineFile(FormFile onlineFile) {
-        this.onlineFile = onlineFile;
-    }
     /**
      * @return Returns the defineLater.
      */
@@ -169,38 +137,6 @@ public class NbAuthoringForm extends ActionForm {
 	}
 	
 	/**
-	 * @return Returns the online instructions
-	 */
-	public String getOnlineInstructions()
-	{
-		return onlineInstructions;
-	}
-	
-	/**
-	 * @param onlineInstructions The online instructions to set
-	 */
-	public void setOnlineInstructions(String onlineInstructions)
-	{
-		this.onlineInstructions = onlineInstructions;
-	}
-	
-	/**
-	 * @return Returns the offline instructions
-	 */
-	public String getOfflineInstructions()
-	{
-		return offlineInstructions;
-	}
-	
-	/**
-	 * @param offlineInstructions The offline instructions to set
-	 */
-	public void setOfflineInstructions(String offlineInstructions)
-	{
-		this.offlineInstructions = offlineInstructions;
-	}
-	
-	/**
 	 * @return Returns the method.
 	 */
 	public String getMethod() {
@@ -245,13 +181,8 @@ public class NbAuthoringForm extends ActionForm {
 	{
 	//	this.content = null;
 		//this.title = null;
-		//this.onlineInstructions = null;
-		//this.offlineInstructions = null;
 	    this.method= null;
 	    this.defineLater = null;
-	    this.onlineFile = null;
-	    this.offlineFile = null;
-	    this.deleteFileUuid = null;
 	}
 	
 	/**
@@ -263,8 +194,6 @@ public class NbAuthoringForm extends ActionForm {
 	{
 		setTitle(nbContent.getTitle());
 		setBasicContent(nbContent.getContent());
-		setOnlineInstructions(nbContent.getOnlineInstructions());
-		setOfflineInstructions(nbContent.getOfflineInstructions());
 		setReflectOnActivity(nbContent.getReflectOnActivity());
 		setReflectInstructions(nbContent.getReflectInstructions());
 	}
@@ -275,8 +204,6 @@ public class NbAuthoringForm extends ActionForm {
 	    nbContent.setContent(getBasicContent());
 	    if (defineLater == null || defineLater.length() == 0) {
 	    	// ie. If defineLater is null or empty, this means we are in authoring
-			nbContent.setOnlineInstructions(getOnlineInstructions());
-			nbContent.setOfflineInstructions(getOfflineInstructions());
 			nbContent.setReflectOnActivity(getReflectOnActivity());
 			nbContent.setReflectInstructions(getReflectInstructions());
 			nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
@@ -289,17 +216,5 @@ public class NbAuthoringForm extends ActionForm {
 	public void setCurrentTab(String currentTab) {
 		this.currentTab = currentTab;
 	}
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
-	public Long getDeleteFileUuid() {
-		return deleteFileUuid;
-	}
-	public void setDeleteFileUuid(Long deleteFileUuid) {
-		this.deleteFileUuid = deleteFileUuid;
-	}	
   
 }

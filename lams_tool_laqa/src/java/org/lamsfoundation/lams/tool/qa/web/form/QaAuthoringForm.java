@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Authoring environment*/
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
@@ -41,8 +40,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String removeAllContent;
     protected String submitAllContent;
     protected String submitTabDone;
-    protected String submitOfflineFile;
-    protected String submitOnlineFile;
     protected String dispatch;
     protected String currentTab;
 
@@ -58,12 +55,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String instructions;
     protected String questionIndex;
     protected String isRemoveContent;
-
-    /* instructions content */
-    protected String onlineInstructions;
-    protected String offlineInstructions;
-    protected FormFile theOfflineFile;
-    protected FormFile theOnlineFile;
 
     protected String toolContentID;
     /* advanced content */
@@ -106,8 +97,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.removeAllContent = null;
 	this.submitAllContent = null;
 	this.submitTabDone = null;
-	this.submitOfflineFile = null;
-	this.submitOnlineFile = null;
 
 	this.summaryMonitoring = null;
 	this.instructionsMonitoring = null;
@@ -124,8 +113,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.removeAllContent = null;
 	this.submitAllContent = null;
 	this.submitTabDone = null;
-	this.submitOfflineFile = null;
-	this.submitOnlineFile = null;
 
 	this.choice = null;
 	this.choiceBasic = null;
@@ -136,9 +123,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.instructions = null;
 	this.questionIndex = null;
 	this.isRemoveContent = null;
-
-	this.onlineInstructions = null;
-	this.offlineInstructions = null;
 
 	this.endLearningMessage = null;
 	this.synchInMonitor = null;
@@ -177,8 +161,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 		.append("activeModule: ", activeModule).append("defaultContentIdStr: ", defaultContentIdStr)
 		.append("title: ", title).append("instructions: ", instructions).append("reportTitle: ", reportTitle)
 		.append("monitoringReportTitle: ", monitoringReportTitle)
-		.append("endLearningMessage: ", endLearningMessage).append("onlineInstructions: ", onlineInstructions)
-		.append("offlineInstructions: ", offlineInstructions).append("usernameVisible: ", usernameVisible)
+		.append("endLearningMessage: ", endLearningMessage)
+		.append("usernameVisible: ", usernameVisible)
 		.append("allowRateAnswers: ", allowRateAnswers).append("showOtherAnswers: ", showOtherAnswers)
 		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
 		.append("lockWhenFinished: ", lockWhenFinished).append("reflect: ", reflect)
@@ -303,36 +287,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *                The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *                The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
     }
 
     /**
@@ -588,66 +542,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setEdit(String edit) {
 	this.edit = edit;
-    }
-
-    /**
-     * @return Returns the submitOfflineFile.
-     */
-    public String getSubmitOfflineFile() {
-	return submitOfflineFile;
-    }
-
-    /**
-     * @param submitOfflineFile
-     *                The submitOfflineFile to set.
-     */
-    public void setSubmitOfflineFile(String submitOfflineFile) {
-	this.submitOfflineFile = submitOfflineFile;
-    }
-
-    /**
-     * @param theOfflineFile
-     *                The theOfflineFile to set.
-     */
-    public void setTheOfflineFile(FormFile theOfflineFile) {
-	this.theOfflineFile = theOfflineFile;
-    }
-
-    /**
-     * @param theOnlineFile
-     *                The theOnlineFile to set.
-     */
-    public void setTheOnlineFile(FormFile theOnlineFile) {
-	this.theOnlineFile = theOnlineFile;
-    }
-
-    /**
-     * @return Returns the theOfflineFile.
-     */
-    public FormFile getTheOfflineFile() {
-	return theOfflineFile;
-    }
-
-    /**
-     * @return Returns the theOnlineFile.
-     */
-    public FormFile getTheOnlineFile() {
-	return theOnlineFile;
-    }
-
-    /**
-     * @return Returns the submitOnlineFile.
-     */
-    public String getSubmitOnlineFile() {
-	return submitOnlineFile;
-    }
-
-    /**
-     * @param submitOnlineFile
-     *                The submitOnlineFile to set.
-     */
-    public void setSubmitOnlineFile(String submitOnlineFile) {
-	this.submitOnlineFile = submitOnlineFile;
     }
 
     /**

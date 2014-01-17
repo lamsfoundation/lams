@@ -24,22 +24,15 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
@@ -70,7 +63,6 @@ import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionExceptio
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the ILeaderselectionService interface.
@@ -81,7 +73,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 public class LeaderselectionService implements ToolSessionManager, ToolContentManager, ILeaderselectionService,
 	ToolContentImport102Manager {
 
-    static Logger logger = Logger.getLogger(LeaderselectionService.class.getName());
+    private static Logger logger = Logger.getLogger(LeaderselectionService.class.getName());
 
     private ILeaderselectionDAO leaderselectionDAO = null;
 
@@ -184,26 +176,6 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     }
 
     @Override
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
-	if (content == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	content.setDefineLater(value);
-	leaderselectionDAO.saveOrUpdate(content);
-    }
-
-    @Override
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
-	if (content == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	content.setRunOffline(value);
-	leaderselectionDAO.saveOrUpdate(content);
-    }
-
-    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
     }
@@ -233,6 +205,8 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(LeaderselectionImportContentVersionFilter.class);
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath,
 		    leaderselectionToolContentHandler, fromVersion, toVersion);

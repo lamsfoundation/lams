@@ -228,27 +228,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		return FILENAME;
 
 	}
-
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-        	ISubmitFilesService service = SubmitFilesServiceProxy.getSubmitFilesService(getServletContext());
-
-        	SubmitFilesContent content = null;
-            if ( toolContentID != null ) {
-            	content = service.getSubmitFilesContent(toolContentID);
-            } else {
-            	SubmitFilesSession session=service.getSessionById(toolSessionID);
-            	if ( session != null )
-            		content = session.getContent();
-            }
-            if ( content != null ) {
-            	activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
-	}
 	
 	public Map learner(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap) {

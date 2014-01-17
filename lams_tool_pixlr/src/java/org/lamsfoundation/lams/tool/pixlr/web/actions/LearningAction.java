@@ -81,7 +81,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm"
  * @struts.action-forward name="pixlr" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="success" path="/pages/learning/success.jsp"
  * @struts.action-forward name="notebook" path="/pages/learning/notebook.jsp"
@@ -147,11 +146,6 @@ public class LearningAction extends LamsDispatchAction {
 	
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-
-	// check runOffline
-	if (pixlr.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 
 	// get the user
 	PixlrUser pixlrUser;

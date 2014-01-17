@@ -57,7 +57,6 @@
 			<lams:Tabs control="true">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
 				<lams:Tab id="2" key="label.authoring.heading.advance" />
-				<lams:Tab id="3" key="label.authoring.heading.instructions" />
 			</lams:Tabs>
 		</div>
 
@@ -84,10 +83,6 @@
 				<!-- tab content 2 (Advanced) -->
 				<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 				<!-- end of content (Advanced) -->
-
-				<!-- tab content 3 (Instructions) -->
-				<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-				<!-- end of content (Instructions) -->
 
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" 

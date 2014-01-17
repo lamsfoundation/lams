@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,28 +43,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -74,63 +66,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
  * @author Ozgur Demirtas
- * 
- <action
- path="/authoring"
- type="org.lamsfoundation.lams.tool.qa.web.QaAction"
- name="QaAuthoringForm"
- input="/AuthoringMaincontent.jsp"
- parameter="dispatch"
- scope="request"
- unknown="false"
- validate="false"
- >
-
- <forward
- name="load"
- path="/AuthoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="loadMonitoring"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="refreshMonitoring"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="loadViewOnly"
- path="/authoring/AuthoringTabsHolder.jsp"
- redirect="false"
- />
-
- <forward
- name="newQuestionBox"
- path="/authoring/newQuestionBox.jsp"
- redirect="false"
- />
-
- <forward
- name="editQuestionBox"
- path="/authoring/editQuestionBox.jsp"
- redirect="false"
- />
-
-
- <forward
- name="starter"
- path="/index.jsp"
- redirect="false"
- />
- </action>
  */
 public class QaAction extends LamsDispatchAction implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaAction.class.getName());
@@ -190,26 +126,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-
-	}
-
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
@@ -254,13 +170,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    }
 
 	    authoringUtil.reOrganizeDisplayOrder(qaService, qaAuthoringForm, qaContent);
-
-	    if (activeModule.equals(QaAppConstants.AUTHORING)) {
-
-		List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-		List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-		List attachments = saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
-	    }
 
 	    QaUtils.setDefineLater(request, false, strToolContentID, qaService);
 	    QaUtils.setFormProperties(request, qaService, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
@@ -451,29 +360,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-
-	}
-
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -578,25 +464,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
 
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -671,12 +538,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	QaUtils.setFormProperties(request, qaService, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
@@ -780,13 +641,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	return mapping.findForward("editQuestionBox");
     }
 
@@ -886,25 +740,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
@@ -993,25 +828,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setTitle(richTextTitle);
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
@@ -1102,26 +918,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
@@ -1150,216 +946,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
 
-    /**
-     * adds a new file to content repository 
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-
-	String onlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
-
-	String offlineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
-
-	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, onlineInstructions);
-	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS, offlineInstructions);
-
-	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-
-	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-
-	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-	qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	addFileToContentRepository(request, qaAuthoringForm, attachmentList, deletedAttachmentList, sessionMap,
-		qaGeneralAuthoringDTO);
-
-	sessionMap.put(QaAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
-
-	qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaUtils.setFormProperties(request, qaService, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
-		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	qaGeneralAuthoringDTO.setActiveModule(activeModule);
-	qaGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setActiveModule(activeModule);
-	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-	qaAuthoringForm.setCurrentTab("3");
-
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
-
-	qaAuthoringForm.resetUserAction();
-
-	String strOnlineInstructions = request.getParameter("onlineInstructions");
-	String strOfflineInstructions = request.getParameter("offlineInstructions");
-
-	qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
-    }
-
-    /**
-     * deletes a file from the content repository 
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-
-	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-
-	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-
-	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-
-	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
-	QaUtils.setFormProperties(request, qaService, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
-		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-	String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-
-	String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-
-	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-	qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-	qaAuthoringForm.setOnlineInstructions(onlineInstructions);
-	qaAuthoringForm.setOfflineInstructions(offlineInstructions);
-
-	String richTextTitle = (String) sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY);
-	String richTextInstructions = (String) sessionMap.get(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
-
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	long uuid = WebUtil.readLongParam(request, QaAppConstants.UUID);
-
-	List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-
-	if (attachmentList == null) {
-	    attachmentList = new ArrayList();
-	}
-
-	List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	if (deletedAttachmentList == null) {
-	    deletedAttachmentList = new ArrayList();
-	}
-
-	/*
-	 * move the file's details from the attachment collection to the deleted attachments collection the attachment
-	 * will be delete on saving.
-	 */
-
-	deletedAttachmentList = QaUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList);
-
-	sessionMap.put(QaAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
-
-	qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	qaGeneralAuthoringDTO.setActiveModule(activeModule);
-	qaGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-	qaAuthoringForm.setToolContentID(strToolContentID);
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaAuthoringForm.setActiveModule(activeModule);
-	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-	qaAuthoringForm.setCurrentTab("3");
-
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	qaAuthoringForm.resetUserAction();
-	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
-    }
 
     /**
      * persists error messages to request scope
@@ -1375,94 +961,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * 
-     * @param request
-     * @param qaAuthoringForm
-     */
-    public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
-	    List attachmentList, List deletedAttachmentList, SessionMap sessionMap,
-	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO) {
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-
-	if (attachmentList == null) {
-	    attachmentList = new ArrayList();
-	}
-
-	if (deletedAttachmentList == null) {
-	    deletedAttachmentList = new ArrayList();
-	}
-
-	FormFile uploadedFile = null;
-	boolean isOnlineFile = false;
-	String fileType = null;
-	if (qaAuthoringForm.getTheOfflineFile() != null && qaAuthoringForm.getTheOfflineFile().getFileSize() > 0) {
-	    //theOfflineFile is available
-	    uploadedFile = qaAuthoringForm.getTheOfflineFile();
-	    fileType = IToolContentHandler.TYPE_OFFLINE;
-	} else if (qaAuthoringForm.getTheOnlineFile() != null && qaAuthoringForm.getTheOnlineFile().getFileSize() > 0) {
-	    //theOnlineFile is available
-	    uploadedFile = qaAuthoringForm.getTheOnlineFile();
-	    isOnlineFile = true;
-	    fileType = IToolContentHandler.TYPE_ONLINE;
-	} else {
-	    /* no file uploaded */
-	    return;
-	}
-
-	// validate upload file size.
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(uploadedFile, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return;
-	}
-
-	/*
-	 * if a file with the same name already exists then move the old one to deleted
-	 */
-	deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList,
-		deletedAttachmentList);
-
-	try {
-	    /*
-	     * This is a new file and so is saved to the content repository. Add it to the attachments collection, but
-	     * don't add it to the tool's tables yet.
-	     */
-	    NodeKey node = getToolContentHandler().uploadFile(uploadedFile.getInputStream(),
-		    uploadedFile.getFileName(), uploadedFile.getContentType(), fileType);
-	    QaUploadedFile file = new QaUploadedFile();
-	    String fileName = uploadedFile.getFileName();
-
-	    if (fileName != null && fileName.length() > 30) {
-		fileName = fileName.substring(0, 31);
-	    }
-
-	    file.setFileName(fileName);
-	    file.setFileOnline(isOnlineFile);
-	    file.setUuid(node.getUuid().toString());
-	    /* file.setVersionId(node.getVersion()); */
-
-	    /*
-	     * add the files to the attachment collection - if one existed, it should have already been removed.
-	     */
-	    attachmentList.add(file);
-
-	    /* reset the fields so that more files can be uploaded */
-	    qaAuthoringForm.setTheOfflineFile(null);
-	    qaAuthoringForm.setTheOnlineFile(null);
-	} catch (FileNotFoundException e) {
-	    QaAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	} catch (IOException e) {
-	    QaAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	} catch (RepositoryCheckedException e) {
-	    QaAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	}
-    }
-
-    /**
      * QaToolContentHandler getToolContentHandler()
      * 
      * @return
@@ -1474,60 +972,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    toolContentHandler = (QaToolContentHandler) wac.getBean("qaToolContentHandler");
 	}
 	return toolContentHandler;
-    }
-
-    /**
-     * 
-     * Go through the attachments collections. Remove any content repository or
-     * tool objects matching entries in the the deletedAttachments collection,
-     * add any new attachments in the attachments collection. Clear the
-     * deletedAttachments collection, ready for new editing.
-     * 
-     * @param qaContent
-     * @param attachmentList
-     * @param deletedAttachmentList
-     * @param mapping
-     * @param request
-     * @return
-     */
-    private List saveAttachments(QaContent qaContent, List attachmentList, List deletedAttachmentList,
-	    ActionMapping mapping, HttpServletRequest request) {
-
-	if (attachmentList == null || deletedAttachmentList == null) {
-	    return null;
-	}
-
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-
-	if (deletedAttachmentList != null) {
-	    Iterator iter = deletedAttachmentList.iterator();
-	    while (iter.hasNext()) {
-		QaUploadedFile attachment = (QaUploadedFile) iter.next();
-
-		/* remove entry from db, leave in content repository. */
-
-		if (attachment.getSubmissionId() != null) {
-		    qaService.removeFile(attachment.getSubmissionId());
-		}
-	    }
-	    deletedAttachmentList.clear();
-	}
-
-	if (attachmentList != null) {
-	    Iterator iter = attachmentList.iterator();
-	    while (iter.hasNext()) {
-		QaUploadedFile attachment = (QaUploadedFile) iter.next();
-
-		if (attachment.getSubmissionId() == null) {
-		    /*
-		     * add entry to tool table - file already in content repository
-		     */
-		    qaService.persistFile(qaContent, attachment);
-		}
-	    }
-	}
-
-	return deletedAttachmentList;
     }
 
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,

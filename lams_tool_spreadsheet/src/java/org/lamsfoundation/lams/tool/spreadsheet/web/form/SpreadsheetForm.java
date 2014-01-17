@@ -73,7 +73,6 @@ public class SpreadsheetForm extends ActionForm  {
     	if(!StringUtils.equals(param,"start") && !StringUtils.equals(param,"initPage")){
 	    	spreadsheet.setLockWhenFinished(false);
 	    	spreadsheet.setDefineLater(false);
-	    	spreadsheet.setRunOffline(false);
 	    	spreadsheet.setLearnerAllowedToSave(true);
 	    	spreadsheet.setMarkingEnabled(false);
 	    	spreadsheet.setReflectOnActivity(false);

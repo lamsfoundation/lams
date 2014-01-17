@@ -41,12 +41,6 @@
         	return true;
         }
         
-		function deleteAttachment(uuid) {
-			document.NbAuthoringForm.method.value = 'deleteAttachment';
-			document.NbAuthoringForm.deleteFileUuid.value = uuid;
-			document.NbAuthoringForm.submit();
-		}        
-		
 		function doUpload() {
 			document.NbAuthoringForm.method.value = 'upload';
 			document.NbAuthoringForm.submit();
@@ -62,16 +56,10 @@
 			<html:hidden property="toolContentID" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="sessionMapID" />
 			<html:hidden property="defineLater" />
 
-			<c:set var="formBean"
-				value="<%=request
-											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<c:set var="sessionMap"
-				value="${sessionScope[formBean.sessionMapID]}" scope="request" />
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			
-			<%-- in define later mode we edit only the basic content. But if we don't have the instructions tab, then the instructions are lost when saving. --%>
 			<h1>
 				<fmt:message key="activity.title" />
 			</h1>
@@ -81,7 +69,6 @@
 					<lams:Tab id="1" key="label.authoring.heading.basic" />
 					<c:if test="${formBean.defineLater != 'true'}">
 						<lams:Tab id="2" key="label.authoring.heading.advanced" />
-						<lams:Tab id="3" key="label.authoring.heading.instructions" />
 					</c:if>
 				</lams:Tabs>
 				<!-- end tab buttons -->
@@ -105,10 +92,6 @@
 				<c:if test="${formBean.defineLater != 'true'}">
 					<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
 						page="advance.jsp" />
-
-					<lams:TabBody id="3"
-						titleKey="label.authoring.heading.instructions"
-						page="instructions.jsp" />
 				</c:if>
 
 				<!-- Button Row -->
@@ -131,7 +114,6 @@
 					saveButtonLabelKey="button.save"
 					accessMode="${accessMode}"
 					defineLater="${formBean.defineLater}"
-					customiseSessionID="${sessionMap.sessionID}"
 					contentFolderID="${NbAuthoringForm.contentFolderID}" />
 			</div>
 			<div id="footer" />

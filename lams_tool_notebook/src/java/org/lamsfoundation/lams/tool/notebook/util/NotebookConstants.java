@@ -33,8 +33,6 @@ public interface NotebookConstants {
     public static final Integer SESSION_COMPLETED = new Integer(2);
 
     public static final String AUTHORING_DEFAULT_TAB = "1";
-    public static final String ATTACHMENT_LIST = "attachmentList";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
     public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
     public static final String AUTH_SESSION_ID = "authoringSessionId";
 
@@ -62,7 +60,7 @@ public interface NotebookConstants {
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
     
-    //  for submission deadline LDEV-2657
+    //  for submission deadline
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 }

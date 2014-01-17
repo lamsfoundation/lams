@@ -46,16 +46,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.struts.upload.FormFile;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -84,7 +80,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAttachmentDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
@@ -94,7 +89,6 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -124,8 +118,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     private ScratchieItemDAO scratchieItemDao;
 
-    private ScratchieAttachmentDAO scratchieAttachmentDao;
-
     private ScratchieUserDAO scratchieUserDao;
 
     private ScratchieSessionDAO scratchieSessionDao;
@@ -138,7 +130,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     private MessageService messageService;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -161,32 +152,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-
-    /**
-     * This method verifies the credentials of the Scratchie Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws ScratchieApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws ScratchieApplicationException {
-	ICredentials credentials = new SimpleCredentials(scratchieToolContentHandler.getRepositoryUser(),
-		scratchieToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    scratchieToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ScratchieApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ScratchieApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ScratchieApplicationException("Login failed." + e.getMessage());
-	}
-    }
 
     @Override
     public Scratchie getScratchieByContentId(Long contentId) {
@@ -216,7 +181,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	Scratchie defaultContent = getDefaultScratchie();
 	// save default content by given ID.
 	Scratchie content = new Scratchie();
-	content = Scratchie.newInstance(defaultContent, contentId, scratchieToolContentHandler);
+	content = Scratchie.newInstance(defaultContent, contentId);
 	return content;
     }
 
@@ -235,28 +200,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public ScratchieAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadScratchieFileException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadScratchieFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	ScratchieAttachment file = new ScratchieAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
-    }
-
-    @Override
     public void createUser(ScratchieUser scratchieUser) {
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {
 	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
@@ -267,29 +210,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public ScratchieUser getUserByIDAndSession(Long userId, Long sessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getUserByIDAndSession(), getting ScratchieUser by ID: " + userId
-		    + " and session ID: " + sessionId);
-	}
-	ScratchieUser res = scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getUserByIDAndSession(), retrieved ScratchieUser by ID: " + userId
-		    + " and session ID: " + sessionId);
-	}
-	return res;
-    }
 
-    @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ScratchieApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new ScratchieApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
+	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
     @Override
@@ -299,11 +221,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    + "]: entered saveOrUpdateScratchie(), saving Scratchie UID: " + scratchie.getUid());
 	}
 	scratchieDao.saveObject(scratchie);
-    }
-
-    @Override
-    public void deleteScratchieAttachment(Long attachmentUid) {
-	scratchieAttachmentDao.removeObject(ScratchieAttachment.class, attachmentUid);
     }
 
     @Override
@@ -1701,35 +1618,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws ScratchieApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadScratchieFileException {
-	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = scratchieToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadScratchieFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadScratchieFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadScratchieFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadScratchieFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {
@@ -1753,14 +1641,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setScratchieAttachmentDao(ScratchieAttachmentDAO scratchieAttachmentDao) {
-	this.scratchieAttachmentDao = scratchieAttachmentDao;
     }
 
     public void setScratchieDao(ScratchieDAO scratchieDao) {
@@ -1814,10 +1694,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
 	
 	// wipe out the links from ScratchieAnswer back to ScratchieItem, or it will try to
 	// include the hibernate object version of the ScratchieItem within the XML
@@ -1830,8 +1707,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 	
 	try {
-	    exportContentService.registerFileClassForExport(ScratchieAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService
 		    .exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
@@ -1844,9 +1719,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(ScratchieAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ScratchieImportContentVersionFilter.class);
 
@@ -1919,7 +1791,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	}
 
-	Scratchie toContent = Scratchie.newInstance(scratchie, toContentId, scratchieToolContentHandler);
+	Scratchie toContent = Scratchie.newInstance(scratchie, toContentId);
 	scratchieDao.saveObject(toContent);
 
 	// save scratchie items as well
@@ -1936,24 +1808,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getScratchieByContentId(toolContentId).getTitle();
-    }
-
-    @Override
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
-	if (scratchie == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	scratchie.setDefineLater(value);
-    }
-
-    @Override
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
-	if (scratchie == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	scratchie.setRunOffline(value);
     }
 
     @Override

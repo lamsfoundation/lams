@@ -28,12 +28,6 @@
         </property>
     </bean>
 
-   <bean id="scratchieAttachmentDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-
    <bean id="scratchieUserDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieUserDAOHibernate">
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
@@ -66,9 +60,6 @@
         <property name="scratchieAnswerVisitDao">
             <ref local="scratchieAnswerVisitDao"/>
         </property>
-        <property name="scratchieAttachmentDao">
-            <ref local="scratchieAttachmentDao"/>
-        </property>
         <property name="scratchieUserDao">
             <ref local="scratchieUserDao"/>
         </property>
@@ -77,9 +68,6 @@
         </property>
         <property name="scratchieToolContentHandler">
             <ref local="scratchieToolContentHandler"/>
-        </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -123,8 +111,6 @@
                 <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyScratchesFromLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setScratchingFinished">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="logAnswerAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

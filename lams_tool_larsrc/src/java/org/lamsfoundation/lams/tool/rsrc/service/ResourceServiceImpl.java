@@ -78,7 +78,6 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dao.ResourceAttachmentDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
@@ -91,7 +90,6 @@ import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
@@ -125,8 +123,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     private ResourceDAO resourceDao;
 
     private ResourceItemDAO resourceItemDao;
-
-    private ResourceAttachmentDAO resourceAttachmentDao;
 
     private ResourceUserDAO resourceUserDao;
 
@@ -254,33 +250,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	Resource defaultContent = getDefaultResource();
 	// save default content by given ID.
 	Resource content = new Resource();
-	content = Resource.newInstance(defaultContent, contentId, resourceToolContentHandler);
+	content = Resource.newInstance(defaultContent, contentId);
 	return content;
     }
 
     public List getAuthoredItems(Long resourceUid) {
 	return resourceItemDao.getAuthoringItems(resourceUid);
-    }
-
-    public ResourceAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadResourceFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	ResourceAttachment file = new ResourceAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public void createUser(ResourceUser resourceUser) {
@@ -311,11 +286,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     public void saveOrUpdateResource(Resource resource) {
 	resourceDao.saveObject(resource);
-    }
-
-    public void deleteResourceAttachment(Long attachmentUid) {
-	resourceAttachmentDao.removeObject(ResourceAttachment.class, attachmentUid);
-
     }
 
     public void saveOrUpdateResourceItem(ResourceItem item) {
@@ -690,13 +660,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadResourceFileException {
+    private NodeKey processFile(FormFile file) throws UploadResourceFileException {
 	NodeKey node = null;
 	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
-		node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
+		node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
 		throw new UploadResourceFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	    } catch (FileNotFoundException e) {
@@ -729,7 +698,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    String fileType = file.getContentType();
 	    // For file only upload one sigle file
 	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
-		NodeKey nodeKey = processFile(file, IToolContentHandler.TYPE_ONLINE);
+		NodeKey nodeKey = processFile(file);
 		item.setFileUuid(nodeKey.getUuid());
 		item.setFileVersionId(nodeKey.getVersion());
 	    }
@@ -837,10 +806,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	this.repositoryService = repositoryService;
     }
 
-    public void setResourceAttachmentDao(ResourceAttachmentDAO resourceAttachmentDao) {
-	this.resourceAttachmentDao = resourceAttachmentDao;
-    }
-
     public void setResourceDao(ResourceDAO resourceDao) {
 	this.resourceDao = resourceDao;
     }
@@ -891,14 +856,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
 
 	// set ResourceToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Resource.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Resource.newInstance(toolContentObj, toolContentId);
 	toolContentObj.setMiniViewNumberStr(null);
 	try {
-	    exportContentService.registerFileClassForExport(ResourceAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.registerFileClassForExport(ResourceItem.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, resourceToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
@@ -910,8 +870,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(ResourceAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(ResourceImportContentVersionFilter.class);
+	
 	    exportContentService.registerFileClassForImport(ResourceItem.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, "initialItem");
 
@@ -988,7 +949,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 	}
 
-	Resource toContent = Resource.newInstance(resource, toContentId, resourceToolContentHandler);
+	Resource toContent = Resource.newInstance(resource, toContentId);
 	resourceDao.saveObject(toContent);
 
 	// save resource items as well
@@ -1004,22 +965,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     
     public String getToolContentTitle(Long toolContentId) {
 	return getResourceByContentId(toolContentId).getTitle();
-    }
-    
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Resource resource = resourceDao.getByContentId(toolContentId);
-	if (resource == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	resource.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Resource resource = resourceDao.getByContentId(toolContentId);
-	if (resource == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	resource.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -1118,9 +1063,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    toolContentObj.setDefineLater(Boolean.FALSE);
 	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		    .get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setOfflineInstructions(null);
-	    toolContentObj.setOnlineInstructions(null);
-	    toolContentObj.setRunOffline(Boolean.FALSE);
 	    toolContentObj.setUpdated(now);
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);

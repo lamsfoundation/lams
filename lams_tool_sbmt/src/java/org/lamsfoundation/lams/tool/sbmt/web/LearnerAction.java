@@ -83,7 +83,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 
  * @struts.action-forward name="success" path="/learner/sbmtlearner.jsp"
  * @struts.action-forward name="defineLater" path="/learner/definelater.jsp"
- * @struts.action-forward name="runOffline" path="/learner/runoffline.jsp"
+ * @struts.action-forward name="submissionDeadline" path="/learner/submissionDeadline.jsp"
  * 
  * 
  */
@@ -174,11 +174,6 @@ public class LearnerAction extends DispatchAction {
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
 		.getServletContext());
 
-	// add run offline support
-	if (content.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
-
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -190,9 +185,9 @@ public class LearnerAction extends DispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 

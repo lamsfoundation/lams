@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -125,22 +124,7 @@ public class AuthoringAction extends Action {
 	if (param.equals("initPage")) {
 	    return initPage(mapping, form, request, response);
 	}
-
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
-	}
+	
 	// ----------------------- Add resource item function
 	// ---------------------------
 	if (param.equals("newItemInit")) {
@@ -426,11 +410,6 @@ public class AuthoringAction extends Action {
 	    }
 
 	    resourceForm.setResource(resource);
-
-	    // initialize instruction attachment list
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(resource.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -574,53 +553,11 @@ public class AuthoringAction extends Action {
 
 	resourcePO.setCreatedBy(resourceUser);
 
-	// **********************************Handle Authoring Instruction
-	// Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because
-	// PropertyUtils.copyProperties() is executed
-	Set attPOSet = resourcePO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    ResourceAttachment newAtt = (ResourceAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is
-	// non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    ResourceAttachment delAtt = (ResourceAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    ResourceAttachment att = (ResourceAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteResourceAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-
-	// copy back
-	resourcePO.setAttachments(attPOSet);
 	// ************************* Handle resource items *******************
 	// Handle resource items
 	Set itemList = new LinkedHashSet();
 	SortedSet topics = getResourceItemList(sessionMap);
-	iter = topics.iterator();
+	Iterator iter = topics.iterator();
 	while (iter.hasNext()) {
 	    ResourceItem item = (ResourceItem) iter.next();
 	    if (item != null) {
@@ -658,9 +595,6 @@ public class AuthoringAction extends Action {
 	// finally persist resourcePO again
 	service.saveOrUpdateResource(resourcePO);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(resource.getAttachments());
 	resourceForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -669,163 +603,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadResourceFileException
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws UploadResourceFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadResourceFileException
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws UploadResourceFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadResourceFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) throws UploadResourceFileException {
-
-	ResourceForm resourceForm = (ResourceForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(resourceForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = resourceForm.getOfflineFile();
-	} else {
-	    file = resourceForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(ResourceConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(ResourceConstants.SUCCESS);
-	}
-
-	IResourceService service = getResourceService();
-	// upload to repository
-	ResourceAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ResourceAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ResourceAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName()) && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(ResourceConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current Resource authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Resource authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ResourceAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ResourceAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(ResourceConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ResourceConstants.SUCCESS);
-
     }
 
     // *************************************************************************************
@@ -837,22 +614,6 @@ public class AuthoringAction extends Action {
     private IResourceService getResourceService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ResourceConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
     }
 
     /**

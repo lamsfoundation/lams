@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.service;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
@@ -40,18 +39,9 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -76,7 +66,6 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
@@ -85,7 +74,6 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
-import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
@@ -125,12 +113,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	QaAppConstants {
     static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
-    private final String repositoryUser = "laqa11";
-    private final char[] repositoryId = { 'l', 'a', 'q', 'a', '_', '1', '1' };
-    private final String repositoryWorkspace = "laqa11";
-    private IRepositoryService repositoryService;
-    private ICredentials cred;
-
     private IQaContentDAO qaDAO;
     private IQaQuestionDAO qaQuestionDAO;
 
@@ -138,7 +120,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IQaQueUsrDAO qaQueUsrDAO;
     private IQaUsrRespDAO qaUsrRespDAO;
     private IResponseRatingDAO qaResponseRatingDAO;
-    private IQaUploadedFileDAO qaUploadedFileDAO;
 
     private IToolContentHandler qaToolContentHandler = null;
     private IUserManagementService userManagementService;
@@ -530,15 +511,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		.getUsername(), qaUsrResp.getAnswer());
     }
 
-    public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException {
-	try {
-	    return qaUploadedFileDAO.retrieveQaUploadedFiles(qa);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public int getTotalNumberOfUsers(QaContent qa) {
 	try {
 	    return qaQueUsrDAO.getTotalNumberOfUsers(qa);
@@ -644,7 +616,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		fromContent.getConditions().add(
 			getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
 	    }
-	    QaContent toContent = QaContent.newInstance(qaToolContentHandler, fromContent, toContentId);
+	    QaContent toContent = QaContent.newInstance(fromContent, toContentId);
 	    if (toContent == null) {
 		QaServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
 		throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
@@ -661,48 +633,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    throw new ToolException("Exception occured when lams is copying content between content ids.");
 	}
 
-    }
-
-    /**
-     * setAsDefineLater(Long toolContentID) throws DataMissingException,
-     * ToolException
-     * 
-     * @param toolContentID
-     *                return void
-     */
-    public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	if (toolContentID == null) {
-	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
-	    throw new DataMissingException("toolContentID is missing");
-	}
-	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
-	if (qaContent == null) {
-	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
-	    throw new DataMissingException("qaContent is missing");
-	}
-	qaContent.setDefineLater(value);
-	updateQa(qaContent);
-    }
-
-    /**
-     * setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException set the runOffline to true on this
-     * content
-     * 
-     * @param toolContentID
-     *                return void
-     */
-    public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	if (toolContentID == null) {
-	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
-	    throw new DataMissingException("toolContentID is missing");
-	}
-	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
-	if (qaContent == null) {
-	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
-	    throw new DataMissingException("qaContent is missing");
-	}
-	qaContent.setRunOffline(value);
-	updateQa(qaContent);
     }
 
     /**
@@ -857,7 +787,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	try {
 	    // set ToolContentHandler as null to avoid copy file node in
 	    // repository again.
-	    toolContentObj = QaContent.newInstance(null, toolContentObj, toolContentID);
+	    toolContentObj = QaContent.newInstance(toolContentObj, toolContentID);
 
 	    // don't export following fields value
 	    toolContentObj.setQaSessions(null);
@@ -866,12 +796,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		question.setQaQueUsers(null);
 		question.setQaContent(null);
 	    }
-	    Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
-	    for (QaUploadedFile file : files) {
-		file.setQaContent(null);
-	    }
 
-	    exportContentService.registerFileClassForExport(QaUploadedFile.class.getName(), "uuid", null);
 	    exportContentService.exportToolContent(toolContentID, toolContentObj, qaToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -891,9 +816,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(QaUploadedFile.class.getName(), "uuid", null, "fileName",
-		    "fileProperty", null, null);
-
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(QaImportContentVersionFilter.class);
 
@@ -913,10 +835,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {
 		question.setQaContent(toolContentObj);
-	    }
-	    Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
-	    for (QaUploadedFile file : files) {
-		file.setQaContent(toolContentObj);
 	    }
 	    qaDAO.saveOrUpdateQa(toolContentObj);
 	} catch (ImportToolContentException e) {
@@ -1137,91 +1055,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return contentId;
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    public ITicket getRepositoryLoginTicket() throws QaApplicationException {
-	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, repositoryWorkspace);
-	    return ticket;
-	} catch (AccessDeniedException e) {
-	    throw new QaApplicationException("Access Denied to repository." + e.getMessage());
-	} catch (WorkspaceNotFoundException e) {
-	    throw new QaApplicationException("Workspace not found." + e.getMessage());
-	} catch (LoginException e) {
-	    throw new QaApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
-    /**
-     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
-     * repository
-     * 
-     * @param uuid
-     *                The <code>uuid</code> of the node to be deleted
-     * @param versionID
-     *                The <code>version_id</code> of the node to be deleted.
-     * @throws SubmitFilesException
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    String files[] = repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new QaApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public InputStream downloadFile(Long uuid, Long versionID) throws QaApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    return node.getFile();
-	} catch (AccessDeniedException e) {
-	    throw new QaApplicationException("AccessDeniedException occured while trying to download file "
-		    + e.getMessage());
-	} catch (FileException e) {
-	    throw new QaApplicationException("FileException occured while trying to download file " + e.getMessage());
-	} catch (ItemNotFoundException e) {
-	    throw new QaApplicationException("ItemNotFoundException occured while trying to download file "
-		    + e.getMessage());
-	}
-    }
-
-    /**
-     * adds a new entry to the uploaded files table
-     */
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent)
-	    throws QaApplicationException {
-	QaUploadedFile qaUploadedFile = new QaUploadedFile(uuid, isOnlineFile, fileName, qaContent);
-	qaUploadedFileDAO.saveUploadFile(qaUploadedFile);
-    }
-
-    /**
-     * adds a new entry to the uploaded files table
-     */
-    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException {
-	content.getQaUploadedFiles().add(file);
-	file.setQaContent(content);
-	qaDAO.saveOrUpdateQa(content);
-    }
-
-    /**
-     * removes an entry from the uploaded files table
-     */
-    public void removeFile(Long submissionId) throws QaApplicationException {
-	qaUploadedFileDAO.removeUploadFile(submissionId);
-    }
-
     @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
@@ -1246,57 +1079,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
-    }
-
-    /**
-     * @return Returns the cred.
-     */
-    public ICredentials getCred() {
-	return cred;
-    }
-
-    /**
-     * @param cred
-     *                The cred to set.
-     */
-    public void setCred(ICredentials cred) {
-	this.cred = cred;
-    }
-
-    /**
-     * @return Returns the qaUploadedFileDAO.
-     */
-    public IQaUploadedFileDAO getQaUploadedFileDAO() {
-	return qaUploadedFileDAO;
-    }
-
-    /**
-     * @param qaUploadedFileDAO
-     *                The qaUploadedFileDAO to set.
-     */
-    public void setQaUploadedFileDAO(IQaUploadedFileDAO qaUploadedFileDAO) {
-	this.qaUploadedFileDAO = qaUploadedFileDAO;
-    }
-
-    /**
-     * @return Returns the repositoryId.
-     */
-    public char[] getRepositoryId() {
-	return repositoryId;
-    }
-
-    /**
-     * @return Returns the repositoryUser.
-     */
-    public String getRepositoryUser() {
-	return repositoryUser;
-    }
-
-    /**
-     * @return Returns the repositoryWorkspace.
-     */
-    public String getRepositoryWorkspace() {
-	return repositoryWorkspace;
     }
 
     /**
@@ -1387,21 +1169,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaResponseRatingDAO;
     }
 
-    /**
-     * @return Returns the repositoryService.
-     */
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    /**
-     * @param repositoryService
-     *                The repositoryService to set.
-     */
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
@@ -1456,11 +1223,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	toolContentObj.setCreationDate(now);
 	toolContentObj.setDefineLater(false);
 	toolContentObj.setInstructions(null);
-	toolContentObj.setOfflineInstructions(null);
-	toolContentObj.setOnlineInstructions(null);
 	toolContentObj.setReflect(false);
 	toolContentObj.setReflectionSubject(null);
-	toolContentObj.setRunOffline(false);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	toolContentObj.setQaContentId(toolContentId);
 	toolContentObj.setUpdateDate(now);
@@ -1489,7 +1253,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
 	// leave as empty, no need to set them to anything.
-	// setQaUploadedFiles(Set qaUploadedFiles);
 	// setQaSessions(Set qaSessions);
 
 	// set up question from body

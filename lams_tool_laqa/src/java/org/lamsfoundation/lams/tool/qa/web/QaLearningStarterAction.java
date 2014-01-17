@@ -291,13 +291,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 	}
 
-	// find out if the content is set to run offline or online. If it is set to run offline , the learners are
-	// informed about that.
-	if (qaContent.isRunOffline()) {
-	    QaUtils.cleanUpSessionAbsolute(request);
-	    return (mapping.findForward(RUN_OFFLINE));
-	}
-
 	//check if there is submission deadline
 	Date submissionDeadline = qaContent.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -310,9 +303,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 		
-		//calculate whether submission deadline has passed, and if so forward to "runOffline"
+		//calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 		if (currentLearnerDate.after(tzSubmissionDeadline)) {
-			return mapping.findForward("runOffline");
+			return mapping.findForward("submissionDeadline");
 		}
 	}
 	

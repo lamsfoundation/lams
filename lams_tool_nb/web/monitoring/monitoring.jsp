@@ -58,7 +58,6 @@
 			
 				<lams:Tabs>
 					<lams:Tab id="<%=NbMonitoringAction.SUMMARY_TABID%>" key="titleHeading.summary" />
-					<lams:Tab id="<%=NbMonitoringAction.INSTRUCTIONS_TABID%>" key="titleHeading.instructions" />
 					<lams:Tab id="<%=NbMonitoringAction.EDITACTIVITY_TABID%>" key="titleHeading.editActivity" />
 					<lams:Tab id="<%=NbMonitoringAction.STATISTICS_TABID%>" key="titleHeading.statistics" />
 				</lams:Tabs>
@@ -68,9 +67,8 @@
 				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 				
 				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" />
-				<lams:TabBody id="2" titleKey="titleHeading.instructions" page="m_Instructions.jsp" />
-				<lams:TabBody id="3" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
-				<lams:TabBody id="4" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
+				<lams:TabBody id="2" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
+				<lams:TabBody id="3" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
 			</div>
 			
 			<div id="footer" />

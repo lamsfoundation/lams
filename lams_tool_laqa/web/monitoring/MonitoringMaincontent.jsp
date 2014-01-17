@@ -29,7 +29,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <% 
 		Set tabs = new LinkedHashSet();
 		tabs.add("label.summary");
-		tabs.add("label.instructions");
 		tabs.add("label.editActivity");
 		tabs.add("label.stats");
 		pageContext.setAttribute("tabs", tabs);
@@ -214,9 +213,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="monitoring"/>
 
 		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
-		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
-		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+		<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+		<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
 		</html:form>
 	</div>	
 	

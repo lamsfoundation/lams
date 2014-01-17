@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.kaltura.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Hashtable;
@@ -34,20 +32,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -64,7 +50,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaAttachmentDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaCommentDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaItemDAO;
@@ -74,7 +59,6 @@ import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaSessionDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaUserDAO;
 import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
-import org.lamsfoundation.lams.tool.kaltura.model.KalturaAttachment;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaComment;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItemVisitLog;
@@ -83,8 +67,8 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
+import org.lamsfoundation.lams.tool.kaltura.util.KalturaImportContentVersionFilter;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaItemComparator;
-import org.lamsfoundation.lams.tool.kaltura.util.KalturaToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -117,8 +101,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
     private IKalturaUserDAO kalturaUserDao = null;
 
-    private IKalturaAttachmentDAO kalturaAttachmentDao = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
@@ -128,8 +110,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     private MessageService messageService;
 
     private IToolContentHandler kalturaToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
 
     private IAuditService auditService = null;
 
@@ -214,28 +194,8 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Kaltura toContent = Kaltura.newInstance(fromContent, toContentId, kalturaToolContentHandler);
+	Kaltura toContent = Kaltura.newInstance(fromContent, toContentId);
 	kalturaDao.saveOrUpdate(toContent);
-    }
-
-    @Override
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
-	if (kaltura == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	kaltura.setDefineLater(value);
-	kalturaDao.saveOrUpdate(kaltura);
-    }
-
-    @Override
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
-	if (kaltura == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	kaltura.setRunOffline(value);
-	kalturaDao.saveOrUpdate(kaltura);
     }
 
     @Override
@@ -255,20 +215,13 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	kaltura = Kaltura.newInstance(kaltura, toolContentId, null);
-	kaltura.setToolContentHandler(null);
+	kaltura = Kaltura.newInstance(kaltura, toolContentId);
 	kaltura.setKalturaSessions(null);
-	Set<KalturaAttachment> atts = kaltura.getKalturaAttachments();
-	for (KalturaAttachment att : atts) {
-	    att.setKaltura(null);
-	}
 	Set<KalturaItem> items = kaltura.getKalturaItems();
 	for (KalturaItem item : items) {
 	    item.setKalturaUid(null);
 	}
 	try {
-	    exportContentService.registerFileClassForExport(KalturaAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, kaltura, kalturaToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -279,9 +232,9 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(KalturaAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(KalturaImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, kalturaToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Kaltura)) {
@@ -525,7 +478,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	Kaltura defaultContent = getDefaultContent();
 	// create new kaltura using the newContentID
 	Kaltura newContent = new Kaltura();
-	newContent = Kaltura.newInstance(defaultContent, newContentID, kalturaToolContentHandler);
+	newContent = Kaltura.newInstance(defaultContent, newContentID);
 	kalturaDao.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -564,36 +517,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public KalturaAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new KalturaException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	KalturaAttachment attachment = new KalturaAttachment(nodeKey.getVersion(), type, file.getFileName(),
-		nodeKey.getUuid(), new Date());
-	return attachment;
-    }
-
-    @Override
-    public void deleteFromRepository(Long uuid, Long versionID) throws KalturaException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new KalturaException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    @Override
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	kalturaDao.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
-    @Override
     public void saveOrUpdateKaltura(Kaltura kaltura) {
 	kalturaDao.saveOrUpdate(kaltura);
     }
@@ -628,53 +551,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	return messageService.getMessage(key, args);
     }
 
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = kalturaToolContentHandler.uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), type);
-	    } catch (InvalidParameterException e) {
-		throw new KalturaException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new KalturaException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new KalturaException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new KalturaException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws KalturaException {
-	ICredentials credentials = new SimpleCredentials(KalturaToolContentHandler.repositoryUser,
-		KalturaToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, KalturaToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new KalturaException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new KalturaException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new KalturaException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -699,10 +575,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public void setKalturaAttachmentDao(IKalturaAttachmentDAO attachmentDAO) {
-	kalturaAttachmentDao = attachmentDAO;
-    }
 
     public void setKalturaDao(IKalturaDAO kalturaDAO) {
 	this.kalturaDao = kalturaDAO;
@@ -758,10 +630,6 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public KalturaOutputFactory getKalturaOutputFactory() {

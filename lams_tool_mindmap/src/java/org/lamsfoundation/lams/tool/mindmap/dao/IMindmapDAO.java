@@ -39,7 +39,5 @@ public interface IMindmapDAO extends IBaseDAO {
 
     void saveOrUpdate(Mindmap toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 }

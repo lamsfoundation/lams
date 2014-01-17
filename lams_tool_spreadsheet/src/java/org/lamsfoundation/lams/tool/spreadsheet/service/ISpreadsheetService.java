@@ -27,13 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
-import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
@@ -60,15 +58,6 @@ public interface ISpreadsheetService{
 	 * @throws SpreadsheetApplicationException
 	 */
 	Spreadsheet getDefaultContent(Long contentId) throws SpreadsheetApplicationException;
-	
-	/**
-	 * Upload instruciton file into repository.
-	 * @param file
-	 * @param type
-	 * @return
-	 * @throws UploadSpreadsheetFileException
-	 */
-	SpreadsheetAttachment uploadInstructionFile(FormFile file, String type) throws UploadSpreadsheetFileException;
 	
 	//********** user methods *************
 	/**
@@ -114,25 +103,12 @@ public interface ISpreadsheetService{
 	 * @return
 	 */
 	SpreadsheetUser getUser(Long uid);
-	
-	//********** Repository methods ***********************
-	/**
-	 * Delete file from repository.
-	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SpreadsheetApplicationException ;
 
 	/**
 	 * Save or update spreadsheet into database.
 	 * @param Spreadsheet
 	 */
 	void saveOrUpdateSpreadsheet(Spreadsheet Spreadsheet);
-	/**
-	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
-	 * delete the file from repository.
-	 * 
-	 * @param attachmentUid
-	 */
-	void deleteSpreadsheetAttachment(Long attachmentUid);
 	
 	/**
 	 * Get spreadsheet which is relative with the special toolSession.

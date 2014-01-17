@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.tool.mc.util.McToolContentHandler;
@@ -166,27 +165,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-
-	}
-
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
@@ -231,15 +209,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 
 	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, mcService, mcAuthoringForm, mcContent);
-
-	    if (activeModule.equals(McAppConstants.AUTHORING)) {
-
-		List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-
-		List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-		
-		saveAttachments(mcContent, attachmentList, deletedAttachmentList, mapping, request);
-	    }
 
 	    McUtils.setDefineLater(request, false, strToolContentID, mcService);
 	    // define later set to false
@@ -578,27 +547,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -783,13 +731,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
@@ -948,13 +889,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
@@ -1068,25 +1002,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
@@ -1190,25 +1105,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
@@ -1296,25 +1192,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
@@ -1357,250 +1234,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	return (mapping.findForward("itemList"));
     }
-
-    /**
-     * 
-     * adds a new file to content repository
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-
-	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	mcAuthoringForm.setContentFolderID(contentFolderID);
-
-	String totalMarks = request.getParameter("totalMarks");
-
-	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-
-	String onlineInstructions = request.getParameter(McAppConstants.ONLINE_INSTRUCTIONS);
-
-	String offlineInstructions = request.getParameter(McAppConstants.OFFLINE_INSTRUCTIONS);
-
-	sessionMap.put(McAppConstants.ONLINE_INSTRUCTIONS_KEY, onlineInstructions);
-	sessionMap.put(McAppConstants.OFFLINE_INSTRUCTIONS, offlineInstructions);
-
-	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-
-	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
-		.toString();
-
-	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-
-	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-	mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
-	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-
-	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	mcAuthoringForm.setTitle(richTextTitle);
-
-	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	addFileToContentRepository(request, mcAuthoringForm, attachmentList, deletedAttachmentList, sessionMap,
-		mcGeneralAuthoringDTO);
-
-	sessionMap.put(McAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(McAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
-
-	mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
-		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	mcGeneralAuthoringDTO.setActiveModule(activeModule);
-	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-	mcAuthoringForm.setToolContentID(strToolContentID);
-	mcAuthoringForm.setHttpSessionID(httpSessionID);
-	mcAuthoringForm.setActiveModule(activeModule);
-	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-	mcAuthoringForm.setCurrentTab("3");
-
-	AuthoringUtil authoringUtil = new AuthoringUtil();
-	Map marksMap = authoringUtil.buildMarksMap();
-	mcGeneralAuthoringDTO.setMarksMap(marksMap);
-
-	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-
-	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	mcAuthoringForm.setTotalMarks(totalMark);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-	Map correctMap = authoringUtil.buildCorrectMap();
-	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	mcAuthoringForm.resetUserAction();
-
-	String strOnlineInstructions = request.getParameter("onlineInstructions");
-	String strOfflineInstructions = request.getParameter("offlineInstructions");
-	mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-
-	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
-    }
-
-    /**
-     * 
-     * deletes a file from the content repository
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-
-	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	mcAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String totalMarks = request.getParameter("totalMarks");
-
-	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
-		.toString();
-
-	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-
-	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-
-	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-
-	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
-	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
-		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-	String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-
-	String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-
-	mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-	mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-	mcAuthoringForm.setOnlineInstructions(onlineInstructions);
-	mcAuthoringForm.setOfflineInstructions(offlineInstructions);
-
-	String richTextTitle = (String) sessionMap.get(McAppConstants.ACTIVITY_TITLE_KEY);
-	String richTextInstructions = (String) sessionMap.get(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
-	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	mcAuthoringForm.setTitle(richTextTitle);
-
-	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	long uuid = WebUtil.readLongParam(request, McAppConstants.UUID);
-
-	List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-
-	if (attachmentList == null) {
-	    attachmentList = new ArrayList();
-	}
-
-	List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	if (deletedAttachmentList == null) {
-	    deletedAttachmentList = new ArrayList();
-	}
-
-	/*
-	 * move the file's details from the attachment collection to the deleted attachments collection the attachment
-	 * will be delete on saving.
-	 */
-
-	deletedAttachmentList = McUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList);
-
-	sessionMap.put(McAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(McAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
-
-	mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	mcGeneralAuthoringDTO.setActiveModule(activeModule);
-	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-	mcAuthoringForm.setToolContentID(strToolContentID);
-	mcAuthoringForm.setHttpSessionID(httpSessionID);
-	mcAuthoringForm.setActiveModule(activeModule);
-	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-	mcAuthoringForm.setCurrentTab("3");
-
-	AuthoringUtil authoringUtil = new AuthoringUtil();
-	Map marksMap = authoringUtil.buildMarksMap();
-	mcGeneralAuthoringDTO.setMarksMap(marksMap);
-
-	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-
-	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	mcAuthoringForm.setTotalMarks(totalMark);
-	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-	Map correctMap = authoringUtil.buildCorrectMap();
-	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	mcAuthoringForm.resetUserAction();
-	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
-    }
+ 
 
     /**
      * 
@@ -1615,93 +1249,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	saveErrors(request, errors);
     }
 
-    /**
-     * addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm, List attachmentList, List
-     * deletedAttachmentList, SessionMap sessionMap, McGeneralAuthoringDTO mcGeneralAuthoringDTO)
-     * 
-     * @param request
-     * @param mcAuthoringForm
-     */
-    public void addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm,
-	    List attachmentList, List deletedAttachmentList, SessionMap sessionMap,
-	    McGeneralAuthoringDTO mcGeneralAuthoringDTO) {
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-
-	if (attachmentList == null) {
-	    attachmentList = new ArrayList();
-	}
-
-	if (deletedAttachmentList == null) {
-	    deletedAttachmentList = new ArrayList();
-	}
-
-	FormFile uploadedFile = null;
-	boolean isOnlineFile = false;
-	String fileType = null;
-	if ((mcAuthoringForm.getTheOfflineFile() != null) && (mcAuthoringForm.getTheOfflineFile().getFileSize() > 0)) {
-	    // theOfflineFile is available
-	    uploadedFile = mcAuthoringForm.getTheOfflineFile();
-	    fileType = IToolContentHandler.TYPE_OFFLINE;
-	} else if ((mcAuthoringForm.getTheOnlineFile() != null)
-		&& (mcAuthoringForm.getTheOnlineFile().getFileSize() > 0)) {
-	    // theOnlineFile is available
-	    uploadedFile = mcAuthoringForm.getTheOnlineFile();
-	    isOnlineFile = true;
-	    fileType = IToolContentHandler.TYPE_ONLINE;
-	} else {
-	    /* no file uploaded */
-	    return;
-	}
-
-	// validate upload file size.
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(uploadedFile, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return;
-	}
-
-	/* if a file with the same name already exists then move the old one to deleted */
-	deletedAttachmentList = McUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList,
-		deletedAttachmentList);
-
-	try {
-	    /*
-	     * This is a new file and so is saved to the content repository. Add it to the attachments collection, but
-	     * don't add it to the tool's tables yet.
-	     */
-	    NodeKey node = getToolContentHandler().uploadFile(uploadedFile.getInputStream(),
-		    uploadedFile.getFileName(), uploadedFile.getContentType(), fileType);
-	    McUploadedFile file = new McUploadedFile();
-	    String fileName = uploadedFile.getFileName();
-
-	    if ((fileName != null) && (fileName.length() > 30)) {
-		fileName = fileName.substring(0, 31);
-	    }
-
-	    file.setFileName(fileName);
-	    file.setFileOnline(isOnlineFile);
-	    file.setUuid(node.getUuid().toString());
-	    /* file.setVersionId(node.getVersion()); */
-
-	    /* add the files to the attachment collection - if one existed, it should have already been removed. */
-	    attachmentList.add(file);
-
-	    /* reset the fields so that more files can be uploaded */
-	    mcAuthoringForm.setTheOfflineFile(null);
-	    mcAuthoringForm.setTheOnlineFile(null);
-	} catch (FileNotFoundException e) {
-	    McAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	} catch (IOException e) {
-	    McAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	} catch (RepositoryCheckedException e) {
-	    McAction.logger.error("Unable to uploadfile", e);
-	    throw new RuntimeException("Unable to upload file, exception was " + e.getMessage());
-	}
-    }
-
     private McToolContentHandler getToolContentHandler() {
 	if (toolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -1709,55 +1256,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    toolContentHandler = (McToolContentHandler) wac.getBean("mcToolContentHandler");
 	}
 	return toolContentHandler;
-    }
-
-    /**
-     * 
-     * Go through the attachments collections. Remove any content repository or tool objects matching entries in the the
-     * deletedAttachments collection, add any new attachments in the attachments collection. Clear the
-     * deletedAttachments collection, ready for new editing.
-     * 
-     * @param mcContent
-     * @param attachmentList
-     * @param deletedAttachmentList
-     * @param mapping
-     * @param request
-     * @return
-     */
-    private List saveAttachments(McContent mcContent, List attachmentList, List deletedAttachmentList,
-	    ActionMapping mapping, HttpServletRequest request) {
-
-	if ((attachmentList == null) || (deletedAttachmentList == null)) {
-	    return null;
-	}
-
-	IMcService voteService = McServiceProxy.getMcService(getServlet().getServletContext());
-
-	if (deletedAttachmentList != null) {
-	    Iterator iter = deletedAttachmentList.iterator();
-	    while (iter.hasNext()) {
-		McUploadedFile attachment = (McUploadedFile) iter.next();
-
-		if (attachment.getSubmissionId() != null) {
-		    voteService.removeFile(attachment.getSubmissionId());
-		}
-	    }
-	    deletedAttachmentList.clear();
-	}
-
-	if (attachmentList != null) {
-	    Iterator iter = attachmentList.iterator();
-	    while (iter.hasNext()) {
-		McUploadedFile attachment = (McUploadedFile) iter.next();
-
-		if (attachment.getSubmissionId() == null) {
-		    /* add entry to tool table - file already in content repository */
-		    voteService.persistFile(mcContent, attachment);
-		}
-	    }
-	}
-
-	return deletedAttachmentList;
     }
 
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1966,20 +1464,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -2110,20 +1594,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
@@ -2274,20 +1744,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -2424,20 +1880,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -2523,25 +1965,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setTitle(richTextTitle);
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	}
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
@@ -2651,23 +2074,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -2775,20 +2181,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
@@ -2919,20 +2311,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
-
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -3054,20 +2432,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-	}
 
 	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 

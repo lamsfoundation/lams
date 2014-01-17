@@ -37,7 +37,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  */
 public class GeneralLearnerFlowDTO implements Comparable {
-    protected String activityOffline;
 
     protected Integer totalQuestionCount;
 
@@ -208,21 +207,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the activityOffline.
-     */
-    public String getActivityOffline() {
-	return activityOffline;
-    }
-
-    /**
-     * @param activityOffline
-     *                The activityOffline to set.
-     */
-    public void setActivityOffline(String activityOffline) {
-	this.activityOffline = activityOffline;
-    }
-
-    /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
@@ -277,7 +261,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     public String toString() {
-	return new ToStringBuilder(this).append("activityOffline: ", activityOffline).append(
+	return new ToStringBuilder(this).append(
 		"remainingQuestionCount: ", remainingQuestionCount).append("totalQuestionCount : ", totalQuestionCount)
 		.append("activityInstructions: ", activityInstructions).append("teacherViewOnly: ", teacherViewOnly)
 		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle).append(

@@ -25,7 +25,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.kaltura.service.KalturaService">
-				<property name="kalturaAttachmentDao"><ref bean="kalturaAttachmentDao"/></property>
 				<property name="kalturaSessionDao"><ref bean="kalturaSessionDao"/></property>
 				<property name="kalturaUserDao"><ref bean="kalturaUserDao"/></property>
 				<property name="kalturaDao"><ref bean="kalturaDao"/></property>
@@ -41,7 +40,6 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="kalturaOutputFactory"><ref bean="kalturaOutputFactory"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
 		   		<property name="messageService"><ref bean="kalturaMessageService"/></property>
 			</bean>
 		</property>
@@ -60,8 +58,6 @@
 				<prop key="hide*">PROPAGATION_REQUIRED</prop>
 				<prop key="rateMessage">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
@@ -97,10 +93,6 @@
 	</bean>
 	
 	<bean id="kalturaUserDao" class="org.lamsfoundation.lams.tool.kaltura.dao.hibernate.KalturaUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="kalturaAttachmentDao" class="org.lamsfoundation.lams.tool.kaltura.dao.hibernate.KalturaAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

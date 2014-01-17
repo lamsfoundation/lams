@@ -24,14 +24,11 @@
 
 package org.lamsfoundation.lams.tool.pixlr.service;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
-import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
-import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -64,28 +61,6 @@ public interface IPixlrService {
      * @return
      */
     public Pixlr getPixlrByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public PixlrAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws PixlrException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param pixlr

@@ -23,19 +23,14 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.scratchie.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 
 /**
  * Scratchie
@@ -60,18 +55,10 @@ public class Scratchie implements Cloneable {
     private String instructions;
 
     // advance
-    private boolean runOffline;
 
     private boolean defineLater;
 
     private boolean contentInUse;
-
-    // instructions
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
-    private Set attachments;
 
     // general infomation
     private Date created;
@@ -89,29 +76,19 @@ public class Scratchie implements Cloneable {
 
     private String reflectInstructions;
 
-    // *************** NON Persist Fields ********************
-    private IToolContentHandler toolContentHandler;
-
-    private List<ScratchieAttachment> onlineFileList;
-
-    private List<ScratchieAttachment> offlineFileList;
-
     /**
      * Default contruction method.
      * 
      */
     public Scratchie() {
-	attachments = new HashSet();
 	scratchieItems = new HashSet();
     }
 
     // **********************************************************
     // Function method for Scratchie
     // **********************************************************
-    public static Scratchie newInstance(Scratchie defaultContent, Long contentId,
-	    ScratchieToolContentHandler scratchieToolContentHandler) {
+    public static Scratchie newInstance(Scratchie defaultContent, Long contentId) {
 	Scratchie toContent = new Scratchie();
-	defaultContent.toolContentHandler = scratchieToolContentHandler;
 	toContent = (Scratchie) defaultContent.clone();
 	toContent.setContentId(contentId);
 
@@ -136,19 +113,6 @@ public class Scratchie implements Cloneable {
 		}
 		scratchie.scratchieItems = set;
 	    }
-	    // clone attachment
-	    if (attachments != null) {
-		Iterator iter = attachments.iterator();
-		Set set = new HashSet();
-		while (iter.hasNext()) {
-		    ScratchieAttachment file = (ScratchieAttachment) iter.next();
-		    ScratchieAttachment newFile = (ScratchieAttachment) file.clone();
-		    // just clone old file without duplicate it in repository
-
-		    set.add(newFile);
-		}
-		scratchie.attachments = set;
-	    }
 	} catch (CloneNotSupportedException e) {
 	    Scratchie.log.error("When clone " + Scratchie.class + " failed");
 	}
@@ -168,16 +132,13 @@ public class Scratchie implements Cloneable {
 	final Scratchie genericEntity = (Scratchie) o;
 
 	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
-		.append(instructions, genericEntity.instructions)
-		.append(onlineInstructions, genericEntity.onlineInstructions)
-		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created).append(updated).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).toHashCode();
     }
 
     /**
@@ -190,21 +151,6 @@ public class Scratchie implements Cloneable {
 	    this.setCreated(new Date(now));
 	}
 	this.setUpdated(new Date(now));
-    }
-
-    public void toDTO() {
-	onlineFileList = new ArrayList<ScratchieAttachment>();
-	offlineFileList = new ArrayList<ScratchieAttachment>();
-	Set<ScratchieAttachment> fileSet = this.getAttachments();
-	if (fileSet != null) {
-	    for (ScratchieAttachment file : fileSet) {
-		if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-		    offlineFileList.add(file);
-		} else {
-		    onlineFileList.add(file);
-		}
-	    }
-	}
     }
 
     // **********************************************************
@@ -297,26 +243,6 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @return Returns the runOffline.
-     * 
-     * @hibernate.property column="run_offline"
-     * 
-     */
-    public boolean getRunOffline() {
-	return runOffline;
-    }
-
-    /**
-     * @param runOffline
-     *            The forceOffLine to set.
-     * 
-     * 
-     */
-    public void setRunOffline(boolean forceOffline) {
-	runOffline = forceOffline;
-    }
-
-    /**
      * @return Returns the instructions set by the teacher.
      * 
      * @hibernate.property column="instructions" type="text"
@@ -327,51 +253,6 @@ public class Scratchie implements Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="online_instructions" type="text"
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="offline_instructions" type="text"
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * 
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
-     * @hibernate.collection-key column="scratchie_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment"
-     * 
-     * @return a set of Attachments to this Message.
-     */
-    public Set getAttachments() {
-	return attachments;
-    }
-
-    /*
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
-	this.attachments = attachments;
     }
 
     /**
@@ -425,26 +306,6 @@ public class Scratchie implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    public List<ScratchieAttachment> getOfflineFileList() {
-	return offlineFileList;
-    }
-
-    public void setOfflineFileList(List<ScratchieAttachment> offlineFileList) {
-	this.offlineFileList = offlineFileList;
-    }
-
-    public List<ScratchieAttachment> getOnlineFileList() {
-	return onlineFileList;
-    }
-
-    public void setOnlineFileList(List<ScratchieAttachment> onlineFileList) {
-	this.onlineFileList = onlineFileList;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

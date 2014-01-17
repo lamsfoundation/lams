@@ -60,14 +60,6 @@
         length="1"        
    />
 
-   <property
-        name="runOffline"
-        type="boolean"
-        access="property"
-        column="run_offline"
-        length="1"        
-   />
-
 
     <property
         name="creationDate"
@@ -125,22 +117,6 @@
         access="property"        
         column="content_in_use"
         length="1"
-    />
-
-    <property
-        name="offlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="offline_instructions"
-        length="65535"
-    />
-    
-    <property
-        name="onlineInstructions"
-        type="java.lang.String"
-        access="property"        
-        column="online_instructions"
-        length="65535"
     />
     
     <property
@@ -242,24 +218,6 @@
 
               <one-to-many
                   class="org.lamsfoundation.lams.tool.mc.pojos.McSession"
-              />
-
-    </set>
-    
-    	<set
-            name="mcAttachments"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-              <key
-                  column="mc_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile"
               />
 
     </set>

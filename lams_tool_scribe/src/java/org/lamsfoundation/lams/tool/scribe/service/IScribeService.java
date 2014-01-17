@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.scribe.service;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
@@ -63,28 +62,6 @@ public interface IScribeService {
      * @return
      */
     public Scribe getScribeByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public ScribeAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws ScribeException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param scribe

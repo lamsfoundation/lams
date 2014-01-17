@@ -25,11 +25,9 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.servlet;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -43,13 +41,11 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieBundler;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -114,27 +110,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	return FILENAME;
     }
 
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-
-	    Scratchie content = null;
-	    if (toolContentID != null) {
-		content = service.getScratchieByContentId(toolContentID);
-	    } else {
-		ScratchieSession session = service.getScratchieSessionBySessionId(toolSessionID);
-		if (session != null)
-		    content = session.getScratchie();
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
-    }
-
     public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies, HashMap sessionMap) throws ScratchieApplicationException {
 
@@ -186,8 +161,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	List<GroupSummary> summaryList = service.getMonitoringSummary(content.getContentId(), false);
-
-	content.toDTO();
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(toolContentID);

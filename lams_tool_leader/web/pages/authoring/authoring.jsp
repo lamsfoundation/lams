@@ -28,9 +28,6 @@
 		<html:hidden property="sessionMapID" />
 
 		<div id="message" style="text-align: center;">
-			<c:if test="${unsavedChanges}">
-				<fmt:message key="message.unsavedChanges" />
-			</c:if>
 			<logic:messagesPresent>
 				<p class="warning">
 				        <html:messages id="error">

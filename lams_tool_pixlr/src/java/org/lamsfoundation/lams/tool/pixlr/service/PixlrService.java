@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -64,13 +63,11 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrAttachmentDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrConfigItemDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrSessionDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrUserDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
-import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
@@ -103,15 +100,11 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     private IPixlrUserDAO pixlrUserDAO = null;
 
-    private IPixlrAttachmentDAO pixlrAttachmentDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
     private IToolContentHandler pixlrToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
 
     private IAuditService auditService = null;
 
@@ -208,7 +201,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Pixlr toContent = Pixlr.newInstance(fromContent, toContentId, pixlrToolContentHandler);
+	Pixlr toContent = Pixlr.newInstance(fromContent, toContentId);
 
 	try {
 	    toContent.setImageFileName(copyImage(toContent));
@@ -263,24 +256,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     }
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
-	if (pixlr == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	pixlr.setDefineLater(value);
-	pixlrDAO.saveOrUpdate(pixlr);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
-	if (pixlr == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	pixlr.setRunOffline(value);
-	pixlrDAO.saveOrUpdate(pixlr);
-    }
-
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub
@@ -304,10 +279,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    throw new DataMissingException("Unable to find default content for the pixlr tool");
 	}
 
-	// set ResourceToolContentHandler as null to avoid copy file node in
-	// repository again.
-	pixlr = Pixlr.newInstance(pixlr, toolContentId, null);
-	pixlr.setToolContentHandler(null);
+	pixlr = Pixlr.newInstance(pixlr, toolContentId);
 	pixlr.setPixlrSessions(null);
 
 	// bundling the author image in export
@@ -335,13 +307,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    PixlrService.logger.error("Could not export pixlr image, image may be missing in export", e);
 	}
 
-	Set<PixlrAttachment> atts = pixlr.getPixlrAttachments();
-	for (PixlrAttachment att : atts) {
-	    att.setPixlr(null);
-	}
 	try {
-	    exportContentService.registerFileClassForExport(PixlrAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, pixlr, pixlrToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -357,9 +323,9 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(PixlrAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(PixlrImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, pixlrToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Pixlr)) {
@@ -482,7 +448,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	Pixlr defaultContent = getDefaultContent();
 	// create new pixlr using the newContentID
 	Pixlr newContent = new Pixlr();
-	newContent = Pixlr.newInstance(defaultContent, newContentID, pixlrToolContentHandler);
+	newContent = Pixlr.newInstance(defaultContent, newContentID);
 	pixlrDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -515,33 +481,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return pixlrUserDAO.getByUID(uid);
     }
 
-    public PixlrAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new PixlrException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	PixlrAttachment attachment = new PixlrAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws PixlrException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new PixlrException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	pixlrDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
     public void saveOrUpdatePixlr(Pixlr pixlr) {
 	pixlrDAO.saveOrUpdate(pixlr);
     }
@@ -567,56 +506,9 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }
-
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getPixlrToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			type);
-	    } catch (InvalidParameterException e) {
-		throw new PixlrException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new PixlrException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new PixlrException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new PixlrException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws PixlrException {
-	ICredentials credentials = new SimpleCredentials(PixlrToolContentHandler.repositoryUser,
-		PixlrToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, PixlrToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new PixlrException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new PixlrException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new PixlrException("Login failed." + e.getMessage());
-	}
     }
 
     public PixlrConfigItem getConfigItem(String key) {
@@ -643,9 +535,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	pixlr.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	pixlr.setLockOnFinished(Boolean.TRUE);
-	pixlr.setOfflineInstructions(null);
-	pixlr.setOnlineInstructions(null);
-	pixlr.setRunOffline(Boolean.FALSE);
 	pixlr.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	pixlr.setToolContentId(toolContentId);
 	pixlr.setUpdateDate(now);
@@ -675,14 +564,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public IPixlrAttachmentDAO getPixlrAttachmentDAO() {
-	return pixlrAttachmentDAO;
-    }
-
-    public void setPixlrAttachmentDAO(IPixlrAttachmentDAO attachmentDAO) {
-	pixlrAttachmentDAO = attachmentDAO;
-    }
 
     public IPixlrDAO getPixlrDAO() {
 	return pixlrDAO;
@@ -762,14 +643,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     public void setPixlrConfigItemDAO(IPixlrConfigItemDAO pixlrConfigItemDAO) {
 	this.pixlrConfigItemDAO = pixlrConfigItemDAO;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

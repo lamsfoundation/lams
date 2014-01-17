@@ -48,10 +48,6 @@ public class AuthoringForm extends ActionForm {
 
     private String instructions;
 
-    private String offlineInstruction;
-
-    private String onlineInstruction;
-
     private boolean lockOnFinished;
     
     private boolean allowContributeVideos;
@@ -63,10 +59,6 @@ public class AuthoringForm extends ActionForm {
     private boolean allowComments;
     
     private boolean allowRatings;
-
-    private FormFile onlineFile;
-
-    private FormFile offlineFile;
 
     private String currentTab;
 
@@ -136,38 +128,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setAllowContributeVideos(boolean allowContributeVideos) {
 	this.allowContributeVideos = allowContributeVideos;
-    }
-
-    public FormFile getOfflineFile() {
-	return offlineFile;
-    }
-
-    public void setOfflineFile(FormFile offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    public String getOfflineInstruction() {
-	return offlineInstruction;
-    }
-
-    public void setOfflineInstruction(String offlineInstruction) {
-	this.offlineInstruction = offlineInstruction;
-    }
-
-    public FormFile getOnlineFile() {
-	return onlineFile;
-    }
-
-    public void setOnlineFile(FormFile onlineFile) {
-	this.onlineFile = onlineFile;
-    }
-
-    public String getOnlineInstruction() {
-	return onlineInstruction;
-    }
-
-    public void setOnlineInstruction(String onlineInstruction) {
-	this.onlineInstruction = onlineInstruction;
     }
 
     public String getTitle() {

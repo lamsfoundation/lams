@@ -25,15 +25,13 @@
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.List;
-import org.apache.struts.upload.FormFile;
+
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
-import org.lamsfoundation.lams.tool.mindmap.model.MindmapAttachment;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
-import org.lamsfoundation.lams.tool.mindmap.util.MindmapException;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
@@ -52,12 +50,6 @@ public interface IMindmapService {
     public Mindmap getMindmapByContentId(Long toolContentID);
 
     public Mindmap getMindmapByUid(Long Uid);
-
-    public MindmapAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws MindmapException;
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     public void saveOrUpdateMindmap(Mindmap mindmap);
 

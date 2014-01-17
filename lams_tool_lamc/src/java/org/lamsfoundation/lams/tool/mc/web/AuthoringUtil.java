@@ -1013,9 +1013,6 @@ public class AuthoringUtil implements McAppConstants {
 
 	String reflect = request.getParameter(McAppConstants.REFLECT);
 
-	String richTextOfflineInstructions = request.getParameter(McAppConstants.OFFLINE_INSTRUCTIONS);
-	String richTextOnlineInstructions = request.getParameter(McAppConstants.ONLINE_INSTRUCTIONS);
-
 	String reflectionSubject = request.getParameter(McAppConstants.REFLECTION_SUBJECT);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
@@ -1115,8 +1112,6 @@ public class AuthoringUtil implements McAppConstants {
 	AuthoringUtil.logger.debug("activeModule:" + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    // setting other content values
-	    mcContent.setOnlineInstructions(richTextOnlineInstructions);
-	    mcContent.setOfflineInstructions(richTextOfflineInstructions);
 	    mcContent.setQuestionsSequenced(questionsSequencedBoolean);
 	    mcContent.setRandomize(randomizeBoolean);
 	    mcContent.setDisplayAnswers(displayAnswersBoolean);

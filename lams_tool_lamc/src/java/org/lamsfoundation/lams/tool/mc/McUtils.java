@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.web.McAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -123,10 +122,6 @@ public abstract class McUtils implements McAppConstants {
 	return mapOptionsContent;
     }
 
-    public static void configureContentRepository(HttpServletRequest request, IMcService mcService) {
-	mcService.configureContentRepository();
-    }
-
     /**
      * temporary function
      * 
@@ -194,17 +189,6 @@ public abstract class McUtils implements McAppConstants {
      */
     public static boolean isDefineLater(McContent mcContent) {
 	return mcContent.isDefineLater();
-    }
-
-    /**
-     * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed
-     * about that..
-     * 
-     * @param mcContent
-     * @return boolean
-     */
-    public static boolean isRunOffline(McContent mcContent) {
-	return mcContent.isRunOffline();
     }
 
     /**
@@ -284,21 +268,13 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(ON);
 	request.getSession().removeAttribute(OFF);
 	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-	request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
 	request.getSession().removeAttribute(PASSMARK);
 	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
-	request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
 	request.getSession().removeAttribute(RICHTEXT_REPORT_TITLE);
 	// request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
 	request.getSession().removeAttribute(RICHTEXT_TITLE);
 	request.getSession().removeAttribute(RICHTEXT_INSTRUCTIONS);
 	request.getSession().removeAttribute(RICHTEXT_BLANK);
-	request.getSession().removeAttribute(SUBMIT_OFFLINE_FILE);
-	request.getSession().removeAttribute(SUBMIT_ONLINE_FILE);
-	request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
-	request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-	request.getSession().removeAttribute(LIST_OFFLINEFILES_METADATA);
-	request.getSession().removeAttribute(LIST_ONLINEFILES_METADATA);
 	request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
 	request.getSession().removeAttribute(COUNT_ALL_USERS);
 	request.getSession().removeAttribute(COUNT_MAX_ATTEMPT);
@@ -326,7 +302,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(USER_FEEDBACK);
 	request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
 	request.getSession().removeAttribute(TOTAL_COUNT_REACHED);
-	request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
 	request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 	request.getSession().removeAttribute(IS_CONTENT_IN_USE);
 	request.getSession().removeAttribute(IS_RETRIES);
@@ -399,9 +374,6 @@ public abstract class McUtils implements McAppConstants {
 	    McGeneralAuthoringDTO mcGeneralAuthoringDTO) {
 	mcGeneralAuthoringDTO.setActivityTitle(defaultMcContent.getTitle());
 	mcGeneralAuthoringDTO.setActivityInstructions(defaultMcContent.getInstructions());
-
-	mcGeneralAuthoringDTO.setOnlineInstructions(defaultMcContent.getOnlineInstructions());
-	mcGeneralAuthoringDTO.setOfflineInstructions(defaultMcContent.getOfflineInstructions());
     }
 
     /**
@@ -468,14 +440,6 @@ public abstract class McUtils implements McAppConstants {
 	mcAuthoringForm.setRetries(retries);
 	mcGeneralAuthoringDTO.setRetries(retries);
 
-	String offlineInstructions = request.getParameter(OFFLINE_INSTRUCTIONS);
-	mcAuthoringForm.setOfflineInstructions(offlineInstructions);
-	mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	String onlineInstructions = request.getParameter(ONLINE_INSTRUCTIONS);
-	mcAuthoringForm.setOnlineInstructions(onlineInstructions);
-	mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
 	String reflect = request.getParameter(REFLECT);
 	mcAuthoringForm.setReflect(reflect);
 	mcGeneralAuthoringDTO.setReflect(reflect);
@@ -486,62 +450,6 @@ public abstract class McUtils implements McAppConstants {
 
 	String passmark = request.getParameter("passmark");
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
-    }
-
-    /**
-     * If this file exists in attachments map, move it to the deleted attachments map. Returns the updated
-     * deletedAttachments map, creating a new one if needed. If uuid supplied then tries to match on that, otherwise
-     * uses filename and isOnline.
-     */
-    public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    McUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		McUploadedFile value = (McUploadedFile) iter.next();
-		if (uuid.equals(value.getUuid())) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
-    }
-
-    /**
-     * If this file exists in attachments map, move it to the deleted attachments map. Returns the updated
-     * deletedAttachments map, creating a new one if needed. If uuid supplied then tries to match on that, otherwise
-     * uses filename and isOnline.
-     */
-    public static List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    McUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		McUploadedFile value = (McUploadedFile) iter.next();
-		if (filename.equals(value.getFileName()) && isOnline == value.isFileOnline()) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
     }
 
 }

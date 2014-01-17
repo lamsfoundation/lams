@@ -30,194 +30,126 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 
 public class NotebookDTO {
 
-	private static Logger logger = Logger.getLogger(NotebookDTO.class);
+    public Long toolContentId;
 
-	public Long toolContentId;
+    public String title;
 
-	public String title;
+    public String instructions;
 
-	public String instructions;
+    public boolean contentInUse;
 
-	public String onlineInstructions;
+    public boolean allowRichEditor;
 
-	public String offlineInstructions;
-	
-	public boolean defineLater;
-	
-	public boolean contentInUse;
-	
-	public boolean allowRichEditor;
-	
-	public boolean lockOnFinish;
-	
-	public Date submissionDeadline;
-	
-	public Set<NotebookAttachmentDTO> onlineInstructionsFiles;
+    public boolean lockOnFinish;
 
-	public Set<NotebookAttachmentDTO> offlineInstructionsFiles;
+    public Date submissionDeadline;
 
-	public Set<NotebookSessionDTO> sessionDTOs = new TreeSet<NotebookSessionDTO>();
-	
-	public Long currentTab;
-	
-	/* Constructors */
-	public NotebookDTO(){}
-	
-	public NotebookDTO(Notebook notebook) {
-		toolContentId = notebook.getToolContentId();
-		title = notebook.getTitle();
-		instructions = notebook.getInstructions();
-		onlineInstructions = notebook.getOnlineInstructions();
-		offlineInstructions = notebook.getOfflineInstructions();
-		contentInUse = notebook.isContentInUse();
-		allowRichEditor = notebook.isAllowRichEditor();
-		lockOnFinish = notebook.isLockOnFinished();
+    public Set<NotebookSessionDTO> sessionDTOs = new TreeSet<NotebookSessionDTO>();
 
-		onlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();
-		offlineInstructionsFiles = new TreeSet<NotebookAttachmentDTO>();
+    public Long currentTab;
 
-		for (Iterator i = notebook.getNotebookAttachments().iterator(); i.hasNext();) {
-			NotebookAttachment att = (NotebookAttachment) i.next();
-			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-				NotebookAttachmentDTO attDTO = new NotebookAttachmentDTO(att);
-				offlineInstructionsFiles.add(attDTO);
-			} else if (att.getFileType()
-					.equals(IToolContentHandler.TYPE_ONLINE)) {
-				NotebookAttachmentDTO attDTO = new NotebookAttachmentDTO(att);
-				onlineInstructionsFiles.add(attDTO);
-			} else {
-				// something is wrong. Ignore file, log error
-				logger.error("File with uid " + att.getFileUuid()
-						+ " contains invalid fileType: " + att.getFileType());
-			}
-		}
-		
-		for (Iterator iter = notebook.getNotebookSessions().iterator(); iter.hasNext();) {
-			NotebookSession session = (NotebookSession) iter.next();
-			NotebookSessionDTO sessionDTO = new NotebookSessionDTO(session);
-			
-			sessionDTOs.add(sessionDTO);
-		}
+    /* Constructors */
+    public NotebookDTO() {
+    }
+
+    public NotebookDTO(Notebook notebook) {
+	toolContentId = notebook.getToolContentId();
+	title = notebook.getTitle();
+	instructions = notebook.getInstructions();
+	contentInUse = notebook.isContentInUse();
+	allowRichEditor = notebook.isAllowRichEditor();
+	lockOnFinish = notebook.isLockOnFinished();
+
+	for (Iterator iter = notebook.getNotebookSessions().iterator(); iter.hasNext();) {
+	    NotebookSession session = (NotebookSession) iter.next();
+	    NotebookSessionDTO sessionDTO = new NotebookSessionDTO(session);
+
+	    sessionDTOs.add(sessionDTO);
 	}
+    }
 
-	/* Getters / Setters */
-	public Set<NotebookSessionDTO> getSessionDTOs() {
-		return sessionDTOs;
-	}
-	
-	public void setSessionDTOs(Set<NotebookSessionDTO> sessionDTOs) {
-		this.sessionDTOs = sessionDTOs;
-	}
+    /* Getters / Setters */
+    public Set<NotebookSessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public void setSessionDTOs(Set<NotebookSessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public Set<NotebookAttachmentDTO> getOfflineInstructionsFiles() {
-		return offlineInstructionsFiles;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setOfflineInstructionsFiles(
-			Set<NotebookAttachmentDTO> offlineInstructionsFiles) {
-		this.offlineInstructionsFiles = offlineInstructionsFiles;
-	}
+    public Long getToolContentId() {
+	return toolContentId;
+    }
 
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
+    public void setToolContentId(Long toolContentID) {
+	this.toolContentId = toolContentID;
+    }
 
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
+    public Boolean getContentInUse() {
+	return contentInUse;
+    }
 
-	public Set<NotebookAttachmentDTO> getOnlineInstructionsFiles() {
-		return onlineInstructionsFiles;
-	}
+    public void setContentInUse(Boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public void setOnlineInstructionsFiles(
-			Set<NotebookAttachmentDTO> onlineInstructionsFiles) {
-		this.onlineInstructionsFiles = onlineInstructionsFiles;
-	}
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public boolean isLockOnFinish() {
+	return lockOnFinish;
+    }
 
-	public Long getToolContentId() {
-		return toolContentId;
-	}
+    public void setLockOnFinish(boolean lockOnFinish) {
+	this.lockOnFinish = lockOnFinish;
+    }
 
-	public void setToolContentId(Long toolContentID) {
-		this.toolContentId = toolContentID;
-	}
+    /**
+     * @return the submissionDeadline
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
 
-	public Boolean getContentInUse() {
-		return contentInUse;
-	}
+    /**
+     * @param submissionDeadline
+     *            the submissionDeadline to set
+     */
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
 
-	public void setContentInUse(Boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    public Long getCurrentTab() {
+	return currentTab;
+    }
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
-
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
-
-	public boolean isLockOnFinish() {
-		return lockOnFinish;
-	}
-
-	public void setLockOnFinish(boolean lockOnFinish) {
-		this.lockOnFinish = lockOnFinish;
-	}
-
-	/**
-	 * @return the submissionDeadline
-	 */
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-
-	/**
-	 * @param submissionDeadline the submissionDeadline to set
-	 */
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
-
-	public Long getCurrentTab() {
-		return currentTab;
-	}
-
-	public void setCurrentTab(Long currentTab) {
-		this.currentTab = currentTab;
-	}
+    public void setCurrentTab(Long currentTab) {
+	this.currentTab = currentTab;
+    }
 }

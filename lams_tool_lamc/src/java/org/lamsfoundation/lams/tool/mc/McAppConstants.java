@@ -54,16 +54,10 @@ public interface McAppConstants {
     public static final String PREVIEW = "preview";
     public static final String LEARNER_PROGRESS = "learnerProgress";
     public static final String LEARNER_PROGRESS_USERID = "learnerProgressUserId";
-    public static final String ATTACHMENT_LIST_KEY = "attachmentListKey";
-    public static final String DELETED_ATTACHMENT_LIST_KEY = "deletedAttachmentListKey";
     public static final String ACTIVITY_TITLE_KEY = "activityTitleKey";
     public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
     public static final String LIST_QUESTION_CONTENT_DTO = "listQuestionContentDTO";
     public static final String LIST_QUESTION_CONTENT_DTO_KEY = "listQuestionContentDTOKey";
-    public static final String DEFAULT_ONLINE_INST = "";
-    public static final String DEFAULT_OFFLINE_INST = "";
-    public static final String ONLINE_INSTRUCTIONS_KEY = "onlineInstructionsKey";
-    public static final String OFFLINE_INSTRUCTIONS_KEY = "offlineInstructionsKey";
     public static final String MAP_QUESTION_CONTENT_KEY = "mapQuestionContentKey";
     public static final String LOAD_VIEW_ONLY = "loadViewOnly";
     public static final String MC_GENERAL_AUTHORING_DTO = "mcGeneralAuthoringDTO";
@@ -71,9 +65,6 @@ public interface McAppConstants {
     public static final String LIST_ADD_QUESTION_CONTENT_DTO_KEY = "listAddQuestionContentDtoKey";
     public static final String NEW_QUESTION_CONTENT_DTO = "newQuestionContentDTO";
     public static final Integer MAX_QUESTION_COUNT = new Integer(50);
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
-    public static final String UUID = "uuid";
     public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
     public static final String LIST_CANDIDATE_ANSWERS_DTO = "listCandidateAnswersDTO";
     public static final String CURRENT_EDITABLE_QUESTION_INDEX = "currentEditableQuestionIndex";
@@ -188,7 +179,6 @@ public interface McAppConstants {
     public static final String CREATION_DATE = "creationDate";
     public static final String DEFINE_LATER = "defineLater";
     public static final String WAIT_FOR_LEADER = "waitForLeader";    
-    public static final String RUN_OFFLINE = "runOffline";
     public static final String RETRIES = "retries";
     public static final String PASSMARK = "passMark";
     public static final String VIEW_ANSWERS = "viewAnswers";
@@ -201,19 +191,10 @@ public interface McAppConstants {
     public static final String RICHTEXT_INCORRECT_FEEDBACK = "richTextIncorrectFeedback";
     public static final String RICHTEXT_CORRECT_FEEDBACK = "richTextCorrectFeedback";
     public static final String RICHTEXT_FEEDBACK_INCORRECT = "richTextFeedbackInCorrect";
-    public static final String RICHTEXT_OFFLINEINSTRUCTIONS = "richTextOfflineInstructions";
-    public static final String RICHTEXT_ONLINEINSTRUCTIONS = "richTextOnlineInstructions";
     public static final String RICHTEXT_REPORT_TITLE = "richTextReportTitle";
-    // public static final String RICHTEXT_END_LEARNING_MSG ="richTextEndLearningMsg";
     public static final String RICHTEXT_TITLE = "richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
     public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
-    public static final String SUBMIT_OFFLINE_FILE = "submitOfflineFile";
-    public static final String SUBMIT_ONLINE_FILE = "submitOnlineFile";
-    public static final String LIST_UPLOADED_OFFLINE_FILENAMES = "listUploadedOfflineFileNames";
-    public static final String LIST_UPLOADED_ONLINE_FILENAMES = "listUploadedOnlineFileNames";
-    public static final String LIST_OFFLINEFILES_METADATA = "listOfflineFilesMetadata";
-    public static final String LIST_ONLINEFILES_METADATA = "listOnlineFilesMetadata";
 
     public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
     public static final String COUNT_ALL_USERS = "countAllUsers";
@@ -222,7 +203,7 @@ public interface McAppConstants {
     public static final String LOWEST_MARK = "lowestMark";
     public static final String AVERAGE_MARK = "averageMark";
 
-    /* Date time restriction LDEV-2657 */
+    /* Date time restriction */
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_GROUP_USERS = "groupUsers";
@@ -271,7 +252,6 @@ public interface McAppConstants {
     public static final String ENTRY_TEXT = "entryText";
 
     public static final String MC_LEARNER_STARTER_DTO = "mcLearnerStarterDTO";
-    public static final String IS_TOOL_ACTIVITY_OFFLINE = "isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE = "isUsernameVisible";
     public static final String IS_CONTENT_IN_USE = "isContentInUse";
     public static final String IS_MONITORED_CONTENT_IN_USE = "isMonitoredContentInUse";
@@ -352,7 +332,6 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_MODE_REQUIRED = "userExceptionModeRequired";
     public static final String USER_EXCEPTION_CONTENT_IN_USE = "userExceptionContentInUse";
     public static final String USER_EXCEPTION_CONTENT_BEING_MODIFIED = "userExceptionContentBeingModified";
-    public static final String USER_EXCEPTION_CONTENT_RUNOFFLINE = "userExceptionContentRunOffline";
     public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTION_EMPTY = "userExceptionQuestionEmpty";
     public static final String USER_EXCEPTION_ANSWER_EMPTY = "userExceptionAnswerEmpty";
@@ -367,7 +346,6 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_PASSMARK_NOTINTEGER = "userExceptionPassmarkNotInteger";
     public static final String USER_EXCEPTION_PASSMARK_EMPTY = "userExceptionPassmarkEmpty";
     public static final String USER_EXCEPTION_PASSMARK_GREATER100 = "userExceptionPassmarkGreater100";
-    public static final String USER_EXCEPTION_FILENAME_EMPTY = "userExceptionFilenameEmpty";
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100 = "userExceptionWeightMustEqual100";
     public static final String USER_EXCEPTION_SINGLE_OPTION = "userExceptionSingleOption";
 

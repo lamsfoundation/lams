@@ -106,9 +106,6 @@ public class NbMonitoringAction extends LamsDispatchAction {
 
     	monitorForm.setTitle(content.getTitle());
     	monitorForm.setBasicContent(content.getContent());
-    	monitorForm.setOnlineInstructions(content.getOnlineInstructions());
-    	monitorForm.setOfflineInstructions(content.getOfflineInstructions());
-		monitorForm.setAttachmentsList(NbWebUtil.setupAttachmentList(nbService, content));
 
 		monitorForm.setContentEditable("true");
 	    //set up the request parameters to append to the URL

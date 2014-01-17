@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,6 @@ import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -176,13 +174,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to true
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	// getting instructions screen content 
-	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-	List<McUploadedFile> attachmentList = service.retrieveMcUploadedFiles(mcContent);
-	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 

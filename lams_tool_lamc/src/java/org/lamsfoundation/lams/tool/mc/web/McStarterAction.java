@@ -145,7 +145,6 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -232,8 +231,6 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	SessionMap sessionMap = new SessionMap();
 	List sequentialCheckedCa = new LinkedList();
-	sessionMap.put(ATTACHMENT_LIST_KEY, new ArrayList());
-	sessionMap.put(DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
 	sessionMap.put(ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, "");
 	mcAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
@@ -290,20 +287,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	    }
 	    mcContent = retrieveContent(request, mapping, mcAuthoringForm, mapQuestionContent, new Long(
 		    strToolContentID).longValue(), false, mcService, mcGeneralAuthoringDTO, sessionMap);
-	}
-
-	if ((mcGeneralAuthoringDTO.getOnlineInstructions() == null)
-		|| (mcGeneralAuthoringDTO.getOnlineInstructions().length() == 0)) {
-	    mcGeneralAuthoringDTO.setOnlineInstructions(DEFAULT_ONLINE_INST);
-	    mcAuthoringForm.setOnlineInstructions(DEFAULT_ONLINE_INST);
-	    sessionMap.put(ONLINE_INSTRUCTIONS_KEY, DEFAULT_ONLINE_INST);
-	}
-
-	if ((mcGeneralAuthoringDTO.getOfflineInstructions() == null)
-		|| (mcGeneralAuthoringDTO.getOfflineInstructions().length() == 0)) {
-	    mcGeneralAuthoringDTO.setOfflineInstructions(DEFAULT_OFFLINE_INST);
-	    mcAuthoringForm.setOfflineInstructions(DEFAULT_OFFLINE_INST);
-	    sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, DEFAULT_OFFLINE_INST);
 	}
 
 	String destination = McUtils.getDestination(sourceMcStarter, requestedModule);
@@ -380,13 +363,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	mcGeneralAuthoringDTO.setReflect(mcContent.isReflect() ? "1" : "0");
 	mcGeneralAuthoringDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
-	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-	mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	mcGeneralAuthoringDTO.setDeletedAttachmentList(new ArrayList());
-
-	sessionMap.put(ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
-
 	mcGeneralAuthoringDTO.setIsDefineLater(new Boolean(mcContent.isDefineLater()).toString());
 
 	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
@@ -412,13 +388,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	}
 
 	mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-	mcGeneralAuthoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralAuthoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-
-	mcAuthoringForm.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcAuthoringForm.setOfflineInstructions(mcContent.getOfflineInstructions());
-	sessionMap.put(ONLINE_INSTRUCTIONS_KEY, mcContent.getOnlineInstructions());
-	sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, mcContent.getOfflineInstructions());
 
 	mcAuthoringForm.resetUserAction();
 	return mcContent;

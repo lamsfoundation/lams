@@ -80,8 +80,6 @@ public class NoticeboardConstants
     //used in monitoring
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
     public static final String TOOL_CONTENT_ID_INMONITORMODE = "toolContentIdInMonitor";
  
     public static final String DEFINE_LATER = "defineLater";
@@ -93,11 +91,6 @@ public class NoticeboardConstants
     public static final String CONTENT_FOLDER_ID = "contentFolderID"; //request variable
     public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
-    public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
-    public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
-    
-    public static final String ATTACHMENT_LIST = "attachmentList";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
     
     public static final String READ_ONLY_MODE = "readOnlyMode";
    
@@ -114,8 +107,6 @@ public class NoticeboardConstants
     public static final String BUTTON_DONE = "button.done";
     public static final String BUTTON_FINISH = "button.finish";
     public static final String BUTTON_EDIT = "button.edit";
-    public static final String BUTTON_UPLOAD = "button.upload";
-    public static final String LINK_DELETE="link.delete";
     public static final String BUTTON_CONTINUE = "button.continue";
     
     
@@ -125,7 +116,6 @@ public class NoticeboardConstants
     
     public static final int FLAG_DEFINE_LATER = 1;
     public static final int FLAG_CONTENT_IN_USE = 2;
-    public static final int FLAG_RUN_OFFLINE = 3;
    
     //------------------------------
     // Error Keys/Messages
@@ -134,5 +124,4 @@ public class NoticeboardConstants
     public static final String ERROR_NBAPPLICATION = "error.exception.NbApplication";
     public static final String ERROR_MANDATORY="error.mandatoryField";
     public static final String ERR_MISSING_PARAM = "error.missingParam";
-    public static final String ERROR_FILE_UPLOAD_CONTENT_REPOSITORY = "error.contentrepository";   
 }

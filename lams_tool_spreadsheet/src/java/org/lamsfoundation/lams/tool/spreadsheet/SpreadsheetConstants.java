@@ -42,7 +42,6 @@ public class SpreadsheetConstants {
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";	
-	public static final String PARAM_RUN_OFFLINE = "runOffline";
 	public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 	public static final String PARAM_TITLE = "title";
 	
@@ -51,9 +50,7 @@ public class SpreadsheetConstants {
 	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
 	public static final String ATTR_RESOURCE_ITEM_LIST = "spreadsheetList";
-	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteSpreadsheetList";
-	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 	public static final String ATTR_RESOURCE = "spreadsheet";
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";	

@@ -37,8 +37,6 @@ public interface IKalturaDAO extends IBaseDAO {
 
     void saveOrUpdate(Kaltura toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 
 }

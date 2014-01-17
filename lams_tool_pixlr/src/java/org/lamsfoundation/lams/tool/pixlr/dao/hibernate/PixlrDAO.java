@@ -30,7 +30,6 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
-import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -39,9 +38,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public class PixlrDAO extends BaseDAO implements IPixlrDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Pixlr pixlr where pixlr.toolContentId=?";
-
-    private static final String FIND_INSTRUCTION_FILE = "from " + PixlrAttachment.class.getName()
-	    + " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
 
     @SuppressWarnings("unchecked")
     public Pixlr getByContentId(Long toolContentId) {
@@ -56,23 +52,6 @@ public class PixlrDAO extends BaseDAO implements IPixlrDAO {
     public void saveOrUpdate(Pixlr pixlr) {
 	this.getHibernateTemplate().saveOrUpdate(pixlr);
 	this.getHibernateTemplate().flush();
-    }
-
-    @SuppressWarnings("unchecked")
-    public void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	if (toolContentId != null && uuid != null && versionId != null) {
-	    List list = getSession().createQuery(PixlrDAO.FIND_INSTRUCTION_FILE).setLong(0,
-		    toolContentId.longValue()).setLong(1, uuid.longValue()).setLong(2, versionId.longValue())
-		    .setString(3, type).list();
-	    if (list != null && list.size() > 0) {
-		PixlrAttachment file = (PixlrAttachment) list.get(0);
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(file);
-		templ.flush();
-	    }
-	}
-
     }
 
     public void releaseFromCache(Object o) {

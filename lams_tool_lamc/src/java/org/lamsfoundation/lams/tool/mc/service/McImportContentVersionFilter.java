@@ -36,6 +36,15 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 	// Adds displayAnswers LDEV-1156
 
 	this.addField(McContent.class, "displayAnswers", new Boolean(true));
-
+    }
+    
+    /**
+     * Import 20140101 version content to 20140102 version tool server.
+     */
+    public void up20140101To20140102() {
+	this.removeField(McContent.class, "runOffline");
+	this.removeField(McContent.class, "onlineInstructions");
+	this.removeField(McContent.class, "offlineInstructions");
+	this.removeField(McContent.class, "mcAttachments");
     }
 }

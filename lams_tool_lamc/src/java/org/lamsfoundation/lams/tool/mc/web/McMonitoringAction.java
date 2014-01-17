@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -148,15 +147,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to true
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-
-	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here **/
 
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 
@@ -330,13 +320,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-
-	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 	/* .. till here */
 
@@ -412,26 +395,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-
-	if (activeModule.equals(AUTHORING)) {
-	    List attachmentList = (List) sessionMap.get(ATTACHMENT_LIST_KEY);
-	    List deletedAttachmentList = (List) sessionMap.get(DELETED_ATTACHMENT_LIST_KEY);
-
-	    String onlineInstructions = (String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-	    String offlineInstructions = (String) sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
-	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-
-	    String strOnlineInstructions = request.getParameter("onlineInstructions");
-	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-
-	}
 
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
@@ -545,13 +508,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	} else {
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-
-	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
@@ -2576,13 +2532,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	} else {
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-
-	List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 	/* .. till here */

@@ -12,255 +12,177 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**
  * 
  * @author Dapeng.Ni
- *	@struts.form name="SbmtAuthoringForm"
+ * @struts.form name="SbmtAuthoringForm"
  */
 public class AuthoringForm extends ValidatorForm {
 
-	private Long toolContentID;
+    private Long toolContentID;
 
-	private String contentFolderID;
+    private String contentFolderID;
 
-	//control fields
-	private String sessionMapID;
+    // control fields
+    private String sessionMapID;
 
-	private String currentTab;
+    private String currentTab;
 
-	//basic input fields
-	private String title;
+    // basic input fields
+    private String title;
 
-	private String instructions;
+    private String instructions;
 
-	private String offlineInstruction;
+    private boolean lockOnFinished;
 
-	private String onlineInstruction;
+    // file and display fields
 
-	private boolean lockOnFinished;
+    private boolean limitUpload;
 
-	//file and display fields
-	private FormFile offlineFile;
+    private int limitUploadNumber;
 
-	private FormFile onlineFile;
+    private boolean reflectOnActivity;
 
-	private List onlineFileList;
+    private String reflectInstructions;
 
-	private List offlineFileList;
+    private boolean notifyLearnersOnMarkRelease;
 
-	private boolean limitUpload;
+    private boolean notifyTeachersOnFileSubmit;
 
-	private int limitUploadNumber;
+    @Override
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
+	lockOnFinished = false;
+	limitUpload = false;
+	reflectOnActivity = false;
 
-	private boolean reflectOnActivity;
+    }
 
-	private String reflectInstructions;
-
-	private boolean notifyLearnersOnMarkRelease;
-
-	private boolean notifyTeachersOnFileSubmit;
-
-	@Override
-	public void reset(ActionMapping mapping, HttpServletRequest request) {
-		lockOnFinished = false;
-		limitUpload = false;
-		reflectOnActivity = false;
-
+    public void initContentValue(SubmitFilesContent content) {
+	if (content == null) {
+	    return;
 	}
 
-	public void initContentValue(SubmitFilesContent content) {
-		if (content == null) {
-			return;
-		}
+	// copy attribute
+	toolContentID = content.getContentID();
+	title = content.getTitle();
+	instructions = content.getInstruction();
+	lockOnFinished = content.isLockOnFinished();
 
-		//copy attribute
-		toolContentID = content.getContentID();
-		title = content.getTitle();
-		instructions = content.getInstruction();
-		offlineInstruction = content.getOfflineInstruction();
-		onlineInstruction = content.getOnlineInstruction();
-		lockOnFinished = content.isLockOnFinished();
+	limitUpload = content.isLimitUpload();
+	limitUploadNumber = content.getLimitUploadNumber();
 
-		limitUpload = content.isLimitUpload();
-		limitUploadNumber = content.getLimitUploadNumber();
+	reflectOnActivity = content.isReflectOnActivity();
+	reflectInstructions = content.getReflectInstructions();
+	setNotifyLearnersOnMarkRelease(content.isNotifyLearnersOnMarkRelease());
+	setNotifyTeachersOnFileSubmit(content.isNotifyTeachersOnFileSubmit());
+    }
 
-		reflectOnActivity = content.isReflectOnActivity();
-		reflectInstructions = content.getReflectInstructions();
+    // **************************************************
+    // Get / Set method
+    // **************************************************
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-		onlineFileList = new ArrayList();
-		offlineFileList = new ArrayList();
-		Set fileSet = content.getInstructionFiles();
-		if (fileSet != null) {
-			Iterator iter = fileSet.iterator();
-			while (iter.hasNext()) {
-				InstructionFiles file = (InstructionFiles) iter.next();
-				if (StringUtils.equalsIgnoreCase(file.getType(), IToolContentHandler.TYPE_OFFLINE)) {
-					offlineFileList.add(file);
-				}
-				else {
-					onlineFileList.add(file);
-				}
-			}
-		}
-		setNotifyLearnersOnMarkRelease(content.isNotifyLearnersOnMarkRelease());
-		setNotifyTeachersOnFileSubmit(content.isNotifyTeachersOnFileSubmit());
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	//**************************************************
-	// Get / Set method
-	//**************************************************
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    public Long getToolContentID() {
+	return toolContentID;
+    }
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    public void setToolContentID(Long toolContentID) {
+	this.toolContentID = toolContentID;
+    }
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public List getOfflineFileList() {
-		return offlineFileList;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setOfflineFileList(List offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	public List getOnlineFileList() {
-		return onlineFileList;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setOnlineFileList(List onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+    public boolean isLimitUpload() {
+	return limitUpload;
+    }
 
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    public void setLimitUpload(boolean limitUpload) {
+	this.limitUpload = limitUpload;
+    }
 
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public int getLimitUploadNumber() {
+	return limitUploadNumber;
+    }
 
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public void setLimitUploadNumber(int limitUploadNumber) {
+	this.limitUploadNumber = limitUploadNumber;
+    }
 
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public boolean isNotifyLearnersOnMarkRelease() {
+	return notifyLearnersOnMarkRelease;
+    }
 
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
+    public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public boolean isNotifyTeachersOnFileSubmit() {
+	return notifyTeachersOnFileSubmit;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
-
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
-
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
-
-	public String getContentFolderID() {
-		return contentFolderID;
-	}
-
-	public void setContentFolderID(String contentFolderID) {
-		this.contentFolderID = contentFolderID;
-	}
-
-	public boolean isLimitUpload() {
-		return limitUpload;
-	}
-
-	public void setLimitUpload(boolean limitUpload) {
-		this.limitUpload = limitUpload;
-	}
-
-	public int getLimitUploadNumber() {
-		return limitUploadNumber;
-	}
-
-	public void setLimitUploadNumber(int limitUploadNumber) {
-		this.limitUploadNumber = limitUploadNumber;
-	}
-
-	public boolean isNotifyLearnersOnMarkRelease() {
-		return notifyLearnersOnMarkRelease;
-	}
-
-	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
-		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
-	}
-
-	public boolean isNotifyTeachersOnFileSubmit() {
-		return notifyTeachersOnFileSubmit;
-	}
-
-	public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
-		this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
-	}
+    public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
+	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
+    }
 }

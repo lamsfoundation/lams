@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -85,16 +84,6 @@ public interface IResourceService {
     List getAuthoredItems(Long resourceUid);
 
     /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadResourceFileException
-     */
-    ResourceAttachment uploadInstructionFile(FormFile file, String type) throws UploadResourceFileException;
-
-    /**
      * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.
      * 
      * @param item
@@ -138,14 +127,6 @@ public interface IResourceService {
      * @param Resource
      */
     void saveOrUpdateResource(Resource Resource);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteResourceAttachment(Long attachmentUid);
 
     /**
      * Delete resoruce item from database.

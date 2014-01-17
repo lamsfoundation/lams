@@ -307,8 +307,6 @@ public class AuthoringUtil implements QaAppConstants {
 	
 	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 
-	String richTextOfflineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
-	String richTextOnlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
 	String reflect = request.getParameter(QaAppConstants.REFLECT);
 
 	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
@@ -388,8 +386,6 @@ public class AuthoringUtil implements QaAppConstants {
 	/** make sure we are setting the userId from the User object above */
 
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    qaContent.setOnlineInstructions(richTextOnlineInstructions);
-	    qaContent.setOfflineInstructions(richTextOfflineInstructions);
 	    qaContent.setUsernameVisible(usernameVisibleBoolean);
 	    qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
 	    qaContent.setShowOtherAnswers(showOtherAnswersBoolean);

@@ -62,8 +62,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
@@ -71,10 +69,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     private boolean allowViewOthersImages;
 
     private String reflectInstructions;
-
-    private String onlineInstructions;
-
-    private String offlineInstructions;
 
     private boolean contentInUse;
 
@@ -88,12 +82,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     
     private Long imageHeight;
 
-    private Set<PixlrAttachment> pixlrAttachments;
-
     private Set<PixlrSession> pixlrSessions;
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
 
     // Constructors
 
@@ -103,23 +92,19 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /** full constructor */
     public Pixlr(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    Long toolContentId, String reflectInstructions, Set<PixlrAttachment> pixlrAttachments,
-	    Set<PixlrSession> pixlrSessions, String imageFileName, Long imageWidth, Long imageHeight, boolean allowViewOthersImages) {
+	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, String onlineInstructions,
+	    String offlineInstructions, boolean contentInUse, boolean defineLater, Long toolContentId,
+	    String reflectInstructions, Set<PixlrSession> pixlrSessions, String imageFileName, Long imageWidth,
+	    Long imageHeight, boolean allowViewOthersImages) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
 	this.title = title;
 	this.instructions = instructions;
-	this.runOffline = runOffline;
 	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
 	this.contentInUse = contentInUse;
 	this.defineLater = defineLater;
 	this.toolContentId = toolContentId;
-	this.pixlrAttachments = pixlrAttachments;
 	this.pixlrSessions = pixlrSessions;
 	this.imageFileName = imageFileName;
 	this.reflectInstructions = reflectInstructions;
@@ -208,19 +193,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -253,31 +225,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
         this.allowViewOthersImages = allowViewOthersImages;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -317,23 +264,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-    
-    
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="pixlr_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment"
-     * 
-     */
-
-    public Set<PixlrAttachment> getPixlrAttachments() {
-	return pixlrAttachments;
-    }
-
-    public void setPixlrAttachments(Set<PixlrAttachment> pixlrAttachments) {
-	this.pixlrAttachments = pixlrAttachments;
     }
 
     /**
@@ -393,9 +323,8 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Pixlr newInstance(Pixlr fromContent, Long toContentId, IToolContentHandler pixlrToolContentHandler) {
+    public static Pixlr newInstance(Pixlr fromContent, Long toContentId) {
 	Pixlr toContent = new Pixlr();
-	fromContent.toolContentHandler = pixlrToolContentHandler;
 	toContent = (Pixlr) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -410,17 +339,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	    pixlr = (Pixlr) super.clone();
 	    pixlr.setUid(null);
 
-	    if (pixlrAttachments != null) {
-		// create a copy of the attachments
-		Iterator<PixlrAttachment> iter = pixlrAttachments.iterator();
-		Set<PixlrAttachment> set = new HashSet<PixlrAttachment>();
-		while (iter.hasNext()) {
-		    PixlrAttachment originalFile = (PixlrAttachment) iter.next();
-		    PixlrAttachment newFile = (PixlrAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		pixlr.pixlrAttachments = set;
-	    }
 	    // create an empty set for the pixlrSession
 	    pixlr.pixlrSessions = new HashSet<PixlrSession>();
 
@@ -428,14 +346,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	    Pixlr.log.error("Error cloning " + Pixlr.class);
 	}
 	return pixlr;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

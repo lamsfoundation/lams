@@ -34,13 +34,8 @@ public class SbmtConstants {
     public static final String AUTHORING_DTO = "authoring";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "sbmtToolContentHandler";
-    // public static final String TOOL_SESSION_ID = "toolSessionID";
-    // public static final String TOOL_CONTENT_ID = "toolContentID";
+    
     public static final String USER_ID = "userID";
-
-    public static final String ATTACHMENT_LIST = "attachmentList";
-
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
 
@@ -79,8 +74,6 @@ public class SbmtConstants {
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 
     public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT = "notify_teachers_on_file_submit";
-	
-    public static final String ATTR_RUN_OFFLINE = "runOffline";
 	
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 	

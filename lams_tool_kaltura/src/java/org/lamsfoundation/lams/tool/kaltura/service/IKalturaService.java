@@ -30,7 +30,6 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
-import org.lamsfoundation.lams.tool.kaltura.model.KalturaAttachment;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
@@ -67,28 +66,6 @@ public interface IKalturaService {
      * @return
      */
     Kaltura getKalturaByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    KalturaAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    void deleteFromRepository(Long uuid, Long versionID) throws KalturaException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param kaltura

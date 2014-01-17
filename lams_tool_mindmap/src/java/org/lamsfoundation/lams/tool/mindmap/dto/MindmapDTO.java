@@ -30,9 +30,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
-import org.lamsfoundation.lams.tool.mindmap.model.MindmapAttachment;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 public class MindmapDTO {
@@ -42,14 +40,10 @@ public class MindmapDTO {
     public Long toolContentId;
     public String title;
     public String instructions;
-    public String onlineInstructions;
-    public String offlineInstructions;
     public boolean defineLater;
     public boolean contentInUse;
     public boolean lockOnFinish;
     public boolean multiUserMode;
-    public Set<MindmapAttachmentDTO> onlineInstructionsFiles;
-    public Set<MindmapAttachmentDTO> offlineInstructionsFiles;
     public Set<MindmapSessionDTO> sessionDTOs = new TreeSet<MindmapSessionDTO>();
     public Long currentTab;
     // reflection
@@ -64,30 +58,11 @@ public class MindmapDTO {
 	toolContentId = mindmap.getToolContentId();
 	title = mindmap.getTitle();
 	instructions = mindmap.getInstructions();
-	onlineInstructions = mindmap.getOnlineInstructions();
-	offlineInstructions = mindmap.getOfflineInstructions();
 	contentInUse = mindmap.isContentInUse();
 	lockOnFinish = mindmap.isLockOnFinished();
 	multiUserMode = mindmap.isMultiUserMode();
 	reflectOnActivity = mindmap.isReflectOnActivity();
 	reflectInstructions = mindmap.getReflectInstructions();
-
-	onlineInstructionsFiles = new TreeSet<MindmapAttachmentDTO>();
-	offlineInstructionsFiles = new TreeSet<MindmapAttachmentDTO>();
-
-	for (Iterator i = mindmap.getMindmapAttachments().iterator(); i.hasNext();) {
-	    MindmapAttachment att = (MindmapAttachment) i.next();
-	    if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-		MindmapAttachmentDTO attDTO = new MindmapAttachmentDTO(att);
-		offlineInstructionsFiles.add(attDTO);
-	    } else if (att.getFileType().equals(IToolContentHandler.TYPE_ONLINE)) {
-		MindmapAttachmentDTO attDTO = new MindmapAttachmentDTO(att);
-		onlineInstructionsFiles.add(attDTO);
-	    } else {
-		// something is wrong. Ignore file, log error
-		logger.error("File with uid " + att.getFileUuid() + " contains invalid fileType: " + att.getFileType());
-	    }
-	}
 
 	for (Iterator iter = mindmap.getMindmapSessions().iterator(); iter.hasNext();) {
 	    MindmapSession session = (MindmapSession) iter.next();
@@ -112,38 +87,6 @@ public class MindmapDTO {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public Set<MindmapAttachmentDTO> getOfflineInstructionsFiles() {
-	return offlineInstructionsFiles;
-    }
-
-    public void setOfflineInstructionsFiles(Set<MindmapAttachmentDTO> offlineInstructionsFiles) {
-	this.offlineInstructionsFiles = offlineInstructionsFiles;
-    }
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    public Set<MindmapAttachmentDTO> getOnlineInstructionsFiles() {
-	return onlineInstructionsFiles;
-    }
-
-    public void setOnlineInstructionsFiles(Set<MindmapAttachmentDTO> onlineInstructionsFiles) {
-	this.onlineInstructionsFiles = onlineInstructionsFiles;
     }
 
     public String getTitle() {

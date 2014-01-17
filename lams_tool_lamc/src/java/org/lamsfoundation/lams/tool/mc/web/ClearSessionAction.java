@@ -61,16 +61,10 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	    session.removeAttribute(McAction.USER_EXCEPTION_ANSWERS_DUPLICATE);
 	    session.removeAttribute(McAction.USER_EXCEPTION_ANSWER_EMPTY);
 	    session.removeAttribute(McAction.USER_EXCEPTION_NO_TOOL_SESSIONS);
-	    session.removeAttribute(McAction.LIST_UPLOADED_OFFLINE_FILENAMES);
-	    session.removeAttribute(McAction.LIST_UPLOADED_ONLINE_FILENAMES);
 	    session.removeAttribute(McAction.CREATION_DATE);
-	    session.removeAttribute(McAction.LIST_OFFLINEFILES_METADATA);
-	    session.removeAttribute(McAction.LIST_ONLINEFILES_METADATA);
 	    session.removeAttribute(McAction.QUESTIONS_WITHNO_OPTIONS);
 	    session.removeAttribute(McAction.RICHTEXT_CORRECT_FEEDBACK);
 	    // session.removeAttribute(McAction.RICHTEXT_END_LEARNING_MSG);
-	    session.removeAttribute(McAction.RICHTEXT_OFFLINEINSTRUCTIONS);
-	    session.removeAttribute(McAction.RICHTEXT_ONLINEINSTRUCTIONS);
 	    session.removeAttribute(McAction.RICHTEXT_INSTRUCTIONS);
 	    session.removeAttribute(McAction.MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
 	    session.removeAttribute(McAction.MAP_STARTUP_GENERAL_OPTIONS_QUEID);

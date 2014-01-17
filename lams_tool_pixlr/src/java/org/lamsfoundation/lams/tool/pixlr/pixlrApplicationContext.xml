@@ -26,7 +26,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.pixlr.service.PixlrService">
-				<property name="pixlrAttachmentDAO"><ref bean="pixlrAttachmentDAO"/></property>
 				<property name="pixlrSessionDAO"><ref bean="pixlrSessionDAO"/></property>
 				<property name="pixlrUserDAO"><ref bean="pixlrUserDAO"/></property>
 				<property name="pixlrConfigItemDAO"><ref bean="pixlrConfigItemDAO"/></property>
@@ -38,7 +37,6 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="pixlrOutputFactory"><ref bean="pixlrOutputFactory"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService" /></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -52,8 +50,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
@@ -74,10 +70,6 @@
 	</bean>
 	
 	<bean id="pixlrUserDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="pixlrAttachmentDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

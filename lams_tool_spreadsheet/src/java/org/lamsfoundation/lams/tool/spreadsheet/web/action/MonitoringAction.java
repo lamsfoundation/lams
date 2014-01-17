@@ -121,7 +121,6 @@ public class MonitoringAction extends Action {
 		request.setAttribute(SpreadsheetConstants.ATTR_STATISTIC_LIST, statisticList);
 
 		Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
-		spreadsheet.toDTO();
 
 		Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(contentId, false);
 

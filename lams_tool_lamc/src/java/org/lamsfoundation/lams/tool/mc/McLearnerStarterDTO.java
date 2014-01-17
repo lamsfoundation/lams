@@ -37,24 +37,7 @@ public class McLearnerStarterDTO implements Comparable {
 
     protected String activityTitle;
 
-    protected String toolActivityOffline;
-
     protected Date submissionDeadline;
-
-    /**
-     * @return Returns the toolActivityOffline.
-     */
-    public String getToolActivityOffline() {
-	return toolActivityOffline;
-    }
-
-    /**
-     * @param toolActivityOffline
-     *            The toolActivityOffline to set.
-     */
-    public void setToolActivityOffline(String toolActivityOffline) {
-	this.toolActivityOffline = toolActivityOffline;
-    }
 
     /**
      * @return Returns the activityTitle.

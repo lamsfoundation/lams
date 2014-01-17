@@ -52,11 +52,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String randomize;
     protected String displayAnswers;
 
-    protected String fileItem;
-    protected String uuid;
-
-    protected FormFile receivedFile;
-    protected String offlineFile;
     protected String defaultContentIdStr;
 
     protected String addContent;
@@ -64,8 +59,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String removeAllContent;
     protected String submitAllContent;
     protected String submitTabDone;
-    protected String submitOfflineFile;
-    protected String submitOnlineFile;
 
     // dispatch controls which method is called by the Lookup map */
     protected String dispatch;
@@ -85,15 +78,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String isRemoveContent;
     protected String toolContentId;
     protected String toolContentID;
-
-    /* instructions content */
-    protected String onlineInstructions;
-    protected String offlineInstructions;
-    protected FormFile theOfflineFile;
-    protected FormFile theOnlineFile;
-
-    protected String richTextOfflineInstructions;
-    protected String richTextOnlineInstructions;
 
     /* advanced content */
     protected String synchInMonitor;
@@ -134,15 +118,11 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.addOptionContent = null;
 	this.removeOptionContent = null;
 
-	this.fileItem = null;
-
 	this.addContent = null;
 	this.removeContent = null;
 	this.removeAllContent = null;
 	this.submitAllContent = null;
 	this.submitTabDone = null;
-	this.submitOfflineFile = null;
-	this.submitOnlineFile = null;
 
 	this.dispatch = null;
 
@@ -159,18 +139,11 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.addOptionContent = null;
 	this.removeOptionContent = null;
 
-	this.fileItem = null;
-	this.uuid = null;
-	this.receivedFile = null;
-
 	this.addContent = null;
 	this.removeContent = null;
 	this.removeAllContent = null;
 	this.submitAllContent = null;
 	this.submitTabDone = null;
-	this.submitOfflineFile = null;
-	this.submitOnlineFile = null;
-	this.offlineFile = null;
 
 	this.showMarks = null;
 	this.useSelectLeaderToolOuput = null;
@@ -192,12 +165,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.isRemoveContent = null;
 	this.toolContentId = null;
 	this.toolContentID = null;
-
-	this.onlineInstructions = null;
-	this.offlineInstructions = null;
-
-	this.richTextOfflineInstructions = null;
-	this.richTextOnlineInstructions = null;
 
 	this.endLearningMessage = null;
 	this.synchInMonitor = null;
@@ -363,37 +330,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setToolContentId(String toolContentId) {
 	this.toolContentId = toolContentId;
     }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *            The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *            The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
+    
     /**
      * @return Returns the syncInMonitor.
      */
@@ -635,96 +572,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the submitOfflineFile.
-     */
-    public String getSubmitOfflineFile() {
-	return submitOfflineFile;
-    }
-
-    /**
-     * @param submitOfflineFile
-     *            The submitOfflineFile to set.
-     */
-    public void setSubmitOfflineFile(String submitOfflineFile) {
-	this.submitOfflineFile = submitOfflineFile;
-    }
-
-    /**
-     * @param theOfflineFile
-     *            The theOfflineFile to set.
-     */
-    public void setTheOfflineFile(FormFile theOfflineFile) {
-	this.theOfflineFile = theOfflineFile;
-    }
-
-    /**
-     * @param theOnlineFile
-     *            The theOnlineFile to set.
-     */
-    public void setTheOnlineFile(FormFile theOnlineFile) {
-	this.theOnlineFile = theOnlineFile;
-    }
-
-    /**
-     * @return Returns the theOfflineFile.
-     */
-    public FormFile getTheOfflineFile() {
-	return theOfflineFile;
-    }
-
-    /**
-     * @return Returns the theOnlineFile.
-     */
-    public FormFile getTheOnlineFile() {
-	return theOnlineFile;
-    }
-
-    /**
-     * @return Returns the submitOnlineFile.
-     */
-    public String getSubmitOnlineFile() {
-	return submitOnlineFile;
-    }
-
-    /**
-     * @param submitOnlineFile
-     *            The submitOnlineFile to set.
-     */
-    public void setSubmitOnlineFile(String submitOnlineFile) {
-	this.submitOnlineFile = submitOnlineFile;
-    }
-
-    /**
-     * @return Returns the richTextOfflineInstructions.
-     */
-    public String getRichTextOfflineInstructions() {
-	return richTextOfflineInstructions;
-    }
-
-    /**
-     * @param richTextOfflineInstructions
-     *            The richTextOfflineInstructions to set.
-     */
-    public void setRichTextOfflineInstructions(String richTextOfflineInstructions) {
-	this.richTextOfflineInstructions = richTextOfflineInstructions;
-    }
-
-    /**
-     * @return Returns the richTextOnlineInstructions.
-     */
-    public String getRichTextOnlineInstructions() {
-	return richTextOnlineInstructions;
-    }
-
-    /**
-     * @param richTextOnlineInstructions
-     *            The richTextOnlineInstructions to set.
-     */
-    public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-	this.richTextOnlineInstructions = richTextOnlineInstructions;
-    }
-
-    /**
      * @return Returns the editDefaultQuestion.
      */
     public String getEditDefaultQuestion() {
@@ -874,35 +721,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.sln = sln;
     }
 
-    /**
-     * @return Returns the fileItem.
-     */
-    public String getFileItem() {
-	return fileItem;
-    }
-
-    /**
-     * @param fileItem
-     *            The fileItem to set.
-     */
-    public void setFileItem(String fileItem) {
-	this.fileItem = fileItem;
-    }
-
-    /**
-     * @return Returns the receivedFile.
-     */
-    public FormFile getReceivedFile() {
-	return receivedFile;
-    }
-
-    /**
-     * @param receivedFile
-     *            The receivedFile to set.
-     */
-    public void setReceivedFile(FormFile receivedFile) {
-	this.receivedFile = receivedFile;
-    }
 
     public String getDispatch() {
 	return dispatch;
@@ -910,36 +728,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 
     public void setDispatch(String buttonValue) {
 	this.dispatch = buttonValue;
-    }
-
-    /**
-     * @return Returns the offlineFile.
-     */
-    public String getOfflineFile() {
-	return offlineFile;
-    }
-
-    /**
-     * @param offlineFile
-     *            The offlineFile to set.
-     */
-    public void setOfflineFile(String offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    /**
-     * @return Returns the uuid.
-     */
-    public String getUuid() {
-	return uuid;
-    }
-
-    /**
-     * @param uuid
-     *            The uuid to set.
-     */
-    public void setUuid(String uuid) {
-	this.uuid = uuid;
     }
 
     /**

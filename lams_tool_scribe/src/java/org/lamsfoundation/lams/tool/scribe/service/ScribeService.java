@@ -64,13 +64,11 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.scribe.dao.IScribeAttachmentDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
@@ -104,17 +102,11 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     private IScribeUserDAO scribeUserDAO = null;
 
-    private IScribeAttachmentDAO scribeAttachmentDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
     private IToolContentHandler scribeToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
-
-    private IAuditService auditService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -205,26 +197,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Scribe toContent = Scribe.newInstance(fromContent, toContentId, scribeToolContentHandler);
+	Scribe toContent = Scribe.newInstance(fromContent, toContentId);
 	scribeDAO.saveOrUpdate(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Scribe scribe = scribeDAO.getByContentId(toolContentId);
-	if (scribe == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	scribe.setDefineLater(value);
-	scribeDAO.saveOrUpdate(scribe);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Scribe scribe = scribeDAO.getByContentId(toolContentId);
-	if (scribe == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	scribe.setRunOffline(value);
-	scribeDAO.saveOrUpdate(scribe);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -252,22 +226,15 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	scribe = Scribe.newInstance(scribe, toolContentId, null);
-	scribe.setToolContentHandler(null);
+	scribe = Scribe.newInstance(scribe, toolContentId);
 	scribe.setScribeSessions(null);
-	// wipe out the links from ScribeAttachments, ScribeHeading back to Scribe, or it will try to
+	// wipe out the links from ScribeHeading back to Scribe, or it will try to
 	// include the hibernate object version of the Scribe within the XML
-	Set<ScribeAttachment> atts = scribe.getScribeAttachments();
-	for (ScribeAttachment att : atts) {
-	    att.setScribe(null);
-	}
 	Set<ScribeHeading> headings = scribe.getScribeHeadings();
 	for (ScribeHeading heading : headings) {
 	    heading.setScribe(null);
 	}
 	try {
-	    exportContentService.registerFileClassForExport(ScribeAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, scribe, scribeToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -283,9 +250,9 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(ScribeAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(ScribeImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, scribeToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Scribe)) {
@@ -390,7 +357,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	Scribe defaultContent = getDefaultContent();
 	// create new scribe using the newContentID
 	Scribe newContent = new Scribe();
-	newContent = Scribe.newInstance(defaultContent, newContentID, scribeToolContentHandler);
+	newContent = Scribe.newInstance(defaultContent, newContentID);
 	scribeDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -423,38 +390,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return scribeUserDAO.getByUID(uid);
     }
 
-    public ScribeAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new ScribeException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	ScribeAttachment attachment = new ScribeAttachment();
-	attachment.setFileType(type);
-	attachment.setFileUuid(nodeKey.getUuid());
-	attachment.setFileVersionId(nodeKey.getVersion());
-	attachment.setFileName(file.getFileName());
-	attachment.setCreateDate(new Date());
-
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws ScribeException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new ScribeException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	scribeDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
     public void saveOrUpdateScribe(Scribe scribe) {
 	scribeDAO.saveOrUpdate(scribe);
     }
@@ -477,72 +412,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return toolService.isGroupedActivity(toolContentID);
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
-    }
-
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
-    /* ********** Private methods ********** */
-
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getScribeToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			type);
-	    } catch (InvalidParameterException e) {
-		throw new ScribeException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new ScribeException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new ScribeException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new ScribeException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws ScribeException {
-	ICredentials credentials = new SimpleCredentials(ScribeToolContentHandler.repositoryUser,
-		ScribeToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, ScribeToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ScribeException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ScribeException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ScribeException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
-    public IScribeAttachmentDAO getScribeAttachmentDAO() {
-	return scribeAttachmentDAO;
-    }
-
-    public void setScribeAttachmentDAO(IScribeAttachmentDAO attachmentDAO) {
-	scribeAttachmentDAO = attachmentDAO;
-    }
 
     public IScribeDAO getScribeDAO() {
 	return scribeDAO;
@@ -608,14 +479,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	this.coreNotebookService = coreNotebookService;
     }
 
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
@@ -643,11 +506,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribe.setCreateDate(now);
 	scribe.setDefineLater(Boolean.FALSE);
 	scribe.setInstructions(null);
-	scribe.setOfflineInstructions(null);
-	scribe.setOnlineInstructions(null);
 	scribe.setReflectInstructions(null);
 	scribe.setReflectOnActivity(Boolean.FALSE);
-	scribe.setRunOffline(Boolean.FALSE);
 	scribe.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	scribe.setToolContentId(toolContentId);
 	scribe.setUpdateDate(now);
@@ -681,7 +541,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	}
 
 	// leave as empty, no need to set them to anything.
-	// setScribeAttachments(Set scribeAttachments);
 	// setScribeSessions(Set scribeSessions);
 	scribeDAO.saveOrUpdate(scribe);
     }

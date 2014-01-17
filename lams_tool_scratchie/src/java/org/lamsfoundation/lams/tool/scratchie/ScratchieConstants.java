@@ -48,10 +48,6 @@ public class ScratchieConstants {
     
     public static final String PARAM_SESSION_ID = "sessionId";
 
-    public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
-
-    public static final String PARAM_FILE_UUID = "fileUuid";
-
     public static final String PARAM_ITEM_INDEX = "itemIndex";
 
     public static final String PARAM_ITEM_UID = "itemUid";
@@ -59,8 +55,6 @@ public class ScratchieConstants {
     public static final String PARAM_ANSWER_UID = "answerUid";
     
     public static final String PARAM_ANSWER_INDEX = "answerIndex";
-
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
     
     public static final String PARAM_NOT_A_NUMBER = "nan";
     
@@ -93,13 +87,9 @@ public class ScratchieConstants {
     
     public static final String ATTR_ANSWER_ORDER_ID_PREFIX = "answerOrderId";
 
-    public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
-
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
     
     public static final String ATTR_DELETED_ANSWER_LIST = "deleteAnswerList";
-
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_SCRATCHIE = "scratchie";
     
@@ -126,8 +116,6 @@ public class ScratchieConstants {
     public static final String ATTR_USER_SESSION_ID = "userSessionId";
 
     public static final String ATTR_RESOURCE_FORM = "scratchieForm";
-
-    public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
     public static final String ATTR_TITLE = "title";
     

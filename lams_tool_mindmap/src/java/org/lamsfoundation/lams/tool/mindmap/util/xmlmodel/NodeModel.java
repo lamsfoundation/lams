@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.mindmap.util.xmlmodel;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 
 /**
  * XML Model Class for Mindmap Node

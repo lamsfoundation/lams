@@ -35,9 +35,9 @@ import java.util.Set;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
@@ -156,30 +156,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 	
 	return ERROR;
-    }
-
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-	    if (mindmapService == null) {
-		mindmapService = MindmapServiceProxy.getMindmapService(getServletContext());
-	    }
-
-	    Mindmap content = null;
-	    if (toolContentID != null) {
-		content = mindmapService.getMindmapByContentId(toolContentID);
-	    } else {
-		MindmapSession session = mindmapService.getSessionBySessionId(toolSessionID);
-		if (session != null)
-		    content = session.getMindmap();
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
     }
     
     private void exportMindmapNodes(List mindmapNodeList, Mindmap mindmap, MindmapUser mindmapUser, String path)

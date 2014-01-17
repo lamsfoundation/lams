@@ -26,12 +26,9 @@ package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * DAO for accessing the Notebook objects - Hibernate specific code.
@@ -39,9 +36,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public class NotebookDAO extends BaseDAO implements INotebookDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Notebook notebook where notebook.toolContentId=?";
-
-    private static final String FIND_INSTRUCTION_FILE = "from " + NotebookAttachment.class.getName()
-	    + " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
 
     public Notebook getByContentId(Long toolContentId) {
 	List list = getHibernateTemplate().find(NotebookDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
@@ -55,22 +49,6 @@ public class NotebookDAO extends BaseDAO implements INotebookDAO {
     public void saveOrUpdate(Notebook notebook) {
 	this.getHibernateTemplate().saveOrUpdate(notebook);
 	this.getHibernateTemplate().flush();
-    }
-
-    public void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	if (toolContentId != null && uuid != null && versionId != null) {
-	    List list = getSession().createQuery(NotebookDAO.FIND_INSTRUCTION_FILE).setLong(0,
-		    toolContentId.longValue()).setLong(1, uuid.longValue()).setLong(2, versionId.longValue())
-		    .setString(3, type).list();
-	    if (list != null && list.size() > 0) {
-		NotebookAttachment file = (NotebookAttachment) list.get(0);
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(file);
-		templ.flush();
-	    }
-	}
-
     }
 
     public void releaseFromCache(Object o) {

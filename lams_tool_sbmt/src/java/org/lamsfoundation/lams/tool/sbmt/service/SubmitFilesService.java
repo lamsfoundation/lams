@@ -77,13 +77,11 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
-import org.lamsfoundation.lams.tool.sbmt.dao.IAttachmentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
@@ -120,8 +118,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     private ISubmissionDetailsDAO submissionDetailsDAO;
 
     private ISubmitUserDAO submitUserDAO;
-
-    private IAttachmentDAO attachmentDAO;
 
     private IToolContentHandler sbmtToolContentHandler;
 
@@ -199,46 +195,9 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	if (fromContent == null) {
 	    fromContent = getDefaultSubmit();
 	}
-	SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent, toContentId, sbmtToolContentHandler);
+	SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent, toContentId);
 
 	submitFilesContentDAO.saveOrUpdate(toContent);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
-     */
-    public void setAsRunOffline(Long toolContentId, boolean value) {
-	// pre-condition validation
-	if (toolContentId == null) {
-	    throw new SubmitFilesException("Fail to set tool content to run offline - "
-		    + " based on null toolContentId");
-	}
-	
-	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-	if (content == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	content.setRunOffline(value);
-	submitFilesContentDAO.saveOrUpdate(content);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
-     */
-    public void setAsDefineLater(Long toolContentId, boolean value) {
-	// pre-condition validation
-	if (toolContentId == null) {
-	    throw new SubmitFilesException("Fail to set tool content to define later - "
-		    + " based on null toolContentId");
-	}
-	
-	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-	if (content == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	content.setDefineLater(value);
-	submitFilesContentDAO.saveOrUpdate(content);
-
     }
 
     /**
@@ -275,7 +234,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * @throws ExportToolContentException
      */
     public void exportToolContent(Long toolContentId, String toPath) throws ToolException, DataMissingException {
-	exportContentService.registerFileClassForExport(InstructionFiles.class.getName(), "uuID", "versionID");
 	SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
 	if (toolContentObj == null) {
 	    toolContentObj = getDefaultSubmit();
@@ -285,8 +243,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
 
 	// set toolContentHandler as null to avoid duplicate file node in repository.
-	toolContentObj = SubmitFilesContent.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
+	toolContentObj = SubmitFilesContent.newInstance(toolContentObj, toolContentId);
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, sbmtToolContentHandler, toPath);
 	} catch (ExportToolContentException e) {
@@ -298,9 +255,9 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(InstructionFiles.class.getName(), "uuID", "versionID",
-		    "name", "type", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(SubmitFilesImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, sbmtToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof SubmitFilesContent)) {
@@ -436,10 +393,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    throw new SubmitFilesException("Exception occured while deleting files from" + " the repository "
 		    + e.getMessage());
 	}
-    }
-
-    public void deleteInstructionFile(Long uid) {
-	attachmentDAO.deleteById(InstructionFiles.class, uid);
     }
 
     /*
@@ -584,28 +537,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile )
-     */
-    public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType)
-	    throws SubmitFilesException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
-	}
-
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	InstructionFiles file = new InstructionFiles();
-	file.setType(fileType);
-	file.setUuID(nodeKey.getUuid());
-	file.setVersionID(nodeKey.getVersion());
-	file.setName(uploadFile.getFileName());
-
-	return file;
-    }
-
-    /**
-     * (non-Javadoc)
-     * 
      * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long )
      */
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
@@ -620,7 +551,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
 	}
 
-	NodeKey nodeKey = processFile(uploadFile, IToolContentHandler.TYPE_ONLINE);
+	NodeKey nodeKey = processFile(uploadFile);
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
@@ -652,13 +583,12 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) {
+    private NodeKey processFile(FormFile file) {
 	NodeKey node = null;
 	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
-		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
+		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
 		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
 			+ e.getMessage());
@@ -768,7 +698,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 		}
 
 		// Add the new file
-		NodeKey nodeKey = this.processFile(markFile, IToolContentHandler.TYPE_ONLINE);
+		NodeKey nodeKey = this.processFile(markFile);
 		// NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
 		// IToolContentHandler.TYPE_ONLINE);
 
@@ -940,7 +870,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
 	// save default content by given ID.
 	SubmitFilesContent content = new SubmitFilesContent();
-	content = SubmitFilesContent.newInstance(defaultContent, contentID, sbmtToolContentHandler);
+	content = SubmitFilesContent.newInstance(defaultContent, contentID);
 	content.setContentID(contentID);
 
 	return content;
@@ -985,9 +915,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	toolContentObj.setDefineLater(Boolean.FALSE);
 	toolContentObj.setInstruction(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setOfflineInstruction(null);
-	toolContentObj.setOnlineInstruction(null);
-	toolContentObj.setRunOffline(Boolean.FALSE);
 	toolContentObj.setUpdated(now);
 	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
 	toolContentObj.setLockOnFinished(Boolean.TRUE);
@@ -1172,10 +1099,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public void setAttachmentDAO(IAttachmentDAO attachmentDAO) {
-	this.attachmentDAO = attachmentDAO;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {

@@ -36,7 +36,5 @@ public interface IScribeDAO extends IBaseDAO{
 	Scribe getByContentId(Long toolContentId);
 
 	void saveOrUpdate(Scribe toContent);
-
-	void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
 	
 }

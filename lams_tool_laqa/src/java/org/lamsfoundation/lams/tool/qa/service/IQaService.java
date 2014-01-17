@@ -23,12 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.service;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -39,7 +37,6 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
@@ -188,10 +185,6 @@ public interface IQaService {
      */
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
-    void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
-
     boolean isStudentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException;
 
     /**
@@ -220,21 +213,6 @@ public interface IQaService {
     IToolVO getToolBySignature(String toolSignature) throws QaApplicationException;
 
     long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException;
-
-    ITicket getRepositoryLoginTicket() throws QaApplicationException;
-
-    void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
-
-    InputStream downloadFile(Long uuid, Long versionID) throws QaApplicationException;
-
-    void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent)
-	    throws QaApplicationException;
-
-    void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException;
-
-    void removeFile(Long submissionId) throws QaApplicationException;
-
-    List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException;
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 

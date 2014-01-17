@@ -23,487 +23,356 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.spreadsheet.model;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler;
 
 /**
  * Spreadsheet
+ * 
  * @author Andrey Balan
- *
- * @hibernate.class  table="tl_lasprd10_spreadsheet"
- *
+ * 
+ * @hibernate.class table="tl_lasprd10_spreadsheet"
+ * 
  */
 public class Spreadsheet implements Cloneable {
-	
-	private static final Logger log = Logger.getLogger(Spreadsheet.class);
-	
-	//key 
-	private Long uid;
-	//tool contentID
-	private Long contentId;
-	private String title;
-	private String instructions;
-	private String code;
-	
-	//advance
-	private boolean runOffline;
-	private boolean isLearnerAllowedToSave;
-	private boolean isMarkingEnabled;
-	
-	private boolean lockWhenFinished;
-	private boolean defineLater;
-	private boolean contentInUse;
-	//instructions
-	private String onlineInstructions;
-	private String offlineInstructions;
-	private Set attachments;
-	
-	//general infomation
-	private Date created;
-	private Date updated;
-	private SpreadsheetUser createdBy;
-	
-	private boolean reflectOnActivity;
-	private String reflectInstructions;
-	
-	//*************** NON Persist Fields ********************
-	private IToolContentHandler toolContentHandler;
 
-	private List<SpreadsheetAttachment> onlineFileList;
-	private List<SpreadsheetAttachment> offlineFileList;
-	/**
-	 * Default contruction method. 
-	 *
-	 */
-  	public Spreadsheet(){
-  		attachments = new HashSet();
-  	}
-//  **********************************************************
-  	//		Function method for Spreadsheet
-//  **********************************************************
-	public static Spreadsheet newInstance(Spreadsheet defaultContent, Long contentId, SpreadsheetToolContentHandler spreadsheetToolContentHandler) {
-		Spreadsheet toContent = new Spreadsheet();
-		defaultContent.toolContentHandler = spreadsheetToolContentHandler;
-		toContent = (Spreadsheet) defaultContent.clone();
-		toContent.setContentId(contentId);
-		
-		//reset user info as well
-		if(toContent.getCreatedBy() != null){
-			toContent.getCreatedBy().setSpreadsheet(toContent);
-		}
-		return toContent;
+    private static final Logger log = Logger.getLogger(Spreadsheet.class);
+
+    // key
+    private Long uid;
+    // tool contentID
+    private Long contentId;
+    private String title;
+    private String instructions;
+    private String code;
+
+    // advance
+    private boolean isLearnerAllowedToSave;
+    private boolean isMarkingEnabled;
+
+    private boolean lockWhenFinished;
+    private boolean defineLater;
+    private boolean contentInUse;
+
+    // general infomation
+    private Date created;
+    private Date updated;
+    private SpreadsheetUser createdBy;
+
+    private boolean reflectOnActivity;
+    private String reflectInstructions;
+
+    // **********************************************************
+    // Function method for Spreadsheet
+    // **********************************************************
+    public static Spreadsheet newInstance(Spreadsheet defaultContent, Long contentId) {
+	Spreadsheet toContent = new Spreadsheet();
+	toContent = (Spreadsheet) defaultContent.clone();
+	toContent.setContentId(contentId);
+
+	// reset user info as well
+	if (toContent.getCreatedBy() != null) {
+	    toContent.getCreatedBy().setSpreadsheet(toContent);
 	}
-  	public Object clone(){
-  		
-  		Spreadsheet spreadsheet = null;
-  		try{
-  			spreadsheet = (Spreadsheet) super.clone();
-  			spreadsheet.setUid(null);
-  			//clone attachment
-  			if(attachments != null){
-  				Iterator iter = attachments.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					SpreadsheetAttachment file = (SpreadsheetAttachment)iter.next(); 
-  					SpreadsheetAttachment newFile = (SpreadsheetAttachment) file.clone();
-  					//just clone old file without duplicate it in repository
-					set.add(newFile);
-  				}
-  				spreadsheet.attachments = set;
-  			}
-  			//clone ReourceUser as well
-  			if(this.createdBy != null){
-  				spreadsheet.setCreatedBy((SpreadsheetUser) this.createdBy.clone());
-  			}
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Spreadsheet.class + " failed");
-		}
-  		
-  		return spreadsheet;
-  	}
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof Spreadsheet))
-			return false;
+	return toContent;
+    }
 
-		final Spreadsheet genericEntity = (Spreadsheet) o;
+    public Object clone() {
 
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.title,genericEntity.title)
-      	.append(this.instructions,genericEntity.instructions)
-      	.append(this.code,genericEntity.code)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.isEquals();
+	Spreadsheet spreadsheet = null;
+	try {
+	    spreadsheet = (Spreadsheet) super.clone();
+	    spreadsheet.setUid(null);
+	    // clone ReourceUser as well
+	    if (this.createdBy != null) {
+		spreadsheet.setCreatedBy((SpreadsheetUser) this.createdBy.clone());
+	    }
+	} catch (CloneNotSupportedException e) {
+	    log.error("When clone " + Spreadsheet.class + " failed");
 	}
 
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(code).append(code)
-		.append(offlineInstructions).append(created)
-		.append(updated).append(createdBy)
-		.toHashCode();
-	}
-	
-	/**
-	 * Updates the modification data for this entity.
-	 */
-	public void updateModificationData() {
-	
-		long now = System.currentTimeMillis();
-		if (created == null) {
-			this.setCreated (new Date(now));
-		}
-		this.setUpdated(new Date(now));
-	}
+	return spreadsheet;
+    }
 
-	public void toDTO(){
-		onlineFileList = new ArrayList<SpreadsheetAttachment>();
-		offlineFileList = new ArrayList<SpreadsheetAttachment>();
-		Set<SpreadsheetAttachment> fileSet = this.getAttachments();
-		if(fileSet != null){
-			for(SpreadsheetAttachment file:fileSet){
-				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-					offlineFileList.add(file);
-				else
-					onlineFileList.add(file);
-			}
-		}
-	}
-	
-	//**********************************************************
-	// get/set methods
-	//**********************************************************
-	/**
-	 * Returns the object's creation date
-	 *
-	 * @return date
-	 * @hibernate.property column="create_date"
-	 */
-	public Date getCreated() {
-      return created;
-	}
-	/**
-	 * Sets the object's creation date
-	 *
-	 * @param created
-	 */
-	public void setCreated(Date created) {
-	    this.created = created;
-	}
+    public boolean equals(Object o) {
+	if (this == o)
+	    return true;
+	if (!(o instanceof Spreadsheet))
+	    return false;
 
-	/**
-	 * Returns the object's date of last update
-	 *
-	 * @return date updated
-	 * @hibernate.property column="update_date"
-	 */
-	public Date getUpdated() {
-        return updated;
+	final Spreadsheet genericEntity = (Spreadsheet) o;
+
+	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.title, genericEntity.title)
+		.append(this.instructions, genericEntity.instructions).append(this.code, genericEntity.code)
+		.append(this.created, genericEntity.created).append(this.updated, genericEntity.updated)
+		.append(this.createdBy, genericEntity.createdBy).isEquals();
+    }
+
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(code).append(code)
+		.append(created).append(updated).append(createdBy).toHashCode();
+    }
+
+    /**
+     * Updates the modification data for this entity.
+     */
+    public void updateModificationData() {
+
+	long now = System.currentTimeMillis();
+	if (created == null) {
+	    this.setCreated(new Date(now));
 	}
-	/**
-	 * Sets the object's date of last update
-	 *
-	 * @param updated
-	 */
-	public void setUpdated(Date updated) {
-        this.updated = updated;
-	}
+	this.setUpdated(new Date(now));
+    }
+
+    // **********************************************************
+    // get/set methods
+    // **********************************************************
+    /**
+     * Returns the object's creation date
+     * 
+     * @return date
+     * @hibernate.property column="create_date"
+     */
+    public Date getCreated() {
+	return created;
+    }
+
+    /**
+     * Sets the object's creation date
+     * 
+     * @param created
+     */
+    public void setCreated(Date created) {
+	this.created = created;
+    }
+
+    /**
+     * Returns the object's date of last update
+     * 
+     * @return date updated
+     * @hibernate.property column="update_date"
+     */
+    public Date getUpdated() {
+	return updated;
+    }
+
+    /**
+     * Sets the object's date of last update
+     * 
+     * @param updated
+     */
+    public void setUpdated(Date updated) {
+	this.updated = updated;
+    }
 
     /**
      * @return Returns the userid of the user who created the Share spreadsheet.
-     *
-     * @hibernate.many-to-one
-     *      cascade="save-update"
-     * 		column="create_by"
+     * 
+     * @hibernate.many-to-one cascade="save-update" column="create_by"
      */
     public SpreadsheetUser getCreatedBy() {
-        return createdBy;
+	return createdBy;
     }
+
     /**
-     * @param createdBy The userid of the user who created this Share spreadsheet.
+     * @param createdBy
+     *            The userid of the user who created this Share spreadsheet.
      */
     public void setCreatedBy(SpreadsheetUser createdBy) {
-        this.createdBy = createdBy;
+	this.createdBy = createdBy;
     }
 
     /**
      * @hibernate.id column="uid" generator-class="native"
      */
-	public Long getUid() {
-		return uid;
-	}
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public Long getUid() {
+	return uid;
+    }
 
-	/**
-	 * @return Returns the title.
-	 *
-	 * @hibernate.property
-	 * 		column="title"
-	 */
-	public String getTitle() {
-		return title;
-	}
-	/**
-	 * @param title The title to set.
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 * @return Returns the runOffline.
-	 *
-	 * @hibernate.property 
-	 * 		column="run_offline"
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
-	/**
-	 * @param runOffline The forceOffLine to set.
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		this.runOffline = forceOffline;
-	}
-	
-	/**
-	 * @return Returns whether learner is allowed to save spreadsheet.
-	 *
-	 * @hibernate.property column="is_learner_allowed_to_save"
-	 */
-	public boolean isLearnerAllowedToSave() {
-		return isLearnerAllowedToSave;
-	}
-	/**
-	 * @param isLearnerAllowedToSave boolean describing whether learner is allowed to save spreadsheet or not
-	 */
-	public void setLearnerAllowedToSave(boolean isLearnerAllowedToSave) {
-		this.isLearnerAllowedToSave = isLearnerAllowedToSave;
-	}
-	
-	/**
-	 * @return Returns whether the marking is enabled.
-	 *
-	 * @hibernate.property column="is_marking_enabled"
-	 */
-	public boolean isMarkingEnabled() {
-		return isMarkingEnabled;
-	}
-	/**
-	 * @param isMarkingEnabled boolean describing wwhether the marking is enabled
-	 */
-	public void setMarkingEnabled(boolean isMarkingEnabled) {
-		this.isMarkingEnabled = isMarkingEnabled;
-	}
+    /**
+     * @return Returns the title.
+     * 
+     * @hibernate.property column="title"
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    /**
+     * @param title
+     *            The title to set.
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    /**
+     * @return Returns whether learner is allowed to save spreadsheet.
+     * 
+     * @hibernate.property column="is_learner_allowed_to_save"
+     */
+    public boolean isLearnerAllowedToSave() {
+	return isLearnerAllowedToSave;
+    }
+
+    /**
+     * @param isLearnerAllowedToSave
+     *            boolean describing whether learner is allowed to save spreadsheet or not
+     */
+    public void setLearnerAllowedToSave(boolean isLearnerAllowedToSave) {
+	this.isLearnerAllowedToSave = isLearnerAllowedToSave;
+    }
+
+    /**
+     * @return Returns whether the marking is enabled.
+     * 
+     * @hibernate.property column="is_marking_enabled"
+     */
+    public boolean isMarkingEnabled() {
+	return isMarkingEnabled;
+    }
+
+    /**
+     * @param isMarkingEnabled
+     *            boolean describing wwhether the marking is enabled
+     */
+    public void setMarkingEnabled(boolean isMarkingEnabled) {
+	this.isMarkingEnabled = isMarkingEnabled;
+    }
 
     /**
      * @return Returns the lockWhenFinish.
-     *
-     * @hibernate.property
-     * 		column="lock_on_finished"
+     * 
+     * @hibernate.property column="lock_on_finished"
      */
     public boolean getLockWhenFinished() {
-        return lockWhenFinished;
+	return lockWhenFinished;
     }
+
     /**
-     * @param lockWhenFinished Set to true to lock the spreadsheet for finished users.
+     * @param lockWhenFinished
+     *            Set to true to lock the spreadsheet for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
-        this.lockWhenFinished = lockWhenFinished;
+	this.lockWhenFinished = lockWhenFinished;
     }
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="instructions"
-     *      type="text"
+     * 
+     * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
-        return instructions;
+	return instructions;
     }
+
     public void setInstructions(String instructions) {
-        this.instructions = instructions;
+	this.instructions = instructions;
     }
-    
+
     /**
      * @return Returns spreadsheet code.
-     *
-     * @hibernate.property
-     * 		column="code"
-     *      type="text"
+     * 
+     * @hibernate.property column="code" type="text"
      */
     public String getCode() {
-        return code;
+	return code;
     }
+
     public void setCode(String code) {
-    	this.code = code;
-//        this.code = javaScriptEscape(code);;
+	this.code = code;
+	// this.code = javaScriptEscape(code);;
     }
 
     /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="online_instructions"
-     *      type="text"
+     * @hibernate.property column="content_in_use"
+     * @return
      */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
+    public boolean isContentInUse() {
+	return contentInUse;
     }
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
+
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
     }
 
     /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="offline_instructions"
-     *      type="text"
+     * @hibernate.property column="define_later"
+     * @return
      */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
+    public boolean isDefineLater() {
+	return defineLater;
     }
 
-	/**
-     *
-     * @hibernate.set   lazy="true"
-     * 					cascade="all"
-     * 					inverse="false"
-     * 					order-by="create_date desc"
-     * @hibernate.collection-key column="spreadsheet_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetAttachment"
-     *
-     * @return a set of Attachments to this Message.
-     */
-	public Set getAttachments() {
-		return attachments;
-	}
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
     /**
-	 * @param attachments The attachments to set.
+     * @hibernate.property column="content_id" unique="true"
+     * @return
      */
-    public void setAttachments(Set attachments) {
-		this.attachments = attachments;
-	}
+    public Long getContentId() {
+	return contentId;
+    }
 
-	/**
-	 * @hibernate.property  column="content_in_use"
-	 * @return
-	 */
-	public boolean isContentInUse() {
-		return contentInUse;
-	}
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
-	
-	/**
-	 * @hibernate.property column="define_later"
-	 * @return
-	 */
-	public boolean isDefineLater() {
-		return defineLater;
-	}
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
-	
-	/**
-	 * @hibernate.property column="content_id" unique="true" 
-	 * @return
-	 */
-	public Long getContentId() {
-		return contentId;
-	}
-	public void setContentId(Long contentId) {
-		this.contentId = contentId;
-	}
+    public void setContentId(Long contentId) {
+	this.contentId = contentId;
+    }
 
-	public List<SpreadsheetAttachment> getOfflineFileList() {
-		return offlineFileList;
-	}
-	public void setOfflineFileList(List<SpreadsheetAttachment> offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-	
-	public List<SpreadsheetAttachment> getOnlineFileList() {
-		return onlineFileList;
-	}
-	public void setOnlineFileList(List<SpreadsheetAttachment> onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
-	
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
+    /**
+     * @hibernate.property column="reflect_instructions"
+     * @return
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	/**
-	 * @hibernate.property column="reflect_instructions"
-	 * @return
-	 */	
-	public String getReflectInstructions() {
-		return reflectInstructions;
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
+
+    /**
+     * @hibernate.property column="reflect_on_activity"
+     * @return
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    private static String javaScriptEscape(String input) {
+	StringBuffer filtered = new StringBuffer();
+
+	for (char c : input.toCharArray()) {
+	    switch (c) {
+	    case '\'':
+		filtered.append("\\'");
+		break;
+
+	    case '"':
+		filtered.append("\\\"");
+		break;
+
+	    case '\n':
+	    case '\r':
+		break;
+
+	    default:
+		filtered.append(c);
+	    }
 	}
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-	
-	/**
-	 * @hibernate.property column="reflect_on_activity"
-	 * @return
-	 */		
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
-	
-	private static String javaScriptEscape(String input) {
-		StringBuffer filtered = new StringBuffer();
-		
-		for ( char c : input.toCharArray() ) {
-			switch (c) {
-				case '\'':
-					filtered.append("\\'");
-				break;
-				
-				case '"':
-					filtered.append("\\\"");
-				break;
-					
-				case '\n': case '\r':					
-				break;
-				
-				default:
-					filtered.append(c);			
-			}
-		}		
-		return filtered.toString();
-	}
+	return filtered.toString();
+    }
 }

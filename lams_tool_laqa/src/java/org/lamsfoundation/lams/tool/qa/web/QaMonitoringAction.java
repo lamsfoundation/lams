@@ -95,7 +95,6 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -223,16 +222,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	/* ... till here */
 
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
@@ -329,16 +318,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	/* ... till here */
 
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
-
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
@@ -423,16 +402,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
 	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
@@ -542,16 +511,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	/* ... till here */
 
-	/* getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/* ...till here */
-
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
@@ -606,16 +565,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	/** getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/** ...till here * */
 
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
@@ -1360,16 +1309,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	generalMonitoringDTO.setEditResponse(new Boolean(setEditResponse).toString());
 
-	/* getting instructions screen content from here... */
-	generalMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
-	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-	/* ...till here * */
-
 	if (generalLearnerFlowDTO != null) {
 	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
 
@@ -1447,10 +1386,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
@@ -1842,9 +1777,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	prepareEditActivityScreenData(request, qaContent);
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	generalMonitoringDTO.setAttachmentList(attachmentList);
 
 	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
@@ -2022,13 +1954,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	
@@ -2227,13 +2152,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	
@@ -2382,13 +2300,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
@@ -2477,13 +2388,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
@@ -2601,15 +2505,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	
-
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
@@ -2753,13 +2648,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
@@ -2888,13 +2776,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
@@ -3025,13 +2906,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
-
-	qaGeneralMonitoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	
-	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
 	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());

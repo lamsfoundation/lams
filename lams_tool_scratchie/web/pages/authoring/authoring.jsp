@@ -30,21 +30,8 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);	    	
-        } 
-
-        function doUploadOnline() {
-        	var myForm = $("#authoringForm");
-        	myForm.attr("action", "<c:url value='/authoring/uploadOnlineFile.do'/>");
-        	myForm.submit();
-        }
-        function doUploadOffline() {
-        	var myForm = $("#authoringForm");
-        	myForm.attr("action", "<c:url value='/authoring/uploadOfflineFile.do'/>");
-        	myForm.submit();
         }
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-
  
 </lams:head>
 <body class="stripes" onLoad="init()">
@@ -56,7 +43,6 @@
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-			<lams:Tab id="3" key="label.authoring.heading.instructions" />
 		</lams:Tabs></div>
 		<!-- start tabs -->
 <div id="content">
@@ -81,10 +67,6 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 			<!-- end of content (Advanced) -->
-
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
 
 
 			<!-- Button Row -->

@@ -59,7 +59,6 @@ public class Resource implements Cloneable {
 	private String instructions;
 
 	//advance
-	private boolean runOffline;
 
 	private boolean runAuto;
 
@@ -77,13 +76,6 @@ public class Resource implements Cloneable {
 
 	private boolean notifyTeachersOnAssigmentSumbit;
 
-	//instructions
-	private String onlineInstructions;
-
-	private String offlineInstructions;
-
-	private Set attachments;
-
 	//general infomation
 	private Date created;
 
@@ -99,30 +91,22 @@ public class Resource implements Cloneable {
 	private String reflectInstructions;
 
 	//*************** NON Persist Fields ********************
-	private IToolContentHandler toolContentHandler;
 
 	private String miniViewNumberStr;
-
-	private List<ResourceAttachment> onlineFileList;
-
-	private List<ResourceAttachment> offlineFileList;
 
 	/**
 	 * Default contruction method. 
 	 *
 	 */
 	public Resource() {
-		attachments = new HashSet();
 		resourceItems = new HashSet();
 	}
 
 	//  **********************************************************
 	//		Function method for Resource
 	//  **********************************************************
-	public static Resource newInstance(Resource defaultContent, Long contentId,
-			ResourceToolContentHandler resourceToolContentHandler) {
+	public static Resource newInstance(Resource defaultContent, Long contentId) {
 		Resource toContent = new Resource();
-		defaultContent.toolContentHandler = resourceToolContentHandler;
 		toContent = (Resource) defaultContent.clone();
 		toContent.setContentId(contentId);
 
@@ -155,19 +139,6 @@ public class Resource implements Cloneable {
 				}
 				resource.resourceItems = set;
 			}
-			//clone attachment
-			if (attachments != null) {
-				Iterator iter = attachments.iterator();
-				Set set = new HashSet();
-				while (iter.hasNext()) {
-					ResourceAttachment file = (ResourceAttachment) iter.next();
-					ResourceAttachment newFile = (ResourceAttachment) file.clone();
-					//  				just clone old file without duplicate it in repository
-
-					set.add(newFile);
-				}
-				resource.attachments = set;
-			}
 			//clone ReourceUser as well
 			if (createdBy != null) {
 				resource.setCreatedBy((ResourceUser) createdBy.clone());
@@ -192,15 +163,13 @@ public class Resource implements Cloneable {
 		final Resource genericEntity = (Resource) o;
 
 		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
-				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
-				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
+				genericEntity.instructions).append(created, genericEntity.created).append(updated,
 				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
 	}
 
 	/**
@@ -213,22 +182,6 @@ public class Resource implements Cloneable {
 			this.setCreated(new Date(now));
 		}
 		this.setUpdated(new Date(now));
-	}
-
-	public void toDTO() {
-		onlineFileList = new ArrayList<ResourceAttachment>();
-		offlineFileList = new ArrayList<ResourceAttachment>();
-		Set<ResourceAttachment> fileSet = this.getAttachments();
-		if (fileSet != null) {
-			for (ResourceAttachment file : fileSet) {
-				if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-					offlineFileList.add(file);
-				}
-				else {
-					onlineFileList.add(file);
-				}
-			}
-		}
 	}
 
 	//**********************************************************
@@ -321,26 +274,6 @@ public class Resource implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the runOffline.
-	 *
-	 * @hibernate.property 
-	 * 		column="run_offline"
-	 *
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
-
-	/**
-	 * @param runOffline The forceOffLine to set.
-	 *
-	 *
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		runOffline = forceOffline;
-	}
-
-	/**
 	 * @return Returns the lockWhenFinish.
 	 *
 	 * @hibernate.property
@@ -371,59 +304,6 @@ public class Resource implements Cloneable {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="online_instructions"
-	 *      type="text"
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="offline_instructions"
-	 *      type="text"
-	 */
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	/**
-	 *
-	 * @hibernate.set   lazy="true"
-	 * 					cascade="all"
-	 * 					inverse="false"
-	 * 					order-by="create_date desc"
-	 * @hibernate.collection-key column="resource_uid"
-	 * @hibernate.collection-one-to-many
-	 * 			class="org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
-	 *
-	 * @return a set of Attachments to this Message.
-	 */
-	public Set getAttachments() {
-		return attachments;
-	}
-
-	/*
-	 * @param attachments The attachments to set.
-	 */
-	public void setAttachments(Set attachments) {
-		this.attachments = attachments;
 	}
 
 	/**
@@ -540,26 +420,6 @@ public class Resource implements Cloneable {
 
 	public void setMiniViewNumberStr(String minViewNumber) {
 		miniViewNumberStr = minViewNumber;
-	}
-
-	public List<ResourceAttachment> getOfflineFileList() {
-		return offlineFileList;
-	}
-
-	public void setOfflineFileList(List<ResourceAttachment> offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-
-	public List<ResourceAttachment> getOnlineFileList() {
-		return onlineFileList;
-	}
-
-	public void setOnlineFileList(List<ResourceAttachment> onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 
 	/**

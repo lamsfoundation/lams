@@ -61,18 +61,12 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	private String title;
 
 	private String instructions;
-
-	private boolean runOffline;
 	
 	private boolean lockOnFinished;
 
 	private boolean reflectOnActivity;
 	
 	private String reflectInstructions;
-
-	private String onlineInstructions;
-
-	private String offlineInstructions;
 
 	private boolean contentInUse;
 
@@ -82,43 +76,11 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 	private Long toolContentId;
 
-	private Set scribeAttachments;
-
 	private Set scribeSessions;
 	
 	private Set scribeHeadings;
 	
 	private boolean showAggregatedReports;
-	
-	//*********** NON Persisit fields
-	private IToolContentHandler toolContentHandler;
-
-	// Constructors
-
-	/** default constructor */
-	public Scribe() {
-	}
-
-	/** full constructor */
-	public Scribe(Date createDate, Date updateDate, Long createBy, String title,
-			String instructions, boolean runOffline,
-			String onlineInstructions, String offlineInstructions,
-			boolean contentInUse, boolean defineLater, Long toolContentId,
-			Set scribeAttachments, Set scribeSessions) {
-		this.createDate = createDate;
-		this.updateDate = updateDate;
-		this.createBy = createBy;
-		this.title = title;
-		this.instructions = instructions;
-		this.runOffline = runOffline;
-		this.onlineInstructions = onlineInstructions;
-		this.offlineInstructions = offlineInstructions;
-		this.contentInUse = contentInUse;
-		this.defineLater = defineLater;
-		this.toolContentId = toolContentId;
-		this.scribeAttachments = scribeAttachments;
-		this.scribeSessions = scribeSessions;
-	}
 
 	// Property accessors
 	/**
@@ -200,19 +162,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="run_offline" length="1"
-	 * 
-	 */
-
-	public boolean isRunOffline() {
-		return this.runOffline;
-	}
-
-	public void setRunOffline(boolean runOffline) {
-		this.runOffline = runOffline;
-	}
-
-	/**
 	 * @hibernate.property column="lock_on_finished" length="1"
 	 * 
 	 */
@@ -258,32 +207,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
 	}
-	
-	/**
-	 * @hibernate.property column="online_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOnlineInstructions() {
-		return this.onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @hibernate.property column="offline_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOfflineInstructions() {
-		return this.offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
 
 	/**
 	 * @hibernate.property column="content_in_use" length="1"
@@ -322,21 +245,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
 	public void setToolContentId(Long toolContentId) {
 		this.toolContentId = toolContentId;
-	}
-
-	/**
-	 * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
-	 * @hibernate.collection-key column="scribe_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scribe.model.ScribeAttachment"
-	 * 
-	 */
-
-	public Set getScribeAttachments() {
-		return this.scribeAttachments;
-	}
-
-	public void setScribeAttachments(Set scribeAttachments) {
-		this.scribeAttachments = scribeAttachments;
 	}
 
 	/**
@@ -421,10 +329,8 @@ public class Scribe implements java.io.Serializable, Cloneable {
 		return result;
 	}
 
-	public static Scribe newInstance(Scribe fromContent, Long toContentId,
-			IToolContentHandler scribeToolContentHandler) {
+	public static Scribe newInstance(Scribe fromContent, Long toContentId) {
 		Scribe toContent = new Scribe();
-		fromContent.toolContentHandler = scribeToolContentHandler;
 		toContent = (Scribe) fromContent.clone();
 		toContent.setToolContentId(toContentId);
 		toContent.setCreateDate(new Date());
@@ -437,20 +343,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 		try {
 			scribe = (Scribe) super.clone();
 			scribe.setUid(null);
-
-			if (scribeAttachments != null) {
-				// create a copy of the attachments
-				Iterator iter = scribeAttachments.iterator();
-				Set<ScribeAttachment> set = new HashSet<ScribeAttachment>();
-				while (iter.hasNext()) {
-					ScribeAttachment originalFile = (ScribeAttachment) iter.next();
-					ScribeAttachment newFile = (ScribeAttachment) originalFile
-							.clone();
-					newFile.setScribe(scribe);
-					set.add(newFile);
-				}
-				scribe.scribeAttachments = set;
-			}
 			
 			if (scribeHeadings != null) {
 				// create copy of headings
@@ -476,13 +368,5 @@ public class Scribe implements java.io.Serializable, Cloneable {
 			log.error("Error cloning " + Scribe.class);
 		}
 		return scribe;
-	}
-
-	public IToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 }

@@ -49,8 +49,6 @@ public class McGeneralAuthoringDTO implements Comparable {
 
     protected String activityTitle;
     protected String activityInstructions;
-    protected String onlineInstructions;
-    protected String offlineInstructions;
     protected String usernameVisible;
     protected String reflect;
     protected String synchInMonitor;
@@ -67,9 +65,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     protected String requestedModule;
     protected String isDefineLater;
     protected Map mapQuestionContent;
-
-    protected List attachmentList;
-    protected List deletedAttachmentList;
 
     protected String sbmtSuccess;
     protected String userExceptionQuestionsDuplicate;
@@ -101,14 +96,12 @@ public class McGeneralAuthoringDTO implements Comparable {
 		.append("targetMode: ", targetMode).append("defaultQuestionContent: ", defaultQuestionContent)
 		.append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ", activityTitle)
 		.append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
-		.append("onlineInstructions: ", onlineInstructions)
-		.append("offlineInstructions: ", offlineInstructions).append("usernameVisible: ", usernameVisible)
+		.append("usernameVisible: ", usernameVisible)
 		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
 		.append("editActivityEditMode: ", editActivityEditMode)
 		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule)
 		.append("isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("mapQuestionContent: ", mapQuestionContent).append("attachmentList: ", attachmentList)
-		.append("deletedAttachmentList: ", deletedAttachmentList).append("sbmtSuccess: ", sbmtSuccess)
+		.append("mapQuestionContent: ", mapQuestionContent).append("sbmtSuccess: ", sbmtSuccess)
 		.append("userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
     }
 
@@ -173,21 +166,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the deletedAttachmentList.
-     */
-    public List getDeletedAttachmentList() {
-	return deletedAttachmentList;
-    }
-
-    /**
-     * @param deletedAttachmentList
-     *            The deletedAttachmentList to set.
-     */
-    public void setDeletedAttachmentList(List deletedAttachmentList) {
-	this.deletedAttachmentList = deletedAttachmentList;
-    }
-
-    /**
      * @return Returns the mapQuestionContent.
      */
     public Map getMapQuestionContent() {
@@ -215,21 +193,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setIsDefineLater(String isDefineLater) {
 	this.isDefineLater = isDefineLater;
-    }
-
-    /**
-     * @return Returns the attachmentList.
-     */
-    public List getAttachmentList() {
-	return attachmentList;
-    }
-
-    /**
-     * @param attachmentList
-     *            The attachmentList to set.
-     */
-    public void setAttachmentList(List attachmentList) {
-	this.attachmentList = attachmentList;
     }
 
     /**
@@ -404,36 +367,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setActivityTitle(String activityTitle) {
 	this.activityTitle = activityTitle;
-    }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *            The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *            The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
     }
 
     /**

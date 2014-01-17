@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -36,11 +35,9 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.Summary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -86,16 +83,6 @@ public interface IScratchieService {
      */
     List getAuthoredItems(Long scratchieUid);
 
-    /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadScratchieFileException
-     */
-    ScratchieAttachment uploadInstructionFile(FormFile file, String type) throws UploadScratchieFileException;
-
     // ********** for user methods *************
     /**
      * Create a new user in database.
@@ -127,26 +114,12 @@ public interface IScratchieService {
      */
     void saveUser(ScratchieUser user);
 
-    // ********** Repository methods ***********************
-    /**
-     * Delete file from repository.
-     */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ScratchieApplicationException;
-
     /**
      * Save or update scratchie into database.
      * 
      * @param Scratchie
      */
     void saveOrUpdateScratchie(Scratchie scratchie);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteScratchieAttachment(Long attachmentUid);
 
     /**
      * Delete resoruce item from database.

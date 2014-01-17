@@ -25,7 +25,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.mindmap.service.MindmapService">
-				<property name="mindmapAttachmentDAO"><ref bean="mindmapAttachmentDAO"/></property>
 				<property name="mindmapSessionDAO"><ref bean="mindmapSessionDAO"/></property>
 				<property name="mindmapUserDAO"><ref bean="mindmapUserDAO"/></property>
 				<property name="mindmapNodeDAO"><ref bean="mindmapNodeDAO"/></property>
@@ -38,7 +37,6 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="mindmapOutputFactory"><ref bean="mindmapOutputFactory"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
 		   		<property name="mindmapMessageService"><ref bean="mindmapMessageService"/></property>
 			</bean>
 		</property>
@@ -53,8 +51,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
@@ -83,10 +79,6 @@
 	</bean>
 	
 	<bean id="mindmapRequestDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapRequestDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="mindmapAttachmentDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

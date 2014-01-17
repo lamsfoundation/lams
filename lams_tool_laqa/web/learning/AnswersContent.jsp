@@ -150,56 +150,46 @@
 				</p>
 			</logic:messagesPresent>
 
-			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}">
-				<h3>
-				   <fmt:message key="label.learning.forceOfflineMessage" />
-				</h3>
-			</c:if>
-
-
-			<c:if test="${generalLearnerFlowDTO.activityOffline == 'false'}">
 				<p>
 				  <c:out value="${generalLearnerFlowDTO.activityInstructions}"
 						escapeXml="false" />
 				</p>
-				<c:choose>
+				
+			<c:choose>
+				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
 
-					<c:when
-						test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
-
-						<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-							<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
-								<p><fmt:message key="label.feedback.seq" />
+					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
+						<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
+							<p><fmt:message key="label.feedback.seq" />
 									
-									<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-									
-									<fmt:message key="label.questions.simple" /></p>
-								
-							</c:if>
-						</c:if>
-
-						<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
-							<p>
-								<fmt:message key="label.questions.remaining" />
 								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-							</p>
+									
+								<fmt:message key="label.questions.simple" /></p>
+								
 						</c:if>
+					</c:if>
+					
+					<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
+						<p>
+							<fmt:message key="label.questions.remaining" />
+							<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+						</p>
+					</c:if>
 
-						<jsp:include page="/learning/SequentialAnswersContent.jsp" />
-					</c:when>
+					<jsp:include page="/learning/SequentialAnswersContent.jsp" />
+				</c:when>
 
-					<c:otherwise>
+				<c:otherwise>
 
-						<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-							<fmt:message key="label.feedback.combined" /> &nbsp <c:out
-								value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-							<fmt:message key="label.questions.simple" />
-						</c:if>						
+					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
+						<fmt:message key="label.feedback.combined" /> &nbsp <c:out
+							value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+						<fmt:message key="label.questions.simple" />
+					</c:if>						
 
-						<jsp:include page="/learning/CombinedAnswersContent.jsp" />
-					</c:otherwise>
-				</c:choose>
-			</c:if>
+					<jsp:include page="/learning/CombinedAnswersContent.jsp" />
+				</c:otherwise>
+			</c:choose>
 
 		</html:form>
 	</div>

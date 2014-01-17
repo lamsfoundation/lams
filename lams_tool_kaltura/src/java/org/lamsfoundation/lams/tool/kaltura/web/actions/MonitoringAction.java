@@ -82,7 +82,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	Kaltura kaltura = kalturaService.getKalturaByContentId(toolContentID);
-	kaltura.toDTO();
 	boolean isGroupedActivity = kalturaService.isGroupedActivity(toolContentID);
 	request.setAttribute(KalturaConstants.ATTR_KALTURA, kaltura);
 	request.setAttribute("contentFolderID", contentFolderID);

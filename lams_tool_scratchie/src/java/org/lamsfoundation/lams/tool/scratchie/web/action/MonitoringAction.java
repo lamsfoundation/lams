@@ -108,7 +108,6 @@ public class MonitoringAction extends Action {
 	List<GroupSummary> summaryList = service.getMonitoringSummary(contentId, true);
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
-	scratchie.toDTO();
 	Set<ScratchieUser> learners = service.getAllLeaders(contentId);
 	
 	//set SubmissionDeadline, if any

@@ -35,7 +35,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
@@ -46,12 +45,10 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
  */
 
 /**
- * QaContent Value Object The value object that maps to our model database
- * table: tl_laqa11_content The relevant hibernate mapping resides in:
- * QaContent.hbm.xml
+ * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
+ * hibernate mapping resides in: QaContent.hbm.xml
  * 
- * Holds content representation for the tool. Default content is made available
- * to the tool by the database.
+ * Holds content representation for the tool. Default content is made available to the tool by the database.
  */
 public class QaContent implements Serializable {
 
@@ -77,12 +74,6 @@ public class QaContent implements Serializable {
     private String monitoringReportTitle;
 
     /** nullable persistent field */
-    private String offlineInstructions;
-
-    /** nullable persistent field */
-    private String onlineInstructions;
-
-    /** nullable persistent field */
     private long createdBy;
 
     /** nullable persistent field */
@@ -93,21 +84,20 @@ public class QaContent implements Serializable {
     private String reflectionSubject;
 
     /** nullable persistent field */
-    private boolean runOffline;
 
     private boolean questionsSequenced;
 
     private boolean lockWhenFinished;
 
     private boolean showOtherAnswers;
-    
+
     private boolean allowRichEditor;
     
     private boolean useSelectLeaderToolOuput;
 
     /** nullable persistent field */
     private boolean usernameVisible;
-    
+
     /** nullable persistent field */
     private boolean allowRateAnswers;
 
@@ -122,7 +112,7 @@ public class QaContent implements Serializable {
 
     /** nullable persistent field */
     private Date updateDate;
-    
+
     private Date submissionDeadline;
 
     /** persistent field */
@@ -132,8 +122,6 @@ public class QaContent implements Serializable {
     private Set qaSessions;
 
     /** persistent field */
-    private Set qaUploadedFiles;
-    /** persistent field */
     private Set<QaCondition> conditions = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 
     public QaContent() {
@@ -141,22 +129,18 @@ public class QaContent implements Serializable {
 
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
-	    String monitoringReportTitle, String offlineInstructions, String onlineInstructions, long createdBy,
-	    boolean defineLater, boolean runOffline, boolean questionsSequenced, boolean usernameVisible,
+	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
 	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked,
 	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set qaQueContents, Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
+	    Set qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
+	    boolean useSelectLeaderToolOuput) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.reportTitle = reportTitle;
 	this.monitoringReportTitle = monitoringReportTitle;
-	this.offlineInstructions = offlineInstructions;
-	this.onlineInstructions = onlineInstructions;
 	this.createdBy = createdBy;
-	this.defineLater = defineLater;
-	this.runOffline = runOffline;
 	this.questionsSequenced = questionsSequenced;
 	this.usernameVisible = usernameVisible;
 	this.allowRateAnswers = allowRateAnswers;
@@ -170,36 +154,32 @@ public class QaContent implements Serializable {
 	this.updateDate = updateDate;
 	this.qaQueContents = qaQueContents;
 	this.qaSessions = qaSessions;
-	this.qaUploadedFiles = qaUploadedFiles;
 	this.conditions = conditions;
 	this.allowRichEditor = allowRichEditor;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**
-     * Copy Construtor to create a new qa content instance. Note that we don't
-     * copy the qa session data here because the qa session will be created
-     * after we copied tool content.
+     * Copy Construtor to create a new qa content instance. Note that we don't copy the qa session data here because the
+     * qa session will be created after we copied tool content.
      * 
      * @param qa
-     *                the original qa content.
+     *            the original qa content.
      * @param newContentId
-     *                the new qa content id.
+     *            the new qa content id.
      * @return the new qa content object.
      */
-    public static QaContent newInstance(IToolContentHandler toolContentHandler, QaContent qa, Long newContentId)
-	    throws ItemNotFoundException, RepositoryCheckedException {
+    public static QaContent newInstance(QaContent qa, Long newContentId) throws ItemNotFoundException,
+	    RepositoryCheckedException {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
-		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getOfflineInstructions(),
-		qa.getOnlineInstructions(), qa.getCreatedBy(), qa.isDefineLater(), qa.isRunOffline(),
-		qa.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(),
-		qa.isLockWhenFinished(), qa.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(),
-		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
-		new TreeSet(), new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
+		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
+		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(), qa.isLockWhenFinished(),
+		qa.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
+		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
+			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
-	newContent.setQaUploadedFiles(qa.deepCopyQaAttachments(toolContentHandler, newContent));
 	newContent.setConditions(qa.deepCopyConditions(newContent));
 	return newContent;
     }
@@ -211,20 +191,6 @@ public class QaContent implements Serializable {
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
 	}
 	return newQaQueContent;
-    }
-
-    public Set deepCopyQaAttachments(IToolContentHandler toolContentHandler, QaContent newQaContent)
-	    throws ItemNotFoundException, RepositoryCheckedException {
-	Set attachments = new TreeSet();
-	for (Iterator i = this.getQaUploadedFiles().iterator(); i.hasNext();) {
-	    QaUploadedFile qaUploadedFile = (QaUploadedFile) i.next();
-	    if (qaUploadedFile.getQaContent() != null) {
-		QaUploadedFile newQaUploadedFile = QaUploadedFile.newInstance(toolContentHandler, qaUploadedFile,
-			newQaContent);
-		attachments.add(newQaUploadedFile);
-	    }
-	}
-	return attachments;
     }
 
     public Set<QaCondition> deepCopyConditions(QaContent newQaContent) {
@@ -274,7 +240,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param qaContentId
-     *                The qaContentId to set.
+     *            The qaContentId to set.
      */
     public void setQaContentId(Long qaContentId) {
 	this.qaContentId = qaContentId;
@@ -289,7 +255,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -298,12 +264,10 @@ public class QaContent implements Serializable {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("qaContentId:", getQaContentId()).append("qa title:", getTitle())
-		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy()).append(
-			"username_visible:", isUsernameVisible()).append(
-				"allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater()).append(
-			"offline_instructions:", getOfflineInstructions()).append("online_instructions:",
-			getOnlineInstructions()).append("report_title: ", getReportTitle()).append(
-			"reflection subject: ", getReflectionSubject())
+		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy())
+		.append("username_visible:", isUsernameVisible())
+		.append("allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater())
+		.append("report_title: ", getReportTitle()).append("reflection subject: ", getReflectionSubject())
 		.append("synch_in_monitor: ", isSynchInMonitor()).toString();
     }
 
@@ -330,7 +294,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param createdBy
-     *                The createdBy to set.
+     *            The createdBy to set.
      */
     public void setCreatedBy(long createdBy) {
 	this.createdBy = createdBy;
@@ -345,7 +309,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param defineLater
-     *                The defineLater to set.
+     *            The defineLater to set.
      */
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
@@ -360,40 +324,10 @@ public class QaContent implements Serializable {
 
     /**
      * @param instructions
-     *                The instructions to set.
+     *            The instructions to set.
      */
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the offlineInstructions.
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    /**
-     * @param offlineInstructions
-     *                The offlineInstructions to set.
-     */
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions.
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    /**
-     * @param onlineInstructions
-     *                The onlineInstructions to set.
-     */
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
     }
 
     /**
@@ -405,7 +339,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param reportTitle
-     *                The reportTitle to set.
+     *            The reportTitle to set.
      */
     public void setReportTitle(String reportTitle) {
 	this.reportTitle = reportTitle;
@@ -420,7 +354,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param synchInMonitor
-     *                The synchInMonitor to set.
+     *            The synchInMonitor to set.
      */
     public void setSynchInMonitor(boolean synchInMonitor) {
 	this.synchInMonitor = synchInMonitor;
@@ -435,7 +369,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param updateDate
-     *                The updateDate to set.
+     *            The updateDate to set.
      */
     public void setUpdateDate(Date updateDate) {
 	this.updateDate = updateDate;
@@ -445,17 +379,17 @@ public class QaContent implements Serializable {
      * @return Returns the submissionDeadline.
      */
     public Date getSubmissionDeadline() {
-    	return submissionDeadline;
+	return submissionDeadline;
     }
-    
+
     /**
      * @param submissionDeadline
-     * The submissionDeadline to set.
+     *            The submissionDeadline to set.
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
-    	this.submissionDeadline = submissionDeadline;
+	this.submissionDeadline = submissionDeadline;
     }
-    
+
     /**
      * @return Returns the usernameVisible.
      */
@@ -465,12 +399,12 @@ public class QaContent implements Serializable {
 
     /**
      * @param usernameVisible
-     *                The usernameVisible to set.
+     *            The usernameVisible to set.
      */
     public void setUsernameVisible(boolean usernameVisible) {
 	this.usernameVisible = usernameVisible;
     }
-    
+
     /**
      * @return Returns the allowRateAnswers.
      */
@@ -480,7 +414,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param allowRateAnswers
-     *                The allowRateAnswers to set.
+     *            The allowRateAnswers to set.
      */
     public void setAllowRateAnswers(boolean allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
@@ -495,25 +429,10 @@ public class QaContent implements Serializable {
 
     /**
      * @param questionsSequenced
-     *                The questionsSequenced to set.
+     *            The questionsSequenced to set.
      */
     public void setQuestionsSequenced(boolean questionsSequenced) {
 	this.questionsSequenced = questionsSequenced;
-    }
-
-    /**
-     * @return Returns the runOffline.
-     */
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    /**
-     * @param runOffline
-     *                The runOffline to set.
-     */
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
     }
 
     /**
@@ -525,7 +444,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param monitoringReportTitle
-     *                The monitoringReportTitle to set.
+     *            The monitoringReportTitle to set.
      */
     public void setMonitoringReportTitle(String monitoringReportTitle) {
 	this.monitoringReportTitle = monitoringReportTitle;
@@ -540,28 +459,10 @@ public class QaContent implements Serializable {
 
     /**
      * @param contentLocked
-     *                The contentLocked to set.
+     *            The contentLocked to set.
      */
     public void setContentLocked(boolean contentLocked) {
 	this.contentLocked = contentLocked;
-    }
-
-    /**
-     * @return Returns the qaUploadedFiles.
-     */
-    public Set getQaUploadedFiles() {
-	if (qaUploadedFiles == null) {
-	    qaUploadedFiles = new TreeSet();
-	}
-	return qaUploadedFiles;
-    }
-
-    /**
-     * @param qaUploadedFiles
-     *                The qaUploadedFiles to set.
-     */
-    public void setQaUploadedFiles(Set qaUploadedFiles) {
-	this.qaUploadedFiles = qaUploadedFiles;
     }
 
     /**
@@ -573,7 +474,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param uid
-     *                The uid to set.
+     *            The uid to set.
      */
     public void setUid(Long uid) {
 	this.uid = uid;
@@ -588,7 +489,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param content
-     *                The content to set.
+     *            The content to set.
      */
     public void setContent(String content) {
 	this.content = content;
@@ -603,7 +504,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param creationDate
-     *                The creationDate to set.
+     *            The creationDate to set.
      */
     public void setCreationDate(Date creationDate) {
 	this.creationDate = creationDate;
@@ -618,7 +519,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param reflect
-     *                The reflect to set.
+     *            The reflect to set.
      */
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
@@ -633,7 +534,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
@@ -648,19 +549,18 @@ public class QaContent implements Serializable {
 
     /**
      * @param lockWhenFinished
-     *                The lockWhenFinished to set.
+     *            The lockWhenFinished to set.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
-    
+
     public boolean isAllowRichEditor() {
-        return allowRichEditor;
+	return allowRichEditor;
     }
 
     public void setAllowRichEditor(boolean allowRichEditor) {
-        this.allowRichEditor = allowRichEditor;
+	this.allowRichEditor = allowRichEditor;
     }
     
     public boolean isUseSelectLeaderToolOuput() {
@@ -680,7 +580,7 @@ public class QaContent implements Serializable {
 
     /**
      * @param showOtherAnswers
-     *                The showOtherAnswers to set.
+     *            The showOtherAnswers to set.
      */
     public void setShowOtherAnswers(boolean showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;

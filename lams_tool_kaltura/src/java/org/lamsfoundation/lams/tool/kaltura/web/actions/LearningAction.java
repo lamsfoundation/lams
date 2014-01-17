@@ -81,7 +81,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @struts.action-forward name="success" path="tiles:/learning/main"
  * @struts:action-forward name ="viewitem" path="/learning.do?dispatch=viewItem" redirect="true"
  * @struts.action-forward name="commentlist" path="tiles:/learning/commentlist"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
+ * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="finish" path="tiles:/learning/finish"
@@ -147,11 +147,6 @@ public class LearningAction extends LamsDispatchAction {
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet()
 		.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
-	// check runOffline
-	if (kaltura.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 
 	// reflection information
 	String entryText = new String();
@@ -181,9 +176,9 @@ public class LearningAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether deadline has passed, and if so forward to "runOffline"
+	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 	

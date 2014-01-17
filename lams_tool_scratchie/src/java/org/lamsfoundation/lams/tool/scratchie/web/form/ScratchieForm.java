@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 
 /**
@@ -48,8 +47,6 @@ public class ScratchieForm extends ActionForm {
 
     // Forum fields
     private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
 
     private Scratchie scratchie;
 
@@ -73,7 +70,6 @@ public class ScratchieForm extends ActionForm {
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
 	    scratchie.setDefineLater(false);
-	    scratchie.setRunOffline(false);
 	    scratchie.setReflectOnActivity(false);
 	    scratchie.setExtraPoint(false);
 	}
@@ -101,22 +97,6 @@ public class ScratchieForm extends ActionForm {
 
     public void setCurrentTab(int currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public FormFile getOfflineFile() {
-	return offlineFile;
-    }
-
-    public void setOfflineFile(FormFile offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    public FormFile getOnlineFile() {
-	return onlineFile;
-    }
-
-    public void setOnlineFile(FormFile onlineFile) {
-	this.onlineFile = onlineFile;
     }
 
     public Scratchie getScratchie() {

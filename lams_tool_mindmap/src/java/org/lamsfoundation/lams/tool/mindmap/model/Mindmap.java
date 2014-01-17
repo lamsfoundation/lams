@@ -26,12 +26,11 @@ package org.lamsfoundation.lams.tool.mindmap.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler; //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
+//import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
  * @hibernate.class table="tl_lamind10_mindmap"
@@ -49,23 +48,16 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private Long createBy;
     private String title;
     private String instructions;
-    private boolean runOffline;
     private boolean lockOnFinished;
     private boolean multiUserMode;
-    private String onlineInstructions;
-    private String offlineInstructions;
     private boolean contentInUse;
     private boolean defineLater;
     private Long toolContentId;
-    private String mindmapExportContent; 
-    private Set mindmapAttachments;
+    private String mindmapExportContent;
     private Set mindmapSessions;
 
     private boolean reflectOnActivity;
     private String reflectInstructions;
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
 
     // Constructors
 
@@ -75,22 +67,17 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /** full constructor */
     public Mindmap(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    Long toolContentId, Set mindmapAttachments, Set mindmapSessions) {
+	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse,
+	    boolean defineLater, Long toolContentId, Set mindmapSessions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
 	this.title = title;
 	this.instructions = instructions;
-	this.runOffline = runOffline;
 	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
 	this.contentInUse = contentInUse;
 	this.defineLater = defineLater;
 	this.toolContentId = toolContentId;
-	this.mindmapAttachments = mindmapAttachments;
 	this.mindmapSessions = mindmapSessions;
     }
 
@@ -187,18 +174,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -220,30 +195,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     public void setMultiUserMode(boolean multiUserMode) {
 	this.multiUserMode = multiUserMode;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -315,20 +266,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="mindmap_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mindmap.model.MindmapAttachment"
-     * 
-     */
-    public Set getMindmapAttachments() {
-	return mindmapAttachments;
-    }
-
-    public void setMindmapAttachments(Set mindmapAttachments) {
-	this.mindmapAttachments = mindmapAttachments;
-    }
-
-    /**
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="mindmap_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mindmap.model.MindmapSession"
@@ -384,10 +321,8 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Mindmap newInstance(Mindmap fromContent, Long toContentId,
-	    IToolContentHandler mindmapToolContentHandler) {
+    public static Mindmap newInstance(Mindmap fromContent, Long toContentId) {
 	Mindmap toContent = new Mindmap();
-	fromContent.toolContentHandler = mindmapToolContentHandler;
 	toContent = (Mindmap) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -402,17 +337,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	    mindmap = (Mindmap) super.clone();
 	    mindmap.setUid(null);
 
-	    if (mindmapAttachments != null) {
-		// create a copy of the attachments
-		Iterator iter = mindmapAttachments.iterator();
-		Set<MindmapAttachment> set = new HashSet<MindmapAttachment>();
-		while (iter.hasNext()) {
-		    MindmapAttachment originalFile = (MindmapAttachment) iter.next();
-		    MindmapAttachment newFile = (MindmapAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		mindmap.mindmapAttachments = set;
-	    }
 	    // create an empty set for the mindmapSession
 	    mindmap.mindmapSessions = new HashSet();
 
@@ -420,13 +344,5 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	    Mindmap.log.error("Error cloning " + Mindmap.class);
 	}
 	return mindmap;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 }

@@ -41,11 +41,6 @@
 	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-
-
-	<bean id="mcUploadedFileDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUploadedFileDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
 	
 	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.tool.mc.util.McToolContentHandler">
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -74,10 +69,8 @@
 					<property name="mcUserDAO"><ref bean="mcUserDAO"/></property>
 					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
 					<property name="mcOptionsContentDAO"><ref bean="mcOptionsContentDAO"/></property>								
-					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>													
-			 		<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>
+					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>	
 					<property name="toolService"><ref bean="lamsToolService"/></property>
-			 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
 					<property name="auditService"><ref bean="auditService"/></property>					

@@ -37,8 +37,6 @@ public interface INotebookDAO extends IBaseDAO {
 
     void saveOrUpdate(Notebook toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 
 }

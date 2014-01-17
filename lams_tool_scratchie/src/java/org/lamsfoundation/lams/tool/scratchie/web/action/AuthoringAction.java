@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,9 +52,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
@@ -63,20 +60,16 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
-import org.lamsfoundation.lams.tool.scratchie.service.UploadScratchieFileException;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieItemForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -124,18 +117,6 @@ public class AuthoringAction extends Action {
 
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
 	}
 	// ----------------------- Scratchie item functions ---------
 	if (param.equals("addItem")) {
@@ -230,11 +211,6 @@ public class AuthoringAction extends Action {
 	    }
 
 	    scratchieForm.setScratchie(scratchie);
-
-	    // initialize instruction attachment list
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(scratchie.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -336,53 +312,11 @@ public class AuthoringAction extends Action {
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
-	// **********************************Handle Authoring Instruction
-	// Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because
-	// PropertyUtils.copyProperties() is executed
-	Set attPOSet = scratchiePO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    ScratchieAttachment newAtt = (ScratchieAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is
-	// non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    ScratchieAttachment delAtt = (ScratchieAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    ScratchieAttachment att = (ScratchieAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteScratchieAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-
-	// copy back
-	scratchiePO.setAttachments(attPOSet);
 	// ************************* Handle scratchie items *******************
 	// Handle scratchie items
 	Set itemList = new LinkedHashSet();
 	SortedSet topics = getItemList(sessionMap);
-	iter = topics.iterator();
+	Iterator iter = topics.iterator();
 	while (iter.hasNext()) {
 	    ScratchieItem item = (ScratchieItem) iter.next();
 	    if (item != null) {
@@ -406,9 +340,6 @@ public class AuthoringAction extends Action {
 	// finally persist scratchiePO again
 	service.saveOrUpdateScratchie(scratchiePO);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(scratchie.getAttachments());
 	scratchieForm.setScratchie(scratchiePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -417,135 +348,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadScratchieFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadScratchieFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-	    throws UploadScratchieFileException {
-
-	ScratchieForm scratchieForm = (ScratchieForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(scratchieForm.getSessionMapID());
-
-	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = scratchieForm.getOfflineFile();
-	} else {
-	    file = scratchieForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(ScratchieConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(ScratchieConstants.SUCCESS);
-	}
-
-	IScratchieService service = getScratchieService();
-	// upload to repository
-	ScratchieAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ScratchieAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ScratchieAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(ScratchieConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current Scratchie authoring page.
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Scratchie authoring page.
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    ActionForm form, String type) {
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
-
-	Long versionID = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_FILE_UUID));
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ScratchieAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ScratchieAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(ScratchieConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ScratchieConstants.SUCCESS);
-
     }
 
     /**
@@ -976,22 +778,6 @@ public class AuthoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ScratchieConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ScratchieConstants.ATTR_DELETED_ATTACHMENT_LIST);
     }
 
     /**

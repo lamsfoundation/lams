@@ -11,7 +11,6 @@
 		Set tabs = new LinkedHashSet();
 		tabs.add("label.basic");
 		tabs.add("label.advanced");
-		tabs.add("label.instructions");
 		pageContext.setAttribute("tabs", tabs);
 		
 		Set tabsBasic = new LinkedHashSet();
@@ -143,10 +142,6 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
 			<!-- end of content (Advanced) -->
-			
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
-			<!-- end of content (Instructions) -->
 
 
 			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />

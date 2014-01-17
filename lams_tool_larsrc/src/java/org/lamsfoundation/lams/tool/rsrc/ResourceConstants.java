@@ -63,8 +63,6 @@ public class ResourceConstants {
 
     public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
 
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
-
     public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 
     public static final String PARAM_TITLE = "title";
@@ -78,11 +76,7 @@ public class ResourceConstants {
 
     public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
 
-    public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
-
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
-
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
 

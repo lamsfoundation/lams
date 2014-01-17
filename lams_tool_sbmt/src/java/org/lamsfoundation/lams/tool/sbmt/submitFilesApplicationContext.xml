@@ -35,10 +35,6 @@
 	<bean id="submitUserDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-
-	<bean id="attachmentDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.AttachmentDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
 	
 	<bean id="submitFilesOutputFactory" class="org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesOutputFactory">  
     	<property name="toolMessageService"><ref bean="sbmtMessageService"/></property>  
@@ -50,7 +46,6 @@
 		<property name="submitFilesReportDAO"><ref bean="submitFilesReportDAO"/></property>
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
 		<property name="submitUserDAO"><ref bean="submitUserDAO"/></property>
-		<property name="attachmentDAO"><ref bean="attachmentDAO"/></property>
 		<property name="sbmtToolContentHandler"><ref bean="sbmtToolContentHandler"/></property>
 		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="toolService"><ref bean="lamsToolService"/></property>
@@ -89,9 +84,6 @@
                 <prop key="finish*">PROPAGATION_REQUIRED</prop>
                 
                 <prop key="uploadFileToSession">PROPAGATION_REQUIRED</prop>
-                
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="createToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>				
 

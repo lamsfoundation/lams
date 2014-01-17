@@ -37,8 +37,6 @@ public interface IPixlrDAO extends IBaseDAO {
 
     void saveOrUpdate(Pixlr toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 
 }

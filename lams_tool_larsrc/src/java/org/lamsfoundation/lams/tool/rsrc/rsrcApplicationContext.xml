@@ -28,12 +28,6 @@
         </property>
     </bean>
 
-   <bean id="resourceAttachmentDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-
    <bean id="resourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAOHibernate">
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
@@ -65,9 +59,6 @@
         </property>
         <property name="resourceItemVisitDao">
             <ref local="resourceItemVisitDao"/>
-        </property>
-        <property name="resourceAttachmentDao">
-            <ref local="resourceAttachmentDao"/>
         </property>
         <property name="resourceUserDao">
             <ref local="resourceUserDao"/>
@@ -121,8 +112,6 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

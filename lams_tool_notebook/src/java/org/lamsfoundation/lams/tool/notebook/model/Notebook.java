@@ -26,32 +26,23 @@ package org.lamsfoundation.lams.tool.notebook.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
 
 /**
  * @hibernate.class table="tl_lantbk11_notebook"
  */
-
 public class Notebook implements java.io.Serializable, Cloneable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(NotebookService.class.getName());
 
     // Fields
-    /**
-     * 
-     */
     private Long uid;
 
     private Date createDate;
@@ -64,67 +55,27 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean allowRichEditor;
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean contentInUse;
-
-    private boolean defineLater;
     
-    // LDEV-2657
+    private boolean defineLater;
+
     private Date submissionDeadline;
 
     private Long toolContentId;
 
-    private Set notebookAttachments;
-
     private Set notebookSessions;
 
     private Set<NotebookCondition> conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
-
-    // Constructors
-
-    /** default constructor */
-    public Notebook() {
-    }
-
-    /** full constructor */
-    public Notebook(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    Long toolContentId, Set notebookAttachments, Set notebookSessions) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.runOffline = runOffline;
-	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.notebookAttachments = notebookAttachments;
-	this.notebookSessions = notebookSessions;
-    }
 
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
      * 
      */
-
     public Long getUid() {
 	return uid;
     }
@@ -137,7 +88,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
      * @hibernate.property column="create_date"
      * 
      */
-
     public Date getCreateDate() {
 	return createDate;
     }
@@ -150,7 +100,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
      * @hibernate.property column="update_date"
      * 
      */
-
     public Date getUpdateDate() {
 	return updateDate;
     }
@@ -199,19 +148,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -237,32 +173,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
      * @hibernate.property column="content_in_use" length="1"
      * 
      */
@@ -274,7 +184,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setContentInUse(boolean contentInUse) {
 	this.contentInUse = contentInUse;
     }
-
+    
     /**
      * @hibernate.property column="define_later" length="1"
      * 
@@ -289,8 +199,8 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
+	this.submissionDeadline = submissionDeadline;
+    }
 
     /**
      * 
@@ -298,12 +208,12 @@ public class Notebook implements java.io.Serializable, Cloneable {
      * @return date submissionDeadline
      * 
      */
-    
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
 
-	/**
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    /**
      * @hibernate.property column="tool_content_id" length="20"
      * 
      */
@@ -314,21 +224,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="notebook_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment"
-     * 
-     */
-
-    public Set getNotebookAttachments() {
-	return notebookAttachments;
-    }
-
-    public void setNotebookAttachments(Set notebookAttachments) {
-	this.notebookAttachments = notebookAttachments;
     }
 
     /**
@@ -403,10 +298,8 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Notebook newInstance(Notebook fromContent, Long toContentId,
-	    IToolContentHandler notebookToolContentHandler) {
+    public static Notebook newInstance(Notebook fromContent, Long toContentId) {
 	Notebook toContent = new Notebook();
-	fromContent.toolContentHandler = notebookToolContentHandler;
 	toContent = (Notebook) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -421,17 +314,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	    notebook = (Notebook) super.clone();
 	    notebook.setUid(null);
 
-	    if (notebookAttachments != null) {
-		// create a copy of the attachments
-		Iterator iter = notebookAttachments.iterator();
-		Set<NotebookAttachment> set = new HashSet<NotebookAttachment>();
-		while (iter.hasNext()) {
-		    NotebookAttachment originalFile = (NotebookAttachment) iter.next();
-		    NotebookAttachment newFile = (NotebookAttachment) originalFile.clone();
-		    set.add(newFile);
-		}
-		notebook.notebookAttachments = set;
-	    }
 	    // create an empty set for the notebookSession
 	    notebook.notebookSessions = new HashSet();
 
@@ -447,14 +329,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	    Notebook.log.error("Error cloning " + Notebook.class);
 	}
 	return notebook;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
 }

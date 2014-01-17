@@ -24,30 +24,16 @@
 
 package org.lamsfoundation.lams.tool.notebook.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -63,18 +49,15 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.notebook.dao.INotebookAttachmentDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -97,15 +80,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     private INotebookUserDAO notebookUserDAO = null;
 
-    private INotebookAttachmentDAO notebookAttachmentDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
     private IToolContentHandler notebookToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
 
     private IAuditService auditService = null;
 
@@ -119,7 +98,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public NotebookService() {
 	super();
-	// TODO Auto-generated constructor stub
     }
 
     /* ************ Methods from ToolSessionManager ************* */
@@ -150,7 +128,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
@@ -201,31 +178,12 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Notebook toContent = Notebook.newInstance(fromContent, toContentId, notebookToolContentHandler);
+	Notebook toContent = Notebook.newInstance(fromContent, toContentId);
 	notebookDAO.saveOrUpdate(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Notebook notebook = notebookDAO.getByContentId(toolContentId);
-	if (notebook == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	notebook.setDefineLater(value);
-	notebookDAO.saveOrUpdate(notebook);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Notebook notebook = notebookDAO.getByContentId(toolContentId);
-	if (notebook == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	notebook.setRunOffline(value);
-	notebookDAO.saveOrUpdate(notebook);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
-	// TODO Auto-generated method stub
     }
 
     /**
@@ -248,16 +206,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	notebook = Notebook.newInstance(notebook, toolContentId, null);
-	notebook.setToolContentHandler(null);
+	notebook = Notebook.newInstance(notebook, toolContentId);
 	notebook.setNotebookSessions(null);
-	Set<NotebookAttachment> atts = notebook.getNotebookAttachments();
-	for (NotebookAttachment att : atts) {
-	    att.setNotebook(null);
-	}
 	try {
-	    exportContentService.registerFileClassForExport(NotebookAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, notebook, notebookToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -273,9 +224,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(NotebookAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(NotebookImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, notebookToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Notebook)) {
@@ -366,7 +317,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	Notebook defaultContent = getDefaultContent();
 	// create new notebook using the newContentID
 	Notebook newContent = new Notebook();
-	newContent = Notebook.newInstance(defaultContent, newContentID, notebookToolContentHandler);
+	newContent = Notebook.newInstance(defaultContent, newContentID);
 	notebookDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -399,33 +350,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return notebookUserDAO.getByUID(uid);
     }
 
-    public NotebookAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new NotebookException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	NotebookAttachment attachment = new NotebookAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws NotebookException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new NotebookException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	notebookDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-    }
-
     public void saveOrUpdateNotebook(Notebook notebook) {
 	notebookDAO.saveOrUpdate(notebook);
     }
@@ -452,54 +376,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	this.auditService = auditService;
     }
 
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getNotebookToolContentHandler().uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), type);
-	    } catch (InvalidParameterException e) {
-		throw new NotebookException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new NotebookException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new NotebookException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new NotebookException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws NotebookException {
-	ICredentials credentials = new SimpleCredentials(NotebookToolContentHandler.repositoryUser,
-		NotebookToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, NotebookToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new NotebookException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new NotebookException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new NotebookException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -515,15 +391,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	notebook.setInstructions(WebUtil.convertNewlines((String) importValues
 		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	notebook.setLockOnFinished(Boolean.TRUE);
-	notebook.setOfflineInstructions(null);
-	notebook.setOnlineInstructions(null);
-	notebook.setRunOffline(Boolean.FALSE);
 	notebook.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	notebook.setToolContentId(toolContentId);
 	notebook.setUpdateDate(now);
 	notebook.setAllowRichEditor(Boolean.FALSE);
 	// leave as empty, no need to set them to anything.
-	// setNotebookAttachments(Set notebookAttachments);
 	// setNotebookSessions(Set notebookSessions);
 	notebookDAO.saveOrUpdate(notebook);
     }
@@ -545,14 +417,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public INotebookAttachmentDAO getNotebookAttachmentDAO() {
-	return notebookAttachmentDAO;
-    }
-
-    public void setNotebookAttachmentDAO(INotebookAttachmentDAO attachmentDAO) {
-	notebookAttachmentDAO = attachmentDAO;
-    }
 
     public INotebookDAO getNotebookDAO() {
 	return notebookDAO;
@@ -616,14 +480,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public NotebookOutputFactory getNotebookOutputFactory() {

@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.qa.util;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +36,6 @@ import javax.servlet.http.HttpSession;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
@@ -63,9 +61,6 @@ public abstract class QaUtils implements QaAppConstants {
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO) {
 	qaGeneralAuthoringDTO.setActivityTitle(defaultQaContent.getTitle());
 	qaGeneralAuthoringDTO.setActivityInstructions(defaultQaContent.getInstructions());
-
-	qaGeneralAuthoringDTO.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
-	qaGeneralAuthoringDTO.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
     }
 
     public static String replaceNewLines(String text) {
@@ -117,16 +112,6 @@ public abstract class QaUtils implements QaAppConstants {
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
 	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
-
-	String offlineInstructions = request.getParameter(OFFLINE_INSTRUCTIONS);
-	
-	qaAuthoringForm.setOfflineInstructions(offlineInstructions);
-	qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-	String onlineInstructions = request.getParameter(ONLINE_INSTRUCTIONS);
-	
-	qaAuthoringForm.setOnlineInstructions(onlineInstructions);
-	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	String reflect = request.getParameter(REFLECT);
 	
@@ -183,64 +168,6 @@ public abstract class QaUtils implements QaAppConstants {
 
     public static String getFormattedDateString(Date date) {
 	return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
-    }
-
-    /**
-     * If this file exists in attachments map, move it to the deleted
-     * attachments map. Returns the updated deletedAttachments map, creating a
-     * new one if needed. If uuid supplied then tries to match on that,
-     * otherwise uses filename and isOnline.
-     */
-    public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    QaUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		QaUploadedFile value = (QaUploadedFile) iter.next();
-		if (uuid.equals(value.getUuid())) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
-    }
-
-    /**
-     * If this file exists in attachments map, move it to the deleted
-     * attachments map. Returns the updated deletedAttachments map, creating a
-     * new one if needed. If uuid supplied then tries to match on that,
-     * otherwise uses filename and isOnline.
-     */
-    public static List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList) {
-
-	List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
-
-	if (attachmentsList != null) {
-	    Iterator iter = attachmentsList.iterator();
-	    QaUploadedFile attachment = null;
-	    while (iter.hasNext() && attachment == null) {
-		QaUploadedFile value = (QaUploadedFile) iter.next();
-		if (filename.equals(value.getFileName()) && isOnline == value.isFileOnline()) {
-		    attachment = value;
-		}
-
-	    }
-	    if (attachment != null) {
-		deletedList.add(attachment);
-		attachmentsList.remove(attachment);
-	    }
-	}
-
-	return deletedList;
     }
 
     /**
@@ -306,19 +233,12 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(SELECTION_CASE);
 	request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
 	request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
-	request.getSession().removeAttribute(ONLINE_INSTRUCTIONS);
-	request.getSession().removeAttribute(OFFLINE_INSTRUCTIONS);
 	request.getSession().removeAttribute(END_LEARNING_MESSSAGE);
 	request.getSession().removeAttribute(ON);
 	request.getSession().removeAttribute(OFF);
-	request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
-	request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
 	request.getSession().removeAttribute(RICHTEXT_TITLE);
 	request.getSession().removeAttribute(RICHTEXT_INSTRUCTIONS);
 	request.getSession().removeAttribute(RICHTEXT_BLANK);
-	request.getSession().removeAttribute(SUBMIT_OFFLINE_FILE);
-	request.getSession().removeAttribute(SUBMIT_ONLINE_FILE);
-	request.getSession().removeAttribute(POPULATED_UPLOADED_FILESDATA);
 	request.getSession().removeAttribute(USER_ID);
 	request.getSession().removeAttribute(NOT_ATTEMPTED);
 	request.getSession().removeAttribute(INCOMPLETE);
@@ -353,7 +273,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(MONITORING_REPORT_TITLE);
 	request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
 	request.getSession().removeAttribute(END_LEARNING_MESSAGE);
-	request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
 	request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 	request.getSession().removeAttribute(FROM_TOOL_CONTENT_ID);
 	request.getSession().removeAttribute(TO_TOOL_CONTENT_ID);
@@ -371,10 +290,7 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(FEEDBACK_TYPE_SEQUENTIAL);
 	request.getSession().removeAttribute(FEEDBACK_TYPE_COMBINED);
 	request.getSession().removeAttribute(QUESTIONS);
-	request.getSession().removeAttribute(ATTACHMENT_LIST);
 	request.getSession().removeAttribute(SUBMIT_SUCCESS);
-	request.getSession().removeAttribute(DELETED_ATTACHMENT_LIST);
-	request.getSession().removeAttribute(UUID);
 	request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 	request.getSession().removeAttribute(CURRENT_ANSWER);
 	request.getSession().removeAttribute(ACTIVE_MODULE);
@@ -411,7 +327,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
 	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
 	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
-	request.getSession().removeAttribute(USER_EXCEPTION_RUN_OFFLINE);
 	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
 	request.getSession().removeAttribute(USER_EXCEPTION_QUESTIONS_DUPLICATE);
     }

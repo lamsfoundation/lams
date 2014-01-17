@@ -167,17 +167,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 	    mcLearnerStarterDTO.setSubmissionDeadline(submissionDeadline);
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-		return mapping.findForward(McAppConstants.RUN_OFFLINE);
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 
-	/*
-	 * Is the tool activity been checked as Run Offline in the property inspector?
-	 */
-	mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
 	mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
@@ -209,15 +205,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	// have a mark > 1.
 	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswersDTOList);
 	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
-
-	/*
-	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
-	 * informed about that.
-	 */
-	boolean isRunOffline = McUtils.isRunOffline(mcContent);
-	if (isRunOffline == true) {
-	    return (mapping.findForward(McAppConstants.RUN_OFFLINE));
-	}
 
 	/* find out if the content is being modified at the moment. */
 	boolean isDefineLater = McUtils.isDefineLater(mcContent);

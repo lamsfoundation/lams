@@ -124,7 +124,6 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -236,8 +235,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	SessionMap sessionMap = new SessionMap();
 	List sequentialCheckedCa = new LinkedList();
-	sessionMap.put(QaAppConstants.ATTACHMENT_LIST_KEY, new ArrayList());
-	sessionMap.put(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	qaAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
@@ -302,20 +299,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    strToolContentID).longValue(), false, qaService, qaGeneralAuthoringDTO, sessionMap);
 	}
 
-	if (qaGeneralAuthoringDTO.getOnlineInstructions() == null
-		|| qaGeneralAuthoringDTO.getOnlineInstructions().length() == 0) {
-	    qaGeneralAuthoringDTO.setOnlineInstructions(QaAppConstants.DEFAULT_ONLINE_INST);
-	    qaAuthoringForm.setOnlineInstructions(QaAppConstants.DEFAULT_ONLINE_INST);
-	    sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, QaAppConstants.DEFAULT_ONLINE_INST);
-	}
-
-	if (qaGeneralAuthoringDTO.getOfflineInstructions() == null
-		|| qaGeneralAuthoringDTO.getOfflineInstructions().length() == 0) {
-	    qaGeneralAuthoringDTO.setOfflineInstructions(QaAppConstants.DEFAULT_OFFLINE_INST);
-	    qaAuthoringForm.setOfflineInstructions(QaAppConstants.DEFAULT_OFFLINE_INST);
-	    sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY, QaAppConstants.DEFAULT_OFFLINE_INST);
-	}
-
 	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
 	conditionList.clear();
 	conditionList.addAll(qaContent.getConditions());
@@ -373,13 +356,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
 	qaGeneralAuthoringDTO.setReflectionSubject(qaContent.getReflectionSubject());
 
-	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
-	qaGeneralAuthoringDTO.setDeletedAttachmentList(new ArrayList());
-
-	sessionMap.put(QaAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
-	sessionMap.put(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY, new ArrayList());
-
 	qaGeneralAuthoringDTO.setIsDefineLater(new Boolean(qaContent.isDefineLater()).toString());
 
 	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
@@ -436,14 +412,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    qaGeneralAuthoringDTO.setDefaultQuestionContent("Sample Question 1?");
 
 	}
-
-	qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
-
-	qaAuthoringForm.setOnlineInstructions(qaContent.getOnlineInstructions());
-	qaAuthoringForm.setOfflineInstructions(qaContent.getOfflineInstructions());
-	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, qaContent.getOnlineInstructions());
-	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY, qaContent.getOfflineInstructions());
 
 	qaAuthoringForm.resetUserAction();
 	

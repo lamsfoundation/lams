@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -35,7 +34,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -54,12 +52,10 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
@@ -90,8 +86,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     private NoticeboardUser nbUser;
     private INoticeboardUserDAO nbUserDAO = null;
-
-    private INoticeboardAttachmentDAO nbAttachmentDAO = null;
     private IToolContentHandler nbToolContentHandler = null;
 
     private IExportToolContentService exportContentService;
@@ -573,103 +567,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * ============================================================================== Methods for access to
      * NoticeboardUser objects ==============================================================================
      */
-
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachment(java.lang.Long) */
-    public NoticeboardAttachment retrieveAttachment(Long attachmentId) {
-	if (attachmentId == null) {
-	    String error = "Unable to continue. The attachment id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
-	}
-
-	try {
-	    return nbAttachmentDAO.retrieveAttachment(attachmentId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrieve the attachment " + e.getMessage(), e);
-	}
-    }
-
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachmentByUuid(java.lang.Long) */
-    public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid) {
-	if (uuid == null) {
-	    String error = "Unable to continue. The uuid is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
-	}
-	try {
-	    return nbAttachmentDAO.retrieveAttachmentByUuid(uuid);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrieve the attachment " + e.getMessage(), e);
-	}
-    }
-
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachment(java.lang.String) */
-    public NoticeboardAttachment retrieveAttachmentByFilename(String filename) {
-	if (filename == null || filename.trim().length() == 0) {
-	    String error = "Unable to continue. The filename is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
-	}
-	try {
-	    return nbAttachmentDAO.retrieveAttachmentByFilename(filename);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrieve the attachment with filename "
-			    + filename + " " + e.getMessage(), e);
-	}
-    }
-
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getAttachmentIdsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
-    public List getAttachmentIdsFromContent(NoticeboardContent nbContent) {
-	try {
-	    return nbAttachmentDAO.getAttachmentIdsFromContent(nbContent);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrieve the list of attachment ids "
-			    + e.getMessage(), e);
-	}
-    }
-
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
-    public void saveAttachment(NoticeboardContent content, NoticeboardAttachment attachment) {
-	try {
-	    content.getNbAttachments().add(attachment);
-	    attachment.setNbContent(content);
-	    saveNoticeboard(content);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to save the attachment " + e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @throws RepositoryCheckedException
-     * @throws
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment)
-     */
-    public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment)
-	    throws RepositoryCheckedException {
-	try {
-	    attachment.setNbContent(null);
-	    content.getNbAttachments().remove(attachment);
-	    saveNoticeboard(content);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this attachment" + e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @throws RepositoryCheckedException
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#uploadFile(java.io.InputStream,
-     *      java.lang.String, java.lang.String, java.lang.String)
-     */
-    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
-	    throws RepositoryCheckedException {
-	return nbToolContentHandler.uploadFile(istream, filename, contentType, fileType);
-    }
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
@@ -701,15 +598,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 
 		if (defaultContent != null) {
-		    NoticeboardContent newContent = NoticeboardContent.newInstance(defaultContent, toContentId,
-			    nbToolContentHandler);
+		    NoticeboardContent newContent = NoticeboardContent.newInstance(defaultContent, toContentId);
 		    saveNoticeboard(newContent);
 		} else {
 		    throw new ToolException("Default content is missing. Unable to copy tool content");
 		}
 	    } else {
-		NoticeboardContent newNbContent = NoticeboardContent.newInstance(originalNb, toContentId,
-			nbToolContentHandler);
+		NoticeboardContent newNbContent = NoticeboardContent.newInstance(originalNb, toContentId);
 		saveNoticeboard(newNbContent);
 	    }
 	} catch (RepositoryCheckedException e) {
@@ -721,24 +616,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     }
 
-    /** @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long) */
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
-
-	nbContent.setDefineLater(value);
-	// nbContent.setContentInUse(false); //if define later is set to true, then contentInUse flag should be false
-	saveNoticeboard(nbContent);
-
-    }
-
-    /** @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long) */
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
-
-	nbContent.setForceOffline(value);
-	saveNoticeboard(nbContent);
-    }
-
     /** @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long) */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
@@ -747,17 +624,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	if (!nbContent.getNbSessions().isEmpty() && !removeSessionData) {
 	    throw new SessionDataExistsException(
 		    "Delete failed: There is session data that belongs to this tool content id");
-	}
-
-	// remove any attachments that belong to this tool entry
-	Set attachments = nbContent.getNbAttachments();
-	Iterator i = attachments.iterator();
-	while (i.hasNext()) {
-	    try {
-		removeAttachment(nbContent, (NoticeboardAttachment) i.next());
-	    } catch (RepositoryCheckedException e) {
-		// TODO: not sure if suppose to throw another type of exception or not
-	    }
 	}
 
 	removeNoticeboard(toolContentId);
@@ -819,9 +685,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	try {
 	    // set ResourceToolContentHandler as null to avoid copy file node in repository again.
-	    toolContentObj = NoticeboardContent.newInstance(toolContentObj, toolContentId, null);
+	    toolContentObj = NoticeboardContent.newInstance(toolContentObj, toolContentId);
 	    toolContentObj.setNbSessions(null);
-	    exportContentService.registerFileClassForExport(NoticeboardAttachment.class.getName(), "uuid", "versionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, nbToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -841,9 +706,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(NoticeboardAttachment.class.getName(), "uuid", "versionId",
-		    "filename", "fileProperty", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(NoticeboardImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, nbToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof NoticeboardContent)) {
@@ -968,15 +833,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	toolContentObj.setDateCreated(now);
 	toolContentObj.setDateUpdated(now);
 	toolContentObj.setDefineLater(false);
-	toolContentObj.setForceOffline(false);
 	toolContentObj.setNbContentId(toolContentId);
-	toolContentObj.setOfflineInstructions(null);
-	toolContentObj.setOnlineInstructions(null);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	toolContentObj.setReflectOnActivity(false);
 	// leave as empty, no need to set them to anything.
 	// toolContentObj.setNbSessions(nbSessions);
-	// toolContentObj.setNbAttachments(nbAttachments);
 	nbContentDAO.saveNbContent(toolContentObj);
     }
 
@@ -1042,14 +903,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      */
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
-    }
-
-    /*
-     * public INoticeboardAttachmentDAO getNbAttachmentDAO() { return nbAttachmentDAO; }
-     */
-
-    public void setNbAttachmentDAO(INoticeboardAttachmentDAO nbAttachmentDAO) {
-	this.nbAttachmentDAO = nbAttachmentDAO;
     }
 
     /**
