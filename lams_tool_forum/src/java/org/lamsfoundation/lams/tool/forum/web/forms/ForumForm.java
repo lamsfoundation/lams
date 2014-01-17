@@ -64,11 +64,6 @@ public class ForumForm extends ActionForm {
 	private String currentTab;
 	private String sessionMapID;
 	private String contentFolderID;
-	
-    private FormFile offlineFile;
-    private FormFile onlineFile;
-    private List onlineFileList;
-    private List offlineFileList;
 
     private Forum forum;
 
@@ -91,19 +86,6 @@ public class ForumForm extends ActionForm {
         //set Form special varaible from given forum
         if(forum != null){
         	this.toolContentID = forum.getContentId();
-    		onlineFileList = new ArrayList();
-    		offlineFileList = new ArrayList();
-    		Set fileSet = forum.getAttachments();
-    		if(fileSet != null){
-    			Iterator iter = fileSet.iterator();
-    			while(iter.hasNext()){
-    				Attachment file = (Attachment) iter.next();
-    				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
-    					offlineFileList.add(file);
-    				else
-    					onlineFileList.add(file);
-    			}
-    		}
         }else{
         	logger.error("Initial ForumForm failed by null value of Forum.");
         }
@@ -126,22 +108,6 @@ public class ForumForm extends ActionForm {
         return forum;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
-        this.onlineFile = onlineFile;
-    }
-
-    public FormFile getOnlineFile() {
-        return onlineFile;
-    }
-
-    public void setOfflineFile(FormFile offlineFile) {
-        this.offlineFile = offlineFile;
-    }
-
-    public FormFile getOfflineFile() {
-        return offlineFile;
-    }
-
 	public String getCurrentTab() {
 		return currentTab;
 	}
@@ -157,22 +123,7 @@ public class ForumForm extends ActionForm {
 	public void setToolContentID(Long toolContentID) {
 		this.toolContentID = toolContentID;
 	}
-
-	public List getOfflineFileList() {
-		return offlineFileList;
-	}
-
-	public void setOfflineFileList(List offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-
-	public List getOnlineFileList() {
-		return onlineFileList;
-	}
-
-	public void setOnlineFileList(List onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
+	
 	public String getSessionMapID() {
 		return sessionMapID;
 	}

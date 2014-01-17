@@ -26,16 +26,11 @@ package org.eucm.lams.tool.eadventure.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.eucm.lams.tool.eadventure.dto.ReflectDTO;
 import org.eucm.lams.tool.eadventure.dto.Summary;
 import org.eucm.lams.tool.eadventure.model.Eadventure;
-import org.eucm.lams.tool.eadventure.model.EadventureAttachment;
 import org.eucm.lams.tool.eadventure.model.EadventureCondition;
 import org.eucm.lams.tool.eadventure.model.EadventureExpression;
 import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
@@ -43,6 +38,9 @@ import org.eucm.lams.tool.eadventure.model.EadventureParam;
 import org.eucm.lams.tool.eadventure.model.EadventureSession;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
 import org.eucm.lams.tool.eadventure.model.EadventureVars;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -111,16 +109,6 @@ public interface IEadventureService {
    // List getAuthoredItems(Long eadventureUid);
 
     /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadEadventureFileException
-     */
-    EadventureAttachment uploadInstructionFile(FormFile file, String type) throws UploadEadventureFileException;
-
-    /**
      * Upload eadventure file to repository.
      * 
      * @param eAdventure
@@ -164,14 +152,6 @@ public interface IEadventureService {
      * @param Eadventure
      */
     void saveOrUpdateEadventure(Eadventure Eadventure);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteEadventureAttachment(Long attachmentUid);
 
 
     public void saveOrUpdateEadventureConditions(Set<EadventureCondition> eadConditions);

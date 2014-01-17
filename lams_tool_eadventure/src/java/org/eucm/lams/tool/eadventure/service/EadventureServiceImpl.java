@@ -39,14 +39,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.eucm.lams.tool.eadventure.EadventureConstants;
+import org.eucm.lams.tool.eadventure.dao.EadventureConditionDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureExpressionDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureItemVisitDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureParamDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureSessionDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureUserDAO;
+import org.eucm.lams.tool.eadventure.dao.EadventureVarsDAO;
+import org.eucm.lams.tool.eadventure.dto.ReflectDTO;
+import org.eucm.lams.tool.eadventure.dto.Summary;
+import org.eucm.lams.tool.eadventure.ims.IContentPackageConverter;
+import org.eucm.lams.tool.eadventure.ims.IMSManifestException;
+import org.eucm.lams.tool.eadventure.ims.ImscpApplicationException;
+import org.eucm.lams.tool.eadventure.ims.SimpleContentPackageConverter;
+import org.eucm.lams.tool.eadventure.model.Eadventure;
+import org.eucm.lams.tool.eadventure.model.EadventureCondition;
+import org.eucm.lams.tool.eadventure.model.EadventureExpression;
+import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
+import org.eucm.lams.tool.eadventure.model.EadventureParam;
+import org.eucm.lams.tool.eadventure.model.EadventureSession;
+import org.eucm.lams.tool.eadventure.model.EadventureUser;
+import org.eucm.lams.tool.eadventure.model.EadventureVars;
+import org.eucm.lams.tool.eadventure.util.EadventureToolContentHandler;
+import org.eucm.lams.tool.eadventure.util.InputOutputReader;
+import org.eucm.lams.tool.eadventure.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -56,7 +79,6 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -78,34 +100,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.eucm.lams.tool.eadventure.EadventureConstants;
-import org.eucm.lams.tool.eadventure.dao.EadventureAttachmentDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureConditionDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureExpressionDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureItemVisitDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureParamDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureSessionDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureUserDAO;
-import org.eucm.lams.tool.eadventure.dao.EadventureVarsDAO;
-import org.eucm.lams.tool.eadventure.dto.ReflectDTO;
-import org.eucm.lams.tool.eadventure.dto.Summary;
-import org.eucm.lams.tool.eadventure.ims.IContentPackageConverter;
-import org.eucm.lams.tool.eadventure.ims.IMSManifestException;
-import org.eucm.lams.tool.eadventure.ims.ImscpApplicationException;
-import org.eucm.lams.tool.eadventure.ims.SimpleContentPackageConverter;
-import org.eucm.lams.tool.eadventure.model.Eadventure;
-import org.eucm.lams.tool.eadventure.model.EadventureAttachment;
-import org.eucm.lams.tool.eadventure.model.EadventureCondition;
-import org.eucm.lams.tool.eadventure.model.EadventureExpression;
-import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
-import org.eucm.lams.tool.eadventure.model.EadventureParam;
-import org.eucm.lams.tool.eadventure.model.EadventureSession;
-import org.eucm.lams.tool.eadventure.model.EadventureUser;
-import org.eucm.lams.tool.eadventure.model.EadventureVars;
-import org.eucm.lams.tool.eadventure.util.ReflectDTOComparator;
-import org.eucm.lams.tool.eadventure.util.EadventureToolContentHandler;
-import org.eucm.lams.tool.eadventure.util.InputOutputReader;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -130,8 +124,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     static Logger log = Logger.getLogger(EadventureServiceImpl.class.getName());
 
     private EadventureDAO eadventureDao;
-
-    private EadventureAttachmentDAO eadventureAttachmentDao;
 
     private EadventureUserDAO eadventureUserDao;
 
@@ -272,7 +264,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	Eadventure defaultContent = getDefaultEadventure();
 	// save default content by given ID.
 	Eadventure content = new Eadventure();
-	content = Eadventure.newInstance(defaultContent, contentId, eadventureToolContentHandler);
+	content = Eadventure.newInstance(defaultContent, contentId);
 	return content;
     }
 
@@ -280,27 +272,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
   /*  public List getAuthoredItems(Long eadventureUid) {
 	return eadventureItemDao.getAuthoringItems(eadventureUid);
     }*/
-
-    public EadventureAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadEadventureFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadEadventureFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	EadventureAttachment file = new EadventureAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
-    }
 
     public void createUser(EadventureUser eadventureUser) {
 	eadventureUserDao.saveObject(eadventureUser);
@@ -361,11 +332,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	   // cond.setEadListExpression(expList);
 	}
 }
-
-    public void deleteEadventureAttachment(Long attachmentUid) {
-	eadventureAttachmentDao.removeObject(EadventureAttachment.class, attachmentUid);
-
-    }
     
     public void deleteEadventureCondition(Long conditionUid) {
 	eadventureConditionDao.removeObject(EadventureCondition.class, conditionUid);
@@ -722,35 +688,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws EadventureApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadEadventureFileException {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = eadventureToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadEadventureFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadEadventureFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadEadventureFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadEadventureFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
     private NodeKey processPackage(String packageDirectory, String initFile) throws UploadEadventureFileException {
 	NodeKey node = null;
 	try {
@@ -907,10 +844,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	this.repositoryService = repositoryService;
     }
 
-    public void setEadventureAttachmentDao(EadventureAttachmentDAO eadventureAttachmentDao) {
-	this.eadventureAttachmentDao = eadventureAttachmentDao;
-    }
-
     public void setEadventureDao(EadventureDAO eadventureDao) {
 	this.eadventureDao = eadventureDao;
     }
@@ -966,13 +899,8 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	}
 
 	// set EadventureToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Eadventure.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Eadventure.newInstance(toolContentObj, toolContentId);
 	try {
-	    exportContentService.registerFileClassForExport(EadventureAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    //TODO revisar!!
 	    exportContentService.registerFileClassForExport(Eadventure.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, eadventureToolContentHandler, rootPath);
@@ -985,8 +913,9 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(EadventureAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(EadventureImportContentVersionFilter.class);
+	
 	    //TODO revisar
 	    exportContentService.registerFileClassForImport(Eadventure.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, "initialItem");
@@ -1089,7 +1018,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    }
 	}
 
-	Eadventure toContent = Eadventure.newInstance(eadventure, toContentId, eadventureToolContentHandler);
+	Eadventure toContent = Eadventure.newInstance(eadventure, toContentId);
 	eadventureDao.saveObject(toContent);
 
 	//TODO no hace nada... pero comprobar que no de problema
@@ -1106,22 +1035,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 
     public String getToolContentTitle(Long toolContentId) {
 	return getEadventureByContentId(toolContentId).getTitle();
-    }
-    
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
-	if (eadventure == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	eadventure.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
-	if (eadventure == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	eadventure.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -1229,9 +1142,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    toolContentObj.setDefineLater(Boolean.FALSE);
 	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		    .get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setOfflineInstructions(null);
-	    toolContentObj.setOnlineInstructions(null);
-	    toolContentObj.setRunOffline(Boolean.FALSE);
 	    toolContentObj.setUpdated(now);
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);
@@ -1243,9 +1153,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    bool = WDDXProcessor.convertToBoolean(importValues,
 		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
 	    toolContentObj.setLockWhenFinished(Boolean.FALSE);
-
-	    // leave as empty, no need to set them to anything.
-	    // toolContentObj.setAttachments(attachments);
 
 	    /*
 	     * unused entries from 1.0.2 [directoryName=] no equivalent in 2.0 [runtimeSubmissionStaffFile=true] no

@@ -93,25 +93,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 		forumService = ForumServiceProxy.getForumService(getServletContext());		
 		super.init();
 	}
-	
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-       } else {
-            Forum forum = null;
-            if ( toolContentID != null ) {
-            	forum = forumService.getForumByContentId(toolContentID);
-            } else {
-            	ForumToolSession session = forumService.getSessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		forum = session.getForum();
-            }
-            if ( forum != null ) {
-            	activityTitle = forum.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
-	}
 
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{

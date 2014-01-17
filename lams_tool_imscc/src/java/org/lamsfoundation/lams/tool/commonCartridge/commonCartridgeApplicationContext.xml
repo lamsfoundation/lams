@@ -31,12 +31,6 @@
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
         </property>
-    </bean>      
-
-   <bean id="commonCartridgeAttachmentDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
     </bean>
 
    <bean id="commonCartridgeUserDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeUserDAOHibernate">
@@ -69,9 +63,6 @@
         </property>
         <property name="commonCartridgeConfigItemDao">
             <ref local="commonCartridgeConfigItemDao"/>
-        </property>        
-        <property name="commonCartridgeAttachmentDao">
-            <ref local="commonCartridgeAttachmentDao"/>
         </property>
         <property name="commonCartridgeUserDao">
             <ref local="commonCartridgeUserDao"/>
@@ -125,8 +116,6 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

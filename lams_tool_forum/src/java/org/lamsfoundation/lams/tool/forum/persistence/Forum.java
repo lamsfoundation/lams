@@ -34,7 +34,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
  * Forum
@@ -58,8 +57,6 @@ public class Forum implements Cloneable {
 
     private boolean lockWhenFinished;
 
-    private boolean runOffline;
-
     private boolean allowAnonym;
 
     private boolean allowEdit;
@@ -82,10 +79,6 @@ public class Forum implements Cloneable {
 
     private String instructions;
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean defineLater;
 
     private boolean contentInUse;
@@ -97,8 +90,6 @@ public class Forum implements Cloneable {
     private ForumUser createdBy;
 
     private Set messages;
-
-    private Set attachments;
 
     private int limitedChar;
 
@@ -119,15 +110,11 @@ public class Forum implements Cloneable {
     // conditions
     private Set<ForumCondition> conditions = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
 
-    // ********* Non Persist fields
-    private ForumToolContentHandler toolContentHandler;
-
     /**
      * Default contruction method.
      * 
      */
     public Forum() {
-	attachments = new HashSet();
 	messages = new HashSet();
     }
 
@@ -146,7 +133,7 @@ public class Forum implements Cloneable {
 		Iterator iter = messages.iterator();
 		Set set = new HashSet();
 		while (iter.hasNext()) {
-		    set.add(Message.newInstance((Message) iter.next(), toolContentHandler));
+		    set.add(Message.newInstance((Message) iter.next()));
 		}
 		forum.messages = set;
 	    }
@@ -156,19 +143,6 @@ public class Forum implements Cloneable {
 		    conditionsCopy.add(condition.clone(forum));
 		}
 		forum.setConditions(conditionsCopy);
-	    }
-	    // clone attachment
-	    if (attachments != null) {
-		Iterator iter = attachments.iterator();
-		Set set = new HashSet();
-		while (iter.hasNext()) {
-		    Attachment file = (Attachment) iter.next();
-		    Attachment newFile = (Attachment) file.clone();
-		    // clone old file without duplicate it in repository
-
-		    set.add(newFile);
-		}
-		forum.attachments = set;
 	    }
 
 	} catch (CloneNotSupportedException e) {
@@ -190,15 +164,13 @@ public class Forum implements Cloneable {
 	final Forum genericEntity = (Forum) o;
 
 	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions)
-		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
+		instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-		offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
     }
 
     // **********************************************************
@@ -309,26 +281,6 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @return Returns the runOffline.
-     * 
-     * @hibernate.property column="run_offline"
-     * 
-     */
-    public boolean getRunOffline() {
-	return runOffline;
-    }
-
-    /**
-     * @param runOffline
-     *                The forceOffLine to set.
-     * 
-     * 
-     */
-    public void setRunOffline(boolean forceOffline) {
-	runOffline = forceOffline;
-    }
-
-    /**
      * @return Returns the lockWhenFinish.
      * 
      * @hibernate.property column="lock_on_finished"
@@ -357,51 +309,6 @@ public class Forum implements Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="online_instructions" type="text"
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="offline_instructions" type="text"
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * 
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
-     * @hibernate.collection-key column="forum_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-     * 
-     * @return a set of Attachments to this Message.
-     */
-    public Set getAttachments() {
-	return attachments;
-    }
-
-    /*
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
-	this.attachments = attachments;
     }
 
     /**
@@ -494,9 +401,8 @@ public class Forum implements Cloneable {
 	this.allowRichEditor = allowRichEditor;
     }
 
-    public static Forum newInstance(Forum fromContent, Long contentId, ForumToolContentHandler forumToolContentHandler) {
+    public static Forum newInstance(Forum fromContent, Long contentId) {
 	Forum toContent = new Forum();
-	fromContent.toolContentHandler = forumToolContentHandler;
 	toContent = (Forum) fromContent.clone();
 	toContent.setContentId(contentId);
 	
@@ -535,14 +441,6 @@ public class Forum implements Cloneable {
 
     public void setLimitedInput(boolean limitedInput) {
 	this.limitedInput = limitedInput;
-    }
-
-    public ForumToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

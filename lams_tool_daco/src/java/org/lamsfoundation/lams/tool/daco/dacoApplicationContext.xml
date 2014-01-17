@@ -78,9 +78,6 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
-   		<property name="auditService">
-   			<ref bean="auditService"/>
-   		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
    		</property>
@@ -114,8 +111,6 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

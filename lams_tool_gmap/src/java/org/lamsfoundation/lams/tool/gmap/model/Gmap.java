@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.tool.gmap.service.GmapService;
 /**
  * @hibernate.class table="tl_lagmap10_gmap"
  */
-
 public class Gmap implements java.io.Serializable, Cloneable {
 
 	private static final long serialVersionUID = 938457189932877382L;
@@ -60,9 +59,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	// activity instructions
 	private String instructions;
-
-	// run offline flag
-	private boolean runOffline;
 
 	// lock when user finishes activity
 	private boolean lockOnFinished;
@@ -103,12 +99,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	// map type 
 	private String mapType;
 
-	// online instructions
-	private String onlineInstructions;
-
-	// offline instructions 
-	private String offlineInstructions;
-
 	// flag for content in use
 	private boolean contentInUse;
 
@@ -127,51 +117,11 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	// default Geocoder Address (Set to "Macquarie University, Sydney NSW" by default)
 	String defaultGeocoderAddress;
 
-	// list of attached files for the gmap
-	private Set<GmapAttachment> gmapAttachments;
-
 	// list of sessions for this gmap
 	private Set<GmapSession> gmapSessions;
 	
 	// list of markers for this gmap
 	private Set<GmapMarker> gmapMarkers;
-
-	//*********** NON Persist fields
-	private IToolContentHandler toolContentHandler;
-	
-	// Constructors
-
-	/** default constructor */
-	public Gmap() {
-	}
-
-	/** full constructor */
-	public Gmap(Date createDate, Date updateDate, Long createBy, String title,
-			String instructions, boolean runOffline, boolean lockOnFinished,
-			boolean filteringEnabled, String filterKeywords,
-			String onlineInstructions, String offlineInstructions,
-			boolean contentInUse, boolean defineLater, Long toolContentId,
-			boolean reflectOnActivity, String reflectInstructions, String defaultGeocoderAddress,
-			Set<GmapAttachment> gmapAttachments, Set<GmapSession> gmapSessions, Set<GmapMarker> markers) {
-		this.createDate = createDate;
-		this.updateDate = updateDate;
-		this.createBy = createBy;
-		this.title = title;
-		this.instructions = instructions;
-		this.runOffline = runOffline;
-		this.lockOnFinished = lockOnFinished;
-		this.onlineInstructions = onlineInstructions;
-		this.offlineInstructions = offlineInstructions;
-		this.contentInUse = contentInUse;
-		this.defineLater = defineLater;
-		this.toolContentId = toolContentId;
-		this.gmapAttachments = gmapAttachments;
-		this.gmapSessions = gmapSessions;
-		this.gmapMarkers = markers;
-		this.reflectOnActivity = reflectOnActivity;
-		this.reflectInstructions = reflectInstructions;
-		this.defaultGeocoderAddress = defaultGeocoderAddress;
-	}
 
 	// Property accessors
 	/**
@@ -260,19 +210,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="run_offline" length="1"
-	 * 
-	 */
-
-	public boolean isRunOffline() {
-		return this.runOffline;
-	}
-
-	public void setRunOffline(boolean runOffline) {
-		this.runOffline = runOffline;
-	}
-
-	/**
 	 * @hibernate.property column="lock_on_finished" length="1"
 	 * 
 	 */
@@ -283,32 +220,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
-	}
-
-	/**
-	 * @hibernate.property column="online_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOnlineInstructions() {
-		return this.onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @hibernate.property column="offline_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOfflineInstructions() {
-		return this.offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
 	}
 
 	/**
@@ -348,21 +259,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 
 	public void setToolContentId(Long toolContentId) {
 		this.toolContentId = toolContentId;
-	}
-
-	/**
-	 * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
-	 * @hibernate.collection-key column="gmap_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.gmap.model.GmapAttachment"
-	 * 
-	 */
-
-	public Set<GmapAttachment> getGmapAttachments() {
-		return this.gmapAttachments;
-	}
-
-	public void setGmapAttachments(Set<GmapAttachment> gmapAttachments) {
-		this.gmapAttachments = gmapAttachments;
 	}
 
 	/**
@@ -421,10 +317,8 @@ public class Gmap implements java.io.Serializable, Cloneable {
 		return result;
 	}
 
-	public static Gmap newInstance(Gmap fromContent, Long toContentId,
-			IToolContentHandler gmapToolContentHandler) {
+	public static Gmap newInstance(Gmap fromContent, Long toContentId) {
 		Gmap toContent = new Gmap();
-		fromContent.toolContentHandler = gmapToolContentHandler;
 		toContent = (Gmap) fromContent.clone();
 		toContent.setToolContentId(toContentId);
 		toContent.setCreateDate(new Date());
@@ -438,23 +332,10 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			gmap = (Gmap) super.clone();
 			gmap.setUid(null);
 
-			Set<GmapAttachment> attachmentSet = new HashSet<GmapAttachment>();
 			Set<GmapMarker> markerSet = new HashSet<GmapMarker>();
 			
-			
-			if (gmapAttachments != null) {
-				// create a copy of the attachments
-				Iterator<GmapAttachment> iter = gmapAttachments.iterator();
-				while (iter.hasNext()) {
-					GmapAttachment originalFile = (GmapAttachment) iter.next();
-					GmapAttachment newFile = (GmapAttachment) originalFile.clone();
-					attachmentSet.add(newFile);
-				}
-			}
-			gmap.gmapAttachments = attachmentSet;
-			
 			if (gmapMarkers != null) {
-				// create a copy of the attachments
+				// create a copy of the markers
 				Iterator<GmapMarker> iter = gmapMarkers.iterator();
 				while (iter.hasNext()) {
 					GmapMarker originalMarker = (GmapMarker) iter.next();
@@ -472,14 +353,6 @@ public class Gmap implements java.io.Serializable, Cloneable {
 			log.error("Error cloning " + Gmap.class);
 		}
 		return gmap;
-	}
-
-	public IToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 
 	/**

@@ -41,7 +41,6 @@ public class ImageGalleryConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
     public static final String PARAM_IMAGE_INDEX = "imageIndex";
     public static final String PARAM_IMAGE_UID = "imageUid";
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_COMMENTS = "comments";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
@@ -55,9 +54,7 @@ public class ImageGalleryConstants {
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
     public static final String ATTR_RESOURCE_ITEM_LIST = "imageGalleryList";
-    public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteImageGalleryList";
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
     public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
     public static final String ATTR_RESOURCE = "imageGallery";
     public static final String ATTR_IMAGE = "image";

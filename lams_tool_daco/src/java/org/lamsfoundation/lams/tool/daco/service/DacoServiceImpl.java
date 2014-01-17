@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +74,6 @@ import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummarySingleAnswerDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
-import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
@@ -122,8 +120,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
-
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
@@ -153,7 +149,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    }
 	}
 
-	Daco toContent = Daco.newInstance(daco, toContentId, dacoToolContentHandler);
+	Daco toContent = Daco.newInstance(daco, toContentId);
 	dacoDao.saveObject(toContent);
     }
 
@@ -178,11 +174,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     public void deleteDacoAnswer(Long uid) {
 	dacoAnswerDao.removeObject(DacoAnswer.class, uid);
-    }
-
-    public void deleteDacoAttachment(Long attachmentUid) {
-	dacoDao.removeObject(DacoAttachment.class, attachmentUid);
-
     }
 
     public void deleteDacoQuestion(Long uid) {
@@ -220,13 +211,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	// set DacoToolContentHandler as null to avoid copy file node in
 	// repository again.
-	toolContentObj = Daco.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Daco.newInstance(toolContentObj, toolContentId);
 	try {
-	    exportContentService
-		    .registerFileClassForExport(DacoAttachment.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, dacoToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -311,7 +297,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	Daco defaultContent = getDefaultDaco();
 	// save default content by given ID.
 	Daco content = new Daco();
-	content = Daco.newInstance(defaultContent, contentId, dacoToolContentHandler);
+	content = Daco.newInstance(defaultContent, contentId);
 	return content;
     }
 
@@ -606,9 +592,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(DacoAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(DacoImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, dacoToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Daco)) {
@@ -682,13 +668,12 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadDacoFileException {
+    private NodeKey processFile(FormFile file) throws UploadDacoFileException {
 	NodeKey node = null;
 	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
-		node = dacoToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
+		node = dacoToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
 		throw new UploadDacoFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	    } catch (FileNotFoundException e) {
@@ -759,28 +744,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	dacoSessionDao.saveObject(resSession);
     }
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Daco daco = dacoDao.getByContentId(toolContentId);
-	if (daco == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	daco.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Daco daco = dacoDao.getByContentId(toolContentId);
-	if (daco == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	daco.setRunOffline(value);
-    }
-
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -851,7 +817,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    // For file only upload one sigle file
 	    if (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE
 		    || answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_IMAGE) {
-		NodeKey nodeKey = processFile(file, IToolContentHandler.TYPE_ONLINE);
+		NodeKey nodeKey = processFile(file);
 		answer.setFileUuid(nodeKey.getUuid());
 		answer.setFileVersionId(nodeKey.getVersion());
 	    }
@@ -866,26 +832,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadDacoFileException(messageService.getMessage("error.msg.io.exception"));
 	}
-    }
-
-    public DacoAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws UploadDacoFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadDacoFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	DacoAttachment file = new DacoAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public DacoAnswerDAO getDacoAnswerDao() {

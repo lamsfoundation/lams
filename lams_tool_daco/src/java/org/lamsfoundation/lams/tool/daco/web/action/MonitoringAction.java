@@ -130,7 +130,6 @@ public class MonitoringAction extends Action {
 	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
 		AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Daco daco = service.getDacoByContentId(contentId);
-	daco.toDTO();
 
 	List<MonitoringSummarySessionDTO> monitoringSummaryList = service.getMonitoringSummary(contentId,
 		DacoConstants.MONITORING_SUMMARY_MATCH_NONE);

@@ -30,7 +30,6 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -39,10 +38,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public class GmapDAO extends BaseDAO implements IGmapDAO {
 
 	private static final String FIND_FORUM_BY_CONTENTID = "from Gmap gmap where gmap.toolContentId=?";
-
-	private static final String FIND_INSTRUCTION_FILE = "from "
-			+ GmapAttachment.class.getName()
-			+ " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
 
 	public Gmap getByContentId(Long toolContentId) {
 		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,
@@ -56,23 +51,5 @@ public class GmapDAO extends BaseDAO implements IGmapDAO {
 	public void saveOrUpdate(Gmap gmap) {
 		this.getHibernateTemplate().saveOrUpdate(gmap);
 		this.getHibernateTemplate().flush();
-	}
-
-	public void deleteInstructionFile(Long toolContentId, Long uuid,
-			Long versionId, String type) {
-		HibernateTemplate templ = this.getHibernateTemplate();
-		if (toolContentId != null && uuid != null && versionId != null) {
-			List list = getSession().createQuery(FIND_INSTRUCTION_FILE)
-					.setLong(0, toolContentId.longValue()).setLong(1,
-							uuid.longValue()).setLong(2, versionId.longValue())
-					.setString(3, type).list();
-			if (list != null && list.size() > 0) {
-				GmapAttachment file = (GmapAttachment) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(file);
-				templ.flush();
-			}
-		}
-
 	}
 }

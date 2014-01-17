@@ -70,7 +70,7 @@ public class DacoQuestion implements Cloneable {
 		DacoQuestion obj = null;
 		try {
 			obj = (DacoQuestion) super.clone();
-			// clone attachment
+			// clone answer options
 			obj.setAnswerOptions(new LinkedHashSet<DacoAnswerOption>(answerOptions.size()));
 			for (DacoAnswerOption answerOption : answerOptions) {
 				obj.getAnswerOptions().add((DacoAnswerOption) answerOption.clone());

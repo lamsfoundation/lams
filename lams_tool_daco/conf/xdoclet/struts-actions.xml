@@ -20,23 +20,6 @@
 	<forward name="author" path="/pages/authoring/authoring.jsp" />
 	<forward name="monitor" path="/pages/authoring/definelater.jsp" />
 </action>
-<!-- ==========  Instrcutions File: online/offline ========== -->
-<action path="/authoring/uploadOnlineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
-	scope="request" validate="false" parameter="uploadOnlineFile">
-	<forward name="success" path="/pages/authoring/authoring.jsp" />
-</action>
-<action path="/authoring/uploadOfflineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
-	scope="request" validate="false" parameter="uploadOfflineFile">
-	<forward name="success" path="/pages/authoring/authoring.jsp" />
-</action>
-<action path="/authoring/deleteOnlineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
-	scope="request" validate="false" parameter="deleteOnlineFile">
-	<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
-</action>
-<action path="/authoring/deleteOfflineFile" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm"
-	scope="request" validate="false" parameter="deleteOfflineFile">
-	<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
-</action>
 <!-- ==========  Daco Question  ========== -->
 <action path="/authoring/newQuestion" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction"
 	name="dacoQuestionForm" scope="request" validate="false" parameter="newQuestion">
@@ -100,7 +83,6 @@
 	name="recordForm" scope="request" validate="false">
 	<forward name="success" path="/pages/learning/learning.jsp" />
 	<forward name="definelater" path="/pages/learning/definelater.jsp" />
-	<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
 </action>
 <action path="/learning/finish" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction"
 	input="/pages/learning/learning.jsp" parameter="finish">

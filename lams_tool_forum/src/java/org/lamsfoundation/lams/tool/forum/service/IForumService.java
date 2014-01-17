@@ -70,16 +70,6 @@ public interface IForumService {
     Forum updateForum(Forum forum) throws PersistenceException;
 
     /**
-     * Upload instruction file
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws PersistenceException
-     */
-    Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
-
-    /**
      * Get forum by forum UID
      * 
      * @param forumUid
@@ -96,14 +86,6 @@ public interface IForumService {
      * @throws PersistenceException
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
-
-    /**
-     * Delete authoring page instruction files.
-     * 
-     * @param attachmentId
-     * @throws PersistenceException
-     */
-    void deleteForumAttachment(Long attachmentId) throws PersistenceException;
 
     // ************************************************************************************
     // Topic Method
@@ -184,15 +166,6 @@ public interface IForumService {
      * @throws PersistenceException
      */
     Attachment uploadAttachment(FormFile file) throws PersistenceException;
-
-    /**
-     * Delete file from repository.
-     * 
-     * @param uuID
-     * @param versionID
-     * @throws PersistenceException
-     */
-    void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 
     // ************************************************************************************
     // *********************Get topic methods **********************

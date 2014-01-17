@@ -65,9 +65,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="body" value="/jsps/learning/viewforum.jsp"/>
     	<put name="bodyMobile" value="/jsps/learning/mobile/viewforum.jsp"/>
 	</definition>
-	<definition name="tiles:/learning/forum/runOffline" extends="tiles:learner:layout">
-    	<put name="body" value="/jsps/learning/runoffline.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/runoffline.jsp"/>
+	<definition name="tiles:/learning/forum/submissionDeadline" extends="tiles:learner:layout">
+    	<put name="body" value="/jsps/learning/submissionDeadline.jsp"/>
+    	<put name="bodyMobile" value="/jsps/learning/mobile/submissionDeadline.jsp"/>
 	</definition>
 	<definition name="tiles:/learning/forum/defineLater" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/definelater.jsp"/>

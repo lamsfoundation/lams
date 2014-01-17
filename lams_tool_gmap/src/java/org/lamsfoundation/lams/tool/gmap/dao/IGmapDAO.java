@@ -37,7 +37,5 @@ public interface IGmapDAO extends IBaseDAO{
 	Gmap getByContentId(Long toolContentId);
 
 	void saveOrUpdate(Gmap toContent);
-
-	void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
 	
 }

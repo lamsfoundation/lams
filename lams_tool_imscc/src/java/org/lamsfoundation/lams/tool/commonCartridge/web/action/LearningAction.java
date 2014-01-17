@@ -196,14 +196,6 @@ public class LearningAction extends Action {
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
-	// add run offline support
-	if (commonCartridge.getRunOffline()) {
-	    sessionMap.put(CommonCartridgeConstants.PARAM_RUN_OFFLINE, true);
-	    return mapping.findForward("runOffline");
-	} else {
-	    sessionMap.put(CommonCartridgeConstants.PARAM_RUN_OFFLINE, false);
-	}
-
 	// init commonCartridge item list
 	SortedSet<CommonCartridgeItem> commonCartridgeItemList = getCommonCartridgeItemList(sessionMap);
 	commonCartridgeItemList.clear();
@@ -375,9 +367,7 @@ public class LearningAction extends Action {
 	ICommonCartridgeService service = getCommonCartridgeService();
 	int miniViewFlag = service.checkMiniView(sessionId, userID);
 	// if current user view less than reqired view count number, then just return error message.
-	// if it is runOffline content, then need not check minimum view count
-	Boolean runOffline = (Boolean) sessionMap.get(CommonCartridgeConstants.PARAM_RUN_OFFLINE);
-	if (miniViewFlag > 0 && !runOffline) {
+	if (miniViewFlag > 0) {
 	    ActionErrors errors = new ActionErrors();
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number.less",
 		    miniViewFlag));

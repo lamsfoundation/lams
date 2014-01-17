@@ -23,9 +23,7 @@
 /* $$Id$$ */
 package org.eucm.lams.tool.eadventure.web.action;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -36,8 +34,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,35 +57,24 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.eucm.lams.tool.eadventure.EadventureConstants;
-import org.eucm.lams.tool.eadventure.ims.IContentPackageConverter;
-import org.eucm.lams.tool.eadventure.ims.IMSManifestException;
-import org.eucm.lams.tool.eadventure.ims.ImscpApplicationException;
-import org.eucm.lams.tool.eadventure.ims.SimpleContentPackageConverter;
 import org.eucm.lams.tool.eadventure.model.Eadventure;
-import org.eucm.lams.tool.eadventure.model.EadventureAttachment;
 import org.eucm.lams.tool.eadventure.model.EadventureCondition;
 import org.eucm.lams.tool.eadventure.model.EadventureExpression;
 import org.eucm.lams.tool.eadventure.model.EadventureParam;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
-import org.eucm.lams.tool.eadventure.service.EadventureServiceImpl;
 import org.eucm.lams.tool.eadventure.service.IEadventureService;
-import org.eucm.lams.tool.eadventure.service.EadventureApplicationException;
 import org.eucm.lams.tool.eadventure.service.UploadEadventureFileException;
 import org.eucm.lams.tool.eadventure.util.EadventureConditionComparator;
-import org.eucm.lams.tool.eadventure.util.InputOutputReader;
 import org.eucm.lams.tool.eadventure.web.form.EadventureForm;
 import org.eucm.lams.tool.eadventure.web.form.EadventureGameForm;
 import org.eucm.lams.tool.eadventure.web.form.EadventurePedagogicalPlannerForm;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -101,10 +86,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version $Revision$
  */
 public class AuthoringAction extends Action {
-    private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
-    private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
-    private static final String ITEM_TYPE = "itemType";
 
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
@@ -142,18 +124,6 @@ public class AuthoringAction extends Action {
 
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
 	}
 	// ----------------------- Add eadventure item function
 	// ---------------------------
@@ -236,9 +206,6 @@ public class AuthoringAction extends Action {
 	    
 	    eadventureForm.setEadventure(eadventure);
 	    eadventureForm.setHasFile(eadventure.getFileName()!=null);
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(eadventure.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -659,44 +626,6 @@ public class AuthoringAction extends Action {
 	// merge attachment info
 	// so far, attPOSet will be empty if content is existed. because
 	// PropertyUtils.copyProperties() is executed
-	// For eAdventure tool only store as attachements the online-offline instructions files
-	Set attPOSet = eadventurePO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    EadventureAttachment newAtt = (EadventureAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is
-	// non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    EadventureAttachment delAtt = (EadventureAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    EadventureAttachment att = (EadventureAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteEadventureAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-
-	// copy back
-	eadventurePO.setAttachments(attPOSet);
 	
 	  service.saveOrUpdateEadventureParams(eadventurePO.getParams());
 	
@@ -737,7 +666,7 @@ public class AuthoringAction extends Action {
 	
 
 	// delete TaEadventureConditionfrom database.
-	iter = delEadventureConditionList.iterator();
+	Iterator iter = delEadventureConditionList.iterator();
 	while (iter.hasNext()) {
 	    EadventureCondition condition = (EadventureCondition) iter.next();
 	    iter.remove();
@@ -791,10 +720,6 @@ public class AuthoringAction extends Action {
 	
 	service.saveOrUpdateEadventure(eadventurePO);
 
-	//TODO por que???
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(eadventure.getAttachments());
 	eadventureForm.setEadventure(eadventurePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -803,163 +728,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadEadventureFileException
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws UploadEadventureFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadEadventureFileException
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws UploadEadventureFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadEadventureFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) throws UploadEadventureFileException {
-
-	EadventureForm eadventureForm = (EadventureForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(eadventureForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = eadventureForm.getOfflineFile();
-	} else {
-	    file = eadventureForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(EadventureConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(EadventureConstants.SUCCESS);
-	}
-
-	IEadventureService service = getEadventureService();
-	// upload to repository
-	EadventureAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	EadventureAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (EadventureAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName()) && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(EadventureConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current Eadventure authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Eadventure authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, EadventureConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, EadventureConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, EadventureConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to
-	// deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	EadventureAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (EadventureAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(EadventureConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(EadventureConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(EadventureConstants.SUCCESS);
-
     }
 
     // *************************************************************************************
@@ -971,50 +739,6 @@ public class AuthoringAction extends Action {
     private IEadventureService getEadventureService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IEadventureService) wac.getBean(EadventureConstants.RESOURCE_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, EadventureConstants.ATT_ATTACHMENT_LIST);
-    }
-    
-
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, EadventureConstants.ATTR_DELETED_ATTACHMENT_LIST);
-    }
-
-
-
-    /**
-     * List save deleted eadventure items, which could be persisted or
-     * non-persisted items.
-     * 
-     * @param request
-     * @return
-     */
-    private List getDeletedEadventureItemList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, EadventureConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
-    }
-
-    /**
-     * If a eadventure item has attahment file, and the user edit this item and
-     * change the attachment to new file, then the old file need be deleted when
-     * submitting the whole authoring page. Save the file uuid and version id
-     * into EadventureItem object for temporarily use.
-     * 
-     * @param request
-     * @return
-     */
-    private List getDeletedItemAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, EadventureConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
     }
 
     
@@ -1239,17 +963,16 @@ public class AuthoringAction extends Action {
 	    return mapping.findForward(EadventureConstants.SUCCESS);
 	} else {
 	    try {
-		String onlineInstructions = taskList.getOnlineInstructions();
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter writer = response.getWriter();
 
 		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
 		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
-		    String responseText = (StringUtils.isEmpty(taskList.getOnlineInstructions()) ? "NO" : "OK") + '&' + activityIndex;
+		    String responseText = (StringUtils.isEmpty("") ? "NO" : "OK") + '&' + activityIndex;
 		    writer.print(responseText);
 
 		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
-		    writer.print(onlineInstructions);
+		    writer.print("onlineInstructions");
 		}
 	    } catch (IOException e) {
 		AuthoringAction.log.error(e);

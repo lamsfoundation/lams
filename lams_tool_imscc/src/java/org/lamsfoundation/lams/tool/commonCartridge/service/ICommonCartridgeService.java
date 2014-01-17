@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeAttachment;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
@@ -86,16 +85,6 @@ public interface ICommonCartridgeService {
     List getAuthoredItems(Long commonCartridgeUid);
 
     /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadCommonCartridgeFileException
-     */
-    CommonCartridgeAttachment uploadInstructionFile(FormFile file, String type) throws UploadCommonCartridgeFileException;
-
-    /**
      * Upload commonCartridge item file to repository. i.e., single file, websize zip file, or learning object zip file.
      * 
      * @param item
@@ -140,14 +129,6 @@ public interface ICommonCartridgeService {
      * @param CommonCartridge
      */
     void saveOrUpdateCommonCartridge(CommonCartridge CommonCartridge);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteCommonCartridgeAttachment(Long attachmentUid);
 
     /**
      * Delete resoruce item from database.

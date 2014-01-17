@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +39,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,7 +70,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
-import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeAttachmentDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeConfigItemDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemDAO;
@@ -85,7 +82,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.commonCartridge.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.commonCartridge.ims.SimpleCommonCartridgeConverter;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeAttachment;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction;
@@ -102,7 +98,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -124,8 +119,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     private CommonCartridgeItemDAO commonCartridgeItemDao;
 
-    private CommonCartridgeAttachmentDAO commonCartridgeAttachmentDao;
-
     private CommonCartridgeUserDAO commonCartridgeUserDao;
 
     private CommonCartridgeSessionDAO commonCartridgeSessionDao;
@@ -145,7 +138,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
-
+    
     private IAuditService auditService;
 
     private IUserManagementService userManagementService;
@@ -254,33 +247,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	CommonCartridge defaultContent = getDefaultCommonCartridge();
 	// save default content by given ID.
 	CommonCartridge content = new CommonCartridge();
-	content = CommonCartridge.newInstance(defaultContent, contentId, commonCartridgeToolContentHandler);
+	content = CommonCartridge.newInstance(defaultContent, contentId);
 	return content;
     }
 
     public List getAuthoredItems(Long commonCartridgeUid) {
 	return commonCartridgeItemDao.getAuthoringItems(commonCartridgeUid);
-    }
-
-    public CommonCartridgeAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadCommonCartridgeFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	CommonCartridgeAttachment file = new CommonCartridgeAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public void createUser(CommonCartridgeUser commonCartridgeUser) {
@@ -311,11 +283,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     public void saveOrUpdateCommonCartridge(CommonCartridge commonCartridge) {
 	commonCartridgeDao.saveObject(commonCartridge);
-    }
-
-    public void deleteCommonCartridgeAttachment(Long attachmentUid) {
-	commonCartridgeAttachmentDao.removeObject(CommonCartridgeAttachment.class, attachmentUid);
-
     }
 
     public void saveOrUpdateCommonCartridgeItem(CommonCartridgeItem item) {
@@ -680,47 +647,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws CommonCartridgeApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadCommonCartridgeFileException {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = commonCartridgeToolContentHandler.uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
-    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadCommonCartridgeFileException {
-	NodeKey node = null;
-	try {
-	    node = commonCartridgeToolContentHandler.uploadPackage(packageDirectory, initFile);
-	} catch (InvalidParameterException e) {
-	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	} catch (RepositoryCheckedException e) {
-	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.repository"));
-	}
-	return node;
-    }
-
     public List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
 	    throws UploadCommonCartridgeFileException {
 	try {
@@ -794,10 +720,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.repositoryService = repositoryService;
     }
 
-    public void setCommonCartridgeAttachmentDao(CommonCartridgeAttachmentDAO commonCartridgeAttachmentDao) {
-	this.commonCartridgeAttachmentDao = commonCartridgeAttachmentDao;
-    }
-
     public void setCommonCartridgeDao(CommonCartridgeDAO commonCartridgeDao) {
 	this.commonCartridgeDao = commonCartridgeDao;
     }
@@ -856,14 +778,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
 
 	// set CommonCartridgeToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = CommonCartridge.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = CommonCartridge.newInstance(toolContentObj, toolContentId);
 	toolContentObj.setMiniViewNumberStr(null);
 	try {
-	    exportContentService.registerFileClassForExport(CommonCartridgeAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.registerFileClassForExport(CommonCartridgeItem.class.getName(), "fileUuid",
 		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, commonCartridgeToolContentHandler,
@@ -877,8 +794,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(CommonCartridgeAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(CommonCartridgeImportContentVersionFilter.class);
+	    
 	    exportContentService.registerFileClassForImport(CommonCartridgeItem.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, "initialItem");
 
@@ -950,8 +868,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    }
 	}
 
-	CommonCartridge toContent = CommonCartridge.newInstance(commonCartridge, toContentId,
-		commonCartridgeToolContentHandler);
+	CommonCartridge toContent = CommonCartridge.newInstance(commonCartridge, toContentId);
 	commonCartridgeDao.saveObject(toContent);
 
 	// save commonCartridge items as well
@@ -967,22 +884,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     public String getToolContentTitle(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).getTitle();
-    }
-    
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
-	if (commonCartridge == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	commonCartridge.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
-	if (commonCartridge == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	commonCartridge.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -1070,118 +971,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	CommonCartridge toolContentObj = new CommonCartridge();
-
-	try {
-	    toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    toolContentObj.setContentId(toolContentId);
-	    toolContentObj.setContentInUse(Boolean.FALSE);
-	    toolContentObj.setCreated(now);
-	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
-		    .get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setOfflineInstructions(null);
-	    toolContentObj.setOnlineInstructions(null);
-	    toolContentObj.setRunOffline(Boolean.FALSE);
-	    toolContentObj.setUpdated(now);
-	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	    toolContentObj.setReflectInstructions(null);
-
-	    toolContentObj.setRunAuto(Boolean.FALSE);
-	    Integer minToComplete = WDDXProcessor.convertToInteger(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_MIN_NUMBER_COMPLETE);
-	    toolContentObj.setMiniViewCommonCartridgeNumber(minToComplete != null ? minToComplete.intValue() : 0);
-	    toolContentObj.setLockWhenFinished(Boolean.FALSE);
-	    toolContentObj.setRunAuto(Boolean.FALSE);
-
-	    // leave as empty, no need to set them to anything.
-	    // toolContentObj.setAttachments(attachments);
-
-	    /*
-	     * unused entries from 1.0.2 [directoryName=] no equivalent in 2.0 [runtimeSubmissionStaffFile=true] no
-	     * equivalent in 2.0 [contentShowUser=false] no equivalent in 2.0 [isHTML=false] no equivalent in 2.0
-	     * [showbuttons=false] no equivalent in 2.0 [isReusable=false] not used in 1.0.2 (would be lock when
-	     * finished)
-	     */
-	    CommonCartridgeUser ruser = new CommonCartridgeUser();
-	    ruser.setUserId(new Long(user.getUserID().longValue()));
-	    ruser.setFirstName(user.getFirstName());
-	    ruser.setLastName(user.getLastName());
-	    ruser.setLoginName(user.getLogin());
-	    createUser(ruser);
-	    toolContentObj.setCreatedBy(ruser);
-
-	    // CommonCartridge Items. They are ordered on the screen by create date so they need to be saved in the
-	    // right
-	    // order.
-	    // So read them all in first, then go through and assign the dates in the correct order and then save.
-	    Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
-	    SortedMap<Integer, CommonCartridgeItem> items = new TreeMap<Integer, CommonCartridgeItem>();
-	    if (urls != null) {
-		Iterator iter = urls.iterator();
-		while (iter.hasNext()) {
-		    Hashtable urlMap = (Hashtable) iter.next();
-		    Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
-			    ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-		    CommonCartridgeItem item = new CommonCartridgeItem();
-		    item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-		    item.setCreateBy(ruser);
-		    item.setCreateByAuthor(true);
-		    item.setHide(false);
-
-		    Vector instructions = (Vector) urlMap
-			    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-		    if (instructions != null && instructions.size() > 0) {
-			item.setItemInstructions(new HashSet());
-			Iterator insIter = instructions.iterator();
-			while (insIter.hasNext()) {
-			    item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
-			}
-		    }
-
-		    String commonCartridgeType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
-		    if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(commonCartridgeType)) {
-			item.setType(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI);
-			item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
-			item.setOpenUrlNewWindow(false);
-		    } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(commonCartridgeType)) {
-			item.setType(CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE);
-		    } else {
-			throw new ToolException("Invalid shared commonCartridge type. Type was " + commonCartridgeType);
-		    }
-
-		    items.put(itemOrder, item);
-		}
-	    }
-
-	    Iterator iter = items.values().iterator();
-	    Date itemDate = null;
-	    while (iter.hasNext()) {
-		if (itemDate != null) {
-		    try {
-			Thread.sleep(1000);
-		    } catch (Exception e) {
-		    }
-		}
-		itemDate = new Date();
-
-		CommonCartridgeItem item = (CommonCartridgeItem) iter.next();
-		item.setCreateDate(itemDate);
-		toolContentObj.getCommonCartridgeItems().add(item);
-	    }
-
-	} catch (WDDXProcessorConversionException e) {
-	    CommonCartridgeServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	commonCartridgeDao.saveObject(toolContentObj);
-
     }
 
     private CommonCartridgeItemInstruction createInstruction(Hashtable instructionEntry)

@@ -234,14 +234,6 @@ public class LearningAction extends Action {
 	daco.setDefineLater(false);
 	service.saveOrUpdateDaco(daco);
 
-	// add run offline support
-	if (daco.getRunOffline()) {
-	    sessionMap.put(DacoConstants.PARAM_RUN_OFFLINE, true);
-	    return mapping.findForward(DacoConstants.RUN_OFFLINE);
-	} else {
-	    sessionMap.put(DacoConstants.PARAM_RUN_OFFLINE, false);
-	}
-
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
 
 	if (daco.isNotifyTeachersOnLearnerEntry()) {

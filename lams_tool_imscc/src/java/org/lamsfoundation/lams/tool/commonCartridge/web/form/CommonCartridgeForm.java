@@ -76,7 +76,6 @@ public class CommonCartridgeForm extends ActionForm {
 	    commonCartridge.setLockWhenFinished(false);
 	    commonCartridge.setDefineLater(false);
 	    commonCartridge.setRunAuto(false);
-	    commonCartridge.setRunOffline(false);
 	    commonCartridge.setReflectOnActivity(false);
 	}
     }

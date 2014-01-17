@@ -68,14 +68,12 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.gmap.dao.IGmapAttachmentDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapConfigItemDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapMarkerDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapSessionDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapUserDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
@@ -112,17 +110,11 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     private IGmapUserDAO gmapUserDAO = null;
 
-    private IGmapAttachmentDAO gmapAttachmentDAO = null;
-
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
     private IToolContentHandler gmapToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
-
-    private IAuditService auditService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -225,26 +217,8 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Gmap toContent = Gmap.newInstance(fromContent, toContentId, gmapToolContentHandler);
+	Gmap toContent = Gmap.newInstance(fromContent, toContentId);
 	gmapDAO.saveOrUpdate(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Gmap gmap = gmapDAO.getByContentId(toolContentId);
-	if (gmap == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	gmap.setDefineLater(value);
-	gmapDAO.saveOrUpdate(gmap);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Gmap gmap = gmapDAO.getByContentId(toolContentId);
-	if (gmap == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	gmap.setRunOffline(value);
-	gmapDAO.saveOrUpdate(gmap);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
@@ -272,16 +246,9 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	gmap = Gmap.newInstance(gmap, toolContentId, null);
-	gmap.setToolContentHandler(null);
+	gmap = Gmap.newInstance(gmap, toolContentId);
 	gmap.setGmapSessions(null);
 	gmap.setCreateBy(null);
-	gmap.setToolContentHandler(null);
-
-	Set<GmapAttachment> atts = gmap.getGmapAttachments();
-	for (GmapAttachment att : atts) {
-	    att.setGmap(null);
-	}
 
 	Set<GmapMarker> markers = gmap.getGmapMarkers();
 	Set<GmapMarker> authorItems = new HashSet<GmapMarker>();
@@ -298,8 +265,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	gmap.setGmapMarkers(authorItems);
 
 	try {
-	    exportContentService
-		    .registerFileClassForExport(GmapAttachment.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, gmap, gmapToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -315,9 +280,9 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(GmapAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(GmapImportContentVersionFilter.class);
+	
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, gmapToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Gmap)) {
@@ -405,7 +370,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	Gmap defaultContent = getDefaultContent();
 	// create new gmap using the newContentID
 	Gmap newContent = new Gmap();
-	newContent = Gmap.newInstance(defaultContent, newContentID, gmapToolContentHandler);
+	newContent = Gmap.newInstance(defaultContent, newContentID);
 	gmapDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -436,36 +401,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     public GmapUser getUserByUID(Long uid) {
 	return gmapUserDAO.getByUID(uid);
-    }
-
-    public GmapAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
-	    throw new GmapException("Could not find upload file: " + file);
-	}
-
-	NodeKey nodeKey = processFile(file, type);
-
-	GmapAttachment attachment = new GmapAttachment();
-	attachment.setFileType(type);
-	attachment.setFileUuid(nodeKey.getUuid());
-	attachment.setFileVersionId(nodeKey.getVersion());
-	attachment.setFileName(file.getFileName());
-
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws GmapException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new GmapException("Exception occured while deleting files from" + " the repository " + e.getMessage());
-	}
-    }
-
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
-	gmapDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
     }
 
     public void saveOrUpdateGmap(Gmap gmap) {
@@ -500,36 +435,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     public void saveOrUpdateGmapConfigItem(GmapConfigItem item) {
 	gmapConfigItemDAO.saveOrUpdate(item);
-    }
-
-    public IAuditService getAuditService() {
-	return auditService;
-    }
-
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getGmapToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			type);
-	    } catch (InvalidParameterException e) {
-		throw new GmapException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new GmapException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new GmapException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new GmapException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
     }
 
     /*
@@ -599,31 +504,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return toolService.isGroupedActivity(toolContentID);
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws GmapException {
-	ICredentials credentials = new SimpleCredentials(GmapToolContentHandler.repositoryUser,
-		GmapToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, GmapToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new GmapException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new GmapException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new GmapException("Login failed." + e.getMessage());
-	}
-    }
-
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -636,12 +516,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	gmap.setCreateBy(new Long(user.getUserID().longValue()));
 	gmap.setCreateDate(now);
 	gmap.setDefineLater(Boolean.FALSE);
-	gmap.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	gmap.setLockOnFinished(Boolean.TRUE);
-	gmap.setOfflineInstructions(null);
-	gmap.setOnlineInstructions(null);
-	gmap.setRunOffline(Boolean.FALSE);
 	gmap.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	gmap.setToolContentId(toolContentId);
 	gmap.setUpdateDate(now);
@@ -665,14 +540,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
-    public IGmapAttachmentDAO getGmapAttachmentDAO() {
-	return gmapAttachmentDAO;
-    }
-
-    public void setGmapAttachmentDAO(IGmapAttachmentDAO attachmentDAO) {
-	gmapAttachmentDAO = attachmentDAO;
-    }
 
     public IGmapDAO getGmapDAO() {
 	return gmapDAO;
@@ -736,14 +603,6 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public IGmapMarkerDAO getGmapMarkerDAO() {

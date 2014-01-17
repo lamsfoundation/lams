@@ -85,8 +85,6 @@ public class DacoConstants {
 
     public static final String DEFINE_LATER = "definelater";
 
-    public static final String RUN_OFFLINE = "runOffline";
-
     // record operations
     public static final String RECORD_OPERATION_ADD = "add";
 
@@ -135,8 +133,6 @@ public class DacoConstants {
 
     public static final String PARAM_QUESTION_UID = "questionUid";
 
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
-
     public static final String PARAM_LONGLAT_MAPS_SELECTED = "longlatMapsSelected";
 
     public static final String PARAM_ANSWER_OPTION_INDEX = "removeIndex";
@@ -154,13 +150,7 @@ public class DacoConstants {
 
     public static final String ATTR_RECORD_LIST = "recordList";
 
-    public static final String ATTR_ATTACHMENT_LIST = "instructionAttachmentList";
-
     public static final String ATTR_DELETED_QUESTION_LIST = "deleteDacoList";
-
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
-
-    public static final String ATTR_DELETED_QUESTION_ATTACHMENT_LIST = "deletedQuestionAttachmmentList";
 
     public static final String ATTR_QUESTION_REVIEW_URL = "dacoQuestionReviewUrl";
 
@@ -175,8 +165,6 @@ public class DacoConstants {
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 
     public static final String ATTR_DACO_FORM = "dacoForm";
-
-    public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 

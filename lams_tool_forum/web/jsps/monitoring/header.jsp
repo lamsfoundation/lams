@@ -23,7 +23,7 @@
 		selectTab(tabId);
 		
     	//for statistic page change:
-    	if(tabId == 4)
+    	if(tabId == 3)
     		doStatistic();	 		
 	}
 	

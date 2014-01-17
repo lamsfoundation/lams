@@ -23,11 +23,6 @@
 /* $$Id$$ */
 package org.eucm.lams.tool.eadventure.web.form;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.eucm.lams.tool.eadventure.model.Eadventure;
-import org.eucm.lams.tool.eadventure.model.EadventureAttachment;
 
 /**
  *
@@ -55,8 +48,6 @@ public class EadventureForm extends ActionForm  {
 	private String sessionMapID;
 	private String contentFolderID;
 	private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
     
   //flag of this item has attachment or not
 	private boolean hasFile;
@@ -87,7 +78,6 @@ public class EadventureForm extends ActionForm  {
 	    	eadventure.setDefineComplete(false);
 	    	eadventure.setLockWhenFinished(false);
 	    	eadventure.setDefineLater(false);
-	    	eadventure.setRunOffline(false);
 	    	eadventure.setReflectOnActivity(false);
     	}
     }
@@ -99,26 +89,6 @@ public class EadventureForm extends ActionForm  {
 
 	public void setCurrentTab(int currentTab) {
 		this.currentTab = currentTab;
-	}
-
-
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
-
-
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
-
-
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
-
-
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
 	}
 
 

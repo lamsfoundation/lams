@@ -17,19 +17,16 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.gmap.service.GmapService">
-				<property name="gmapAttachmentDAO"><ref bean="gmapAttachmentDAO"/></property>
 				<property name="gmapSessionDAO"><ref bean="gmapSessionDAO"/></property>
 				<property name="gmapUserDAO"><ref bean="gmapUserDAO"/></property>
 				<property name="gmapDAO"><ref bean="gmapDAO"/></property>
 				<property name="gmapMarkerDAO"><ref bean="gmapMarkerDAO"/></property>
 				<property name="gmapConfigItemDAO"><ref bean="gmapConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="auditService"><ref bean="auditService"/></property>		
+				<property name="learnerService"><ref bean="learnerService"/></property>
  				<property name="gmapToolContentHandler"><ref bean="gmapToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
-		   		<property name="repositoryService"><ref bean="repositoryService" /></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -43,8 +40,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
@@ -73,10 +68,6 @@
 	</bean>
 	
 	<bean id="gmapUserDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="gmapAttachmentDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

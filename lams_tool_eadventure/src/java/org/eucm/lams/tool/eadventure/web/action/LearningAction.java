@@ -251,16 +251,6 @@ public class LearningAction extends Action {
 	eadventure.setDefineLater(false);
 	service.saveOrUpdateEadventure(eadventure);
 
-	// add run offline support
-	if (eadventure.getRunOffline()) {
-	    sessionMap.put(EadventureConstants.PARAM_RUN_OFFLINE, true);
-	    return mapping.findForward("runOffline");
-	} else {
-	    sessionMap.put(EadventureConstants.PARAM_RUN_OFFLINE, false);
-	}
-
-
-
 	// set complete flag for display purpose
 	//TODO getionar el complete
 	//if (eadventureUser != null) {
@@ -526,23 +516,6 @@ public class LearningAction extends Action {
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
-
-	IEadventureService service = getEadventureService();
-	/*int miniViewFlag = service.checkMiniView(sessionId, userID);
-	// if current user view less than reqired view count number, then just return error message.
-	// if it is runOffline content, then need not check minimum view count
-	Boolean runOffline = (Boolean) sessionMap.get(EadventureConstants.PARAM_RUN_OFFLINE);
-	if (miniViewFlag > 0 && !runOffline) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number.less",
-		    miniViewFlag));
-	    this.addErrors(request, errors);
-	    return false;
-	}*/
 
 	return true;
     }

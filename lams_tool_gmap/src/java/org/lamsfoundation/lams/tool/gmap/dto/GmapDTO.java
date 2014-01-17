@@ -25,17 +25,16 @@
 
 package org.lamsfoundation.lams.tool.gmap.dto;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.List;
-import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
-import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 
 /**
@@ -52,10 +51,6 @@ public class GmapDTO {
 	public String title;
 
 	public String instructions;
-
-	public String onlineInstructions;
-
-	public String offlineInstructions;
 	
 	public boolean defineLater;
 	
@@ -96,10 +91,6 @@ public class GmapDTO {
 	String defaultGeocoderAddress;
 	
 	public Set<GmapMarkerDTO> gmapMarkers = new HashSet<GmapMarkerDTO>();
-	
-	public Set<GmapAttachmentDTO> onlineInstructionsFiles;
-
-	public Set<GmapAttachmentDTO> offlineInstructionsFiles;
 
 	public Set<GmapSessionDTO> sessionDTOs = new TreeSet<GmapSessionDTO>();
 	
@@ -110,8 +101,6 @@ public class GmapDTO {
 		toolContentId = gmap.getToolContentId();
 		title = gmap.getTitle();
 		instructions = gmap.getInstructions();
-		onlineInstructions = gmap.getOnlineInstructions();
-		offlineInstructions = gmap.getOfflineInstructions();
 		contentInUse = gmap.isContentInUse();
 		//allowRichEditor = gmap.isAllowRichEditor();	
 		lockOnFinish = gmap.isLockOnFinished();
@@ -130,25 +119,6 @@ public class GmapDTO {
 		reflectOnActivity = gmap.isReflectOnActivity();
 		reflectInstructions = gmap.getReflectInstructions();
 		defaultGeocoderAddress = gmap.getDefaultGeocoderAddress();
-		
-		onlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
-		offlineInstructionsFiles = new TreeSet<GmapAttachmentDTO>();
-
-		for (Iterator<GmapAttachment> i = gmap.getGmapAttachments().iterator(); i.hasNext();) {
-			GmapAttachment att = (GmapAttachment) i.next();
-			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-				GmapAttachmentDTO attDTO = new GmapAttachmentDTO(att);
-				offlineInstructionsFiles.add(attDTO);
-			} else if (att.getFileType()
-					.equals(IToolContentHandler.TYPE_ONLINE)) {
-				GmapAttachmentDTO attDTO = new GmapAttachmentDTO(att);
-				onlineInstructionsFiles.add(attDTO);
-			} else {
-				// something is wrong. Ignore file, log error
-				logger.error("File with uid " + att.getFileUuid()
-						+ " contains invalid fileType: " + att.getFileType());
-			}
-		}
 		
 		for (Iterator<GmapSession> iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
 			GmapSession session = (GmapSession) iter.next();
@@ -172,40 +142,6 @@ public class GmapDTO {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
-	}
-
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	public Set<GmapAttachmentDTO> getOfflineInstructionsFiles() {
-		return offlineInstructionsFiles;
-	}
-
-	public void setOfflineInstructionsFiles(
-			Set<GmapAttachmentDTO> offlineInstructionsFiles) {
-		this.offlineInstructionsFiles = offlineInstructionsFiles;
-	}
-
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	public Set<GmapAttachmentDTO> getOnlineInstructionsFiles() {
-		return onlineInstructionsFiles;
-	}
-
-	public void setOnlineInstructionsFiles(
-			Set<GmapAttachmentDTO> onlineInstructionsFiles) {
-		this.onlineInstructionsFiles = onlineInstructionsFiles;
 	}
 
 	public String getTitle() {

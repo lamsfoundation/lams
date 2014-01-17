@@ -142,7 +142,6 @@ public class MonitoringAction extends Action {
 	List<List<Summary>> groupList = service.getSummary(contentId);
 
 	ImageGallery imageGallery = service.getImageGalleryByContentId(contentId);
-	imageGallery.toDTO();
 
 	Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(contentId, false);
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);

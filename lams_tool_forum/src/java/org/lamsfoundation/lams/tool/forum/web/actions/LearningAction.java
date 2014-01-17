@@ -270,11 +270,6 @@ public class LearningAction extends Action {
 	forum.setDefineLater(false);
 	forumService.updateForum(forum);
 
-	// add run offline support
-	if (forum.getRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
-
 	// get all root topic to display on init page
 	List<MessageDTO> rootTopics = forumService.getRootTopics(sessionId);
 	if (!forum.isAllowNewTopic()) {
@@ -316,9 +311,9 @@ public class LearningAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 
@@ -937,7 +932,7 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(user.getUserID().longValue());
-	if (!forum.getRunOffline() && !forum.isAllowNewTopic()) {
+	if (!forum.isAllowNewTopic()) {
 
 	    List<MessageDTO> list = forumService.getRootTopics(sessionId);
 	    for (MessageDTO msgDto : list) {

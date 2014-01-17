@@ -11,7 +11,6 @@
     		saveMapState();
     	}
     	return save;
-    	
 	}
 </script>
 
@@ -24,12 +23,6 @@
 	<c:if test="${sessionMap.mode == 'teacher'}">
 		<c:set var="defineLater" value="yes" />
 	</c:if>
-	
-	<script type="text/javascript">
-	<!--
-		var toolContentID = "${sessionMap.toolContentID}";
-	//-->
-	</script>
 
 	<div id="header">
 		<!--  TITLE KEY PAGE GOES HERE -->
@@ -37,7 +30,6 @@
 			<lams:Tab id="1" key="button.basic" />
 			<c:if test="${sessionMap.mode == 'author'}">
 				<lams:Tab id="2" key="button.advanced" />
-				<lams:Tab id="3" key="button.instructions" />
 			</c:if>
 		</lams:Tabs>
 	</div>
@@ -54,11 +46,7 @@
 		<html:hidden property="mapCenterLongitude" value="" styleId="mapCenterLongitude" />
 		<html:hidden property="mapType" value="" styleId="mapType" />
 
-
 		<div id="message" style="text-align: center;">
-			<c:if test="${unsavedChanges}">
-				<fmt:message key="message.unsavedChanges" />
-			</c:if>
 			<logic:messagesPresent>
 				<p class="warning">
 				        <html:messages id="error">
@@ -68,15 +56,12 @@
 			</logic:messagesPresent>			
 		</div>
 
-		<lams:help toolSignature="<%=GmapConstants.TOOL_SIGNATURE%>"
-			module="authoring" />
+		<lams:help toolSignature="<%=GmapConstants.TOOL_SIGNATURE%>" module="authoring" />
 
 		<%-- Page tabs --%>
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
 		<c:if test="${sessionMap.mode == 'author'}">
 			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.instructions"
-				page="instructions.jsp" />
 		</c:if>
 
 		<lams:AuthoringButton formID="authoringForm"

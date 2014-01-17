@@ -68,8 +68,6 @@ public class Message implements Cloneable {
     private ForumReport report;
     private Set sessionClones;
 
-    private ForumToolContentHandler toolContentHandler;
-
     public Message() {
 	attachments = new TreeSet();
 	sessionClones = new HashSet();
@@ -78,9 +76,8 @@ public class Message implements Cloneable {
     // **********************************************************
     // Function method for Message
     // **********************************************************
-    public static Message newInstance(Message fromMsg, ForumToolContentHandler toolContentHandler) {
+    public static Message newInstance(Message fromMsg) {
 	Message toMsg = new Message();
-	fromMsg.toolContentHandler = toolContentHandler;
 	toMsg = (Message) fromMsg.clone();
 	return toMsg;
     }
@@ -143,7 +140,6 @@ public class Message implements Cloneable {
 	clone.setReplyNumber(this.getReplyNumber());
 	clone.setReport(this.getReport());
 	clone.setSubject(this.getSubject());
-	clone.setToolContentHandler(this.getToolContentHandler());
 	clone.setUpdated(clone.getUpdated());
 
 	// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
@@ -515,14 +511,6 @@ public class Message implements Cloneable {
 
     public String toString() {
 	return new ToStringBuilder(this).append("uid", uid).append("subject", subject).append("body", body).toString();
-    }
-
-    public ForumToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
 }

@@ -76,7 +76,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO;
-import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryAttachmentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
@@ -134,8 +133,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     private ImageVoteDAO imageVoteDao;
 
-    private ImageGalleryAttachmentDAO imageGalleryAttachmentDao;
-
     private ImageGalleryUserDAO imageGalleryUserDao;
 
     private ImageGallerySessionDAO imageGallerySessionDao;
@@ -152,7 +149,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryOutputFactory imageGalleryOutputFactory;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -173,69 +169,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws ImageGalleryException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the ImageGallery Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws ImageGalleryException
-     */
-    private ITicket getRepositoryLoginTicket() throws ImageGalleryException {
-	ICredentials credentials = new SimpleCredentials(imageGalleryToolContentHandler.getRepositoryUser(),
-		imageGalleryToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, imageGalleryToolContentHandler
-		    .getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ImageGalleryException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ImageGalleryException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ImageGalleryException("Login failed." + e.getMessage());
-	}
-    }
 
     public ImageGallery getImageGalleryByContentId(Long contentId) {
 	ImageGallery rs = imageGalleryDao.getByContentId(contentId);
@@ -255,30 +188,13 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	ImageGallery defaultContent = getDefaultImageGallery();
 	// save default content by given ID.
 	ImageGallery content = new ImageGallery();
-	content = ImageGallery.newInstance(defaultContent, contentId, imageGalleryToolContentHandler);
+	content = ImageGallery.newInstance(defaultContent, contentId);
 	// content.setNextImageTitle(new Long(1));
 	return content;
     }
 
     public List getAuthoredItems(Long imageGalleryUid) {
 	return imageGalleryItemDao.getAuthoringItems(imageGalleryUid);
-    }
-
-    public ImageGalleryAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadImageGalleryFileException {
-
-	// upload file to repository
-	NodeKey nodeKey = uploadFormFile(uploadFile, fileType);
-
-	// create new attachement
-	ImageGalleryAttachment file = new ImageGalleryAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     public void saveUser(ImageGalleryUser imageGalleryUser) {
@@ -293,23 +209,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return imageGalleryUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new ImageGalleryException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
     public void saveOrUpdateImageGallery(ImageGallery imageGallery) {
 	imageGalleryDao.saveObject(imageGallery);
-    }
-
-    public void deleteImageGalleryAttachment(Long attachmentUid) {
-	imageGalleryAttachmentDao.removeObject(ImageGalleryAttachment.class, attachmentUid);
-
     }
 
     public ImageGalleryItem getImageGalleryItemByUid(Long itemUid) {
@@ -631,7 +532,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throws UploadImageGalleryFileException {
 	try {
 	    // upload file
-	    NodeKey nodeKey = uploadFormFile(file, IToolContentHandler.TYPE_ONLINE);
+	    NodeKey nodeKey = uploadFormFile(file);
 	    image.setFileName(file.getFileName());
 	    image.setFileType(file.getContentType());
 	    image.setFileVersionId(nodeKey.getVersion());
@@ -650,8 +551,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalImage, mediumImageDimensions);
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
-	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName, file
-		    .getContentType(), IToolContentHandler.TYPE_ONLINE);
+	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
+		    file.getContentType());
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 
 	    ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
@@ -665,8 +566,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumImage, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
-	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName, file
-		    .getContentType(), IToolContentHandler.TYPE_ONLINE);
+	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
+		    file.getContentType());
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
@@ -694,7 +595,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey uploadFormFile(FormFile file, String fileType) throws UploadImageGalleryFileException {
+    private NodeKey uploadFormFile(FormFile file) throws UploadImageGalleryFileException {
 	if (file == null || StringUtils.isEmpty(file.getFileName())) {
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.upload.file.not.found",
 		    new Object[] { file }));
@@ -702,8 +603,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	NodeKey node = null;
 	try {
-	    node = imageGalleryToolContentHandler.uploadFile(file.getInputStream(), file.getFileName(), file
-		    .getContentType(), fileType);
+	    node = imageGalleryToolContentHandler.uploadFile(file.getInputStream(), file.getFileName(),
+		    file.getContentType());
 	} catch (InvalidParameterException e) {
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	} catch (FileNotFoundException e) {
@@ -734,15 +635,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setImageGalleryAttachmentDao(ImageGalleryAttachmentDAO imageGalleryAttachmentDao) {
-	this.imageGalleryAttachmentDao = imageGalleryAttachmentDao;
-    }
-
+    
     public void setImageGalleryDao(ImageGalleryDAO imageGalleryDao) {
 	this.imageGalleryDao = imageGalleryDao;
     }
@@ -813,10 +706,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	// set ImageGalleryToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = ImageGallery.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = ImageGallery.newInstance(toolContentObj, toolContentId);
 	Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
 	for (ImageGalleryItem image : images) {
 	    image.setComments(null);
@@ -832,21 +722,18 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    originalFile.setFileUuid(image.getOriginalFileUuid());
 	    originalFile.setFileVersionId(image.getFileVersionId());
 	    originalFile.setFileName(fileName);
-	    originalFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setOriginalFile(originalFile);
 
 	    ImageGalleryAttachment mediumFile = new ImageGalleryAttachment();
 	    mediumFile.setFileUuid(image.getMediumFileUuid());
 	    mediumFile.setFileVersionId(image.getFileVersionId());
 	    mediumFile.setFileName(ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX + fileName);
-	    mediumFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setMediumFile(mediumFile);
 
 	    ImageGalleryAttachment thumbnailFile = new ImageGalleryAttachment();
 	    thumbnailFile.setFileUuid(image.getThumbnailFileUuid());
 	    thumbnailFile.setFileVersionId(image.getFileVersionId());
 	    thumbnailFile.setFileName(ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX + fileName);
-	    thumbnailFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setThumbnailFile(thumbnailFile);
 	}
 
@@ -864,6 +751,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    String toVersion) throws ToolException {
 
 	try {
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(ImageGalleryImportContentVersionFilter.class);
+	
 	    exportContentService.registerFileClassForImport(ImageGalleryAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
 
@@ -943,7 +833,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    }
 	}
 
-	ImageGallery toContent = ImageGallery.newInstance(imageGallery, toContentId, imageGalleryToolContentHandler);
+	ImageGallery toContent = ImageGallery.newInstance(imageGallery, toContentId);
 	imageGalleryDao.saveObject(toContent);
 
 	// save imageGallery items as well
@@ -959,22 +849,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public String getToolContentTitle(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).getTitle();
-    }
-    
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
-	if (imageGallery == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	imageGallery.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
-	if (imageGallery == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	imageGallery.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

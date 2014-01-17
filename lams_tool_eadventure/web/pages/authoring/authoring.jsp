@@ -57,17 +57,6 @@
 			}
 		}
 
-        function doUploadOnline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
-        	myForm.submit();
-        }
-        function doUploadOffline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
-        	myForm.submit();
-        }
-        
         function changeViewNum(initVal){
 			var tb = document.getElementById("itemTable");
 			var num = tb.getElementsByTagName("tr");

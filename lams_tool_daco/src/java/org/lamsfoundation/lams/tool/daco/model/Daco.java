@@ -59,7 +59,6 @@ public class Daco implements Cloneable {
 	private String instructions;
 
 	// advance
-	private boolean runOffline;
 
 	private boolean lockOnFinished;
 
@@ -70,13 +69,6 @@ public class Daco implements Cloneable {
 	private Short minRecords;
 
 	private Short maxRecords;
-
-	// instructions
-	private String onlineInstructions;
-
-	private String offlineInstructions;
-
-	private Set<DacoAttachment> attachments = new LinkedHashSet();
 
 	// general infomation
 	private Date created;
@@ -96,19 +88,11 @@ public class Daco implements Cloneable {
 
 	private boolean notifyTeachersOnRecordSumbit;
 
-	// *************** NON Persist Fields ********************
-	private IToolContentHandler toolContentHandler;
-
-	private List<DacoAttachment> onlineFileList;
-
-	private List<DacoAttachment> offlineFileList;
-
 	// **********************************************************
 	// Function method for Daco
 	// **********************************************************
-	public static Daco newInstance(Daco defaultContent, Long contentId, DacoToolContentHandler dacoToolContentHandler) {
+	public static Daco newInstance(Daco defaultContent, Long contentId) {
 		Daco toContent = new Daco();
-		defaultContent.toolContentHandler = dacoToolContentHandler;
 		toContent = (Daco) defaultContent.clone();
 		toContent.setContentId(contentId);
 
@@ -137,11 +121,6 @@ public class Daco implements Cloneable {
 				daco.getDacoQuestions().add(clonedQuestion);
 			}
 
-			daco.setAttachments(new LinkedHashSet<DacoAttachment>(attachments.size()));
-			for (DacoAttachment attachment : attachments) {
-				daco.getAttachments().add((DacoAttachment) attachment.clone());
-			}
-
 			if (createdBy != null) {
 				daco.setCreatedBy((DacoUser) createdBy.clone());
 			}
@@ -165,15 +144,13 @@ public class Daco implements Cloneable {
 		final Daco genericEntity = (Daco) o;
 
 		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
-				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
-				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
+				genericEntity.instructions).append(created, genericEntity.created).append(updated,
 				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
 	}
 
 	/**
@@ -186,22 +163,6 @@ public class Daco implements Cloneable {
 			this.setCreated(new Date(now));
 		}
 		this.setUpdated(new Date(now));
-	}
-
-	public void toDTO() {
-		onlineFileList = new ArrayList<DacoAttachment>();
-		offlineFileList = new ArrayList<DacoAttachment>();
-		Set<DacoAttachment> fileSet = this.getAttachments();
-		if (fileSet != null) {
-			for (DacoAttachment file : fileSet) {
-				if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-					offlineFileList.add(file);
-				}
-				else {
-					onlineFileList.add(file);
-				}
-			}
-		}
 	}
 
 	// **********************************************************
@@ -292,26 +253,6 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the runOffline.
-	 * 
-	 * @hibernate.property column="run_offline"
-	 * 
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
-
-	/**
-	 * @param runOffline
-	 *            The forceOffLine to set.
-	 * 
-	 * 
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		runOffline = forceOffline;
-	}
-
-	/**
 	 * @return Returns the lockOnFinish.
 	 * 
 	 * @hibernate.property column="lock_on_finished"
@@ -340,51 +281,6 @@ public class Daco implements Cloneable {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 * 
-	 * @hibernate.property column="online_instructions" type="text"
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 * 
-	 * @hibernate.property column="offline_instructions" type="text"
-	 */
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	/**
-	 * 
-	 * @hibernate.set lazy="true" cascade="all"  order-by="create_date desc"
-	 * @hibernate.collection-key column="content_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAttachment"
-	 * 
-	 * @return a set of Attachments to this Message.
-	 */
-	public Set<DacoAttachment> getAttachments() {
-		return attachments;
-	}
-
-	/**
-	 * @param attachments The attachments to set.
-	 */
-	public void setAttachments(Set<DacoAttachment> attachments) {
-		this.attachments = attachments;
 	}
 
 	/**
@@ -438,26 +334,6 @@ public class Daco implements Cloneable {
 
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
-	}
-
-	public List<DacoAttachment> getOfflineFileList() {
-		return offlineFileList;
-	}
-
-	public void setOfflineFileList(List<DacoAttachment> offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-
-	public List<DacoAttachment> getOnlineFileList() {
-		return onlineFileList;
-	}
-
-	public void setOnlineFileList(List<DacoAttachment> onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 
 	/**

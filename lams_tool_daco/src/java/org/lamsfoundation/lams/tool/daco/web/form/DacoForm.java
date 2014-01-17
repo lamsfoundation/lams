@@ -79,7 +79,6 @@ public class DacoForm extends ActionForm {
 			daco.setLockOnFinished(false);
 			daco.setDefineLater(false);
 
-			daco.setRunOffline(false);
 			daco.setReflectOnActivity(false);
 		}
 	}

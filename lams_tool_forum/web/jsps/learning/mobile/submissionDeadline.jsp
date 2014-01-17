@@ -1,28 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<div id="content">
-
+<div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
 		<fmt:message key="activity.title" />
 	</h1>
+</div>
 
-	<c:choose>
-		<c:when test="${empty sessionMap.submissionDeadline}">
-			<p>
-				<fmt:message key="run.offline.message" />
-			</p>	
-		</c:when>
-		<c:otherwise>
-			<div class="warning">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
-				</fmt:message>
-			</div>
-		</c:otherwise>
-	</c:choose>
+<div data-role="content">
 
-	<div class="space-bottom-top align-right">
+	<div class="warning">
+		<fmt:message key="authoring.info.teacher.set.restriction" >
+			<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+		</fmt:message>
+	</div>
+
+</div>
+
+<div data-role="footer" data-theme="b" class="ui-bar">
+	<span class="ui-finishbtn-right">
+	
 		<c:set var="continue">
 			<html:rewrite
 				page="/learning/newReflection.do?sessionMapID=${sessionMapID}" />
@@ -33,7 +30,7 @@
 		
 		<script type="text/javascript">
 			function submitFinish() {
-				document.getElementById("finishButton").disabled = true;
+				document.getElementById("finish").disabled = true;
 				location.href = '${finish}';
 			}		
 		</script>
@@ -41,15 +38,13 @@
 		<c:choose>
 			<c:when
 				test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
-				<html:button property="continue"
-					onclick="javascript:location.href='${continue}';"
-					styleClass="button">
+				<button name="continue" onclick="javascript:location.href='${continue}';" data-icon="arrow-r" data-theme="b">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo"  property="finish" styleId="finishButton"
-					onclick="submitFinish();" styleClass="button">
+				<a href="#nogo"  name="finish" id="finish"
+					onclick="submitFinish();" data-role="button" data-icon="arrow-r" data-theme="b">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -60,11 +55,11 @@
 		 					</c:otherwise>
 		 				</c:choose>
 			 		</span>
-				</html:link>
+				</a>
 			</c:otherwise>
 		</c:choose>
-
-	</div>
+		
+	</span>
 </div>
 
 

@@ -85,14 +85,6 @@ public interface ForumConstants {
 
     public static final String ATTR_LOCK_WHEN_FINISHED = "lockedWhenFinished";
 
-    public static final String ONLINE_ATTACHMENT = "online_att";
-
-    public static final String OFFLINE_ATTACHMENT = "offline_att";
-
-    public static final String ATTACHMENT_LIST = "attachmentList";
-
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-
     public static final String TOPIC_DELETED_ATTACHMENT_LIST = "topicDeletedAttachmentList";
 
     public static final String DELETED_AUTHORING_TOPICS_LIST = "deletedAuthoringTopicList";
@@ -105,11 +97,11 @@ public interface ForumConstants {
     
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
 
-    // for submission deadline LDEV-2657
+    // for submission deadline
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 
-	public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     // used in monitoring
     public static final String TITLE = "title";
@@ -134,8 +126,6 @@ public interface ForumConstants {
 
     public static final String ATTR_REPORT = "report";
 
-    public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
-
     public static final String PARAM_UPDATE_MODE = "updateMode";
 
     public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
@@ -154,6 +144,8 @@ public interface ForumConstants {
     public static final String ATTR_REFLECTION_ON = "reflectOn";
 
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+    
+    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 

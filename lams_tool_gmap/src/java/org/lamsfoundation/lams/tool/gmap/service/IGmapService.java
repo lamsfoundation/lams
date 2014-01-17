@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
@@ -67,31 +66,6 @@ public interface IGmapService {
 	 * @return
 	 */
 	public Gmap getGmapByContentId(Long toolContentID);
-
-	/**
-	 * @param toolContentId
-	 * @param file
-	 * @param type
-	 * @return
-	 */
-	public GmapAttachment uploadFileToContent(Long toolContentId,
-			FormFile file, String type);
-
-	/**
-	 * @param uuid
-	 * @param versionID
-	 */
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws GmapException;
-
-	/**
-	 * @param contentID
-	 * @param uuid
-	 * @param versionID
-	 * @param type
-	 */
-	public void deleteInstructionFile(Long contentID, Long uuid,
-			Long versionID, String type);
 
 	/**
 	 * @param gmap

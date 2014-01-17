@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
-import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
@@ -75,16 +74,6 @@ public interface IDacoService {
      * @throws DacoApplicationException
      */
     Daco getDefaultContent(Long contentId) throws DacoApplicationException;
-
-    /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadDacoFileException
-     */
-    DacoAttachment uploadInstructionFile(FormFile file, String type) throws UploadDacoFileException;
 
     /**
      * Upload daco answer file to repository
@@ -132,14 +121,6 @@ public interface IDacoService {
     void saveOrUpdateDaco(Daco Daco);
 
     void saveOrUpdateAnswer(DacoAnswer answer);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteDacoAttachment(Long attachmentUid);
 
     /**
      * Delete question from database.

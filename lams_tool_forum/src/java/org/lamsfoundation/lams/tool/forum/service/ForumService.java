@@ -34,13 +34,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -53,10 +53,8 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -363,54 +361,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return replyMessage;
     }
 
-    public Attachment uploadInstructionFile(FormFile uploadFile, String fileType) throws PersistenceException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new ForumException("Could not find upload file: " + uploadFile);
-	}
-
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	Attachment file = new Attachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
-
-    }
-
-    /**
-     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
-     * repository
-     * 
-     * @param uuid
-     *            The <code>uuid</code> of the node to be deleted
-     * @param versionID
-     *            The <code>version_id</code> of the node to be deleted.
-     * @throws SubmitFilesException
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws ForumException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new ForumException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
     public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
 	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
 	    throw new ForumException("Could not find upload file: " + uploadFile);
 	}
 
-	NodeKey nodeKey = processFile(uploadFile, IToolContentHandler.TYPE_ONLINE);
+	NodeKey nodeKey = processFile(uploadFile);
 	Attachment file = new Attachment();
-	file.setFileType(IToolContentHandler.TYPE_ONLINE);
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
 	file.setFileName(uploadFile.getFileName());
@@ -656,13 +613,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) {
+    private NodeKey processFile(FormFile file) {
 	NodeKey node = null;
 	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
-		node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
+		node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
 		throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (FileNotFoundException e) {
@@ -762,7 +718,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    fromContent = getDefaultForum();
 	}
 
-	Forum toContent = Forum.newInstance(fromContent, toContentId, forumToolContentHandler);
+	Forum toContent = Forum.newInstance(fromContent, toContentId);
 
 	// save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 	Set topics = toContent.getMessages();
@@ -785,24 +741,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 	
 	forumDao.saveOrUpdate(toContent);
-
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Forum forum = forumDao.getByContentId(toolContentId);
-	if (forum == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	forum.setDefineLater(value);
-	forum.setContentInUse(false);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Forum forum = forumDao.getByContentId(toolContentId);
-	if (forum == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	forum.setRunOffline(value);
 
     }
 
@@ -839,8 +777,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	// set ResourceToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Forum.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
+	toolContentObj = Forum.newInstance(toolContentObj, toolContentId);
 	toolContentObj.setCreatedBy(null);
 	Set<Message> items = toolContentObj.getMessages();
 	Set<Message> authorItems = new HashSet<Message>();
@@ -851,7 +788,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		item.setModifiedBy(null);
 		item.setToolSession(null);
 		item.setForum(null);
-		item.setToolContentHandler(null);
 		item.setReport(null);
 		item.setReplyNumber(0);
 		item.setParent(null);
@@ -877,6 +813,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    String toVersion) throws ToolException {
 
 	try {
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(ForumImportContentVersionFilter.class);
+	    
 	    exportContentService.registerFileClassForImport(Attachment.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, null);
 
@@ -960,7 +899,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (contentTopics != null && contentTopics.size() > 0) {
 	    for (Message msg : contentTopics) {
 		if (msg.getIsAuthored() && msg.getToolSession() == null) {
-		    Message newMsg = Message.newInstance(msg, forumToolContentHandler);
+		    Message newMsg = Message.newInstance(msg);
 		    msg.getSessionClones().add(newMsg);
 		    createRootTopic(forum.getContentId(), session, newMsg);
 		}
@@ -1049,7 +988,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	}
 	// get default content by given ID.
-	Forum content = Forum.newInstance(defaultContent, contentID, forumToolContentHandler);
+	Forum content = Forum.newInstance(defaultContent, contentID);
 
 	return content;
     }
@@ -1092,9 +1031,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    toolContentObj.setLockWhenFinished(bool != null ? !bool.booleanValue() : false);
 	    toolContentObj.setMaximumReply(0);
 	    toolContentObj.setMinimumReply(0);
-	    toolContentObj.setOfflineInstructions(null);
-	    toolContentObj.setOnlineInstructions(null);
-	    toolContentObj.setRunOffline(Boolean.FALSE);
 	    toolContentObj.setUpdated(now);
 
 	    // unused entries from 1.0.2

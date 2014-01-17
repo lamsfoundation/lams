@@ -54,24 +54,20 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption;
-import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.DacoApplicationException;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
-import org.lamsfoundation.lams.tool.daco.service.UploadDacoFileException;
 import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoForm;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -86,34 +82,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class AuthoringAction extends Action {
 
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
-
-	/**
-	 * Delete offline instruction file from current Daco authoring page.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-	}
-
-	/**
-	 * Delete online instruction file from current Daco authoring page.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-	}
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -151,18 +119,6 @@ public class AuthoringAction extends Action {
 		if (param.equals("updateContent")) {
 			return updateContent(mapping, form, request, response);
 		}
-		if (param.equals("uploadOnlineFile")) {
-			return uploadOnline(mapping, form, request, response);
-		}
-		if (param.equals("uploadOfflineFile")) {
-			return uploadOffline(mapping, form, request, response);
-		}
-		if (param.equals("deleteOnlineFile")) {
-			return deleteOnlineFile(mapping, form, request, response);
-		}
-		if (param.equals("deleteOfflineFile")) {
-			return deleteOfflineFile(mapping, form, request, response);
-		}
 		// ----------------------- Add daco question function
 		// ---------------------------
 		if (param.equals("newQuestion")) {
@@ -185,77 +141,6 @@ public class AuthoringAction extends Action {
 		}
 
 		return mapping.findForward(DacoConstants.ERROR);
-	}
-
-	/**
-	 * Handle upload offline instruction files request.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws UploadDacoFileException
-	 */
-	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws UploadDacoFileException {
-		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-	}
-
-	/**
-	 * Handle upload online instruction files request.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws UploadDacoFileException
-	 */
-	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws UploadDacoFileException {
-		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-	}
-
-	/**
-	 * General method to delete file (online or offline)
-	 * 
-	 * @param mapping
-	 * @param request
-	 * @param response
-	 * @param form
-	 * @param type
-	 * @return
-	 */
-	protected ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-			ActionForm form, String type) {
-		Long versionID = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_FILE_VERSION_ID));
-		Long uuID = new Long(WebUtil.readLongParam(request, DacoConstants.PARAM_FILE_UUID));
-
-		// get back sessionMAP
-		String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-		// handle session value
-		List attachmentList = getAttachmentList(sessionMap);
-		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-		// first check exist attachment and delete old one (if exist) to
-		// deletedAttachmentList
-		Iterator iter = attachmentList.iterator();
-		DacoAttachment existAtt;
-		while (iter.hasNext()) {
-			existAtt = (DacoAttachment) iter.next();
-			if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-				// if there is same name attachment, delete old one
-				deleteAttachmentList.add(existAtt);
-				iter.remove();
-			}
-		}
-
-		request.setAttribute(DacoConstants.ATTR_FILE_TYPE_FLAG, type);
-		request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-		return mapping.findForward(DacoConstants.SUCCESS);
-
 	}
 
 	/**
@@ -465,14 +350,6 @@ public class AuthoringAction extends Action {
 		return answerOptionList;
 	}
 
-	/**
-	 * @param request
-	 * @return
-	 */
-	protected List getAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap, DacoConstants.ATTR_ATTACHMENT_LIST);
-	}
-
 	// *************************************************************************************
 	// Private method
 	// *************************************************************************************
@@ -482,14 +359,6 @@ public class AuthoringAction extends Action {
 	protected IDacoService getDacoService() {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 		return (IDacoService) wac.getBean(DacoConstants.DACO_SERVICE);
-	}
-
-	/**
-	 * @param request
-	 * @return
-	 */
-	protected List getDeletedAttachmentList(SessionMap sessionMap) {
-		return getListFromSession(sessionMap, DacoConstants.ATTR_DELETED_ATTACHMENT_LIST);
 	}
 
 	/**
@@ -851,11 +720,6 @@ public class AuthoringAction extends Action {
 			}
 
 			dacoForm.setDaco(daco);
-
-			// initialize instruction attachment list
-			List attachmentList = getAttachmentList(sessionMap);
-			attachmentList.clear();
-			attachmentList.addAll(daco.getAttachments());
 		}
 		catch (Exception e) {
 			AuthoringAction.log.error(e);
@@ -967,48 +831,7 @@ public class AuthoringAction extends Action {
 		}
 
 		dacoPO.setCreatedBy(dacoUser);
-		// **********************************Handle Authoring Instruction
-		// Attachement *********************
-		// merge attachment info
-		// so far, attPOSet will be empty if content is existed. because
-		// PropertyUtils.copyProperties() is executed
-		Set attPOSet = dacoPO.getAttachments();
-		if (attPOSet == null) {
-			attPOSet = new HashSet();
-		}
-		List attachmentList = getAttachmentList(sessionMap);
-		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 
-		// current attachemnt in authoring instruction tab.
-		Iterator iter = attachmentList.iterator();
-		while (iter.hasNext()) {
-			DacoAttachment newAtt = (DacoAttachment) iter.next();
-			attPOSet.add(newAtt);
-		}
-		attachmentList.clear();
-
-		// deleted attachment. 2 possible types: one is persist another is
-		// non-persist before.
-		iter = deleteAttachmentList.iterator();
-		while (iter.hasNext()) {
-			DacoAttachment delAtt = (DacoAttachment) iter.next();
-			iter.remove();
-			// it is an existed att, then delete it from current attachmentPO
-			if (delAtt.getUid() != null) {
-				Iterator attIter = attPOSet.iterator();
-				while (attIter.hasNext()) {
-					DacoAttachment att = (DacoAttachment) attIter.next();
-					if (delAtt.getUid().equals(att.getUid())) {
-						attIter.remove();
-						break;
-					}
-				}
-				service.deleteDacoAttachment(delAtt.getUid());
-			}// end remove from persist value
-		}
-
-		// copy back
-		dacoPO.setAttachments(attPOSet);
 		// ************************* Handle daco questions *******************
 		// Handle daco questions
 		SortedSet<DacoQuestion> formQuestionSet = getQuestionList(sessionMap);
@@ -1027,7 +850,7 @@ public class AuthoringAction extends Action {
 
 		// delete questions from database
 		List<DacoQuestion> deletedQuestionList = getDeletedDacoQuestionList(sessionMap);
-		iter = deletedQuestionList.iterator();
+		Iterator<DacoQuestion> iter = deletedQuestionList.iterator();
 		while (iter.hasNext()) {
 			DacoQuestion question = (DacoQuestion) iter.next();
 			iter.remove();
@@ -1035,9 +858,6 @@ public class AuthoringAction extends Action {
 				service.deleteDacoQuestion(question.getUid());
 			}
 		}
-		// initialize attachmentList again
-		attachmentList = getAttachmentList(sessionMap);
-		attachmentList.addAll(daco.getAttachments());
 		dacoForm.setDaco(dacoPO);
 
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -1048,70 +868,6 @@ public class AuthoringAction extends Action {
 		else {
 			return mapping.findForward("monitor");
 		}
-
-	}
-
-	/**
-	 * Common method to upload online or offline instruction files request.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param type
-	 * @param request
-	 * @return
-	 * @throws UploadDacoFileException
-	 */
-	protected ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-			throws UploadDacoFileException {
-
-		DacoForm dacoForm = (DacoForm) form;
-		// get back sessionMAP
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(dacoForm.getSessionMapID());
-
-		FormFile file;
-		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-			file = dacoForm.getOfflineFile();
-		}
-		else {
-			file = dacoForm.getOnlineFile();
-		}
-
-		if (file == null || StringUtils.isBlank(file.getFileName())) {
-			return mapping.findForward(DacoConstants.SUCCESS);
-		}
-
-		// validate file size
-		ActionMessages errors = new ActionMessages();
-		FileValidatorUtil.validateFileSize(file, true, errors);
-		if (!errors.isEmpty()) {
-			this.saveErrors(request, errors);
-			return mapping.findForward(DacoConstants.SUCCESS);
-		}
-
-		IDacoService service = getDacoService();
-		// upload to repository
-		DacoAttachment att = service.uploadInstructionFile(file, type);
-		// handle session value
-		List attachmentList = getAttachmentList(sessionMap);
-		List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-		// first check exist attachment and delete old one (if exist) to
-		// deletedAttachmentList
-		Iterator iter = attachmentList.iterator();
-		DacoAttachment existAtt;
-		while (iter.hasNext()) {
-			existAtt = (DacoAttachment) iter.next();
-			if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-					&& StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-				// if there is same name attachment, delete old one
-				deleteAttachmentList.add(existAtt);
-				iter.remove();
-				break;
-			}
-		}
-		// add to attachmentList
-		attachmentList.add(att);
-
-		return mapping.findForward(DacoConstants.SUCCESS);
 
 	}
 

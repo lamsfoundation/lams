@@ -70,16 +70,6 @@ public interface IImageGalleryService {
     List getAuthoredItems(Long imageGalleryUid);
 
     /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadImageGalleryFileException
-     */
-    ImageGalleryAttachment uploadInstructionFile(FormFile file, String type) throws UploadImageGalleryFileException;
-
-    /**
      * Upload imageGallery item file to repository. i.e., single file, websize zip file, or learning object zip file.
      * 
      * @param item
@@ -111,26 +101,12 @@ public interface IImageGalleryService {
      */
     ImageGalleryUser getUserByIDAndSession(Long userId, Long sessionId);
 
-    // ********** Repository methods ***********************
-    /**
-     * Delete file from repository.
-     */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryException;
-
     /**
      * Save or update imageGallery into database.
      * 
      * @param ImageGallery
      */
     void saveOrUpdateImageGallery(ImageGallery ImageGallery);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteImageGalleryAttachment(Long attachmentUid);
 
     /**
      * Delete resoruce item from database.

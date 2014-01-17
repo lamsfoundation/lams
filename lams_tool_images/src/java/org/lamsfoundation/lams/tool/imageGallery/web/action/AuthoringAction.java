@@ -117,18 +117,6 @@ public class AuthoringAction extends Action {
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
 	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
-	}
 	// ----------------------- Add imageGallery item function ---------------------------
 	if (param.equals("newImageInit")) {
 	    return newImageInit(mapping, form, request, response);
@@ -208,11 +196,6 @@ public class AuthoringAction extends Action {
 
 	    imageGalleryForm.setImageGallery(imageGallery);
 	    imageGalleryForm.setAllowRatingsOrVote(imageGallery.isAllowVote() || imageGallery.isAllowRank());
-
-	    // initialize instruction attachment list
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(imageGallery.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -351,45 +334,6 @@ public class AuthoringAction extends Action {
 
 	imageGalleryPO.setCreatedBy(imageGalleryUser);
 
-	// **********************************Handle Authoring Instruction Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
-	Set attPOSet = imageGalleryPO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    ImageGalleryAttachment newAtt = (ImageGalleryAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is non-persist before.
-	iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    ImageGalleryAttachment delAtt = (ImageGalleryAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    ImageGalleryAttachment att = (ImageGalleryAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteImageGalleryAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-	// copy back
-	imageGalleryPO.setAttachments(attPOSet);
-
 	// ************************* Handle imageGallery allowRank item *******************
 	imageGalleryPO.setAllowRank(imageGalleryForm.isAllowRatingsOrVote() && !imageGalleryPO.isAllowVote());
 
@@ -397,7 +341,7 @@ public class AuthoringAction extends Action {
 	// Handle imageGallery items
 	Set itemList = new LinkedHashSet();
 	SortedSet imageList = getImageList(sessionMap);
-	iter = imageList.iterator();
+	Iterator iter = imageList.iterator();
 	while (iter.hasNext()) {
 	    ImageGalleryItem item = (ImageGalleryItem) iter.next();
 	    if (item != null) {
@@ -429,9 +373,6 @@ public class AuthoringAction extends Action {
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(imageGallery.getAttachments());
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -440,166 +381,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadImageGalleryFileException
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadImageGalleryFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadImageGalleryFileException
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadImageGalleryFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadImageGalleryFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-	    throws UploadImageGalleryFileException {
-
-	ImageGalleryForm imageGalleryForm = (ImageGalleryForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageGalleryForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = imageGalleryForm.getOfflineFile();
-	} else {
-	    file = imageGalleryForm.getOnlineFile();
-	}
-
-	if ((file == null) || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(ImageGalleryConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(ImageGalleryConstants.SUCCESS);
-	}
-
-	IImageGalleryService service = getImageGalleryService();
-	// upload to repository
-	ImageGalleryAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ImageGalleryAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ImageGalleryAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current ImageGallery authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current ImageGallery authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	ImageGalleryAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (ImageGalleryAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(ImageGalleryConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-
     }
 
     // **********************************************************
@@ -868,22 +649,6 @@ public class AuthoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ImageGalleryConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_ATTACHMENT_LIST);
     }
 
     /**

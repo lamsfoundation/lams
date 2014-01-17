@@ -111,27 +111,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	return FILENAME;
     }
 
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-
-	    CommonCartridge content = null;
-	    if (toolContentID != null) {
-		content = service.getCommonCartridgeByContentId(toolContentID);
-	    } else {
-		CommonCartridgeSession session = service.getCommonCartridgeSessionBySessionId(toolSessionID);
-		if (session != null)
-		    content = session.getCommonCartridge();
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
-    }
-
     public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies, HashMap sessionMap) throws CommonCartridgeApplicationException {
 

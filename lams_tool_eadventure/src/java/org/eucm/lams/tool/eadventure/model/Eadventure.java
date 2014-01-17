@@ -60,20 +60,12 @@ public class Eadventure implements Cloneable {
 	private String instructions;
 
 	//advance
-	private boolean runOffline;
 
 	private boolean lockWhenFinished;
 
 	private boolean defineLater;
 
 	private boolean contentInUse;
-
-	//instructions
-	private String onlineInstructions;
-
-	private String offlineInstructions;
-
-	private Set attachments;
 
 	//general infomation
 	private Date created;
@@ -115,21 +107,12 @@ public class Eadventure implements Cloneable {
 	 // DTO fields:
 	 private boolean complete;
 	
-	//*************** NON Persist Fields ********************
-	// manages the content in the repository
-	private IToolContentHandler toolContentHandler;
-
-	private List<EadventureAttachment> onlineFileList;
-
-	private List<EadventureAttachment> offlineFileList;
-	
 	
 	/**
 	 * Default contruction method. 
 	 *
 	 */
 	public Eadventure() {
-		attachments = new HashSet();
 		params = new HashSet();
 		conditions = new HashSet(); 
 		
@@ -138,10 +121,8 @@ public class Eadventure implements Cloneable {
 	//  **********************************************************
 	//		Function method for Eadventure
 	//  **********************************************************
-	public static Eadventure newInstance(Eadventure defaultContent, Long contentId,
-			EadventureToolContentHandler eadventureToolContentHandler) {
+	public static Eadventure newInstance(Eadventure defaultContent, Long contentId) {
 		Eadventure toContent = new Eadventure();
-		defaultContent.toolContentHandler = eadventureToolContentHandler;
 		toContent = (Eadventure) defaultContent.clone();
 		toContent.setContentId(contentId);
 
@@ -160,19 +141,6 @@ public class Eadventure implements Cloneable {
 		try {
 			eadventure = (Eadventure) super.clone();
 			eadventure.setUid(null);
-			//clone attachment
-			if (attachments != null) {
-				Iterator iter = attachments.iterator();
-				Set set = new HashSet();
-				while (iter.hasNext()) {
-					EadventureAttachment file = (EadventureAttachment) iter.next();
-					EadventureAttachment newFile = (EadventureAttachment) file.clone();
-					//  				just clone old file without duplicate it in repository
-
-					set.add(newFile);
-				}
-				eadventure.attachments = set;
-			}
 			//clone ReourceUser as well
 			if (createdBy != null) {
 				eadventure.setCreatedBy((EadventureUser) createdBy.clone());
@@ -234,17 +202,16 @@ public class Eadventure implements Cloneable {
 
 		final Eadventure genericEntity = (Eadventure) o;
 
-		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
-				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
-				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
-				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
+		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
 	}
 
 	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
-	}
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
+    }
 
 	/**
 	 * Updates the modification data for this entity.
@@ -256,22 +223,6 @@ public class Eadventure implements Cloneable {
 			this.setCreated(new Date(now));
 		}
 		this.setUpdated(new Date(now));
-	}
-
-	public void toDTO() {
-		onlineFileList = new ArrayList<EadventureAttachment>();
-		offlineFileList = new ArrayList<EadventureAttachment>();
-		Set<EadventureAttachment> fileSet = this.getAttachments();
-		if (fileSet != null) {
-			for (EadventureAttachment file : fileSet) {
-				if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-					offlineFileList.add(file);
-				}
-				else {
-					onlineFileList.add(file);
-				}
-			}
-		}
 	}
 
 	//**********************************************************
@@ -364,26 +315,6 @@ public class Eadventure implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the runOffline.
-	 *
-	 * @hibernate.property 
-	 * 		column="run_offline"
-	 *
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
-
-	/**
-	 * @param runOffline The forceOffLine to set.
-	 *
-	 *
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		runOffline = forceOffline;
-	}
-
-	/**
 	 * @return Returns the lockWhenFinish.
 	 *
 	 * @hibernate.property
@@ -414,59 +345,6 @@ public class Eadventure implements Cloneable {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="online_instructions"
-	 *      type="text"
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="offline_instructions"
-	 *      type="text"
-	 */
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	/**
-	 *
-	 * @hibernate.set   lazy="true"
-	 * 					cascade="all"
-	 * 					inverse="false"
-	 * 					order-by="create_date desc"
-	 * @hibernate.collection-key column="eadventure_uid"
-	 * @hibernate.collection-one-to-many
-	 * 			class="org.eucm.lams.tool.eadventure.model.EadventureAttachment"
-	 *
-	 * @return a set of Attachments to this Message.
-	 */
-	public Set getAttachments() {
-		return attachments;
-	}
-
-	/*
-	 * @param attachments The attachments to set.
-	 */
-	public void setAttachments(Set attachments) {
-		this.attachments = attachments;
 	}
 
 	/**
@@ -503,26 +381,6 @@ public class Eadventure implements Cloneable {
 
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
-	}
-
-	public List<EadventureAttachment> getOfflineFileList() {
-		return offlineFileList;
-	}
-
-	public void setOfflineFileList(List<EadventureAttachment> offlineFileList) {
-		this.offlineFileList = offlineFileList;
-	}
-
-	public List<EadventureAttachment> getOnlineFileList() {
-		return onlineFileList;
-	}
-
-	public void setOnlineFileList(List<EadventureAttachment> onlineFileList) {
-		this.onlineFileList = onlineFileList;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
 	}
 
 	/**

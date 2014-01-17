@@ -79,7 +79,6 @@ public class ImageGalleryForm extends ActionForm {
 	    imageGallery.setLockWhenFinished(false);
 	    imageGallery.setDefineLater(false);
 	    imageGallery.setAllowVote(false);
-	    imageGallery.setRunOffline(false);
 	    imageGallery.setReflectOnActivity(false);
 	}
     }

@@ -128,18 +128,6 @@ public class AuthoringAction extends Action {
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
 	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
-	}
 	// -----------------------Topic function ---------------------------
 	if (param.equals("newTopic")) {
 	    return newTopic(mapping, form, request, response);
@@ -251,9 +239,6 @@ public class AuthoringAction extends Action {
 		    }
 		}
 	    }
-	    // initialize attachmentList
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.addAll(forum.getAttachments());
 
 	    // tear down PO to normal object using clone() method
 	    forumForm.setForum((Forum) forum.clone());
@@ -361,46 +346,12 @@ public class AuthoringAction extends Action {
 	    }
 	    forumPO.setCreatedBy(forumUser);
 
-	    // **********************************Handle Attachement*********************
-	    // merge attachment info
-	    Set attPOSet = forumPO.getAttachments();
-	    if (attPOSet == null) {
-		attPOSet = new HashSet();
-	    }
-	    List attachmentList = getAttachmentList(sessionMap);
-	    List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	    Iterator iter = attachmentList.iterator();
-	    while (iter.hasNext()) {
-		Attachment newAtt = (Attachment) iter.next();
-		attPOSet.add(newAtt);
-	    }
-	    attachmentList.clear();
-
-	    iter = deleteAttachmentList.iterator();
-	    while (iter.hasNext()) {
-		Attachment delAtt = (Attachment) iter.next();
-		iter.remove();
-		// it is an existed att, then delete it from current attachmentPO
-		if (delAtt.getUid() != null) {
-		    Iterator attIter = attPOSet.iterator();
-		    while (attIter.hasNext()) {
-			Attachment att = (Attachment) attIter.next();
-			if (delAtt.getUid().equals(att.getUid())) {
-			    attIter.remove();
-			    break;
-			}
-		    }
-		    forumService.deleteForumAttachment(delAtt.getUid());
-		}// end remove from persist value
-	    }
-
 	    // copy back
-	    forumPO.setAttachments(attPOSet);
 	    forum = forumService.updateForum(forumPO);
 	    
 	    // delete message attachment
 	    List topicDeleteAttachmentList = getTopicDeletedAttachmentList(sessionMap);
-	    iter = topicDeleteAttachmentList.iterator();
+	    Iterator iter = topicDeleteAttachmentList.iterator();
 	    while (iter.hasNext()) {
 		Attachment delAtt = (Attachment) iter.next();
 		iter.remove();
@@ -460,167 +411,12 @@ public class AuthoringAction extends Action {
 
 	forum = forumService.updateForum(forum);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(forum.getAttachments());
-
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	if (mode.isAuthor()) {
 	    return mapping.findForward("author");
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) {
-
-	ForumForm forumForm = (ForumForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(forumForm.getSessionMapID());
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = forumForm.getOfflineFile();
-	} else {
-	    file = forumForm.getOnlineFile();
-	}
-
-	if (file == null || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward("success");
-	}
-
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward("success");
-	}
-
-	forumService = getForumManager();
-	// upload to repository
-	Attachment att = forumService.uploadInstructionFile(file, type);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	Attachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (Attachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward("success");
-
-    }
-
-    /**
-     * Delete offline instruction file from current Forum authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, form, request, response, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Forum authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, form, request, response, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, "versionID"));
-	Long uuID = new Long(WebUtil.readLongParam(request, "uuID"));
-	// get sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	Attachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (Attachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-
-	}
-
-	request.setAttribute(ForumConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward("success");
     }
 
     // ******************************************************************************************************************
@@ -712,7 +508,7 @@ public class AuthoringAction extends Action {
 	if (forum != null) {
 	    List<ForumToolSession> toolSessions = forumService.getSessionsByContentId(forum.getContentId());
 	    for (ForumToolSession toolSession : toolSessions) {
-		Message newMsg = Message.newInstance(message, forum.getToolContentHandler());
+		Message newMsg = Message.newInstance(message);
 		newMsg.setToolSession(toolSession);
 		newMsg.setAttachments(new TreeSet());
 		newMsg.setModifiedBy(null);
@@ -971,22 +767,6 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ForumConstants.ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ForumConstants.DELETED_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
     private SortedSet<MessageDTO> getTopics(SessionMap sessionMap) {
 	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
 	if (topics == null) {
@@ -995,7 +775,7 @@ public class AuthoringAction extends Action {
 	}
 	return topics;
     }
-
+    
     /**
      * @param request
      * @return

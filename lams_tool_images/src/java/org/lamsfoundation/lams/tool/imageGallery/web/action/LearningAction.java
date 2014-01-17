@@ -233,14 +233,6 @@ public class LearningAction extends Action {
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
-	// add run offline support
-	if (imageGallery.getRunOffline()) {
-	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, true);
-	    return mapping.findForward("runOffline");
-	} else {
-	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, false);
-	}
-
 	// Create set of images, along with this filtering out items added by users from other groups
 	TreeSet<ImageGalleryItem> images = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
 	if (mode.isLearner()) {

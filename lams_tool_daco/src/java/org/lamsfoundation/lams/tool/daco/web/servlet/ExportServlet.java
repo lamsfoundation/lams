@@ -101,31 +101,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		return FILENAME;
 	}
 
-	@Override
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-			Cookie[] cookies) {
-		if (toolContentID == null && toolSessionID == null) {
-			ExportServlet.logger.error("Tool content Id or and session Id are null. Unable to activity title");
-		}
-		else {
-			IDacoService service = DacoServiceProxy.getDacoService(getServletContext());
-			Daco daco = null;
-			if (toolContentID != null) {
-				daco = service.getDacoByContentId(toolContentID);
-			}
-			else {
-				DacoSession session = service.getSessionBySessionId(toolSessionID);
-				if (session != null) {
-					daco = session.getDaco();
-				}
-			}
-			if (daco != null) {
-				activityTitle = daco.getTitle();
-			}
-		}
-		return super.doOfflineExport(request, response, directoryName, cookies);
-	}
-
 	private void teacherExport(SessionMap sessionMap, String basePath, String learnerDirectory, Cookie[] cookies)
 			throws DacoApplicationException {
 		if (toolContentID == null) {

@@ -18,12 +18,6 @@
         </property>
     </bean>
 
-   <bean id="eadventureAttachmentDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-
    <bean id="eadventureUserDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureUserDAOHibernate">
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
@@ -79,9 +73,6 @@
     <bean id="eadventureManagerTarget" class="org.eucm.lams.tool.eadventure.service.EadventureServiceImpl">
         <property name="eadventureDao">
             <ref local="eadventureDao"/>
-        </property>
-        <property name="eadventureAttachmentDao">
-            <ref local="eadventureAttachmentDao"/>
         </property>
         <property name="eadventureUserDao">
             <ref local="eadventureUserDao"/>
@@ -153,8 +144,6 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="uploadEadventureFile">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                

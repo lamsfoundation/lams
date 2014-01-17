@@ -189,7 +189,6 @@ public class MonitoringAction extends Action {
 	List<Summary> groupList = service.getSummary(contentId);
 
 	Eadventure eadventure = service.getEadventureByContentId(contentId);
-	eadventure.toDTO();
 
 	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
 	
