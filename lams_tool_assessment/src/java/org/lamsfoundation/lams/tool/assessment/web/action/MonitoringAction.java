@@ -123,7 +123,6 @@ public class MonitoringAction extends Action {
 	List<Summary> summaryList = service.getSummaryList(contentId);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	assessment.toDTO();
 	
 	//set SubmissionDeadline, if any
 	if (assessment.getSubmissionDeadline() != null) {

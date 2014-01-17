@@ -33,8 +33,6 @@ public interface ChatConstants {
     public static final Integer SESSION_COMPLETED = new Integer(2);
 
     public static final String AUTHORING_DEFAULT_TAB = "1";
-    public static final String ATTACHMENT_LIST = "attachmentList";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
     public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
     public static final String AUTH_SESSION_ID = "authoringSessionId";
 
@@ -68,7 +66,7 @@ public interface ChatConstants {
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
     public static final String MESSAGE_SEPARATOR = " ";
     
-    /* Date time restriction LDEV-2657 */
+    /* Date time restriction */
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     

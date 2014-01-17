@@ -64,8 +64,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
@@ -76,10 +74,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     private String filterKeywords;
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean contentInUse;
 
     private boolean defineLater;
@@ -88,13 +82,8 @@ public class Chat implements java.io.Serializable, Cloneable {
     
     private Date submissionDeadline;
 
-    private Set chatAttachments;
-
     private Set chatSessions;
     private Set<ChatCondition> conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
-
-    // *********** NON Persisit fields
-    private IToolContentHandler toolContentHandler;
 
     // Constructors
 
@@ -103,25 +92,20 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /** full constructor */
-    public Chat(Date createDate, Date updateDate, Long createBy, String title, String instructions, boolean runOffline,
-	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, String onlineInstructions,
-	    String offlineInstructions, boolean contentInUse, boolean defineLater, Long toolContentId,
-	    Set chatAttachments, Set chatSessions) {
+    public Chat(Date createDate, Date updateDate, Long createBy, String title, String instructions,
+	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse, boolean defineLater, Long toolContentId,
+	    Set chatSessions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
 	this.title = title;
 	this.instructions = instructions;
-	this.runOffline = runOffline;
 	this.lockOnFinished = lockOnFinished;
 	this.filteringEnabled = filteringEnabled;
 	this.filterKeywords = filterKeywords;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
 	this.contentInUse = contentInUse;
 	this.defineLater = defineLater;
 	this.toolContentId = toolContentId;
-	this.chatAttachments = chatAttachments;
 	this.chatSessions = chatSessions;
     }
 
@@ -205,19 +189,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -250,32 +221,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -315,21 +260,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-
-    /**
-     * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="chat_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
-     * 
-     */
-
-    public Set getChatAttachments() {
-	return chatAttachments;
-    }
-
-    public void setChatAttachments(Set chatAttachments) {
-	this.chatAttachments = chatAttachments;
     }
 
     /**
@@ -424,9 +354,8 @@ public class Chat implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Chat newInstance(Chat fromContent, Long toContentId, IToolContentHandler chatToolContentHandler) {
+    public static Chat newInstance(Chat fromContent, Long toContentId) {
 	Chat toContent = new Chat();
-	fromContent.toolContentHandler = chatToolContentHandler;
 	toContent = (Chat) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
@@ -441,18 +370,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	    chat = (Chat) super.clone();
 	    chat.setUid(null);
 
-	    if (chatAttachments != null) {
-		// create a copy of the attachments but do not duplicate node in repository
-		Iterator iter = chatAttachments.iterator();
-		Set<ChatAttachment> set = new HashSet<ChatAttachment>();
-		while (iter.hasNext()) {
-		    ChatAttachment originalFile = (ChatAttachment) iter.next();
-		    ChatAttachment newFile = (ChatAttachment) originalFile.clone();
-
-		    set.add(newFile);
-		}
-		chat.chatAttachments = set;
-	    }
 	    // create an empty set for the chatSession
 	    chat.chatSessions = new HashSet();
 
@@ -468,14 +385,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	    Chat.log.error("Error cloning " + Chat.class);
 	}
 	return chat;
-    }
-
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**

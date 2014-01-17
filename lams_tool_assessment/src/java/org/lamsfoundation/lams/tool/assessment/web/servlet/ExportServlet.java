@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -40,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -56,13 +54,10 @@ import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceProxy;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentBundler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
-import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Export portfolio servlet to export all assessment questions into offline HTML package.
@@ -120,27 +115,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		directoryName, FILENAME, cookies);
 
 	return FILENAME;
-    }
-
-    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) {
-	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
-	} else {
-
-	    Assessment content = null;
-	    if (toolContentID != null) {
-		content = service.getAssessmentByContentId(toolContentID);
-	    } else {
-		AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionID);
-		if (session != null)
-		    content = session.getAssessment();
-	    }
-	    if (content != null) {
-		activityTitle = content.getTitle();
-	    }
-	}
-	return super.doOfflineExport(request, response, directoryName, cookies);
     }
 
     public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,

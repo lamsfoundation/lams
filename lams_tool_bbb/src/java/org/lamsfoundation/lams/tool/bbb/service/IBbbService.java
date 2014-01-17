@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.bbb.service;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
-import org.lamsfoundation.lams.tool.bbb.model.BbbAttachment;
 import org.lamsfoundation.lams.tool.bbb.model.BbbConfig;
 import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.model.BbbUser;
@@ -64,20 +63,6 @@ public interface IBbbService {
      * @return
      */
     public Bbb getBbbByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public BbbAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws BbbException;
 
     /**
      * @param bbb

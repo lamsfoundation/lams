@@ -34,7 +34,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.export.web.action.Bundler;
-import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;

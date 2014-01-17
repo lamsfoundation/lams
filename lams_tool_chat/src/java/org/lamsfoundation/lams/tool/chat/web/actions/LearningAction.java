@@ -77,7 +77,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="learning" path="tiles:/learning/main"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
+ * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  */
@@ -178,11 +178,6 @@ public class LearningAction extends LamsDispatchAction {
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-	
-	// check runOffline
-	if (chat.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 
 	/* Check if submission deadline is null */
 
@@ -198,10 +193,9 @@ public class LearningAction extends LamsDispatchAction {
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 	    request.setAttribute("submissionDeadline", submissionDeadline);
 
-	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
-
+		return mapping.findForward("submissionDeadline");
 	    }
 
 	}

@@ -265,7 +265,6 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
 	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser.isSessionFinished());
-	sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, assessment.getRunOffline());
 	sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		service.getLearnerContentFolder(toolSessionId, assessmentUser.getUserId()));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
@@ -290,11 +289,6 @@ public class LearningAction extends Action {
 	assessment.setDefineLater(false);
 	service.saveOrUpdateAssessment(assessment);
 
-	// run offline support
-	if (assessment.getRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
-
 	//check if there is submission deadline
 	Date submissionDeadline = assessment.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -307,9 +301,9 @@ public class LearningAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
 	    
-	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    //calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("runOffline");
+		return mapping.findForward("submissionDeadline");
 	    }
 	}
 	

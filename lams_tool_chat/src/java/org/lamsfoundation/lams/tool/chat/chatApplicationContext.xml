@@ -17,7 +17,6 @@
 			</bean>
 		</property>										
 	</bean>
-	
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="chatOutputFactory" class="org.lamsfoundation.lams.tool.chat.service.ChatOutputFactory" >  
@@ -27,7 +26,6 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.chat.service.ChatService">
-				<property name="chatAttachmentDAO"><ref bean="chatAttachmentDAO"/></property>
 				<property name="chatMessageDAO"><ref bean="chatMessageDAO"/></property>				
 				<property name="chatSessionDAO"><ref bean="chatSessionDAO"/></property>
 				<property name="chatUserDAO"><ref bean="chatUserDAO"/></property>
@@ -39,7 +37,6 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="chatOutputFactory"><ref bean="chatOutputFactory"/></property>
-				<property name="repositoryService"><ref bean="repositoryService" /></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -53,8 +50,6 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
@@ -78,10 +73,6 @@
 	</bean>
 	
 	<bean id="chatMessageDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatMessageDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="chatAttachmentDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatAttachmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

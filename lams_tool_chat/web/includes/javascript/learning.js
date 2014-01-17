@@ -1,5 +1,5 @@
 // for chat users to be indetified by different colours
-var PALETTE = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FF9FF2", "#666633", "#292929", "#666666"];
+var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"];
 // only Monitor can send a personal message
 var selectedUser = null;
 // last message in chat window
@@ -35,11 +35,11 @@ function handleUpdateChatResult(result) {
 	  jQuery.each(result.messages, function(){
 		var container = $('<div />',{
 			'class' : 'message ' + (this.type == 'chat' ? 'private_message' : '')
-			}).css('color' , getColour(this.from));
+			});
 		$('<div />',{
 			'class' : 'messageFrom',
 			'text'  : this.from
-		  }).appendTo(container);
+		  }).css('color' , getColour(this.from)).appendTo(container);
 		$('<span />',{
 			'text'  : this.body
 		  }).appendTo(container);

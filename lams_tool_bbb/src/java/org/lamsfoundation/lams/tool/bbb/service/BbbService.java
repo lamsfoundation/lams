@@ -65,13 +65,11 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.bbb.dao.IBbbAttachmentDAO;
 import org.lamsfoundation.lams.tool.bbb.dao.IBbbConfigDAO;
 import org.lamsfoundation.lams.tool.bbb.dao.IBbbDAO;
 import org.lamsfoundation.lams.tool.bbb.dao.IBbbSessionDAO;
 import org.lamsfoundation.lams.tool.bbb.dao.IBbbUserDAO;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
-import org.lamsfoundation.lams.tool.bbb.model.BbbAttachment;
 import org.lamsfoundation.lams.tool.bbb.model.BbbConfig;
 import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.model.BbbUser;
@@ -102,8 +100,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 
     private IBbbUserDAO bbbUserDAO = null;
 
-    private IBbbAttachmentDAO bbbAttachmentDAO = null;
-
     private IBbbConfigDAO bbbConfigDAO = null;
 
     private ILearnerService learnerService;
@@ -111,10 +107,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     private ILamsToolService toolService;
 
     private IToolContentHandler bbbToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
-
-    private IAuditService auditService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -208,24 +200,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	saveOrUpdateBbb(toContent);
     }
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Bbb bbb = getBbbByContentId(toolContentId);
-	if (bbb == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	bbb.setDefineLater(value);
-	saveOrUpdateBbb(bbb);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Bbb bbb = getBbbByContentId(toolContentId);
-	if (bbb == null) {
-	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
-	}
-	bbb.setRunOffline(value);
-	saveOrUpdateBbb(bbb);
-    }
-
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub
@@ -253,13 +227,7 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	bbb = Bbb.newInstance(bbb, toolContentId, null);
 	bbb.setToolContentHandler(null);
 	bbb.setBbbSessions(null);
-	Set<BbbAttachment> atts = bbb.getBbbAttachments();
-	for (BbbAttachment att : atts) {
-	    att.setBbb(null);
-	}
 	try {
-	    exportContentService.registerFileClassForExport(BbbAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, bbb, bbbToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -275,9 +243,9 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
-	    exportContentService.registerFileClassForImport(BbbAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(BbbImportContentVersionFilter.class);
+	    
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, bbbToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Bbb))
@@ -422,27 +390,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	    return null;
 	} else {
 	    return list.get(0);
-	}
-    }
-
-    public BbbAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName()))
-	    throw new BbbException("Could not find upload file: " + file);
-
-	NodeKey nodeKey = processFile(file, type);
-
-	BbbAttachment attachment = new BbbAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
-	return attachment;
-    }
-
-    public void deleteFromRepository(Long uuid, Long versionID) throws BbbException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, uuid, versionID);
-	} catch (Exception e) {
-	    throw new BbbException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
 	}
     }
 
@@ -595,14 +542,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	bbbConfigDAO.insertOrUpdate(bbbConfig);
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
-    }
-
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
     private String sendRequest(URL url) throws IOException {
 
 	if (logger.isDebugEnabled()) {
@@ -626,53 +565,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	return response;
     }
 
-    private NodeKey processFile(FormFile file, String type) {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = getBbbToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			type);
-	    } catch (InvalidParameterException e) {
-		throw new BbbException("InvalidParameterException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new BbbException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new BbbException("RepositoryCheckedException occured while trying to upload File"
-			+ e.getMessage());
-	    } catch (IOException e) {
-		throw new BbbException("IOException occured while trying to upload File" + e.getMessage());
-	    }
-	}
-	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called every time
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repository access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws BbbException {
-	ICredentials credentials = new SimpleCredentials(BbbToolContentHandler.repositoryUser,
-		BbbToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials, BbbToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new BbbException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new BbbException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new BbbException("Login failed." + e.getMessage());
-	}
-    }
-
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
@@ -693,14 +585,6 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 
     // =========================================================================================
     /* Used by Spring to "inject" the linked objects */
-
-    public IBbbAttachmentDAO getBbbAttachmentDAO() {
-	return bbbAttachmentDAO;
-    }
-
-    public void setBbbAttachmentDAO(IBbbAttachmentDAO attachmentDAO) {
-	this.bbbAttachmentDAO = attachmentDAO;
-    }
 
     public IBbbDAO getBbbDAO() {
 	return bbbDAO;
@@ -773,14 +657,5 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-    
-    public IRepositoryService getRepositoryService() {
-        return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
-    }
-
 
 }

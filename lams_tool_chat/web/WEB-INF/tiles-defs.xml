@@ -88,8 +88,8 @@
 		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 
-	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:learning">
-		<put name="body" value="/pages/learning/runOffline.jsp" />
+	<definition name="tiles:/learning/submissionDeadline" extends="tiles:/layout:learning">
+		<put name="body" value="/pages/learning/submissionDeadline.jsp" />
 	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">

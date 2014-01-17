@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -38,9 +37,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
@@ -115,16 +112,6 @@ public interface IAssessmentService {
      */
     List getAuthoredQuestions(Long assessmentUid);
 
-    /**
-     * Upload instruciton file into repository.
-     * 
-     * @param file
-     * @param type
-     * @return
-     * @throws UploadAssessmentFileException
-     */
-    AssessmentAttachment uploadInstructionFile(FormFile file, String type) throws UploadAssessmentFileException;
-
     // ********** for user methods *************
     /**
      * Create a new user in database.
@@ -148,26 +135,12 @@ public interface IAssessmentService {
      */
     AssessmentUser getUserByIDAndSession(Long long1, Long sessionId);
 
-    // ********** Repository methods ***********************
-    /**
-     * Delete file from repository.
-     */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws AssessmentApplicationException;
-
     /**
      * Save or update assessment into database.
      * 
      * @param Assessment
      */
     void saveOrUpdateAssessment(Assessment Assessment);
-
-    /**
-     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
-     * file from repository.
-     * 
-     * @param attachmentUid
-     */
-    void deleteAssessmentAttachment(Long attachmentUid);
 
     /**
      * Delete resoruce question from database.

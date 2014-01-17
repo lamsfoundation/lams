@@ -39,12 +39,6 @@
         </property>
     </bean>
 
-   <bean id="laasseAssessmentAttachmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentAttachmentDAOHibernate">
-        <property name="sessionFactory">
-             <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-
    <bean id="laasseAssessmentUserDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentUserDAOHibernate">
         <property name="sessionFactory">
              <ref bean="coreSessionFactory"/>
@@ -76,9 +70,6 @@
         <property name="assessmentResultDao">
             <ref local="laasseAssessmentResultDao"/>
         </property>
-        <property name="assessmentAttachmentDao">
-            <ref local="laasseAssessmentAttachmentDao"/>
-        </property>
         <property name="assessmentUserDao">
             <ref local="laasseAssessmentUserDao"/>
         </property>
@@ -87,9 +78,6 @@
         </property>
         <property name="assessmentToolContentHandler">
             <ref local="laasseAssessmentToolContentHandler"/>
-        </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -152,8 +140,6 @@
                 <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionStartDate">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

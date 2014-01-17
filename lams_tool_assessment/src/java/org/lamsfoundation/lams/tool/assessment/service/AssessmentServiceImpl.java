@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,19 +40,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -77,7 +63,6 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentAttachmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
@@ -90,7 +75,6 @@ import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
@@ -129,8 +113,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     private AssessmentQuestionDAO assessmentQuestionDao;
 
-    private AssessmentAttachmentDAO assessmentAttachmentDao;
-
     private AssessmentUserDAO assessmentUserDao;
 
     private AssessmentSessionDAO assessmentSessionDao;
@@ -147,7 +129,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private AssessmentOutputFactory assessmentOutputFactory;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -300,32 +281,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return assessmentUserDao.getBySessionID(toolSessionID);
     }
 
-    /**
-     * This method verifies the credentials of the Assessment Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     * 
-     * @return ITicket The ticket for repostory access
-     * @throws AssessmentApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws AssessmentApplicationException {
-	ICredentials credentials = new SimpleCredentials(assessmentToolContentHandler.getRepositoryUser(),
-		assessmentToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, assessmentToolContentHandler
-		    .getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new AssessmentApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new AssessmentApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new AssessmentApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
@@ -346,34 +301,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	Assessment defaultContent = getDefaultAssessment();
 	// save default content by given ID.
 	Assessment content = new Assessment();
-	content = Assessment.newInstance(defaultContent, contentId, assessmentToolContentHandler);
+	content = Assessment.newInstance(defaultContent, contentId);
 	return content;
     }
 
     @Override
     public List getAuthoredQuestions(Long assessmentUid) {
 	return assessmentQuestionDao.getAuthoringQuestions(assessmentUid);
-    }
-
-    @Override
-    public AssessmentAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
-	    throws UploadAssessmentFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadAssessmentFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
-	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
-
-	// create new attachement
-	AssessmentAttachment file = new AssessmentAttachment();
-	file.setFileType(fileType);
-	file.setFileUuid(nodeKey.getUuid());
-	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
-	file.setCreated(new Date());
-
-	return file;
     }
 
     @Override
@@ -392,24 +326,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws AssessmentApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new AssessmentApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
-	}
-    }
-
-    @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
 	assessmentDao.saveObject(assessment);
-    }
-
-    @Override
-    public void deleteAssessmentAttachment(Long attachmentUid) {
-	assessmentAttachmentDao.removeObject(AssessmentAttachment.class, attachmentUid);
     }
 
     @Override
@@ -1176,35 +1094,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return contentId;
     }
 
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws AssessmentApplicationException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadAssessmentFileException {
-	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = assessmentToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(),
-			fileType);
-	    } catch (InvalidParameterException e) {
-		throw new UploadAssessmentFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadAssessmentFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadAssessmentFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadAssessmentFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
-	}
-	return node;
-    }
-
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
@@ -1219,14 +1108,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setAssessmentAttachmentDao(AssessmentAttachmentDAO assessmentAttachmentDao) {
-	this.assessmentAttachmentDao = assessmentAttachmentDao;
     }
 
     public void setAssessmentDao(AssessmentDAO assessmentDao) {
@@ -1278,14 +1159,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    throw new DataMissingException("Unable to find default content for the assessment tool");
 	}
 
-	// set AssessmentToolContentHandler as null to avoid copy file node in repository again.
-	toolContentObj = Assessment.newInstance(toolContentObj, toolContentId, null);
-	toolContentObj.setToolContentHandler(null);
-	toolContentObj.setOfflineFileList(null);
-	toolContentObj.setOnlineFileList(null);
+	toolContentObj = Assessment.newInstance(toolContentObj, toolContentId);
 	try {
-	    exportContentService.registerFileClassForExport(AssessmentAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
 		    rootPath);
 	} catch (ExportToolContentException e) {
@@ -1297,9 +1172,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    String toVersion) throws ToolException {
 
 	try {
-	    exportContentService.registerFileClassForImport(AssessmentAttachment.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, null);
-
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(AssessmentImportContentVersionFilter.class);
+	    
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, assessmentToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Assessment)) {
@@ -1368,24 +1243,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 
-	Assessment toContent = Assessment.newInstance(assessment, toContentId, assessmentToolContentHandler);
+	Assessment toContent = Assessment.newInstance(assessment, toContentId);
 	assessmentDao.saveObject(toContent);
-    }
-
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Assessment assessment = assessmentDao.getByContentId(toolContentId);
-	if (assessment == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	assessment.setDefineLater(value);
-    }
-
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
-	Assessment assessment = assessmentDao.getByContentId(toolContentId);
-	if (assessment == null) {
-	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
-	}
-	assessment.setRunOffline(value);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

@@ -45,13 +45,8 @@ public final class Constants {
 
     // Authoring SessionMap key names
     public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
-    public static final String KEY_DELETED_FILES = "deletedFiles";
     public static final String KEY_MODE = "mode";
-    public static final String KEY_OFFLINE_FILES = "offlineFiles";
-    public static final String KEY_ONLINE_FILES = "onlineFiles";
     public static final String KEY_TOOL_CONTENT_ID = "toolContentID";
-    public static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
-    public static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
 
     // Big Blue Button parameters
     public static final String BBB_CREATE_PARAM = "bigbluebutton/api/create?";

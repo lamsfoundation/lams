@@ -32,7 +32,6 @@ import java.util.Map;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
-import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
@@ -71,28 +70,6 @@ public interface IChatService {
      * @return
      */
     public Chat getChatByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentId
-     * @param file
-     * @param type
-     * @return
-     */
-    public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
-
-    /**
-     * @param uuid
-     * @param versionID
-     */
-    public void deleteFromRepository(Long uuid, Long versionID) throws ChatException;
-
-    /**
-     * @param contentID
-     * @param uuid
-     * @param versionID
-     * @param type
-     */
-    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
      * @param chat

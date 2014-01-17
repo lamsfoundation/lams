@@ -48,10 +48,6 @@ public class AuthoringForm extends ActionForm {
 
 	String instructions;
 
-	String offlineInstruction;
-
-	String onlineInstruction;
-
 	boolean lockOnFinished;
 	
 	boolean reflectOnActivity;
@@ -61,10 +57,6 @@ public class AuthoringForm extends ActionForm {
 	boolean filteringEnabled;
 	
 	String filterKeywords;
-
-	FormFile onlineFile; 
-
-	FormFile offlineFile;
 
 	String currentTab;
 
@@ -122,38 +114,6 @@ public class AuthoringForm extends ActionForm {
 
 	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
-	}
-
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
-
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
-
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
-
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
-
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
-
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
-	
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
-
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
 	}
 	
 	public String getTitle() {

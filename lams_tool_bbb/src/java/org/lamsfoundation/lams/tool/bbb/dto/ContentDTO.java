@@ -30,7 +30,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
-import org.lamsfoundation.lams.tool.bbb.model.BbbAttachment;
 import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 
 public class ContentDTO {
@@ -43,10 +42,6 @@ public class ContentDTO {
 
     String instructions;
 
-    String onlineInstructions;
-
-    String offlineInstructions;
-
     boolean reflectOnActivity;
 
     String reflectInstructions;
@@ -56,10 +51,6 @@ public class ContentDTO {
     boolean contentInUse;
 
     boolean lockOnFinish;
-
-    Set<AttachmentDTO> onlineInstructionsFiles;
-
-    Set<AttachmentDTO> offlineInstructionsFiles;
 
     Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
@@ -73,30 +64,10 @@ public class ContentDTO {
 	this.toolContentId = bbb.getToolContentId();
 	this.title = bbb.getTitle();
 	this.instructions = bbb.getInstructions();
-	this.onlineInstructions = bbb.getOnlineInstructions();
-	this.offlineInstructions = bbb.getOfflineInstructions();
 	this.contentInUse = bbb.isContentInUse();
 	this.reflectInstructions = bbb.getReflectInstructions();
 	this.reflectOnActivity = bbb.isReflectOnActivity();
 	this.lockOnFinish = bbb.isLockOnFinished();
-
-	this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
-	this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
-
-	for (BbbAttachment att : bbb.getBbbAttachments()) {
-	    Set<AttachmentDTO> attSet = null;
-	    if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-		attSet = offlineInstructionsFiles;
-	    } else if (att.getFileType().equals(IToolContentHandler.TYPE_ONLINE)) {
-		attSet = onlineInstructionsFiles;
-	    } else {
-		// something is wrong. Ignore file, log error
-		logger.error("File with uid " + att.getFileUuid() + " contains invalid fileType: " + att.getFileType());
-	    }
-
-	    if (attSet != null)
-		attSet.add(new AttachmentDTO(att));
-	}
 
 	for (BbbSession bbbSession : bbb.getBbbSessions()) {
 	    sessionDTOs.add(new SessionDTO(bbbSession));
@@ -118,38 +89,6 @@ public class ContentDTO {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    public Set<AttachmentDTO> getOfflineInstructionsFiles() {
-	return offlineInstructionsFiles;
-    }
-
-    public void setOfflineInstructionsFiles(Set<AttachmentDTO> offlineInstructionsFiles) {
-	this.offlineInstructionsFiles = offlineInstructionsFiles;
-    }
-
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    public Set<AttachmentDTO> getOnlineInstructionsFiles() {
-	return onlineInstructionsFiles;
-    }
-
-    public void setOnlineInstructionsFiles(Set<AttachmentDTO> onlineInstructionsFiles) {
-	this.onlineInstructionsFiles = onlineInstructionsFiles;
     }
 
     public boolean isReflectOnActivity() {

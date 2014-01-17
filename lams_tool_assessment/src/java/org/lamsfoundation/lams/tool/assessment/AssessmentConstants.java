@@ -81,8 +81,6 @@ public class AssessmentConstants {
     
     public static final String PARAM_OPTION_INDEX = "optionIndex";
 
-    public static final String PARAM_RUN_OFFLINE = "runOffline";
-
     public static final String PARAM_TITLE = "title";
     
     public static final String PARAM_SECONDS_LEFT = "secondsLeft";
@@ -134,15 +132,9 @@ public class AssessmentConstants {
     
     public static final String ATTR_AVAILABLE_QUESTIONS = "availableQuestions";
 
-    public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
-
     public static final String ATTR_DELETED_QUESTION_LIST = "deleteAssessmentList";
     
     public static final String ATTR_DELETED_QUESTION_REFERENCES = "deleteQuestionReferences";
-
-    public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
-
-    public static final String ATTR_DELETED_QUESTION_ATTACHMENT_LIST = "deletedQuestionAttachmmentList";
     
     public static final String ATTR_UNIT_LIST = "unitList";
     

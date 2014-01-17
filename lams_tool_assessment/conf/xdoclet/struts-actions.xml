@@ -38,41 +38,6 @@
 			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
 		</action>
 		
-		<!-- ==========  Authoring Definitions: Instrcutions Files ========== -->
-		
-		<action path="/authoring/uploadOnlineFile"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			name="assessmentForm" 
-			scope="request" 
-			validate="false"
-			parameter="uploadOnlineFile">
-			<forward name="success" path="/pages/authoring/authoring.jsp" />
-		</action>
-		<action path="/authoring/uploadOfflineFile"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			name="assessmentForm" 
-			scope="request" 
-			validate="false"
-			parameter="uploadOfflineFile">
-			<forward name="success" path="/pages/authoring/authoring.jsp" />
-		</action>
-		<action path="/authoring/deleteOnlineFile"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			name="assessmentForm" 
-			scope="request" 
-			validate="false"
-			parameter="deleteOnlineFile">
-			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
-		</action>
-		<action path="/authoring/deleteOfflineFile"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			name="assessmentForm" 
-			scope="request" 
-			validate="false"
-			parameter="deleteOfflineFile">
-			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
-		</action>
-		
 		<!-- ==========  Authroing Definitions: Assessment Question methods ========== -->
 		
 		<action path="/authoring/newQuestionInit"
@@ -217,8 +182,7 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
-			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
-			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
+			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />
 			<forward name="waitForLeader" path="/pages/learning/waitforleader.jsp" />
 		</action>
 		<action path="/learning/nextPage"

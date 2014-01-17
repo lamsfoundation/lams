@@ -37,7 +37,5 @@ public interface IChatDAO extends IBaseDAO {
 
     void saveOrUpdate(Chat toContent);
 
-    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-
     void releaseFromCache(Object o);
 }

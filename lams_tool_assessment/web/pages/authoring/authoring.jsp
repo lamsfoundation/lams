@@ -1,9 +1,7 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.assessment.AssessmentConstants"%>
-
 
 <lams:html>
 <lams:head>
@@ -29,18 +27,6 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
-        } 
-
-        function doUploadOnline() {
-        	var myForm = $("#authoringForm");
-        	myForm.attr("action", "<c:url value='/authoring/uploadOnlineFile.do'/>");
-        	myForm.submit();
-        }
-        
-        function doUploadOffline() {
-        	var myForm = $("#authoringForm");
-        	myForm.attr("action", "<c:url value='/authoring/uploadOfflineFile.do'/>");
-        	myForm.submit();
         }
         
         function serializeOverallFeedbackForm() {
@@ -61,7 +47,6 @@
 		<lams:Tabs useKey="true" control="true">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-			<lams:Tab id="3" key="label.authoring.heading.instructions" />
 		</lams:Tabs>
 </div>
 	<!-- start tabs -->
@@ -86,11 +71,6 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 			<!-- end of content (Advanced) -->
-
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
-
 
 			<!-- Button Row -->
 			<%--  Default value 

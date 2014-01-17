@@ -344,6 +344,69 @@
 	<div id="footer">
 	</div>
 	<!--closes footer-->
+	
+	<!-- wvi customizations -->  
+    <%@ page import="org.lamsfoundation.lams.util.HashUtil" %>  
+    <%@ page import="org.lamsfoundation.lams.web.util.AttributeNames" %>  
+    <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>  
+    <%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO" %>  
+    <%@ page import="java.text.SimpleDateFormat" %>  
+    <%@ page import="java.util.Date" %>  
+    <%@ page import="org.springframework.web.context.WebApplicationContext" %>    
+    <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>    
+    <%@ page import="org.lamsfoundation.lams.tool.assessment.service.IAssessmentService" %>  
+    <%@ page import="org.lamsfoundation.lams.util.WebUtil" %>  
+    <%@ page import="org.lamsfoundation.lams.tool.assessment.AssessmentConstants" %>  
+    <%@ page import="org.lamsfoundation.lams.web.util.SessionMap" %>  
+    <%@ page import="org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO" %>  
+    <%@ page import="org.lamsfoundation.lams.lesson.service.ILessonService" %>  
+    <%@ page import="java.net.URLEncoder" %>  
+    <%  
+        //specify serverId   
+        String serverId = "aupwvi";  
+        //specify serverKey   
+        String serverKey = "255PF776rned";  
+  
+        HttpSession ss = SessionManager.getSession();  
+        UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);  
+        String userLogin = user.getLogin();  
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHH:mm:ss");  
+        String trxdate = format.format(new Date());  
+  
+        String hashValue = HashUtil.sha1(userLogin.toLowerCase() +  serverId.toLowerCase() + serverKey.toLowerCase() + trxdate.toLowerCase());  
+  
+        //get lessonId and lessonName  
+        String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);  
+        String lessonId = "n/a";  
+        String lessonName = "n/a";  
+        if (sessionMapID != null) {  
+            SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);  
+            Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);  
+            WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());  
+            ILessonService lessonService = (ILessonService) wac.getBean("lessonService");  
+              
+            LessonDetailsDTO lessonDetailsDTO = lessonService.getLessonDetailsFromSessionID(toolSessionId);  
+            lessonId = lessonDetailsDTO.getLessonID().toString();  
+            lessonName = URLEncoder.encode(lessonDetailsDTO.getLessonName(), "UTF-8");  
+        }  
+    %>  
+  
+    <c:if test="${(mode == 'learner') && finishedLock}">  
+        <c:choose>  
+            <c:when test="${isUserFailed}">  
+                <c:set var="result">F</c:set>  
+            </c:when>  
+            <c:otherwise>  
+                <c:set var="result">P</c:set>  
+            </c:otherwise>  
+        </c:choose>  
+        <c:set var="receiveExamResultUrl">  
+            https://up.wvstepwise.org/swaupws/swaupservices.asmx/ReceiveExamResult?ServerID=<%=serverId%>&HashValue=<%=hashValue%>&UserID=<%=userLogin%>&Result=${result}&activityName=${assessment.title}[${assessment.uid}]&TrxDateTime=<%=trxdate%>&LessonId=<%=lessonId%>&LessonName=<%=lessonName%>   
+        </c:set>  
+  
+        <iframe width="0" height="0" src="${receiveExamResultUrl}"></iframe>  
+    </c:if>  
+<!-- end wvi --> 
 
 </body>
 </lams:html>

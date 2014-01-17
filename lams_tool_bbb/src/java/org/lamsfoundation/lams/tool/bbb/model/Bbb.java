@@ -59,25 +59,17 @@ public class Bbb implements java.io.Serializable, Cloneable {
 
     private String instructions;
 
-    private boolean runOffline;
-
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
 
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
     private boolean contentInUse;
 
     private boolean defineLater;
 
     private Long toolContentId;
-
-    private Set<BbbAttachment> bbbAttachments;
 
     private Set<BbbSession> bbbSessions;
 
@@ -161,19 +153,6 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="run_offline" length="1"
-     * 
-     */
-
-    public boolean isRunOffline() {
-	return this.runOffline;
-    }
-
-    public void setRunOffline(boolean runOffline) {
-	this.runOffline = runOffline;
-    }
-
-    /**
      * @hibernate.property column="lock_on_finished" length="1"
      * 
      */
@@ -206,32 +185,6 @@ public class Bbb implements java.io.Serializable, Cloneable {
 
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     * @hibernate.property column="online_instructions" length="65535"
-     * 
-     */
-
-    public String getOnlineInstructions() {
-	return this.onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @hibernate.property column="offline_instructions" length="65535"
-     * 
-     */
-
-    public String getOfflineInstructions() {
-	return this.offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
     }
 
     /**
@@ -271,21 +224,6 @@ public class Bbb implements java.io.Serializable, Cloneable {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
-    }
-
-    /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="bbb_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.bbb.model.BbbAttachment"
-     * 
-     */
-
-    public Set<BbbAttachment> getBbbAttachments() {
-	return this.bbbAttachments;
-    }
-
-    public void setBbbAttachments(Set<BbbAttachment> bbbAttachments) {
-	this.bbbAttachments = bbbAttachments;
     }
 
     /**
@@ -355,14 +293,6 @@ public class Bbb implements java.io.Serializable, Cloneable {
 	    bbb = (Bbb) super.clone();
 	    bbb.setUid(null);
 
-	    if (bbbAttachments != null) {
-		// create a copy of the attachments
-		Set<BbbAttachment> set = new HashSet<BbbAttachment>();
-		for (BbbAttachment att : bbbAttachments) {
-		    set.add((BbbAttachment) att.clone());
-		}
-		bbb.bbbAttachments = set;
-	    }
 	    // create an empty set for the bbbSession
 	    bbb.bbbSessions = new HashSet<BbbSession>();
 

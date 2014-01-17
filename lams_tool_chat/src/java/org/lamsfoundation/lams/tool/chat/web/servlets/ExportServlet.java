@@ -93,26 +93,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		return FILENAME;
 	}
 
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-            IChatService service = ChatServiceProxy.getChatService(getServletContext());
-            Chat chat = null;
-            if ( toolContentID != null ) {
-            	chat = service.getChatByContentId(toolContentID);
-            } else {
-        		ChatSession session = chatService.getSessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		chat = session.getChat();
-            }
-            if ( chat != null ) {
-            	activityTitle = chat.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
-	}
-
 	private void doLearnerExport(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies)
 			throws ChatException {

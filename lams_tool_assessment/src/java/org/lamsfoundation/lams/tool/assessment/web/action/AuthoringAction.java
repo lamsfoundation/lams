@@ -33,7 +33,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -58,10 +57,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -69,7 +65,6 @@ import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
@@ -78,13 +73,11 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.service.UploadAssessmentFileException;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -134,18 +127,6 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
-	}
-	if (param.equals("uploadOnlineFile")) {
-	    return uploadOnline(mapping, form, request, response);
-	}
-	if (param.equals("uploadOfflineFile")) {
-	    return uploadOffline(mapping, form, request, response);
-	}
-	if (param.equals("deleteOnlineFile")) {
-	    return deleteOnlineFile(mapping, form, request, response);
-	}
-	if (param.equals("deleteOfflineFile")) {
-	    return deleteOfflineFile(mapping, form, request, response);
 	}
 	// ----------------------- Add assessment question functions ---------------------------
 	if (param.equals("newQuestionInit")) {
@@ -261,11 +242,6 @@ public class AuthoringAction extends Action {
 	    }
 
 	    assessmentForm.setAssessment(assessment);
-
-	    // initialize instruction attachment list
-	    List attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.clear();
-	    attachmentList.addAll(assessment.getAttachments());
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
@@ -396,47 +372,12 @@ public class AuthoringAction extends Action {
 	}
 
 	assessmentPO.setCreatedBy(assessmentUser);
-
-	// **********************************Handle Authoring Instruction Attachement *********************
-	// merge attachment info
-	// so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
-	Set attPOSet = assessmentPO.getAttachments();
-	if (attPOSet == null) {
-	    attPOSet = new HashSet();
-	}
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-
-	// current attachemnt in authoring instruction tab.
-	attPOSet.addAll(attachmentList);
-	attachmentList.clear();
-
-	// deleted attachment. 2 possible types: one is persist another is non-persist before.
-	Iterator iter = deleteAttachmentList.iterator();
-	while (iter.hasNext()) {
-	    AssessmentAttachment delAtt = (AssessmentAttachment) iter.next();
-	    iter.remove();
-	    // it is an existed att, then delete it from current attachmentPO
-	    if (delAtt.getUid() != null) {
-		Iterator attIter = attPOSet.iterator();
-		while (attIter.hasNext()) {
-		    AssessmentAttachment att = (AssessmentAttachment) attIter.next();
-		    if (delAtt.getUid().equals(att.getUid())) {
-			attIter.remove();
-			break;
-		    }
-		}
-		service.deleteAssessmentAttachment(delAtt.getUid());
-	    }// end remove from persist value
-	}
-
-	// copy back
-	assessmentPO.setAttachments(attPOSet);
+	
 	// ************************* Handle assessment questions *******************
 	// Handle assessment questions
 	Set questions = new LinkedHashSet();
 	SortedSet topics = getQuestionList(sessionMap);
-	iter = topics.iterator();
+	Iterator iter = topics.iterator();
 	while (iter.hasNext()) {
 	    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 	    if (question != null) {
@@ -474,14 +415,6 @@ public class AuthoringAction extends Action {
 	Set<QuestionReference> questionReferences = updateQuestionReferencesGrades(request, sessionMap, true);
 	assessmentPO.setQuestionReferences(questionReferences);
 
-	// handle assessment question attachment file:
-	List delQuestionAttList = getDeletedQuestionAttachmentList(sessionMap);
-	iter = delQuestionAttList.iterator();
-	while (iter.hasNext()) {
-	    AssessmentQuestion delAtt = (AssessmentQuestion) iter.next();
-	    iter.remove();
-	}
-
 	// ************************* Handle assessment overall feedbacks *******************
 	if (mode.isAuthor()) {
 	    TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
@@ -492,9 +425,6 @@ public class AuthoringAction extends Action {
 	// finally persist assessmentPO again
 	service.saveOrUpdateAssessment(assessmentPO);
 
-	// initialize attachmentList again
-	attachmentList = getAttachmentList(sessionMap);
-	attachmentList.addAll(assessment.getAttachments());
 	assessmentForm.setAssessment(assessmentPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -503,166 +433,6 @@ public class AuthoringAction extends Action {
 	} else {
 	    return mapping.findForward("monitor");
 	}
-    }
-
-    /**
-     * Handle upload online instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadAssessmentFileException
-     */
-    public ActionForward uploadOnline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadAssessmentFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
-    }
-
-    /**
-     * Handle upload offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws UploadAssessmentFileException
-     */
-    public ActionForward uploadOffline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UploadAssessmentFileException {
-	return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
-    }
-
-    /**
-     * Common method to upload online or offline instruction files request.
-     * 
-     * @param mapping
-     * @param form
-     * @param type
-     * @param request
-     * @return
-     * @throws UploadAssessmentFileException
-     */
-    private ActionForward uploadFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request)
-	    throws UploadAssessmentFileException {
-
-	AssessmentForm assessmentForm = (AssessmentForm) form;
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(assessmentForm.getSessionMapID());
-	updateQuestionReferencesGrades(request, sessionMap, true);
-
-	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
-	    file = assessmentForm.getOfflineFile();
-	} else {
-	    file = assessmentForm.getOnlineFile();
-	}
-
-	if ((file == null) || StringUtils.isBlank(file.getFileName())) {
-	    return mapping.findForward(AssessmentConstants.SUCCESS);
-	}
-
-	// validate file size
-	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
-	if (!errors.isEmpty()) {
-	    this.saveErrors(request, errors);
-	    return mapping.findForward(AssessmentConstants.SUCCESS);
-	}
-
-	IAssessmentService service = getAssessmentService();
-	// upload to repository
-	AssessmentAttachment att = service.uploadInstructionFile(file, type);
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	AssessmentAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (AssessmentAttachment) iter.next();
-	    if (StringUtils.equals(existAtt.getFileName(), att.getFileName())
-		    && StringUtils.equals(existAtt.getFileType(), att.getFileType())) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-		break;
-	    }
-	}
-	// add to attachmentList
-	attachmentList.add(att);
-
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-
-    }
-
-    /**
-     * Delete offline instruction file from current Assessment authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_OFFLINE);
-    }
-
-    /**
-     * Delete online instruction file from current Assessment authoring page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return deleteFile(mapping, request, response, form, IToolContentHandler.TYPE_ONLINE);
-    }
-
-    /**
-     * General method to delete file (online or offline)
-     * 
-     * @param mapping
-     * @param request
-     * @param response
-     * @param form
-     * @param type
-     * @return
-     */
-    private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	    ActionForm form, String type) {
-	Long versionID = new Long(WebUtil.readLongParam(request, AssessmentConstants.PARAM_FILE_VERSION_ID));
-	Long uuID = new Long(WebUtil.readLongParam(request, AssessmentConstants.PARAM_FILE_UUID));
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// handle session value
-	List attachmentList = getAttachmentList(sessionMap);
-	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
-	// first check exist attachment and delete old one (if exist) to deletedAttachmentList
-	Iterator iter = attachmentList.iterator();
-	AssessmentAttachment existAtt;
-	while (iter.hasNext()) {
-	    existAtt = (AssessmentAttachment) iter.next();
-	    if (existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)) {
-		// if there is same name attachment, delete old one
-		deleteAttachmentList.add(existAtt);
-		iter.remove();
-	    }
-	}
-
-	request.setAttribute(AssessmentConstants.ATTR_FILE_TYPE_FLAG, type);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
     /**
@@ -1601,22 +1371,6 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * @param request
-     * @return
-     */
-    private List getAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, AssessmentConstants.ATT_ATTACHMENT_LIST);
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private List getDeletedAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_ATTACHMENT_LIST);
-    }
-
-    /**
      * List save current assessment questions.
      * 
      * @param request
@@ -1666,18 +1420,6 @@ public class AuthoringAction extends Action {
      */
     private List getDeletedQuestionReferences(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
-    }
-
-    /**
-     * If a assessment question has attahment file, and the user edit this question and change the attachment to new
-     * file, then the old file need be deleted when submitting the whole authoring page. Save the file uuid and version
-     * id into Assessmentquestion object for temporarily use.
-     * 
-     * @param request
-     * @return
-     */
-    private List getDeletedQuestionAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_ATTACHMENT_LIST);
     }
 
     /**

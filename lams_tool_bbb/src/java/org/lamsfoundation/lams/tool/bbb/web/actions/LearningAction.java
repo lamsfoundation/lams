@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="bbb" path="tiles:/learning/main"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="generalMessage" path="tiles:/general/message"
  */
@@ -310,11 +309,6 @@ public class LearningAction extends DispatchAction {
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-	
-	// check runOffline
-	if (bbb.isRunOffline()) {
-	    return mapping.findForward("runOffline");
-	}
 
 	BbbUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

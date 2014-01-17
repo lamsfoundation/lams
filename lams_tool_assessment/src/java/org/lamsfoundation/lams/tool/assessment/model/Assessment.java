@@ -23,19 +23,14 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
@@ -70,8 +65,6 @@ public class Assessment implements Cloneable {
     private int attemptsAllowed;
     
     private int passingMark;
-    
-    private boolean runOffline;
 
     private boolean shuffled;
     
@@ -101,13 +94,6 @@ public class Assessment implements Cloneable {
 
     private String reflectInstructions;
 
-    // instructions
-    private String onlineInstructions;
-
-    private String offlineInstructions;
-
-    private Set attachments;
-
     // general infomation
     private Date created;
 
@@ -125,19 +111,11 @@ public class Assessment implements Cloneable {
     
     private Set overallFeedbacks;
 
-    // *************** NON Persist Fields ********************
-    private IToolContentHandler toolContentHandler;
-
-    private List<AssessmentAttachment> onlineFileList;
-
-    private List<AssessmentAttachment> offlineFileList;
-
     /**
      * Default contruction method.
      * 
      */
     public Assessment() {
-	attachments = new TreeSet();
 	questions = new TreeSet(new SequencableComparator());
 	questionReferences = new TreeSet(new SequencableComparator());
 	overallFeedbacks = new TreeSet(new SequencableComparator());
@@ -146,10 +124,8 @@ public class Assessment implements Cloneable {
     // **********************************************************
     // Function method for Assessment
     // **********************************************************
-    public static Assessment newInstance(Assessment defaultContent, Long contentId,
-	    AssessmentToolContentHandler assessmentToolContentHandler) {
+    public static Assessment newInstance(Assessment defaultContent, Long contentId) {
 	Assessment toContent = new Assessment();
-	defaultContent.toolContentHandler = assessmentToolContentHandler;
 	toContent = (Assessment) defaultContent.clone();
 	toContent.setContentId(contentId);
 
@@ -225,19 +201,6 @@ public class Assessment implements Cloneable {
 		    set.add(newOverallFeedback);
 		}
 		assessment.overallFeedbacks = set;
-	    }	    
-	    // clone attachment
-	    if (attachments != null) {
-		Iterator iter = attachments.iterator();
-		Set set = new TreeSet();
-		while (iter.hasNext()) {
-		    AssessmentAttachment file = (AssessmentAttachment) iter.next();
-		    AssessmentAttachment newFile = (AssessmentAttachment) file.clone();
-		    // just clone old file without duplicate it in repository
-
-		    set.add(newFile);
-		}
-		assessment.attachments = set;
 	    }
 	    // clone ReourceUser as well
 	    if (createdBy != null) {
@@ -262,15 +225,13 @@ public class Assessment implements Cloneable {
 	final Assessment genericEntity = (Assessment) o;
 
 	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions)
-		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
+		instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-		offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(updated).append(createdBy).toHashCode();
     }
 
     /**
@@ -283,21 +244,6 @@ public class Assessment implements Cloneable {
 	    this.setCreated(new Date(now));
 	}
 	this.setUpdated(new Date(now));
-    }
-
-    public void toDTO() {
-	onlineFileList = new ArrayList<AssessmentAttachment>();
-	offlineFileList = new ArrayList<AssessmentAttachment>();
-	Set<AssessmentAttachment> fileSet = this.getAttachments();
-	if (fileSet != null) {
-	    for (AssessmentAttachment file : fileSet) {
-		if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
-		    offlineFileList.add(file);
-		} else {
-		    onlineFileList.add(file);
-		}
-	    }
-	}
     }
 
     // **********************************************************
@@ -406,26 +352,6 @@ public class Assessment implements Cloneable {
     public void setTitle(String title) {
 	this.title = title;
     }
-
-    /**
-     * @return Returns the runOffline.
-     * 
-     * @hibernate.property column="run_offline"
-     * 
-     */
-    public boolean getRunOffline() {
-	return runOffline;
-    }
-
-    /**
-     * @param runOffline
-     *            The forceOffLine to set.
-     * 
-     * 
-     */
-    public void setRunOffline(boolean forceOffline) {
-	runOffline = forceOffline;
-    }
     
     /**
      * If the tool utilizes leaders from Select Leader tool.
@@ -470,51 +396,6 @@ public class Assessment implements Cloneable {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="online_instructions" type="text"
-     */
-    public String getOnlineInstructions() {
-	return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-	this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     * 
-     * @hibernate.property column="offline_instructions" type="text"
-     */
-    public String getOfflineInstructions() {
-	return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-	this.offlineInstructions = offlineInstructions;
-    }
-
-    /**
-     * 
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
-     * @hibernate.collection-key column="assessment_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment"
-     * 
-     * @return a set of Attachments to this Message.
-     */
-    public Set getAttachments() {
-	return attachments;
-    }
-
-    /*
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
-	this.attachments = attachments;
     }
 
     /**
@@ -753,26 +634,6 @@ public class Assessment implements Cloneable {
 
     public void setNumbered(boolean numbered) {
 	this.numbered = numbered;
-    }
-
-    public List<AssessmentAttachment> getOfflineFileList() {
-	return offlineFileList;
-    }
-
-    public void setOfflineFileList(List<AssessmentAttachment> offlineFileList) {
-	this.offlineFileList = offlineFileList;
-    }
-
-    public List<AssessmentAttachment> getOnlineFileList() {
-	return onlineFileList;
-    }
-
-    public void setOnlineFileList(List<AssessmentAttachment> onlineFileList) {
-	this.onlineFileList = onlineFileList;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
     }
 
     /**
