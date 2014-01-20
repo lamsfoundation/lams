@@ -124,6 +124,9 @@ public class AuthoringAction extends Action {
 	if (param.equals("initPage")) {
 	    return initPage(mapping, form, request, response);
 	}
+	if (param.equals("updateContent")) {
+	    return updateContent(mapping, form, request, response);
+	}
 	
 	// ----------------------- Add resource item function
 	// ---------------------------
