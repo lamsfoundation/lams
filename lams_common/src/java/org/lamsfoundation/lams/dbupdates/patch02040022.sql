@@ -10,6 +10,10 @@ SET FOREIGN_KEY_CHECKS=0;
 
 --ALTER TABLE lams_tool DROP COLUMN supports_run_offline_flag;
 --ALTER TABLE lams_tool DROP COLUMN define_later_url;
+
+--TODO remove the next line after uncommenting previous section
+ALTER TABLE lams_learning_activity CHANGE COLUMN run_offline_flag run_offline_flag TINYINT(1) NOT NULL DEFAULT '0';
+
 ALTER TABLE lams_learning_design DROP COLUMN online_instructions;
 ALTER TABLE lams_learning_design DROP COLUMN offline_instructions;
 
