@@ -107,7 +107,7 @@ public class MockUser {
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockUser.USERNAME, username);
 	    params.put(MockUser.PASSWORD, MockUser.sha1(password));
-	    resp = (WebResponse) new Call(wc, test, "User login", fillForm(resp, 0, params)).execute();
+	    resp = (WebResponse) new Call(wc, test, username + " login", fillForm(resp, 0, params)).execute();
 	    if (!MockUser.checkPageContains(resp, MockUser.INDEX_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to login with password " + password);
@@ -173,16 +173,16 @@ public class MockUser {
 	}
 	return form;
     }
-    
-    public boolean equals(Object o){
+
+    public boolean equals(Object o) {
 	return username.equals(((MockUser) o).username);
     }
-    
-    public int hashCode(){
+
+    public int hashCode() {
 	return username.hashCode();
     }
 
     public String getRole() {
-        return role;
+	return role;
     }
 }

@@ -144,7 +144,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<html:form onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
 			<html:hidden property="revisitingUser" />
@@ -183,50 +182,50 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<p>
-				<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-			</p>
-
-			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
-				<p>&nbsp;</p>
 				<p>
-					<fmt:message key="label.nominations.available">
-						<fmt:param>
-							<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
-						</fmt:param>
-					</fmt:message>
+				<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 				</p>
-			</c:if>
 
-			<table class="shading-bg">
-				<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+				<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
+					<p>&nbsp;</p>
+					<p>
+						<fmt:message key="label.nominations.available">
+							<fmt:param>
+								<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
+							</fmt:param>
+						</fmt:message>
+					</p>
+				</c:if>
 
-					<tr>
+				<table class="shading-bg">
+					<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+
+						<tr>
 						<td width="1px">
-							<input type="checkbox" name="checkedVotes" class="noBorder"
-								value="${subEntry.key}" onClick="updateCount(this);">
-						</td>
+								<input type="checkbox" name="checkedVotes" class="noBorder"
+									value="${subEntry.key}" onClick="updateCount(this);">
+							</td>
 
-						<td>
-							<c:out value="${subEntry.value}" escapeXml="false" />
-						</td>
-					</tr>
+							<td>
+								<c:out value="${subEntry.value}" escapeXml="false" />
+							</td>
+						</tr>
 						
-				</c:forEach>
-			</table>
+					</c:forEach>
+				</table>
 
-			<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
-				<strong> <fmt:message key="label.other" />: </strong>
-				<html:text property="userEntry" size="30" maxlength="100" />
-			</c:if>
+				<c:if test="${VoteLearningForm.allowTextEntry == 'true'}">
+					<strong> <fmt:message key="label.other" />: </strong>
+					<html:text property="userEntry" size="30" maxlength="100" />
+				</c:if>
 
-			<html:hidden property="donePreview" />
+				<html:hidden property="donePreview" />
 
-			<div class="space-bottom-top">
-				<html:submit property="continueOptionsCombined" styleClass="button">
-					<fmt:message key="label.submit.vote" />
-				</html:submit>
-			</div>
+				<div class="space-bottom-top">
+						<html:submit property="continueOptionsCombined" styleClass="button">
+							<fmt:message key="label.submit.vote" />
+						</html:submit>
+				</div>
 				
 		</html:form>
 	</div>

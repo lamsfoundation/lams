@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -90,9 +89,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * <p>
@@ -740,40 +736,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward getAllCompletedActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    Long learnerID = WebUtil.readLongParam(request, "learnerID", true);
-	    wddxPacket = monitoringService.getAllCompletedActivities(lessonID, learnerID, getUserId());
-
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-
-    }
-
-    public ActionForward getAllContributeActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonID);
-
-	response.setContentType("application/json;charset=utf-8");
-	Gson gson = new GsonBuilder().create();
-	gson.toJson(contributeActivities, response.getWriter());
-	return null;
-    }
-
     /**
      * Calls the server to bring up the learner progress page. Assumes destination is a new window. The userid that
      * comes from Flash is the user id of the learner for which we are calculating the url. This is different to all the
@@ -945,24 +907,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /** Get the learner progress data for all learners in a lesson. This is called by the sequence tab in monitoring */
-    public ActionForward getAllLearnersProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId(), false);
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     /**
      * Produces necessary data for learner progress bar.
      */
@@ -1008,7 +952,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Produces data to update Lesson tab in Monitor.
      */
-    public ActionForward getLessonDetailsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 

@@ -40,8 +40,8 @@ public class Main {
 	// configure log4j
 	PropertyConfigurator.configure("log.properties");
 	// configure HttpUnit
-	// stops the unsupported javascript stuff from throwing an exception
-	HttpUnitOptions.setExceptionsThrownOnScriptError(false);
+	// stops Javascript parsing, it's not needed
+	HttpUnitOptions.setScriptingEnabled(false);
 	// WebClient.getResponse does not throw an exception when it receives an error status.
 	HttpUnitOptions.setExceptionsThrownOnErrorStatus(false);
     }

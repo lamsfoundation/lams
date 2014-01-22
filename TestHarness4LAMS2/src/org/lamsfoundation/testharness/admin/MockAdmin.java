@@ -22,7 +22,9 @@
  */
 package org.lamsfoundation.testharness.admin;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,6 +80,7 @@ public class MockAdmin extends MockUser {
     private static final char USER_ID_END_FLAG = '&';
 
     private static final String LOGIN_TAKEN_ERROR = "Login is already taken.";
+    private static final Pattern NEW_USER_ID_PATTERN = Pattern.compile("name=\"userId\" value=\"(\\d+)\"");
     private static final Pattern EXISTING_USER_ID_PATTERN = Pattern.compile(", ID: (\\d+)");
 
     public MockAdmin(AbstractTest test, String username, String password) {
@@ -87,8 +90,8 @@ public class MockAdmin extends MockUser {
     public String createCourse(String createCourseURL, String courseName) {
 	try {
 	    delay();
-	    WebResponse resp = (WebResponse) new Call(wc, test, "Creating Course:" + courseName, createCourseURL)
-		    .execute();
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " creating course  " + courseName,
+		    createCourseURL).execute();
 	    if (!MockUser.checkPageContains(resp, MockAdmin.COURSE_FORM_FLAG)) {
 		MockAdmin.log.debug(resp.getText());
 		throw new TestHarnessException(username + " did not get course creation page with the url:"
@@ -97,7 +100,8 @@ public class MockAdmin extends MockUser {
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockAdmin.COURSE_NAME, courseName);
 	    // fill the form and submit it and return the course id
-	    resp = (WebResponse) new Call(wc, test, "Submit Course Creation Form", fillForm(resp, 0, params)).execute();
+	    resp = (WebResponse) new Call(wc, test, username + " submit course creation form",
+		    fillForm(resp, 0, params)).execute();
 	    WebTable[] tables = resp.getTables();
 	    if ((tables == null) || (tables.length == 0)) {
 		MockAdmin.log.debug(resp.getText());
@@ -125,7 +129,7 @@ public class MockAdmin extends MockUser {
 	}
     }
 
-    public void createUsers(String createUserURL, String courseId, String storedUsersFileName) {
+    public void createUsers(String createUserURL, String addRolesURL, String courseId, String storedUsersFileName) {
 	try {
 	    String url = createUserURL.replace(MockAdmin.COURSE_ID_PATTERN, courseId.toString());
 	    List<MockUser> mockUsers = new ArrayList<MockUser>();
@@ -137,50 +141,63 @@ public class MockAdmin extends MockUser {
 	    Collections.addAll(mockUsers, learnerTest.getUsers());
 
 	    for (MockUser mockUser : mockUsers) {
-		String name = mockUser.getUsername();
-		if (mockUser.getUserId() != null) {
-		    log.debug("User " + name + " already exists, skipping creation");
-		    continue;
-		}
-
 		delay();
-		// create the user
-		MockAdmin.log.info(username + " creating user " + name);
-		WebResponse resp = (WebResponse) new Call(wc, test, username + " creating user " + name, url).execute();
-		if (!MockUser.checkPageContains(resp, MockAdmin.USER_FORM_FLAG)) {
-		    MockAdmin.log.debug(resp.getText());
-		    throw new TestHarnessException(username + " did not get user creation page with the url " + url);
-		}
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(MockAdmin.LOGIN, name);
-		params.put(MockAdmin.PASSWORD, name);
-		params.put(MockAdmin.PASSWORD2, name);
-		params.put(MockAdmin.FIRST_NAME, name);
-		params.put(MockAdmin.LAST_NAME, MockAdmin.COMMON_LAST_NAME);
-		params.put(MockAdmin.EMAIL,
-			name + "@" + MockAdmin.COMMON_LAST_NAME + "." + MockAdmin.COMMON_LAST_NAME.toLowerCase());
-		resp = (WebResponse) new Call(wc, test, username + " submit user creation form", fillForm(resp, 0,
-			params)).execute();
 
-		// add the roles
-		String respText = resp.getText();
-		if (respText.indexOf(MockAdmin.LOGIN_TAKEN_ERROR) != -1) {
-		    Matcher m = MockAdmin.EXISTING_USER_ID_PATTERN.matcher(respText);
-		    if (m.find()) {
-			String userId = m.group(1);
-			mockUser.setUserId(userId);
-			MockAdmin.log.debug("User " + name + " already exists with ID: " + userId);
-		    } else {
-			throw new TestHarnessException("User " + name
-				+ " already exists, but could not retrieve his ID");
+		String name = mockUser.getUsername();
+		WebResponse resp = null;
+		if (mockUser.getUserId() == null) {
+		    // create the user
+		    MockAdmin.log.info(username + " creating user " + name);
+		    resp = (WebResponse) new Call(wc, test, username + " creating user " + name, url).execute();
+		    if (!MockUser.checkPageContains(resp, MockAdmin.USER_FORM_FLAG)) {
+			MockAdmin.log.debug(resp.getText());
+			throw new TestHarnessException(username + " did not get user creation page with the url " + url);
 		    }
-		    continue;
+		    Map<String, Object> params = new HashMap<String, Object>();
+		    params.put(MockAdmin.LOGIN, name);
+		    params.put(MockAdmin.PASSWORD, name);
+		    params.put(MockAdmin.PASSWORD2, name);
+		    params.put(MockAdmin.FIRST_NAME, name);
+		    params.put(MockAdmin.LAST_NAME, MockAdmin.COMMON_LAST_NAME);
+		    params.put(MockAdmin.EMAIL, name + "@" + MockAdmin.COMMON_LAST_NAME + "."
+			    + MockAdmin.COMMON_LAST_NAME.toLowerCase());
+		    resp = (WebResponse) new Call(wc, test, username + " submit user creation form", fillForm(resp, 0,
+			    params)).execute();
+		    // add the roles
+		    String respText = resp.getText();
+
+		    if (respText.contains(MockAdmin.LOGIN_TAKEN_ERROR)) {
+			Matcher m = MockAdmin.EXISTING_USER_ID_PATTERN.matcher(respText);
+			if (m.find()) {
+			    String userId = m.group(1);
+			    mockUser.setUserId(userId);
+			    MockAdmin.log.debug("User " + name + " already exists with ID " + userId);
+			} else {
+			    throw new TestHarnessException("User " + name
+				    + " already exists, but could not retrieve his ID");
+			}
+		    } else {
+			Matcher m = MockAdmin.NEW_USER_ID_PATTERN.matcher(respText);
+			if (m.find()) {
+			    String userId = m.group(1);
+			    mockUser.setUserId(userId);
+			    MockAdmin.log.debug("User " + name + " created with ID " + userId);
+			} else {
+			    throw new TestHarnessException("User " + name
+				    + " was just created, but could not retrieve his ID");
+			}
+		    }
+		} else {
+		    MockAdmin.log.debug("User " + name + " already exists, skipping creation");
 		}
+
+		StringBuilder bodyBuilder = new StringBuilder();
+		bodyBuilder.append("orgId=").append(courseId).append("&userId=").append(mockUser.getUserId())
+			.append("&roles=").append(mockUser.getRole());
+		InputStream is = new ByteArrayInputStream(bodyBuilder.toString().getBytes("UTF-8"));
 
 		MockAdmin.log.info(username + " adding roles to user " + name);
-		params = new HashMap<String, Object>();
-		params.put(MockAdmin.ROLES, new String[] { mockUser.getRole() });
-		resp = (WebResponse) new Call(wc, test, username + " submit user rolesform", fillForm(resp, 0, params))
+		resp = (WebResponse) new Call(wc, test, username + " submit user roles form", addRolesURL, is)
 			.execute();
 		WebTable[] tables = resp.getTables();
 		if ((tables == null) || (tables.length < 2)) {

@@ -1935,63 +1935,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long,
-     *      java.lang.Integer)
-     */
-    @Override
-    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedDataOnly) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	FlashMessage flashMessage;
-
-	if (lesson != null) {
-	    checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
-	    Vector progressData = new Vector();
-	    Iterator iterator = lesson.getLearnerProgresses().iterator();
-	    while (iterator.hasNext()) {
-		LearnerProgress learnerProgress = (LearnerProgress) iterator.next();
-		if (!completedDataOnly) {
-		    progressData.add(learnerProgress.getLearnerProgressData());
-		} else {
-		    progressData.add(learnerProgress.getLearnerProgressCompletedData());
-		}
-	    }
-	    flashMessage = (!completedDataOnly) ? new FlashMessage("getAllLearnersProgress", progressData)
-		    : new FlashMessage("getAllCompletedActivities", progressData);
-	} else {
-	    flashMessage = new FlashMessage("getAllLearnersProgress", messageService.getMessage("NO.SUCH.LESSON",
-		    new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    @Override
-    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	FlashMessage flashMessage;
-
-	if (lesson != null) {
-	    checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
-	    Vector progressData = new Vector();
-
-	    if (learnerID != null) {
-		LearnerProgress learnerProgress = learnerService.getProgress(new Integer(learnerID.intValue()),
-			lessonID);
-		progressData.add(learnerProgress.getLearnerProgressCompletedData());
-		flashMessage = new FlashMessage("getAllCompletedActivities", progressData);
-	    } else {
-		return getAllLearnersProgress(lessonID, userID, true);
-	    }
-
-	} else {
-	    flashMessage = new FlashMessage("getAllCompletedActivities", messageService.getMessage("NO.SUCH.LESSON",
-		    new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long, Class)
      */
     @Override

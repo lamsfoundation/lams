@@ -45,22 +45,6 @@ public class TestUtil {
 	return TestUtil.truncate(TestUtil.buildName(TestUtil.truncate(testName, 1, true), simpleName), maxLength, true);
     }
 
-    public static String extractString(String text, String startFlag, char endFlag) {
-	String target = null;
-	try {
-	    int index = text.indexOf(startFlag);
-	    if (index != -1) {
-		int startIndex = index + startFlag.length();
-		int endIndex = text.indexOf(endFlag, startIndex);
-		target = text.substring(startIndex, endIndex);
-	    }
-	} catch (IndexOutOfBoundsException e) {
-	    TestUtil.log.error("Index out of bounds. StartFlag: " + startFlag + ", endFlag: " + endFlag + ", text: "
-		    + text);
-	}
-	return target;
-    }
-
     public static int generateRandomNumber(int length) {
 	return new Random().nextInt(length);
     }

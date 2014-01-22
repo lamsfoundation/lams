@@ -80,6 +80,7 @@ public class TestManager {
     // property keys of admin test
     private static final String CREATE_COURSE_URL = "CreateCourseURL";
     private static final String CREATE_USER_URL = "CreateUserURL";
+    private static final String ADD_ROLES_URL = "AddRolesURL";
     private static final String COURSE_NAME = "CourseName";
     private static final String COURSE_ID = "CourseId";
     private static final String SYSADMIN_USERNAME = "SysadminUsername";
@@ -107,7 +108,6 @@ public class TestManager {
     private static final String NUMBER_LEARNERS = "NumberOfLearners";
     private static final String LEARNER_OFFSET = "LearnerOffset";
     private static final String BASE_LEARNER_NAME = "BaseLearnerName";
-    private static final String GET_LESSON_URL = "GetLessonURL";
     private static final String JOIN_LESSON_URL = "JoinLessonURL";
     private static final String LESSON_ENTRY_URL = "LessonEntryURL";
     private static final String FILES_TO_UPLOAD = "FilesToUpload";
@@ -228,6 +228,8 @@ public class TestManager {
 		TestManager.CREATE_COURSE_URL, courseId != null);
 	String createUserURL = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.CREATE_USER_URL, false);
+	String addRolesURL = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
+		TestManager.ADD_ROLES_URL, false);
 	String courseName = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.COURSE_NAME, true);
 	String sysadminUsername = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
@@ -235,7 +237,7 @@ public class TestManager {
 	String sysadminPassword = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.SYSADMIN_PASSWORD, false);
 
-	AdminTest test = new AdminTest(testName, minDelay, maxDelay, createCourseURL, createUserURL,
+	AdminTest test = new AdminTest(testName, minDelay, maxDelay, createCourseURL, createUserURL, addRolesURL,
 		courseId == null ? null : courseId.toString(), courseName, storedUsersFileName);
 
 	test.setUsers(new MockAdmin[] { new MockAdmin(test, sysadminUsername, sysadminPassword) });
@@ -291,8 +293,6 @@ public class TestManager {
 	learnerOffset = learnerOffset == null ? 1 : learnerOffset;
 	String baseLearnerName = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.BASE_LEARNER_NAME, true);
-	String getLessonURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
-		TestManager.GET_LESSON_URL, false);
 	String joinLessonURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.JOIN_LESSON_URL, false);
 	String lessonEntryURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
@@ -300,7 +300,7 @@ public class TestManager {
 	String filesToUpload = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.FILES_TO_UPLOAD, false);
 
-	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, getLessonURL, joinLessonURL, lessonEntryURL,
+	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, joinLessonURL, lessonEntryURL,
 		filesToUpload == null ? null : filesToUpload.split(";"));
 
 	MockLearner[] learners = new MockLearner[numberOfLearners];
@@ -335,12 +335,6 @@ public class TestManager {
 		TestManager.CREATE_LESSON_CLASS_URL, lsId != null);
 	String startLessonURL = TestManager.getStringProperty(monitorTestPropertyFileName, monitorTestProperties,
 		TestManager.START_LESSON_URL, lsId != null);
-	String getLessonDetailsURL = TestManager.getStringProperty(monitorTestPropertyFileName, monitorTestProperties,
-		TestManager.GET_LESSON_DETAILS_URL, lsId != null);
-	String getContributeActivitiesURL = TestManager.getStringProperty(monitorTestPropertyFileName,
-		monitorTestProperties, TestManager.GET_CA_URL, lsId != null);
-	String getLearningDesignDetailsURL = TestManager.getStringProperty(monitorTestPropertyFileName,
-		monitorTestProperties, TestManager.GET_LD_DETAILS_URL, lsId != null);
 	String getAllLearnersProgressURL = TestManager.getStringProperty(monitorTestPropertyFileName,
 		monitorTestProperties, TestManager.GET_ALL_PROGRESS_URL, lsId != null);
 	String lsName = TestManager.getStringProperty(monitorTestPropertyFileName, monitorTestProperties,
@@ -349,8 +343,7 @@ public class TestManager {
 		TestManager.BASE_MONITOR_NAME, true);
 
 	MonitorTest test = new MonitorTest(testName, minDelay, maxDelay, initLessonURL, createLessonClassURL,
-		startLessonURL, getLessonDetailsURL, getContributeActivitiesURL, getLearningDesignDetailsURL,
-		getAllLearnersProgressURL, lsName, lsId == null ? null : lsId.toString());
+		startLessonURL, getAllLearnersProgressURL, lsName, lsId == null ? null : lsId.toString());
 
 	baseMonitorName = baseMonitorName == null ? MockMonitor.DEFAULT_NAME : baseMonitorName;
 	String username = TestUtil.buildName(testName, baseMonitorName, TestManager.MAX_USERNAME_LENGTH);

@@ -142,17 +142,18 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 public class QaLearningAction extends LamsDispatchAction implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaLearningAction.class.getName());
-    
+
     private static IQaService qaService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	logger.warn("dispatching unspecified...");
+	QaLearningAction.logger.warn("dispatching unspecified...");
 	return null;
     }
 
     /**
-     * submits users responses 
+     * submits users responses
      * 
      * @param mapping
      * @param form
@@ -170,7 +171,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
@@ -182,40 +183,43 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	Map<String, String> mapAnswers = new TreeMap<String, String>(new QaComparator());
 	Map<String, String> mapAnswersPresentable = new TreeMap<String, String>(new QaComparator());
-	
-	String forwardName = INDIVIDUAL_LEARNER_RESULTS;
+
+	String forwardName = QaAppConstants.INDIVIDUAL_LEARNER_RESULTS;
 	ActionMessages errors = new ActionMessages();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	
+
 	/* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate  the answers here*/
-	if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_COMBINED)) {
-	    
-	    for (int questionIndex = INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
-		String answer = request.getParameter("answer" + questionIndex);
+	if (questionListingMode.equalsIgnoreCase(QaAppConstants.QUESTION_LISTING_MODE_COMBINED)) {
+
+	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
+		// TestHarness can not send "answerX" fields, so stick to the original, unfiltered field
+		boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
+		String answerParamName = "answer" + questionIndex + (isTestHarness ? "__textarea" : "");
+		String answer = request.getParameter(answerParamName);
 		String answerPresentable = QaUtils.replaceNewLines(answer);
 
 		String questionIndexString = new Integer(questionIndex).toString();
 		mapAnswers.put(questionIndexString, answer);
 		mapAnswersPresentable.put(questionIndexString, answerPresentable);
-		
-		Map<String,QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+
+		Map<String, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 		QaQuestionDTO dto = questionContentMap.get(questionIndexString);
-		if ( dto.isRequired() && isEmpty(answer)) {
+		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexString));
-		    forwardName = LOAD_LEARNER;
+		    forwardName = QaAppConstants.LOAD_LEARNER;
 		}
-		
-		//store
-		qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex));
+
+		// store
+		QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex));
 	    }
 	    saveErrors(request, errors);
 
 	} else {
 	    mapAnswers = storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
 
-	    mapAnswersPresentable = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
+	    mapAnswersPresentable = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 	    mapAnswersPresentable = MonitoringUtil.removeNewLinesMap(mapAnswersPresentable);
 
 	    // only need to check the final question as the others will have been checked when the user clicked next.
@@ -223,9 +227,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    int numQuestions = questionMap.size();
 	    String finalQuestionIndex = new Integer(numQuestions).toString();
 	    QaQuestionDTO dto = questionMap.get(finalQuestionIndex);
-	    if (dto.isRequired() && isEmpty((String) mapAnswersPresentable.get(finalQuestionIndex))) {
+	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex))) {
 		errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", finalQuestionIndex));
-		forwardName = LOAD_LEARNER;
+		forwardName = QaAppConstants.LOAD_LEARNER;
 	    }
 	}
 
@@ -233,10 +237,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
 
 	/*mapAnswers will be used in the viewAllAnswers screen*/
-	if ( sessionMap == null ) 
+	if (sessionMap == null) {
 	    sessionMap = new SessionMap();
-	
-	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
+	}
+
+	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
@@ -245,12 +250,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	qaLearningForm.resetAll();
 	return (mapping.findForward(forwardName));
     }
-    
+
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	
@@ -269,7 +274,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     }
     
     /**
-     * auto saves responses 
+     * auto saves responses
      * 
      * @param mapping
      * @param form
@@ -286,25 +291,28 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 	int intTotalQuestionCount = qaContent.getQaQueContents().size();
-	
-	if (! qaContent.isQuestionsSequenced()) {
-	    
-	    for (int questionIndex = INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
+
+	if (!qaContent.isQuestionsSequenced()) {
+
+	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String newAnswer = request.getParameter("answer" + questionIndex);
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(questionIndex));
+		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID,
+			new Long(questionIndex));
 	    }
 
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex), qaContent.getUid());
-	    
+	    QaQueContent currentQuestion = QaLearningAction.qaService.getQuestionByContentAndDisplayOrder(new Long(
+		    currentQuestionIndex), qaContent.getUid());
+
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(currentQuestionIndex));
+		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(
+			currentQuestionIndex));
 	    }
 	}
 	return null;
@@ -329,7 +337,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
@@ -344,20 +352,21 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 
-	//create mapQuestions
+	// create mapQuestions
 	Map<String, QaQuestionDTO> mapQuestions = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
 	generalLearnerFlowDTO.setRemainingQuestionCount(new Integer(mapQuestions.size()).toString());
 	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
-		
-	//populate answers
-	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
-	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO, qaService);
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	// populate answers
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
+		QaLearningAction.qaService);
+
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetAll();
-	return (mapping.findForward(LOAD_LEARNER));
+	return (mapping.findForward(QaAppConstants.LOAD_LEARNER));
     }
 
     /**
@@ -370,27 +379,27 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      */
     public ActionForward storeAllResults(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	
+
 	initializeQAService();
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	String userID = request.getParameter("userID");
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	Long toolContentID = qaSession.getQaContent().getQaContentId();
 	QaContent qaContent = qaSession.getQaContent();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	Map mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
-	
-//	LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
-	//mark response as finalised
-	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);	
+	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
+
+	// LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
+	// mark response as finalised
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	qaQueUsr.setResponseFinalized(true);
-	qaService.updateQaQueUsr(qaQueUsr);
-	
+	QaLearningAction.qaService.updateQaQueUsr(qaQueUsr);
+
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
@@ -399,13 +408,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 	    String isUserNamesVisibleBoolean = generalLearnerFlowDTO.getUserNameVisible();
 	    boolean isUserNamesVisible = new Boolean(isUserNamesVisibleBoolean).booleanValue();
-	    
-	    return prepareViewAllAnswers(mapping, request, qaLearningForm, toolSessionID, userID, qaSession,
-		    qaContent, generalLearnerFlowDTO, isUserNamesVisible);
-	    
+
+	    return prepareViewAllAnswers(mapping, request, qaLearningForm, toolSessionID, userID, qaSession, qaContent,
+		    generalLearnerFlowDTO, isUserNamesVisible);
+
 	} else if (qaContent.isReflect()) {
 	    return forwardtoReflection(mapping, request, qaContent, toolSessionID, userID, qaLearningForm);
-	    
+
 	} else {
 	    return endLearning(mapping, qaLearningForm, request, response);
 	}
@@ -417,8 +426,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    QaContent qaContent, GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean isUserNamesVisible) {
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID,
-		userID, generalLearnerFlowDTO, false, toolSessionID);
+	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
+		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
@@ -429,13 +438,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
-	
+
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
-	
+
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
@@ -447,24 +456,24 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 
 	if (sessionUserCount > 1) {
-	    //there are multiple user responses
+	    // there are multiple user responses
 	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
 	}
 
 	boolean usernameVisible = qaContent.isUsernameVisible();
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
 
-	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, new Integer(userID));
+	NotebookEntry notebookEntry = QaLearningAction.qaService.getEntry(new Long(toolSessionID),
+		CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
-	    //String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+	    // String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
 	    String notebookEntryPresentable = notebookEntry.getEntry();
 	    qaLearningForm.setEntryText(notebookEntryPresentable);
 	}
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	return (mapping.findForward(QaAppConstants.INDIVIDUAL_LEARNER_REPORT));
     }
 
     /**
@@ -488,7 +497,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String userID = request.getParameter("userID");
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
 	String toolContentID = qaSession.getQaContent().getQaContentId().toString();
 
@@ -506,30 +515,30 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	Map mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
+	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 
 	/*recreate the users and responses*/
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID,
-		userID, generalLearnerFlowDTO, false, toolSessionID);
+	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
+		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
 
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-	//generalLearnerFlowDTO.setNotebookEntriesVisible(new Boolean(false).toString());
+	// generalLearnerFlowDTO.setNotebookEntriesVisible(new Boolean(false).toString());
 
 	qaLearningForm.resetAll();
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
-	
+
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
-	
+
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
 	
@@ -550,9 +559,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	boolean usernameVisible = qaContent.isUsernameVisible();
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+	return (mapping.findForward(QaAppConstants.INDIVIDUAL_LEARNER_REPORT));
     }
 
     /**
@@ -579,7 +588,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	qaLearningForm.setHttpSessionID(httpSessionID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
@@ -587,12 +596,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
 
 	qaLearningForm.resetAll();
-	return (mapping.findForward(LOAD_LEARNER));
+	return (mapping.findForward(QaAppConstants.LOAD_LEARNER));
     }
 
-    /** 
-     * Get the answer from the form and copy into DTO. Set up the next question. If the current question is
-     * required and the answer is blank, then just persist the error and don't change questions. 
+    /**
+     * Get the answer from the form and copy into DTO. Set up the next question. If the current question is required and
+     * the answer is blank, then just persist the error and don't change questions.
+     * 
      * @param form
      * @param request
      * @param generalLearnerFlowDTO
@@ -607,42 +617,44 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 
-	Map mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
-	if (mapAnswers == null)
+	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
+	if (mapAnswers == null) {
 	    mapAnswers = new TreeMap(new QaComparator());
+	}
 
 	String newAnswer = qaLearningForm.getAnswer();
-	Map mapSequentialAnswers = (Map) sessionMap.get(MAP_SEQUENTIAL_ANSWERS_KEY);
+	Map mapSequentialAnswers = (Map) sessionMap.get(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY);
 	if (mapSequentialAnswers.size() >= new Integer(currentQuestionIndex).intValue()) {
 	    mapSequentialAnswers.remove(new Long(currentQuestionIndex).toString());
 	}
 	mapSequentialAnswers.put(new Long(currentQuestionIndex).toString(), newAnswer);
 	mapAnswers.put(currentQuestionIndex, newAnswer);
 
-	int nextQuestionOffset =  getNextQuestion ? 1 : -1;
+	int nextQuestionOffset = getNextQuestion ? 1 : -1;
 
-	// is this question required and are they trying to go to the next question? 
+	// is this question required and are they trying to go to the next question?
 	// if so, check if the answer is blank and generate an error if it is blank.
-	Map<String,QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	Map<String, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	QaQuestionDTO dto = questionContentMap.get(currentQuestionIndex);
 	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
-	if ( getNextQuestion && isRequiredQuestionMissed) {
+	if (getNextQuestion && isRequiredQuestionMissed) {
 	    ActionMessages errors = new ActionMessages();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", currentQuestionIndex));
 	    saveErrors(request, errors);
 	    nextQuestionOffset = 0;
 	}
-	
-	//store
-	if ( ! isRequiredQuestionMissed) {
-	    qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(), new Long(currentQuestionIndex));
+
+	// store
+	if (!isRequiredQuestionMissed) {
+	    QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(),
+		    new Long(currentQuestionIndex));
 	}
-	
-	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
+
+	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	int intCurrentQuestionIndex = new Integer(currentQuestionIndex).intValue() + nextQuestionOffset;
 	String currentAnswer = "";
@@ -651,7 +663,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 	generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
 
-	//currentQuestionIndex will be: 
+	// currentQuestionIndex will be:
 	generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(intCurrentQuestionIndex));
 
 	String totalQuestionCount = qaLearningForm.getTotalQuestionCount();
@@ -665,29 +677,28 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
 
-	sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
+	sessionMap.put(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	return mapSequentialAnswers;
     }
-    
-
 
     /**
      * Is this string empty? Need to strip out all HTML tags first otherwise an empty DIV might look like a valid answer
      * Smileys and math functions only put in an img tag so explicitly look for that.
      */
     private boolean isEmpty(String answer) {
-	if  ( answer.indexOf("<img") > -1 || answer.indexOf("<IMG") > -1 ) 
+	if ((answer.indexOf("<img") > -1) || (answer.indexOf("<IMG") > -1)) {
 	    return false;
-	else
+	} else {
 	    return StringUtils.isBlank(WebUtil.removeHTMLtags(answer));
+	}
     }
-    
+
     /**
      * moves to the previous question and modifies the map ActionForward
      * 
@@ -711,7 +722,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.setHttpSessionID(httpSessionID);
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	qaLearningForm.setToolSessionID(toolSessionID);
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
@@ -719,35 +730,35 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, false);
 
 	qaLearningForm.resetAll();
-	return (mapping.findForward(LOAD_LEARNER));
+	return (mapping.findForward(QaAppConstants.LOAD_LEARNER));
     }
-    
+
     /**
-     * Rates answers submitted by other learners. 
+     * Rates answers submitted by other learners.
      * 
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws JSONException 
+     * @throws JSONException
      * @throws IOException
      * @throws ServletException
      * @throws ToolException
      */
     public ActionForward rateResponse(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	
-	float rating = Float.parseFloat((String) request.getParameter("rate"));
+
+	float rating = Float.parseFloat(request.getParameter("rate"));
 	Long responseId = WebUtil.readLongParam(request, "idBox");
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long userId = new Long(user.getUserID().intValue());
-	
+
 	AverageRatingDTO averageRatingDTO = qaService.rateResponse(responseId, userId, toolSessionID, rating);
-	
+
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("averageRating", averageRatingDTO.getRating());
 	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
@@ -757,7 +768,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     }
 
     /**
-     * finishes the user's tool activity 
+     * finishes the user's tool activity
      * 
      * @param request
      * @param qaService
@@ -778,11 +789,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String userID = request.getParameter("userID");
 	qaLearningForm.setUserID(userID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
-	QaQueUsr qaQueUsr = qaService.getUserByIdAndSession(new Long(userID), qaSession.getQaSessionId());
+	QaQueUsr qaQueUsr = QaLearningAction.qaService.getUserByIdAndSession(new Long(userID),
+		qaSession.getQaSessionId());
 	qaQueUsr.setLearnerFinished(true);
-	qaService.updateQaQueUsr(qaQueUsr);
+	QaLearningAction.qaService.updateQaQueUsr(qaQueUsr);
 
 	/*
 	 * The learner is done with the tool session. The tool needs to clean-up.
@@ -792,17 +804,17 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
-	qaSession.setSession_status(COMPLETED);
-	qaService.updateQaSession(qaSession);
+	qaSession.setSession_status(QaAppConstants.COMPLETED);
+	QaLearningAction.qaService.updateQaSession(qaSession);
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	//request.getSession().removeAttribute(httpSessionID);
+	// request.getSession().removeAttribute(httpSessionID);
 	qaLearningForm.setHttpSessionID(httpSessionID);
 
 	qaLearningForm.resetAll();
 
-	String nextActivityUrl = qaService.leaveToolSession(new Long(toolSessionID), new Long(user.getUserID()
-		.longValue()));
+	String nextActivityUrl = QaLearningAction.qaService.leaveToolSession(new Long(toolSessionID), new Long(user
+		.getUserID().longValue()));
 	response.sendRedirect(nextActivityUrl);
 
 	return null;
@@ -825,23 +837,24 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String userID = request.getParameter("userID");
 	qaLearningForm.setUserID(userID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
 	QaContent qaContent = qaSession.getQaContent();
 
-	QaQueUsr qaQueUsr = qaService.getUserByIdAndSession(new Long(userID), qaSession.getQaSessionId());
+	QaQueUsr qaQueUsr = QaLearningAction.qaService.getUserByIdAndSession(new Long(userID),
+		qaSession.getQaSessionId());
 
 	String entryText = request.getParameter("entryText");
 	qaLearningForm.setEntryText(entryText);
 
 	NotebookEntry notebookEntryLocal = new NotebookEntry();
 	notebookEntryLocal.setEntry(entryText);
-	//notebookEntry.setUser(qaQueUsr);
+	// notebookEntry.setUser(qaQueUsr);
 	User user = new User();
 	user.setUserId(new Integer(userID));
 	notebookEntryLocal.setUser(user);
 
-	qaService.updateEntry(notebookEntryLocal);
+	QaLearningAction.qaService.updateEntry(notebookEntryLocal);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 
@@ -851,8 +864,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	boolean isUserNamesVisible = isUserNamesVisibleBoolean.booleanValue();
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionID,
-		userID, generalLearnerFlowDTO, false, toolSessionID);
+	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
+		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
 
 	int sessionUserCount = 0;
 	if (qaSession.getQaQueUsers() != null) {
@@ -860,7 +873,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 
 	if (sessionUserCount > 1) {
-	    //there are multiple user responses
+	    // there are multiple user responses
 	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
 	}
 
@@ -869,27 +882,26 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
-	
+
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
-	
+
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
 	
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
-	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, new Integer(userID));
-
+	NotebookEntry notebookEntry = QaLearningAction.qaService.getEntry(new Long(toolSessionID),
+		CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
 	    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
 	    qaLearningForm.setEntryText(notebookEntryPresentable);
 	}
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	return (mapping.findForward(REVISITED_LEARNER_REP));
+	return (mapping.findForward(QaAppConstants.REVISITED_LEARNER_REP));
     }
 
     /**
@@ -920,10 +932,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String userID = request.getParameter("userID");
 	qaLearningForm.setUserID(userID);
 
-	String reflectionEntry = request.getParameter(ENTRY_TEXT);
+	String reflectionEntry = request.getParameter(QaAppConstants.ENTRY_TEXT);
 
-	qaService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
-		new Integer(userID), reflectionEntry);
+	QaLearningAction.qaService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+		QaAppConstants.MY_SIGNATURE, new Integer(userID), reflectionEntry);
 
 	qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
 	return endLearning(mapping, form, request, response);
@@ -944,14 +956,14 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	initializeQAService();
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
-	
+
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 
 	qaLearningForm.setHttpSessionID(httpSessionID);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
 	QaContent qaContent = qaSession.getQaContent();
 
@@ -970,38 +982,38 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	reflectionSubject = QaUtils.replaceNewLines(reflectionSubject);
 	generalLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 
-	//attempt getting notebookEntry
-	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, new Integer(userID));
+	// attempt getting notebookEntry
+	NotebookEntry notebookEntry = QaLearningAction.qaService.getEntry(new Long(toolSessionID),
+		CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
-	    //String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
+	    // String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
 	    String notebookEntryPresentable = notebookEntry.getEntry();
 	    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 	    qaLearningForm.setEntryText(notebookEntryPresentable);
 	}
 
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
 
 	qaLearningForm.resetAll();
-	return (mapping.findForward(NOTEBOOK));
+	return (mapping.findForward(QaAppConstants.NOTEBOOK));
     }
-    
+
     private void initializeQAService() {
-	if (qaService == null) {
-	    qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+	if (QaLearningAction.qaService == null) {
+	    QaLearningAction.qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	}
     }
-    
+
     private QaQueUsr getCurrentUser(String toolSessionID) {
 
-	// get back login user DTO 
+	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = new Long(toolUser.getUserID().longValue());	
+	Long userId = new Long(toolUser.getUserID().longValue());
 
-	return qaService.getUserByIdAndSession(userId, new Long(toolSessionID));
+	return QaLearningAction.qaService.getUserByIdAndSession(userId, new Long(toolSessionID));
     }
-    
+
 }

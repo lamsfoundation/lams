@@ -43,9 +43,6 @@ public class MonitorTest extends AbstractTest {
     private String initLessonURL;
     private String createLessonClassURL;
     private String startLessonURL;
-    private String getLessonDetailsURL;
-    private String getContributeActivitiesURL;
-    private String getLearningDesignDetailsURL;
     private String getAllLearnersProgressURL;
     private String lessonName;
     private String lsId;
@@ -55,17 +52,13 @@ public class MonitorTest extends AbstractTest {
      * MonitorTest Construtor
      * 
      */
-    public MonitorTest(String testName,
-	    Integer minDelay, Integer maxDelay, String initLessonURL, String createLessonClassURL,
-	    String startLessonURL, String getLessonDetailsURL, String getContributeActivitiesURL,
-	    String getLearningDesignDetailsURL, String getAllLearnersProgressURL, String lessonName, String lsId) {
+    public MonitorTest(String testName, Integer minDelay, Integer maxDelay, String initLessonURL,
+	    String createLessonClassURL, String startLessonURL, String getAllLearnersProgressURL, String lessonName,
+	    String lsId) {
 	super(testName, minDelay, maxDelay);
 	this.initLessonURL = initLessonURL;
 	this.createLessonClassURL = createLessonClassURL;
 	this.startLessonURL = startLessonURL;
-	this.getLessonDetailsURL = getLessonDetailsURL;
-	this.getContributeActivitiesURL = getContributeActivitiesURL;
-	this.getLearningDesignDetailsURL = getLearningDesignDetailsURL;
 	this.getAllLearnersProgressURL = getAllLearnersProgressURL;
 	this.lessonName = lessonName == null ? TestUtil.buildName(testName, MonitorTest.DEFAULT_LESSON_NAME) : TestUtil
 		.buildName(testName, lessonName);
@@ -130,17 +123,5 @@ public class MonitorTest extends AbstractTest {
 
     public final String getGetAllLearnersProgressURL() {
 	return getAllLearnersProgressURL;
-    }
-
-    public final String getGetContributeActivitiesURL() {
-	return getContributeActivitiesURL;
-    }
-
-    public final String getGetLearningDesignDetailsURL() {
-	return getLearningDesignDetailsURL;
-    }
-
-    public final String getGetLessonDetailsURL() {
-	return getLessonDetailsURL;
     }
 }

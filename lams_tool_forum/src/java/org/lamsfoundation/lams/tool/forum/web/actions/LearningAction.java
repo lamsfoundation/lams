@@ -657,6 +657,10 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	Message message = messageForm.getMessage();
+	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
+	if (isTestHarness) {
+	    message.setBody(request.getParameter("message.body__textarea"));
+	}
 	message.setIsAuthored(false);
 	message.setCreated(new Date());
 	message.setUpdated(new Date());

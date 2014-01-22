@@ -327,7 +327,7 @@ function updateLessonTab(){
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		cache : false,
 		data : {
-			'method'    : 'getLessonDetailsJSON',
+			'method'    : 'getLessonDetails',
 			'lessonID'  : lessonId
 		},
 		

@@ -40,7 +40,6 @@ public class LearnerTest extends AbstractTest {
 
     private static final Logger log = Logger.getLogger(LearnerTest.class);
 
-    protected String getLessonURL;
     protected String joinLessonURL;
     protected String lessonEntryURL;
     protected String[] filesToUpload;
@@ -50,10 +49,9 @@ public class LearnerTest extends AbstractTest {
      * LearnerTest Constructor
      * 
      */
-    public LearnerTest(String testName, Integer minDelay, Integer maxDelay, String getLessonURL, String joinLessonURL,
+    public LearnerTest(String testName, Integer minDelay, Integer maxDelay, String joinLessonURL,
 	    String lessonEntryURL, String[] filesToUpload) {
 	super(testName, minDelay, maxDelay);
-	this.getLessonURL = getLessonURL;
 	this.joinLessonURL = joinLessonURL;
 	this.lessonEntryURL = lessonEntryURL;
 	this.filesToUpload = filesToUpload;

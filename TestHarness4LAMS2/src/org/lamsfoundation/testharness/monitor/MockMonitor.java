@@ -25,7 +25,6 @@ package org.lamsfoundation.testharness.monitor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -61,13 +60,7 @@ public class MockMonitor extends MockUser implements Runnable {
 
     private static final String ORGANISATION_ID_PATTERN = "%orgId%";
 
-    private static final String LESSON_ID_KEY = "messageValue";
-
     private static final String LESSON_CREATED_FLAG = "true";
-
-    private static final String MESSAGE_VALUE_KEY = "messageValue";
-
-    private static final String LD_ID_KEY = "learningDesignID";
 
     private CountDownLatch stopSignal = null;
 
@@ -95,16 +88,14 @@ public class MockMonitor extends MockUser implements Runnable {
 	    }
 	    bodyBuilder.append("&monitors=").append(test.getTestSuite().getMonitorTest().getUsers()[0].getUserId());
 
-	    String body = URLEncoder.encode(bodyBuilder.toString(), "UTF-8");
-	    InputStream is = new ByteArrayInputStream(body.getBytes("UTF-8"));
-	    new Call(wc, test, "Create Lesson Class", url, is).execute();
+	    InputStream is = new ByteArrayInputStream(bodyBuilder.toString().getBytes("UTF-8"));
+	    new Call(wc, test, username + " creates lesson class", url, is).execute();
 	    MockMonitor.log.info(username + " set the lesson class");
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
     }
 
-    @SuppressWarnings("rawtypes")
     public String initLesson(String initLessonURL, String ldId, String organisationID, String userId, String name) {
 	try {
 	    if (userId == null) {
@@ -116,7 +107,7 @@ public class MockMonitor extends MockUser implements Runnable {
 	    String url = initLessonURL.replace(MockMonitor.LDID_PATTERN, ldId)
 		    .replace(MockMonitor.ORGANISATION_ID_PATTERN, organisationID)
 		    .replace(MockMonitor.USER_ID_PATTERN, userId).replace(MockMonitor.LESSON_NAME_PATTERN, name);
-	    WebResponse resp = (WebResponse) new Call(wc, test, "Init Lesson", url).execute();
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " inits lesson", url).execute();
 
 	    String idAsString = resp.getText().trim();
 	    MockMonitor.log.info(username + " initialized the lesson " + name + " and the id is " + idAsString);
@@ -129,14 +120,13 @@ public class MockMonitor extends MockUser implements Runnable {
     @Override
     public void run() {
 	try {
-	    MockMonitor.log.info(username + " is monitoring...");
+	    MockMonitor.log.info(username + " is monitoring");
 	    MonitorTest monitorTest = (MonitorTest) test;
 
 	    while (stopSignal == null) {
 		delay();
-		MockMonitor.log.info(username + " is refreshing all learners progress");
+		MockMonitor.log.debug(username + " is refreshing all learners progress");
 		getAllLearnersProgress(monitorTest.getGetAllLearnersProgressURL(), monitorTest.getLsId());
-		MockMonitor.log.info(username + " got the latest learners progress");
 	    }
 	    MockMonitor.log.info(username + " stopped monitoring");
 	    stopSignal.countDown();
@@ -153,7 +143,7 @@ public class MockMonitor extends MockUser implements Runnable {
 	try {
 	    String url = startLessonURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId).replace(
 		    MockMonitor.USER_ID_PATTERN, userId);
-	    WebResponse resp = (WebResponse) new Call(wc, test, "Start Lesson", url).execute();
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " starts Lesson", url).execute();
 	    if (!MockUser.checkPageContains(resp, MockMonitor.LESSON_CREATED_FLAG)) {
 		MockMonitor.log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to create lesson with the url " + url);
@@ -165,6 +155,7 @@ public class MockMonitor extends MockUser implements Runnable {
     }
 
     private void getAllLearnersProgress(String getAllLearnersProgressURL, String lsId) throws IOException {
+	// it gets some redundant information, but reflects what Monitor would be doing in his interface
 	String url = getAllLearnersProgressURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId);
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " get all learners progress", url).execute();
 	MockMonitor.log.debug("Learner progress: " + resp.getText());

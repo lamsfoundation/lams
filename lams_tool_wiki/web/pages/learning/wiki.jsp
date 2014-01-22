@@ -106,7 +106,6 @@
 	&nbsp; 
 
 	<html:form action="/learning" method="post"styleId="learningForm" enctype="multipart/form-data">
-		<html:hidden property="dispatch" styleId="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
 		<input type="hidden" name="userID" value="${userDTO.userId}"/>
@@ -473,7 +472,7 @@
 	
 	function submitWiki(dispatch)
 	{
-		document.getElementById("dispatch").value=dispatch;
+		document.getElementById("learningForm").action += "?dispatch=" + dispatch;
 		replaceJavascriptTokenAndSubmit("learningForm");
 	}
 

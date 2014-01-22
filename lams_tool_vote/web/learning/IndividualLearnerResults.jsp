@@ -41,7 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (actionMethod == 'learnerFinished') {
 				document.getElementById("finishButton").disabled = true;
 			}
-			document.VoteLearningForm.dispatch.value=actionMethod; 
+			document.VoteLearningForm.action += "&dispatch=" + actionMethod; 
 			document.VoteLearningForm.submit();
 		}
 	</script>
@@ -65,7 +65,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
 			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 			
-			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
 			<html:hidden property="revisitingUser" />

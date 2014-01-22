@@ -8,7 +8,7 @@
 	}
 	
 	function continueOrFinish(dispatch) {
-		document.getElementById("dispatch2").value = dispatch;
+		document.getElementById("learningButtonForm").action += "?dispatch=" + dispatch;
 		document.getElementById("learningButtonForm").submit();
 	}
 </script>
@@ -44,7 +44,6 @@
 </c:if>
 
 <html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningButtonForm">
-	<html:hidden property="dispatch" styleId = "dispatch2" value="finishActivity" />
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 	<html:hidden property="mode" value="${mode}" />	
 	<div class="space-bottom-top align-right" id="finishButtonDiv">

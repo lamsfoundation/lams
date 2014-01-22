@@ -69,7 +69,7 @@ public class MockAuthor extends MockUser {
     public String importLearningDesign(String learningDesignUploadURL, File file) {
 	try {
 	    delay();
-	    WebResponse resp = (WebResponse) new Call(wc, test, "Import Learning Design", learningDesignUploadURL)
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " import Learning Design", learningDesignUploadURL)
 		    .execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_FORM_FLAG)) {
 		MockAuthor.log.debug(resp.getText());
@@ -78,7 +78,7 @@ public class MockAuthor extends MockUser {
 	    }
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockAuthor.UPLOAD_FILE_PARAM, file);
-	    resp = (WebResponse) new Call(wc, test, "Submit Learning Design Import Form", fillForm(resp, 0, params))
+	    resp = (WebResponse) new Call(wc, test, username + " submits Learning Design import form", fillForm(resp, 0, params))
 		    .execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_SUCCESS_FLAG)) {
 		MockAuthor.log.debug(resp.getText());

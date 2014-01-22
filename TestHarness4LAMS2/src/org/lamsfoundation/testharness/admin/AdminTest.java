@@ -40,15 +40,17 @@ public class AdminTest extends AbstractTest {
 
     private String createCourseURL;
     private String createUserURL;
+    private String addRolesURL;
     private String courseName;
     private String courseId;
     private String storedUsersFileName;
 
     public AdminTest(String testName, Integer minDelay, Integer maxDelay, String createCourseURL, String createUserURL,
-	    String courseId, String courseName, String storedUsersFileName) {
+	    String addRolesURL, String courseId, String courseName, String storedUsersFileName) {
 	super(testName, minDelay, maxDelay);
 	this.createCourseURL = createCourseURL;
 	this.createUserURL = createUserURL;
+	this.addRolesURL = addRolesURL;
 	this.courseName = courseName == null ? TestUtil.buildName(testName, AdminTest.DEFAULT_COURSE_NAME) : TestUtil
 		.buildName(testName, courseName);
 	this.courseId = courseId;
@@ -61,14 +63,6 @@ public class AdminTest extends AbstractTest {
 
     public final String getCourseName() {
 	return courseName;
-    }
-
-    public final String getCreateCourseURL() {
-	return createCourseURL;
-    }
-
-    public final String getCreateUserURL() {
-	return createUserURL;
     }
 
     public final void setCourseId(String courseId) {
@@ -92,6 +86,6 @@ public class AdminTest extends AbstractTest {
 	if (courseId == null) {
 	    setCourseId(admin.createCourse(createCourseURL, courseName));
 	}
-	admin.createUsers(createUserURL, courseId, storedUsersFileName);
+	admin.createUsers(createUserURL, addRolesURL, courseId, storedUsersFileName);
     }
 }

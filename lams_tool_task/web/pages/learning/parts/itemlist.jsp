@@ -4,18 +4,6 @@
  
 <script language="JavaScript" type="text/JavaScript">
 	<!--
-	    function doUpload(myForm, itemUid) {
-     		
-       		myForm.action = "<c:url value='/learning/uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid='/>" + itemUid;
-       		myForm.submit();
-    	}
-    	
-    	 function addNewComment(myForm, itemUid) {
-     		
-       		myForm.action = "<c:url value='/learning/addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid='/>" + itemUid;
-       		myForm.submit();
-    	}
-	
 		$(document).ready(function() {
 
 			$("a.toggling-link").click(function() {

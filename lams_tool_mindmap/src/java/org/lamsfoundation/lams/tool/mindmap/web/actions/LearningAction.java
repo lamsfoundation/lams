@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -149,7 +150,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
 		.getServletContext());
-		
+
 	// check if there is submission deadline
 	Date submissionDeadline = mindmap.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -834,7 +835,7 @@ public class LearningAction extends LamsDispatchAction {
 		    mindmapService.updateEntry(entry);
 		}
 	    } else {
-		if (!mindmap.isMultiUserMode() && learningForm.getMindmapContent() != null)
+		if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent()))
 		    saveMindmapXML(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
 	    }
 

@@ -21,12 +21,11 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.util.StringUtil;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
@@ -38,138 +37,141 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 
 /**
- *
- * 	Message Form.
- *	@struts.form name="messageForm"
- *
- * User: conradb
- * Date: 10/06/2005
- * Time: 15:44:47
+ * 
+ * Message Form.
+ * 
+ * @struts.form name="messageForm"
+ * 
+ *              User: conradb Date: 10/06/2005 Time: 15:44:47
  */
 public class MessageForm extends ValidatorForm {
-	private static final long serialVersionUID = -9054365604649146734L;
-	private static Logger logger = Logger.getLogger(MessageForm.class.getName());
-	
+    private static final long serialVersionUID = -9054365604649146734L;
+    private static Logger logger = Logger.getLogger(MessageForm.class.getName());
+
     protected Message message;
     protected String sessionMapID;
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
-    
+
     private boolean hasAttachment;
-    //attachment file name
+    // attachment file name
     private String attachmentName;
-    //Message attachment file
+    // Message attachment file
     private FormFile attachmentFile;
-    
+
     public MessageForm() {
-    	message = new Message();
+	message = new Message();
     }
+
     /**
      * MessageForm validation method from STRUCT interface.
      * 
      */
-    public ActionErrors validate(ActionMapping mapping,
-                                 javax.servlet.http.HttpServletRequest request) {
-        ActionErrors errors = new ActionErrors(); 
-        try{
-            if (StringUtils.isBlank(message.getSubject())) {
-               ActionMessage error = new ActionMessage("error.subject.required");
-               errors.add("message.subject", error);
-            }
-            if (StringUtils.isBlank(message.getBody())) {
-            	ActionMessage error = new ActionMessage("error.body.required");
-            	errors.add("message.body", error);
-            }
-            
-            
-//          validate item size
-            boolean largeFile = true;
-            if(request.getRequestURI().indexOf("/learning/") != -1){
-            	if(this.getAttachmentFile() != null && FileUtil.isExecutableFile(this.getAttachmentFile().getFileName())){
-                	ActionMessage error = new ActionMessage("error.attachment.executable");
-                	errors.add("message.attachment", error);
-            	}
-            	largeFile = false;
-            }
-            
-			FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile,"message.attachment", errors );
-			
-        } catch (Exception e) {
-            logger.error("", e);
-        }
-        return errors;
+    @Override
+    public ActionErrors validate(ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
+	ActionErrors errors = new ActionErrors();
+	try {
+	    if (StringUtils.isBlank(message.getSubject())) {
+		ActionMessage error = new ActionMessage("error.subject.required");
+		errors.add("message.subject", error);
+	    }
+	    boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
+	    if (!isTestHarness && StringUtils.isBlank(message.getBody())) {
+		ActionMessage error = new ActionMessage("error.body.required");
+		errors.add("message.body", error);
+	    }
+
+	    // validate item size
+	    boolean largeFile = true;
+	    if (request.getRequestURI().indexOf("/learning/") != -1) {
+		if ((this.getAttachmentFile() != null)
+			&& FileUtil.isExecutableFile(this.getAttachmentFile().getFileName())) {
+		    ActionMessage error = new ActionMessage("error.attachment.executable");
+		    errors.add("message.attachment", error);
+		}
+		largeFile = false;
+	    }
+
+	    FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile, "message.attachment", errors);
+
+	} catch (Exception e) {
+	    MessageForm.logger.error("", e);
+	}
+	return errors;
     }
-    
-    //-------------------------get/set methods----------------
+
+    // -------------------------get/set methods----------------
     public void setMessage(Message message) {
-    	this.message = message;
-    	if(message != null){
-    		if(message.getAttachments() != null
-    				&& message.getAttachments().size() > 0){
-    			hasAttachment = true;
-    			attachmentName = ((Attachment)message.getAttachments().iterator().next()).getFileName();
-    		}else{ 
-    			hasAttachment = false;
-    			attachmentName = null;
-    		}
-    	}
+	this.message = message;
+	if (message != null) {
+	    if ((message.getAttachments() != null) && (message.getAttachments().size() > 0)) {
+		hasAttachment = true;
+		attachmentName = ((Attachment) message.getAttachments().iterator().next()).getFileName();
+	    } else {
+		hasAttachment = false;
+		attachmentName = null;
+	    }
+	}
     }
 
     public Message getMessage() {
-        return message;
+	return message;
     }
 
     public void setForumId(Long forumId) {
-        this.forumId = forumId;
+	this.forumId = forumId;
     }
 
     public Long getForumId() {
-        return this.forumId;
+	return this.forumId;
     }
 
     public void setParentId(Long parentId) {
-        this.parentId = parentId;
+	this.parentId = parentId;
     }
 
     public Long getParentId() {
-        return this.parentId;
+	return this.parentId;
     }
 
     public void setTopicId(Long topicId) {
-        this.topicId = topicId;
+	this.topicId = topicId;
     }
 
     public Long getTopicId() {
-        return this.topicId;
+	return this.topicId;
     }
 
+    public String getAttachmentName() {
+	return attachmentName;
+    }
 
-	public String getAttachmentName() {
-		return attachmentName;
-	}
+    public void setAttachmentName(String attachmentName) {
+	this.attachmentName = attachmentName;
+    }
 
-	public void setAttachmentName(String attachmentName) {
-		this.attachmentName = attachmentName;
-	}
+    public FormFile getAttachmentFile() {
+	return attachmentFile;
+    }
 
-	public FormFile getAttachmentFile() {
-		return attachmentFile;
-	}
+    public void setAttachmentFile(FormFile attachmentFile) {
+	this.attachmentFile = attachmentFile;
+    }
 
-	public void setAttachmentFile(FormFile attachmentFile) {
-		this.attachmentFile = attachmentFile;
-	}
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
-	public boolean isHasAttachment() {
-		return hasAttachment;
-	}
-	public void setHasAttachment(boolean hasAttachment) {
-		this.hasAttachment = hasAttachment;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
+
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
+
+    public boolean isHasAttachment() {
+	return hasAttachment;
+    }
+
+    public void setHasAttachment(boolean hasAttachment) {
+	this.hasAttachment = hasAttachment;
+    }
 }

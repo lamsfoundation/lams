@@ -426,21 +426,6 @@ public interface IMonitoringService {
      */
     public String getLearningDesignDetails(Long lessonID) throws IOException;
     
-    /**
-     * This method returns the progress information of all learners in a given Lesson.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose progress information is required
-     * @param learnerID
-     *            The learner_id of the class learner whose progress information is required If null, provide all
-     *            learner's progress information.
-     * @param userID
-     *            The user id of the user requesting the progress details
-     * @return String The requested information in wddx format
-     * @throws IOException
-     */
-    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException;
-
     public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 
     /**
@@ -761,6 +746,4 @@ public interface IMonitoringService {
      */
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
-    
-    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedDataOnly) throws IOException;
 }

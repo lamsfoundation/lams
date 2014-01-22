@@ -24,7 +24,9 @@ package org.lamsfoundation.testharness.learner;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
@@ -50,38 +50,24 @@ import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * @version
- * 
- *          <p>
- *          <a href="MockLearner.java.html"><i>View Source</i></a>
- *          </p>
- * 
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang, Marcin Cieslak
  */
 public class MockLearner extends MockUser implements Runnable {
 
     private static final Logger log = Logger.getLogger(MockLearner.class);
 
     public static final String DEFAULT_NAME = "Learner";
-
     private static final String ARBITRARY_TEXT_ALPHABET = "`1234567890-=qwertyuiop[]\\asdfghjkl;'\tzxcvbnm,./ ~!@#$%^&*()_+}{POIUYTREWQASDFGHJKL:\"?><MNBVCXZ";
-
     private static final String LESSON_ID_PATTERN = "%lsId%";
 
-    private static final String LD_ID_PATTERN = "%ldId%";
-
-    private static final String MESSAGE_VALUE_KEY = "messageValue";
-
-    private static final String LD_ID_KEY = "learningDesignID";
-
-    private static final String NEXT_URL_START_FLAG = "var url = \"";
-
-    private static final char NEXT_URL_END_FLAG = '"';
-
+    private static final Pattern NEXT_URL_PATTERN = Pattern.compile("var url = \"(.*)\"");
     private static final String OPTIONAL_ACTIVITY_FLAG = "selectActivity";
-
     private static final String ACTIVITY_FINISHED_FLAG = "The next task is loading.";
     private static final String LESSON_FINISHED_FLAG = "LessonComplete.do";
+    private static final String LOAD_TOOL_ACTIVITY_FLAG = "Load Tool Activity";
+    private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
+    private static final Pattern TOOL_SESSION_ID_PATTERN = Pattern.compile("var TOOL_SESSION_ID = '(\\d+)'");
+    private static final String FINISH_SUBSTRING = "finish.do";
 
     private static final String FORUM_FINISH_SUBSTRING = "lafrum11/learning/finish.do";
     private static final String FORUM_VIEW_TOPIC_SUBSTRING = "lafrum11/learning/viewTopic.do";
@@ -99,19 +85,39 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_REFLECTION_AVAILABLE = "return continueReflect()";
     private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
 
+    private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
+    private static final int CHAT_REPLIES = 3;
+
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
     private static final Pattern ASSESSMENT_FINISH_PATTERN = Pattern
 	    .compile("'(/lams/tool/laasse10/learning/finish\\.do\\?.*)'");
 
-    private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
+    private static final Pattern IMAGE_GALLERY_FINISH_PATTERN = Pattern
+	    .compile("'(/lams/tool/laimag10/learning/finish\\.do\\?.*)'");
 
-    private static final String LOAD_TOOL_ACTIVITY_SUBSTRING = "Load Tool Activity";
+    private static final String QA_TOOL_SUBSTRING = "laqa11";
+
+    private static final String VIDEORECORDER_TOOL_STRING = "lavidr10";
+
+    private static final String TASK_FINISH_SUBSTRING = "/lams/tool/latask10/learning/finish.do";
+
+    private static final String VOTE_VIEW_ALL_RESULTS_BUTTON_STRING = "submitMethod('viewAllResults')";
+    private static final String VOTE_LEARNER_FINISHED_BUTTON_STRING = "submitMethod('learnerFinished')";
+
+    private static final String WIKI_EDIT_BUTTON_STRING = "doEditOrAdd('editPage')";
+
+    private static final Pattern SHARE_RESOURCES_REDIRECT_PATTERN = Pattern
+	    .compile("\"(/lams/tool/larsrc11/pages/learning/learning\\.jsp.*)\"");
+    private static final Pattern SHARE_RESOURCES_VIEW_ITEM_URL_PATTERH = Pattern
+	    .compile("\"(/lams/tool/larsrc11/reviewItem\\.do.*)\"");
+    private static final Pattern SHARE_RESOURCES_VIEW_ITEM_PATTERN = Pattern.compile("viewItem\\((\\d+)\\)");
+
+    private static final Pattern SUBMIT_FILES_FINISH_PATTERN = Pattern
+	    .compile("/lams/tool/lasbmt11/learner\\.do\\?method=finish\\&sessionMapID=sessionMapID-\\d+");
 
     private static int joinLessonUserCount = 0;
-
     private static int topJoinLessonUserCount = 0;
-
     private boolean finished = false;
 
     /**
@@ -119,45 +125,10 @@ public class MockLearner extends MockUser implements Runnable {
      */
     public MockLearner(LearnerTest test, String username, String password, String userId) {
 	super(test, username, password, MockAdmin.LEARNER_ROLE, userId);
-
     }
 
-    public final boolean isFinished() {
-	return finished;
-    }
-
-    @Override
-    public void run() {
-	MockLearner.log.info(username + " is studying the lesson...");
-	try {
-	    login();
-	    LearnerTest learnerTest = (LearnerTest) test;
-	    String lsId = test.getTestSuite().getMonitorTest().getLsId();
-	    String ldId = getLesson(learnerTest.getLessonURL, lsId);
-	    joinLesson(learnerTest.joinLessonURL, lsId);
-	    progressThroughActivities(learnerTest.lessonEntryURL, lsId);
-	    finished = true;
-	    MockLearner.log.info(username + " finished the lesson");
-	} catch (TestHarnessException e) {
-	    MockLearner.log.error(username + " aborted on the lesson", e);
-	    // We don't propagate the TestHarnessException so that other
-	    // learners are not affected.
-	    // other RuntimeException will still get propagated so that the
-	    // application will halt, but that's expected, since those exceptions
-	    // should be serious system errors
-	} catch (IOException e) {
-	    throw new RuntimeException(e);
-	} catch (SAXException e) {
-	    throw new RuntimeException(e);
-	} catch (JSONException e) {
-	    throw new RuntimeException(e);
-	} finally {
-	    ((LearnerTest) test).allDoneSignal.countDown();
-	}
-    }
-
-    private String[] chooseArbitraryValues(String[] values) {
-	int length = 1; // + TestUtil.generateRandomIndex(values.length);
+    private static String[] chooseArbitraryValues(String[] values) {
+	int length = 1 + TestUtil.generateRandomNumber(values.length);
 	String[] answers = new String[length];
 	for (int i = 0; i < length; i++) {
 	    answers[i] = values[TestUtil.generateRandomNumber(values.length)];
@@ -165,7 +136,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return answers;
     }
 
-    private String composeArbitraryText() {
+    private static String composeArbitraryText() {
 	int length = 1 + TestUtil.generateRandomNumber(MockLearner.ARBITRARY_TEXT_ALPHABET.length());
 	StringBuilder text = new StringBuilder(length);
 	for (int i = 0; i < length; i++) {
@@ -175,72 +146,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return text.toString();
     }
 
-    private WebForm fillFormArbitrarily(WebForm form) throws IOException, SAXException {
-	String[] params = form.getParameterNames();
-	if ((params != null) && (params.length > 0)) {
-	    for (String param : params) {
-		if (!form.isDisabledParameter(param) && !form.isHiddenParameter(param)
-			&& !form.isReadOnlyParameter(param)) {
-		    if (form.isTextParameter(param)) {
-			String text = composeArbitraryText();
-			form.setParameter(param, text);
-			MockLearner.log.debug(username + " input " + text + " for form field " + param);
-		    } else if (form.isFileParameter(param)) {
-			File file = selectArbitraryFile(((LearnerTest) test).getFilesToUpload());
-			form.setParameter(param, file);
-			MockLearner.log.debug(username + " uploaded file " + file.getName() + " for form field "
-				+ param);
-		    } else if (form.isMultiValuedParameter(param)) {
-			String[] values = chooseArbitraryValues(form.getOptionValues(param));
-			form.setParameter(param, values);
-			MockLearner.log.debug(username + " set " + values.length + " value(s) for form field " + param);
-			MockLearner.log.debug(values);
-		    } else {
-			MockLearner.log.debug(param + " may be a radio button. Current value is "
-				+ form.getParameterValue(param));
-			if (form.getParameterValue(param) == null) {
-			    String[] candidateValues = form.getOptionValues(param);
-			    if ((candidateValues != null) && (candidateValues.length > 0)) {
-				String value = candidateValues[TestUtil.generateRandomNumber(candidateValues.length)];
-				MockLearner.log.debug("Setting param to " + value);
-				form.setParameter(param, value);
-			    }
-			}
-		    }
-		} else {
-		    MockLearner.log.debug("disabled or hidden or readonly parameter " + param);
-		}
-	    }
-	}
-
-	Map<String, List<Button>> buttonGroups = groupButtonsByName(form.getButtons(), FormControl.RADIO_BUTTON_TYPE);
-	for (Map.Entry<String, List<Button>> entry : buttonGroups.entrySet()) {
-	    entry.getValue().get(TestUtil.generateRandomNumber(entry.getValue().size())).click();
-	    MockLearner.log.debug(username + " clicked a radio button " + entry.getKey());
-	}
-	return form;
-    }
-
-    private WebResponse findAnAbsoluteURLOnPage(String respAsText) throws SAXException, IOException {
-	// Probably safest to get the last http address on the page, make sure we don't accidently
-	// go to http://www.w3c.org/
-	int index = respAsText.lastIndexOf("\"http");
-	while (index != -1) {
-	    int indexEnd = respAsText.indexOf("\"", index + 1);
-	    if (indexEnd != -1) {
-		String httpString = respAsText.substring(index + 1, indexEnd);
-		if ((httpString.indexOf("www.w3.org") == -1) && !httpString.endsWith(".js")
-			&& !httpString.endsWith(".css")) {
-		    MockLearner.log.debug("Forwarding user " + username + " to discovered link " + httpString);
-		    return (WebResponse) new Call(wc, test, "", httpString).execute();
-		}
-	    }
-	    index = index > 0 ? respAsText.lastIndexOf("\"http", index - 1) : -1;
-	}
-	throw new TestHarnessException("Unable to find a link to go to on page" + respAsText);
-    }
-
-    private String findURLInAHREF(WebResponse resp, String linkSubstring) throws SAXException {
+    private static String findURLInAHREF(WebResponse resp, String linkSubstring) throws SAXException {
 	WebLink[] links = resp.getLinks();
 	if (links != null) {
 	    for (WebLink link : links) {
@@ -253,47 +159,21 @@ public class MockLearner extends MockUser implements Runnable {
 	return null;
     }
 
-    private String findURLInLocationHref(WebResponse resp, String linkSubstring) throws SAXException, IOException {
-	String respAsText = resp.getText();
-	String lowercaseRespAsText = respAsText.toLowerCase();
-	int stringLength = lowercaseRespAsText.length();
-
-	int index = lowercaseRespAsText.indexOf("location.href");
-	while (index != -1) {
-	    index++;
-	    while ((index < stringLength)
-		    && !((lowercaseRespAsText.charAt(index) == '\'') || (lowercaseRespAsText.charAt(index) == '\"'))) {
-		index++;
-	    }
-	    if (index < (stringLength - 1)) {
-		char quote = lowercaseRespAsText.charAt(index);
-		int indexEnd = lowercaseRespAsText.indexOf(quote, index + 1);
-		String httpString = respAsText.substring(index + 1, indexEnd);
-		MockLearner.log.debug("Discovered link " + httpString);
-		if (httpString.indexOf(linkSubstring) != -1) {
-		    MockLearner.log.debug("Matched to " + linkSubstring);
-		    return httpString;
-		}
-	    }
-	    MockLearner.log.debug("Index was " + index);
-	    index = (index < stringLength) && (index > 0) ? lowercaseRespAsText.indexOf("location.href", index + 1)
-		    : -1;
-	    MockLearner.log.debug("New index is " + index);
+    private static String findURLInLocationHref(WebResponse resp, String linkSubstring) throws IOException {
+	// an example of matched string:
+	// location.href ='http://localhost/lams/mylinksubstring/learner.do'
+	Pattern linkPattern = Pattern.compile("location\\.href\\s*=\\s*['\"](.*" + Pattern.quote(linkSubstring)
+		+ ".*)['\"]");
+	Matcher m = linkPattern.matcher(resp.getText());
+	if (m.find()) {
+	    String url = m.group(1);
+	    MockLearner.log.debug("Found location.href = " + url);
+	    return url;
 	}
 	return null;
     }
 
-    private String getLesson(String getLessonURL, String lsId) throws IOException, JSONException {
-	delay();
-	String url = getLessonURL.replace(MockLearner.LESSON_ID_PATTERN, lsId);
-	WebResponse resp = (WebResponse) new Call(wc, test, username + " get lesson", url).execute();
-	JSONObject responseJson = new JSONObject(resp.getText());
-
-	return responseJson.getString(MockLearner.LD_ID_KEY);
-    }
-
-    private Map<String, List<Button>> groupButtonsByName(Button[] btns, String buttonType) {
-	MockLearner.log.debug(btns.length);
+    private static Map<String, List<Button>> groupButtonsByName(Button[] btns, String buttonType) {
 	Map<String, List<Button>> buttonGroups = new HashMap<String, List<Button>>();
 	if (btns != null) {
 	    for (Button btn : btns) {
@@ -313,175 +193,356 @@ public class MockLearner extends MockUser implements Runnable {
 	return buttonGroups;
     }
 
+    private static String parseOutNextURL(WebResponse resp) throws SAXException, IOException {
+	String text = resp.getText();
+	String toolURL = null;
+	Matcher m = MockLearner.NEXT_URL_PATTERN.matcher(text);
+	if (m.find()) {
+	    toolURL = m.group(1);
+	}
+
+	if ((toolURL != null) && !toolURL.startsWith("/")) {
+	    toolURL = '/' + toolURL;
+	}
+
+	MockLearner.log.debug("Tool URL: " + toolURL);
+	return toolURL;
+    }
+
+    private static File selectArbitraryFile(String[] filesToUpload) {
+	return new File(filesToUpload[TestUtil.generateRandomNumber(filesToUpload.length)]);
+    }
+
+    public final boolean isFinished() {
+	return finished;
+    }
+
+    @Override
+    public void run() {
+	MockLearner.log.info(username + " is studying the lesson");
+	try {
+	    login();
+	    LearnerTest learnerTest = (LearnerTest) test;
+	    String lessonId = test.getTestSuite().getMonitorTest().getLsId();
+	    joinLesson(learnerTest.joinLessonURL, lessonId);
+	    progressThroughActivities(learnerTest.lessonEntryURL, lessonId);
+	    finished = true;
+	    MockLearner.log.info(username + " finished the lesson");
+	} catch (TestHarnessException e) {
+	    MockLearner.log.error(username + " aborted on the lesson", e);
+	    // We don't propagate the TestHarnessException so that other
+	    // learners are not affected.
+	    // other RuntimeException will still get propagated so that the
+	    // application will halt, but that's expected, since those exceptions
+	    // should be serious system errors
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	} catch (SAXException e) {
+	    throw new RuntimeException(e);
+	} finally {
+	    ((LearnerTest) test).allDoneSignal.countDown();
+	}
+    }
+
+    private WebForm fillFormArbitrarily(WebForm form) throws IOException, SAXException {
+	String[] params = form.getParameterNames();
+	if (params != null) {
+	    for (String param : params) {
+		if (!form.isDisabledParameter(param) && !form.isHiddenParameter(param)
+			&& !form.isReadOnlyParameter(param)) {
+		    if (form.isTextParameter(param)) {
+			String text = MockLearner.composeArbitraryText();
+			form.setParameter(param, text);
+			MockLearner.log.debug(username + " input " + text + " for form field " + param);
+
+		    } else if (form.isFileParameter(param)) {
+			File file = MockLearner.selectArbitraryFile(((LearnerTest) test).getFilesToUpload());
+			form.setParameter(param, file);
+			MockLearner.log.debug(username + " uploaded file " + file.getName() + " for form field "
+				+ param);
+		    } else if (form.isMultiValuedParameter(param)) {
+			String[] values = MockLearner.chooseArbitraryValues(form.getOptionValues(param));
+			form.setParameter(param, values);
+			MockLearner.log.debug(username + " set " + values.length + " values for form field " + param);
+			Arrays.toString(values);
+		    } else {
+			MockLearner.log.debug(param + " may be a radio button. Current value is "
+				+ form.getParameterValue(param));
+			if (form.getParameterValue(param) == null) {
+			    String[] candidateValues = form.getOptionValues(param);
+			    if ((candidateValues != null) && (candidateValues.length > 0)) {
+				String value = candidateValues[TestUtil.generateRandomNumber(candidateValues.length)];
+				MockLearner.log.debug(username + " set " + value + " for form field " + param);
+				form.setParameter(param, value);
+			    }
+			}
+		    }
+		} else {
+		    MockLearner.log.debug("Disabled or hidden or readonly parameter " + param + " with value "
+			    + form.getParameterValue(param));
+		}
+	    }
+	}
+
+	Map<String, List<Button>> buttonGroups = MockLearner.groupButtonsByName(form.getButtons(),
+		FormControl.RADIO_BUTTON_TYPE);
+	for (Map.Entry<String, List<Button>> entry : buttonGroups.entrySet()) {
+	    entry.getValue().get(TestUtil.generateRandomNumber(entry.getValue().size())).click();
+	    MockLearner.log.debug(username + " clicked a radio button " + entry.getKey());
+	}
+	return form;
+    }
+
+    private WebResponse findAnAbsoluteURLOnPage(String respAsText) throws SAXException, IOException {
+	// Probably safest to get the last http address on the page, make sure we don't accidently
+	// go to http://www.w3c.org/
+
+	int index = respAsText.lastIndexOf("\"http");
+	while (index != -1) {
+	    int indexEnd = respAsText.indexOf("\"", index + 1);
+	    if (indexEnd != -1) {
+		String httpString = respAsText.substring(index + 1, indexEnd);
+		if ((httpString.indexOf("www.w3.org") == -1) && !httpString.endsWith(".js")
+			&& !httpString.endsWith(".css")) {
+		    MockLearner.log.debug("Forwarding user " + username + " to discovered link " + httpString);
+		    return (WebResponse) new Call(wc, test, username + " forwarded to absolute URL", httpString)
+			    .execute();
+		}
+	    }
+	    index = index > 0 ? respAsText.lastIndexOf("\"http", index - 1) : -1;
+	}
+	return null;
+    }
+
     private WebResponse handleActivity(WebResponse resp) throws SAXException, IOException {
-	if (resp.getFrameNames().length == 2) {
-	    return handleParallelActivity(resp);
-	}
+	// MockLearner.log.debug(resp.getText());
 
-	if (resp.getText().indexOf("/lams/tool/laqa11/learning.do") != -1) {
-	    MockLearner.log.debug(resp.getText());
-	}
-
-	WebResponse nextResp;
+	WebResponse nextResp = null;
 	WebForm[] forms = resp.getForms();
 	if ((forms != null) && (forms.length > 0)) {
 	    MockLearner.log.debug("There " + (forms.length == 1 ? "is " : "are ") + forms.length
 		    + (forms.length == 1 ? " form in the page " : " forms in the page"));
-	    nextResp = handlePageWithForms(forms);
+	    nextResp = handlePageWithForms(resp);
 	} else {
 	    nextResp = handlePageWithoutForms(resp);
 	}
+
 	boolean isActivityFinished = (resp != null)
 		&& ((resp.getText().indexOf(MockLearner.ACTIVITY_FINISHED_FLAG) != -1) || (resp.getText().indexOf(
 			MockLearner.LESSON_FINISHED_FLAG) != -1));
-	if (isActivityFinished) {
-	    return nextResp;
+	return isActivityFinished ? nextResp : handleActivity(nextResp);
+    }
+
+    private WebResponse handleLoadToolActivity(String asText) throws SAXException, IOException {
+	Matcher m = MockLearner.NEXT_URL_PATTERN.matcher(asText);
+	if (m.find()) {
+	    String toolURL = m.group(1);
+	    return (WebResponse) new Call(wc, test, username + " forwarded to tool content page", toolURL).execute();
+	}
+	return null;
+    }
+
+    private WebResponse handlePageWithForms(WebResponse resp) throws IOException, SAXException {
+	int index = -1;
+	WebForm[] forms = resp.getForms();
+	WebForm form = null;
+	String action = null;
+	String asText = resp.getText();
+	do {
+	    index++;
+	    if (index >= forms.length) {
+		throw new TestHarnessException(username
+			+ " checked all forms on the page and does not know how to finish the activity");
+	    }
+	    form = forms[index];
+	    action = form.getAction();
+	} while ((action == null) || (action.trim().length() == 0));
+
+	// special behaviour for different flavours of activities
+	WebResponse nextResp = null;
+	while (action.startsWith(MockLearner.KNOCK_GATE_SUBSTRING)) {
+	    delay();
+	    MockLearner.log.debug(username + " knocking gate");
+	    nextResp = (WebResponse) new Call(wc, test, username + " knocks gate", form).execute();
+	    if (nextResp.getText().indexOf(MockLearner.KNOCK_GATE_SUBSTRING) == -1) {
+		return nextResp;
+	    }
+	}
+	if (asText.contains(MockLearner.TASK_FINISH_SUBSTRING)) {
+	    return handleToolTaskList(resp);
+	}
+	if (action.startsWith(MockLearner.CHAT_FINISH_SUBSTRING)) {
+	    handleToolChat(resp);
+	} else if (action.contains(MockLearner.QA_TOOL_SUBSTRING)) {
+	    // make QA look at "answerX__textarea" form fields rather than "answerX"
+	    form.setAttribute("action", action + "&testHarness=true");
+	} else if (action.contains(MockLearner.VIDEORECORDER_TOOL_STRING)) {
+	    // the second form should be taken into consideration
+	    form = forms[1];
+	} else if (asText.contains(MockLearner.VOTE_LEARNER_FINISHED_BUTTON_STRING)) {
+	    // this is normally done by Javascript in browser
+	    form.setAttribute("action", action + "&dispatch=learnerFinished");
+	} else if (asText.contains(MockLearner.VOTE_VIEW_ALL_RESULTS_BUTTON_STRING)) {
+	    form.setAttribute("action", action + "&dispatch=viewAllResults");
+	} else if (asText.contains(MockLearner.WIKI_EDIT_BUTTON_STRING)) {
+	    form = handleToolWiki(form, action);
+	}
+
+	nextResp = (WebResponse) new Call(wc, test, username + " submits tool form", fillFormArbitrarily(form))
+		.execute();
+
+	// check if it is assessment activity
+	asText = nextResp.getText();
+	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
+	if (m.find()) {
+	    nextResp = (WebResponse) new Call(wc, test, username + " finishes Assessment", m.group(1)).execute();
 	} else {
-	    return handleActivity(nextResp);
+	    m = MockLearner.SUBMIT_FILES_FINISH_PATTERN.matcher(asText);
+	    if (m.find()) {
+		nextResp = (WebResponse) new Call(wc, test, username + " finishes Submit Files", m.group()).execute();
+	    }
+	}
+
+	return nextResp;
+    }
+
+    private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException {
+	String asText = resp.getText();
+
+	if (asText.contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG)) {
+	    return handleLoadToolActivity(asText);
+	}
+
+	// special behaviour for different flavours of activities
+	if (asText.contains(MockLearner.FORUM_FINISH_SUBSTRING)) {
+	    return handleToolForum(resp);
+	}
+	if (asText.contains(MockLearner.LEADER_FINISH_SUBSTRING)) {
+	    return handleToolLeader(resp);
+	}
+	if (asText.contains(MockLearner.SCRATCHIE_FINISH_SUBSTRING)
+		|| asText.contains(MockLearner.SCRATCHIE_RESULTS_SUBSTRING)) {
+	    return handleToolScratchie(resp);
+	}
+
+	Matcher m = MockLearner.SHARE_RESOURCES_REDIRECT_PATTERN.matcher(asText);
+	if (m.find()) {
+	    return handleToolShareResources(resp, m.group(1));
+	}
+	m = MockLearner.IMAGE_GALLERY_FINISH_PATTERN.matcher(asText);
+	if (m.find()) {
+	    return (WebResponse) new Call(wc, test, username + " finishes Image Gallery", m.group(1)).execute();
+	}
+
+	// fallback to some URL in page
+	WebResponse nextResp = findAnAbsoluteURLOnPage(asText);
+	if (nextResp == null) {
+	    String url = MockLearner.findURLInLocationHref(resp, MockLearner.FINISH_SUBSTRING);
+	    if (url == null) {
+		throw new TestHarnessException("Unable to find a link to go to on page" + asText);
+	    }
+	    nextResp = (WebResponse) new Call(wc, test, username + " forwarded to tool finish URL", url).execute();
+	}
+	return nextResp;
+    }
+
+    private void handleToolChat(WebResponse resp) throws IOException {
+	String asText = resp.getText();
+	Matcher m = MockLearner.TOOL_SESSION_ID_PATTERN.matcher(asText);
+	if (!m.find()) {
+	    MockLearner.log.debug("No TOOL_SESSION_ID found in Chat page, it's probably reflection page, carry on");
+	    return;
+	}
+
+	String url = MockLearner.CHAT_FINISH_SUBSTRING + "?dispatch=sendMessage&toolSessionID=" + m.group(1)
+		+ "&message=";
+	// send few messages
+	for (int replyIndex = 0; replyIndex < MockLearner.CHAT_REPLIES; replyIndex++) {
+	    String message = MockLearner.composeArbitraryText();
+	    message = URLEncoder.encode(message, "UTF-8");
+	    new Call(wc, test, username + " sends Chat message", url + message).execute();
+	    delay();
 	}
     }
 
-    private WebResponse handleForum(WebResponse resp) throws SAXException, IOException {
-
+    private WebResponse handleToolForum(WebResponse resp) throws SAXException, IOException {
 	WebResponse replyResponse = null;
 
-	String replyURL = findURLInAHREF(resp, MockLearner.FORUM_VIEW_TOPIC_SUBSTRING);
+	String replyURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_VIEW_TOPIC_SUBSTRING);
 	if (replyURL != null) {
 	    MockLearner.log.debug("Accessing the forum view topic screen using " + replyURL);
-	    replyResponse = handleForumReply(replyURL);
+	    replyResponse = handleToolForumReply(replyURL);
 	}
 
 	if (replyResponse == null) {
-	    throw new TestHarnessException("No links found on the main forum page, or unable to do reply. "
-		    + resp.getText());
+	    MockLearner.log.debug(resp.getText());
+	    throw new TestHarnessException("No links found on the main forum page, or unable to do reply");
 	}
 
-	String finishURL = findURLInLocationHref(replyResponse, MockLearner.FORUM_FINISH_SUBSTRING);
-	if (finishURL != null) {
-	    MockLearner.log.debug("Ending forum using url " + finishURL);
-	    return (WebResponse) new Call(wc, test, "Finish Forum", finishURL).execute();
+	String finishURL = MockLearner.findURLInLocationHref(replyResponse, MockLearner.FORUM_FINISH_SUBSTRING);
+	if (finishURL == null) {
+	    MockLearner.log.debug(replyResponse.getText());
+	    throw new TestHarnessException("Unable to finish the forum. No finish link found");
 	}
 
-	throw new TestHarnessException("Unable to finish the forum. No finish link found. " + replyResponse.getText());
+	MockLearner.log.debug("Ending forum using url " + finishURL);
+	return (WebResponse) new Call(wc, test, "Finish Forum", finishURL).execute();
     }
 
-    /**
-     * @param link
-     * @return
-     * @throws SAXException
-     * @throws IOException
-     */
-    private WebResponse handleForumReply(String url) throws SAXException, IOException {
-	WebResponse resp = (WebResponse) new Call(wc, test, "View Topic Forum", url).execute();
-	String replyURL = findURLInAHREF(resp, MockLearner.FORUM_REPLY_SUBSTRING);
-	if (replyURL != null) {
-	    resp = (WebResponse) new Call(wc, test, "Reply Topic Forum", replyURL).execute();
-	    WebForm[] forms = resp.getForms();
-	    if ((forms != null) && (forms.length > 0)) {
-		resp = handlePageWithForms(forms);
-	    } else {
-		throw new TestHarnessException("No form found on the reply topic page - unable to do reply. "
-			+ resp.getText());
-	    }
-	} else {
-	    throw new TestHarnessException("No reply URL found - unable to do reply. " + resp.getText());
-	    // log.info("No reply URL found - unable to do reply. "+resp.getText());
+    private WebResponse handleToolForumReply(String url) throws SAXException, IOException {
+	WebResponse resp = (WebResponse) new Call(wc, test, username + " views Forum topic", url).execute();
+	String replyURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_REPLY_SUBSTRING);
+	if (replyURL == null) {
+	    MockLearner.log.debug(resp.getText());
+	    throw new TestHarnessException("No reply URL found - unable to do reply. ");
 	}
+
+	resp = (WebResponse) new Call(wc, test, username + " replies to Forum topic", replyURL).execute();
+	WebForm[] forms = resp.getForms();
+	if ((forms == null) || (forms.length == 0)) {
+	    MockLearner.log.debug(resp.getText());
+	    throw new TestHarnessException("No form found on the reply topic page - unable to do reply");
+	}
+	// skip validation and make Forum read "message.body__textarea" instead of Javascript controlled "message.bod"
+	WebForm form = resp.getForms()[0];
+	String action = form.getAction() + "?testHarness=true";
+	form.setAttribute("action", action);
+
+	resp = handlePageWithForms(resp);
 
 	// now we are back on the topic page, so go back to the main forum page.
-	String returnToForumURL = findURLInAHREF(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
-	if (returnToForumURL != null) {
-	    MockLearner.log.debug("Returning to forum page " + returnToForumURL);
-	    return (WebResponse) new Call(wc, test, "Return to Forum", returnToForumURL).execute();
+	String returnToForumURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
+	if (returnToForumURL == null) {
+	    MockLearner.log.debug(resp.getText());
+	    throw new TestHarnessException("No button back to forum page found - stuck while doing reply");
 	}
-	throw new TestHarnessException("No button back to forum page found - stuck while doing reply. "
-		+ resp.getText());
+
+	MockLearner.log.debug("Returning to forum page " + returnToForumURL);
+	return (WebResponse) new Call(wc, test, username + " returns to Forum", returnToForumURL).execute();
     }
 
-    private WebResponse handleLeader(WebResponse resp) throws SAXException, IOException {
+    private WebResponse handleToolLeader(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
 	Matcher m = MockLearner.LEADER_BECOME_PATTERN.matcher(asText);
 	if (m.find()) {
 	    String becomeLeaderQueryOptions = m.group();
 	    String url = "/lams/tool/lalead11/learning.do?" + becomeLeaderQueryOptions;
 	    MockLearner.log.debug("Becoming a leader using link: " + url);
-	    new Call(wc, test, "Become Leader", url).execute();
+	    new Call(wc, test, username + " becomes Leader", url).execute();
 	}
 
-	String finishURL = findURLInLocationHref(resp, MockLearner.LEADER_FINISH_SUBSTRING);
-	if (finishURL != null) {
-	    MockLearner.log.debug("Ending leader using url " + finishURL);
-	    return (WebResponse) new Call(wc, test, "Finish Leader", finishURL).execute();
+	String finishURL = MockLearner.findURLInLocationHref(resp, MockLearner.LEADER_FINISH_SUBSTRING);
+	if (finishURL == null) {
+	    throw new TestHarnessException("Unable to finish the leader, no finish link found. " + asText);
 	}
 
-	throw new TestHarnessException("Unable to finish the leader, no finish link found. " + asText);
+	MockLearner.log.debug("Ending leader using url " + finishURL);
+	return (WebResponse) new Call(wc, test, username + " finishes Leader", finishURL).execute();
     }
 
-    private WebResponse handleLoadToolActivity(String asText) throws SAXException, IOException {
-
-	String toolURL = TestUtil.extractString(asText, MockLearner.NEXT_URL_START_FLAG, MockLearner.NEXT_URL_END_FLAG);
-	return (WebResponse) new Call(wc, test, "Redirect to tool page", toolURL).execute();
-    }
-
-    private WebResponse handlePageWithForms(WebForm[] forms) throws IOException, SAXException {
-	int index = 0;
-	WebForm form = forms[index];
-	while ((form.getAction() == null) || (form.getAction().trim().length() == 0)) {
-	    index++;
-	    if (index >= forms.length) {
-		throw new TestHarnessException(username + " don't know how to finish the activity now");
-	    }
-	    form = forms[index];
-	}
-
-	WebResponse resp = null;
-	while (form.getAction().startsWith(MockLearner.KNOCK_GATE_SUBSTRING)) {
-	    delay();
-	    MockLearner.log.debug("Knocking gate");
-	    resp = (WebResponse) new Call(wc, test, "Knock Gate", form).execute();
-	    if (resp.getText().indexOf(MockLearner.KNOCK_GATE_SUBSTRING) == -1) {
-		return resp;
-	    }
-	}
-
-	resp = (WebResponse) new Call(wc, test, "", fillFormArbitrarily(form)).execute();
-
-	// check if it is assessment activity
+    private WebResponse handleToolScratchie(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
-	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
-	if (m.find()) {
-	    resp = (WebResponse) new Call(wc, test, "", m.group(1)).execute();
-	}
-
-	return resp;
-    }
-
-    private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException {
-
-	String asText = resp.getText();
-
-	// Is this a Forum activity?
-	if (asText.indexOf(MockLearner.FORUM_FINISH_SUBSTRING) != -1) {
-	    return handleForum(resp);
-	} else if (asText.indexOf(MockLearner.LEADER_FINISH_SUBSTRING) != -1) {
-	    return handleLeader(resp);
-	} else if (asText.contains(MockLearner.SCRATCHIE_FINISH_SUBSTRING)
-		|| asText.contains(MockLearner.SCRATCHIE_RESULTS_SUBSTRING)) {
-	    return handleScratchie(resp);
-	} else if (asText.indexOf(MockLearner.LOAD_TOOL_ACTIVITY_SUBSTRING) != -1) {
-	    return handleLoadToolActivity(asText);
-	} else {
-	    return findAnAbsoluteURLOnPage(asText);
-	}
-    }
-
-    private WebResponse handleParallelActivity(WebResponse resp) {
-	// TODO implement me
-	throw new TestHarnessException("Unable to handle parallel activities.");
-    }
-
-    private WebResponse handleScratchie(WebResponse resp) throws SAXException, IOException {
-	String asText = resp.getText();
+	// check if current user is the leader
 	boolean isLeader = asText.contains(MockLearner.SCRATCHIE_IS_LEADER_SUBSTRING);
 	String sessionMapID = null;
 	String recordScratchedURL = null;
@@ -497,6 +558,7 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	if (isLeader) {
+	    // find all answers on the page
 	    m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
 	    Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
 	    while (m.find()) {
@@ -512,6 +574,7 @@ public class MockLearner extends MockUser implements Runnable {
 	    String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
 	    Random generator = new Random();
 
+	    // start scratching random answers
 	    while (!uids.isEmpty()) {
 		Long questionID = uids.keySet().iterator().next();
 		List<Long> answerUids = uids.get(questionID);
@@ -520,15 +583,16 @@ public class MockLearner extends MockUser implements Runnable {
 		Long answerUid = answerUids.get(index);
 		answerUids.remove(index);
 		MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
-		WebResponse scratchResponse = (WebResponse) new Call(wc, test, "Scratch response", scratchURL
-			+ answerUid).execute();
+		WebResponse scratchResponse = (WebResponse) new Call(wc, test,
+			username + " checks answer in Scratchie", scratchURL + answerUid).execute();
 		boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
 		MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID
 			+ " and it was " + (answerCorrect ? "correct" : "incorrect"));
 
 		if (recordScratchedURL != null) {
 		    MockLearner.log.debug("Recording scratched answer UID " + answerUid);
-		    new Call(wc, test, "Record answer scratched", recordScratchedURL + answerUid).execute();
+		    new Call(wc, test, username + " records answer in Scratchie", recordScratchedURL + answerUid)
+			    .execute();
 		}
 
 		if (answerCorrect) {
@@ -549,32 +613,77 @@ public class MockLearner extends MockUser implements Runnable {
 		    MockLearner.log.error("Interrupted waiting between question list refresh in scratchie");
 		}
 		String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
-		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, "Scratchie refresh question list",
-			refreshQuestionsURL).execute();
+		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, username
+			+ " refreshes Scratchie question list", refreshQuestionsURL).execute();
 		asText = questionRefreshResp.getText();
 	    }
 	}
 
-	String reflectionURL = findURLInLocationHref(resp, MockLearner.SCRATCHIE_REFLECTION_SUBSTRING);
+	String reflectionURL = MockLearner.findURLInLocationHref(resp, MockLearner.SCRATCHIE_REFLECTION_SUBSTRING);
 	if (reflectionURL != null) {
 	    MockLearner.log.debug("Showing reflection of scratchie using url " + reflectionURL);
-	    resp = (WebResponse) new Call(wc, test, "Scratchie show reflection", reflectionURL).execute();
-	    resp = handlePageWithForms(resp.getForms());
+	    resp = (WebResponse) new Call(wc, test, username + " gets Scratchie reflection", reflectionURL).execute();
+	    resp = handlePageWithForms(resp);
 	}
 
-	String resultsURL = findURLInLocationHref(resp, MockLearner.SCRATCHIE_RESULTS_SUBSTRING);
+	String resultsURL = MockLearner.findURLInLocationHref(resp, MockLearner.SCRATCHIE_RESULTS_SUBSTRING);
 	if (resultsURL != null) {
 	    MockLearner.log.debug("Showing results of scratchie using url " + resultsURL);
-	    resp = (WebResponse) new Call(wc, test, "Scratchie show results", resultsURL).execute();
+	    resp = (WebResponse) new Call(wc, test, username + " gets Scratchie results", resultsURL).execute();
 	}
 
-	String finishURL = findURLInLocationHref(resp, MockLearner.SCRATCHIE_FINISH_SUBSTRING);
+	String finishURL = MockLearner.findURLInLocationHref(resp, MockLearner.SCRATCHIE_FINISH_SUBSTRING);
 	if (finishURL != null) {
 	    MockLearner.log.debug("Ending scratchie using url " + finishURL);
-	    return (WebResponse) new Call(wc, test, "Finish scratchie", finishURL).execute();
+	    return (WebResponse) new Call(wc, test, username + " finishes Scratchie", finishURL).execute();
 	}
 
 	throw new TestHarnessException("Unable to finish the scratchie, no finish link found. " + asText);
+    }
+
+    private WebResponse handleToolShareResources(WebResponse resp, String initialRedirectLink) throws IOException,
+	    SAXException {
+	WebResponse nextResponse = (WebResponse) new Call(wc, test, username + " forwarded to Share Resources",
+		initialRedirectLink).execute();
+	String asText = nextResponse.getText();
+	Matcher m = MockLearner.SHARE_RESOURCES_VIEW_ITEM_URL_PATTERH.matcher(asText);
+	if (!m.find()) {
+	    throw new TestHarnessException("View Item URL in Share Resources tool not found");
+	}
+	String viewItemURL = m.group(1);
+	m = MockLearner.SHARE_RESOURCES_VIEW_ITEM_PATTERN.matcher(asText);
+	while (m.find()) {
+	    new Call(wc, test, username + " views Share Resources item", viewItemURL + m.group(1)).execute();
+	    delay();
+	}
+
+	String finishURL = MockLearner.findURLInLocationHref(nextResponse, MockLearner.FINISH_SUBSTRING);
+	return (WebResponse) new Call(wc, test, username + " finishes Share Resources", finishURL).execute();
+    }
+
+    private WebResponse handleToolTaskList(WebResponse resp) throws IOException, SAXException {
+	String finishURL = MockLearner.findURLInLocationHref(resp, MockLearner.TASK_FINISH_SUBSTRING);
+	WebForm[] forms = resp.getForms();
+	// send a comment or a file, if available
+	if (forms.length > 0) {
+	    WebForm form = forms[TestUtil.generateRandomNumber(forms.length)];
+	    resp = (WebResponse) new Call(wc, test, username + " adds a comment or file in Task List",
+		    fillFormArbitrarily(form)).execute();
+	    delay();
+	}
+
+	return (WebResponse) new Call(wc, test, username + " finishes Task List", finishURL).execute();
+    }
+
+    private WebForm handleToolWiki(WebForm form, String action) throws IOException, SAXException {
+	// add one random page...
+	form.setAttribute("action", action + "?dispatch=addPage");
+	WebResponse nextResp = (WebResponse) new Call(wc, test, username + " adds Wiki page", fillFormArbitrarily(form))
+		.execute();
+	form = nextResp.getForms()[1];
+	// ...and mark the activity to be finished
+	form.setAttribute("action", action + "?dispatch=finishActivity");
+	return form;
     }
 
     private void joinLesson(String joinLessonURL, String lsId) {
@@ -586,36 +695,14 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 	MockLearner.log.info("Users joining lesson: " + MockLearner.joinLessonUserCount + ". Top: "
 		+ MockLearner.topJoinLessonUserCount);
-	new Call(wc, test, username + " join lesson", url).execute();
+	new Call(wc, test, username + " joins lesson", url).execute();
 	MockLearner.joinLessonUserCount--;
-    }
-
-    private String parseOutNextURL(WebResponse resp) throws SAXException, IOException {
-	String text = resp.getText();
-	String toolURL = TestUtil.extractString(text, MockLearner.NEXT_URL_START_FLAG, MockLearner.NEXT_URL_END_FLAG);
-
-	if ((toolURL != null) && !toolURL.startsWith("/")) {
-	    toolURL = '/' + toolURL;
-	}
-
-	MockLearner.log.debug("toolURL:" + toolURL);
-	return toolURL;
-    }
-
-    private String processButtons(Button[] buttons) {
-	StringBuffer buf = new StringBuffer(100);
-	for (Button button : buttons) {
-	    buf.append(button.toString());
-	    buf.append("; ");
-	}
-	return buf.toString();
     }
 
     /**
      * Steps:
      * <ol>
      * <li>fetch entry url</li>
-     * <li>get passon.swf url and the next activity url</li>
      * <li>fetch the next activity url and get activity page with form</li>
      * <li>fill the form and submit it
      * <li>
@@ -635,41 +722,28 @@ public class MockLearner extends MockUser implements Runnable {
 	delay();
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " enters lesson", lessonEntryURL.replace(
 		MockLearner.LESSON_ID_PATTERN, lsId)).execute();
-	String nextURL = parseOutNextURL(resp);
+	String nextURL = MockLearner.parseOutNextURL(resp);
 	boolean lessonFinished = false;
 	while (!lessonFinished) {
-	    if (nextURL != null) {
-		resp = takeActivity(nextURL);
-		nextURL = parseOutNextURL(resp);
-	    } else {
-		boolean isOptionalActivity = resp.getText().indexOf(MockLearner.OPTIONAL_ACTIVITY_FLAG) != -1;
+	    if (nextURL == null) {
+		boolean isOptionalActivity = resp.getText().contains(MockLearner.OPTIONAL_ACTIVITY_FLAG);
 		if (isOptionalActivity) {
 		    resp = handleActivity(resp);
-		    nextURL = parseOutNextURL(resp);
+		    nextURL = MockLearner.parseOutNextURL(resp);
 		} else {
 		    lessonFinished = true;
 		}
+	    } else {
+		try {
+		    resp = (WebResponse) new Call(wc, test, username + " forwarded to next activity", nextURL)
+			    .execute();
+		    delay();
+		    resp = handleActivity(resp);
+		} catch (Exception e) {
+		    throw new TestHarnessException(e);
+		}
+		nextURL = MockLearner.parseOutNextURL(resp);
 	    }
-	}
-    }
-
-    private File selectArbitraryFile(String[] filesToUpload) {
-	return new File(filesToUpload[TestUtil.generateRandomNumber(filesToUpload.length)]);
-    }
-
-    /**
-     * Retrieve the toolURL and play with it
-     * 
-     * @param toolURL
-     * @return WebResponse
-     */
-    private WebResponse takeActivity(String toolURL) {
-	try {
-	    WebResponse resp = (WebResponse) new Call(wc, test, "", toolURL).execute();
-	    delay();
-	    return handleActivity(resp);
-	} catch (Exception e) {
-	    throw new TestHarnessException(e);
 	}
     }
 }

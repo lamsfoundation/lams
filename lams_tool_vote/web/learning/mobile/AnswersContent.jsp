@@ -151,7 +151,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<html:form action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
 			<html:hidden property="revisitingUser" />
