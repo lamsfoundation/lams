@@ -58,7 +58,7 @@ public interface IVoteSessionDAO {
 
     void addVoteUsers(Long voteSessionId, VoteQueUsr user);
 
-    List getSessionsFromContent(VoteContent voteContent);
+    List<Long> getSessionsFromContent(VoteContent voteContent);
 
     List getSessionNamesFromContent(VoteContent voteContent);
 

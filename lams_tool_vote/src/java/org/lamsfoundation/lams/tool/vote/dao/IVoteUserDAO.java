@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-
 package org.lamsfoundation.lams.tool.vote.dao;
 
 import java.util.List;
@@ -31,34 +30,34 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Interface that defines the contract for VoteQueUsr access </p>
+ *         <p>
+ *         Interface that defines the contract for VoteQueUsr access
+ *         </p>
  */
 public interface IVoteUserDAO {
     public VoteQueUsr getVoteUserByUID(Long uid);
-	
-	public VoteQueUsr findVoteUserById(Long userId);
-	
-	public List getVoteUserBySessionOnly(final VoteSession voteSession);
-	
-	public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
-	
-	public int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
-	
-	public List getVoteUserBySessionUid(final Long voteSessionUid);
-	
-	public VoteQueUsr getVoteQueUsrById(long voteQueUsrId);
-	
-	public void saveVoteUser(VoteQueUsr voteUser);
-	
+
+    public VoteQueUsr findVoteUserById(Long userId);
+
+    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
+
+    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
+
+    public List getVoteUserBySessionUid(final Long voteSessionUid);
+
+    public VoteQueUsr getVoteQueUsrById(long voteQueUsrId);
+
+    public void saveVoteUser(VoteQueUsr voteUser);
+
     public void updateVoteUser(VoteQueUsr voteUser);
-	
-    public List getUserBySessionOnly(final VoteSession voteSession);
+
+    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession);
 
     public void removeVoteUserById(Long userId);
 
     public void removeVoteUser(VoteQueUsr voteUser);
-    
+
     public int getNumberOfUsers(VoteSession voteSession);
-    
-    public int getTotalNumberOfUsers(); 
+
+    public int getTotalNumberOfUsers();
 }

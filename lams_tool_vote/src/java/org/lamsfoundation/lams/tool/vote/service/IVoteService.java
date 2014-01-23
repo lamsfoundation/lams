@@ -108,7 +108,7 @@ public interface IVoteService {
 
     List getUserRecords(final String userEntry) throws VoteApplicationException;
 
-    List getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
+    List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
 
     void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
 
@@ -185,8 +185,6 @@ public interface IVoteService {
 
     void updateVoteSession(VoteSession voteSession) throws VoteApplicationException;
 
-    List getVoteUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
-
     VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
 
     /**
@@ -257,7 +255,7 @@ public interface IVoteService {
 
     List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException;
 
-    List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
+    List<Long> getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
 
     Set getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid)
 	    throws VoteApplicationException;

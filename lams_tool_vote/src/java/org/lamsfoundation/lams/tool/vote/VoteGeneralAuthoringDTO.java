@@ -37,8 +37,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class VoteGeneralAuthoringDTO implements Comparable {
     protected String activeModule;
     protected String defineLaterInEditMode;
-    protected String submissionAttempt;
-    protected String sbmtSuccess;
     protected String exceptionMaxNominationInvalid;
     protected String toolContentID;
     protected String defaultContentId;
@@ -78,7 +76,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     protected Map mapNominationContent;
     protected String editableNominationText;
     protected String editableNominationFeedback;
-    protected String isToolSessionChanged;
     protected String responseId;
     protected String currentUid;
     protected List<String> dataFlowObjectNames;
@@ -302,36 +299,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the sbmtSuccess.
-     */
-    public String getSbmtSuccess() {
-	return sbmtSuccess;
-    }
-
-    /**
-     * @param sbmtSuccess
-     *            The sbmtSuccess to set.
-     */
-    public void setSbmtSuccess(String sbmtSuccess) {
-	this.sbmtSuccess = sbmtSuccess;
-    }
-
-    /**
-     * @return Returns the submissionAttempt.
-     */
-    public String getSubmissionAttempt() {
-	return submissionAttempt;
-    }
-
-    /**
-     * @param submissionAttempt
-     *            The submissionAttempt to set.
-     */
-    public void setSubmissionAttempt(String submissionAttempt) {
-	this.submissionAttempt = submissionAttempt;
-    }
-
-    /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
@@ -508,8 +475,8 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     public String toString() {
 	return new ToStringBuilder(this).append("activeModule: ", activeModule)
 		.append("contentFolderID: ", contentFolderID).append("editableQuestionText: ", editableQuestionText)
-		.append("reflectionSubject: ", reflectionSubject).append("submissionAttempt: ", submissionAttempt)
-		.append("mapNominationContent: ", mapNominationContent).append("sbmtSuccess: ", sbmtSuccess)
+		.append("reflectionSubject: ", reflectionSubject)
+		.append("mapNominationContent: ", mapNominationContent)
 		.append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
 		.append("toolContentID: ", toolContentID).append("defaultContentId: ", defaultContentId)
 		.append("defaultContentIdStr: ", defaultContentIdStr).append("reflect: ", reflect)
@@ -677,21 +644,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setMapNominationContent(Map mapNominationContent) {
 	this.mapNominationContent = mapNominationContent;
-    }
-
-    /**
-     * @return Returns the isToolSessionChanged.
-     */
-    public String getIsToolSessionChanged() {
-	return isToolSessionChanged;
-    }
-
-    /**
-     * @param isToolSessionChanged
-     *            The isToolSessionChanged to set.
-     */
-    public void setIsToolSessionChanged(String isToolSessionChanged) {
-	this.isToolSessionChanged = isToolSessionChanged;
     }
 
     /**

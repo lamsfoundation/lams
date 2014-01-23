@@ -91,11 +91,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    voteService = voteAuthoringForm.getVoteService();
 	}
 
-	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
-
-	voteGeneralAuthoringDTO.setSubmissionAttempt(new Boolean(false).toString());
-	voteGeneralAuthoringDTO.setSbmtSuccess(new Boolean(false).toString());
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String servletPath = request.getServletPath();

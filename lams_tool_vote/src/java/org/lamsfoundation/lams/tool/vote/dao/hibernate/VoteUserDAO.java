@@ -34,181 +34,134 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
- * <p>Hibernate implementation for database access to Voting users (learners) for the voting tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to Voting users (learners) for the voting tool.
+ *         </p>
  */
 public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
-    
-	private static final String FIND_VOTE_USR_CONTENT = "from " + VoteQueUsr.class.getName() + " as voteu where que_usr_id=?";
-	
-	private static final String COUNT_USERS_IN_SESSION = "select voteu.queUsrId from VoteQueUsr voteu where voteu.voteSession= :voteSession";
-	
-	private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSessionId= :voteSessionId";
-	
-	 
-   public VoteQueUsr getVoteUserByUID(Long uid)
-	{
-		String query = "from VoteQueUsr user where user.uid=?";
-		
-			List list = getSession().createQuery(query)
-			.setLong(0,uid.longValue())
-			.list();
-			
-			if(list != null && list.size() > 0){
-				VoteQueUsr voteu = (VoteQueUsr) list.get(0);
-				return voteu;
-			}
-			return null;	
+
+    private static final String FIND_VOTE_USR_CONTENT = "from " + VoteQueUsr.class.getName()
+	    + " as voteu where que_usr_id=?";
+
+    private static final String COUNT_USERS_IN_SESSION = "select voteu.queUsrId from VoteQueUsr voteu where voteu.voteSession= :voteSession";
+
+    private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSessionId= :voteSessionId";
+
+    public VoteQueUsr getVoteUserByUID(Long uid) {
+	String query = "from VoteQueUsr user where user.uid=?";
+
+	List list = getSession().createQuery(query).setLong(0, uid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    VoteQueUsr voteu = (VoteQueUsr) list.get(0);
+	    return voteu;
 	}
-	
-	
-	public VoteQueUsr findVoteUserById(Long userId)
-	{
-		String query = "from VoteQueUsr user where user.queUsrId=?";
-	
-		List list = getSession().createQuery(query)
-		.setLong(0,userId.longValue())
-		.list();
-		
-		if(list != null && list.size() > 0){
-			VoteQueUsr voteu = (VoteQueUsr) list.get(0);
-			return voteu;
-		}
-		return null;
+	return null;
+    }
+
+    public VoteQueUsr findVoteUserById(Long userId) {
+	String query = "from VoteQueUsr user where user.queUsrId=?";
+
+	List list = getSession().createQuery(query).setLong(0, userId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    VoteQueUsr voteu = (VoteQueUsr) list.get(0);
+	    return voteu;
 	}
-	
-	
-	public List getVoteUserBySessionOnly(final VoteSession voteSession)
-    {
-        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSession.getUid().longValue())				
-		.list();
-		return list;
+	return null;
     }
 
-	public List getVoteUserBySessionUid(final Long voteSessionUid)
-    {
-        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSessionUid.longValue())				
-		.list();
-		return list;
+    public List getVoteUserBySessionUid(final Long voteSessionUid) {
+	List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("voteSessionId", voteSessionUid.longValue()).list();
+	return list;
     }
 
-	public int getCompletedVoteUserBySessionUid(final Long voteSessionUid)
-    {
-        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSessionUid.longValue())				
-		.list();
-        
-        int completedSessionUserCount=0;
-		if(list != null && list.size() > 0){
-			Iterator listIterator=list.iterator();
-	    	while (listIterator.hasNext())
-	    	{
-	    	    VoteQueUsr user=(VoteQueUsr)listIterator.next();
-	    	    logger.debug("user: " + user);
-	    	    if (user.getVoteSession().getSessionStatus().equals("COMPLETED"))
-	    	    {
-	    	        ++completedSessionUserCount;
-	    	    }
-	    	}
+    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) {
+	List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("voteSessionId", voteSessionUid.longValue()).list();
+
+	int completedSessionUserCount = 0;
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteQueUsr user = (VoteQueUsr) listIterator.next();
+		logger.debug("user: " + user);
+		if (user.getVoteSession().getSessionStatus().equals("COMPLETED")) {
+		    ++completedSessionUserCount;
 		}
-
-		return completedSessionUserCount;
-    }
-
-	
-	public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId)
-	{
-		
-		String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSessionId=:voteSessionId";
-		List list = getSession().createQuery(strGetUser)
-			.setLong("queUsrId", queUsrId.longValue())
-			.setLong("voteSessionId", voteSessionId.longValue())				
-			.list();
-		
-		if(list != null && list.size() > 0){
-			VoteQueUsr usr = (VoteQueUsr) list.get(0);
-			return usr;
-		}
-		return null;
+	    }
 	}
 
-	
-	public VoteQueUsr getVoteQueUsrById(long voteQueUsrId)
-	{
-		String query = "from VoteQueUsr user where user.queUsrId=?";
-		
-			List list = getSession().createQuery(query)
-			.setLong(0,voteQueUsrId)
-			.list();
-			
-			if(list != null && list.size() > 0){
-			    VoteQueUsr qu = (VoteQueUsr) list.get(0);
-				return qu;
-			}
-			return null;
+	return completedSessionUserCount;
+    }
+
+    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId) {
+
+	String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSessionId=:voteSessionId";
+	List list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue())
+		.setLong("voteSessionId", voteSessionId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    VoteQueUsr usr = (VoteQueUsr) list.get(0);
+	    return usr;
 	}
-
-	
-	
-	public void saveVoteUser(VoteQueUsr voteUser)
-    {
-    	this.getHibernateTemplate().save(voteUser);
-    }
-	
-
-    public void updateVoteUser(VoteQueUsr voteUser)
-    {
-    	this.getHibernateTemplate().update(voteUser);
-    }
-    
-
-    public void removeVoteUserById(Long userId)
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		if ( userId != null) {
-			List list = getSession().createQuery(FIND_VOTE_USR_CONTENT)
-				.setLong(0,userId.longValue())
-				.list();
-			
-			if(list != null && list.size() > 0){
-				VoteQueUsr voteu = (VoteQueUsr) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(voteu);
-				templ.flush();
-			}
-		}
-      
-    }
-    
-	public List getUserBySessionOnly(final VoteSession voteSession)
-    {
-        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSession.getUid().longValue())				
-		.list();
-		return list;
+	return null;
     }
 
-    
+    public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) {
+	String query = "from VoteQueUsr user where user.queUsrId=?";
 
-    public void removeVoteUser(VoteQueUsr voteUser)
-    {
+	List list = getSession().createQuery(query).setLong(0, voteQueUsrId).list();
+
+	if (list != null && list.size() > 0) {
+	    VoteQueUsr qu = (VoteQueUsr) list.get(0);
+	    return qu;
+	}
+	return null;
+    }
+
+    public void saveVoteUser(VoteQueUsr voteUser) {
+	this.getHibernateTemplate().save(voteUser);
+    }
+
+    public void updateVoteUser(VoteQueUsr voteUser) {
+	this.getHibernateTemplate().update(voteUser);
+    }
+
+    public void removeVoteUserById(Long userId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (userId != null) {
+	    List list = getSession().createQuery(FIND_VOTE_USR_CONTENT).setLong(0, userId.longValue()).list();
+
+	    if (list != null && list.size() > 0) {
+		VoteQueUsr voteu = (VoteQueUsr) list.get(0);
 		this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().delete(voteUser);
-    }
-    
-
-    public int getNumberOfUsers(VoteSession voteSession)
-    {
-        return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,
-	            "voteSession",
-				voteSession)).size();
-    }  
-    
-    
-    public int getTotalNumberOfUsers() {
-		String query="from obj in class VoteQueUsr"; 
-		return this.getHibernateTemplate().find(query).size();
+		templ.delete(voteu);
+		templ.flush();
+	    }
 	}
-    
+
+    }
+
+    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) {
+	List<VoteQueUsr> list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("voteSessionId", voteSession.getUid().longValue()).list();
+	return list;
+    }
+
+    public void removeVoteUser(VoteQueUsr voteUser) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(voteUser);
+    }
+
+    public int getNumberOfUsers(VoteSession voteSession) {
+	return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION, "voteSession", voteSession)).size();
+    }
+
+    public int getTotalNumberOfUsers() {
+	String query = "from obj in class VoteQueUsr";
+	return this.getHibernateTemplate().find(query).size();
+    }
+
 }

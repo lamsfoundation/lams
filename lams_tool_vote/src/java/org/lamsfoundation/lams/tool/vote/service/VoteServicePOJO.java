@@ -426,7 +426,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException {
+    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException {
 	try {
 	    return voteUserDAO.getUserBySessionOnly(voteSession);
 	} catch (DataAccessException e) {
@@ -767,15 +767,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List getVoteUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getVoteUserBySessionOnly(voteSession);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving users by session: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public VoteContent retrieveVoteBySessionId(Long voteSessionId) throws VoteApplicationException {
 	try {
 	    return voteContentDAO.getVoteContentBySession(voteSessionId);
@@ -891,7 +882,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException {
+    public List<Long> getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException {
 	try {
 	    return voteSessionDAO.getSessionsFromContent(voteContent);
 	} catch (DataAccessException e) {

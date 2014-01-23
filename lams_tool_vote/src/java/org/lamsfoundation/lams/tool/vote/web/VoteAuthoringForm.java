@@ -97,7 +97,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String defaultContentIdStr;
     protected String defaultContentId;
     protected String isDefineLater;
-    protected String submissionAttempt;
     protected String defaultOptionContent;
     protected String httpSessionID;
     protected IVoteService voteService;
@@ -178,8 +177,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	statsMonitoring = null;
 	edit = null;
 	submit = null;
-	submissionAttempt = null;
-	sbmtSuccess = null;
 
 	maxInputs = 0;
     }
@@ -724,21 +721,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     /**
-     * @return Returns the submissionAttempt.
-     */
-    public String getSubmissionAttempt() {
-	return submissionAttempt;
-    }
-
-    /**
-     * @param submissionAttempt
-     *                The submissionAttempt to set.
-     */
-    public void setSubmissionAttempt(String submissionAttempt) {
-	this.submissionAttempt = submissionAttempt;
-    }
-
-    /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
@@ -836,7 +818,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		contentFolderID).append("addSingleQuestion: ", addSingleQuestion).append("editableQuestionIndex: ",
 		editableQuestionIndex).append("feedback: ", feedback).append("editQuestionBoxRequest: ",
 		editQuestionBoxRequest).append("defineLaterInEditMode: ", defineLaterInEditMode).append(
-		"submissionAttempt: ", submissionAttempt).append("sbmtSuccess: ", sbmtSuccess).append(
 		"exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid).append("isDefineLater: ",
 		isDefineLater).append("toolContentID: ", toolContentID).append("allowText: ", allowText).append(
 		"showResults: ", showResults).append("lockOnFinish: ", lockOnFinish).append("reflect: ", reflect)

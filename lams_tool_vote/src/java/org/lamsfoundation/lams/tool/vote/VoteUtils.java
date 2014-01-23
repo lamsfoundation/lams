@@ -288,31 +288,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     }
 
     /**
-     * builds a String based map from a list convertToMap(List sessionsList)
-     * 
-     * @param sessionsList
-     * @return Map
-     */
-    public static Map convertToStringMap(List sessionsList, String listType) {
-	Map map = new TreeMap(new VoteComparator());
-
-	Iterator listIterator = sessionsList.iterator();
-	Long mapIndex = new Long(1);
-
-	while (listIterator.hasNext()) {
-	    if (listType.equals("String")) {
-		String text = (String) listIterator.next();
-		map.put(mapIndex.toString(), text);
-	    } else if (listType.equals("Long")) {
-		Long LongValue = (Long) listIterator.next();
-		map.put(mapIndex.toString(), LongValue.toString());
-	    }
-	    mapIndex = new Long(mapIndex.longValue() + 1);
-	}
-	return map;
-    }
-
-    /**
      * find out if the content is in use or not. If it is in use, the author can not modify it. The idea of content
      * being in use is, once any one learner starts using a particular content that content should become unmodifiable.
      * 

@@ -140,7 +140,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     }
 
-    public List getSessionsFromContent(VoteContent voteContent) {
+    public List<Long> getSessionsFromContent(VoteContent voteContent) {
 	return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "voteContent", voteContent));
     }
 

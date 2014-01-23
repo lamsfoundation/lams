@@ -642,8 +642,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
-	voteGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
@@ -738,8 +736,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
-
-	voteGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
@@ -1014,8 +1010,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	    }
 	}
-
-	voteGeneralAuthoringDTO.setSbmtSuccess(new Integer(1).toString());
 
 	voteAuthoringForm.resetUserAction();
 	voteGeneralAuthoringDTO.setMapNominationContent(mapNominationContent);

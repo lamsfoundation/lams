@@ -113,7 +113,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 		    toolSessionID.toString(), userID.toString(), true, null, voteGeneralMonitoringDTO,
 		    exportPortfolioDTO);
 
-	    voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(), true, "");
+	    voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(), true);
 	} else {
 	    // thise field is needed for the jsp.
 	    exportPortfolioDTO.setUserExceptionNoToolSessions("false");
@@ -153,6 +153,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
 
-	voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true, "All");
+	voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true);
     }
 }

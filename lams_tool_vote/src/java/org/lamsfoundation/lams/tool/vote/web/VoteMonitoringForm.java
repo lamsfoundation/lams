@@ -21,229 +21,168 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.vote.web;
 
-
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
- * <p> ActionForm for the Monitoring environment </p>
+ * <p>
+ * ActionForm for the Monitoring environment
+ * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppConstants {
-	// controls which method is called by the Lookup map */
-    
-	protected String method;
-	
-	protected String selectedToolSessionId;
-	
-	protected String isToolSessionChanged;
-	
-	protected String sessionUserCount;
-	
-	protected String completedSessionUserCount;
-	
-	protected String completedSessionUserPercent;
-	
-	protected String viewOpenVotes;
-	
-	protected String showOpenVotesSection;
-	
-	protected String closeOpenVotes;
-	
-	protected String hideOpenVote;
-	
-	protected String showOpenVote;
-	
-	protected String currentUid;
-	
-	protected String existsOpenVotes;
-	
-	protected String toolContentID;
-	
-	protected String defineLaterInEditMode;
-	
-	
+    // controls which method is called by the Lookup map */
+
+    protected String method;
+
+    protected String sessionUserCount;
+
+    protected String completedSessionUserCount;
+
+    protected String hideOpenVote;
+
+    protected String showOpenVote;
+
+    protected String currentUid;
+
+    protected String existsOpenVotes;
+
+    protected String toolContentID;
+
+    protected String defineLaterInEditMode;
+
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
+
     /**
-     * @param toolContentID The toolContentID to set.
+     * @param toolContentID
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
+
     /**
      * @return Returns the currentUid.
      */
     public String getCurrentUid() {
-        return currentUid;
+	return currentUid;
     }
+
     /**
-     * @param currentUid The currentUid to set.
+     * @param currentUid
+     *            The currentUid to set.
      */
     public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
+	this.currentUid = currentUid;
     }
+
     /**
      * @return Returns the hideOpenVote.
      */
     public String getHideOpenVote() {
-        return hideOpenVote;
+	return hideOpenVote;
     }
+
     /**
-     * @param hideOpenVote The hideOpenVote to set.
+     * @param hideOpenVote
+     *            The hideOpenVote to set.
      */
     public void setHideOpenVote(String hideOpenVote) {
-        this.hideOpenVote = hideOpenVote;
+	this.hideOpenVote = hideOpenVote;
     }
+
     /**
-     * @return Returns the closeOpenVotes.
+     * @return Returns the method.
      */
-    public String getCloseOpenVotes() {
-        return closeOpenVotes;
+    public String getMethod() {
+	return method;
     }
+
     /**
-     * @param closeOpenVotes The closeOpenVotes to set.
+     * @param method
+     *            The method to set.
      */
-    public void setCloseOpenVotes(String closeOpenVotes) {
-        this.closeOpenVotes = closeOpenVotes;
+    public void setMethod(String method) {
+	this.method = method;
     }
-    /**
-     * @return Returns the viewOpenVotes.
-     */
-    public String getViewOpenVotes() {
-        return viewOpenVotes;
-    }
-    /**
-     * @param viewOpenVotes The viewOpenVotes to set.
-     */
-    public void setViewOpenVotes(String viewOpenVotes) {
-        this.viewOpenVotes = viewOpenVotes;
-    }
-	/**
-	 * @return Returns the isToolSessionChanged.
-	 */
-	public String getIsToolSessionChanged() {
-		return isToolSessionChanged;
-	}
-	/**
-	 * @param isToolSessionChanged The isToolSessionChanged to set.
-	 */
-	public void setIsToolSessionChanged(String isToolSessionChanged) {
-		this.isToolSessionChanged = isToolSessionChanged;
-	}
-	/**
-	 * @return Returns the selectedToolSessionId.
-	 */
-	public String getSelectedToolSessionId() {
-		return selectedToolSessionId;
-	}
-	/**
-	 * @param selectedToolSessionId The selectedToolSessionId to set.
-	 */
-	public void setSelectedToolSessionId(String selectedToolSessionId) {
-		this.selectedToolSessionId = selectedToolSessionId;
-	}
-	
-	/**
-	 * @return Returns the method.
-	 */
-	public String getMethod() {
-		return method;
-	}
-	/**
-	 * @param method The method to set.
-	 */
-	public void setMethod(String method) {
-		this.method = method;
-	}
 
     /**
      * @return Returns the completedSessionUserCount.
      */
     public String getCompletedSessionUserCount() {
-        return completedSessionUserCount;
+	return completedSessionUserCount;
     }
+
     /**
-     * @param completedSessionUserCount The completedSessionUserCount to set.
+     * @param completedSessionUserCount
+     *            The completedSessionUserCount to set.
      */
     public void setCompletedSessionUserCount(String completedSessionUserCount) {
-        this.completedSessionUserCount = completedSessionUserCount;
+	this.completedSessionUserCount = completedSessionUserCount;
     }
+
     /**
      * @return Returns the sessionUserCount.
      */
     public String getSessionUserCount() {
-        return sessionUserCount;
+	return sessionUserCount;
     }
+
     /**
-     * @param sessionUserCount The sessionUserCount to set.
+     * @param sessionUserCount
+     *            The sessionUserCount to set.
      */
     public void setSessionUserCount(String sessionUserCount) {
-        this.sessionUserCount = sessionUserCount;
+	this.sessionUserCount = sessionUserCount;
     }
-    /**
-     * @return Returns the showOpenVotesSection.
-     */
-    public String getShowOpenVotesSection() {
-        return showOpenVotesSection;
-    }
-    /**
-     * @param showOpenVotesSection The showOpenVotesSection to set.
-     */
-    public void setShowOpenVotesSection(String showOpenVotesSection) {
-        this.showOpenVotesSection = showOpenVotesSection;
-    }
+
     /**
      * @return Returns the showOpenVote.
      */
     public String getShowOpenVote() {
-        return showOpenVote;
+	return showOpenVote;
     }
+
     /**
-     * @param showOpenVote The showOpenVote to set.
+     * @param showOpenVote
+     *            The showOpenVote to set.
      */
     public void setShowOpenVote(String showOpenVote) {
-        this.showOpenVote = showOpenVote;
+	this.showOpenVote = showOpenVote;
     }
-    /**
-     * @return Returns the completedSessionUserPercent.
-     */
-    public String getCompletedSessionUserPercent() {
-        return completedSessionUserPercent;
-    }
-    /**
-     * @param completedSessionUserPercent The completedSessionUserPercent to set.
-     */
-    public void setCompletedSessionUserPercent(
-            String completedSessionUserPercent) {
-        this.completedSessionUserPercent = completedSessionUserPercent;
-    }
+
     /**
      * @return Returns the existsOpenVotes.
      */
     public String getExistsOpenVotes() {
-        return existsOpenVotes;
+	return existsOpenVotes;
     }
+
     /**
-     * @param existsOpenVotes The existsOpenVotes to set.
+     * @param existsOpenVotes
+     *            The existsOpenVotes to set.
      */
     public void setExistsOpenVotes(String existsOpenVotes) {
-        this.existsOpenVotes = existsOpenVotes;
+	this.existsOpenVotes = existsOpenVotes;
     }
+
     /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
-        return defineLaterInEditMode;
+	return defineLaterInEditMode;
     }
+
     /**
-     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     * @param defineLaterInEditMode
+     *            The defineLaterInEditMode to set.
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-        this.defineLaterInEditMode = defineLaterInEditMode;
+	this.defineLaterInEditMode = defineLaterInEditMode;
     }
 }

@@ -47,8 +47,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     protected String optionValue;
     protected String checked;
 
-    protected String sbmtSuccess;
-
     protected String userEntry;
     protected String dispatch;
     protected String toolContentID;
@@ -83,7 +81,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     protected String submitAnswersContent;
     protected String getNextQuestion;
     protected String getPreviousQuestion;
-    protected String endLearning;
     protected String refreshVotes;
     protected String submitReflection;
     protected String forwardtoReflection;
@@ -134,7 +131,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     protected void resetUserActions() {
 	this.getNextQuestion = null;
 	this.getPreviousQuestion = null;
-	this.endLearning = null;
 	this.viewAllResults = null;
     }
 
@@ -151,21 +147,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      */
     public void setAnswer(String answer) {
 	this.answer = answer;
-    }
-
-    /**
-     * @return Returns the endLearning.
-     */
-    public String getEndLearning() {
-	return endLearning;
-    }
-
-    /**
-     * @param endLearning
-     *            The endLearning to set.
-     */
-    public void setEndLearning(String endLearning) {
-	this.endLearning = endLearning;
     }
 
     /**
@@ -775,21 +756,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      */
     public void setMinNominationCountReached(String minNominationCountReached) {
 	this.minNominationCountReached = minNominationCountReached;
-    }
-
-    /**
-     * @return Returns the sbmtSuccess.
-     */
-    public String getSbmtSuccess() {
-	return sbmtSuccess;
-    }
-
-    /**
-     * @param sbmtSuccess
-     *            The sbmtSuccess to set.
-     */
-    public void setSbmtSuccess(String sbmtSuccess) {
-	this.sbmtSuccess = sbmtSuccess;
     }
 
     /** Get the votes based on the checkboxes */

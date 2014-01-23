@@ -185,12 +185,6 @@
 		    redirect="false"
 	  	/>
 	  	
-	    <forward
-	        name="learnerReport"
-	        path="/monitoring/LearnerRep.jsp"
-		    redirect="false"
-	      />
-
 	  	<forward
 		    name="viewAnswers"
 		    path="/learning/ViewAnswers.jsp"
@@ -431,6 +425,11 @@
 			redirect="false"
 	    />
 
+	    <forward
+			name="monitoringStarterRedirect"
+			path="/monitoringStarter.do"
+			redirect="true"
+	    />
 
 	  	<forward
 		    name="errorList"

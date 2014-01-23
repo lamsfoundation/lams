@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -38,7 +39,7 @@ import javax.servlet.http.HttpSession;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.vote.VoteAllGroupsDTO;
-import org.lamsfoundation.lams.tool.vote.VoteAllSessionsDTO;
+import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
@@ -71,105 +72,44 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class MonitoringUtil implements VoteAppConstants {
 
-    public static Map populateToolSessions(HttpServletRequest request, VoteContent voteContent, IVoteService voteService) {
-	List sessionsList = voteService.getSessionNamesFromContent(voteContent);
-
-	Map sessionsMap = VoteUtils.convertToStringMap(sessionsList, "String");
-
-	if (sessionsMap.isEmpty()) {
-	    sessionsMap.put(new Long(1).toString(), "None");
-	} else {
-	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
-	}
-
-	return sessionsMap;
-    }
-
-    /**
-     * 
-     * used in presenting user votes data
-     * 
-     * @param request
-     * @param voteContent
-     * @param isUserNamesVisible
-     * @param isLearnerRequest
-     * @param currentSessionId
-     * @param userId
-     * @param voteService
-     * @return
-     */
-    public static List buildGroupsQuestionData(HttpServletRequest request, VoteContent voteContent,
-	    boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId,
-	    IVoteService voteService) {
-	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
-
-	List listMonitoredAnswersContainerDTO = new LinkedList();
-
-	Iterator itListQuestions = listQuestions.iterator();
-	while (itListQuestions.hasNext()) {
-	    VoteQueContent voteQueContent = (VoteQueContent) itListQuestions.next();
-
-	    if (voteQueContent != null) {
-		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
-		voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
-		voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
-
-		Map questionAttemptData = buildGroupsAttemptData(request, voteContent, voteQueContent, voteQueContent
-			.getUid().toString(), isUserNamesVisible, isLearnerRequest, currentSessionId, userId,
-			voteService);
-		voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
-
-	    }
-	}
-	return listMonitoredAnswersContainerDTO;
-    }
-
     /**
      * groups user's votes
-     * 
-     * @param request
-     * @param voteContent
-     * @param voteQueContent
-     * @param questionUid
-     * @param isUserNamesVisible
-     * @param isLearnerRequest
-     * @param currentSessionId
-     * @param userId
-     * @param voteService
-     * @return
      */
-    public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
+    public static Map<String, Map> buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
 	    VoteQueContent voteQueContent, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String currentSessionId, String userId, IVoteService voteService) {
 
-	Map mapMonitoredAttemptsContainerDTO = new TreeMap(new VoteComparator());
-	List listMonitoredAttemptsContainerDTO = new LinkedList();
+	List<Map<String, VoteMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, VoteMonitoredUserDTO>>();
 
-	Map summaryToolSessions = populateToolSessionsId(request, voteContent, voteService);
+	Map<String, String> summaryToolSessions = populateToolSessionsId(voteContent, voteService);
 
-	Iterator itMap = summaryToolSessions.entrySet().iterator();
-
-	/*request is for monitoring summary */
+	/* request is for monitoring summary */
 	if (!isLearnerRequest) {
-	    while (itMap.hasNext()) {
-		Map.Entry pairs = (Map.Entry) itMap.next();
+	    for (Entry<String, String> pairs : summaryToolSessions.entrySet()) {
 
-		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-		    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue().toString()));
+		if (!(pairs.getValue().equals("None")) && !(pairs.getValue().equals("All"))) {
+		    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue()));
 		    if (voteSession != null) {
-			List listUsers = voteService.getUserBySessionOnly(voteSession);
-			Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteContent, voteSession
-				.getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
-				userId, voteService);
+			List<VoteQueUsr> users = voteService.getUserBySessionOnly(voteSession);
+			Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = populateSessionUsersAttempts(request,
+				voteContent, voteSession.getVoteSessionId(), users, questionUid, isUserNamesVisible,
+				isLearnerRequest, userId, voteService);
 			listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 		    }
 		}
 	    }
+	    
+//	    //create data for All sessions in total
+//	    if (summaryToolSessions.size() > 1) {
+//		Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = populateSessionUsersAttempts(request,
+//			voteContent, voteSession.getVoteSessionId(), users, questionUid, isUserNamesVisible,
+//			isLearnerRequest, userId, voteService);
+//		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+//	    }
+
 	} else {
-	    /*request is for learner report, use only the passed tool session in the report*/
-	    while (itMap.hasNext()) {
-		Map.Entry pairs = (Map.Entry) itMap.next();
+	    /* request is for learner report, use only the passed tool session in the report */
+	    for (Entry<String, String> pairs : summaryToolSessions.entrySet()) {
 
 		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
 
@@ -177,10 +117,10 @@ public class MonitoringUtil implements VoteAppConstants {
 			VoteSession voteSession = voteService
 				.retrieveVoteSession(new Long(pairs.getValue().toString()));
 			if (voteSession != null) {
-			    List listUsers = voteService.getUserBySessionOnly(voteSession);
-			    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteContent, voteSession
-				    .getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
-				    userId, voteService);
+			    List<VoteQueUsr> listUsers = voteService.getUserBySessionOnly(voteSession);
+			    Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = populateSessionUsersAttempts(
+				    request, voteContent, voteSession.getVoteSessionId(), listUsers, questionUid,
+				    isUserNamesVisible, isLearnerRequest, userId, voteService);
 			    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 			}
 		    }
@@ -188,15 +128,14 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	}
 
-	mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
+	Map<String, Map> mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
 	return mapMonitoredAttemptsContainerDTO;
     }
 
-    public static Map populateSessionUsersAttempts(HttpServletRequest request, VoteContent voteContent, Long sessionId,
-	    List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId,
-	    IVoteService voteService) {
+    public static Map<String, VoteMonitoredUserDTO> populateSessionUsersAttempts(HttpServletRequest request,
+	    VoteContent voteContent, Long sessionId, List listUsers, String questionUid, boolean isUserNamesVisible,
+	    boolean isLearnerRequest, String userId, IVoteService voteService) {
 
-	Map mapMonitoredUserContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
 	Iterator itUsers = listUsers.iterator();
 
@@ -206,8 +145,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
-				.getUid(), new Long(questionUid));
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
+				new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
@@ -231,8 +170,8 @@ public class MonitoringUtil implements VoteAppConstants {
 				String voteQueContentId = voteQuestionUid.toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				if (voteContent.getVoteContentId().toString().equals(
-					localUserSession.getVoteContentId().toString())) {
+				if (voteContent.getVoteContentId().toString()
+					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
@@ -248,8 +187,9 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((isUserNamesVisible) && (isLearnerRequest)) {
-		//summary reporting case 2
-		//just populating data normally just like monitoring summary, except that the data is ony for a specific session
+		// summary reporting case 2
+		// just populating data normally just like monitoring summary, except that the data is ony for a
+		// specific session
 		String userID = (String) request.getSession().getAttribute(USER_ID);
 		VoteQueUsr voteQueUsr = voteService.getVoteQueUsrById(new Long(userID).longValue());
 
@@ -257,8 +197,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		    voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
-				.getUid(), new Long(questionUid));
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
+				new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
@@ -280,8 +220,8 @@ public class MonitoringUtil implements VoteAppConstants {
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				if (voteContent.getVoteContentId().toString().equals(
-					localUserSession.getVoteContentId().toString())) {
+				if (voteContent.getVoteContentId().toString()
+					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
@@ -297,16 +237,16 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((!isUserNamesVisible) && (isLearnerRequest)) {
-		//summary reporting case 3
-		//populating data normally exception are for a specific session and other user names are not visible
+		// summary reporting case 3
+		// populating data normally exception are for a specific session and other user names are not visible
 		String userID = (String) request.getSession().getAttribute(USER_ID);
 
 		while (itUsers.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
-				.getUid(), new Long(questionUid));
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
+				new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
@@ -336,8 +276,8 @@ public class MonitoringUtil implements VoteAppConstants {
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				if (voteContent.getVoteContentId().toString().equals(
-					localUserSession.getVoteContentId().toString())) {
+				if (voteContent.getVoteContentId().toString()
+					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
@@ -355,8 +295,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		}
 	    }
 	} else {
-	    //summary reporting case 4
-	    //request is for learner progress report userId
+	    // summary reporting case 4
+	    // request is for learner progress report userId
 	    while (itUsers.hasNext()) {
 		VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
@@ -370,7 +310,7 @@ public class MonitoringUtil implements VoteAppConstants {
 
 			if (voteUsrResp != null) {
 			    if (userId.equals(voteQueUsr.getQueUsrId().toString())) {
-				//this is the user requested , include his name for learner progress
+				// this is the user requested , include his name for learner progress
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 				voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
@@ -387,8 +327,8 @@ public class MonitoringUtil implements VoteAppConstants {
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				if (voteContent.getVoteContentId().toString().equals(
-					localUserSession.getVoteContentId().toString())) {
+				if (voteContent.getVoteContentId().toString()
+					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
@@ -407,15 +347,19 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	}
 
-	mapMonitoredUserContainerDTO = convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+	Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
 	return mapMonitoredUserContainerDTO;
     }
 
-    public static Map populateToolSessionsId(HttpServletRequest request, VoteContent voteContent,
-	    IVoteService voteService) {
-	List sessionsList = voteService.getSessionsFromContent(voteContent);
+    public static Map<String, String> populateToolSessionsId(VoteContent voteContent, IVoteService voteService) {
+	List<Long> sessionIds = voteService.getSessionsFromContent(voteContent);
 
-	Map sessionsMap = VoteUtils.convertToStringMap(sessionsList, "Long");
+	Map<String, String> sessionsMap = new TreeMap(new VoteComparator());
+	int mapIndex = 1;
+	for (Long sessionId : sessionIds) {
+	    sessionsMap.put("" + mapIndex, sessionId.toString());
+	    mapIndex++;
+	}
 
 	if (sessionsMap.isEmpty()) {
 	    sessionsMap.put(new Long(1).toString(), "None");
@@ -426,14 +370,14 @@ public class MonitoringUtil implements VoteAppConstants {
 	return sessionsMap;
     }
 
-    public static Map convertToVoteMonitoredUserDTOMap(List list) {
-	Map map = new TreeMap(new VoteComparator());
+    public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {
+	Map<String, VoteMonitoredUserDTO> map = new TreeMap<String, VoteMonitoredUserDTO>(new VoteComparator());
 
-	Iterator listIterator = list.iterator();
+	Iterator<VoteMonitoredUserDTO> listIterator = list.iterator();
 	Long mapIndex = new Long(1);
 
 	while (listIterator.hasNext()) {
-	    VoteMonitoredUserDTO data = (VoteMonitoredUserDTO) listIterator.next();
+	    VoteMonitoredUserDTO data = listIterator.next();
 
 	    map.put(mapIndex.toString(), data);
 	    mapIndex = new Long(mapIndex.longValue() + 1);
@@ -454,8 +398,8 @@ public class MonitoringUtil implements VoteAppConstants {
 	return total;
     }
 
-    public static Map convertToMap(List list) {
-	Map map = new TreeMap(new VoteComparator());
+    public static Map<String, Map> convertToMap(List list) {
+	Map<String, Map> map = new TreeMap<String, Map>(new VoteComparator());
 
 	Iterator listIterator = list.iterator();
 	Long mapIndex = new Long(1);
@@ -469,153 +413,7 @@ public class MonitoringUtil implements VoteAppConstants {
     }
 
     /**
-     * Generates chart data for all sessions in the Monitoring Summary.
-     * 
-     * @param request
-     * @param voteService
-     * @param voteMonitoringForm
-     * @param toolContentID
-     * @return
-     */
-    public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService,
-	    VoteMonitoringForm voteMonitoringForm, Long toolContentID, MessageService messageService) {
-
-	List listVoteAllSessionsDTO = new LinkedList();
-
-	VoteContent voteContent = voteService.retrieveVote(toolContentID);
-
-	Iterator itListSessions = voteContent.getVoteSessions().iterator();
-	while (itListSessions.hasNext()) {
-	    VoteSession voteSession = (VoteSession) itListSessions.next();
-
-	    Map mapOptionsContent = new TreeMap(new VoteComparator());
-	    Map mapVoteRatesContent = new TreeMap(new VoteComparator());
-
-	    VoteAllSessionsDTO voteAllSessionsDTO = new VoteAllSessionsDTO();
-	    voteAllSessionsDTO.setSessionId(voteSession.getVoteSessionId().toString());
-	    voteAllSessionsDTO.setSessionName(voteSession.getSession_name());
-
-	    int entriesCount = voteService.getSessionEntriesCount(voteSession.getUid());
-	    Set userEntries = voteService.getSessionUserEntriesSet(voteSession.getUid());
-
-	    int potentialUserCount = voteService.getVoteSessionPotentialLearnersCount(voteSession.getUid());
-	    voteAllSessionsDTO.setSessionUserCount(Integer.toString(potentialUserCount));
-
-	    int completedSessionUserCount = voteService.getCompletedVoteUserBySessionUid(voteSession.getUid());
-	    voteAllSessionsDTO.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
-
-	    if (potentialUserCount != 0) {
-		double completedPercent = (completedSessionUserCount * 100) / potentialUserCount;
-
-		if (completedPercent > 100)
-		    completedPercent = 100;
-
-		voteAllSessionsDTO.setCompletedSessionUserPercent(new Double(completedPercent).toString());
-	    } else {
-		voteAllSessionsDTO.setCompletedSessionUserPercent("Not Available");
-	    }
-
-	    Map mapStandardUserCount = new TreeMap(new VoteComparator());
-
-	    mapOptionsContent.clear();
-	    Iterator queIterator = voteContent.getVoteQueContents().iterator();
-	    Long mapIndex = new Long(1);
-	    int totalStandardVotesCount = 0;
-
-	    Map mapStandardNominationsHTMLedContent = new TreeMap(new VoteComparator());
-	    Map mapStandardQuestionUid = new TreeMap(new VoteComparator());
-	    Map mapStandardToolSessionUid = new TreeMap(new VoteComparator());
-
-	    while (queIterator.hasNext()) {
-		VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
-		if (voteQueContent != null) {
-		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), voteQueContent.getQuestion());
-		    String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
-		    mapOptionsContent.put(mapIndex.toString(), noHTMLNomination);
-
-		    int votesCount = 0;
-		    votesCount = voteService.getStandardAttemptsForQuestionContentAndSessionUid(
-			    voteQueContent.getUid(), voteSession.getUid());
-
-		    mapStandardQuestionUid.put(mapIndex.toString(), voteQueContent.getUid().toString());
-		    mapStandardToolSessionUid.put(mapIndex.toString(), voteSession.getUid());
-
-		    mapStandardUserCount.put(mapIndex.toString(), new Integer(votesCount).toString());
-		    totalStandardVotesCount = totalStandardVotesCount + votesCount;
-
-		    double voteRate = 0d;
-		    double doubleVotesCount = votesCount * 1d;
-		    double doubleEntriesCount = entriesCount * 1d;
-
-		    if (entriesCount != 0) {
-			voteRate = ((doubleVotesCount * 100) / doubleEntriesCount);
-		    }
-		    String stringVoteRate = new Double(voteRate).toString();
-		    int lengthVoteRate = stringVoteRate.length();
-		    if (lengthVoteRate > 5)
-			stringVoteRate = stringVoteRate.substring(0, 6);
-
-		    mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
-		    mapIndex = new Long(mapIndex.longValue() + 1);
-		}
-	    }
-	    Map mapStandardNominationsContent = new TreeMap(new VoteComparator());
-	    mapStandardNominationsContent = mapOptionsContent;
-
-	    Map mapStandardRatesContent = new TreeMap(new VoteComparator());
-	    mapStandardRatesContent = mapVoteRatesContent;
-
-	    Iterator itListQuestions = userEntries.iterator();
-	    int mapVoteRatesSize = mapVoteRatesContent.size();
-	    mapIndex = new Long(mapVoteRatesSize + 1);
-
-	    double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	    double share = 100d - total;
-	    int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-
-	    if (userEnteredVotesCount != 0) {
-		share = ((userEnteredVotesCount * 100) / entriesCount);
-	    } else {
-		share = 0;
-	    }
-
-	    if (voteContent.isAllowText()) {
-		mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
-		mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService
-			.getMessage("label.open.vote"));
-	    }
-	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
-	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
-	    /** following are needed just for proper iteration in the summary jsp */
-	    mapStandardQuestionUid.put(mapIndex.toString(), "1");
-	    mapStandardToolSessionUid.put(mapIndex.toString(), "1");
-
-	    voteAllSessionsDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
-	    voteAllSessionsDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
-	    voteAllSessionsDTO.setMapStandardUserCount(mapStandardUserCount);
-	    voteAllSessionsDTO.setMapStandardRatesContent(mapStandardRatesContent);
-	    voteAllSessionsDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
-	    voteAllSessionsDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
-
-	    VoteMonitoringAction voteMonitoringAction = new VoteMonitoringAction();
-	    List listUserEntries = voteMonitoringAction.processUserEnteredNominations(voteService, voteContent,
-		    voteSession.getVoteSessionId().toString(), true, null, false);
-	    voteAllSessionsDTO.setListUserEntries(listUserEntries);
-
-	    if (listUserEntries.size() > 0)
-		voteAllSessionsDTO.setExistsOpenVote(new Boolean(true).toString());
-	    else
-		voteAllSessionsDTO.setExistsOpenVote(new Boolean(false).toString());
-
-	    listVoteAllSessionsDTO.add(voteAllSessionsDTO);
-	}
-
-	return listVoteAllSessionsDTO;
-    }
-
-    /**
-     * Generates chart data for the learner module and monitoring module
-     * Summary tab (Individual Sessions mode)
+     * Generates chart data for the learner module and monitoring module Summary tab (Individual Sessions mode)
      * 
      * @param request
      * @param voteService
@@ -652,23 +450,6 @@ public class MonitoringUtil implements VoteAppConstants {
 		    voteGeneralMonitoringDTO.setSessionUserCount(Integer.toString(potentialUserCount));
 		    voteGeneralMonitoringDTO.setCompletedSessionUserCount(new Integer(completedSessionUserCount)
 			    .toString());
-		}
-
-		if (potentialUserCount != 0) {
-		    double completedPercent = (completedSessionUserCount * 100) / potentialUserCount;
-		    if (completedPercent > 100)
-			completedPercent = 100;
-
-		    voteMonitoringForm.setCompletedSessionUserPercent(new Double(completedPercent).toString());
-		    if (voteGeneralMonitoringDTO != null) {
-			voteGeneralMonitoringDTO
-				.setCompletedSessionUserPercent(new Double(completedPercent).toString());
-		    }
-		} else {
-		    voteMonitoringForm.setCompletedSessionUserPercent("Not Available");
-		    if (voteGeneralMonitoringDTO != null) {
-			voteGeneralMonitoringDTO.setCompletedSessionUserPercent("Not Available");
-		    }
 		}
 	    }
 	}
@@ -834,7 +615,7 @@ public class MonitoringUtil implements VoteAppConstants {
 	voteStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	voteStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 	request.setAttribute(VOTE_STATS_DTO, voteStatsDTO);
-	
+
 	// setting up the advanced summary for LDEV-1662
 	request.setAttribute("useSelectLeaderToolOuput", voteContent.isUseSelectLeaderToolOuput());
 	request.setAttribute("lockOnFinish", voteContent.isLockOnFinish());
@@ -845,7 +626,7 @@ public class MonitoringUtil implements VoteAppConstants {
 	request.setAttribute("reflect", voteContent.isReflect());
 	request.setAttribute("reflectionSubject", voteContent.getReflectionSubject());
 	request.setAttribute("toolContentID", voteContent.getVoteContentId());
-	
+
 	// setting up the SubmissionDeadline
 	if (voteContent.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = voteContent.getSubmissionDeadline();
@@ -857,134 +638,56 @@ public class MonitoringUtil implements VoteAppConstants {
 	}
     }
 
-    public static void generateGroupsSessionData(HttpServletRequest request, IVoteService voteService,
-	    VoteContent voteContent) {
-	List listAllGroupsDTO = buildGroupBasedSessionData(request, voteContent, voteService);
-	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
-    }
+    public static Map<String, Map> buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
+	    IVoteService voteService, VoteQueContent voteQueContent, String questionUid, String currentSessionId) {
 
-    public static List buildGroupBasedSessionData(HttpServletRequest request, VoteContent voteContent,
-	    IVoteService voteService) {
-	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
-	List listAllGroupsContainerDTO = new LinkedList();
-
-	Iterator iteratorSession = voteContent.getVoteSessions().iterator();
-	while (iteratorSession.hasNext()) {
-	    VoteSession voteSession = (VoteSession) iteratorSession.next();
-	    String currentSessionId = voteSession.getVoteSessionId().toString();
-
-	    String currentSessionName = voteSession.getSession_name();
-
-	    VoteAllGroupsDTO voteAllGroupsDTO = new VoteAllGroupsDTO();
-	    List listMonitoredAnswersContainerDTO = new LinkedList();
-
-	    if (voteSession != null) {
-		Iterator itListQuestions = listQuestions.iterator();
-		while (itListQuestions.hasNext()) {
-		    VoteQueContent voteQueContent = (VoteQueContent) itListQuestions.next();
-
-		    if (voteQueContent != null) {
-			VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
-			voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
-			voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
-			voteMonitoredAnswersDTO.setSessionId(currentSessionId);
-			voteMonitoredAnswersDTO.setSessionName(currentSessionName);
-
-			Map questionAttemptData = buildGroupsAttemptData(request, voteContent, voteService,
-				voteQueContent, voteQueContent.getUid().toString(), true, false, currentSessionId, null);
-			voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-
-			listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
-		    }
-		}
-	    }
-	    voteAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
-	    voteAllGroupsDTO.setSessionName(currentSessionName);
-	    voteAllGroupsDTO.setSessionId(currentSessionId);
-
-	    listAllGroupsContainerDTO.add(voteAllGroupsDTO);
-
-	}
-
-	return listAllGroupsContainerDTO;
-    }
-
-    public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
-	    IVoteService voteService, VoteQueContent voteQueContent, String questionUid, boolean isUserNamesVisible,
-	    boolean isLearnerRequest, String currentSessionId, String userId) {
-
-	Map mapMonitoredAttemptsContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredAttemptsContainerDTO = new LinkedList();
 
-	Map summaryToolSessions = populateToolSessionsId(request, voteContent, voteService);
+	Map<String, String> summaryToolSessions = populateToolSessionsId(voteContent, voteService);
 
 	Iterator itMap = summaryToolSessions.entrySet().iterator();
 
-	/*request is for monitoring summary */
-	if (!isLearnerRequest) {
+	/* request is for monitoring summary */
 
-	    if (currentSessionId != null) {
-		if (currentSessionId.equals("All")) {
-		    //**summary request is for All**
-		    while (itMap.hasNext()) {
-			Map.Entry pairs = (Map.Entry) itMap.next();
-			if (!(pairs.getValue().toString().equals("None"))
-				&& !(pairs.getValue().toString().equals("All"))) {
-			    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue()
-				    .toString()));
-			    if (voteSession != null) {
-				List listUsers = voteService.getUserBySessionOnly(voteSession);
-				Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService,
-					voteSession.getVoteSessionId(), listUsers, questionUid, isUserNamesVisible,
-					isLearnerRequest, userId);
-				listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-			    }
-			}
-		    }
-		} else if (!currentSessionId.equals("All")) {
-		    //**summary request is for currentSessionId** currentSessionId
-		    VoteSession voteSession = voteService.retrieveVoteSession(new Long(currentSessionId.toString()));
-
-		    List listUsers = voteService.getUserBySessionOnly(voteSession);
-
-		    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService, new Long(
-			    currentSessionId), listUsers, questionUid, isUserNamesVisible, isLearnerRequest, userId);
-		    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-		}
-	    }
-	} else {
-	    /*request is for learner report, use only the passed tool session in the report*/
-	    while (itMap.hasNext()) {
-		Map.Entry pairs = (Map.Entry) itMap.next();
-
-		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-
-		    if (currentSessionId.equals(pairs.getValue())) {
+	if (currentSessionId != null) {
+	    if (currentSessionId.equals("All")) {
+		// **summary request is for All**
+		while (itMap.hasNext()) {
+		    Map.Entry pairs = (Map.Entry) itMap.next();
+		    if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
 			VoteSession voteSession = voteService
 				.retrieveVoteSession(new Long(pairs.getValue().toString()));
 			if (voteSession != null) {
-			    List listUsers = voteService.getUserBySessionOnly(voteSession);
-			    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService, voteSession
-				    .getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
-				    userId);
+			    List<VoteQueUsr> listUsers = voteService.getUserBySessionOnly(voteSession);
+			    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService,
+				    voteSession.getVoteSessionId(), listUsers, questionUid, true, false, null);
 			    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 			}
 		    }
 		}
+	    } else if (!currentSessionId.equals("All")) {
+		// **summary request is for currentSessionId** currentSessionId
+		VoteSession voteSession = voteService.retrieveVoteSession(new Long(currentSessionId.toString()));
+
+		List listUsers = voteService.getUserBySessionOnly(voteSession);
+
+		Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService,
+			new Long(currentSessionId), listUsers, questionUid, true, false, null);
+		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 	    }
 	}
 
-	mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
+	Map<String, Map> mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
 	return mapMonitoredAttemptsContainerDTO;
     }
 
     public static Map populateSessionUsersAttempts(HttpServletRequest request, IVoteService voteService,
-	    Long sessionId, List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest,
-	    String userId) {
+	    Long sessionId, List<VoteQueUsr> users, String questionUid, boolean isUserNamesVisible,
+	    boolean isLearnerRequest, String userId) {
 
 	Map mapMonitoredUserContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
-	Iterator itUsers = listUsers.iterator();
+	Iterator itUsers = users.iterator();
 
 	if (userId == null) {
 	    if ((isUserNamesVisible) && (!isLearnerRequest)) {
@@ -1002,7 +705,7 @@ public class MonitoringUtil implements VoteAppConstants {
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
-				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+				// voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
@@ -1020,7 +723,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((isUserNamesVisible) && (isLearnerRequest)) {
-		//just populating data normally just like monitoring summary, except that the data is ony for a specific session
+		// just populating data normally just like monitoring summary, except that the data is ony for a
+		// specific session
 
 		String userID = VoteUtils.getCurrentLearnerID();
 		VoteQueUsr voteQueUsr = voteService.getVoteQueUsrById(new Long(userID).longValue());
@@ -1039,7 +743,7 @@ public class MonitoringUtil implements VoteAppConstants {
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
-				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+				// voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
@@ -1057,8 +761,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((!isUserNamesVisible) && (isLearnerRequest)) {
-		//populating data normally exception are for a specific session and other user names are not visible
-		//getting only current user's data
+		// populating data normally exception are for a specific session and other user names are not visible
+		// getting only current user's data
 
 		String userID = VoteUtils.getCurrentLearnerID();
 		while (itUsers.hasNext()) {
@@ -1075,7 +779,7 @@ public class MonitoringUtil implements VoteAppConstants {
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
-				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+				// voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 
 				if (userID.equals(voteQueUsr.getQueUsrId().toString())) {
@@ -1100,7 +804,7 @@ public class MonitoringUtil implements VoteAppConstants {
 		}
 	    }
 	} else {
-	    //request is for learner progress report
+	    // request is for learner progress report
 	    while (itUsers.hasNext()) {
 		VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
@@ -1116,7 +820,7 @@ public class MonitoringUtil implements VoteAppConstants {
 			    if (userId.equals(voteQueUsr.getQueUsrId().toString())) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
-				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+				// voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
@@ -1153,6 +857,30 @@ public class MonitoringUtil implements VoteAppConstants {
 	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 	return map;
+    }
+
+    public static void repopulateRequestParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm,
+	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) {
+
+	String toolContentID = request.getParameter(VoteAppConstants.TOOL_CONTENT_ID);
+	voteMonitoringForm.setToolContentID(toolContentID);
+	voteGeneralMonitoringDTO.setToolContentID(toolContentID);
+
+	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
+	voteMonitoringForm.setActiveModule(activeModule);
+	voteGeneralMonitoringDTO.setActiveModule(activeModule);
+
+	String defineLaterInEditMode = request.getParameter(VoteAppConstants.DEFINE_LATER_IN_EDIT_MODE);
+	voteMonitoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
+	voteGeneralMonitoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
+
+	String responseId = request.getParameter(VoteAppConstants.RESPONSE_ID);
+	voteMonitoringForm.setResponseId(responseId);
+	voteGeneralMonitoringDTO.setResponseId(responseId);
+
+	String currentUid = request.getParameter(VoteAppConstants.CURRENT_UID);
+	voteMonitoringForm.setCurrentUid(currentUid);
+	voteGeneralMonitoringDTO.setCurrentUid(currentUid);
     }
 
 }

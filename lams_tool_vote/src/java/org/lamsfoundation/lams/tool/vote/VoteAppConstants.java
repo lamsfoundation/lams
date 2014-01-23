@@ -50,6 +50,7 @@ public interface VoteAppConstants {
     public static final String LOAD_LEARNER = "loadLearner";
     public static final String ALL_NOMINATIONS = "allNominations";
     public static final String LOAD_MONITORING_CONTENT = "loadMonitoring";
+    public static final String MONITORING_STARTER_REDIRECT = "monitoringStarterRedirect";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY = "loadMonitoringEditActivity";
     public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String INDIVIDUAL_REPORT = "individualReport";
@@ -74,7 +75,6 @@ public interface VoteAppConstants {
     public static final String USER_ENTRY = "userEntry";
     public static final String RESPONSE_ID = "responseId";
     public static final String CURRENT_UID = "currentUid";
-    public static final String SELECTED_TOOL_SESSION_ID = "selectedToolSessionId";
     public static final String DEFAULT_VOTING_TITLE = "Voting";
     public static final String DEFAULT_VOTING_INSTRUCTIONS = "Instructions";
     public static final String NOTEBOOK_ENTRIES_EXIST = "notebookEntriesExist";
@@ -97,7 +97,6 @@ public interface VoteAppConstants {
     public static final String DEFINE_LATER_EDIT_ACTIVITY = "defineLaterEditActivity";
     public static final String ACTIVE_MODULE = "activeModule";
     public static final String DEFINE_LATER_IN_EDIT_MODE = "defineLaterInEditMode";
-    public static final String SUBMIT_SUCCESS = "sbmtSuccess";
     public static final String REQUEST_LEARNING_REPORT = "requestLearningReport";
     public static final String REQUEST_LEARNING_REPORT_PROGRESS = "requestLearningReportProgress";
     public static final String VOTE_GENERAL_AUTHORING_DTO = "voteGeneralAuthoringDTO";
@@ -211,7 +210,6 @@ public interface VoteAppConstants {
     public static final String RICHTEXT_TITLE = "richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
     public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
-    public static final String LIST_VOTE_ALLSESSIONS_DTO = "listVoteAllSessionsDTO";
 
     public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
     public static final String COUNT_ALL_USERS = "countAllUsers";
@@ -226,8 +224,6 @@ public interface VoteAppConstants {
     public static final String COMPLETED = "COMPLETED";
 
     public static final String MAP_TOOL_SESSIONS = "mapToolSessions";
-    public static final Integer MAX_TOOL_SESSION_COUNT = new Integer(500);
-    public static final String IS_TOOL_SESSION_CHANGED = "isToolSessionChanged";
     public static final String OPTION_OFF = "false";
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";
@@ -258,7 +254,6 @@ public interface VoteAppConstants {
     public static final String CHECK_ALL_SESSIONS_COMPLETED = "checkAllSessionsCompleted";
     public static final String FROM_TOOL_CONTENT_ID = "fromToolContentId";
     public static final String TO_TOOL_CONTENT_ID = "toToolContentId";
-    public static final String LEARNER_REPORT = "learnerReport";
     public static final String MAP_USER_RESPONSES = "mapUserResponses";
     public static final String MAP_MAIN_REPORT = "mapMainReport";
     public static final String MAP_STATS = "mapStats";
@@ -272,16 +267,11 @@ public interface VoteAppConstants {
     public static final String MONITORING_REPORT = "monitoringReport";
     public static final String MONITORING_ERROR = "monitoringError";
     public static final String MAP_MONITORING_QUESTIONS = "mapMonitoringQuestions";
-    public static final String SUMMARY_TOOL_SESSIONS = "summaryToolSessions";
-    public static final String SUMMARY_TOOL_SESSIONS_ID = "summaryToolSessionsId";
     public static final String MONITORED_CONTENT_ID = "monitoredContentId";
     public static final String EDITACTIVITY_EDITMODE = "editActivityEditMode";
     public static final String VALIDATION_ERROR = "validationError";
     public static final String FORM_INDEX = "formIndex";
-    public static final String CURRENT_MONITORED_TOOL_SESSION = "currentMonitoredToolSession";
-    public static final String SELECTION_CASE = "selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
-    public static final String GROUP_NAME = "groupName";
     public static final String TIMEZONE = "timeZone";
     public static final String PREVIEW_ONLY = "previewOnly";
 

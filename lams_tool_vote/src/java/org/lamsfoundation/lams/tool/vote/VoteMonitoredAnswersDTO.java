@@ -27,129 +27,143 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds question/candidate answers data as well as user attempts data for jsp purposes </p>
+ * <p>
+ * DTO that holds question/candidate answers data as well as user attempts data for jsp purposes
+ * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class VoteMonitoredAnswersDTO implements Comparable
-{
-	protected String questionUid;
-	
-	private String question;
-	
-	private String attemptUid;
-	
-	private List candidateAnswers;
-	
-	private Map questionAttempts;
-	
-	
-	private String sessionId;
-    
+public class VoteMonitoredAnswersDTO implements Comparable {
+    protected String questionUid;
+
+    private String question;
+
+    private String attemptUid;
+
+    private List candidateAnswers;
+
+    private Map questionAttempts;
+
+    private String sessionId;
+
     private String sessionName;
-	
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
+
     /**
      * @return Returns the sessionName.
      */
     public String getSessionName() {
-        return sessionName;
+	return sessionName;
     }
+
     /**
-     * @param sessionName The sessionName to set.
+     * @param sessionName
+     *            The sessionName to set.
      */
     public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+	this.sessionName = sessionName;
     }
-	/**
-	 * @return Returns the candidateAnswers.
-	 */
-	public List getCandidateAnswers() {
-		return candidateAnswers;
-	}
-	/**
-	 * @param candidateAnswers The candidateAnswers to set.
-	 */
-	public void setCandidateAnswers(List candidateAnswers) {
-		this.candidateAnswers = candidateAnswers;
-	}
-	/**
-	 * @return Returns the question.
-	 */
-	public String getQuestion() {
-		return question;
-	}
-	/**
-	 * @param question The question to set.
-	 */
-	public void setQuestion(String question) {
-		this.question = question;
-	}
-	/**
-	 * @return Returns the questionUid.
-	 */
-	public String getQuestionUid() {
-		return questionUid;
-	}
-	/**
-	 * @param questionUid The questionUid to set.
-	 */
-	public void setQuestionUid(String questionUid) {
-		this.questionUid = questionUid;
-	}
-	
-	/**
-	 * @return Returns the questionAttempts.
-	 */
-	public Map getQuestionAttempts() {
-		return questionAttempts;
-	}
-	/**
-	 * @param questionAttempts The questionAttempts to set.
-	 */
-	public void setQuestionAttempts(Map questionAttempts) {
-		this.questionAttempts = questionAttempts;
-	}
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("question", getQuestion())
-            .toString();
+
+    /**
+     * @return Returns the candidateAnswers.
+     */
+    public List getCandidateAnswers() {
+	return candidateAnswers;
     }
-	
-	public int compareTo(Object o)
-    {
-		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = (VoteMonitoredAnswersDTO) o;
-     
-        if (voteMonitoredAnswersDTO == null)
-        	return 1;
-		else
-			return (int) (new Long(questionUid).longValue() - new Long(voteMonitoredAnswersDTO.questionUid).longValue());
+
+    /**
+     * @param candidateAnswers
+     *            The candidateAnswers to set.
+     */
+    public void setCandidateAnswers(List candidateAnswers) {
+	this.candidateAnswers = candidateAnswers;
     }
-	
+
+    /**
+     * @return Returns the question.
+     */
+    public String getQuestion() {
+	return question;
+    }
+
+    /**
+     * @param question
+     *            The question to set.
+     */
+    public void setQuestion(String question) {
+	this.question = question;
+    }
+
+    /**
+     * @return Returns the questionUid.
+     */
+    public String getQuestionUid() {
+	return questionUid;
+    }
+
+    /**
+     * @param questionUid
+     *            The questionUid to set.
+     */
+    public void setQuestionUid(String questionUid) {
+	this.questionUid = questionUid;
+    }
+
+    /**
+     * @return Returns the questionAttempts.
+     */
+    public Map getQuestionAttempts() {
+	return questionAttempts;
+    }
+
+    /**
+     * @param questionAttempts
+     *            The questionAttempts to set.
+     */
+    public void setQuestionAttempts(Map questionAttempts) {
+	this.questionAttempts = questionAttempts;
+    }
+
+    public String toString() {
+	return new ToStringBuilder(this).append("question", getQuestion()).toString();
+    }
+
+    public int compareTo(Object o) {
+	VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = (VoteMonitoredAnswersDTO) o;
+
+	if (voteMonitoredAnswersDTO == null)
+	    return 1;
+	else
+	    return (int) (new Long(questionUid).longValue() - new Long(voteMonitoredAnswersDTO.questionUid).longValue());
+    }
+
     /**
      * @return Returns the attemptUid.
      */
     public String getAttemptUid() {
-        return attemptUid;
+	return attemptUid;
     }
+
     /**
-     * @param attemptUid The attemptUid to set.
+     * @param attemptUid
+     *            The attemptUid to set.
      */
     public void setAttemptUid(String attemptUid) {
-        this.attemptUid = attemptUid;
+	this.attemptUid = attemptUid;
     }
 }
