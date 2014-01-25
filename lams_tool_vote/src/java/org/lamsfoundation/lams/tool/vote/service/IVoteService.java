@@ -158,7 +158,7 @@ public interface IVoteService {
 
     Set getUserEntries() throws VoteApplicationException;
 
-    int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
+    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId);
 
     List getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
 

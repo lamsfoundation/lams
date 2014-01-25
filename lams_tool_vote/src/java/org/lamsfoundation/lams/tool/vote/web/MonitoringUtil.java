@@ -385,19 +385,6 @@ public class MonitoringUtil implements VoteAppConstants {
 	return map;
     }
 
-    public static double calculateTotal(Map mapVoteRatesContent) {
-	double total = 0d;
-	Iterator itMap = mapVoteRatesContent.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
-
-	    if (pairs.getValue() != null) {
-		total = total + new Double(pairs.getValue().toString()).doubleValue();
-	    }
-	}
-	return total;
-    }
-
     public static Map<String, Map> convertToMap(List list) {
 	Map<String, Map> map = new TreeMap<String, Map>(new VoteComparator());
 
@@ -510,16 +497,8 @@ public class MonitoringUtil implements VoteAppConstants {
 	int mapVoteRatesSize = mapVoteRatesContent.size();
 	mapIndex = new Long(mapVoteRatesSize + 1);
 
-	double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	double share = 100 - total;
-
 	int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-
-	if (userEnteredVotesCount != 0) {
-	    share = ((userEnteredVotesCount * 100) / entriesCount);
-	} else {
-	    share = 0;
-	}
+	double share = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / entriesCount) : 0;
 
 	if (voteContent.isAllowText()) {
 	    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));

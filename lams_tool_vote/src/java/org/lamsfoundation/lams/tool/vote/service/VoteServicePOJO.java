@@ -554,10 +554,9 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid) {
+    public List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId) {
 	try {
-	    return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndContentUid(voteQueContentId,
-		    voteContentUid);
+	    return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndContentUid(voteQueContentId);
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException(
 		    "Exception occured when lams is getting all standard attempts entries count: " + e.getMessage(), e);

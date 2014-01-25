@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -250,125 +252,161 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
     private static List<SessionDTO> getSessionDTOs(HttpServletRequest request, IVoteService voteService,
 	    VoteMonitoringForm voteMonitoringForm, Long toolContentID, MessageService messageService) {
 
-	List<SessionDTO> sessionsDTOs = new LinkedList<SessionDTO>();
+	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
 
 	VoteContent voteContent = voteService.retrieveVote(toolContentID);
-
-	Iterator itListSessions = voteContent.getVoteSessions().iterator();
-	while (itListSessions.hasNext()) {
-	    VoteSession voteSession = (VoteSession) itListSessions.next();
-
-	    Map mapOptionsContent = new TreeMap(new VoteComparator());
-	    Map mapVoteRatesContent = new TreeMap(new VoteComparator());
+	for (VoteSession session: (Set<VoteSession>)voteContent.getVoteSessions()) {
 
 	    SessionDTO sessionDTO = new SessionDTO();
-	    sessionDTO.setSessionId(voteSession.getVoteSessionId().toString());
-	    sessionDTO.setSessionName(voteSession.getSession_name());
+	    sessionDTO.setSessionId(session.getVoteSessionId().toString());
+	    sessionDTO.setSessionName(session.getSession_name());
 
-	    int entriesCount = voteService.getSessionEntriesCount(voteSession.getUid());
-	    Set userEntries = voteService.getSessionUserEntriesSet(voteSession.getUid());
+	    int entriesCount = voteService.getSessionEntriesCount(session.getUid());
 
-	    int potentialUserCount = voteService.getVoteSessionPotentialLearnersCount(voteSession.getUid());
-	    sessionDTO.setSessionUserCount(Integer.toString(potentialUserCount));
+	    // potentialUserCount
+	    int potentialUserCount = voteService.getVoteSessionPotentialLearnersCount(session.getUid());
+	    sessionDTO.setSessionUserCount(potentialUserCount);
 
-	    int completedSessionUserCount = voteService.getCompletedVoteUserBySessionUid(voteSession.getUid());
-	    sessionDTO.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
+	    //completedSessionUserCount
+	    int completedSessionUserCount = voteService.getCompletedVoteUserBySessionUid(session.getUid());
+	    sessionDTO.setCompletedSessionUserCount(completedSessionUserCount);
 
-	    Map mapStandardUserCount = new TreeMap(new VoteComparator());
-
-	    mapOptionsContent.clear();
-	    Iterator queIterator = voteContent.getVoteQueContents().iterator();
-	    Long mapIndex = new Long(1);
+	    Long mapIndex = 1L;
 	    int totalStandardVotesCount = 0;
 
-	    Map mapStandardNominationsHTMLedContent = new TreeMap(new VoteComparator());
-	    Map mapStandardQuestionUid = new TreeMap(new VoteComparator());
-	    Map mapStandardToolSessionUid = new TreeMap(new VoteComparator());
+	    Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
+	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
 
-	    while (queIterator.hasNext()) {
-		VoteQueContent question = (VoteQueContent) queIterator.next();
-		if (question != null) {
-		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), question.getQuestion());
-		    String noHTMLNomination = VoteUtils.stripHTML(question.getQuestion());
-		    mapOptionsContent.put(mapIndex.toString(), noHTMLNomination);
+	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
 
-		    int votesCount = 0;
-		    votesCount = voteService.getStandardAttemptsForQuestionContentAndSessionUid(
-			    question.getUid(), voteSession.getUid());
+		int votesCount = voteService.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
+			session.getUid());
+		totalStandardVotesCount += votesCount;
+		mapStandardUserCount.put(mapIndex, new Long(votesCount));
 
-		    mapStandardQuestionUid.put(mapIndex.toString(), question.getUid().toString());
-		    mapStandardToolSessionUid.put(mapIndex.toString(), voteSession.getUid());
+		mapStandardQuestionUid.put(mapIndex, question.getUid());
+		mapStandardToolSessionUid.put(mapIndex, session.getUid());
 
-		    mapStandardUserCount.put(mapIndex.toString(), new Integer(votesCount).toString());
-		    totalStandardVotesCount = totalStandardVotesCount + votesCount;
-
-		    double voteRate = 0d;
-		    double doubleVotesCount = votesCount * 1d;
-		    double doubleEntriesCount = entriesCount * 1d;
-
-		    if (entriesCount != 0) {
-			voteRate = ((doubleVotesCount * 100) / doubleEntriesCount);
-		    }
-		    String stringVoteRate = new Double(voteRate).toString();
-		    int lengthVoteRate = stringVoteRate.length();
-		    if (lengthVoteRate > 5)
-			stringVoteRate = stringVoteRate.substring(0, 6);
-
-		    mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
-		    mapIndex = new Long(mapIndex.longValue() + 1);
-		}
-	    }
-	    Map mapStandardNominationsContent = new TreeMap(new VoteComparator());
-	    mapStandardNominationsContent = mapOptionsContent;
-
-	    Map mapStandardRatesContent = new TreeMap(new VoteComparator());
-	    mapStandardRatesContent = mapVoteRatesContent;
-
-	    Iterator itListQuestions = userEntries.iterator();
-	    int mapVoteRatesSize = mapVoteRatesContent.size();
-	    mapIndex = new Long(mapVoteRatesSize + 1);
-
-	    double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	    double share = 100d - total;
-	    int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-
-	    if (userEnteredVotesCount != 0) {
-		share = ((userEnteredVotesCount * 100) / entriesCount);
-	    } else {
-		share = 0;
+		Double voteRate = (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d;
+		mapVoteRates.put(mapIndex, voteRate);
+		
+		// mapIndex++
+		mapIndex = new Long(mapIndex + 1);
 	    }
 
+	    //open votes
 	    if (voteContent.isAllowText()) {
-		mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
-		mapStandardNominationsHTMLedContent.put(mapIndex.toString(),
-			messageService.getMessage("label.open.vote"));
+		int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
+		Double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / entriesCount) : 0d;
+		mapVoteRates.put(mapIndex, voteRate);
+		
+		mapStandardNominationsHTMLedContent.put(mapIndex, messageService.getMessage("label.open.vote"));
+		mapStandardUserCount.put(mapIndex, new Long(userEnteredVotesCount));
+		/** following are needed just for proper iteration in the summary jsp */
+		mapStandardQuestionUid.put(mapIndex, 1L);
+		mapStandardToolSessionUid.put(mapIndex, 1L);
 	    }
-	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
-	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
-	    /** following are needed just for proper iteration in the summary jsp */
-	    mapStandardQuestionUid.put(mapIndex.toString(), "1");
-	    mapStandardToolSessionUid.put(mapIndex.toString(), "1");
 
-	    sessionDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
 	    sessionDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 	    sessionDTO.setMapStandardUserCount(mapStandardUserCount);
-	    sessionDTO.setMapStandardRatesContent(mapStandardRatesContent);
+	    sessionDTO.setMapStandardRatesContent(mapVoteRates);
 	    sessionDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 	    sessionDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 
-	    List listUserEntries = VoteMonitoringAction.processUserEnteredNominations(voteService, voteContent,
-		    voteSession.getVoteSessionId().toString(), true, null, false);
-	    sessionDTO.setListUserEntries(listUserEntries);
+	    List<VoteMonitoredAnswersDTO> openVotes = VoteMonitoringAction.processUserEnteredNominations(voteService, voteContent,
+		    session.getVoteSessionId().toString(), true, null, false);
+	    sessionDTO.setOpenVotes(openVotes);
+	    boolean isExistsOpenVote = openVotes.size() > 0;
+	    sessionDTO.setExistsOpenVote(isExistsOpenVote);
 
-	    if (listUserEntries.size() > 0)
-		sessionDTO.setExistsOpenVote(new Boolean(true).toString());
-	    else
-		sessionDTO.setExistsOpenVote(new Boolean(false).toString());
+	    sessionDTOs.add(sessionDTO);
+	}
+	
+	//All groups total
+	if (sessionDTOs.size() > 1) {
+	    SessionDTO totalSessionDTO = new SessionDTO();
+	    totalSessionDTO.setSessionId("0");
+	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
 
-	    sessionsDTOs.add(sessionDTO);
+	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<VoteMonitoredAnswersDTO>();
+	    int totalPotentialUserCount = 0;
+	    int totalCompletedSessionUserCount = 0;
+	    int allSessionsVotesCount = 0;
+	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    for (SessionDTO sessionDTO : sessionDTOs) {
+
+		totalPotentialUserCount += sessionDTO.getSessionUserCount();
+		totalCompletedSessionUserCount += sessionDTO.getCompletedSessionUserCount();
+
+		Long mapIndex = 1L;
+		for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
+		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
+			    .get(mapIndex) : 0;
+		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
+		    
+		    allSessionsVotesCount += votesCount;
+
+		    // mapIndex++
+		    mapIndex = new Long(mapIndex + 1);
+		}
+
+		//open votes
+		if (voteContent.isAllowText()) {
+		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
+		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
+			    .get(mapIndex) : 0;
+		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
+		    
+		    allSessionsVotesCount += votesCount;
+		}
+
+		totalOpenVotes.addAll(sessionDTO.getOpenVotes());
+	    }
+	    totalSessionDTO.setSessionUserCount(totalPotentialUserCount);
+	    totalSessionDTO.setCompletedSessionUserCount(totalCompletedSessionUserCount);
+	    totalSessionDTO.setOpenVotes(totalOpenVotes);
+	    boolean isExistsOpenVote = totalOpenVotes.size() > 0;
+	    totalSessionDTO.setExistsOpenVote(isExistsOpenVote);
+	    totalSessionDTO.setMapStandardNominationsHTMLedContent(sessionDTOs.get(0)
+		    .getMapStandardNominationsHTMLedContent());
+	    totalSessionDTO.setMapStandardQuestionUid(sessionDTOs.get(0).getMapStandardQuestionUid());
+	    totalSessionDTO.setMapStandardToolSessionUid(sessionDTOs.get(0).getMapStandardToolSessionUid());
+	    totalSessionDTO.setMapStandardUserCount(totalMapStandardUserCount);
+
+	    // All groups total -- totalMapVoteRates part
+	    Long mapIndex = 1L;
+	    Map<Long, Double> totalMapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    int totalStandardVotesCount = 0;
+	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+
+		Long votesCount = totalMapStandardUserCount.get(mapIndex);
+
+		double voteRate = (allSessionsVotesCount != 0) ? ((votesCount * 100) / allSessionsVotesCount) : 0d;
+		totalMapVoteRates.put(mapIndex, voteRate);
+		
+		totalStandardVotesCount += votesCount;
+
+		// mapIndex++
+		mapIndex = new Long(mapIndex + 1);
+	    }
+	    // open votes
+	    if (voteContent.isAllowText()) {
+		int userEnteredVotesCount = allSessionsVotesCount - totalStandardVotesCount;
+		double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / allSessionsVotesCount)
+			: 0;
+		totalMapVoteRates.put(mapIndex, voteRate);
+	    }
+	    totalSessionDTO.setMapStandardRatesContent(totalMapVoteRates);
+
+	    sessionDTOs.addFirst(totalSessionDTO);
 	}
 
-	return sessionsDTOs;
+	return sessionDTOs;
     }
 
     private boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request,

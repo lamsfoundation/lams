@@ -35,15 +35,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  */
 public class SessionDTO implements Comparable {
-    private String sessionUserCount;
-    private String completedSessionUserCount;
+    private int sessionUserCount;
+    private int completedSessionUserCount;
     private String sessionId;
     private String sessionName;
-    private Map mapStandardNominationsContent;
     private Map mapStandardNominationsHTMLedContent;
-
     private Map mapStandardQuestionUid;
     private Map mapStandardToolSessionUid;
+    private boolean existsOpenVote;
+    private Map<Long, Long> mapStandardUserCount;
+    private Map mapStandardRatesContent;
+    private List<VoteMonitoredAnswersDTO> openVotes;
 
     /**
      * @return Returns the mapStandardQuestionUid.
@@ -75,24 +77,20 @@ public class SessionDTO implements Comparable {
 	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
 
-    private Map mapStandardUserCount;
-    private Map mapStandardRatesContent;
-    private List listUserEntries;
-    private String existsOpenVote;
 
     /**
-     * @return Returns the listUserEntries.
+     * @return Returns the openVotes.
      */
-    public List getListUserEntries() {
-	return listUserEntries;
+    public List<VoteMonitoredAnswersDTO> getOpenVotes() {
+	return openVotes;
     }
 
     /**
-     * @param listUserEntries
-     *            The listUserEntries to set.
+     * @param openVotes
+     *            The openVotes to set.
      */
-    public void setListUserEntries(List listUserEntries) {
-	this.listUserEntries = listUserEntries;
+    public void setOpenVotes(List<VoteMonitoredAnswersDTO> openVotes) {
+	this.openVotes = openVotes;
     }
 
     /**
@@ -113,7 +111,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the mapStandardUserCount.
      */
-    public Map getMapStandardUserCount() {
+    public Map<Long, Long> getMapStandardUserCount() {
 	return mapStandardUserCount;
     }
 
@@ -121,7 +119,7 @@ public class SessionDTO implements Comparable {
      * @param mapStandardUserCount
      *            The mapStandardUserCount to set.
      */
-    public void setMapStandardUserCount(Map mapStandardUserCount) {
+    public void setMapStandardUserCount(Map<Long, Long> mapStandardUserCount) {
 	this.mapStandardUserCount = mapStandardUserCount;
     }
 
@@ -141,7 +139,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the completedSessionUserCount.
      */
-    public String getCompletedSessionUserCount() {
+    public int getCompletedSessionUserCount() {
 	return completedSessionUserCount;
     }
 
@@ -149,7 +147,7 @@ public class SessionDTO implements Comparable {
      * @param completedSessionUserCount
      *            The completedSessionUserCount to set.
      */
-    public void setCompletedSessionUserCount(String completedSessionUserCount) {
+    public void setCompletedSessionUserCount(int completedSessionUserCount) {
 	this.completedSessionUserCount = completedSessionUserCount;
     }
 
@@ -171,7 +169,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the sessionUserCount.
      */
-    public String getSessionUserCount() {
+    public int getSessionUserCount() {
 	return sessionUserCount;
     }
 
@@ -179,23 +177,8 @@ public class SessionDTO implements Comparable {
      * @param sessionUserCount
      *            The sessionUserCount to set.
      */
-    public void setSessionUserCount(String sessionUserCount) {
+    public void setSessionUserCount(int sessionUserCount) {
 	this.sessionUserCount = sessionUserCount;
-    }
-
-    /**
-     * @return Returns the mapStandardNominationsContent.
-     */
-    public Map getMapStandardNominationsContent() {
-	return mapStandardNominationsContent;
-    }
-
-    /**
-     * @param mapStandardNominationsContent
-     *            The mapStandardNominationsContent to set.
-     */
-    public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
-	this.mapStandardNominationsContent = mapStandardNominationsContent;
     }
 
     /**
@@ -216,7 +199,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the existsOpenVote.
      */
-    public String getExistsOpenVote() {
+    public boolean getExistsOpenVote() {
 	return existsOpenVote;
     }
 
@@ -224,7 +207,7 @@ public class SessionDTO implements Comparable {
      * @param existsOpenVote
      *            The existsOpenVote to set.
      */
-    public void setExistsOpenVote(String existsOpenVote) {
+    public void setExistsOpenVote(boolean existsOpenVote) {
 	this.existsOpenVote = existsOpenVote;
     }
 

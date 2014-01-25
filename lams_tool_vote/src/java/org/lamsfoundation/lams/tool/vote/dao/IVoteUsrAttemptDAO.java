@@ -59,7 +59,7 @@ public interface IVoteUsrAttemptDAO {
 
     int getSessionEntriesCount(final Long voteSessionId);
 
-    int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
+    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId);
 
     int getAttemptsForQuestionContent(final Long voteQueContentId);
 
