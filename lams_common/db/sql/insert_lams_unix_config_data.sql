@@ -44,7 +44,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs,.php,.jsp,.asp,.aspx,.pl,.do,.py,.tcl,.cgi,.shtml,.stm,.cfm,.adp', 'config.executable.extensions', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('UserInactiveTimeout','86400', 'config.user.inactive.timeout', 'config.header.system', 'LONG', 1);
+values ('UserInactiveTimeout','10800', 'config.user.inactive.timeout', 'config.header.system', 'LONG', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('UseCacheDebugListener','false', 'config.use.cache.debug.listener', 'config.header.system', 'BOOLEAN', 1);
@@ -291,3 +291,4 @@ values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.h
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+update lams_configuration set config_value ='http://192.168.1.10:8080/lams/' where config_key = 'ServerURL';
