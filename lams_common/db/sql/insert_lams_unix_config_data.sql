@@ -291,4 +291,3 @@ values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.h
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
-update lams_configuration set config_value ='http://192.168.1.10:8080/lams/' where config_key = 'ServerURL';
