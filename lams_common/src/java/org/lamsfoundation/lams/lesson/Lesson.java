@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -75,10 +74,10 @@ public class Lesson implements Serializable {
     public static final Integer ARCHIVED_STATE = new Integer(6);
     /** The state for lesssons that are removed and never can be accessed again */
     public static final Integer REMOVED_STATE = new Integer(7);
-    
-    //---------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------
     // attributes
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     /** identifier field */
     private Long lessonId;
 
@@ -87,7 +86,7 @@ public class Lesson implements Serializable {
 
     /** persistent field */
     private String lessonName;
-    
+
     /** persistent field */
     private Date createDateTime;
 
@@ -99,13 +98,13 @@ public class Lesson implements Serializable {
 
     /** nullable persistent field */
     private Date scheduleStartDate;
-    
+
     /** nullable persistent field */
-    private Date scheduleEndDate;  
-    
+    private Date scheduleEndDate;
+
     /** nullable persistent field */
-    private Integer scheduledNumberDaysToLessonFinish; 
-    
+    private Integer scheduledNumberDaysToLessonFinish;
+
     /** persistent field */
     private User user;
 
@@ -126,16 +125,16 @@ public class Lesson implements Serializable {
 
     /** persistent field */
     private Set learnerProgresses;
-    
+
     /** persistent field */
     private Set<GradebookUserLesson> gradebookUserLessons;
-    
+
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean enableLessonIntro;
-    
+
     /** persistent field */
     private String lessonDescription;
-    
+
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean displayDesignImage;
 
@@ -159,20 +158,25 @@ public class Lesson implements Serializable {
 
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean marksReleased;
-    
+
+    /**
+     * Should Learner start the lesson from the beginning each time he enters it.
+     */
+    private Boolean learnerRestart;
+
     /**
      * For lesson conditional release
      */
     private Set<Lesson> precedingLessons;
     private Set<Lesson> succeedingLessons;
-    
-    //---------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------
     // constructors
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     /** default constructor */
     public Lesson() {
     }
-    
+
     /**
      * Minimum constructor that initialize the lesson data. It doesn't include organization and class information. Chain
      * constructor pattern implementation.
@@ -181,44 +185,46 @@ public class Lesson implements Serializable {
 	    Integer previousLessonStateId, LearningDesign learningDesign, Set learnerProgresses,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Integer scheduledNumberDaysTolessonFinish) {
+	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysTolessonFinish) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
 		enableLessonIntro, displayDesignImage, learnerExportAvailable, false, learningDesign, null, null,
 		learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, scheduledNumberDaysTolessonFinish);
+		enableLessonNotifications, learnerRestart, scheduledNumberDaysTolessonFinish);
     }
-    
+
     /** full constructor */
     public Lesson(Long lessonId, String name, String description, Date createDateTime, Date startDateTime,
 	    Date endDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean lockedForEdit, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation,
 	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish) {
-        this.lessonId = lessonId;
-        this.lessonName = name;
-        this.lessonDescription = description;
-        this.createDateTime = createDateTime;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-        this.user = user;
-        this.lessonStateId = lessonStateId;
-        this.previousLessonStateId = previousLessonStateId;
-        this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : Boolean.FALSE;
-        this.displayDesignImage = displayDesignImage != null ? displayDesignImage : Boolean.FALSE;
-        this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
-        this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
-        this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
-        this.lockedForEdit = false;
-        this.learningDesign = learningDesign;
-        this.lessonClass = lessonClass;
-        this.organisation = organisation;
-        this.learnerProgresses = learnerProgresses;
-        this.liveEditEnabled = liveEditEnabled;
-        this.enableLessonNotifications = enableLessonNotifications;
-        this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
-        this.marksReleased = false;
-        this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish) {
+	this.lessonId = lessonId;
+	this.lessonName = name;
+	this.lessonDescription = description;
+	this.createDateTime = createDateTime;
+	this.startDateTime = startDateTime;
+	this.endDateTime = endDateTime;
+	this.user = user;
+	this.lessonStateId = lessonStateId;
+	this.previousLessonStateId = previousLessonStateId;
+	this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : Boolean.FALSE;
+	this.displayDesignImage = displayDesignImage != null ? displayDesignImage : Boolean.FALSE;
+	this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
+	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
+	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
+	this.lockedForEdit = false;
+	this.learningDesign = learningDesign;
+	this.lessonClass = lessonClass;
+	this.organisation = organisation;
+	this.learnerProgresses = learnerProgresses;
+	this.liveEditEnabled = liveEditEnabled;
+	this.enableLessonNotifications = enableLessonNotifications;
+	this.learnerRestart = learnerRestart;
+	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
+	this.marksReleased = false;
+	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
     }
 
     /**
@@ -233,35 +239,14 @@ public class Lesson implements Serializable {
      *            the learning design that this lesson is based on.
      * @return the lesson created.
      */
-    public static Lesson createNewLessonWithoutClass(String lessonName,
-                                                     String lessonDescription,
-                                                     User user,
-                                                     LearningDesign ld,
-                                                     Boolean enableLessonIntro, 
-                                                     Boolean displayDesignImage,
-                                                     Boolean learnerExportAvailable,
-                                                     Boolean learnerPresenceAvailable,
-                                                     Boolean learnerImAvailable,
-                                                     Boolean liveEditEnabled,
-                                                     Boolean enableLessonNotifications,
-                                                     Integer scheduledNumberDaysToLessonFinish)
-    {
-        return new Lesson(lessonName,
-                          lessonDescription,
-                          new Date(System.currentTimeMillis()),
-                          user,
-                          Lesson.CREATED,
-                          null,
-                          ld,
-                          new HashSet(),
-                          enableLessonIntro, 
-                          displayDesignImage,
-                          learnerExportAvailable,
-                          learnerPresenceAvailable,
-                          learnerImAvailable,
-                          liveEditEnabled,
-                          enableLessonNotifications,
-                          scheduledNumberDaysToLessonFinish);
+    public static Lesson createNewLessonWithoutClass(String lessonName, String lessonDescription, User user,
+	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish) {
+	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
+		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerExportAvailable,
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
+		learnerRestart, scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -417,7 +402,7 @@ public class Lesson implements Serializable {
     public void setPreviousLessonStateId(Integer previousLessonStateId) {
 	this.previousLessonStateId = previousLessonStateId;
     }
-    
+
     public Boolean isEnableLessonIntro() {
 	return enableLessonIntro;
     }
@@ -491,11 +476,11 @@ public class Lesson implements Serializable {
     }
 
     public LessonClass getLessonClass() {
-        return this.lessonClass;
+	return this.lessonClass;
     }
 
     public void setLessonClass(LessonClass lessonClass) {
-        this.lessonClass = lessonClass;
+	this.lessonClass = lessonClass;
     }
 
     public Organisation getOrganisation() {
@@ -507,29 +492,31 @@ public class Lesson implements Serializable {
     }
 
     public Set getLearnerProgresses() {
-        return this.learnerProgresses;
+	return this.learnerProgresses;
     }
 
     public void setLearnerProgresses(Set learnerProgresses) {
-        this.learnerProgresses = learnerProgresses;
+	this.learnerProgresses = learnerProgresses;
     }
 
-
+    @Override
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("lessonId", getLessonId())
-            .toString();
+	return new ToStringBuilder(this).append("lessonId", getLessonId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if (!(other instanceof Lesson))
+	}
+	if (!(other instanceof Lesson)) {
 	    return false;
+	}
 	Lesson castOther = (Lesson) other;
 	return new EqualsBuilder().append(this.getLessonId(), castOther.getLessonId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getLessonId()).toHashCode();
     }
@@ -563,7 +550,7 @@ public class Lesson implements Serializable {
     /** Is this lesson a preview lesson? ie is it attached to a preview learning design? */
     public boolean isPreviewLesson() {
 	Integer copyTypeID = getLearningDesign().getCopyTypeID();
-	return (copyTypeID != null && LearningDesign.COPY_TYPE_PREVIEW == copyTypeID.intValue());
+	return ((copyTypeID != null) && (LearningDesign.COPY_TYPE_PREVIEW == copyTypeID.intValue()));
     }
 
     /**
@@ -575,16 +562,17 @@ public class Lesson implements Serializable {
     }
 
     private boolean isStarted(Integer stateId) {
-	return (stateId != null && (stateId.equals(STARTED_STATE) || stateId.equals(FINISHED_STATE)
-		|| stateId.equals(ARCHIVED_STATE) || stateId.equals(REMOVED_STATE)));
+	return ((stateId != null) && (stateId.equals(Lesson.STARTED_STATE) || stateId.equals(Lesson.FINISHED_STATE)
+		|| stateId.equals(Lesson.ARCHIVED_STATE) || stateId.equals(Lesson.REMOVED_STATE)));
     }
-    
+
     /**
      * Checks whether learners are allowed to access the lesson based on its state. As they can only access Started or
      * Finished lessons.
      */
     public boolean isLessonAccessibleForLearner() {
-	return (lessonStateId != null && (lessonStateId.equals(STARTED_STATE) || lessonStateId.equals(FINISHED_STATE)));
+	return ((lessonStateId != null) && (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId
+		.equals(Lesson.FINISHED_STATE)));
     }
 
     public Set<GradebookUserLesson> getGradebookUserLessons() {
@@ -601,6 +589,14 @@ public class Lesson implements Serializable {
 
     public void setMarksReleased(Boolean marksReleased) {
 	this.marksReleased = marksReleased;
+    }
+
+    public Boolean getLearnerRestart() {
+	return learnerRestart;
+    }
+
+    public void setLearnerRestart(Boolean learnerRestart) {
+	this.learnerRestart = learnerRestart;
     }
 
     public Set<Lesson> getPrecedingLessons() {

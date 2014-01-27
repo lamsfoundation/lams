@@ -182,6 +182,12 @@ public class HomeAction extends DispatchAction {
 		if (!lesson.isLessonAccessibleForLearner()) {
 		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
 		}
+		
+		if (lesson.getLearnerRestart()) {
+		    // start the lesson from the beginning each time
+		    getLessonService().removeLearnerProgress(lessonId, user.getUserID());
+		}
+		
 
 		String learnerURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "learning/main.jsp";
 

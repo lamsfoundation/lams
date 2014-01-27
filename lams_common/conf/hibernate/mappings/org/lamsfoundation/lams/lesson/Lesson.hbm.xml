@@ -76,6 +76,9 @@
     	<property name="marksReleased" type="java.lang.Boolean"
         	column="marks_released" length="1">
     	</property>
+    	<property name="learnerRestart" type="java.lang.Boolean"
+        	column="learner_restart" length="1">
+    	</property>
 		
 		<!-- Associations -->
 		

@@ -185,6 +185,7 @@
 			
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.section.advanced" /></div>
 			<input id="startMonitorField" name="startMonitor" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.monitor" /></input><br />
+				<input name="learnerRestart" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.restart" /></input><br />
 			<input name="liveEditEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.liveedit" /></input><br />
 			<input name="notificationsEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.notification" /></input><br />
 			<input name="portfolioEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.export" /></input><br />
@@ -202,7 +203,7 @@
 				</tr>
 			</table>
 			<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.scheduling" /></input>
-			<input id="schedulingDatetimeField" name="schedulingDatetime" />
+			<input id="schedulingDatetimeField" name="schedulingDatetime" /><br />
 	</div>
 	
 	<div id="tabConditions" class="tabContent">
