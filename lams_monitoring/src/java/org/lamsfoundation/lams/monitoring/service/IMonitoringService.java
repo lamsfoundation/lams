@@ -75,7 +75,7 @@ public interface IMonitoringService {
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish,
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
 	    Lesson precedingLesson);
 
     /**
@@ -111,7 +111,7 @@ public interface IMonitoringService {
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableNotifications,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableNotifications, Boolean learnerRestart,
 	    Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**

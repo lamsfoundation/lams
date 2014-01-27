@@ -199,9 +199,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
 	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
+	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
 	Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
-		Boolean.FALSE, Boolean.FALSE, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, Boolean.FALSE, null, null);
+		false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+		liveEditEnabled, false, learnerRestart, null, null);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(newLesson.getLessonId());
@@ -283,6 +284,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
 	Date schedulingDatetime = schedulingEnable ? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request
 		.getParameter("schedulingDatetime")) : null;
+	boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
 	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
@@ -339,7 +341,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	    Lesson lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId,
 		    organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
-		    enableLiveEdit, notificationsEnable, timeLimitIndividual, precedingLessonId);
+		    enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
 
 	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation, learnerGroupInstanceName,
 		    lessonInstanceLearners, staffGroupInstanceName, staff, userId);
