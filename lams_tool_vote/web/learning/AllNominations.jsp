@@ -164,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:set var="currentRateKey" scope="request"
 									value="${currentRate.key}" />
 								<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<c:out value="${currentRate.value}" />
+																	 &nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentRate.value}" />
 									<fmt:message key="label.percent" />) 
 														</c:if>
 							</c:forEach>
@@ -179,12 +179,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
 						style="cursor: pointer; height: 30px; border: none"
-						onclick="javascript:drawChart('pie', 0)">
+						onclick="javascript:drawChart('pie', 0, {'currentSessionId' : '${formBean.toolSessionID}'})">
 
 					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 						title="<fmt:message key='label.tip.displayBarChart'/>" 
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('bar', 0)">
+						onclick="javascript:drawChart('bar', 0, {'currentSessionId' : '${formBean.toolSessionID}'})">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">

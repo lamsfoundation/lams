@@ -139,10 +139,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	Set userAttempts = voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
 	request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
-	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
-		voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
-		getMessageService());
+	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
@@ -462,9 +459,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(true).toString());
 
-	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	MonitoringUtil.prepareChartData(request, voteService, null, toolContentID.toString(),
-		toolSessionUid.toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO, getMessageService());
+	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());

@@ -312,17 +312,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	return resultLong.intValue();
     }
 
-    public int getCompletedSessionEntriesCount(final Long voteSessionUid) {
-	List<VoteUsrAttempt> list = getSessionUserEntries(voteSessionUid);
-	int completedSessionCount = 0;
-	for (VoteUsrAttempt att : list) {
-	    String sessionStatus = att.getVoteQueUsr().getVoteSession().getSessionStatus();
-	    //this is a completed session
-	    ++completedSessionCount;
-	}
-	return completedSessionCount;
-    }
-
     public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(voteUsrAttempt);

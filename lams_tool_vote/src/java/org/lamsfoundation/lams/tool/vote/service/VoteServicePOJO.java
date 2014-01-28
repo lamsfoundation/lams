@@ -22,14 +22,20 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -63,8 +69,12 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
@@ -76,6 +86,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -274,6 +285,237 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
+    public VoteGeneralLearnerFlowDTO prepareChartData(HttpServletRequest request, Long toolContentID,
+	    Long toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
+	
+	VoteContent voteContent = this.retrieveVote(toolContentID);
+
+	int entriesCount = 0;
+	Set userEntries = null;
+	if (toolSessionUid != null) {
+	    entriesCount = this.getSessionEntriesCount(toolSessionUid);
+	    userEntries = this.getSessionUserEntriesSet(toolSessionUid);
+	}
+	
+	Long mapIndex = 1L;
+	int totalStandardVotesCount = 0;
+
+	Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
+	Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
+	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
+	Map<Long, String> mapStandardNominationsContent = new TreeMap<Long, String>(new VoteComparator());
+	Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	
+	for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+
+	    mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
+	    String noHTMLNomination = VoteUtils.stripHTML(question.getQuestion());
+	    mapStandardNominationsContent.put(mapIndex, noHTMLNomination);
+
+	    int votesCount = this.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(), toolSessionUid);
+	    totalStandardVotesCount += votesCount;
+	    mapStandardUserCount.put(mapIndex, new Long(votesCount));
+
+	    mapStandardQuestionUid.put(mapIndex, question.getUid());
+	    mapStandardToolSessionUid.put(mapIndex, toolSessionUid);
+
+	    Double voteRate = (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d;
+	    mapVoteRates.put(mapIndex, voteRate);
+	    
+	    // mapIndex++
+	    mapIndex = new Long(mapIndex + 1);
+	}
+	
+	// open votes
+	if (voteContent.isAllowText()) {
+	    int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
+	    Double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / entriesCount) : 0d;
+	    mapVoteRates.put(mapIndex, voteRate);
+
+	    mapStandardNominationsContent.put(mapIndex, messageService.getMessage("label.open.vote"));
+	    mapStandardNominationsHTMLedContent.put(mapIndex, messageService.getMessage("label.open.vote"));
+	    mapStandardUserCount.put(mapIndex, new Long(userEnteredVotesCount));
+	    /** following are needed just for proper iteration in the summary jsp */
+	    mapStandardQuestionUid.put(mapIndex, 1L);
+	    mapStandardToolSessionUid.put(mapIndex, 1L);
+	}
+
+	voteGeneralLearnerFlowDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
+	voteGeneralLearnerFlowDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
+	voteGeneralLearnerFlowDTO.setMapStandardRatesContent(mapVoteRates);
+	voteGeneralLearnerFlowDTO.setMapStandardUserCount(mapStandardUserCount);
+	voteGeneralLearnerFlowDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
+	voteGeneralLearnerFlowDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
+	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+	
+	request.setAttribute(LIST_USER_ENTRIES_CONTENT, userEntries);
+
+	// return value is only used in VoteChartGeneratorAction
+	return voteGeneralLearnerFlowDTO;
+    }
+    
+    @Override
+    public LinkedList<SessionDTO> getSessionDTOs(Long toolContentID) {
+
+	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
+
+	VoteContent voteContent = this.retrieveVote(toolContentID);
+	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+
+	    SessionDTO sessionDTO = new SessionDTO();
+	    sessionDTO.setSessionId(session.getVoteSessionId().toString());
+	    sessionDTO.setSessionName(session.getSession_name());
+
+	    int entriesCount = this.getSessionEntriesCount(session.getUid());
+
+	    // potentialUserCount
+	    int potentialUserCount = this.getVoteSessionPotentialLearnersCount(session.getUid());
+	    sessionDTO.setSessionUserCount(potentialUserCount);
+
+	    // completedSessionUserCount
+	    int completedSessionUserCount = this.getCompletedVoteUserBySessionUid(session.getUid());
+	    sessionDTO.setCompletedSessionUserCount(completedSessionUserCount);
+
+	    Long mapIndex = 1L;
+	    int totalStandardVotesCount = 0;
+
+	    Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    Map<Long, Long> mapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, String> mapStandardNominationsHTMLedContent = new TreeMap<Long, String>(new VoteComparator());
+	    Map<Long, Long> mapStandardQuestionUid = new TreeMap<Long, Long>(new VoteComparator());
+	    Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
+
+	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
+
+		int votesCount = this.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
+			session.getUid());
+		totalStandardVotesCount += votesCount;
+		mapStandardUserCount.put(mapIndex, new Long(votesCount));
+
+		mapStandardQuestionUid.put(mapIndex, question.getUid());
+		mapStandardToolSessionUid.put(mapIndex, session.getUid());
+
+		Double voteRate = (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d;
+		mapVoteRates.put(mapIndex, voteRate);
+
+		// mapIndex++
+		mapIndex = new Long(mapIndex + 1);
+	    }
+
+	    // open votes
+	    if (voteContent.isAllowText()) {
+		int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
+		Double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / entriesCount) : 0d;
+		mapVoteRates.put(mapIndex, voteRate);
+
+		mapStandardNominationsHTMLedContent.put(mapIndex, messageService.getMessage("label.open.vote"));
+		mapStandardUserCount.put(mapIndex, new Long(userEnteredVotesCount));
+		/** following are needed just for proper iteration in the summary jsp */
+		mapStandardQuestionUid.put(mapIndex, 1L);
+		mapStandardToolSessionUid.put(mapIndex, 1L);
+	    }
+
+	    sessionDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
+	    sessionDTO.setMapStandardUserCount(mapStandardUserCount);
+	    sessionDTO.setMapStandardRatesContent(mapVoteRates);
+	    sessionDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
+	    sessionDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
+
+	    List<VoteMonitoredAnswersDTO> openVotes = VoteMonitoringAction.processUserEnteredNominations(this,
+		    voteContent, session.getVoteSessionId().toString(), true, null, false);
+	    sessionDTO.setOpenVotes(openVotes);
+	    boolean isExistsOpenVote = openVotes.size() > 0;
+	    sessionDTO.setExistsOpenVote(isExistsOpenVote);
+
+	    sessionDTOs.add(sessionDTO);
+	}
+
+	// All groups total
+	if (sessionDTOs.size() > 1) {
+	    SessionDTO totalSessionDTO = new SessionDTO();
+	    totalSessionDTO.setSessionId("0");
+	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
+
+	    List<VoteMonitoredAnswersDTO> totalOpenVotes = new ArrayList<VoteMonitoredAnswersDTO>();
+	    int totalPotentialUserCount = 0;
+	    int totalCompletedSessionUserCount = 0;
+	    int allSessionsVotesCount = 0;
+	    Map<Long, Long> totalMapStandardUserCount = new TreeMap<Long, Long>(new VoteComparator());
+	    for (SessionDTO sessionDTO : sessionDTOs) {
+
+		totalPotentialUserCount += sessionDTO.getSessionUserCount();
+		totalCompletedSessionUserCount += sessionDTO.getCompletedSessionUserCount();
+
+		Long mapIndex = 1L;
+		for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
+		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
+			    .get(mapIndex) : 0;
+		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
+
+		    allSessionsVotesCount += votesCount;
+
+		    // mapIndex++
+		    mapIndex = new Long(mapIndex + 1);
+		}
+
+		// open votes
+		if (voteContent.isAllowText()) {
+		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
+		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
+			    .get(mapIndex) : 0;
+		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
+
+		    allSessionsVotesCount += votesCount;
+		}
+
+		totalOpenVotes.addAll(sessionDTO.getOpenVotes());
+	    }
+	    totalSessionDTO.setSessionUserCount(totalPotentialUserCount);
+	    totalSessionDTO.setCompletedSessionUserCount(totalCompletedSessionUserCount);
+	    totalSessionDTO.setOpenVotes(totalOpenVotes);
+	    boolean isExistsOpenVote = totalOpenVotes.size() > 0;
+	    totalSessionDTO.setExistsOpenVote(isExistsOpenVote);
+	    totalSessionDTO.setMapStandardNominationsHTMLedContent(sessionDTOs.get(0)
+		    .getMapStandardNominationsHTMLedContent());
+	    totalSessionDTO.setMapStandardQuestionUid(sessionDTOs.get(0).getMapStandardQuestionUid());
+	    totalSessionDTO.setMapStandardToolSessionUid(sessionDTOs.get(0).getMapStandardToolSessionUid());
+	    totalSessionDTO.setMapStandardUserCount(totalMapStandardUserCount);
+
+	    // All groups total -- totalMapVoteRates part
+	    Long mapIndex = 1L;
+	    Map<Long, Double> totalMapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
+	    int totalStandardVotesCount = 0;
+	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+
+		Long votesCount = totalMapStandardUserCount.get(mapIndex);
+
+		double voteRate = (allSessionsVotesCount != 0) ? ((votesCount * 100) / allSessionsVotesCount) : 0d;
+		totalMapVoteRates.put(mapIndex, voteRate);
+		
+		totalStandardVotesCount += votesCount;
+
+		// mapIndex++
+		mapIndex = new Long(mapIndex + 1);
+	    }
+	    // open votes
+	    if (voteContent.isAllowText()) {
+		int userEnteredVotesCount = allSessionsVotesCount - totalStandardVotesCount;
+		double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / allSessionsVotesCount)
+			: 0;
+		totalMapVoteRates.put(mapIndex, voteRate);
+	    }
+	    totalSessionDTO.setMapStandardRatesContent(totalMapVoteRates);
+
+	    sessionDTOs.addFirst(totalSessionDTO);
+	}
+
+	return sessionDTOs;
+    }
+
     public void createVote(VoteContent voteContent) throws VoteApplicationException {
 	try {
 	    voteContentDAO.saveVoteContent(voteContent);
@@ -368,15 +610,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    e);
 	}
 
-    }
-
-    public int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getCompletedSessionEntriesCount(voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting completed session user entries count: " + e.getMessage(), e);
-	}
     }
 
     public List getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException {

@@ -268,10 +268,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteLearningForm.setReportViewOnly(new Boolean(true).toString());
 	    voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
 
-	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
-		    voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
-		    getMessageService());
+	    voteService.prepareChartData(request, voteContent.getVoteContentId(), voteSession.getUid(),
+		    voteGeneralLearnerFlowDTO);
 
 	    boolean isGroupedActivity = voteService.isGroupedActivity(new Long(voteLearningForm.getToolContentID()));
 	    request.setAttribute("isGroupedActivity", isGroupedActivity);
@@ -311,10 +309,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 			sessionUid);
 		request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
-		VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
-			voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
-			getMessageService());
+		voteService.prepareChartData(request, voteContent.getVoteContentId(), voteSession.getUid(),
+			voteGeneralLearnerFlowDTO);
 
 		String isContentLockOnFinish = voteLearningForm.getLockOnFinish();
 		if (isContentLockOnFinish.equals(new Boolean(true).toString()) && isResponseFinalised == true) {

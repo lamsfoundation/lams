@@ -575,8 +575,50 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			voteMonitoredAnswersDTO.setSessionId(currentSessionId);
 			voteMonitoredAnswersDTO.setSessionName(currentSessionName);
 
-			Map questionAttemptData = MonitoringUtil.buildGroupsAttemptData(request, voteContent, voteService,
-				voteQueContent, voteQueContent.getUid().toString(), currentSessionId);
+			String questionUid = voteQueContent.getUid().toString();
+
+			List listMonitoredAttemptsContainerDTO = new LinkedList();
+
+			Map<String, String> summaryToolSessions = MonitoringUtil.populateToolSessionsId(voteContent,
+				voteService);
+
+			Iterator itMap = summaryToolSessions.entrySet().iterator();
+
+			/* request is for monitoring summary */
+
+			if (currentSessionId != null) {
+			    if (currentSessionId.equals("All")) {
+				// **summary request is for All**
+				while (itMap.hasNext()) {
+				    Map.Entry pairs = (Map.Entry) itMap.next();
+				    if (!(pairs.getValue().toString().equals("None"))
+					    && !(pairs.getValue().toString().equals("All"))) {
+					VoteSession voteSession2 = voteService.retrieveVoteSession(new Long(pairs
+						.getValue().toString()));
+					if (voteSession2 != null) {
+					    List<VoteQueUsr> listUsers = voteService.getUserBySessionOnly(voteSession2);
+					    Map sessionUsersAttempts = MonitoringUtil.populateSessionUsersAttempts(
+						    request, voteService, voteSession2.getVoteSessionId(), listUsers,
+						    questionUid, true, false, null);
+					    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+					}
+				    }
+				}
+			    } else if (!currentSessionId.equals("All")) {
+				// **summary request is for currentSessionId** currentSessionId
+
+				List listUsers = voteService.getUserBySessionOnly(voteSession);
+
+				Map sessionUsersAttempts = MonitoringUtil.populateSessionUsersAttempts(request,
+					voteService, new Long(currentSessionId), listUsers, questionUid, true, false,
+					null);
+				listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+			    }
+			}
+
+			Map<String, Map> questionAttemptData = MonitoringUtil.convertToMap(listMonitoredAttemptsContainerDTO);
+			
+			
 			voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 
 			listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);

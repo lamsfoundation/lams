@@ -20,10 +20,7 @@
 	
 	$(document).ready(function(){
 		<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
-			<c:if test="${currentDto.sessionId != 0}">
-			drawChart('bar', ${currentDto.sessionId}0, {'currentSessionId' : '${currentDto.sessionId}'});
-			drawChart('pie', ${currentDto.sessionId}1, {'currentSessionId' : '${currentDto.sessionId}'});
-			</c:if>
+			drawChart('pie', ${currentDto.sessionId}, {'currentSessionId' : '${currentDto.sessionId}', 'toolContentID' : '${toolContentID}'});
 		</c:forEach>
 	});
 

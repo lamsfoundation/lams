@@ -22,8 +22,11 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -34,7 +37,9 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -71,6 +76,25 @@ public interface IVoteService {
      * @param leader
      */
     void copyAnswersFromLeader(VoteQueUsr user, VoteQueUsr leader);
+    
+    /**
+     * Generates chart data for the learner module and monitoring module Summary tab (Individual Sessions mode)
+     * 
+     * @param request
+     * @param voteService
+     * @param toolContentID
+     * @param toolSessionUid
+     */
+    VoteGeneralLearnerFlowDTO prepareChartData(HttpServletRequest request, Long toolContentID, Long toolSessionUid,
+	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO);
+    
+    /**
+     * Generates data for all sessions in the Monitoring Summary, including all sessions summary.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
 
     void createVote(VoteContent voteContent) throws VoteApplicationException;
 
@@ -129,8 +153,6 @@ public interface IVoteService {
 	    throws VoteApplicationException;
 
     int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
-
-    int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException;
 
     List getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
 	    throws VoteApplicationException;

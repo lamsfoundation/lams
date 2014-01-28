@@ -23,6 +23,9 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +37,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Prepares data for charts.
@@ -51,30 +59,48 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 public class VoteChartGeneratorAction extends LamsDispatchAction {
 
     private static IVoteService voteService;
-    private static MessageService messageService;
 
     @SuppressWarnings("unchecked")
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	String currentSessionId = request.getParameter("currentSessionId");
 
-	if (!StringUtils.isBlank(currentSessionId)) {
-	    // it is a call from Monitor
+	Map<Long, String> nominationNames = new HashMap<Long, String>();
+	Map<Long, Double> nominationVotes = new HashMap<Long, Double>();
+	
+	//request for the all session summary
+	if ("0".equals(currentSessionId)) {
+	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	    LinkedList<SessionDTO> sessionDTOs = getVoteService().getSessionDTOs(toolContentID);
+	
+	    // check allSessionsSummary exists
+	    SessionDTO allSessionsSummary = sessionDTOs.getFirst();
+	    if ("0".equals(allSessionsSummary.getSessionId())) {
+		nominationNames = allSessionsSummary.getMapStandardNominationsHTMLedContent();
+		nominationVotes = allSessionsSummary.getMapStandardRatesContent();
+		
+		//replace all html tags
+		for (Long index : nominationNames.keySet()) {
+		    String name = nominationNames.get(index);
+		    String noHTMLNomination = VoteUtils.stripHTML(name);
+		    nominationNames.put(index, noHTMLNomination);
+		}
+	    }
+	    
+	//sessionId should not be blank
+	} else if (!StringUtils.isBlank(currentSessionId)) {
 	    VoteSession voteSession = getVoteService().retrieveVoteSession(new Long(currentSessionId));
 	    VoteContent voteContent = voteSession.getVoteContent();
 
-	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	    MonitoringUtil.prepareChartData(request, getVoteService(), null, voteContent.getVoteContentId().toString(),
-		    voteSession.getUid().toString(), null, voteGeneralMonitoringDTO, getMessageService());
+	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = getVoteService().prepareChartData(request,
+		    voteContent.getVoteContentId(), voteSession.getUid(), new VoteGeneralLearnerFlowDTO());
+
+	    nominationNames = voteGeneralLearnerFlowDTO.getMapStandardNominationsContent();
+	    nominationVotes = voteGeneralLearnerFlowDTO.getMapStandardRatesContent();
 	}
 
-	Map<String, String> nominationNames = (Map<String, String>) request.getSession().getAttribute(
-		VoteAppConstants.MAP_STANDARD_NOMINATIONS_CONTENT);
-	Map<String, String> nominationVotes = (Map<String, String>) request.getSession().getAttribute(
-		VoteAppConstants.MAP_STANDARD_RATES_CONTENT);
-
 	JSONObject responseJSON = new JSONObject();
-	for (String index : nominationNames.keySet()) {
+	for (Long index : nominationNames.keySet()) {
 	    JSONObject nomination = new JSONObject();
 	    // nominations' names and values go separately
 	    nomination.put("name", nominationNames.get(index));
@@ -85,13 +111,6 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
-    }
-
-    private MessageService getMessageService() {
-	if (messageService == null) {
-	    messageService = (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
-	}
-	return messageService;
     }
 
     private IVoteService getVoteService() {

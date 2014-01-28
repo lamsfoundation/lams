@@ -96,17 +96,17 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapGeneralCheckedOptionsContent;
 
-    protected Map mapStandardNominationsContent;
+    protected Map<Long, String> mapStandardNominationsContent;
 
-    protected Map mapStandardNominationsHTMLedContent;
+    protected Map<Long, String> mapStandardNominationsHTMLedContent;
 
-    protected Map mapStandardRatesContent;
+    protected Map<Long, Double> mapStandardRatesContent;
 
-    protected Map mapStandardUserCount;
+    protected Map<Long, Long> mapStandardUserCount;
 
-    protected Map mapStandardQuestionUid;
+    protected Map<Long, Long> mapStandardQuestionUid;
 
-    protected Map mapStandardToolSessionUid;
+    protected Map<Long, Long> mapStandardToolSessionUid;
 
     protected List listMonitoredAnswersContainerDto;
 
@@ -507,7 +507,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapStandardNominationsContent.
      */
-    public Map getMapStandardNominationsContent() {
+    public Map<Long, String> getMapStandardNominationsContent() {
 	return mapStandardNominationsContent;
     }
 
@@ -515,14 +515,14 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardNominationsContent
      *            The mapStandardNominationsContent to set.
      */
-    public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
+    public void setMapStandardNominationsContent(Map<Long, String> mapStandardNominationsContent) {
 	this.mapStandardNominationsContent = mapStandardNominationsContent;
     }
 
     /**
      * @return Returns the mapStandardNominationsHTMLedContent.
      */
-    public Map getMapStandardNominationsHTMLedContent() {
+    public Map<Long, String> getMapStandardNominationsHTMLedContent() {
 	return mapStandardNominationsHTMLedContent;
     }
 
@@ -530,14 +530,14 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardNominationsHTMLedContent
      *            The mapStandardNominationsHTMLedContent to set.
      */
-    public void setMapStandardNominationsHTMLedContent(Map mapStandardNominationsHTMLedContent) {
+    public void setMapStandardNominationsHTMLedContent(Map<Long, String> mapStandardNominationsHTMLedContent) {
 	this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
     }
 
     /**
      * @return Returns the mapStandardRatesContent.
      */
-    public Map getMapStandardRatesContent() {
+    public Map<Long, Double> getMapStandardRatesContent() {
 	return mapStandardRatesContent;
     }
 
@@ -545,14 +545,14 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardRatesContent
      *            The mapStandardRatesContent to set.
      */
-    public void setMapStandardRatesContent(Map mapStandardRatesContent) {
+    public void setMapStandardRatesContent(Map<Long, Double> mapStandardRatesContent) {
 	this.mapStandardRatesContent = mapStandardRatesContent;
     }
 
     /**
      * @return Returns the mapStandardUserCount.
      */
-    public Map getMapStandardUserCount() {
+    public Map<Long, Long> getMapStandardUserCount() {
 	return mapStandardUserCount;
     }
 
@@ -560,7 +560,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardUserCount
      *            The mapStandardUserCount to set.
      */
-    public void setMapStandardUserCount(Map mapStandardUserCount) {
+    public void setMapStandardUserCount(Map<Long, Long> mapStandardUserCount) {
 	this.mapStandardUserCount = mapStandardUserCount;
     }
 
@@ -597,7 +597,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapStandardQuestionUid.
      */
-    public Map getMapStandardQuestionUid() {
+    public Map<Long, Long> getMapStandardQuestionUid() {
 	return mapStandardQuestionUid;
     }
 
@@ -605,14 +605,14 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardQuestionUid
      *            The mapStandardQuestionUid to set.
      */
-    public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
+    public void setMapStandardQuestionUid(Map<Long, Long> mapStandardQuestionUid) {
 	this.mapStandardQuestionUid = mapStandardQuestionUid;
     }
 
     /**
      * @return Returns the mapStandardToolSessionUid.
      */
-    public Map getMapStandardToolSessionUid() {
+    public Map<Long, Long> getMapStandardToolSessionUid() {
 	return mapStandardToolSessionUid;
     }
 
@@ -620,7 +620,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapStandardToolSessionUid
      *            The mapStandardToolSessionUid to set.
      */
-    public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
+    public void setMapStandardToolSessionUid(Map<Long, Long> mapStandardToolSessionUid) {
 	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
 
