@@ -405,7 +405,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Integer userID = getUserId();
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, true, false, false, true, true, null, null);
+		    null, false, false, true, false, false, true, true, false, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();

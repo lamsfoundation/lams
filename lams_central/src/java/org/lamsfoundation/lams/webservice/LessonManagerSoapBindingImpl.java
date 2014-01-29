@@ -57,93 +57,102 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LessonManagerSoapBindingImpl implements LessonManager {
 
-	private static MessageContext context = MessageContext.getCurrentContext();
-	
-	private static IntegrationService integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
-			.getBean("integrationService");
+    private static MessageContext context = MessageContext.getCurrentContext();
 
-	private static IMonitoringService monitoringService = (IMonitoringService) WebApplicationContextUtils.getRequiredWebApplicationContext(((HttpServlet)context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
-			.getBean("monitoringService");
+    private static IntegrationService integrationService = (IntegrationService) WebApplicationContextUtils
+	    .getRequiredWebApplicationContext(
+		    ((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
+			    .getServletContext()).getBean("integrationService");
 
-	public Long startLesson(String serverId, String datetime, String hashValue, String username,
-			long ldId, String courseId, String title, String desc, String countryIsoCode,
-			String langIsoCode, String customCSV) throws RemoteException {
-		try {
-			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-			Authenticator.authenticate(serverMap, datetime, username, hashValue);
-			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
-			// 1. init lesson
-                	Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap.getOrganisation()
-                		.getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false, true, false, false,
-                		false, false, null, null);
-			// 2. create lessonClass for lesson
-			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
-			// 3. start lesson
-			monitoringService.startLesson(lesson.getLessonId(), userMap.getUser().getUserId());
-			return lesson.getLessonId();
-		} catch (Exception e) {
-			throw new RemoteException(e.getMessage(), e);
-		}
+    private static IMonitoringService monitoringService = (IMonitoringService) WebApplicationContextUtils
+	    .getRequiredWebApplicationContext(
+		    ((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
+			    .getServletContext()).getBean("monitoringService");
+
+    @Override
+    public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
+	    throws RemoteException {
+	try {
+	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+		    username);
+	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
+		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	    // 1. init lesson
+	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId, orgMap
+		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
+		    true, false, false, false, false, false, null, null);
+	    // 2. create lessonClass for lesson
+	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
+	    // 3. start lesson
+	    LessonManagerSoapBindingImpl.monitoringService.startLesson(lesson.getLessonId(), userMap.getUser()
+		    .getUserId());
+	    return lesson.getLessonId();
+	} catch (Exception e) {
+	    throw new RemoteException(e.getMessage(), e);
 	}
+    }
 
-	public Long scheduleLesson(String serverId, String datetime, String hashValue, String username,
-			long ldId, String courseId, String title, String desc, String startDate,
-			String countryIsoCode, String langIsoCode, String customCSV) throws RemoteException {
-		try {
-			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-			Authenticator.authenticate(serverMap, datetime, username, hashValue);
-			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
-			// 1. init lesson
-                	Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap.getOrganisation()
-                		.getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false, true, false, false,
-                		false, false, null, null);
-			// 2. create lessonClass for lesson
-			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
-			// 3. schedule lesson
-			Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-			monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
-			return lesson.getLessonId();
-		} catch (Exception e) {
-			throw new RemoteException(e.getMessage(), e);
-		}
+    @Override
+    public Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
+	    String customCSV) throws RemoteException {
+	try {
+	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+		    username);
+	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
+		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	    // 1. init lesson
+	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId, orgMap
+		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
+		    true, false, false, false, false, false, null, null);
+	    // 2. create lessonClass for lesson
+	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
+	    // 3. schedule lesson
+	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
+	    LessonManagerSoapBindingImpl.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap
+		    .getUser().getUserId());
+	    return lesson.getLessonId();
+	} catch (Exception e) {
+	    throw new RemoteException(e.getMessage(), e);
 	}
+    }
 
-	public boolean deleteLesson(String serverId, String datetime, String hashValue,
-			String username, long lsId) throws RemoteException {
-		try {
-			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-			Authenticator.authenticate(serverMap, datetime, username, hashValue);
-			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			monitoringService.removeLesson(lsId, userMap.getUser().getUserId());
-			return true;
-		} catch (Exception e) {
-			throw new RemoteException(e.getMessage(), e);
-		}
+    @Override
+    public boolean deleteLesson(String serverId, String datetime, String hashValue, String username, long lsId)
+	    throws RemoteException {
+	try {
+	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+		    username);
+	    LessonManagerSoapBindingImpl.monitoringService.removeLesson(lsId, userMap.getUser().getUserId());
+	    return true;
+	} catch (Exception e) {
+	    throw new RemoteException(e.getMessage(), e);
 	}
+    }
 
-	@SuppressWarnings("unchecked")
-	private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
-		List<User> staffList = new LinkedList<User>();
-		staffList.add(creator);
-		List<User> learnerList = new LinkedList<User>();
-		IUserManagementService userManagementService = (IUserManagementService) WebApplicationContextUtils
-				.getRequiredWebApplicationContext(
-						((HttpServlet) context
-								.getProperty(HTTPConstants.MC_HTTP_SERVLET))
-								.getServletContext()).getBean(
-						"userManagementService");
-		Vector<User> learnerVector = userManagementService
-				.getUsersFromOrganisationByRole(organisation
-						.getOrganisationId(), Role.LEARNER, false, true);
-		learnerList.addAll(learnerVector);
-		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
-				organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff",
-				staffList, creator.getUserId());
+    @SuppressWarnings("unchecked")
+    private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
+	List<User> staffList = new LinkedList<User>();
+	staffList.add(creator);
+	List<User> learnerList = new LinkedList<User>();
+	IUserManagementService userManagementService = (IUserManagementService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(
+			((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
+				.getServletContext()).getBean("userManagementService");
+	Vector<User> learnerVector = userManagementService.getUsersFromOrganisationByRole(
+		organisation.getOrganisationId(), Role.LEARNER, false, true);
+	learnerList.addAll(learnerVector);
+	LessonManagerSoapBindingImpl.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
+		creator.getUserId());
 
-	}
+    }
 
 }
