@@ -839,6 +839,19 @@ b.error {
 	color: #cc0000;
 }
 
+.info {
+	color: #000000;
+	padding:8px 10px 10px 40px;
+	margin-top: 25px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+	font-weight: normal;
+	background: url('../images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
+	width: 70%;
+	border: 1px solid #3c78b5;
+}
+
 /* ***********************************************
     Monitoring page styles
 ************************************************ */
