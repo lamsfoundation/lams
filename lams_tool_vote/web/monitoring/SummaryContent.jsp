@@ -47,9 +47,16 @@
 			<tr>
 		</table>
 	</c:if>							
-</c:if>			
+</c:if>
 
-<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }">						
+<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }">
+
+	<c:if test="${useSelectLeaderToolOuput}">
+		<div class="info space-bottom">
+			<fmt:message key="label.info.use.select.leader.outputs" />
+		</div>
+	</c:if>
+
 	<jsp:include page="/monitoring/AllSessionsSummary.jsp" />
 					
 	<jsp:include page="/monitoring/Reflections.jsp" />
@@ -57,7 +64,7 @@
 
 <c:if test="${noSessionsNotebookEntriesExist == 'true'}">
 	<jsp:include page="/monitoring/Reflections.jsp" />
-</c:if>						
+</c:if>
 		
 <%@include file="AdvanceOptions.jsp"%>
 

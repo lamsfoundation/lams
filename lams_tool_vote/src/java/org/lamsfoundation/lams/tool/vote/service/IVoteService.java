@@ -37,9 +37,11 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -95,6 +97,11 @@ public interface IVoteService {
      * @return
      */
     LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
+
+    List<VoteMonitoredAnswersDTO> processUserEnteredNominations(VoteContent voteContent, String currentSessionId,
+	    boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId);
+    
+    List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
 
     void createVote(VoteContent voteContent) throws VoteApplicationException;
 

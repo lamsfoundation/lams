@@ -149,19 +149,21 @@
 		</fmt:message>
 	</p>
 	
-	<p class="float-right " style="margin-right: 8%;">
-		<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
-			title="<fmt:message key='label.tip.displayPieChart'/>"
-			style="cursor: pointer; height: 30px; border: none"
-			onclick="javascript:drawChart('pie', ${sessionDto.sessionId})">
-
-		<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
-			title="<fmt:message key='label.tip.displayBarChart'/>" 
-			style="cursor: pointer;" height="30" border="0"
-			onclick="javascript:drawChart('bar', ${sessionDto.sessionId})">
-	</p>
+	<c:if test="${!statsTabActive}">
+		<p class="float-right " style="margin-right: 8%;">
+			<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
+				title="<fmt:message key='label.tip.displayPieChart'/>"
+				style="cursor: pointer; height: 30px; border: none"
+				onclick="javascript:drawChart('pie', ${sessionDto.sessionId})">
 	
-	<p id="chartDiv${sessionDto.sessionId}" style="height: 220px; display: none;" class="space-bottom"></p>
+			<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
+				title="<fmt:message key='label.tip.displayBarChart'/>" 
+				style="cursor: pointer;" height="30" border="0"
+				onclick="javascript:drawChart('bar', ${sessionDto.sessionId})">
+		</p>
+	
+		<p id="chartDiv${sessionDto.sessionId}" style="height: 220px; display: none;" class="space-bottom"></p>
+	</c:if>
 
 	<c:if test="${fn:length(voteGeneralMonitoringDTO.sessionDTOs) > 1}">
 		<br><br><hr size="2">

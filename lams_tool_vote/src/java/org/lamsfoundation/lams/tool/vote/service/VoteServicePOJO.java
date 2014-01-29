@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -69,12 +70,14 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
@@ -86,6 +89,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.web.MonitoringUtil;
 import org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -424,8 +428,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    sessionDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 	    sessionDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 
-	    List<VoteMonitoredAnswersDTO> openVotes = VoteMonitoringAction.processUserEnteredNominations(this,
-		    voteContent, session.getVoteSessionId().toString(), true, null, false);
+	    List<VoteMonitoredAnswersDTO> openVotes = this.processUserEnteredNominations(voteContent, session
+		    .getVoteSessionId().toString(), true, null, false);
 	    sessionDTO.setOpenVotes(openVotes);
 	    boolean isExistsOpenVote = openVotes.size() > 0;
 	    sessionDTO.setExistsOpenVote(isExistsOpenVote);
@@ -514,6 +518,159 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 
 	return sessionDTOs;
+    }
+
+    @Override
+    public List<VoteMonitoredAnswersDTO> processUserEnteredNominations(VoteContent voteContent,
+	    String currentSessionId, boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId) {
+	Set userEntries = this.getUserEntries();
+
+	List<VoteMonitoredAnswersDTO> listUserEntries = new LinkedList<VoteMonitoredAnswersDTO>();
+
+	Iterator itListNominations = userEntries.iterator();
+	while (itListNominations.hasNext()) {
+	    String userEntry = (String) itListNominations.next();
+
+	    if (userEntry != null && userEntry.length() > 0) {
+		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
+		voteMonitoredAnswersDTO.setQuestion(userEntry);
+
+		List userRecords = this.getUserRecords(userEntry);
+		List listMonitoredUserContainerDTO = new LinkedList();
+
+		Iterator itUserRecords = userRecords.iterator();
+		while (itUserRecords.hasNext()) {
+		    VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+		    VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) itUserRecords.next();
+
+		    VoteSession localUserSession = voteUsrAttempt.getVoteQueUsr().getVoteSession();
+
+		    if (showUserEntriesBySession == false) {
+			if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString())) {
+			    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+			    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+			    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+			    voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+			    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+			    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+			    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+			    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+			}
+		    } else {
+			// showUserEntriesBySession is true: the case with learner export portfolio
+			// show user entries by same content and same session and same user
+			String userSessionId = voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId()
+				.toString();
+
+			if (showUserEntriesByUserId == true) {
+			    if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString())) {
+				if (userSessionId.equals(currentSessionId)) {
+				    String localUserId = voteUsrAttempt.getVoteQueUsr().getQueUsrId().toString();
+				    if (userId.equals(localUserId)) {
+					voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+					voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+					voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+					voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid()
+						.toString());
+					voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+					listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+					voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+					voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible())
+						.toString());
+					if (voteUsrAttempt.isVisible() == false) {
+					    voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
+					}
+
+				    }
+				}
+			    }
+			} else {
+			    // showUserEntriesByUserId is false
+			    // show user entries by same content and same session
+			    if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString())) {
+				if (userSessionId.equals(currentSessionId)) {
+				    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+				    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+				    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+				    voteMonitoredUserDTO
+					    .setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+				    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+				    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+				    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+				    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+				}
+			    }
+			}
+		    }
+
+		}
+
+		if (listMonitoredUserContainerDTO.size() > 0) {
+		    Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringUtil
+			    .convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+
+		    voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);
+		    listUserEntries.add(voteMonitoredAnswersDTO);
+		}
+	    }
+	}
+
+	return listUserEntries;
+    }
+    
+    @Override
+    public List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID) {
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
+
+	if (userID == null) {
+	    for (Iterator sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
+		VoteSession voteSession = (VoteSession) sessionIter.next();
+
+		for (Iterator userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
+		    VoteQueUsr user = (VoteQueUsr) userIter.next();
+
+		    NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(user
+				    .getQueUsrId().toString()));
+
+		    if (notebookEntry != null) {
+			ReflectionDTO reflectionDTO = new ReflectionDTO();
+			reflectionDTO.setUserId(user.getQueUsrId().toString());
+			reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
+			reflectionDTO.setUserName(user.getFullname());
+			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntryPresentable);
+			reflectionsContainerDTO.add(reflectionDTO);
+		    }
+		}
+	    }
+	} else {
+	    for (Iterator sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
+		VoteSession voteSession = (VoteSession) sessionIter.next();
+		for (Iterator userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
+		    VoteQueUsr user = (VoteQueUsr) userIter.next();
+		    if (user.getQueUsrId().equals(userID)) {
+			NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(user
+					.getQueUsrId().toString()));
+
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
+			    reflectionDTO.setUserName(user.getFullname());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionsContainerDTO.add(reflectionDTO);
+			}
+		    }
+		}
+	    }
+	}
+	
+	return reflectionsContainerDTO;
     }
 
     public void createVote(VoteContent voteContent) throws VoteApplicationException {

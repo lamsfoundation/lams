@@ -35,7 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  */
 public class VoteGeneralMonitoringDTO implements Comparable {
-    protected String currentMonitoringTab;
     protected String defineLaterInEditMode;
     protected String requestLearningReport;
     protected String userExceptionNoToolSessions;
@@ -194,21 +193,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
      */
     public void setActivityTitle(String activityTitle) {
 	this.activityTitle = activityTitle;
-    }
-
-    /**
-     * @return Returns the currentMonitoringTab.
-     */
-    public String getCurrentMonitoringTab() {
-	return currentMonitoringTab;
-    }
-
-    /**
-     * @param currentMonitoringTab
-     *            The currentMonitoringTab to set.
-     */
-    public void setCurrentMonitoringTab(String currentMonitoringTab) {
-	this.currentMonitoringTab = currentMonitoringTab;
     }
 
     /**
@@ -574,7 +558,7 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     public String toString() {
 	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
 		.append("activeModule: ", activeModule).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("currentMonitoringTab: ", currentMonitoringTab).append("currentTab: ", currentTab)
+		.append("currentTab: ", currentTab)
 		.append("requestLearningReport: ", requestLearningReport)
 		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
 		.append("userExceptionContentDoesNotExist: ", userExceptionContentDoesNotExist)

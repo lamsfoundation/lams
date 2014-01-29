@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
+import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
+import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
@@ -108,12 +111,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 
 	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 
-	    VoteMonitoringAction voteMonitoringAction = new VoteMonitoringAction();
-	    voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true,
+	    VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, true, true,
 		    toolSessionID.toString(), userID.toString(), true, null, voteGeneralMonitoringDTO,
 		    exportPortfolioDTO);
 
-	    voteMonitoringAction.prepareReflectionData(request, content, voteService, userID.toString(), true);
+	    List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(content, userID);
+	    request.setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	    request.getSession().setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	    
 	} else {
 	    // thise field is needed for the jsp.
 	    exportPortfolioDTO.setUserExceptionNoToolSessions("false");
@@ -146,13 +151,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	exportPortfolioDTO.setAllowText(content.isAllowText());
 
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	VoteMonitoringAction voteMonitoringAction = new VoteMonitoringAction();
 
-	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null,
+	VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null,
 		voteGeneralMonitoringDTO, exportPortfolioDTO);
 
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
 
-	voteMonitoringAction.prepareReflectionData(request, content, voteService, null, true);
+	List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(content, null);
+	request.setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	request.getSession().setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
     }
 }

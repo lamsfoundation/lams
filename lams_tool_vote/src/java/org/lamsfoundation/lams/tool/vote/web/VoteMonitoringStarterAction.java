@@ -44,11 +44,14 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.EditActivityDTO;
+import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
+import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
+import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
@@ -63,10 +66,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
- * <p>
  * Starts up the monitoring module
- * </p>
  * 
  * @author Ozgur Demirtas
  */
@@ -79,158 +79,21 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
-	MessageService messageService = VoteServiceProxy.getMessageService(getServlet().getServletContext());
-
 	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
+	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
+	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
 	ActionForward validateParameters = validateParameters(request, mapping, voteMonitoringForm);
-
 	if (validateParameters != null) {
 	    return validateParameters;
 	}
 
-	boolean initData = initialiseMonitoringData(mapping, form, request, response, voteService,
-		voteGeneralMonitoringDTO);
-	if (initData == false)
-	    return (mapping.findForward(ERROR_LIST));
-
-	voteMonitoringForm.setCurrentTab("1");
-	voteGeneralMonitoringDTO.setCurrentTab("1");
-
-	String toolContentID = voteMonitoringForm.getToolContentID();
-
-	voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-	// Come back to fix here
-	voteGeneralMonitoringDTO.setCountAllUsers(new Integer(0).toString());
-	voteGeneralMonitoringDTO.setCountSessionComplete(new Integer(0).toString());
-
-	initSummaryContent(toolContentID, request, voteService, voteGeneralMonitoringDTO);
-
-	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
-
-	/* true means there is at least 1 response */
-	if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-	} else {
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-	}
-
-	voteMonitoringForm.setActiveModule(MONITORING);
-	voteGeneralMonitoringDTO.setActiveModule(MONITORING);
-
-	voteGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-	voteGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
-
-	request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
-	/* this section is needed for Edit Activity screen, from here... */
-	voteGeneralAuthoringDTO.setActivityTitle(voteGeneralMonitoringDTO.getActivityTitle());
-	voteGeneralAuthoringDTO.setActivityInstructions(voteGeneralMonitoringDTO.getActivityInstructions());
-	voteGeneralAuthoringDTO.setDefaultOptionContent(voteGeneralMonitoringDTO.getDefaultOptionContent());
-	voteGeneralAuthoringDTO.setMapOptionsContent(voteGeneralMonitoringDTO.getMapOptionsContent());
-	voteGeneralAuthoringDTO.setActiveModule(MONITORING);
-
-	Map mapOptionsContent = voteGeneralMonitoringDTO.getMapOptionsContent();
-	int maxIndex = mapOptionsContent.size();
-	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex);
-
-	request.setAttribute(VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-	/* ...till here */
-
-	MonitoringUtil.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
-
-	List<SessionDTO> sessionDTOs = voteService.getSessionDTOs(new Long(toolContentID));
-	voteGeneralMonitoringDTO.setSessionDTOs(sessionDTOs);
-	
-	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
-
-	voteGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-
-	// initInstructionsContent(toolContentID, request, voteService, voteGeneralMonitoringDTO);
-	initStatsContent(toolContentID, request, voteService, voteGeneralMonitoringDTO);
-	/* setting editable screen properties */
-
-	Map mapOptionsContent2 = new TreeMap(new VoteComparator());
-	Iterator queIterator = voteContent.getVoteQueContents().iterator();
-	Long mapIndex = new Long(1);
-	while (queIterator.hasNext()) {
-	    VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
-	    if (voteQueContent != null) {
-		mapOptionsContent2.put(mapIndex.toString(), voteQueContent.getQuestion());
-		/**
-		 * make the first entry the default(first) one for jsp
-		 */
-		if (mapIndex.longValue() == 1) {
-		    voteGeneralAuthoringDTO.setDefaultOptionContent(voteQueContent.getQuestion());
-		}
-
-		mapIndex = new Long(mapIndex.longValue() + 1);
-	    }
-	}
-
-	int maxIndex2 = mapOptionsContent2.size();
-	voteGeneralAuthoringDTO.setMaxOptionIndex(maxIndex2);
-
-	voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent2);
-
-	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
-	voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
-	if (isContentInUse == true) {
-	    //monitoring url does not allow editActivity since the content is in use
-	    voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
-	}
-
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-
-	VoteMonitoringAction.prepareReflectionData(request, voteContent, voteService, null, false);
-
-	if (voteService.studentActivityOccurredGlobal(voteContent)) {
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-	} else {
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-	}
-
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(VoteAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-
-	/* find out if there are any reflection entries, from here */
-	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(voteService, voteContent);
-	if (notebookEntriesExist) {
-	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-
-	    String userExceptionNoToolSessions = voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-
-	    if (userExceptionNoToolSessions.equals("true")) {
-		//there are no online student activity but there are reflections
-		request.setAttribute(VoteAppConstants.NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-	    }
-	} else {
-	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-	}
-	/* ... till here */
-
-	MonitoringUtil.buildVoteStatsDTO(request, voteService, voteContent);
-	
-	return mapping.findForward(VoteAppConstants.LOAD_MONITORING);
-    }
-    
-   private boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, IVoteService voteService, VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) {
-	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
-
-	voteGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
+	//initialiseMonitoringData
 	voteGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 	voteGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-	voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 
 	VoteUtils.saveTimeZone(request);
 
@@ -241,13 +104,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	if (voteContent == null) {
 	    VoteUtils.cleanUpSessionAbsolute(request);
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(new Boolean(true).toString());
-	    return false;
-	}
-
-	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
-	voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
-	if (isContentInUse == true) {
-	    voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
+	    return (mapping.findForward(ERROR_LIST));
 	}
 
 	voteGeneralMonitoringDTO.setActivityTitle(voteContent.getTitle());
@@ -256,16 +113,12 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
 	    VoteUtils.cleanUpSessionAbsolute(request);
 	    voteGeneralMonitoringDTO.setUserExceptionContentInUse(new Boolean(true).toString());
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-	} else {
-	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
 	/*
 	 * get the nominations section is needed for the Edit tab's View Only mode, starts here
 	 */
-
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	sessionMap.put(ACTIVITY_TITLE_KEY, voteContent.getTitle());
 	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, voteContent.getInstructions());
 
@@ -275,7 +128,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	List listNominationContentDTO = new LinkedList();
 
 	Map mapOptionsContent = new TreeMap(new VoteComparator());
-	mapOptionsContent.clear();
 	Iterator queIterator = voteContent.getVoteQueContents().iterator();
 	Long mapIndex = new Long(1);
 	while (queIterator.hasNext()) {
@@ -288,6 +140,11 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		voteNominationContentDTO.setQuestion(voteQueContent.getQuestion());
 		voteNominationContentDTO.setDisplayOrder(new Integer(voteQueContent.getDisplayOrder()).toString());
 		listNominationContentDTO.add(voteNominationContentDTO);
+		
+		//make the first entry the default(first) one for jsp
+		if (mapIndex.longValue() == 1) {
+		    voteGeneralAuthoringDTO.setDefaultOptionContent(voteQueContent.getQuestion());
+		}
 
 		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
@@ -300,49 +157,42 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 	request.setAttribute(TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
-	VoteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null, false,
+	VoteMonitoringStarterAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null, false,
 		null, voteGeneralMonitoringDTO, null);
 
 	voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
 
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	isContentInUse = VoteUtils.isContentInUse(voteContent);
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+	voteMonitoringForm.setCurrentTab("1");
+	voteGeneralMonitoringDTO.setCurrentTab("1");
 
-	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(voteService, voteContent);
-
-	if (notebookEntriesExist) {
-	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-
-	    String userExceptionNoToolSessions = (String) voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-
-	    if (userExceptionNoToolSessions.equals("true")) {
-		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-	    }
-
-	} else {
-	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-	}
-
-	MonitoringUtil.buildVoteStatsDTO(request, voteService, voteContent);
-
-	return true;
-    }
-    
-
-
-    private void initStatsContent(String toolContentID, HttpServletRequest request, IVoteService voteService,
-	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) throws IOException, ServletException {
-	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
-
+	/* true means there is at least 1 response */
 	if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
+
+	voteMonitoringForm.setActiveModule(MONITORING);
+	voteGeneralMonitoringDTO.setActiveModule(MONITORING);
+
+	voteGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
+
+	// this section is needed for Edit Activity screen
+	voteGeneralAuthoringDTO.setActivityTitle(voteGeneralMonitoringDTO.getActivityTitle());
+	voteGeneralAuthoringDTO.setActivityInstructions(voteGeneralMonitoringDTO.getActivityInstructions());
+	voteGeneralAuthoringDTO.setDefaultOptionContent(voteGeneralMonitoringDTO.getDefaultOptionContent());
+	voteGeneralAuthoringDTO.setMapOptionsContent(voteGeneralMonitoringDTO.getMapOptionsContent());
+	voteGeneralAuthoringDTO.setActiveModule(MONITORING);
+	voteGeneralAuthoringDTO.setMaxOptionIndex(mapOptionsContent.size());
+
+	MonitoringUtil.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+
+	List<SessionDTO> sessionDTOs = voteService.getSessionDTOs(new Long(toolContentID));
+	voteGeneralMonitoringDTO.setSessionDTOs(sessionDTOs);
+	
+	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+
 
 	//refreshStatsData
 	/* it is possible that no users has ever logged in for the activity yet */
@@ -353,69 +203,108 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	voteGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	int countSessionComplete = voteService.countSessionComplete();
 	voteGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
 
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(VoteAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-
-	voteGeneralMonitoringDTO.setCurrentMonitoringTab("stats");
-
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
-	/* find out if there are any reflection entries, from here */
-	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(voteService, voteContent);
-
-	if (notebookEntriesExist) {
-	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-
-	    String userExceptionNoToolSessions = voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-
-	    if (userExceptionNoToolSessions.equals("true")) {
-		//there are no online student activity but there are reflections
-		request.setAttribute(VoteAppConstants.NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-	    }
-	} else {
-	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-	}
-	/* ... till here */
-
-	MonitoringUtil.buildVoteStatsDTO(request, voteService, voteContent);
+	List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(voteContent, null);
+	request.setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	
+	return mapping.findForward(VoteAppConstants.LOAD_MONITORING);
     }
 
-    private void initSummaryContent(String toolContentID, HttpServletRequest request, IVoteService voteService,
-	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) throws IOException, ServletException {
-	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
+    public static void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService,
+	    boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId,
+	    boolean showUserEntriesBySession, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO,
+	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO, ExportPortfolioDTO exportPortfolioDTO) {
 
-	/* true means there is at least 1 response */
+	/* this section is related to summary tab. Starts here. */
+
 	if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
+	    if (voteGeneralMonitoringDTO != null) {
+		voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+	    }
+	} else {
+	    if (voteGeneralMonitoringDTO != null) {
+		voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+	    }
+	}
+
+	String userExceptionNoToolSessions = voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+	if (exportPortfolioDTO != null) {
+	    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
+	}
+	
+	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
+
+	List listMonitoredAnswersContainerDTO = new LinkedList();
+
+	Iterator itListQuestions = listQuestions.iterator();
+	while (itListQuestions.hasNext()) {
+	    VoteQueContent voteQueContent = (VoteQueContent) itListQuestions.next();
+
+	    if (voteQueContent != null) {
+		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
+		voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
+		voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
+
+		Map<String, Map> questionAttemptData = MonitoringUtil.buildGroupsAttemptData(request, voteContent, voteQueContent,
+			voteQueContent.getUid().toString(), isUserNamesVisible, isLearnerRequest, currentSessionId,
+			userId, voteService);
+		voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+		listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
+
+	    }
+	}
+	/* ends here. */
+
+	List<VoteMonitoredAnswersDTO> listUserEntries = voteService.processUserEnteredNominations(voteContent,
+		currentSessionId, showUserEntriesBySession, userId, isLearnerRequest);
+
+	if (voteGeneralLearnerFlowDTO != null) {
+	    voteGeneralLearnerFlowDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	    voteGeneralLearnerFlowDTO.setListUserEntries(listUserEntries);
+	}
+
+	if (exportPortfolioDTO != null) {
+	    exportPortfolioDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	    exportPortfolioDTO.setListUserEntries(listUserEntries);
+	}
+
+	if (voteGeneralMonitoringDTO != null) {
+	    voteGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	    voteGeneralMonitoringDTO.setListUserEntries(listUserEntries);
+
+	    voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
+	    if (listUserEntries.size() > 0) {
+		voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(true).toString());
+	    }
+	}
+
+	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
+	voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
+	if (isContentInUse == true) {
+	    //monitoring url does not allow editActivity since the content is in use
+	    voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
+	}
+
+	if (voteService.studentActivityOccurredGlobal(voteContent)) {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
 	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
+	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
+
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+	    //monitoring url does not allow editActivity since the content is in use
+	    voteGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
 	}
 	request.setAttribute(VoteAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	voteGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
-
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
-	/* find out if there are any reflection entries, from here */
+	// find out if there are any reflection entries
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(voteService, voteContent);
-
 	if (notebookEntriesExist) {
 	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-
-	    String userExceptionNoToolSessions = voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-
 	    if (userExceptionNoToolSessions.equals("true")) {
 		//there are no online student activity but there are reflections
 		request.setAttribute(VoteAppConstants.NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
@@ -423,7 +312,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	} else {
 	    request.setAttribute(VoteAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
 	}
-	/* ... till here */
 
 	MonitoringUtil.buildVoteStatsDTO(request, voteService, voteContent);
 
@@ -447,18 +335,5 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    }
 	}
 	return null;
-    }
-
-    /**
-     * persists error messages to request scope
-     * 
-     * @param request
-     * @param message
-     */
-    public void persistInRequestError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	logger.error("add " + message + "  to ActionMessages:");
-	saveErrors(request, errors);
     }
 }
