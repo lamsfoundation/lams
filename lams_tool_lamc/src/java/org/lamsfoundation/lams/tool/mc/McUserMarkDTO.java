@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 
 /**
  * <p>
@@ -39,6 +40,7 @@ public class McUserMarkDTO implements Comparable {
     private String queUsrId;
     private String userName;
     private String fullName;
+    private boolean isUserLeader;
     private Date attemptTime;
     private Integer[] marks;
     private String[] answeredOptions;
@@ -123,6 +125,14 @@ public class McUserMarkDTO implements Comparable {
      */
     public void setFullName(String fullName) {
 	this.fullName = fullName;
+    }
+    
+    public boolean setUserGroupLeader(boolean isUserLeader) {
+	return this.isUserLeader = isUserLeader;
+    }
+    
+    public boolean isUserGroupLeader() {
+	return isUserLeader;
     }
     
     public int compareTo(Object o) {

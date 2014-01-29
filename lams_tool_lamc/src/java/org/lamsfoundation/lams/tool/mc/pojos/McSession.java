@@ -229,4 +229,12 @@ public class McSession implements Serializable {
     public void setGroupLeader(McQueUsr groupLeader) {
 	this.groupLeader = groupLeader;
     }
+    
+    public boolean isUserGroupLeader(McQueUsr user) {
+
+	McQueUsr groupLeader = this.getGroupLeader();
+	
+	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	return isUserLeader;
+    }
 }

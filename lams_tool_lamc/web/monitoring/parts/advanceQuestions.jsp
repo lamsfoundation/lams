@@ -1,11 +1,10 @@
-<h1 style="padding-bottom: 10px;">
+<h1>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon3" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advanced-questions'), document.getElementById('treeIcon3'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advanced-questions'), document.getElementById('treeIcon3'),'<lams:LAMSURL/>');" >
 		<fmt:message key="label.Questions" />
 	</a>
 </h1>
-<br />
 
 <div class="monitoring-advanced" id="advanced-questions" style="display:none">
 

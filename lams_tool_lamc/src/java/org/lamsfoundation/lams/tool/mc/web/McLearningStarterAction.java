@@ -241,7 +241,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	}
 	
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = mcService.isUserGroupLeader(user, new Long(toolSessionID));
+	boolean isUserLeader = mcSession.isUserGroupLeader(user);
 	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ATTR_CONTENT, mcContent);

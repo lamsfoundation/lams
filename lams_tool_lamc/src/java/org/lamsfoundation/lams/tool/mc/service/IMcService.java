@@ -55,13 +55,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 public interface IMcService {
     
     /**
-     * @param user
-     * @param toolSessionId
-     * @return
-     */
-    boolean isUserGroupLeader(McQueUsr user, Long toolSessionId);
-    
-    /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      * 
      * @param userId

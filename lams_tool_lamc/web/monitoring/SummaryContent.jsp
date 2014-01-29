@@ -75,12 +75,12 @@
 			}).hideCol("userId").hideCol("sessionId");
 			
    	        <c:forEach var="userMarkEntity" items="${sessionMarkDto.userMarks}" varStatus="i">
-   	     		<c:set var="mcSessionMarkDTO" scope="request" value="${userMarkEntity.value}"/>
+   	     		<c:set var="mcUserMarkDTO" scope="request" value="${userMarkEntity.value}"/>
    	     		jQuery("#group${sessionMarkDto.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:"${i.index + 1}",
-   	   	     		userUid:"${mcSessionMarkDTO.queUsrId}",
-   	   	     		userName:"${mcSessionMarkDTO.fullName}",
-   	   	     		total:"${mcSessionMarkDTO.totalMark}"
+   	   	     		userUid:"${mcUserMarkDTO.queUsrId}",
+   	   	     		userName:"${mcUserMarkDTO.fullName} <c:if test='${mcUserMarkDTO.userGroupLeader}'>( <fmt:message key='label.monitoring.group.leader' />)</c:if>",
+   	   	     		total:"${mcUserMarkDTO.totalMark}"
    	   	   	    });
 	        </c:forEach>
 	        
@@ -155,57 +155,66 @@
 
 </script>
 
-<%@ include file="parts/advanceOptions.jsp"%>
-<%@ include file="parts/dateRestriction.jsp"%>
 <%@ include file="parts/advanceQuestions.jsp"%>
 
-	<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
-		<c:if test="${notebookEntriesExist != 'true' }"> 			
-			<table align="center">
-				<tr> 
-					<td NOWRAP valign=top align=center> 
-						<b>  <fmt:message key="error.noLearnerActivity"/> </b>
-					</td> 
-				<tr>
-			</table>
-		</c:if>
+<c:if test="${useSelectLeaderToolOuput}">
+	<div class="info">
+		<fmt:message key="label.info.use.select.leader.outputs" />
+	</div>
+	<br>
+</c:if>
+
+<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
+	<c:if test="${notebookEntriesExist != 'true' }"> 			
+		<table align="center">
+			<tr> 
+				<td NOWRAP valign=top align=center> 
+					<b>  <fmt:message key="error.noLearnerActivity"/> </b>
+				</td> 
+			<tr>
+		</table>
 	</c:if>
+</c:if>
 			
-		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
+<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
 
-			<h2>    
-				<fmt:message key="label.studentMarks"/>
-			</h2>
+	<h2 style="font-size: 15px; margin-left: 30px;">    
+		<fmt:message key="label.studentMarks"/>
+	</h2>
 
-			<div id="masterDetailArea">
-				<%@ include file="masterDetailLoadUp.jsp"%>
-			</div>
+	<div id="masterDetailArea">
+		<%@ include file="masterDetailLoadUp.jsp"%>
+	</div>
 		
-			<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
+	<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
 			
-				<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-					<c:if test="${isGroupedActivity}">
-						<div style="padding-bottom: 5px; font-size: small;">
-							<B><fmt:message key="group.label" /></B> ${sessionMarkDto.sessionName}
-						</div>
-					</c:if>
-					
-					<table id="group${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					<div style="margin-top: 10px; width:99%;">
-						<table id="userSummary${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</div>
+		<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+			<c:if test="${isGroupedActivity}">
+				<div style="padding-bottom: 5px; font-size: small;">
+					<B><fmt:message key="group.label" /></B> ${sessionMarkDto.sessionName}
 				</div>
+			</c:if>
+					
+			<table id="group${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+			
+			<div style="margin-top: 10px; width:99%;">
+				<table id="userSummary${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+			</div>
+		</div>
 				
-			</c:forEach>
+	</c:forEach>
 
-			<jsp:include page="/monitoring/Reflections.jsp" />
+	<jsp:include page="/monitoring/Reflections.jsp" />
 				
-			<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button float-right">
-				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</html:link>					
-		</c:if>						
-		
-		
-		<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
-			<jsp:include page="/monitoring/Reflections.jsp" />
-		</c:if>
+	<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button float-right">
+		<fmt:message key="label.monitoring.downloadMarks.button" />
+	</html:link>
+	<br><br>			
+</c:if>
+
+<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
+	<jsp:include page="/monitoring/Reflections.jsp" />
+</c:if>
+
+<%@ include file="parts/advanceOptions.jsp"%>
+<%@ include file="parts/dateRestriction.jsp"%>

@@ -154,16 +154,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
     
     @Override
-    public boolean isUserGroupLeader(McQueUsr user, Long toolSessionId) {
-
-	McSession session = this.getMcSessionById(toolSessionId);
-	McQueUsr groupLeader = session.getGroupLeader();
-	
-	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
-	return isUserLeader;
-    }
-    
-    @Override
     public McQueUsr checkLeaderSelectToolForSessionLeader(McQueUsr user, Long toolSessionId) {
 	if (user == null || toolSessionId == null) {
 	    return null;
@@ -551,6 +541,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		mcUserMarkDTO.setSessionId(session.getMcSessionId().toString());
 		mcUserMarkDTO.setSessionName(session.getSession_name().toString());
 		mcUserMarkDTO.setFullName(user.getFullname());
+		mcUserMarkDTO.setUserGroupLeader(session.isUserGroupLeader(user));
 		mcUserMarkDTO.setUserName(user.getUsername());
 		mcUserMarkDTO.setQueUsrId(user.getUid().toString());
 
