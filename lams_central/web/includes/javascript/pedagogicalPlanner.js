@@ -162,7 +162,8 @@
    function checkSubmitOperationsCompleted(){
    if (activitiesResponded==activitySupportingPlannerCount 
   	  && activityCallRetrievedID==callAttemptedID
-  	  && sequenceDetailsCallRetrievedID==callAttemptedID){
+  	  && sequenceDetailsCallRetrievedID==callAttemptedID
+  	  || (activitySupportingPlannerCount == 0)){
   	$('#pedagogicalPlannerBusy').hide();
   	if (sequenceDetailsValid &&  activitiesValid==activitiesResponded){
   	   	$('#pedagogicalPlannerInfoArea').show();
