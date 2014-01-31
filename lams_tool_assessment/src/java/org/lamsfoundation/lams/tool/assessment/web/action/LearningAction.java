@@ -139,13 +139,7 @@ public class LearningAction extends Action {
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
      * 
-     * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
-     * @throws ServletException 
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws InstantiationException 
-     * @throws IllegalAccessException 
-     * 
+     * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page". 
      */
     @SuppressWarnings("unchecked")
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -372,7 +366,7 @@ public class LearningAction extends Action {
 	//check if need to display results page
 	if ((dbResultCount > 0) && finishedLock) {
 	    // display results page
-	    populateResultsPage(sessionMap);
+	    prepareResultsPageData(sessionMap);
 	}
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -446,7 +440,7 @@ public class LearningAction extends Action {
 	storeUserAnswersIntoDatabase(sessionMap, false);
 	
 	// populate info for displaying results page
-	populateResultsPage(sessionMap);
+	prepareResultsPageData(sessionMap);
 	
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	//calculate whether isResubmitAllowed
@@ -458,12 +452,6 @@ public class LearningAction extends Action {
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
-	
-	//calculate whether isUserFailed
-	AssessmentResult result = (AssessmentResult) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_RESULT);
-	int passingMark = assessment.getPassingMark();
-	boolean isUserFailed = ((passingMark != 0) && (passingMark > result.getGrade()));
-	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -487,7 +475,10 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);	
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	//clear isUserFailed indicator
+	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
+	
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -727,7 +718,10 @@ public class LearningAction extends Action {
 	}
     }
     
-    private void populateResultsPage(SessionMap<String, Object> sessionMap){
+    /**
+     * Prepare data for displaying results page
+     */
+    private void prepareResultsPageData(SessionMap<String, Object> sessionMap){
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
@@ -773,6 +767,12 @@ public class LearningAction extends Action {
 		lastBorder = overallFeedback.getGradeBoundary();
 	    }
 	}
+	
+	//calculate whether user has failed this attempt
+	int passingMark = assessment.getPassingMark();
+	boolean isUserFailed = ((passingMark != 0) && (passingMark > result.getGrade()));
+	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
+	
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
     }    
     

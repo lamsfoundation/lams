@@ -322,9 +322,7 @@ hr {border:0px;
 .warning {
 	color: #cc0000;
 	padding:8px 10px 10px 40px;
-	margin-top: 25px;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 25px auto 10px;
 	text-align: left;
 	font-weight: normal;
 	background: url('../images/css/warning.gif') no-repeat #ffeae0 10px 8px;
