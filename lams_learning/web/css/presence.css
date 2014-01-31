@@ -145,3 +145,15 @@ Presence stylesheet
 table.tabLabelTable {
 	width: auto;
 }
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a{
+	cursor: pointer;
+}
+
+#presenceChatRoster li {
+	width: 100%;
+}
+
+#presenceChatRoster li a{
+	width: 83%;
+}

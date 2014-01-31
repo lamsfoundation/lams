@@ -27,7 +27,6 @@
 	$(document).ready(function (){
 		presenceChat = $("#presenceChat");
 		rosterDiv = $("#presenceUserListings");
-		minMaxIcon = $("#minMaxIcon");
 		
 		// if browser is ie6
 		if($.browser.msie && parseInt($.browser.version) == 6){
@@ -124,7 +123,6 @@
 	        		</table>
 	        	</span>
 	        </a></li>
-	        <img id="minMaxIcon" class="smallImage" src="<lams:LAMSURL/>images/icons/bullet_arrow_top.png" />
 	    </ul>
 	    <div id="presenceUserListings">
 	    </div>

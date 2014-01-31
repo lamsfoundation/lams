@@ -308,13 +308,11 @@ function handlePresenceClick() {
 		presenceChat.animate({
 			top : windowHeight + "px"
 		}, 1000);
-		minMaxIcon.attr("src", lamsUrl + "images/icons/bullet_arrow_top.png")
 		presenceShown = false;
 	} else {
 		presenceChat.animate({
 			top : windowHeight - 270 + "px"
 		}, 1000);
-		minMaxIcon.attr("src", lamsUrl + "images/icons/bullet_arrow_bottom.png");
 		presenceShown = true;
 	}
 }
