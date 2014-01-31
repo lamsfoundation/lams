@@ -280,7 +280,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (message != null) {
 	    Long userId = 0L;
 	    String loginName = "Default";
-	    if (message.getCreatedBy() == null) {
+	    if (message.getCreatedBy() != null) {
 		userId = message.getCreatedBy().getUserId();
 		loginName = message.getCreatedBy().getLoginName();
 	    }
