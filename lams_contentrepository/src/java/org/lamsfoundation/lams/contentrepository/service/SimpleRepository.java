@@ -134,7 +134,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 			}
 			return user.getUserID();
 		} else {
-			throw new AccessDeniedException("Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
+			throw new AccessDeniedException("Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
 		}
 	}
 	/**
