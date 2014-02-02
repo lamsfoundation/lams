@@ -56,7 +56,9 @@
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
                destdir="${build.classes.java}"
-		/>
+		>
+        <compilerarg line="-encoding utf-8"/>
+        </javac>
 		
 		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
 	 	<copy todir="${build.classes.java}" overwrite="true">

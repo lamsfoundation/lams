@@ -450,6 +450,7 @@
 	           srcdir="${build.war}/WEB-INF/src" 
 		  	   excludes="**/*.smap"
 	    	   classpathref="jsp.precompile.classpath">
+	      <compilerarg line="-encoding utf-8"/>
 	      <include name="**" />
 	      <exclude name="tags/**" />
 	    </javac>

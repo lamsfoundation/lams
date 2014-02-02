@@ -20,6 +20,7 @@
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>
+			<compilerarg line="-encoding utf-8"/>
 			<include name="**/*.java"/>
 		</javac>
 	</target>
