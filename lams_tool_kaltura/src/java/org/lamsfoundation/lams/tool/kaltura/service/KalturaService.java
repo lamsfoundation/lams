@@ -202,7 +202,13 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
     }
-
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("This tool does not support learner content removing yet.");
+	}
+    }
+    
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);

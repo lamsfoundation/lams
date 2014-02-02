@@ -204,7 +204,13 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	    ToolException {
 	// TODO Auto-generated method stub
     }
-
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("This tool does not support learner content removing yet.");
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

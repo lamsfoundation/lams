@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -184,6 +185,33 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Notebook entries for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+	
+	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	    NotebookUser user = notebookUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		if (user.getEntryUID() != null) {
+		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    notebookDAO.delete(entry);
+		    user.setEntryUID(null);
+		}
+
+		user.setFinishedActivity(false);
+		notebookUserDAO.update(user);
+	    }
+	}
     }
 
     /**

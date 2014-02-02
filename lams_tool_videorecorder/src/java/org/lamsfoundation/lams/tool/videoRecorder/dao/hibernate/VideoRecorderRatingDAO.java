@@ -65,12 +65,12 @@ public class VideoRecorderRatingDAO extends BaseDAO implements IVideoRecorderRat
 		return (VideoRecorderRating) list.get(0);
 	}
 	
-	public Set<VideoRecorderRating> getRatingsByUserId(Long userId){
-		return (Set<VideoRecorderRating>)(this.getHibernateTemplate().find(SQL_QUERY_BY_USER_ID, userId));
+	public List<VideoRecorderRating> getRatingsByUserId(Long userId){
+		return (List<VideoRecorderRating>)(this.getHibernateTemplate().find(SQL_QUERY_BY_USER_ID, userId));
 	}
 	
-	public Set<VideoRecorderRating> getRatingsByToolSessionId(Long toolSessionId){
-		return (Set<VideoRecorderRating>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
+	public List<VideoRecorderRating> getRatingsByToolSessionId(Long toolSessionId){
+		return (List<VideoRecorderRating>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
 	}
 
     public void saveOrUpdate(VideoRecorderRating videoRecorderRating) {

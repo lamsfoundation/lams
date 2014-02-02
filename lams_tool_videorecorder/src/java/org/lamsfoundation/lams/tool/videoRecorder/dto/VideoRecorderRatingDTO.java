@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.videoRecorder.dto;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -67,7 +68,7 @@ public class VideoRecorderRatingDTO implements Comparable<VideoRecorderRatingDTO
 		this.videoRecorderSession = videoRecorderRating.getVideoRecorderSession();
 	}
 
-	public static Set<VideoRecorderRatingDTO> getVideoRecorderRatingDTOs(Set list){
+	public static Set<VideoRecorderRatingDTO> getVideoRecorderRatingDTOs(Collection list){
 		Set<VideoRecorderRatingDTO> retSet = new TreeSet<VideoRecorderRatingDTO>();
 		if(list == null || list.isEmpty())
 			return retSet;

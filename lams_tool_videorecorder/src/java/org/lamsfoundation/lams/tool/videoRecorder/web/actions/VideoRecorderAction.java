@@ -138,7 +138,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		// otherwise
 		} else{
 			// get all recordings from user specified
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionId, userId, toolContentId);
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserUid(toolSessionId, userId, toolContentId);
 		}
 		
 		// sort the list of recording DTOs in order to create the xml correctly

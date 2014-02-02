@@ -86,7 +86,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	    Iterator listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
 		VoteQueUsr user = (VoteQueUsr) listIterator.next();
-		logger.debug("user: " + user);
 		if (user.getVoteSession().getSessionStatus().equals("COMPLETED")) {
 		    ++completedSessionUserCount;
 		}

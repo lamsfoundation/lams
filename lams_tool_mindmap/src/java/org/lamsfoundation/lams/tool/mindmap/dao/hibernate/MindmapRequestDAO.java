@@ -47,6 +47,9 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 	" select mr.globalId from " + MindmapRequest.class.getName() + " mr where mr.mindmap.uid = ? and " +
 	" mr.user.mindmapSession.sessionId = ? order by mr.globalId desc limit 1 ";
     
+    private static final String SQL_QUERY_FIND_REQUESTS_BY_USER_ID =
+		" from " + MindmapRequest.class.getName() + " mr where mr.user.userId = ? ";
+    
     public void saveOrUpdate(MindmapRequest mindmapRequest) {
 	this.getHibernateTemplate().saveOrUpdate(mindmapRequest);
     }
@@ -72,5 +75,10 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 	    return ((Number) list.get(0)).longValue();
 	else
 	    return 0l;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<MindmapRequest> getRequestsByUserId(Long userId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
     }
 }

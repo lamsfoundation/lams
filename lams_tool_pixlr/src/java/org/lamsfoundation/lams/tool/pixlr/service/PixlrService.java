@@ -261,6 +261,31 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	// TODO Auto-generated method stub
     }
 
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Pixlr image for user ID " + userId + " and toolContentId " + toolContentId);
+
+	    Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
+	    if (pixlr != null) {
+		for (PixlrSession session : pixlr.getPixlrSessions()) {
+		    PixlrUser user = pixlrUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+		    user.setFinishedActivity(false);
+		    user.setImageFileName(null);
+		    user.setImageHeight(null);
+		    user.setImageWidth(null);
+		    user.setImageHidden(false);
+		    user.setFinishedActivity(false);
+		    if (user.getEntryUID() != null) {
+			NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+			pixlrDAO.delete(entry);
+		    }
+
+		    pixlrUserDAO.update(user);
+		}
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

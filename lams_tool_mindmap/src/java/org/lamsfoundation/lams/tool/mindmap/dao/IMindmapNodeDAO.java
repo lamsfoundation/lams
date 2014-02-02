@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
+import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 /**
  * IMindmapNodeDao
@@ -62,4 +63,6 @@ public interface IMindmapNodeDAO extends IBaseDAO {
     public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
     
     public int getNumNodesByUserAndSession(Long userId, Long sessionId);
+    
+    public List<MindmapNode> getMindmapNodesBySessionIdAndUserId(Long sessionId, Long userId);
 }

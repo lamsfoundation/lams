@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -178,6 +179,33 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Leader Selection state for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
+
+	Leaderselection selection = leaderselectionDAO.getByContentId(toolContentId);
+	if (selection == null) {
+	    return;
+	}
+
+	for (LeaderselectionSession session : (Set<LeaderselectionSession>) selection.getLeaderselectionSessions()) {
+	    if (session.getGroupLeader() != null && session.getGroupLeader().getUserId().equals(userId.longValue())) {
+		session.setGroupLeader(null);
+		leaderselectionSessionDAO.update(session);
+	    }
+
+	    LeaderselectionUser user = leaderselectionUserDAO.getByUserIdAndSessionId(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		user.setFinishedActivity(false);
+		leaderselectionDAO.update(user);
+	    }
+	}
     }
 
     @Override

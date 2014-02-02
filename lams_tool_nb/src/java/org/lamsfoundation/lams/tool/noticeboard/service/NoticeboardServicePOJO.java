@@ -629,6 +629,28 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	removeNoticeboard(toolContentId);
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Noticeboard finished flat for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
+
+	NoticeboardContent nbContent = nbContentDAO.findNbContentById(toolContentId);
+	if (nbContent == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (NoticeboardSession session : (Set<NoticeboardSession>) nbContent.getNbSessions()) {
+	    NoticeboardUser user = nbUserDAO.getNbUser(userId.longValue(), session.getNbSessionId());
+	    if (user != null) {
+		user.setUserStatus(NoticeboardUser.INCOMPLETE);
+		nbUserDAO.updateNbUser(user);
+	    }
+	}
+    }
+    
     private NoticeboardContent getAndCheckIDandObject(Long toolContentId) throws ToolException, DataMissingException {
 	if (toolContentId == null) {
 	    throw new ToolException("Tool content ID is missing. Unable to continue");

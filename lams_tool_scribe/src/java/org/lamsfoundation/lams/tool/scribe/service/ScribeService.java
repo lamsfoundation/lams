@@ -205,7 +205,36 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    ToolException {
 	// TODO Auto-generated method stub
     }
+    
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Scribe contents for user ID " + userId + " and toolContentId " + toolContentId);
+	}
 
+	Scribe scribe = scribeDAO.getByContentId(toolContentId);
+	if (scribe == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
+	    if (session.getAppointedScribe() != null
+		    && session.getAppointedScribe().getUserId().equals(userId.longValue())) {
+		session.setAppointedScribe(null);
+		scribeSessionDAO.update(session);
+	    }
+
+	    ScribeUser user = scribeUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		user.setFinishedActivity(false);
+		user.setStartedActivity(false);
+		user.setReportApproved(false);
+		scribeUserDAO.saveOrUpdate(user);
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

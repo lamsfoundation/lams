@@ -679,6 +679,35 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
     
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	QaContent content = qaDAO.getQaByContentId(toolContentId);
+	if (content != null) {
+	    for (QaSession session : (Set<QaSession>) content.getQaSessions()) {
+		QaQueUsr user = qaQueUsrDAO.getQaUserBySession(userId.longValue(), session.getQaSessionId());
+		if (user != null) {
+		    List<ResponseRating> ratings = qaResponseRatingDAO.getRatingsByUser(user.getUid());
+		    for (ResponseRating rating : ratings) {
+			qaResponseRatingDAO.removeResponseRating(rating);
+		    }
+
+		    for (QaUsrResp response : (Set<QaUsrResp>) user.getQaUsrResps()) {
+			qaUsrRespDAO.removeUserResponse(response);
+		    }
+		    user.getQaUsrResps().clear();
+
+		    user.setLearnerFinished(false);
+		    user.setResponseFinalized(false);
+		    qaQueUsrDAO.updateUsr(user);
+		}
+	    }
+	}
+    }
+
     public AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating) {
 	QaQueUsr imageGalleryUser = this.getUserByIdAndSession(userId, toolSessionID);
 	ResponseRating responseRating = qaResponseRatingDAO.getRatingByResponseAndUser(responseId, userId);

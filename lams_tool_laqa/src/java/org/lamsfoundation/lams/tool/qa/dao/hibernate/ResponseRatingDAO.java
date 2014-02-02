@@ -27,7 +27,9 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
@@ -48,6 +50,9 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     
     private static final String FIND_AVERAGE_RATING_BY_RESPONSE = "SELECT AVG(r.rating), COUNT(*) from "
 	    + ResponseRating.class.getName() + " as r where r.response.responseId=?";
+    
+    private static final String FIND_BY_USER_UID = "from " + ResponseRating.class.getName()
+	    + " as r where r.user.uid = ?";
 
     public ResponseRating getRatingByResponseAndUser(Long responseId, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_RESPONSE_AND_USER, new Object[] { userId, responseId });
@@ -76,5 +81,14 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     public void saveObject(Object o) {
 	super.insertOrUpdate(o);
     }
+    
+    public void removeResponseRating(ResponseRating rating) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(rating);
+    }
 
+    @SuppressWarnings("unchecked")
+    public List<ResponseRating> getRatingsByUser(Long userUid) {
+	return getHibernateTemplate().find(FIND_BY_USER_UID, userUid);
+    }
 }

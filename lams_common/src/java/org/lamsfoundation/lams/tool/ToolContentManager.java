@@ -76,6 +76,11 @@ public interface ToolContentManager {
      */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException;
+    
+    /**
+     * Removes content previously added by the given user.
+     */
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException;
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.

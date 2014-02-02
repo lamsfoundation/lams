@@ -75,8 +75,8 @@ public interface IMonitoringService {
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson);
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * Initialize a new lesson so as to start the learning process. It needs to notify lams which learning design it
@@ -281,7 +281,8 @@ public interface IMonitoringService {
      */
     public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
-    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId);
+    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
+	    boolean removeLearnerContent);
 
     /**
      * Archive the specified lesson. When archived, the data is retained but the learners cannot access the details.
@@ -425,7 +426,7 @@ public interface IMonitoringService {
      * @throws IOException
      */
     public String getLearningDesignDetails(Long lessonID) throws IOException;
-    
+
     public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 
     /**

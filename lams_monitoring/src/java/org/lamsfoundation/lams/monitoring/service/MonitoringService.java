@@ -1274,7 +1274,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
     @Override
-    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
+    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
+	    boolean removeLearnerContent) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
 
@@ -1308,7 +1309,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			    .getCompletedActivities().containsKey(parentActivity) || ((parentActivity
 			    .getParentActivity() != null) && learnerProgress.getCompletedActivities().containsKey(
 			    parentActivity.getParentActivity())))))) {
-		return forceUncompleteActivity(learnerProgress, stopActivity);
+		return forceUncompleteActivity(learnerProgress, stopActivity, removeLearnerContent);
 	    }
 	}
 
@@ -1496,19 +1497,22 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * achieve it.
      */
     @SuppressWarnings("unchecked")
-    private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity targetActivity) {
+    private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity targetActivity,
+	    boolean removeLearnerContent) {
 	User learner = learnerProgress.getUser();
 	Activity currentActivity = learnerProgress.getCurrentActivity();
+	// set of activities for which "attempted" and "completed" status will be removed
+	Set<Activity> uncompleteActivities = new HashSet<Activity>();
+	uncompleteActivities.add(targetActivity);
+	
 	if (currentActivity == null) {
 	    // Learner has finished the whole lesson. Find the last activity by traversing the transition.
 	    currentActivity = learnerProgress.getLesson().getLearningDesign().getFirstActivity();
 	    while (currentActivity.getTransitionFrom() != null) {
 		currentActivity = currentActivity.getTransitionFrom().getToActivity();
 	    }
+	    uncompleteActivities.add(currentActivity);
 	}
-
-	// set of activities for which "attempted" and "completed" status will be removed
-	Set<Activity> uncompleteActivities = new HashSet<Activity>();
 
 	// check if the target is a part of complex activity
 	CompletedActivityProgress completedActivityProgress = learnerProgress.getCompletedActivities().get(
@@ -1547,7 +1551,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Set<Activity> groupings = new HashSet<Activity>();
 
 	// remove completed activities step by step, all the way from current to target activity
-	do {
+	while (!currentActivity.equals(targetActivity)) {
 	    uncompleteActivities.add(currentActivity);
 
 	    if (currentActivity.isComplexActivity()) {
@@ -1600,17 +1604,19 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    groupings.add(currentActivity);
 		}
 	    }
-
-	} while (!currentActivity.equals(targetActivity));
+	}
 
 	// forget that user completed and attempted activiites
 	for (Activity activity : uncompleteActivities) {
 	    learnerProgress.getAttemptedActivities().remove(activity);
 	    learnerProgress.getCompletedActivities().remove(activity);
+	    if (removeLearnerContent && activity.isToolActivity()) {
+		// remove learner content from this activity
+		lamsCoreToolService.notifyToolToDeleteLearnerContent((ToolActivity) activity, learner.getUserId());
+	    }
 	}
 
 	// set target activity as attempted
-	learnerProgress.getCompletedActivities().remove(targetActivity);
 	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 	if (targetParentActivity != null) {
 	    // set parent as attempted

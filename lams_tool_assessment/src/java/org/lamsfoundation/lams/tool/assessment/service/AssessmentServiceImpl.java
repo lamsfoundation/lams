@@ -1260,7 +1260,31 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	assessmentDao.delete(assessment);
     }
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
+	for (AssessmentSession session : sessions) {
+	    List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(session.getSessionId(),
+		    userId.longValue());
+	    for (AssessmentResult result : results) {
+		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+		    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class, questionResult.getUid());
+		}
+		assessmentResultDao.removeObject(AssessmentResult.class, result.getUid());
+	    }
 
+	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		user.setSessionFinished(false);
+		assessmentUserDao.saveObject(user);
+	    }
+	}
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	AssessmentSession session = new AssessmentSession();
 	session.setSessionId(toolSessionId);

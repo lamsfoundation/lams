@@ -758,6 +758,29 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forumDao.delete(forum);
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Hiding Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	List<ForumToolSession> sessionList = forumToolSessionDao.getByContentId(toolContentId);
+
+	for (ForumToolSession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    ForumUser learner = forumUserDao.getByUserIdAndSessionId(userId.longValue(), sessionId);
+	    if (learner != null) {
+		List<Message> messages = messageDao.getByUserAndSession(learner.getUid(), sessionId);
+		for (Message message : messages) {
+		    message.setHideFlag(true);
+		    messageDao.update(message);
+		}
+		
+		learner.setSessionFinished(false);
+		forumUserDao.save(learner);
+	    }
+	}
+    }
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

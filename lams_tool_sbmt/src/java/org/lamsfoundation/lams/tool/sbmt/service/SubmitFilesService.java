@@ -223,6 +223,25 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    submitFilesContentDAO.delete(submitFilesContent);
 	}
     }
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Submit Files content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	List<SubmitFilesSession> sessions = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
+	for (SubmitFilesSession session : sessions) {
+	    List<SubmissionDetails> submissions = submissionDetailsDAO.getBySessionAndLearner(session.getSessionID(),
+		    userId);
+	    submissionDetailsDAO.deleteAll(submissions);
+
+	    SubmitUser user = submitUserDAO.getLearner(session.getSessionID(), userId);
+	    if (user != null) {
+		user.setFinished(false);
+		submitUserDAO.update(user);
+	    }
+	}
+    }
 
     public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID) {
 	return submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentID);

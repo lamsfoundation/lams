@@ -702,6 +702,23 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	surveyDao.delete(survey);
     }
 
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	List<SurveyAnswer> answers = surveyAnswerDao.getByToolContentIdAndUserId(toolContentId, userId.longValue());
+	for (SurveyAnswer answer : answers) {
+	    surveyAnswerDao.removeObject(SurveyAnswer.class, answer.getUid());
+	}
+
+	SurveyUser user = surveyUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
+	if (user != null) {
+	    user.setSessionFinished(false);
+	    surveyUserDao.saveObject(user);
+	}
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SurveySession session = new SurveySession();
 	session.setSessionId(toolSessionId);

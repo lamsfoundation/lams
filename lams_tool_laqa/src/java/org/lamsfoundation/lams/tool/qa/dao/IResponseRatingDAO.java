@@ -63,5 +63,8 @@ public interface IResponseRatingDAO {
     public void saveObject(Object o);
     
     AverageRatingDTO getAverageRatingDTOByResponse(Long responseId);
-
+    
+    public void removeResponseRating(ResponseRating rating);
+    
+    public List<ResponseRating> getRatingsByUser(Long userUid);
 }

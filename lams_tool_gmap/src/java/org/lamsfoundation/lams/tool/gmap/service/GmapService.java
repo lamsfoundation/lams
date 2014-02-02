@@ -30,6 +30,7 @@ import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -226,6 +227,34 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	// TODO Auto-generated method stub
     }
 
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Gmap markers for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	Gmap gmap = gmapDAO.getByContentId(toolContentId);
+	if (gmap == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+	
+	Iterator<GmapMarker> markerIterator = gmap.getGmapMarkers().iterator();
+	while (markerIterator.hasNext()) {
+	    GmapMarker marker = markerIterator.next();
+	    if (!marker.isAuthored() && marker.getCreatedBy().getUserId().equals(userId.longValue())) {
+		gmapMarkerDAO.delete(marker);
+		markerIterator.remove();
+	    }
+	}
+
+	for (GmapSession session : gmap.getGmapSessions()) {
+	    GmapUser user = gmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		user.setFinishedActivity(false);
+		gmapUserDAO.update(user);
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

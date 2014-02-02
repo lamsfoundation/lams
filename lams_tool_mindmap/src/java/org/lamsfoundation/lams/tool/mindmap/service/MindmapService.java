@@ -25,10 +25,13 @@
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -376,6 +379,71 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	// TODO Auto-generated method stub
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
+	if (mindmap == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	List<MindmapNode> nodesToDelete = new LinkedList<MindmapNode>();
+	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	    List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
+		    userId.longValue());
+
+	    for (MindmapNode node : nodes) {
+		List<MindmapNode> descendants = new LinkedList<MindmapNode>();
+		if (node.getUser() != null && node.getUser().getUserId().equals(userId.longValue())
+			&& !nodesToDelete.contains(node)
+			&& userOwnsChildrenNodes(node, userId.longValue(), descendants)) {
+		    // reverse so leafs are first and nodes closer to root are last
+		    descendants.add(node);
+		    nodesToDelete.addAll(descendants);
+		}
+	    }
+	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		if (user.getEntryUID() != null) {
+		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    mindmapDAO.delete(entry);
+		    user.setEntryUID(null);
+		    mindmapUserDAO.update(user);
+		}
+	    }
+
+	}
+
+	for (MindmapNode node : nodesToDelete) {
+	    mindmapNodeDAO.delete(node);
+	}
+
+	List<MindmapRequest> requests = mindmapRequestDAO.getRequestsByUserId(userId.longValue());
+	for (MindmapRequest request : requests) {
+	    mindmapRequestDAO.delete(request);
+	}
+    }
+    
+    @SuppressWarnings("unchecked")
+    private boolean userOwnsChildrenNodes(MindmapNode node, Long userId, List<MindmapNode> descendants) {
+	List<MindmapNode> children = mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(node.getNodeId(), node
+		.getMindmap().getUid(), node.getSession().getSessionId());
+	for (MindmapNode child : children) {
+	    boolean userOwnsChild = child.getUser() != null && child.getUser().getUserId().equals(userId)
+		    && userOwnsChildrenNodes(child, userId, descendants);
+	    if (!userOwnsChild) {
+		return false;
+	    }
+	    descendants.add(child);
+	}
+	return true;
+    }
+    
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

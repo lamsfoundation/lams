@@ -122,7 +122,7 @@ public interface IVideoRecorderService {
      * @param userId
      * @return
      */
-    public Set<VideoRecorderComment> getCommentsByUserId(Long userId);
+    public List<VideoRecorderComment> getCommentsByUserId(Long userId);
     
     /**
      * 
@@ -143,13 +143,6 @@ public interface IVideoRecorderService {
      * @return
      */
     public VideoRecorderRating getRatingById(Long ratingId);
-    
-    /**
-     * 
-     * @param userId
-     * @return
-     */
-    public Set<VideoRecorderRating> getRatingsByUserId(Long userId);
     
     /**
      * 
@@ -194,7 +187,7 @@ public interface IVideoRecorderService {
      * @param toolContentId
      * @return
      */
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId, Long toolContentId);
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserUid(Long toolSessionId, Long userId, Long toolContentId);
 
     /**
      * 

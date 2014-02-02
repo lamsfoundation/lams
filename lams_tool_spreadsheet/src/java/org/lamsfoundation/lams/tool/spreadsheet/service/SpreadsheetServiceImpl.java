@@ -594,6 +594,27 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	spreadsheetDao.delete(spreadsheet);
     }
 
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	List<SpreadsheetSession> sessions = spreadsheetSessionDao.getByContentId(toolContentId);
+	for (SpreadsheetSession session : sessions) {
+	    SpreadsheetUser user = spreadsheetUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		user.setSessionFinished(false);
+		if (user.getUserModifiedSpreadsheet() != null) {
+		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, user
+			    .getUserModifiedSpreadsheet().getUid());
+		    user.setUserModifiedSpreadsheet(null);
+		}
+		spreadsheetUserDao.saveObject(user);
+	    }
+	}
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SpreadsheetSession session = new SpreadsheetSession();
 	session.setSessionId(toolSessionId);

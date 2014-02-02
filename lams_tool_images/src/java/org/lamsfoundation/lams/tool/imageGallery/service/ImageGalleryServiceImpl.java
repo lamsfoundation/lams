@@ -865,6 +865,68 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGalleryDao.delete(imageGallery);
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Image Gallery content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	ImageGallery gallery = imageGalleryDao.getByContentId(toolContentId);
+	if (gallery == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+	
+	Iterator<ImageGalleryItem> itemIterator = gallery.getImageGalleryItems().iterator();
+	while (itemIterator.hasNext()) {
+	    ImageGalleryItem item = itemIterator.next();
+
+	    Iterator<ImageComment> commentIterator = item.getComments().iterator();
+	    while (commentIterator.hasNext()) {
+		ImageComment comment = commentIterator.next();
+		if (comment.getCreateBy().getUserId().equals(userId.longValue())) {
+		    imageCommentDao.removeObject(ImageComment.class, comment.getUid());
+		    commentIterator.remove();
+		}
+	    }
+
+	    ImageVote vote = imageVoteDao.getImageVoteByImageAndUser(item.getUid(), userId.longValue());
+	    if (vote != null) {
+		imageVoteDao.removeObject(ImageVote.class, vote.getUid());
+	    }
+
+	    ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(item.getUid(), userId.longValue());
+	    if (rating != null) {
+		imageRatingDao.removeObject(ImageRating.class, rating.getUid());
+	    }
+
+	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		try {
+		    if (item.getOriginalFileUuid() != null) {
+			imageGalleryToolContentHandler.deleteFile(item.getOriginalFileUuid());
+		    }
+		    if (item.getMediumFileUuid() != null) {
+			imageGalleryToolContentHandler.deleteFile(item.getMediumFileUuid());
+		    }
+		    if (item.getThumbnailFileUuid() != null) {
+			imageGalleryToolContentHandler.deleteFile(item.getThumbnailFileUuid());
+		    }
+		} catch (Exception e) {
+		    throw new ToolException("Error while removing a file in Image Gallery", e);
+		}
+
+		imageGalleryItemDao.removeObject(ImageGalleryItem.class, item.getUid());
+		itemIterator.remove();
+	    }
+	}
+
+	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
+	if (user != null) {
+	    user.setSessionFinished(false);
+	    imageGalleryUserDao.saveObject(user);
+	}
+
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ImageGallerySession session = new ImageGallerySession();
 	session.setSessionId(toolSessionId);

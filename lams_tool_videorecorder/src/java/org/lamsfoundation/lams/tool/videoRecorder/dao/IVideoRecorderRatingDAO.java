@@ -41,9 +41,9 @@ public interface IVideoRecorderRatingDAO extends IBaseDAO{
 	 */
 	VideoRecorderRating getRatingById(Long ratingId);
 	
-	Set<VideoRecorderRating> getRatingsByUserId(Long userId);
+	List<VideoRecorderRating> getRatingsByUserId(Long userId);
 	
-	Set<VideoRecorderRating> getRatingsByToolSessionId(Long toolSessionId);
+	List<VideoRecorderRating> getRatingsByToolSessionId(Long toolSessionId);
 	
 	void saveOrUpdate(VideoRecorderRating videoRecorderRating);
 	

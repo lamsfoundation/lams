@@ -98,6 +98,7 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -1342,6 +1343,28 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Multiple Choice attempts for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
+
+	McContent content = mcContentDAO.findMcContentById(toolContentId);
+	if (content != null) {
+	    for (McSession session : (Set<McSession>) content.getMcSessions()) {
+		McQueUsr user = mcUserDAO.getMcUserBySession(userId.longValue(), session.getUid());
+		if (user != null) {
+		    mcUsrAttemptDAO.removeAllUserAttempts(user.getUid());
+		    user.setResponseFinalised(false);
+		    user.setLastAttemptTotalMark(null);
+		    user.setNumberOfAttempts(0);
+		    mcUserDAO.saveMcUser(user);
+		}
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

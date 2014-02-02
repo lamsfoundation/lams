@@ -41,11 +41,11 @@ public interface IVideoRecorderCommentDAO extends IBaseDAO{
 	 */
 	VideoRecorderComment getCommentById(Long commentId);
 	
-	Set<VideoRecorderComment> getCommentsByUserId(Long userId);
+	List<VideoRecorderComment> getCommentsByUserId(Long userId);
 	
-	Set<VideoRecorderComment> getCommentsByToolSessionId(Long toolSessionId);
+	List<VideoRecorderComment> getCommentsByToolSessionId(Long toolSessionId);
 	
-	Set<VideoRecorderComment> getCommentsByRecordingId(Long recordingId);
+	List<VideoRecorderComment> getCommentsByRecordingId(Long recordingId);
 	
 	void saveOrUpdate(VideoRecorderComment videoRecorderComment);
 	

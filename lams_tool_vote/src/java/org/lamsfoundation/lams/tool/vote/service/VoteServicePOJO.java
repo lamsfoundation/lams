@@ -1517,6 +1517,31 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Vote attempts for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+	if (voteContent == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	    VoteQueUsr user = voteUserDAO.getVoteUserBySession(userId.longValue(), session.getUid());
+	    if (user != null) {
+		voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
+		user.getVoteUsrAttempts().clear();
+		
+		user.setFinalScreenRequested(false);
+		user.setResponseFinalised(false);
+		voteUserDAO.updateVoteUser(user);
+	    }
+	}
+    }
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

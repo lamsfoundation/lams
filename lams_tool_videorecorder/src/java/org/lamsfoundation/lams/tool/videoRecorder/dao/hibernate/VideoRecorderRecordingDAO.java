@@ -46,8 +46,11 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 	private static final String SQL_QUERY_BY_TOOL_CONTENT_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
 	+ "where vrr.toolContentId=?";
 	
+	private static final String SQL_QUERY_BY_SESSION_ID_AND_USER_UID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
+	+ "where vrr.videoRecorderSession.sessionId=? and vrr.createBy.uid=?";
+	
 	private static final String SQL_QUERY_BY_SESSION_ID_AND_USER_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
-	+ "where vrr.videoRecorderSession.sessionId=? and vrr.createBy=?";
+	+ "where vrr.videoRecorderSession.sessionId=? and vrr.createBy.userId=?";
 	
 	private static final String SQL_QUERY_NB_RECORDINGS_BY_USER = "select count(*) from " + VideoRecorderRecording.class.getName() + " vrr "
 	+ " where vrr.createBy.userId=? and vrr.videoRecorderSession.sessionId=?";
@@ -67,10 +70,14 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION_ID, toolSessionId));
 	}
 	
-	public List<VideoRecorderRecording> getBySessionAndUserIds(Long toolSessionId, Long userId){
+	public List<VideoRecorderRecording> getBySessionAndUserUid(Long toolSessionId, Long userUid){
+		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION_ID_AND_USER_UID, new Object[] {toolSessionId, userUid}));
+	}
+	
+	public List<VideoRecorderRecording> getBySessionAndUserId(Long toolSessionId, Long userId){
 		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION_ID_AND_USER_ID, new Object[] {toolSessionId, userId}));
 	}
-
+	
 	public List<VideoRecorderRecording> getByToolContentId(Long toolContentId){
 		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_CONTENT_ID, toolContentId));
 	}

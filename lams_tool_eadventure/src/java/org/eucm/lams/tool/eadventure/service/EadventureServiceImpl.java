@@ -1051,6 +1051,12 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	eadventureDao.delete(eadventure);
     }
     
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("This tool does not support learner content removing yet.");
+	}
+    }
+    
     public void removeParams(Long toolContentId){
 	List<EadventureParam> params = getEadventureParamByContentId(toolContentId);
 	if (params!=null){

@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -227,6 +228,36 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	// TODO Auto-generated method stub
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Chat messages for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	Chat chat = chatDAO.getByContentId(toolContentId);
+	if (chat == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (ChatSession session : (Set<ChatSession>) chat.getChatSessions()) {
+	    ChatUser user = chatUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		List<ChatMessage> messages = chatMessageDAO.getForUser(user);
+		if (!messages.isEmpty()) {
+		    for (ChatMessage message : messages) {
+			chatMessageDAO.delete(message);
+			session.getChatMessages().remove(message);
+		    }
+		}
+
+		user.setFinishedActivity(false);
+		user.setLastPresence(null);
+		chatUserDAO.update(user);
+	    }
+
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

@@ -37,5 +37,5 @@ public interface SurveyAnswerDAO extends DAO {
 	 * @return
 	 */
 	List<SurveyAnswer> getSessionAnswer(Long sessionId,Long questionUid);
-
+	List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId);
 }

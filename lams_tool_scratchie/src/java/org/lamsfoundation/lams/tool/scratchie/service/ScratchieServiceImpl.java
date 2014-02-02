@@ -1824,7 +1824,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 	scratchieDao.delete(scratchie);
     }
-
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("This tool does not support learner content removing yet.");
+	}
+    }
+    
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {

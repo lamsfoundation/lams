@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -275,7 +276,40 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    ToolException {
 	// TODO Auto-generated method stub
     }
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Wiki contents for user ID " + userId + " and toolContentId " + toolContentId);
+	}
 
+	Wiki wiki = wikiDAO.getByContentId(toolContentId);
+	if (wiki == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (WikiSession session : wiki.getWikiSessions()) {
+	    for (WikiPage page : session.getWikiPages()) {
+		if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
+		    page.setDeleted(true);
+		    wikiPageDAO.update(page);
+		}
+	    }
+
+	    WikiUser user = wikiUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		if (user.getEntryUID() != null) {
+		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    wikiDAO.delete(entry);
+		    user.setEntryUID(null);
+		}
+		user.setFinishedActivity(false);
+		user.setWikiEdits(0);
+		wikiUserDAO.update(user);
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

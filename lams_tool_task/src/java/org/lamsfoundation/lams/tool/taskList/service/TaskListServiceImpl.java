@@ -883,6 +883,64 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	taskListDao.delete(taskList);
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Task List contents for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	TaskList taskList = taskListDao.getByContentId(toolContentId);
+	if (taskList == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	List<TaskListSession> sessions = taskListSessionDao.getByContentId(toolContentId);
+	for (TaskListSession session : sessions) {
+	    Set<TaskListItem> items = session.getTaskListItems();
+	    for (TaskListItem item : items) {
+		if (log.isDebugEnabled()) {
+		    log.debug("Removing visit log, comments and attachments for user ID " + userId + " and item UID "
+			    + item.getUid());
+		}
+		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(),
+			userId.longValue());
+		if (visitLog != null) {
+		    taskListDao.removeObject(TaskListItemVisitLog.class, visitLog.getUid());
+		}
+
+		Iterator<TaskListItemAttachment> attachmentIter = item.getAttachments().iterator();
+		while (attachmentIter.hasNext()) {
+		    TaskListItemAttachment attachment = attachmentIter.next();
+		    if (attachment.getCreateBy().getUserId().equals(userId.longValue())) {
+			try {
+			    taskListToolContentHandler.deleteFile(attachment.getFileUuid());
+			} catch (Exception e) {
+			    throw new ToolException("Error while removing Task List attachment", e);
+			}
+			taskListDao.removeObject(TaskListItemAttachment.class, attachment.getUid());
+			attachmentIter.remove();
+		    }
+		}
+
+		Iterator<TaskListItemComment> commentIter = item.getComments().iterator();
+		while (commentIter.hasNext()) {
+		    TaskListItemComment comment = commentIter.next();
+		    if (comment.getCreateBy().getUserId().equals(userId.longValue())) {
+			taskListDao.removeObject(TaskListItemComment.class, comment.getUid());
+			commentIter.remove();
+		    }
+		}
+	    }
+
+	    TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		user.setSessionFinished(false);
+		user.setVerifiedByMonitor(false);
+		taskListUserDao.saveObject(user);
+	    }
+	}
+    }
+
     /**
      * {@inheritDoc}
      */

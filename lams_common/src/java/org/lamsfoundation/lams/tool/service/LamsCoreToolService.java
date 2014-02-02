@@ -268,6 +268,19 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
+    
+    @Override
+    public void notifyToolToDeleteLearnerContent(ToolActivity toolActivity, Integer userId) throws ToolException {
+	try {
+	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
+	    contentManager.removeLearnerContent(toolActivity.getToolContentId(), userId);
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete learner content. ToolActivity "
+		    + toolActivity;
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}
+    }
 
     @Override
     public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)

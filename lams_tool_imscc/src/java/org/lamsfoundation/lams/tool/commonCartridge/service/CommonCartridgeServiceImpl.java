@@ -899,7 +899,13 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
 	commonCartridgeDao.delete(commonCartridge);
     }
-
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("This tool does not support learner content removing yet.");
+	}
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	CommonCartridgeSession session = new CommonCartridgeSession();
 	session.setSessionId(toolSessionId);

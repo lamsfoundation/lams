@@ -176,7 +176,12 @@ public interface ILamsCoreToolService {
      * @throws ToolException
      */
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException;
-
+    
+    /**
+     * Ask a tool to delete content entered by the given user, if exists.
+     */
+    public void notifyToolToDeleteLearnerContent(ToolActivity toolActivity, Integer userId) throws ToolException;
+    
     /**
      * Ask a tool for its OutputDefinitions, based on the given toolContentId. If the tool doesn't have any content
      * matching the toolContentId then it should create the OutputDefinitions based on the tool's default content.

@@ -63,16 +63,16 @@ public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCo
 		return (VideoRecorderComment) list.get(0);
 	}
 	
-	public Set<VideoRecorderComment> getCommentsByUserId(Long userId){
-		return (Set<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_USER_ID, userId));
+	public List<VideoRecorderComment> getCommentsByUserId(Long userId){
+		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_USER_ID, userId));
 	}
 
-	public Set<VideoRecorderComment> getCommentsByToolSessionId(Long toolSessionId){
-		return (Set<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
+	public List<VideoRecorderComment> getCommentsByToolSessionId(Long toolSessionId){
+		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
 	}
 	
-	public Set<VideoRecorderComment> getCommentsByRecordingId(Long recordingId) {
-		return (Set<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_RECORDING_ID, recordingId));
+	public List<VideoRecorderComment> getCommentsByRecordingId(Long recordingId) {
+		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_RECORDING_ID, recordingId));
 	}
 	
     public void saveOrUpdate(VideoRecorderComment videoRecorderComment) {

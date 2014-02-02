@@ -42,4 +42,6 @@ public interface IMindmapRequestDAO extends IBaseDAO {
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
     
     public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId);
+    
+    public List<MindmapRequest> getRequestsByUserId(Long userId);
 }

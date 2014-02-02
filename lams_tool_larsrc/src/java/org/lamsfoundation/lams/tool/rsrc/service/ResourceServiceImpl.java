@@ -981,6 +981,46 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resourceDao.delete(resource);
     }
 
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	List<ResourceSession> sessions = resourceSessionDao.getByContentId(toolContentId);
+	for (ResourceSession session : sessions) {
+	    Iterator<ResourceItem> itemIterator = session.getResourceItems().iterator();
+	    while (itemIterator.hasNext()) {
+		ResourceItem item = itemIterator.next();
+
+		if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		    ResourceItemVisitLog visitLog = resourceItemVisitDao.getResourceItemLog(item.getUid(),
+			    userId.longValue());
+		    if (visitLog != null) {
+			resourceItemVisitDao.removeObject(ResourceItemVisitLog.class, visitLog.getUid());
+		    }
+
+		    if (item.getFileUuid() != null) {
+			try {
+			    resourceToolContentHandler.deleteFile(item.getFileUuid());
+			} catch (Exception e) {
+			    throw new ToolException("Error while removing Share Resources file UUID "
+				    + item.getFileUuid(), e);
+			}
+		    }
+		    resourceItemDao.removeObject(ResourceItem.class, item.getUid());
+		    itemIterator.remove();
+		}
+	    }
+	    
+	    ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		user.setSessionFinished(false);
+		resourceUserDao.saveObject(user);
+	    }
+	}
+    }
+    
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ResourceSession session = new ResourceSession();
 	session.setSessionId(toolSessionId);

@@ -90,7 +90,7 @@ public class MindmapNode implements Cloneable {
 	}
 	
 	/**
-	 * @hibernate.many-to-one column="parent_id" cascade="all" 
+	 * @hibernate.many-to-one column="parent_id"
 	 * @return
 	 */
 	public MindmapNode getParent() {
@@ -136,7 +136,7 @@ public class MindmapNode implements Cloneable {
 
 	/**
 	 * @return Returns the sessionid of the session in Mindmap.
-	 * @hibernate.many-to-one column="session_id" cascade="all"
+	 * @hibernate.many-to-one column="session_id"
 	 */
 	public MindmapSession getSession() {
 	    return session;
@@ -151,7 +151,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="user_id" cascade="all"
+	 * @hibernate.many-to-one column="user_id"
 	 */
 	public MindmapUser getUser() {
 	    return user;
@@ -166,7 +166,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="mindmap_id" cascade="all"
+	 * @hibernate.many-to-one column="mindmap_id"
 	 */
 	public Mindmap getMindmap() {
 	    return mindmap;

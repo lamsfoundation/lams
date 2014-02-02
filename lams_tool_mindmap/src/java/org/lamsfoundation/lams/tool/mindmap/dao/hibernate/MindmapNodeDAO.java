@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 
 /**
- * MindmapNodeDao
  * 
  * @author Ruslan Kazakov
  */
@@ -75,6 +74,9 @@ public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
 
     private static final String SQL_QUERY_FIND_NODES_NUMBER_BY_USERUID_SESSIONID = " select count(*) from "
 	    + MindmapNode.class.getName() + " mn where mn.user.uid = ? ";
+    
+    private static final String SQL_QUERY_FIND_NODES_BY_SESSION_ID_AND_USER_ID = "from " + MindmapNode.class.getName()
+	    + " mn where mn.session.sessionId = ? and mn.user.userId = ?";
     
     /* Functions Implementations */
     
@@ -165,5 +167,11 @@ public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
 	    return ((Number) list.get(0)).intValue();
 	else
 	    return 0;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<MindmapNode> getMindmapNodesBySessionIdAndUserId(Long sessionId, Long userId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODES_BY_SESSION_ID_AND_USER_ID,
+		new Object[] { sessionId, userId });
     }
 }

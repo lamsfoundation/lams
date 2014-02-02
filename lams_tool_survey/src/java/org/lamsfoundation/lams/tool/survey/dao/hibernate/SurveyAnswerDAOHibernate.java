@@ -31,6 +31,8 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 	private static final String GET_LEARNER_ANSWER = "from "+SurveyAnswer.class.getName()+" as a where a.surveyQuestion.uid=? and a.user.uid=?";
 	private static final String GET_SESSION_ANSWER = "from "+SurveyAnswer.class.getName()+" as a " +
 							" where a.user.session.sessionId=? and a.surveyQuestion.uid=?";
+	private static final String GET_BY_TOOL_CONTENT_ID_AND_USER_ID = "from "+SurveyAnswer.class.getName()+" as a " +
+		" where a.user.session.survey.contentId = ? and a.user.userId = ?";
 	
 	public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
 		List list = getHibernateTemplate().find(GET_LEARNER_ANSWER,new Object[]{questionUid,userUid});
@@ -43,5 +45,9 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 	public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid) {
 		return getHibernateTemplate().find(GET_SESSION_ANSWER,new Object[]{sessionId,questionUid});
 	}
-
+	
+    @SuppressWarnings("unchecked")
+    public List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId) {
+	return getHibernateTemplate().find(GET_BY_TOOL_CONTENT_ID_AND_USER_ID, new Object[] { toolContentId, userId });
+    }
 }

@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.videoRecorder.dto;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,7 +68,7 @@ public class VideoRecorderCommentDTO implements Comparable<VideoRecorderCommentD
 		this.videoRecorderSession = videoRecorderComment.getVideoRecorderSession();
 	}
 
-	public static Set<VideoRecorderCommentDTO> getVideoRecorderCommentDTOs(Set list){
+	public static Set<VideoRecorderCommentDTO> getVideoRecorderCommentDTOs(Collection list){
 		Set<VideoRecorderCommentDTO> retSet = new TreeSet<VideoRecorderCommentDTO>();
 		if(list == null || list.isEmpty())
 			return retSet;

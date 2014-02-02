@@ -723,7 +723,33 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
 	dacoDao.removeObject(Daco.class, daco.getUid());
     }
-
+    
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Daco data for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+	List<DacoSession> sessions = dacoSessionDao.getByContentId(toolContentId);
+	for (DacoSession session : sessions) {
+	    DacoUser user = dacoUserDao.getUserByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		for (DacoAnswer answer : user.getAnswers()) {
+		    if (answer.getFileUuid() != null) {
+			try {
+			    dacoToolContentHandler.deleteFile(answer.getFileUuid());
+			} catch (Exception e) {
+			    throw new ToolException("Error while removing Daco file", e);
+			}
+		    }
+		    dacoAnswerDao.removeObject(DacoAnswer.class, answer.getUid());
+		}
+		user.getAnswers().clear();
+		
+		user.setSessionFinished(false);
+		dacoUserDao.saveObject(user);
+	    }
+	}
+    }
+    
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	dacoSessionDao.deleteBySessionId(toolSessionId);
     }

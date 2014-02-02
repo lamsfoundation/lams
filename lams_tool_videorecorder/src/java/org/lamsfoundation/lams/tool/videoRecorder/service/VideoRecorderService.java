@@ -235,7 +235,46 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    ToolException {
 	// TODO Auto-generated method stub
     }
+    
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Removing Video Recorder contents for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
 
+	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
+	if (videoRecorder == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (VideoRecorderSession session : (Set<VideoRecorderSession>) videoRecorder.getVideoRecorderSessions()) {
+	    List<VideoRecorderComment> comments = videoRecorderCommentDAO.getCommentsByUserId(userId.longValue());
+	    videoRecorderCommentDAO.deleteAll(comments);
+
+	    List<VideoRecorderRating> ratings = videoRecorderRatingDAO.getRatingsByUserId(userId.longValue());
+	    videoRecorderRatingDAO.deleteAll(ratings);
+
+	    List<VideoRecorderRecording> recordings = videoRecorderRecordingDAO.getBySessionAndUserId(
+		    session.getSessionId(), userId.longValue());
+	    videoRecorderRecordingDAO.deleteAll(recordings);
+
+	    VideoRecorderUser user = videoRecorderUserDAO.getByUserIdAndSessionId(userId.longValue(),
+		    session.getSessionId());
+
+	    if (user != null) {
+		if (user.getEntryUID() != null) {
+		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    videoRecorderDAO.delete(entry);
+		    user.setEntryUID(null);
+		}
+		user.setFinishedActivity(false);
+		videoRecorderUserDAO.update(user);
+	    }
+	}
+    }
+    
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
@@ -440,21 +479,17 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return videoRecorderCommentDAO.getCommentById(commentId);
     }
 
-    public Set<VideoRecorderRating> getRatingsByUserId(Long userId) {
-	return videoRecorderRatingDAO.getRatingsByUserId(userId);
-    }
-
     public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId) {
-	Set<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
+	List<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
 	return VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(list);
     }
 
-    public Set<VideoRecorderComment> getCommentsByUserId(Long userId) {
+    public List<VideoRecorderComment> getCommentsByUserId(Long userId) {
 	return videoRecorderCommentDAO.getCommentsByUserId(userId);
     }
 
     public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId) {
-	Set<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
+	List<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
 	return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
     }
 
@@ -465,9 +500,9 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
 
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId,
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserUid(Long toolSessionId, Long userId,
 	    Long toolContentId) {
-	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserIds(toolSessionId, userId);
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserUid(toolSessionId, userId);
 	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
 
 	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);

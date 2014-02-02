@@ -169,7 +169,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		{
 			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionID, toolContentID);
 		}else{
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionID, videoRecorderUser.getUid(), toolContentID);
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserUid(toolSessionID, videoRecorderUser.getUid(), toolContentID);
 		}
 		
 		// sort the list of recording dtos in order to create the xml correctly

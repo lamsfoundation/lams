@@ -201,8 +201,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
 	Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
-		false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, false, learnerRestart, null, null);
+		false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
+		false, learnerRestart, null, null);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(newLesson.getLessonId());
@@ -549,8 +549,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
 	Integer requesterId = getUserId();
+	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
+		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
-	String message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId);
+	String message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
+		removeLearnerContent);
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
 	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "

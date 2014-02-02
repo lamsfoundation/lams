@@ -93,13 +93,13 @@ function initLessonTab(){
 				
 				if (checked) {
 					$('#imAvailableField').attr('disabled', null);
-					alert(LESSON_PRESENCE_ENABLE_ALERT_LABEL);
+					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
 					$('#imAvailableField').attr({
 						'checked'  : null,
 						'disabled' : 'disabled'
 					});
-					alert(LESSON_PRESENCE_DISABLE_ALERT_LABEL);
+					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
 		});
@@ -120,10 +120,10 @@ function initLessonTab(){
 			success : function() {
 				if (checked) {
 					$('#openImButton').css('display', 'inline');
-					alert(LESSON_IM_ENABLE_ALERT_LABEL);
+					alert(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
 					$('#openImButton').css('display', 'none');
-					alert(LESSON_IM_DISABLE_ALERT_LABEL);
+					alert(LABELS.LESSON_IM_DISABLE_ALERT);
 				}
 			}
 		});
@@ -230,7 +230,7 @@ function initLessonTab(){
 		'resizable' : false,
 		'show'      : 'fold',
 		'hide'      : 'fold',
-		'title'     : EMAIL_BUTTON_LABEL,
+		'title'     : LABELS.EMAIL_BUTTON,
 		'open'      : function(){
 			autoRefreshBlocked = true;
 			$('#emailFrame').attr('src',
@@ -259,7 +259,7 @@ function showLessonLearnersDialog() {
 			'classOnly' : true
 		},
 		success : function(response) {
-			 showLearnerGroupDialog(null, LESSON_GROUP_DIALOG_CLASS_LABEL, response, false, false, true);
+			 showLearnerGroupDialog(null, LABELS.LESSON_GROUP_DIALOG_CLASS, response, false, false, true);
 		}
 	});
 }
@@ -288,8 +288,8 @@ function changeLessonState(){
 			method = "archiveLesson";
 			break;
 		case 7: //FINISHED
-			if (confirm(LESSON_REMOVE_ALERT_LABEL)){
-				if (confirm(LESSON_REMOVE_DOUBLECHECK_ALERT_LABEL)) {
+			if (confirm(LABELS.LESSON_REMOVE_ALERT)){
+				if (confirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT)) {
 					method = "removeLesson";
 				}
 			}
@@ -337,25 +337,25 @@ function updateLessonTab(){
 			var label = null;
 			switch (lessonStateId) {
 				case 1:
-					label = LESSON_STATE_CREATED_LABEL;
+					label = LABELS.LESSON_STATE_CREATED;
 					break;
 				case 2:
-					label = LESSON_STATE_SCHEDULED_LABEL;
+					label = LABELS.LESSON_STATE_SCHEDULED;
 					break;
 				case 3:
-					label = LESSON_STATE_STARTED_LABEL;
+					label = LABELS.LESSON_STATE_STARTED;
 					break;
 				case 4:
-					label = LESSON_STATE_SUSPENDED_LABEL;
+					label = LABELS.LESSON_STATE_SUSPENDED;
 					break;
 				case 5:
-					label = LESSON_STATE_FINISHED_LABEL;
+					label = LABELS.LESSON_STATE_FINISHED;
 					break;
 				case 6:
-					label = LESSON_STATE_ARCHIVED_LABEL;
+					label = LABELS.LESSON_STATE_ARCHIVED;
 					break;
 				case 7:
-					label = LESSON_STATE_REMOVED_LABEL;
+					label = LABELS.LESSON_STATE_REMOVED;
 					break;
 			}
 			$('#lessonStateLabel').text(label);
@@ -366,20 +366,20 @@ function updateLessonTab(){
 			selectField.children('option:not([value="-1"])').remove();
 			switch (lessonStateId) {
 				case 3:
-					$('<option />').attr('value', 4).text(LESSON_STATE_ACTION_DISABLE_LABEL).appendTo(selectField);
-					$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
-					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 4).text(LABELS.LESSON_STATE_ACTION_DISABLE).appendTo(selectField);
+					$('<option />').attr('value', 6).text(LABELS.LESSON_STATE_ACTION_ARCHIVE).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
 				case 4:
-					$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
-					$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
-					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 3).text(LABELS.LESSON_STATE_ACTION_ACTIVATE).appendTo(selectField);
+					$('<option />').attr('value', 6).text(LABELS.LESSON_STATE_ACTION_ARCHIVE).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
 				case 5:
 					break;
 				case 6:
-					$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
-					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 3).text(LABELS.LESSON_STATE_ACTION_ACTIVATE).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
 			}
 			
@@ -424,7 +424,7 @@ function scheduleLesson(){
 			}
 		});
 	} else {
-		alert(LESSON_ERROR_SCHEDULE_DATE_LABEL);
+		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
 	}
 }
 
@@ -544,7 +544,7 @@ function initSequenceTab(){
 			},
 			'buttons' : [
 			             {
-			            	'text'   : FORCE_COMPLETE_BUTTON_LABEL,
+			            	'text'   : LABELS.FORCE_COMPLETE_BUTTON,
 			            	'id'     : 'learnerGroupDialogForceCompleteButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
@@ -562,12 +562,12 @@ function initSequenceTab(){
 			            							selectedLearner.text(), event.pageX, event.pageY);
 			            				});
 				            		$(this).dialog('close');
-				            		alert(FORCE_COMPLETE_CLICK_LABEL.replace('[0]', selectedLearner.text()));
+				            		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', selectedLearner.text()));
 			            		}
 							}
 			             },
 			             {
-			            	'text'   : VIEW_LEARNER_BUTTON_LABEL,
+			            	'text'   : LABELS.VIEW_LEARNER_BUTTON,
 			            	'id'     : 'learnerGroupDialogViewButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
@@ -579,7 +579,7 @@ function initSequenceTab(){
 							}
 			             },
 			             {
-			            	'text'   : EMAIL_BUTTON_LABEL,
+			            	'text'   : LABELS.EMAIL_BUTTON,
 			            	'id'     : 'learnerGroupDialogEmailButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
@@ -590,7 +590,7 @@ function initSequenceTab(){
 			            	}	
 			             },
 			             {
-			            	'text'   : CLOSE_BUTTON_LABEL,
+			            	'text'   : LABELS.CLOSE_BUTTON,
 			            	'id'     : 'learnerGroupDialogCloseButton',
 			            	'click'  : function() {
 								$(this).dialog('close');
@@ -626,6 +626,48 @@ function initSequenceTab(){
 				dialog.dialog('close');
 			}, sequenceInfoTimeout);
 		}
+	});
+	
+	$('#forceBackwardsDialog').dialog({
+		'autoOpen'  : false,
+		'modal'     : true,
+		'resizable' : false,
+		'minWidth'  : 350,
+		'show'      : 'fold',
+		'hide'      : 'fold',
+		'title'		: LABELS.FORCE_COMPLETE_BUTTON,
+		'open'      : function(){
+			autoRefreshBlocked = true;
+		},
+		'close' 	: function(){
+			autoRefreshBlocked = false;
+		},
+		'buttons' : [
+		             {
+		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_YES,
+		            	'click'  : function() {
+							$(this).dialog('close');
+		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
+		            							 $(this).dialog('option', 'activityId'),
+		            							 true);
+						}
+		             },
+		             {
+		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_NO,
+		            	'click'  : function() {
+		            		$(this).dialog('close');
+		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
+       							 				 $(this).dialog('option', 'activityId'),
+       							 				 false);
+						}
+		             },
+		             {
+		            	'text'   : LABELS.CLOSE_BUTTON,
+		            	'click'  : function() {
+							$(this).dialog('close');
+						} 
+		             }
+		]
 	});
 }
 	
@@ -789,38 +831,52 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			var executeForceComplete = false;
 			
 			if (act.attr('id') == 'completedLearnersContainer') {
-				executeForceComplete =  currentActivityId && confirm(FORCE_COMPLETE_END_LESSON_CONFIRM_LABEL
+				executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
 						.replace('[0]',learnerName));
 			} else {
 				var targetActivityId = act.parent().attr('id');
 				if (currentActivityId != targetActivityId) {
-					var targetActivityName = act.is('polygon') ? "Gate" 
+					
+					var precedingActivityId = currentActivityId,
+						targetActivityName = act.is('polygon') ? "Gate" 
 							: act.siblings('text[id^="TextElement"]').text();
-					executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
-								.replace('[0]', learnerName).replace('[1]', targetActivityName));
+					
+					// find out if we are moving learner forward or backwards
+					while (precedingActivityId){
+						// find transition line and extract activity IDs from them
+						var transitionLine = $('line[id$="to_' 
+								+ precedingActivityId + '"]:not([id^="arrow"])'
+								, sequenceCanvas);
+						precedingActivityId = transitionLine.length == 1 ? 
+								transitionLine.attr('id').split('_')[0] : null;
+						if (targetActivityId == precedingActivityId) {
+							break;
+						}
+					};
+					
+					// check if the target activity was found or we are moving the learner from end of lesson
+					if (!currentActivityId || precedingActivityId) {
+						// move the learner backwards
+						$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
+									.replace('[0]', learnerName).replace('[1]', targetActivityName))
+									.dialog('option', {
+										'learnerId' : learnerId,
+										'activityId': targetActivityId
+									})
+									.dialog('open');
+						// so autoRefreshBlocked = false is not set
+						return;
+					} else {
+						// move the learner forward
+						executeForceComplete = confirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM
+									.replace('[0]', learnerName).replace('[1]', targetActivityName));
+					}
 				}
 			}
 			
 			if (executeForceComplete) {
-				// tell server to force complete the learner
-				$.ajax({
-					dataType : 'text',
-					url : LAMS_URL + 'monitoring/monitoring.do',
-					cache : false,
-					data : {
-						'method'     		 : 'forceComplete',
-						'lessonID'   		 : lessonId,
-						'learnerID'  		 : learnerId,
-						'activityID' 		 : targetActivityId
-					},
-					success : function(response) {
-						// inform user of result
-						alert(response);
-												
-						// progress changed, show it to monitor
-						refreshMonitor('sequence');
-					}
-				});
+				
+				forceCompleteExecute(learnerId, targetActivityId, false);
 			}
 			// we found our target, stop iteration
 			return false;
@@ -828,6 +884,32 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	});
 	
 	autoRefreshBlocked = false;
+}
+
+
+/**
+ * Tell server to force complete the learner.
+ */
+function forceCompleteExecute(learnerId, activityId, removeContent) {
+	$.ajax({
+		dataType : 'text',
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : {
+			'method'     		 : 'forceComplete',
+			'lessonID'   		 : lessonId,
+			'learnerID'  		 : learnerId,
+			'activityID' 		 : activityId,
+			'removeContent'		 : removeContent
+		},
+		success : function(response) {
+			// inform user of result
+			alert(response);
+									
+			// progress changed, show it to monitor
+			refreshMonitor('sequence');
+		}
+	});
 }
 
 
@@ -860,8 +942,8 @@ function addLearnerIcons(activity) {
 	
 	// add group of users icon
 	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width')),
-		groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
-		+ ' ' + LEARNER_GROUP_SHOW_LABEL,
+		groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT
+		+ ' ' + LABELS.LEARNER_GROUP_SHOW,
 	// if icons do not fit in shape anymore, show a group icon
 		element = appendXMLElement('image', {
 		'id'         : 'act' + activity.id + 'learnerGroup',
@@ -883,7 +965,7 @@ function addLearnerIcons(activity) {
 	}, activity.learners.length, activityGroup[0]);
 	appendXMLElement('title', null, groupTitle, element);
 
-	var actTooltip = LEARNER_GROUP_LIST_TITLE_LABEL;
+	var actTooltip = LABELS.LEARNER_GROUP_LIST_TITLE;
 	// draw single user icons for the first few
 	if (!isGate) {
 		$.each(activity.learners, function(learnerIndex, learner){
@@ -982,7 +1064,7 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 	var completedLearnerCount = (learners ? learners.length : 0 );
 	// show (current/total) label
 	$('<span />').attr({
-		'title' : LEARNER_FINISHED_COUNT_LABEL
+		'title' : LABELS.LEARNER_FINISHED_COUNT
 			.replace('[0]', completedLearnerCount).replace('[1]', learnerTotalCount)
 	}).text('(' + completedLearnerCount + '/' + learnerTotalCount + ')')
 	  .appendTo(iconsContainer);
@@ -1024,10 +1106,10 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 		// show a group icon
 		$('<img />').attr({
 			'src' : LAMS_URL + 'images/icons/group.png',
-			'title'      : LEARNER_GROUP_SHOW_LABEL
+			'title'      : LABELS.LEARNER_GROUP_SHOW
 		}).css('cursor', 'pointer')
 		  .dblclick(function(){
-			showLearnerGroupDialog(null, LEARNER_FINISHED_DIALOG_TITLE_LABEL, learners, true, false);
+			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, learners, true, false);
 		}).appendTo(iconsContainer);
 	}
 }
@@ -1079,7 +1161,7 @@ function showClassDialog(){
 	$('#classDialog')
 		.dialog('option',
 			{
-			 'title' : LESSON_EDIT_CLASS_LABEL
+			 'title' : LABELS.LESSON_EDIT_CLASS
 			})
 		.dialog('open');
 }
@@ -1151,7 +1233,7 @@ function fillClassDialogList(listId, users, disableCreator) {
  * Opens Authoring for live edit.
  */
 function openLiveEdit(){
-	if (confirm(LIVE_EDIT_CONFIRM_LABEL)) {
+	if (confirm(LABELS.LIVE_EDIT_CONFIRM)) {
 		$.ajax({
 			dataType : 'text',
 			url : LAMS_URL + 'monitoring/monitoring.do',
@@ -1299,17 +1381,17 @@ function loadLearnerProgressPage(pageNumber){
 		learnerProgressCellsTemplate =
 		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>'
 		+ '<a class="button" title="' 
-		+ EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
+		+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
 		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
 		+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
-		+ EXPORT_PORTFOLIO_LABEL
+		+ LABELS.EXPORT_PORTFOLIO
 		+ '</a><a class="button" title="'
-		+ TIME_CHART_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
+		+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
 		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
 		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
-		+ TIME_CHART_LABEL 
+		+ LABELS.TIME_CHART 
 		+ '</a><a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
-		+ EMAIL_BUTTON_LABEL
+		+ LABELS.EMAIL_BUTTON
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
 	

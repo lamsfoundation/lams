@@ -21,64 +21,69 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
-		var userId = '<lams:user property="userID"/>';
-		var lessonId = ${lesson.lessonID};
-		var ldId = ${lesson.learningDesignID};
-		var lessonStateId = ${lesson.lessonStateID};
-		var createDateTimeStr = '${lesson.createDateTimeStr}';
-		// settings for progress bar
-		var isHorizontalBar = true;
-		var hasContentFrame = false;
-		var presenceEnabled =  false;
-		var hasDialog = false;
-		
-		var LAMS_URL = '<lams:LAMSURL/>';
-		
-		var FORCE_COMPLETE_CLICK_LABEL = '<fmt:message key="force.complete.click"/>';
-		var FORCE_COMPLETE_BUTTON_LABEL = '<fmt:message key="button.force.complete"/>';
-		var FORCE_COMPLETE_END_LESSON_CONFIRM_LABEL = '<fmt:message key="force.complete.end.lesson.confirm"/>';
-		var FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL = '<fmt:message key="force.complete.activity.confirm"/>';
-		var FORCE_COMPLETE_DROP_FAIL_LABEL = '<fmt:message key="force.complete.drop.fail"/>';
-		var LEARNER_GROUP_COUNT_LABEL = '<fmt:message key="learner.group.count"/>';
-		var LEARNER_GROUP_SHOW_LABEL = '<fmt:message key="learner.group.show"/>';
-		var LEARNER_GROUP_REMOVE_PROGRESS = '<fmt:message key="learner.group.remove.progress"/>';
-		var LEARNER_GROUP_LIST_TITLE_LABEL = '<fmt:message key="learner.group.list.title"/>';
-		var VIEW_LEARNER_BUTTON_LABEL = '<fmt:message key="button.view.learner"/>';
-		var EMAIL_BUTTON_LABEL = '<fmt:message key="button.email"/>';
-		var CLOSE_BUTTON_LABEL = '<fmt:message key="button.close"/>';
-		var NOTIFCATIONS_LABEL = '<fmt:message key="email.notifications"/>';
-		var LEARNER_FINISHED_COUNT_LABEL = '<fmt:message key="learner.finished.count"/>';
-		var LEARNER_FINISHED_DIALOG_TITLE_LABEL = '<fmt:message key="learner.finished.dialog.title"/>';
-		var LESSON_PRESENCE_ENABLE_ALERT_LABEL = '<fmt:message key="lesson.enable.presence.alert"/>';
-		var LESSON_PRESENCE_DISABLE_ALERT_LABEL = '<fmt:message key="lesson.disable.presence.alert"/>';
-		var LESSON_IM_ENABLE_ALERT_LABEL = '<fmt:message key="lesson.enable.im.alert"/>';
-		var LESSON_IM_DISABLE_ALERT_LABEL = '<fmt:message key="lesson.disable.im.alert"/>';
-		var LESSON_REMOVE_ALERT_LABEL = '<fmt:message key="lesson.remove.alert"/>';
-		var LESSON_REMOVE_DOUBLECHECK_ALERT_LABEL = '<fmt:message key="lesson.remove.doublecheck.alert"/>';
-		var LESSON_STATE_CREATED_LABEL = '<fmt:message key="lesson.state.created"/>';
-		var LESSON_STATE_SCHEDULED_LABEL = '<fmt:message key="lesson.state.scheduled"/>';
-		var LESSON_STATE_STARTED_LABEL = '<fmt:message key="lesson.state.started"/>';
-		var LESSON_STATE_SUSPENDED_LABEL = '<fmt:message key="lesson.state.suspended"/>';
-		var LESSON_STATE_FINISHED_LABEL = '<fmt:message key="lesson.state.finished"/>';
-		var LESSON_STATE_ARCHIVED_LABEL = '<fmt:message key="lesson.state.archived"/>';
-		var LESSON_STATE_REMOVED_LABEL = '<fmt:message key="lesson.state.removed"/>';
-		var LESSON_STATE_ACTION_DISABLE_LABEL = '<fmt:message key="lesson.state.action.disable"/>';
-		var LESSON_STATE_ACTION_ACTIVATE_LABEL = '<fmt:message key="lesson.state.action.activate"/>';
-		var LESSON_STATE_ACTION_REMOVE_LABEL = '<fmt:message key="lesson.state.action.remove"/>';
-		var LESSON_STATE_ACTION_ARCHIVE_LABEL = '<fmt:message key="lesson.state.action.archive"/>';
-		var LESSON_ERROR_SCHEDULE_DATE_LABEL = '<fmt:message key="error.lesson.schedule.date"/>';
-		var LESSON_EDIT_CLASS_LABEL = '<fmt:message key="button.edit.class"/>';
-		var LESSON_GROUP_DIALOG_CLASS_LABEL = '<fmt:message key="lesson.group.dialog.class"/>';
-		var CURRENT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
-		var COMPLETED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
-		var ATTEMPTED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
-		var TOSTART_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>';
-		var SUPPORT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.support.tooltip"/>';
-		var EXPORT_PORTFOLIO_LABEL = '<fmt:message key="button.export"/>';
-		var EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL = '<fmt:message key="button.export.learner.tooltip"/>';
-	    var TIME_CHART_LABEL = '<fmt:message key="button.timechart"/>';
-	    var TIME_CHART_TOOLTIP_LABEL = '<fmt:message key="button.timechart.tooltip"/>';
-		var LIVE_EDIT_CONFIRM_LABEL = '<fmt:message key="button.live.edit.confirm"/>';
+		var userId = '<lams:user property="userID"/>',
+			lessonId = ${lesson.lessonID},
+			ldId = ${lesson.learningDesignID},
+			lessonStateId = ${lesson.lessonStateID},
+			createDateTimeStr = '${lesson.createDateTimeStr}',
+			// settings for progress bar
+			isHorizontalBar = true,
+			hasContentFrame = false,
+			presenceEnabled =  false,
+			hasDialog = false,
+			
+			LAMS_URL = '<lams:LAMSURL/>',
+			
+			LABELS = {
+				FORCE_COMPLETE_CLICK : '<fmt:message key="force.complete.click"/>',
+				FORCE_COMPLETE_BUTTON : '<fmt:message key="button.force.complete"/>',
+				FORCE_COMPLETE_END_LESSON_CONFIRM : '<fmt:message key="force.complete.end.lesson.confirm"/>',
+				FORCE_COMPLETE_ACTIVITY_CONFIRM : '<fmt:message key="force.complete.activity.confirm"/>',
+				FORCE_COMPLETE_REMOVE_CONTENT : '<fmt:message key="force.complete.remove.content"/>',
+				FORCE_COMPLETE_REMOVE_CONTENT_YES : '<fmt:message key="force.complete.remove.content.yes"/>',
+				FORCE_COMPLETE_REMOVE_CONTENT_NO : '<fmt:message key="force.complete.remove.content.no"/>',
+				FORCE_COMPLETE_DROP_FAIL : '<fmt:message key="force.complete.drop.fail"/>',
+				LEARNER_GROUP_COUNT : '<fmt:message key="learner.group.count"/>',
+				LEARNER_GROUP_SHOW : '<fmt:message key="learner.group.show"/>',
+				LEARNER_GROUP_REMOVE_PROGRESS : '<fmt:message key="learner.group.remove.progress"/>',
+				LEARNER_GROUP_LIST_TITLE : '<fmt:message key="learner.group.list.title"/>',
+				VIEW_LEARNER_BUTTON : '<fmt:message key="button.view.learner"/>',
+				EMAIL_BUTTON : '<fmt:message key="button.email"/>',
+				CLOSE_BUTTON : '<fmt:message key="button.close"/>',
+				NOTIFCATIONS : '<fmt:message key="email.notifications"/>',
+				LEARNER_FINISHED_COUNT : '<fmt:message key="learner.finished.count"/>',
+				LEARNER_FINISHED_DIALOG_TITLE : '<fmt:message key="learner.finished.dialog.title"/>',
+				LESSON_PRESENCE_ENABLE_ALERT : '<fmt:message key="lesson.enable.presence.alert"/>',
+				LESSON_PRESENCE_DISABLE_ALERT : '<fmt:message key="lesson.disable.presence.alert"/>',
+				LESSON_IM_ENABLE_ALERT : '<fmt:message key="lesson.enable.im.alert"/>',
+				LESSON_IM_DISABLE_ALERT : '<fmt:message key="lesson.disable.im.alert"/>',
+				LESSON_REMOVE_ALERT : '<fmt:message key="lesson.remove.alert"/>',
+				LESSON_REMOVE_DOUBLECHECK_ALERT : '<fmt:message key="lesson.remove.doublecheck.alert"/>',
+				LESSON_STATE_CREATED : '<fmt:message key="lesson.state.created"/>',
+				LESSON_STATE_SCHEDULED : '<fmt:message key="lesson.state.scheduled"/>',
+				LESSON_STATE_STARTED : '<fmt:message key="lesson.state.started"/>',
+				LESSON_STATE_SUSPENDED : '<fmt:message key="lesson.state.suspended"/>',
+				LESSON_STATE_FINISHED : '<fmt:message key="lesson.state.finished"/>',
+				LESSON_STATE_ARCHIVED : '<fmt:message key="lesson.state.archived"/>',
+				LESSON_STATE_REMOVED : '<fmt:message key="lesson.state.removed"/>',
+				LESSON_STATE_ACTION_DISABLE : '<fmt:message key="lesson.state.action.disable"/>',
+				LESSON_STATE_ACTION_ACTIVATE : '<fmt:message key="lesson.state.action.activate"/>',
+				LESSON_STATE_ACTION_REMOVE : '<fmt:message key="lesson.state.action.remove"/>',
+				LESSON_STATE_ACTION_ARCHIVE : '<fmt:message key="lesson.state.action.archive"/>',
+				LESSON_ERROR_SCHEDULE_DATE : '<fmt:message key="error.lesson.schedule.date"/>',
+				LESSON_EDIT_CLASS : '<fmt:message key="button.edit.class"/>',
+				LESSON_GROUP_DIALOG_CLASS : '<fmt:message key="lesson.group.dialog.class"/>',
+				CURRENT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.current.tooltip"/>',
+				COMPLETED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>',
+				ATTEMPTED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>',
+				TOSTART_ACTIVITY : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
+				SUPPORT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>',
+				EXPORT_PORTFOLIO : '<fmt:message key="button.export"/>',
+				EXPORT_PORTFOLIO_LEARNER_TOOLTIP : '<fmt:message key="button.export.learner.tooltip"/>',
+			    TIME_CHART : '<fmt:message key="button.timechart"/>',
+			    TIME_CHART_TOOLTIP : '<fmt:message key="button.timechart.tooltip"/>',
+				LIVE_EDIT_CONFIRM : '<fmt:message key="button.live.edit.confirm"/>'
+			}
 	    
 	    
 		$(document).ready(function(){
@@ -450,6 +455,8 @@
 			<fmt:message key="sequence.help.info"/>
 		</div>
 	</c:if>
+	
+	<div id="forceBackwardsDialog" class="dialogContainer"></div>
 	
 	<div id="tooltip"></div>
 </div>
