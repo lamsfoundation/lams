@@ -4,9 +4,9 @@ SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 -- LDEV-3147 Simplify tools: get rid of instructions tab, define in monitor and offline activity options
-ALTER TABLE tl_latask10_taskList DROP COLUMN online_instructions;
-ALTER TABLE tl_latask10_taskList DROP COLUMN offline_instructions;
-ALTER TABLE tl_latask10_taskList DROP COLUMN run_offline;
+ALTER TABLE tl_latask10_tasklist DROP COLUMN online_instructions;
+ALTER TABLE tl_latask10_tasklist DROP COLUMN offline_instructions;
+ALTER TABLE tl_latask10_tasklist DROP COLUMN run_offline;
 DROP TABLE IF EXISTS tl_latask10_attachment;
 
 UPDATE lams_tool SET tool_version='20140102' WHERE tool_signature='latask10';

@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimsc11_commonCartridge_item"
+ * @hibernate.class table="tl_laimsc11_commoncartridge_item"
  * 
  */
 public class CommonCartridgeItem implements Cloneable {

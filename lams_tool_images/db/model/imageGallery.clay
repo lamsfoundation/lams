@@ -69,7 +69,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK_tl_laimag10_item_comment_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f6d">
+<foreign-key alias="" name="FK_tl_laimag10_item_comment_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f6d">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -162,7 +162,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK_tl_laimag10_item_rating_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f46">
+<foreign-key alias="" name="FK_tl_laimag10_item_rating_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f46">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -281,7 +281,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK_NEW_1821149711_1E7009430E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f9d">
+<foreign-key alias="" name="FK_NEW_1821149711_1E7009430E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f9d">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -300,7 +300,7 @@
 </index>
 </index-list>
 </table>
-<table alias="" name="tl_laimag10_imageGallery" remarks="" uid="120fac0:11c25acc4f7:-7fea">
+<table alias="" name="tl_laimag10_imagegallery" remarks="" uid="120fac0:11c25acc4f7:-7fea">
 <table-description/>
 <table-figure-bounds height="-1" width="-1" x="26" y="31"/>
 <column-list>
@@ -490,7 +490,7 @@
 </index>
 </index-list>
 </table>
-<table alias="" name="tl_laimag10_imageGallery_item" remarks="" uid="120fac0:11c25acc4f7:-7fd4">
+<table alias="" name="tl_laimag10_imagegallery_item" remarks="" uid="120fac0:11c25acc4f7:-7fd4">
 <table-description/>
 <table-figure-bounds height="-1" width="-1" x="41" y="379"/>
 <column-list>
@@ -653,7 +653,7 @@
 </foreign-key-figure>
 <foreign-key-column column-name="session_uid" referenced-key-column-name="uid"/>
 </foreign-key>
-<foreign-key alias="" name="FK_NEW_1821149711_F52D1F9330E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f99">
+<foreign-key alias="" name="FK_NEW_1821149711_F52D1F9330E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f99">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -756,7 +756,7 @@
 </foreign-key-figure>
 <foreign-key-column column-name="user_uid" referenced-key-column-name="uid"/>
 </foreign-key>
-<foreign-key alias="" name="FK_NEW_1821149711_693580A438BF8DFE" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f96">
+<foreign-key alias="" name="FK_NEW_1821149711_693580A438BF8DFE" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f96">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -868,7 +868,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK_NEW_1821149711_24AA78C530E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f95">
+<foreign-key alias="" name="FK_NEW_1821149711_24AA78C530E79035" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imagegallery" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f95">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>

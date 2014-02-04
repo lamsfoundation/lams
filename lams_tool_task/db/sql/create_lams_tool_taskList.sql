@@ -2,9 +2,9 @@ SET FOREIGN_KEY_CHECKS=0;
 drop table if exists tl_latask10_attachment;
 drop table if exists tl_latask10_condition;
 drop table if exists tl_latask10_condition_tl_item;
-drop table if exists tl_latask10_taskList;
-drop table if exists tl_latask10_taskList_item;
-drop table if exists tl_latask10_taskList_item_visit_log;
+drop table if exists tl_latask10_tasklist;
+drop table if exists tl_latask10_tasklist_item;
+drop table if exists tl_latask10_tasklist_item_visit_log;
 drop table if exists tl_latask10_item_attachment;
 drop table if exists tl_latask10_item_comment;
 drop table if exists tl_latask10_session;
@@ -31,7 +31,7 @@ create table tl_latask10_condition_tl_item (
    condition_uid bigint not null,
    primary key (uid, condition_uid)
 )ENGINE=InnoDB;
-create table tl_latask10_taskList (
+create table tl_latask10_tasklist (
    uid bigint not null auto_increment,
    create_date datetime,
    update_date datetime,
@@ -54,7 +54,7 @@ create table tl_latask10_taskList (
    submission_deadline datetime DEFAULT NULL,
    primary key (uid)
 )ENGINE=InnoDB;
-create table tl_latask10_taskList_item (
+create table tl_latask10_tasklist_item (
    uid bigint not null auto_increment,
    sequence_id integer,
    description text,
@@ -127,33 +127,33 @@ create table tl_latask10_user (
    is_verified_by_monitor tinyint,
    primary key (uid)
 )ENGINE=InnoDB;
-alter table tl_latask10_attachment add index FK_NEW_174079138_1E7009430E79035 (taskList_uid), add constraint FK_NEW_174079138_1E7009430E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);
-alter table tl_latask10_condition add index FK_tl_latask10_condition_1 (taskList_uid), add constraint FK_tl_latask10_condition_1 foreign key (taskList_uid) references tl_latask10_taskList (uid);
-alter table tl_latask10_condition_tl_item add index FK_tl_latask10_taskList_item_condition_1 (condition_uid), add constraint FK_tl_latask10_taskList_item_condition_1 foreign key (condition_uid) references tl_latask10_condition (condition_uid);
-alter table tl_latask10_condition_tl_item add index FK_tl_latask10_taskList_item_condition_2 (uid), add constraint FK_tl_latask10_taskList_item_condition_2 foreign key (uid) references tl_latask10_taskList_item (uid);
-alter table tl_latask10_taskList add index FK_NEW_174079138_89093BF758092FB (create_by), add constraint FK_NEW_174079138_89093BF758092FB foreign key (create_by) references tl_latask10_user (uid);
-alter table tl_latask10_taskList_item add index FK_NEW_174079138_F52D1F93758092FB (create_by), add constraint FK_NEW_174079138_F52D1F93758092FB foreign key (create_by) references tl_latask10_user (uid);
-alter table tl_latask10_taskList_item add index FK_NEW_174079138_F52D1F9330E79035 (taskList_uid), add constraint FK_NEW_174079138_F52D1F9330E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);
-alter table tl_latask10_taskList_item add index FK_NEW_174079138_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_174079138_F52D1F93EC0D3147 foreign key (session_uid) references tl_latask10_session (uid);
-alter table tl_latask10_item_log add index FK_NEW_174079138_693580A438BF8DFE (taskList_item_uid), add constraint FK_NEW_174079138_693580A438BF8DFE foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
+alter table tl_latask10_attachment add index FK_NEW_174079138_1E7009430E79035 (taskList_uid), add constraint FK_NEW_174079138_1E7009430E79035 foreign key (taskList_uid) references tl_latask10_tasklist (uid);
+alter table tl_latask10_condition add index FK_tl_latask10_condition_1 (taskList_uid), add constraint FK_tl_latask10_condition_1 foreign key (taskList_uid) references tl_latask10_tasklist (uid);
+alter table tl_latask10_condition_tl_item add index FK_tl_latask10_tasklist_item_condition_1 (condition_uid), add constraint FK_tl_latask10_tasklist_item_condition_1 foreign key (condition_uid) references tl_latask10_condition (condition_uid);
+alter table tl_latask10_condition_tl_item add index FK_tl_latask10_tasklist_item_condition_2 (uid), add constraint FK_tl_latask10_tasklist_item_condition_2 foreign key (uid) references tl_latask10_tasklist_item (uid);
+alter table tl_latask10_tasklist add index FK_NEW_174079138_89093BF758092FB (create_by), add constraint FK_NEW_174079138_89093BF758092FB foreign key (create_by) references tl_latask10_user (uid);
+alter table tl_latask10_tasklist_item add index FK_NEW_174079138_F52D1F93758092FB (create_by), add constraint FK_NEW_174079138_F52D1F93758092FB foreign key (create_by) references tl_latask10_user (uid);
+alter table tl_latask10_tasklist_item add index FK_NEW_174079138_F52D1F9330E79035 (taskList_uid), add constraint FK_NEW_174079138_F52D1F9330E79035 foreign key (taskList_uid) references tl_latask10_tasklist (uid);
+alter table tl_latask10_tasklist_item add index FK_NEW_174079138_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_174079138_F52D1F93EC0D3147 foreign key (session_uid) references tl_latask10_session (uid);
+alter table tl_latask10_item_log add index FK_NEW_174079138_693580A438BF8DFE (taskList_item_uid), add constraint FK_NEW_174079138_693580A438BF8DFE foreign key (taskList_item_uid) references tl_latask10_tasklist_item (uid);
 alter table tl_latask10_item_log add index FK_NEW_174079138_693580A441F9365D (user_uid), add constraint FK_NEW_174079138_693580A441F9365D foreign key (user_uid) references tl_latask10_user (uid);
-alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_1 (taskList_item_uid), add constraint FK_tl_latask10_item_attachment_1 foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
+alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_1 (taskList_item_uid), add constraint FK_tl_latask10_item_attachment_1 foreign key (taskList_item_uid) references tl_latask10_tasklist_item (uid);
 alter table tl_latask10_item_attachment add index FK_tl_latask10_item_attachment_2 (create_by), add constraint FK_tl_latask10_item_attachment_2 foreign key (create_by) references tl_latask10_user (uid);
-alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_3 (taskList_item_uid), add constraint FK_tl_latask10_item_comment_3 foreign key (taskList_item_uid) references tl_latask10_taskList_item (uid);
+alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_3 (taskList_item_uid), add constraint FK_tl_latask10_item_comment_3 foreign key (taskList_item_uid) references tl_latask10_tasklist_item (uid);
 alter table tl_latask10_item_comment add index FK_tl_latask10_item_comment_2 (create_by), add constraint FK_tl_latask10_item_comment_2 foreign key (create_by) references tl_latask10_user (uid);
-alter table tl_latask10_session add index FK_NEW_174079138_24AA78C530E79035 (taskList_uid), add constraint FK_NEW_174079138_24AA78C530E79035 foreign key (taskList_uid) references tl_latask10_taskList (uid);
+alter table tl_latask10_session add index FK_NEW_174079138_24AA78C530E79035 (taskList_uid), add constraint FK_NEW_174079138_24AA78C530E79035 foreign key (taskList_uid) references tl_latask10_tasklist (uid);
 alter table tl_latask10_user add index FK_NEW_174079138_30113BFCEC0D3147 (session_uid), add constraint FK_NEW_174079138_30113BFCEC0D3147 foreign key (session_uid) references tl_latask10_session (uid);
-alter table tl_latask10_user add index FK_NEW_174079138_30113BFC309ED320 (taskList_uid), add constraint FK_NEW_174079138_30113BFC309ED320 foreign key (taskList_uid) references tl_latask10_taskList (uid);
+alter table tl_latask10_user add index FK_NEW_174079138_30113BFC309ED320 (taskList_uid), add constraint FK_NEW_174079138_30113BFC309ED320 foreign key (taskList_uid) references tl_latask10_tasklist (uid);
 
 
 
-INSERT INTO `tl_latask10_taskList` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `instructions`,
+INSERT INTO `tl_latask10_tasklist` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `instructions`,
 	`online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `lock_when_finished`, 
 	`minimum_number_tasks`, `is_sequential_order`, `allow_contribute_tasks`, `is_monitor_verification_required`, 
 	`reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'Task List','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0,0);
   
-INSERT INTO `tl_latask10_taskList_item` (`uid`, `sequence_id`, `description`, `init_item`, `organization_xml`, `title`, `create_by`, `create_date`, `create_by_author`, `is_required`, `is_comments_allowed`, `is_comments_required`, `is_files_allowed`, `is_files_required`, `is_comments_files_allowed`, `show_comments_to_all`, `is_child_task`, `parent_task_name`, `taskList_uid`, `session_uid`) VALUES 
+INSERT INTO `tl_latask10_tasklist_item` (`uid`, `sequence_id`, `description`, `init_item`, `organization_xml`, `title`, `create_by`, `create_date`, `create_by_author`, `is_required`, `is_comments_allowed`, `is_comments_required`, `is_files_allowed`, `is_files_required`, `is_comments_files_allowed`, `show_comments_to_all`, `is_child_task`, `parent_task_name`, `taskList_uid`, `session_uid`) VALUES 
   (1,1,NULL,NULL,NULL,'Task number 1',null,NOW(),1,0,0,0,0,0,0,1,0,NULL,1,NULL);
     
 SET FOREIGN_KEY_CHECKS=1;

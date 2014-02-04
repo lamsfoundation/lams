@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * @author Dapeng Ni
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_latask10_taskList"
+ * @hibernate.class  table="tl_latask10_tasklist"
  */
 public class TaskList implements Cloneable{
 	

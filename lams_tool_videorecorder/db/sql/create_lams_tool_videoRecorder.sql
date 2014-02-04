@@ -3,7 +3,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_lavidr10_conditions;
 drop table if exists tl_lavidr10_attachment;
-drop table if exists tl_lavidr10_videoRecorder;
+drop table if exists tl_lavidr10_videorecorder;
 drop table if exists tl_lavidr10_recording;
 drop table if exists tl_lavidr10_session;
 drop table if exists tl_lavidr10_user;
@@ -21,7 +21,7 @@ create table tl_lavidr10_attachment (
 	primary key (uid)
 )ENGINE=InnoDB;
 
-create table tl_lavidr10_videoRecorder (
+create table tl_lavidr10_videorecorder (
 	uid bigint not null auto_increment,
 	create_date datetime,
 	update_date datetime,
@@ -107,11 +107,11 @@ create table tl_lavidr10_rating (
    primary key (uid)
 )ENGINE=InnoDB;
 
-alter table tl_lavidr10_attachment add index FK_NEW_75587508_12090F57FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_12090F57FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videoRecorder (uid);
-alter table tl_lavidr10_session add index FK_NEW_75587508_B7C198E2FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_B7C198E2FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videoRecorder (uid);
+alter table tl_lavidr10_attachment add index FK_NEW_75587508_12090F57FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_12090F57FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videorecorder (uid);
+alter table tl_lavidr10_session add index FK_NEW_75587508_B7C198E2FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_B7C198E2FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videorecorder (uid);
 alter table tl_lavidr10_user add index FK_NEW_75587508_CB8A58FFA3B0FADF (videoRecorder_session_uid), add constraint FK_NEW_75587508_CB8A58FFA3B0FADF foreign key (videoRecorder_session_uid) references tl_lavidr10_session (uid);
 
-INSERT INTO tl_lavidr10_videoRecorder (
+INSERT INTO tl_lavidr10_videorecorder (
 	title,
 	instructions,
 	online_instructions,
@@ -160,7 +160,7 @@ CREATE TABLE tl_lavidr10_conditions (
 	 , CONSTRAINT VideoRecorderConditionInheritance FOREIGN KEY (condition_id)
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT VideoRecorderConditionToVideoRecorder FOREIGN KEY (content_uid)
-                  REFERENCES tl_lavidr10_videoRecorder(uid) ON DELETE CASCADE ON UPDATE CASCADE
+                  REFERENCES tl_lavidr10_videorecorder(uid) ON DELETE CASCADE ON UPDATE CASCADE
 )ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS=1;

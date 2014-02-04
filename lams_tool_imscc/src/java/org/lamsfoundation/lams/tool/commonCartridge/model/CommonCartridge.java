@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolCont
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimsc11_commonCartridge"
+ * @hibernate.class table="tl_laimsc11_commoncartridge"
  * 
  */
 public class CommonCartridge implements Cloneable {

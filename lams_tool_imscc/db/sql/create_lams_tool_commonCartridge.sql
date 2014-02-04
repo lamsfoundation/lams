@@ -1,9 +1,9 @@
 SET FOREIGN_KEY_CHECKS=0;
 drop table if exists tl_laimsc11_attachment;
 drop table if exists tl_laimsc11_item_instruction;
-drop table if exists tl_laimsc11_commonCartridge;
-drop table if exists tl_laimsc11_commonCartridge_item;
-drop table if exists tl_laimsc11_commonCartridge_item_visit_log;
+drop table if exists tl_laimsc11_commoncartridge;
+drop table if exists tl_laimsc11_commoncartridge_item;
+drop table if exists tl_laimsc11_commoncartridge_item_visit_log;
 drop table if exists tl_laimsc11_session;
 drop table if exists tl_laimsc11_user;
 drop table if exists tl_laimsc11_configuration;
@@ -25,7 +25,7 @@ create table tl_laimsc11_item_instruction (
    item_uid bigint,
    primary key (uid)
 )ENGINE=InnoDB;
-create table tl_laimsc11_commonCartridge (
+create table tl_laimsc11_commoncartridge (
    uid bigint not null auto_increment,
    create_date datetime,
    update_date datetime,
@@ -45,7 +45,7 @@ create table tl_laimsc11_commonCartridge (
    reflect_on_activity smallint,
    primary key (uid)
 )ENGINE=InnoDB;
-create table tl_laimsc11_commonCartridge_item (
+create table tl_laimsc11_commoncartridge_item (
    uid bigint not null auto_increment,
    file_uuid bigint,
    file_version_id bigint,
@@ -111,26 +111,26 @@ create table tl_laimsc11_configuration (
    primary key (uid)
 )ENGINE=InnoDB;
 
-alter table tl_laimsc11_attachment add index FK_NEW_1279208528_1E7009430E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_1E7009430E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commonCartridge (uid);
-alter table tl_laimsc11_item_instruction add index FK_NEW_1279208528_A5665013980570ED (item_uid), add constraint FK_NEW_1279208528_A5665013980570ED foreign key (item_uid) references tl_laimsc11_commonCartridge_item (uid);
-alter table tl_laimsc11_commonCartridge add index FK_NEW_1279208528_89093BF758092FB (create_by), add constraint FK_NEW_1279208528_89093BF758092FB foreign key (create_by) references tl_laimsc11_user (uid);
-alter table tl_laimsc11_commonCartridge_item add index FK_NEW_1279208528_F52D1F93758092FB (create_by), add constraint FK_NEW_1279208528_F52D1F93758092FB foreign key (create_by) references tl_laimsc11_user (uid);
-alter table tl_laimsc11_commonCartridge_item add index FK_NEW_1279208528_F52D1F9330E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_F52D1F9330E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commonCartridge (uid);
-alter table tl_laimsc11_commonCartridge_item add index FK_NEW_1279208528_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1279208528_F52D1F93EC0D3147 foreign key (session_uid) references tl_laimsc11_session (uid);
-alter table tl_laimsc11_item_log add index FK_NEW_1279208528_693580A438BF8DFE (commonCartridge_item_uid), add constraint FK_NEW_1279208528_693580A438BF8DFE foreign key (commonCartridge_item_uid) references tl_laimsc11_commonCartridge_item (uid);
+alter table tl_laimsc11_attachment add index FK_NEW_1279208528_1E7009430E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_1E7009430E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commoncartridge (uid);
+alter table tl_laimsc11_item_instruction add index FK_NEW_1279208528_A5665013980570ED (item_uid), add constraint FK_NEW_1279208528_A5665013980570ED foreign key (item_uid) references tl_laimsc11_commoncartridge_item (uid);
+alter table tl_laimsc11_commoncartridge add index FK_NEW_1279208528_89093BF758092FB (create_by), add constraint FK_NEW_1279208528_89093BF758092FB foreign key (create_by) references tl_laimsc11_user (uid);
+alter table tl_laimsc11_commoncartridge_item add index FK_NEW_1279208528_F52D1F93758092FB (create_by), add constraint FK_NEW_1279208528_F52D1F93758092FB foreign key (create_by) references tl_laimsc11_user (uid);
+alter table tl_laimsc11_commoncartridge_item add index FK_NEW_1279208528_F52D1F9330E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_F52D1F9330E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commoncartridge (uid);
+alter table tl_laimsc11_commoncartridge_item add index FK_NEW_1279208528_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1279208528_F52D1F93EC0D3147 foreign key (session_uid) references tl_laimsc11_session (uid);
+alter table tl_laimsc11_item_log add index FK_NEW_1279208528_693580A438BF8DFE (commonCartridge_item_uid), add constraint FK_NEW_1279208528_693580A438BF8DFE foreign key (commonCartridge_item_uid) references tl_laimsc11_commoncartridge_item (uid);
 alter table tl_laimsc11_item_log add index FK_NEW_1279208528_693580A441F9365D (user_uid), add constraint FK_NEW_1279208528_693580A441F9365D foreign key (user_uid) references tl_laimsc11_user (uid);
-alter table tl_laimsc11_session add index FK_NEW_1279208528_24AA78C530E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_24AA78C530E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commonCartridge (uid);
+alter table tl_laimsc11_session add index FK_NEW_1279208528_24AA78C530E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_24AA78C530E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commoncartridge (uid);
 alter table tl_laimsc11_user add index FK_NEW_1279208528_30113BFCEC0D3147 (session_uid), add constraint FK_NEW_1279208528_30113BFCEC0D3147 foreign key (session_uid) references tl_laimsc11_session (uid);
-alter table tl_laimsc11_user add index FK_NEW_1279208528_30113BFC309ED320 (commonCartridge_uid), add constraint FK_NEW_1279208528_30113BFC309ED320 foreign key (commonCartridge_uid) references tl_laimsc11_commonCartridge (uid);
+alter table tl_laimsc11_user add index FK_NEW_1279208528_30113BFC309ED320 (commonCartridge_uid), add constraint FK_NEW_1279208528_30113BFC309ED320 foreign key (commonCartridge_uid) references tl_laimsc11_commoncartridge (uid);
 
 
 
-INSERT INTO `tl_laimsc11_commonCartridge` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,
+INSERT INTO `tl_laimsc11_commoncartridge` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,
  `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`,
  `mini_view_commonCartridge_number`, `allow_auto_run`,`reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'CommonCartridge','0','0','Instructions ',null,null,0,0,${default_content_id},0,0,0);
   
-INSERT INTO `tl_laimsc11_commonCartridge_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `ims_schema`, `init_item`, `organization_xml`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `item_type`, `file_type`, `file_name`, `open_url_new_window`, `commonCartridge_uid`, `session_uid`, `frame_height`) VALUES 
+INSERT INTO `tl_laimsc11_commoncartridge_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `ims_schema`, `init_item`, `organization_xml`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `item_type`, `file_type`, `file_name`, `open_url_new_window`, `commonCartridge_uid`, `session_uid`, `frame_height`) VALUES 
   (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',null,NOW(),1,0,1,NULL,NULL,0,1,NULL, 100);
   
 INSERT INTO `tl_laimsc11_configuration` (`config_key`, `config_value`) VALUES

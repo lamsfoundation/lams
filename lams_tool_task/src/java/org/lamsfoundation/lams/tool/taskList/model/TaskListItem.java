@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  * TaskList
  * @author Dapeng Ni
  *
- * @hibernate.class  table="tl_latask10_taskList_item"
+ * @hibernate.class  table="tl_latask10_tasklist_item"
  *
  */
 public class TaskListItem  implements Cloneable{

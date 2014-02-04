@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHan
 /**
  * ImageGallery
  * 
- * @hibernate.class table="tl_laimag10_imageGallery"
+ * @hibernate.class table="tl_laimag10_imagegallery"
  * 
  */
 public class ImageGallery implements Cloneable {

@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 /**
  * ImageGallery
  * 
- * @hibernate.class table="tl_laimag10_imageGallery_item"
+ * @hibernate.class table="tl_laimag10_imagegallery_item"
  * 
  * @author Andrey Balan
  * 

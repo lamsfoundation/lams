@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 
 /**
- * @hibernate.class table="tl_lavidr10_videoRecorder"
+ * @hibernate.class table="tl_lavidr10_videorecorder"
  */
 
 public class VideoRecorder implements java.io.Serializable, Cloneable {
