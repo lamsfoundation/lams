@@ -112,7 +112,7 @@ public class TaskListItemComment  implements Cloneable{
 	}
 	/**
 	 * @hibernate.many-to-one  column="create_by"
- 	 * cascade="none"
+ 	 * cascade="save-update"
 	 * @return
 	 */
 	public TaskListUser getCreateBy() {

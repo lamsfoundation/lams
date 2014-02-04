@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.authoring.service;
 
-import java.util.ArrayList;
-
-import org.apache.commons.collections.ArrayStack;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -40,60 +37,43 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
 
     private static Logger log = Logger.getLogger(EditOnFlyProcessor.class);
 
-    ArrayList<Activity> mainActivityList;
-	ArrayList<Activity> currentActivityList;
-	ArrayStack activityListStack;
+    private Activity lastReadOnlyActivity = null;
 
-	/** 
-	 */
-	public EditOnFlyProcessor(LearningDesign design, IActivityDAO activityDAO) {
-		super(design, activityDAO);
 
-		this.mainActivityList = new ArrayList<Activity>();
-		this.activityListStack = new ArrayStack(5);
-		this.currentActivityList = mainActivityList;
-	}
+    public EditOnFlyProcessor(LearningDesign design, IActivityDAO activityDAO) {
+	super(design, activityDAO);
+    }
 
-	/** Prepares to process children */
-	public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-		// Create a new current activity list, putting the old current one on the stack. 
-		activityListStack.push(currentActivityList);
-		currentActivityList = new ArrayList<Activity>();
-		return true;
-	}
+    @Override
+    public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+	return true;
+    }
 
-	/** Creates an ActivityPortfolio and sets up the list of its children. Doesn't create an entry if there are no children. */
-	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-		
-		currentActivityList = (ArrayList<Activity>) activityListStack.pop();
-		
-		if(!activity.isActivityReadOnly())
-			return;
-		
-		if ( activity != null ) {
-			if(!currentActivityList.isEmpty()) currentActivityList.remove(currentActivityList.size()-1);
-			currentActivityList.add(activity);
-		}
+    @Override
+    public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
+	if (activity.isActivityReadOnly()) {
+	    lastReadOnlyActivity = activity;
 	}
+    }
 
-	public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
-		// everything done by endSimpleActivity
-	}
+    @Override
+    public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
+	// everything done by endSimpleActivity
+    }
 
-	/** Creates an ActivityPortfolio. */
-	public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
-		if(!activity.isActivityReadOnly())
-			return;
-		
-		if(activity != null) {
-			if(!currentActivityList.isEmpty()) currentActivityList.remove(currentActivityList.size()-1);
-			currentActivityList.add(activity);
-		}
-		
+    /** Creates an ActivityPortfolio. */
+    @Override
+    public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
+	if (activity.isActivityReadOnly()) {
+	    lastReadOnlyActivity = activity;
 	}
-	
-	/** Get the last activities in the sequence which are read-only, may contain more than one Activity due to branching paths */
-	public ArrayList<Activity> getLastReadOnlyActivity() {
-		return mainActivityList;
-	}
+    }
+
+    /**
+     * Get the last activities in the sequence which are read-only, may contain more than one Activity due to branching
+     * paths
+     */
+    public Activity getLastReadOnlyActivity() {
+	return lastReadOnlyActivity;
+    }
 }

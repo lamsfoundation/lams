@@ -75,7 +75,7 @@ public class TaskListItemVisitLog {
 	}
 	/**
 	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="none"
+ 	 * cascade="save-update"
 	 * @return
 	 */
 	public TaskListUser getUser() {

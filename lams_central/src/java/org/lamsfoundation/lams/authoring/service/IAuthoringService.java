@@ -359,12 +359,6 @@ public interface IAuthoringService {
 
     /**
      * 
-     * @param gate
-     */
-    public LearningDesign removeTempSystemGate(GateActivity gate, LearningDesign design);
-
-    /**
-     * 
      * @param design
      * @return
      * @throws LearningDesignException

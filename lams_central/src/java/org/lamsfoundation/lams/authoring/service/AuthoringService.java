@@ -563,10 +563,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	processor.parseLearningDesign();
 
-	ArrayList<Activity> activities = processor.getLastReadOnlyActivity();
+	Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
 
 	// add new System Gate after last read-only Activity
-	addSystemGateAfterActivity(activities, design);
+	addSystemGateAfterActivity(lastReadOnlyActivity, design);
 
 	setLessonLock(design, false);
 
@@ -616,20 +616,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 		processor.parseLearningDesign();
 
-		ArrayList<Activity> activities = processor.getLastReadOnlyActivity();
+		Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
 
 		// open and release waiting list on system gate
 		GateActivity gate = null;
 
-		if (activities != null) {
-		    if (!activities.isEmpty() && activities.get(0).isGateActivity()) {
-			gate = (GateActivity) activities.get(0);
-		    }
+		if (lastReadOnlyActivity != null && lastReadOnlyActivity.isGateActivity()
+			&& ((GateActivity) lastReadOnlyActivity).isSystemGate()) {
+		    gate = (GateActivity) lastReadOnlyActivity;
 		}
 
 		if (gate != null) {
 		    // remove inputted system gate
-		    design = removeTempSystemGate(gate, design);
+		    design = removeTempSystemGate(gate.getActivityId(), design.getLearningDesignId());
 		}
 
 		// LDEV-1899 only mark learners uncompleted if a change was
@@ -663,12 +662,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * This will leave a "hole" in the learner progress, but the progress engine can take care of that.
      * 
-     * @param gate
-     * @param design
      * @return Learning Design with removed System Gate
      */
-    @Override
-    public LearningDesign removeTempSystemGate(GateActivity gate, LearningDesign design) {
+    private LearningDesign removeTempSystemGate(Long gateId, Long learningDesignId) {
+	LearningDesign design = learningDesignDAO.getLearningDesignById(learningDesignId);
+	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
+
 	// get transitions
 	Transition toTransition = gate.getTransitionTo();
 	Transition fromTransition = gate.getTransitionFrom();
@@ -694,6 +693,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	// remove temp system gate
 	design.getActivities().remove(gate);
+	gate.setTransitionFrom(null);
+	gate.setTransitionTo(null);
 
 	// increment design version field
 	design.setDesignVersion(design.getDesignVersion() + 1);
@@ -710,7 +711,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param activities
      * @param design
      */
-    public void addSystemGateAfterActivity(ArrayList<Activity> activities, LearningDesign design) {
+    public void addSystemGateAfterActivity(Activity activity, LearningDesign design) {
 	GateActivity gate = null;
 
 	Integer syncType = new Integer(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
@@ -720,7 +721,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	String title = "System Gate";
 
 	SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYSTEM_GATE);
-	Activity activity = activities.isEmpty() ? null : (Activity) activities.get(0);
 
 	try { /* create new System Gate Activity */
 	    gate = (GateActivity) Activity.getActivityInstance(syncType.intValue());
@@ -789,8 +789,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		    newTransition.setToUIID(gate.getActivityUIID());
 		    newTransition.setLearningDesign(design);
 
-		    activity.setTransitionFrom(fromTransition);
-		    gate.setTransitionTo(fromTransition);
+		    activity.setTransitionFrom(newTransition);
+		    gate.setTransitionTo(newTransition);
 
 		    Integer x1 = activity.getTransitionTo() != null ? activity.getTransitionTo().getFromActivity()
 			    .getXcoord() : 0; /* set x/y position for Gate */
@@ -899,7 +899,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (Iterator i = activities.iterator(); i.hasNext();) {
 	    Activity activity = (Activity) i.next();
 
-	    if (! activity.isInitialised()) {
+	    if (!activity.isInitialised()) {
 		// this is a new activity - need to set up the content, do any
 		// scheduling, etc
 		// always have to copy the tool content, even though it may
