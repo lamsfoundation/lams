@@ -894,44 +894,44 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    return;
 	}
 
-	List<TaskListSession> sessions = taskListSessionDao.getByContentId(toolContentId);
-	for (TaskListSession session : sessions) {
-	    Set<TaskListItem> items = session.getTaskListItems();
-	    for (TaskListItem item : items) {
-		if (log.isDebugEnabled()) {
-		    log.debug("Removing visit log, comments and attachments for user ID " + userId + " and item UID "
-			    + item.getUid());
-		}
-		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(),
-			userId.longValue());
-		if (visitLog != null) {
-		    taskListDao.removeObject(TaskListItemVisitLog.class, visitLog.getUid());
-		}
+	Set<TaskListItem> items = taskList.getTaskListItems();
+	for (TaskListItem item : items) {
+	    if (log.isDebugEnabled()) {
+		log.debug("Removing visit log, comments and attachments for user ID " + userId + " and item UID "
+			+ item.getUid());
+	    }
 
-		Iterator<TaskListItemAttachment> attachmentIter = item.getAttachments().iterator();
-		while (attachmentIter.hasNext()) {
-		    TaskListItemAttachment attachment = attachmentIter.next();
-		    if (attachment.getCreateBy().getUserId().equals(userId.longValue())) {
-			try {
-			    taskListToolContentHandler.deleteFile(attachment.getFileUuid());
-			} catch (Exception e) {
-			    throw new ToolException("Error while removing Task List attachment", e);
-			}
-			taskListDao.removeObject(TaskListItemAttachment.class, attachment.getUid());
-			attachmentIter.remove();
-		    }
-		}
+	    TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), userId.longValue());
+	    if (visitLog != null) {
+		taskListDao.removeObject(TaskListItemVisitLog.class, visitLog.getUid());
+	    }
 
-		Iterator<TaskListItemComment> commentIter = item.getComments().iterator();
-		while (commentIter.hasNext()) {
-		    TaskListItemComment comment = commentIter.next();
-		    if (comment.getCreateBy().getUserId().equals(userId.longValue())) {
-			taskListDao.removeObject(TaskListItemComment.class, comment.getUid());
-			commentIter.remove();
+	    Iterator<TaskListItemAttachment> attachmentIter = item.getAttachments().iterator();
+	    while (attachmentIter.hasNext()) {
+		TaskListItemAttachment attachment = attachmentIter.next();
+		if (attachment.getCreateBy().getUserId().equals(userId.longValue())) {
+		    try {
+			taskListToolContentHandler.deleteFile(attachment.getFileUuid());
+		    } catch (Exception e) {
+			throw new ToolException("Error while removing Task List attachment", e);
 		    }
+		    taskListDao.removeObject(TaskListItemAttachment.class, attachment.getUid());
+		    attachmentIter.remove();
 		}
 	    }
 
+	    Iterator<TaskListItemComment> commentIter = item.getComments().iterator();
+	    while (commentIter.hasNext()) {
+		TaskListItemComment comment = commentIter.next();
+		if (comment.getCreateBy().getUserId().equals(userId.longValue())) {
+		    taskListDao.removeObject(TaskListItemComment.class, comment.getUid());
+		    commentIter.remove();
+		}
+	    }
+	}
+
+	List<TaskListSession> sessions = taskListSessionDao.getByContentId(toolContentId);
+	for (TaskListSession session : sessions) {
 	    TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
 		user.setSessionFinished(false);
