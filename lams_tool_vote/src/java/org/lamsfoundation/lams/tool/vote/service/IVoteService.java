@@ -98,7 +98,7 @@ public interface IVoteService {
      */
     LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
 
-    List<VoteMonitoredAnswersDTO> processUserEnteredNominations(VoteContent voteContent, String currentSessionId,
+    List<VoteMonitoredAnswersDTO> processUserEnteredNominations(Long voteContentUid, String currentSessionId,
 	    boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId);
     
     List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
@@ -115,8 +115,6 @@ public interface IVoteService {
 
     void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException;
 
-    List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
-
     VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid)
 	    throws VoteApplicationException;
 
@@ -129,15 +127,13 @@ public interface IVoteService {
     VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid)
 	    throws VoteApplicationException;
 
-    Set getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid);
+    Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid);
 
    Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException;
 
     void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
 
     void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
-
-    List getUserRecords(final String userEntry) throws VoteApplicationException;
 
     List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
 
@@ -153,7 +149,7 @@ public interface IVoteService {
 
     int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException;
 
-    List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+    List<VoteUsrAttempt> getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
 	    final Long voteSessionUid);
 
     int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId)
@@ -185,11 +181,7 @@ public interface IVoteService {
 
     void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException;
 
-    Set getUserEntries() throws VoteApplicationException;
-
     List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId);
-
-    List getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
 
     VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
 
@@ -199,7 +191,7 @@ public interface IVoteService {
 
     void updateVoteUser(VoteQueUsr voteUser) throws VoteApplicationException;
 
-    void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId)
+    void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid)
 	    throws VoteApplicationException;
 
     List getAllQuestionEntries(final Long voteContentId) throws VoteApplicationException;
@@ -286,7 +278,7 @@ public interface IVoteService {
 
     List<Long> getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
 
-    Set getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid)
+    Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid)
 	    throws VoteApplicationException;
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);

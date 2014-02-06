@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
+import org.lamsfoundation.lams.tool.vote.VoteStringComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -386,9 +387,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 						.getValue().toString()));
 					if (voteSession2 != null) {
 					    List<VoteQueUsr> listUsers = voteService.getUserBySessionOnly(voteSession2);
-					    Map sessionUsersAttempts = MonitoringUtil.populateSessionUsersAttempts(
+					    Map sessionUsersAttempts = VoteMonitoringAction.populateSessionUsersAttempts(
 						    request, voteService, voteSession2.getVoteSessionId(), listUsers,
-						    questionUid, true, false, null);
+						    questionUid);
 					    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 					}
 				    }
@@ -398,9 +399,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 				List listUsers = voteService.getUserBySessionOnly(voteSession);
 
-				Map sessionUsersAttempts = MonitoringUtil.populateSessionUsersAttempts(request,
-					voteService, new Long(currentSessionId), listUsers, questionUid, true, false,
-					null);
+				Map sessionUsersAttempts = VoteMonitoringAction.populateSessionUsersAttempts(request,
+					voteService, new Long(currentSessionId), listUsers, questionUid);
 				listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 			    }
 			}
@@ -424,6 +424,56 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsContainerDTO);
 
 	return mapping.findForward(VoteAppConstants.LOAD_MONITORING);
+    }
+
+    private static Map populateSessionUsersAttempts(HttpServletRequest request, IVoteService voteService,
+	    Long sessionId, List<VoteQueUsr> users, String questionUid) {
+
+	List listMonitoredUserContainerDTO = new LinkedList();
+	Iterator itUsers = users.iterator();
+
+	while (itUsers.hasNext()) {
+	    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
+
+	    if (voteQueUsr != null) {
+		List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(
+			questionUid));
+
+		Iterator itAttempts = listUserAttempts.iterator();
+		while (itAttempts.hasNext()) {
+		    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
+
+		    if (voteUsrResp != null) {
+			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
+			// voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
+			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
+			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
+			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
+			voteMonitoredUserDTO.setSessionId(sessionId.toString());
+			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+
+			String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+
+			voteMonitoredUserDTO.setQuestionUid(questionUid);
+			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());
+			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+		    }
+		}
+	    }
+	}
+	
+	//convertToMcMonitoredUserDTOMap
+	Map mapMonitoredUserContainerDTO = new TreeMap(new VoteStringComparator());
+	Iterator listIterator = listMonitoredUserContainerDTO.iterator();
+	Long mapIndex = new Long(1);
+	while (listIterator.hasNext()) {
+	    VoteMonitoredUserDTO data = (VoteMonitoredUserDTO) listIterator.next();
+	    mapMonitoredUserContainerDTO.put(mapIndex.toString(), data);
+	    mapIndex = new Long(mapIndex.longValue() + 1);
+	}
+	return mapMonitoredUserContainerDTO;
     }
 
     public void prepareEditActivityScreenData(HttpServletRequest request, VoteContent voteContent) {

@@ -261,7 +261,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	    Long sessionUid = user.getVoteSessionId();
 	    putMapQuestionsContentIntoRequest(request, voteService, user);
-	    Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
+	    Set<String> userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
 	    request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
 	    // since this is progress view, present a screen which can not be edited

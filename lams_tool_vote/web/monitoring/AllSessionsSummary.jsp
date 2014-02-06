@@ -44,28 +44,32 @@
 											<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
 											<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 						
-												<c:if test="${currentNomination.value != 'Open Vote'}">
-												 	<c:choose>
-												 		<c:when test="${sessionDto.sessionId == 0}">
-												 			<c:set var="sessionUidParam" value=""/>
-												 		</c:when>
-												 		<c:otherwise>
-												 			<c:set var="sessionUidParam" value="${currentSessionUid.value}"/>
-												 		</c:otherwise>
-												 	</c:choose>
-												
-													<c:set scope="request" var="viewURL">
-														<lams:WebAppURL/>monitoring.do?dispatch=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${sessionUidParam}
-													</c:set>
-																			  																					
-													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<c:out value="${currentUserCount.value}"/>  
-													</a>
-												</c:if>
-												
-												<c:if test="${currentNomination.value == 'Open Vote'}"> 				
-													<c:out value="${currentUserCount.value}"/>  
-												</c:if> 	    
+												<c:set var="openVoteLabel" scope="request"><fmt:message key='label.open.vote'/></c:set>
+												<c:choose>
+												 	<c:when test="${currentNomination.value != openVoteLabel}">
+												 	
+													 	<c:choose>
+													 		<c:when test="${sessionDto.sessionId == 0}">
+													 			<c:set var="sessionUidParam" value=""/>
+													 		</c:when>
+													 		<c:otherwise>
+													 			<c:set var="sessionUidParam" value="${currentSessionUid.value}"/>
+													 		</c:otherwise>
+													 	</c:choose>
+													
+														<c:set scope="request" var="viewURL">
+															<lams:WebAppURL/>monitoring.do?dispatch=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${sessionUidParam}
+														</c:set>
+																				  																					
+														<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+															<c:out value="${currentUserCount.value}"/>  
+														</a>
+														
+												 	</c:when>
+												 	<c:otherwise>
+												 		<c:out value="${currentUserCount.value}"/>
+												 	</c:otherwise>
+												 </c:choose>	    
 																							
 											</c:if> 	    
 										</c:forEach>		  

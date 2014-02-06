@@ -41,17 +41,13 @@ public interface IVoteUsrAttemptDAO {
 
     List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId);
 
-    List getUserRecords(final String userEntry);
+    List<VoteUsrAttempt> getUserRecords(final Long voteContentUid, final String userEntry);
 
-    Set getUserEntries();
+    Set<String> getUserEntries(final Long voteContentUid);
 
     int getUserEnteredVotesCountForContent(final Long voteContentUid);
 
-    List getSessionUserEntries(final Long voteSessionUid);
-
-    Set getSessionUserEntriesSet(final Long voteSessionUid);
-
-    List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
+    Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid);
 
     VoteUsrAttempt getAttemptByUID(Long uid);
 
@@ -63,21 +59,21 @@ public interface IVoteUsrAttemptDAO {
 
     int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 
-    List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+    List<VoteUsrAttempt> getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
 	    final Long voteSessionUid);
 
-    void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId);
+    void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid);
 
-    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long voteQueContentId, final Long voteSessionId);
+    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId,
+	    final Long sessionUid);
 
     void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
     void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
-    Set getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid);
+    Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long sessionUid);
 
-    Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long voteSessionId);
+    Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid);
 
     List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
 }

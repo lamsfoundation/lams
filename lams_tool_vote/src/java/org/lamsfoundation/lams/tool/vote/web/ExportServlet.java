@@ -47,13 +47,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 /**
- * <p>
  * Enables exporting portfolio for teacher and learner modes.
- * </p>
  * 
  * @author Ozgur Demirtas
  */
-
 public class ExportServlet extends AbstractExportPortfolioServlet implements VoteAppConstants {
     static Logger logger = Logger.getLogger(ExportServlet.class.getName());
     private static final long serialVersionUID = -1529093489007108983L;
@@ -82,7 +79,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	exportPortfolioDTO.setPortfolioExportMode("learner");
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-	MessageService messageService = VoteServiceProxy.getMessageService(getServletContext());
 
 	if ((userID == null) || (toolSessionID == null)) {
 	    String error = "Tool session Id or user Id is null. Unable to continue";
@@ -111,8 +107,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 
 	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 
-	    VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, true, true,
-		    toolSessionID.toString(), userID.toString(), true, null, voteGeneralMonitoringDTO,
+	    VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, true,
+		    toolSessionID.toString(), userID.toString(), true, voteGeneralMonitoringDTO,
 		    exportPortfolioDTO);
 
 	    List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(content, userID);
@@ -130,9 +126,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 	ExportPortfolioDTO exportPortfolioDTO = new ExportPortfolioDTO();
 	exportPortfolioDTO.setPortfolioExportMode("teacher");
-
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
-	MessageService messageService = VoteServiceProxy.getMessageService(getServletContext());
 
 	if (toolContentID == null) {
 	    String error = "Tool Content Id is missing. Unable to continue";
@@ -141,7 +135,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	}
 
 	VoteContent content = voteService.retrieveVote(toolContentID);
-
 	if (content == null) {
 	    String error = "Data is missing from the database. Unable to Continue";
 	    ExportServlet.logger.error(error);
@@ -152,7 +145,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 
-	VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, true, false, null, null, false, null,
+	VoteMonitoringStarterAction.refreshSummaryData(request, content, voteService, false, null, null, false,
 		voteGeneralMonitoringDTO, exportPortfolioDTO);
 
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);

@@ -56,8 +56,8 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     private static final String GET_SESSIONNAMES_FROM_CONTENT = "select votes.session_name from VoteSession votes where votes.voteContent=:voteContent order by votes.voteSessionId";
 
-    public VoteSession getVoteSessionByUID(Long uid) {
-	return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, uid);
+    public VoteSession getVoteSessionByUID(Long sessionUid) {
+	return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, sessionUid);
     }
 
     public VoteSession findVoteSessionById(Long voteSessionId) {

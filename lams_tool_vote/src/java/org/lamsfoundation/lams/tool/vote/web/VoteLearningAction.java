@@ -136,7 +136,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	existingVoteQueUsr.setFinalScreenRequested(true);
 	voteService.updateVoteUser(existingVoteQueUsr);
 
-	Set userAttempts = voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
+	Set<String> userAttempts = voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
 	request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
 	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
