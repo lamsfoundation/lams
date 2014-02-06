@@ -48,32 +48,36 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
-		var LAMS_URL = '<lams:LAMSURL/>';
-		var APP_URL = LAMS_URL + 'learning/';
+		var LAMS_URL = '<lams:LAMSURL/>',
+			APP_URL = LAMS_URL + 'learning/',
+			
+			LABELS = {
+				CURRENT_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.current.tooltip"/>',
+				COMPLETED_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>',
+				ATTEMPTED_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>',
+				TOSTART_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
+				SUPPORT_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>'
+			},
 		
-		var CURRENT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
-		var COMPLETED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
-		var ATTEMPTED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
-		var TOSTART_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>';
-		var SUPPORT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.support.tooltip"/>';
-		
-		var supportSeparatorRow = null;
-		var supportPart = null;
-		
-		var parentURL = "${notifyCloseURL}";
-		var lessonId = '${param.lessonID}';
-		var progressPanelEnabled = '<lams:Configuration key="LearnerCollapsProgressPanel" />' != 'false';
-		// settings for progress bar
-		var presenceEnabled = '${param.presenceEnabledPatch}' != 'false';
-		var isHorizontalBar = false;
-		var hasContentFrame = true;
-		var hasDialog = false;
-		var isTouchInterface = ${isTouchInterface};
-		var bars = {
-			'learnerMainBar' : {
-				'containerId' : 'progressBarDiv'
-			}
-		};
+			supportSeparatorRow = null,
+			supportPart = null,
+			
+			parentURL = "${notifyCloseURL}",
+			lessonId = '${param.lessonID}',
+			progressPanelEnabled = '<lams:Configuration key="LearnerCollapsProgressPanel" />' != 'false',
+			
+			// settings for progress bar
+			presenceEnabled = '${param.presenceEnabledPatch}' != 'false',
+			isHorizontalBar = false,
+			hasContentFrame = true,
+			hasDialog = false,
+			isTouchInterface = ${isTouchInterface},
+			
+			bars = {
+				'learnerMainBar' : {
+					'containerId' : 'progressBarDiv'
+				}
+			};
 		
 		$(document).ready(function() {
 			window.onresize = resizeElements;
