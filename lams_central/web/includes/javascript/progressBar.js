@@ -192,7 +192,7 @@ var ActivityUtils = {
 				+ PATH_SQUARE;
 		activity.fill = COLOR_CURRENT_ACTIVITY;
 		activity.stroke = COLOR_STROKE_ACTIVITY;
-		activity.statusTooltip = CURRENT_ACTIVITY_LABEL;
+		activity.statusTooltip = LABELS.CURRENT_ACTIVITY;
 	},
 
 	shapeCompletedActivity : function(activity) {
@@ -201,7 +201,7 @@ var ActivityUtils = {
 				+ PATH_CIRCLE;
 		activity.fill = COLOR_COMPLETED_ACTIVITY;
 		activity.stroke = COLOR_STROKE_ACTIVITY;
-		activity.statusTooltip = COMPLETED_ACTIVITY_LABEL;
+		activity.statusTooltip = LABELS.COMPLETED_ACTIVITY;
 	},
 
 	shapeAttemptedActivity : function(activity) {
@@ -210,7 +210,7 @@ var ActivityUtils = {
 				+ PATH_SQUARE;
 		activity.fill = COLOR_TOSTART_ACTIVITY;
 		activity.stroke = COLOR_STROKE_ACTIVITY;
-		activity.statusTooltip = ATTEMPTED_ACTIVITY_LABEL;
+		activity.statusTooltip = LABELS.ATTEMPTED_ACTIVITY;
 
 		// this and similar methods are run when activity shape is drawn for
 		// real
@@ -238,7 +238,7 @@ var ActivityUtils = {
 				+ PATH_TRIANGLE;
 		activity.fill = COLOR_TOSTART_ACTIVITY;
 		activity.stroke = COLOR_STROKE_ACTIVITY;
-		activity.statusTooltip = TOSTART_ACTIVITY_LABEL;
+		activity.statusTooltip = LABELS.TOSTART_ACTIVITY;
 	},
 
 	shapeGateActivity : function(activity) {
@@ -269,7 +269,7 @@ var ActivityUtils = {
 			
 			if (act.status == 0) {
 				// add dark red edge when current activity
-				act.statusTooltip = CURRENT_ACTIVITY_LABEL;
+				act.statusTooltip = LABELS.CURRENT_ACTIVITY;
 
 				var edge = paper.path(act.path);
 				edge.attr({
@@ -280,7 +280,7 @@ var ActivityUtils = {
 				});
 				act.decoration.push(edge);
 			} else {
-				act.statusTooltip = TOSTART_ACTIVITY_LABEL;
+				act.statusTooltip = LABELS.TOSTART_ACTIVITY;
 			}
 		}
 	},
@@ -916,12 +916,12 @@ function SupportActivity(paper, index, name, status, url) {
 	} else if (status == 3) {
 		ActivityUtils.shapeToStartActivity(this);
 	}
-	this.statusTooltip = SUPPORT_ACTIVITY_LABEL;
+	this.statusTooltip = LABELS.SUPPORT_ACTIVITY;
 
 	this.transformToAttempted = function() {
 		var oldDecoration = this.decoration;
 		ActivityUtils.shapeAttemptedActivity(this);
-		this.statusTooltip = SUPPORT_ACTIVITY_LABEL;
+		this.statusTooltip = LABELS.SUPPORT_ACTIVITY;
 
 		ActivityUtils.animate(this, oldDecoration);
 	}
