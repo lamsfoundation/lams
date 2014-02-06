@@ -463,20 +463,54 @@ public class LessonService implements ILessonService {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException {
+    public void removeProgressReferencesToActivity(Activity activity) {
 	if (activity != null) {
 	    LessonService.log.debug("Processing learner progress for activity " + activity.getActivityId());
 
-	    List progresses = learnerProgressDAO.getLearnerProgressReferringToActivity(activity);
-	    if (progresses != null && progresses.size() > 0) {
-		Iterator iter = progresses.iterator();
-		while (iter.hasNext()) {
-		    LearnerProgress progress = (LearnerProgress) iter.next();
-		    if (removeActivityReference(activity, progress)) {
-			;
+	    List<LearnerProgress> progresses = learnerProgressDAO.getLearnerProgressReferringToActivity(activity);
+	    if (progresses != null) {
+		for (LearnerProgress progress : progresses) {
+		    if (LessonService.log.isDebugEnabled()) {
+			LessonService.log
+				.debug("Processing learner progress learner " + progress.getUser().getUserId());
 		    }
-		    learnerProgressDAO.updateLearnerProgress(progress);
+
+		    boolean recordUpdated = false;
+		    boolean removed = progress.getAttemptedActivities().remove(activity) != null;
+		    if (removed) {
+			recordUpdated = true;
+			LessonService.log.debug("Removed activity from attempted activities");
+		    }
+
+		    removed = progress.getCompletedActivities().remove(activity) != null;
+		    if (removed) {
+			recordUpdated = true;
+			LessonService.log.debug("Removed activity from completed activities");
+		    }
+
+		    if (progress.getCurrentActivity() != null && progress.getCurrentActivity().equals(activity)) {
+			progress.setCurrentActivity(null);
+			recordUpdated = true;
+			LessonService.log.debug("Removed activity as current activity");
+		    }
+
+		    if (progress.getNextActivity() != null && progress.getNextActivity().equals(activity)) {
+			progress.setNextActivity(null);
+			recordUpdated = true;
+			LessonService.log.debug("Removed activity as next activity");
+		    }
+
+		    if (progress.getPreviousActivity() != null && progress.getPreviousActivity().equals(activity)) {
+			progress.setPreviousActivity(null);
+			recordUpdated = true;
+			LessonService.log.debug("Removed activity as previous activity");
+		    }
+
+		    if (recordUpdated) {
+			learnerProgressDAO.updateLearnerProgress(progress);
+		    }
 		}
 	    }
 	}
@@ -491,47 +525,6 @@ public class LessonService implements ILessonService {
 	if (learnerProgress != null) {
 	    learnerProgressDAO.deleteLearnerProgress(learnerProgress);
 	}
-    }
-
-    private boolean removeActivityReference(Activity activity, LearnerProgress progress) {
-
-	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log.debug("Processing learner progress learner " + progress.getUser().getUserId());
-	}
-
-	boolean recordUpdated = false;
-
-	boolean removed = (progress.getAttemptedActivities().remove(activity) != null);
-	if (removed) {
-	    recordUpdated = true;
-	    LessonService.log.debug("Removed activity from attempted activities");
-	}
-
-	removed = (progress.getCompletedActivities().remove(activity) != null);
-	if (removed) {
-	    recordUpdated = true;
-	    LessonService.log.debug("Removed activity from completed activities");
-	}
-
-	if (progress.getCurrentActivity() != null && progress.getCurrentActivity().equals(activity)) {
-	    progress.setCurrentActivity(null);
-	    recordUpdated = true;
-	    LessonService.log.debug("Removed activity as current activity");
-	}
-
-	if (progress.getNextActivity() != null && progress.getNextActivity().equals(activity)) {
-	    progress.setNextActivity(null);
-	    recordUpdated = true;
-	    LessonService.log.debug("Removed activity as next activity");
-	}
-
-	if (progress.getPreviousActivity() != null && progress.getPreviousActivity().equals(activity)) {
-	    progress.setPreviousActivity(null);
-	    recordUpdated = true;
-	    LessonService.log.debug("Removed activity as previous activity");
-	}
-
-	return recordUpdated;
     }
 
     @Override

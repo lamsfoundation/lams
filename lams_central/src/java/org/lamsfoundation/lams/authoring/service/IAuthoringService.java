@@ -358,25 +358,6 @@ public interface IAuthoringService {
     public String finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException;
 
     /**
-     * 
-     * @param design
-     * @return
-     * @throws LearningDesignException
-     */
-    public Activity getFirstUnattemptedActivity(LearningDesign design) throws LearningDesignException;
-
-    /**
-     * 
-     * @param design
-     * @param userID
-     * @return
-     * @throws LearningDesignException
-     * @throws IOException
-     */
-    public boolean isLearningDesignAvailable(LearningDesign design, Integer userID) throws LearningDesignException,
-	    IOException;
-
-    /**
      * Returns the generic help url from configuration
      * 
      * @return String Generic help url

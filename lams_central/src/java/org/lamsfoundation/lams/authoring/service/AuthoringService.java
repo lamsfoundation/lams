@@ -478,60 +478,37 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#isLearningDesignAvailable(LearningDesign,
-     *      java.lang.Integer)
-     */
-    @Override
-    public boolean isLearningDesignAvailable(LearningDesign design, Integer userID) throws LearningDesignException,
-	    IOException {
-	if (design == null) {
-	    throw new LearningDesignException(FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",
-		    design.getLearningDesignId()).serializeMessage());
-	}
-
-	if ((design.getEditOverrideUser() != null) && (design.getEditOverrideLock() != null)) {
-	    return design.getEditOverrideUser().getUserId().equals(userID) ? true : !design.getEditOverrideLock();
-	} else {
-	    return true;
-	}
-    }
-
-    private void setLessonLock(LearningDesign design, boolean lock) {
-	Lesson lesson = null;
-
-	// lock active lesson
-	Set lessons = design.getLessons();
-	Iterator it = lessons.iterator();
-
-	while (it.hasNext()) {
-	    lesson = (Lesson) it.next();
-	    lesson.setLockedForEdit(lock);
-	}
-    }
-
-    /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyLock(LearningDesign,
      *      java.lang.Integer)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID) throws LearningDesignException,
 	    UserException, IOException {
 	User user = (User) baseDAO.find(User.class, userID);
+	if (user == null) {
+	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
+	}
 
-	LearningDesign design = learningDesignID != null ? getLearningDesign(learningDesignID) : null;
+	LearningDesign design = learningDesignID == null ? null : getLearningDesign(learningDesignID);
 
-	if (isLearningDesignAvailable(design, userID)) {
+	if (design == null) {
+	    throw new LearningDesignException(FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",
+		    learningDesignID).serializeMessage());
+	}
 
+	boolean learningDesignAvailable = design.getEditOverrideUser() == null || design.getEditOverrideLock() == null
+		|| design.getEditOverrideUser().getUserId().equals(userID) || !design.getEditOverrideLock();
+
+	if (learningDesignAvailable) {
 	    if (design.getLessons().isEmpty()) {
-		throw new LearningDesignException("There are no lessons attached to the design."); // TODO:
-		// add
-		// error
-		// msg
-	    } else if (user == null) {
-		throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
+		// TODO: add error msg
+		throw new LearningDesignException("There are no lessons attached to the design.");
 	    }
 
-	    setLessonLock(design, true);
+	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
+		lesson.setLockedForEdit(true);
+	    }
 
 	    // lock Learning Design
 	    design.setEditOverrideLock(true);
@@ -540,37 +517,38 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    learningDesignDAO.update(design);
 
 	    return true;
-	} else {
-	    return false;
 	}
+	return false;
     }
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyGate(java.lang.Long,
      *      java.lang.Integer)
      */
+
     @Override
     public String setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, IOException {
 	User user = (User) baseDAO.find(User.class, userID);
-	LearningDesign design = learningDesignID != null ? getLearningDesign(learningDesignID) : null;
-
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
 	}
 
-	// parse Learning Design to find last read - only Activity
+	LearningDesign design = learningDesignID == null ? null : getLearningDesign(learningDesignID);
+
+	// parse Learning Design to find last read-only Activity
 	EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);
 
 	processor.parseLearningDesign();
 
 	Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
 
-	// add new System Gate after last read-only Activity
-	addSystemGateAfterActivity(lastReadOnlyActivity, design);
-
-	setLessonLock(design, false);
-
-	learningDesignDAO.update(design);
+	// check if system gate already exists
+	if (lastReadOnlyActivity == null || !lastReadOnlyActivity.isGateActivity()
+		|| !((GateActivity) lastReadOnlyActivity).isSystemGate()) {
+	    // add new System Gate after last read-only Activity
+	    addSystemGateAfterActivity(lastReadOnlyActivity, design);
+	    learningDesignDAO.update(design);
+	}
 
 	return new FlashMessage("setupEditOnFlyGate", true).serializeMessage();
     }
@@ -579,39 +557,30 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#finishEditOnFly(java.lang.Long,
      *      java.lang.Integer)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
 	FlashMessage flashMessage = null;
-	Lesson lesson = null;
-
-	LearningDesign design = learningDesignID != null ? learningDesignDAO.getLearningDesignById(learningDesignID)
-		: null;
 
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
 	    flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
 	}
 
-	if (design != null) { /*
-			      			 * only the user who is editing the design may
-			      			 * unlock it
-			      			 */
+	LearningDesign design = learningDesignID == null ? null : learningDesignDAO
+		.getLearningDesignById(learningDesignID);
+
+	if (design == null) {
+	    flashMessage = FlashMessage.getNoSuchLearningDesignExists("finishEditOnFly", learningDesignID);
+	} else {
+	    // only the user who is editing the design may unlock it
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);
 
-		Set lessons = design.getLessons(); /* unlock lesson */
+		// parse Learning Design to find last read - only Activity
+		// (hopefully the system gate in this case )
 
-		Iterator it = lessons.iterator();
-		while (it.hasNext()) {
-		    lesson = (Lesson) it.next();
-		    lesson.setLockedForEdit(false);
-		}
-
-		/*
-		 * parse Learning Design to find last read - only Activity (
-		 * hopefully the system gate in this case )
-		 */
 		EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);
 
 		processor.parseLearningDesign();
@@ -619,37 +588,33 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
 
 		// open and release waiting list on system gate
-		GateActivity gate = null;
-
-		if (lastReadOnlyActivity != null && lastReadOnlyActivity.isGateActivity()
+		if ((lastReadOnlyActivity != null) && lastReadOnlyActivity.isGateActivity()
 			&& ((GateActivity) lastReadOnlyActivity).isSystemGate()) {
-		    gate = (GateActivity) lastReadOnlyActivity;
+		    // remove previously inserted system gate
+		    design = removeTempSystemGate(lastReadOnlyActivity.getActivityId(), design.getLearningDesignId());
 		}
 
-		if (gate != null) {
-		    // remove inputted system gate
-		    design = removeTempSystemGate(gate.getActivityId(), design.getLearningDesignId());
+		for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
+		    lesson.setLockedForEdit(false);
+
+		    // LDEV-1899 only mark learners uncompleted if a change was saved
+		    if (!cancelled) {
+			// the lesson may now have additional activities on the end,
+			// so clear any completed flags
+			lessonService.performMarkLessonUncompleted(lesson.getLessonId());
+		    }
+
+		    initialiseToolActivityForRuntime(design, lesson);
+
+		    if (flashMessage == null) {
+			flashMessage = new FlashMessage("finishEditOnFly", lesson.getLessonId());
+		    }
 		}
 
-		// LDEV-1899 only mark learners uncompleted if a change was
-		// saved
-		if (!cancelled) {
-		    // the lesson may now have additional activities on the end,
-		    // so clear any completed flags
-		    lessonService.performMarkLessonUncompleted(lesson.getLessonId());
-		}
-
-		initialiseToolActivityForRuntime(design, lesson);
-		learningDesignDAO.insertOrUpdate(design);
-
-		flashMessage = new FlashMessage("finishEditOnFly", lesson.getLessonId());
-
+		learningDesignDAO.update(design);
 	    } else {
 		flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
 	    }
-	} else {
-
-	    flashMessage = FlashMessage.getNoSuchLearningDesignExists("finishEditOnFly", learningDesignID);
 	}
 
 	return flashMessage.serializeMessage();
@@ -657,8 +622,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Remove a temp. System Gate from the design. Requires removing the gate from any learner progress entries - should
-     * only be a current activity but remove it from previous and next, just in case.
+     * Remove a temporary System Gate from the design. Requires removing the gate from any learner progress entries -
+     * should only be a current activity but remove it from previous and next, just in case.
      * 
      * This will leave a "hole" in the learner progress, but the progress engine can take care of that.
      * 
@@ -674,14 +639,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	// rearrange to-transition and/or delete redundant transition
 	if ((toTransition != null) && (fromTransition != null)) {
-
 	    toTransition.setToActivity(fromTransition.getToActivity());
 	    fromTransition.getToActivity().setTransitionTo(toTransition);
 	    toTransition.setToUIID(toTransition.getToActivity().getActivityUIID());
 
 	    design.getTransitions().remove(fromTransition);
 	    transitionDAO.update(toTransition);
-
 	} else if ((toTransition != null) && (fromTransition == null)) {
 	    toTransition.getFromActivity().setTransitionFrom(null);
 	    design.getTransitions().remove(toTransition);
@@ -691,6 +654,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    design.getTransitions().remove(fromTransition);
 	}
 
+	// need to remove it from any learner progress entries
+	lessonService.removeProgressReferencesToActivity(gate);
+
 	// remove temp system gate
 	design.getActivities().remove(gate);
 	gate.setTransitionFrom(null);
@@ -699,206 +665,157 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	// increment design version field
 	design.setDesignVersion(design.getDesignVersion() + 1);
 
-	// need to remove it from any learner progress entries
-	lessonService.removeProgressReferencesToActivity(gate);
-
 	return design;
     }
 
     /**
-     * Add a temp. System Gate. to the design.
-     * 
-     * @param activities
-     * @param design
+     * Add a temporary System Gate to the design.
      */
-    public void addSystemGateAfterActivity(Activity activity, LearningDesign design) {
+    @SuppressWarnings("unchecked")
+    private void addSystemGateAfterActivity(Activity activity, LearningDesign design) {
 	GateActivity gate = null;
-
-	Integer syncType = new Integer(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
-	Integer activityType = new Integer(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
 	Integer maxId = design.getMaxID();
-	// messageService.getMessage(MSG_KEY_SYNC_GATE );
 	String title = "System Gate";
-
 	SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYSTEM_GATE);
 
-	try { /* create new System Gate Activity */
-	    gate = (GateActivity) Activity.getActivityInstance(syncType.intValue());
-	    gate.setActivityTypeId(activityType.intValue());
-	    gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    gate.setSystemTool(systemTool);
-	    gate.setActivityUIID(++maxId);
-	    gate.setTitle(title != null ? title : "Gate");
-	    gate.setGateOpen(false);
-	    gate.setWaitingLearners(null);
-	    gate.setGateActivityLevelId(GateActivity.LEARNER_GATE_LEVEL);
-	    gate.setApplyGrouping(false); // not nullable so default to false
-	    gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
-	    gate.setOrderId(null);
-	    gate.setCreateDateTime(new Date());
-	    gate.setReadOnly(Boolean.TRUE);
-	    gate.setLearningDesign(design);
+	/* create new System Gate Activity */
+	gate = (GateActivity) Activity.getActivityInstance(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
+	gate.setActivityTypeId(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
+	gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+	gate.setSystemTool(systemTool);
+	gate.setActivityUIID(++maxId);
+	gate.setTitle(title);
+	gate.setGateOpen(false);
+	gate.setWaitingLearners(null);
+	gate.setGateActivityLevelId(GateActivity.LEARNER_GATE_LEVEL);
+	gate.setApplyGrouping(false); // not nullable so default to false
+	gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);
+	gate.setOrderId(null);
+	gate.setCreateDateTime(new Date());
+	gate.setReadOnly(Boolean.TRUE);
+	gate.setLearningDesign(design);
 
-	    design.getActivities().add(gate);
-	    baseDAO.insert(gate);
+	design.getActivities().add(gate);
+	baseDAO.insert(gate);
 
-	    Transition fromTransition;
-	    Transition newTransition = new Transition();
-	    Activity toActivity = null;
+	Transition fromTransition = null;
+	Activity toActivity = null;
 
-	    if (activity != null) {
-		// update transitions
-		fromTransition = activity.getTransitionFrom();
+	Transition newTransition = new Transition();
+	newTransition.setTransitionUIID(++maxId);
+	newTransition.setLearningDesign(design);
 
-		if (fromTransition != null) {
-		    toActivity = fromTransition.getToActivity();
+	if (activity == null) {
+	    // no read-only activities, insert gate at start of sequence
+	    fromTransition = newTransition;
 
-		    fromTransition.setToActivity(gate);
+	    toActivity = design.getFirstActivity();
 
-		    fromTransition.setToUIID(gate.getActivityUIID());
-		    newTransition.setTransitionUIID(++maxId);
-		    newTransition.setFromActivity(gate);
-		    newTransition.setFromUIID(gate.getActivityUIID());
-		    newTransition.setToActivity(toActivity);
-		    newTransition.setToUIID(toActivity.getActivityUIID());
-		    newTransition.setLearningDesign(design);
+	    newTransition.setToActivity(toActivity);
+	    newTransition.setToUIID(toActivity.getActivityUIID());
+	    newTransition.setFromActivity(gate);
+	    newTransition.setFromUIID(gate.getActivityUIID());
 
-		    gate.setTransitionFrom(newTransition);
-		    toActivity.setTransitionTo(newTransition);
-		    gate.setTransitionTo(fromTransition);
+	    gate.setTransitionFrom(fromTransition);
+	    toActivity.setTransitionTo(fromTransition);
 
-		    // set x / y position for Gate
-		    Integer x1 = activity.getXcoord() != null ? activity.getXcoord() : 0;
+	    // set gate as first activity in sequence
+	    design.setFirstActivity(gate);
 
-		    Integer x2 = toActivity.getXcoord() != null ? toActivity.getXcoord() : 0;
+	    // set x / y position for Gate
+	    Integer x1 = toActivity.getXcoord() == null ? 0 : toActivity.getXcoord();
 
-		    gate.setXcoord(new Integer(((x1.intValue() + 123 + x2.intValue()) / 2) - 13));
+	    Integer x2 = toActivity.getTransitionFrom() == null ? null : toActivity.getTransitionFrom().getToActivity()
+		    .getXcoord();
 
-		    Integer y1 = activity.getYcoord() != null ? activity.getYcoord() : 0;
-		    Integer y2 = toActivity.getYcoord() != null ? toActivity.getYcoord() : 0;
-
-		    gate.setYcoord(new Integer((y1.intValue() + 50 + y2.intValue()) / 2));
-
-		} else {
-		    // fromTransition = newTransition;
-
-		    newTransition.setTransitionUIID(++maxId);
-		    newTransition.setFromActivity(activity);
-		    newTransition.setFromUIID(activity.getActivityUIID());
-		    newTransition.setToActivity(gate);
-		    newTransition.setToUIID(gate.getActivityUIID());
-		    newTransition.setLearningDesign(design);
-
-		    activity.setTransitionFrom(newTransition);
-		    gate.setTransitionTo(newTransition);
-
-		    Integer x1 = activity.getTransitionTo() != null ? activity.getTransitionTo().getFromActivity()
-			    .getXcoord() : 0; /* set x/y position for Gate */
-		    Integer x2 = activity.getXcoord() != null ? activity.getXcoord() : 0;
-
-		    if ((x1 != null) && (x2 != null)) {
-			gate.setXcoord(x2 >= x1 ? new Integer(x2.intValue() + 123 + 13 + 20) : new Integer(x2
-				.intValue() - 13 - 20));
-		    } else {
-			gate.setXcoord(new Integer(x2.intValue() + 123 + 13 + 20));
-		    }
-
-		    gate.setYcoord(activity.getYcoord() + 25);
-		}
-
+	    if ((x1 != null) && (x2 != null)) {
+		gate.setXcoord(x2 >= x1 ? (x1.intValue() - 13 - 20) : (x1.intValue() + 123 + 13 + 20));
 	    } else {
-		// no read-only activities insert gate at start of sequence
-		fromTransition = newTransition;
+		gate.setXcoord(x1.intValue() - 13 - 20);
+	    }
 
-		toActivity = design.getFirstActivity();
+	    gate.setYcoord(toActivity.getYcoord() + 25);
 
-		newTransition.setTransitionUIID(++maxId);
-		newTransition.setToActivity(toActivity);
-		newTransition.setToUIID(toActivity.getActivityUIID());
-		newTransition.setFromActivity(gate);
-		newTransition.setFromUIID(gate.getActivityUIID());
-		newTransition.setLearningDesign(design);
+	} else {
+	    // update transitions
+	    fromTransition = activity.getTransitionFrom();
 
-		gate.setTransitionFrom(fromTransition);
-		toActivity.setTransitionTo(fromTransition);
+	    if (fromTransition == null) {
+		newTransition.setFromActivity(activity);
+		newTransition.setFromUIID(activity.getActivityUIID());
+		newTransition.setToActivity(gate);
+		newTransition.setToUIID(gate.getActivityUIID());
 
-		// keep gate door closed to stop learner's from going past this
-		// point
-		gate.setGateOpen(false);
+		activity.setTransitionFrom(newTransition);
+		gate.setTransitionTo(newTransition);
 
-		// set gate as first activity in sequence
-		design.setFirstActivity(gate);
-
-		// set x / y position for Gate
-		Integer x1 = toActivity.getXcoord() != null ? toActivity.getXcoord() : 0;
-
-		Integer x2 = toActivity.getTransitionFrom() != null ? toActivity.getTransitionFrom().getToActivity()
-			.getXcoord() : null;
+		Integer x1 = activity.getTransitionTo() == null ? 0 : activity.getTransitionTo().getFromActivity()
+			.getXcoord(); /* set x/y position for Gate */
+		Integer x2 = activity.getXcoord() == null ? null : activity.getXcoord();
 
 		if ((x1 != null) && (x2 != null)) {
-		    gate.setXcoord(x2 >= x1 ? new Integer(x1.intValue() - 13 - 20) : new Integer(
-			    x1.intValue() + 123 + 13 + 20));
+		    gate.setXcoord(x2 >= x1 ? (x2.intValue() + 123 + 13 + 20) : (x2.intValue() - 13 - 20));
 		} else {
-		    gate.setXcoord(new Integer(x1.intValue() - 13 - 20));
+		    gate.setXcoord(x2.intValue() + 123 + 13 + 20);
 		}
 
-		gate.setYcoord(toActivity.getYcoord() + 25);
-	    }
+		gate.setYcoord(activity.getYcoord() + 25);
 
-	    design.getTransitions().add(newTransition);
-	    design.setMaxID(maxId);
+	    } else {
 
-	    // increment design version field
-	    design.setDesignVersion(design.getDesignVersion() + 1);
+		toActivity = fromTransition.getToActivity();
 
-	    if (gate != null) {
-		activityDAO.update(gate);
-	    }
-	    if (activity != null) {
-		activityDAO.update(activity);
-	    }
-	    if (toActivity != null) {
-		activityDAO.update(toActivity);
-	    }
+		fromTransition.setToActivity(gate);
+		fromTransition.setToUIID(gate.getActivityUIID());
 
-	    if ((fromTransition != null) && !fromTransition.equals(newTransition)) {
-		baseDAO.update(fromTransition);
-	    }
-	    if (newTransition != null) {
-		baseDAO.insert(newTransition);
-	    }
-	    if (design != null) {
-		learningDesignDAO.insertOrUpdate(design);
-	    }
+		newTransition.setFromActivity(gate);
+		newTransition.setFromUIID(gate.getActivityUIID());
+		newTransition.setToActivity(toActivity);
+		newTransition.setToUIID(toActivity.getActivityUIID());
 
-	} catch (NullPointerException npe) {
-	    log.error(npe.getMessage(), npe);
+		gate.setTransitionFrom(newTransition);
+		toActivity.setTransitionTo(newTransition);
+		gate.setTransitionTo(fromTransition);
+
+		// set x / y position for Gate
+		Integer x1 = activity.getXcoord() == null ? 0 : activity.getXcoord();
+		Integer x2 = toActivity.getXcoord() == null ? 0 : toActivity.getXcoord();
+		gate.setXcoord(((x1.intValue() + 123 + x2.intValue()) / 2) - 13);
+
+		Integer y1 = activity.getYcoord() == null ? 0 : activity.getYcoord();
+		Integer y2 = toActivity.getYcoord() == null ? 0 : toActivity.getYcoord();
+		gate.setYcoord((y1.intValue() + 50 + y2.intValue()) / 2);
+	    }
 	}
 
-    }
+	design.getTransitions().add(newTransition);
+	design.setMaxID(maxId);
 
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getFirstUnattemptedActivity(org.lamsfoundation.lams.learningdesign.LearningDesign)
-     */
-    @Override
-    public Activity getFirstUnattemptedActivity(LearningDesign design) throws LearningDesignException {
-	Activity activity = design.getFirstActivity();
+	// increment design version field
+	design.setDesignVersion(design.getDesignVersion() + 1);
 
-	while (activity.getReadOnly() && (activity.getTransitionFrom() != null)) {
-	    activity = activity.getTransitionFrom().getToActivity();
+	if (gate != null) {
+	    activityDAO.update(gate);
 	}
-
-	return activity;
+	if (activity != null) {
+	    activityDAO.update(activity);
+	}
+	if (toActivity != null) {
+	    activityDAO.update(toActivity);
+	}
+	if (fromTransition != null) {
+	    baseDAO.update(fromTransition);
+	}
+	baseDAO.insert(newTransition);
+	learningDesignDAO.update(design);
     }
 
+    @SuppressWarnings("unchecked")
     private void initialiseToolActivityForRuntime(LearningDesign design, Lesson lesson)
 	    throws MonitoringServiceException {
 	Date now = new Date();
 
-	Set activities = design.getActivities();
-	for (Iterator i = activities.iterator(); i.hasNext();) {
-	    Activity activity = (Activity) i.next();
-
+	for (Activity activity : (Set<Activity>) design.getActivities()) {
 	    if (!activity.isInitialised()) {
 		// this is a new activity - need to set up the content, do any
 		// scheduling, etc
@@ -931,6 +848,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		activityDAO.update(activity);
 	    }
 	}
+
+	learningDesignDAO.update(design);
     }
 
     @Override
