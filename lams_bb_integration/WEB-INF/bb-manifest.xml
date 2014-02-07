@@ -30,8 +30,8 @@
                 <remove value="modules/delete.jsp"/>
             </http-actions>
             <icons>
-                <toolbar value="/images/logo.gif" />
-                <listitem value="/images/logo.gif" />
+                <toolbar value="images/logo.gif" />
+                <listitem value="images/logo.gif" />
             </icons>
         </content-handler>
     </content-handlers>
