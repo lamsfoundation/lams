@@ -207,10 +207,31 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
-	    logger.debug("This tool does not support learner content removing yet.");
+	    logger.debug("Resetting Web Conference completion flag for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
+
+	Bbb bbb = getBbbByContentId(toolContentId);
+	if (bbb == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (BbbSession session : bbb.getBbbSessions()) {
+	    for (BbbUser user : session.getBbbUsers()) {
+		if (user.getUserId().equals(userId.longValue())) {
+		    if (user.getNotebookEntryUID() != null) {
+			NotebookEntry entry = coreNotebookService.getEntry(user.getNotebookEntryUID());
+			bbbDAO.delete(entry);
+			user.setNotebookEntryUID(null);
+		    }
+		    user.setFinishedActivity(false);
+		    bbbUserDAO.update(user);
+		}
+	    }
 	}
     }
-    
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

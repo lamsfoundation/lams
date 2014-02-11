@@ -1034,8 +1034,8 @@ public class GradebookService implements IGradebookService {
 	    // mark and feedback
 	    if (gradebookUserActivity == null || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
 		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook);
+		updateUserActivityGradebookFeedback(activity, learner, feedback);
 	    }
-
 	}
     }
 

@@ -987,40 +987,49 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
+	Resource resource = resourceDao.getByContentId(toolContentId);
+	if (resource == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	Iterator<ResourceItem> itemIterator = resource.getResourceItems().iterator();
+	while (itemIterator.hasNext()) {
+	    ResourceItem item = itemIterator.next();
+	    ResourceItemVisitLog visitLog = resourceItemVisitDao.getResourceItemLog(item.getUid(), userId.longValue());
+	    if (visitLog != null) {
+		resourceItemVisitDao.removeObject(ResourceItemVisitLog.class, visitLog.getUid());
+	    }
+
+	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		if (item.getFileUuid() != null) {
+		    try {
+			resourceToolContentHandler.deleteFile(item.getFileUuid());
+		    } catch (Exception e) {
+			throw new ToolException("Error while removing Share Resources file UUID " + item.getFileUuid(),
+				e);
+		    }
+		}
+		resourceItemDao.removeObject(ResourceItem.class, item.getUid());
+		itemIterator.remove();
+	    }
+	}
+
 	List<ResourceSession> sessions = resourceSessionDao.getByContentId(toolContentId);
 	for (ResourceSession session : sessions) {
-	    Iterator<ResourceItem> itemIterator = session.getResourceItems().iterator();
-	    while (itemIterator.hasNext()) {
-		ResourceItem item = itemIterator.next();
-
-		if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
-		    ResourceItemVisitLog visitLog = resourceItemVisitDao.getResourceItemLog(item.getUid(),
-			    userId.longValue());
-		    if (visitLog != null) {
-			resourceItemVisitDao.removeObject(ResourceItemVisitLog.class, visitLog.getUid());
-		    }
-
-		    if (item.getFileUuid() != null) {
-			try {
-			    resourceToolContentHandler.deleteFile(item.getFileUuid());
-			} catch (Exception e) {
-			    throw new ToolException("Error while removing Share Resources file UUID "
-				    + item.getFileUuid(), e);
-			}
-		    }
-		    resourceItemDao.removeObject(ResourceItem.class, item.getUid());
-		    itemIterator.remove();
-		}
-	    }
-	    
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		user.setSessionFinished(false);
-		resourceUserDao.saveObject(user);
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ResourceConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    resourceDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+		
+		resourceUserDao.removeObject(ResourceUser.class, user.getUid());
 	    }
 	}
     }
-    
+
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ResourceSession session = new ResourceSession();
 	session.setSessionId(toolSessionId);

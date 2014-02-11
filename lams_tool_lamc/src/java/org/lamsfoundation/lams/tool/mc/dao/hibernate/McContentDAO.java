@@ -127,4 +127,9 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
     public void flush() {
 	this.getHibernateTemplate().flush();
     }
+
+    @Override
+    public void delete(Object object) {
+	getHibernateTemplate().delete(object);
+    }
 }

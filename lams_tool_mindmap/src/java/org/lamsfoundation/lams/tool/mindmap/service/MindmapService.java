@@ -406,16 +406,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		    nodesToDelete.addAll(descendants);
 		}
 	    }
-	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
-	    if (user != null) {
-		if (user.getEntryUID() != null) {
-		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
-		    mindmapDAO.delete(entry);
-		    user.setEntryUID(null);
-		    mindmapUserDAO.update(user);
-		}
-	    }
-
 	}
 
 	for (MindmapNode node : nodesToDelete) {
@@ -425,6 +415,18 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	List<MindmapRequest> requests = mindmapRequestDAO.getRequestsByUserId(userId.longValue());
 	for (MindmapRequest request : requests) {
 	    mindmapRequestDAO.delete(request);
+	}
+
+	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		if (user.getEntryUID() != null) {
+		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    mindmapDAO.delete(entry);
+		}
+
+		mindmapUserDAO.delete(user);
+	    }
 	}
     }
     

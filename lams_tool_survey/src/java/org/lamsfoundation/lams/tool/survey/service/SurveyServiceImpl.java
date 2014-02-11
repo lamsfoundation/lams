@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,17 +42,6 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -99,7 +86,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
@@ -712,13 +698,21 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    surveyAnswerDao.removeObject(SurveyAnswer.class, answer.getUid());
 	}
 
-	SurveyUser user = surveyUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
-	if (user != null) {
-	    user.setSessionFinished(false);
-	    surveyUserDao.saveObject(user);
+	List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentId);
+	for (SurveySession session : sessions) {
+	    SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			SurveyConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    surveyDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		surveyUserDao.removeObject(SurveyUser.class, user.getUid());
+	    }
 	}
     }
-    
+
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SurveySession session = new SurveySession();
 	session.setSessionId(toolSessionId);

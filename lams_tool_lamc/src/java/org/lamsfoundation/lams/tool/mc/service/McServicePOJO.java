@@ -923,7 +923,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	// propagade changes to Gradebook
 	int totalMark = (oldMark == null) ? oldTotalMark + newMark : oldTotalMark - oldMark + newMark;
-	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, true);
+	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
 	
 	//record mark change with audit service
 	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(), userAttempt
@@ -1356,10 +1356,16 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		McQueUsr user = mcUserDAO.getMcUserBySession(userId.longValue(), session.getUid());
 		if (user != null) {
 		    mcUsrAttemptDAO.removeAllUserAttempts(user.getUid());
-		    user.setResponseFinalised(false);
-		    user.setLastAttemptTotalMark(null);
-		    user.setNumberOfAttempts(0);
-		    mcUserDAO.saveMcUser(user);
+
+		    NotebookEntry entry = getEntry(session.getMcSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    McAppConstants.MY_SIGNATURE, userId);
+		    if (entry != null) {
+			mcContentDAO.delete(entry);
+		    }
+
+		    mcUserDAO.removeMcUser(user);
+
+		    gradebookService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
 		}
 	    }
 	}

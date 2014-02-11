@@ -53,4 +53,6 @@ public interface IQaContentDAO {
     public void deleteCondition(QaCondition condition);
 
     public void removeQuestionsFromCache(QaContent qaContent);
+    
+    public void delete(Object object);
 }

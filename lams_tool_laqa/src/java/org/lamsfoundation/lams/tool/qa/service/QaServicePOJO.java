@@ -698,11 +698,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    for (QaUsrResp response : (Set<QaUsrResp>) user.getQaUsrResps()) {
 			qaUsrRespDAO.removeUserResponse(response);
 		    }
-		    user.getQaUsrResps().clear();
 
-		    user.setLearnerFinished(false);
-		    user.setResponseFinalized(false);
-		    qaQueUsrDAO.updateUsr(user);
+		    qaQueUsrDAO.deleteQaQueUsr(user);
+		    
+		    NotebookEntry entry = getEntry(session.getQaSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    QaAppConstants.MY_SIGNATURE, userId);
+		    if (entry != null) {
+			qaDAO.delete(entry);
+		    }
 		}
 	    }
 	}

@@ -934,9 +934,13 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	for (TaskListSession session : sessions) {
 	    TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		user.setSessionFinished(false);
-		user.setVerifiedByMonitor(false);
-		taskListUserDao.saveObject(user);
+		NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			TaskListConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    taskListDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		taskListUserDao.removeObject(TaskListUser.class, user.getUid());
 	    }
 	}
     }

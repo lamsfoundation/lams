@@ -139,4 +139,8 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     }
 
+    @Override
+    public void delete(Object object) {
+	getHibernateTemplate().delete(object);
+    }
 }

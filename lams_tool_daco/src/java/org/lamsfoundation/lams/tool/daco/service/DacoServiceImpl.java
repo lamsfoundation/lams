@@ -723,7 +723,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
 	dacoDao.removeObject(Daco.class, daco.getUid());
     }
-    
+
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Removing Daco data for user ID " + userId + " and toolContentId " + toolContentId);
@@ -742,10 +742,14 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		    }
 		    dacoAnswerDao.removeObject(DacoAnswer.class, answer.getUid());
 		}
-		user.getAnswers().clear();
-		
-		user.setSessionFinished(false);
-		dacoUserDao.saveObject(user);
+
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			DacoConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    dacoDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		dacoUserDao.removeObject(DacoUser.class, user.getUid());
 	    }
 	}
     }

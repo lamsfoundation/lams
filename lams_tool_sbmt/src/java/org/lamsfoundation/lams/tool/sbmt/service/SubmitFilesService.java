@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -237,8 +238,15 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
 	    SubmitUser user = submitUserDAO.getLearner(session.getSessionID(), userId);
 	    if (user != null) {
-		user.setFinished(false);
-		submitUserDAO.update(user);
+		NotebookEntry entry = getEntry(session.getSessionID(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			SbmtConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    submitFilesContentDAO.delete(entry);
+		}
+
+		gradebookService.updateActivityMark(null, null, user.getUserID(), session.getSessionID(), false);
+
+		submitUserDAO.delete(user);
 	    }
 	}
     }

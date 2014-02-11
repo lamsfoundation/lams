@@ -921,8 +921,13 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
 	if (user != null) {
-	    user.setSessionFinished(false);
-	    imageGalleryUserDao.saveObject(user);
+	    NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ImageGalleryConstants.TOOL_SIGNATURE, userId);
+	    if (entry != null) {
+		imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
+	    }
+
+	    imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
 	}
 
     }

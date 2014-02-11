@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.gmap.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,25 +38,14 @@ import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -81,11 +68,8 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
-import org.lamsfoundation.lams.tool.gmap.util.GmapToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.w3c.dom.Document;
@@ -236,7 +220,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
-	
+
 	Iterator<GmapMarker> markerIterator = gmap.getGmapMarkers().iterator();
 	while (markerIterator.hasNext()) {
 	    GmapMarker marker = markerIterator.next();
@@ -249,6 +233,12 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	for (GmapSession session : gmap.getGmapSessions()) {
 	    GmapUser user = gmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			GmapConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    gmapDAO.delete(entry);
+		}
+
 		user.setFinishedActivity(false);
 		gmapUserDAO.update(user);
 	    }

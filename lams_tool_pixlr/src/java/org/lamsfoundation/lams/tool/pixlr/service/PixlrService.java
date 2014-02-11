@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -269,23 +270,18 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    if (pixlr != null) {
 		for (PixlrSession session : pixlr.getPixlrSessions()) {
 		    PixlrUser user = pixlrUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
-		    user.setFinishedActivity(false);
-		    user.setImageFileName(null);
-		    user.setImageHeight(null);
-		    user.setImageWidth(null);
-		    user.setImageHidden(false);
-		    user.setFinishedActivity(false);
-		    if (user.getEntryUID() != null) {
-			NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    PixlrConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
 			pixlrDAO.delete(entry);
 		    }
 
-		    pixlrUserDAO.update(user);
+		    pixlrUserDAO.delete(user);
 		}
 	    }
 	}
     }
-    
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 

@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -632,7 +633,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Noticeboard finished flat for user ID " + userId + " and toolContentId "
+	    log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId "
 		    + toolContentId);
 	}
 
@@ -645,12 +646,17 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	for (NoticeboardSession session : (Set<NoticeboardSession>) nbContent.getNbSessions()) {
 	    NoticeboardUser user = nbUserDAO.getNbUser(userId.longValue(), session.getNbSessionId());
 	    if (user != null) {
-		user.setUserStatus(NoticeboardUser.INCOMPLETE);
-		nbUserDAO.updateNbUser(user);
+		NotebookEntry entry = getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			NoticeboardConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    nbContentDAO.delete(entry);
+		}
+
+		nbUserDAO.removeNbUser(user.getUid());
 	    }
 	}
     }
-    
+
     private NoticeboardContent getAndCheckIDandObject(Long toolContentId) throws ToolException, DataMissingException {
 	if (toolContentId == null) {
 	    throw new ToolException("Tool content ID is missing. Unable to continue");

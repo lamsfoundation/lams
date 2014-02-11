@@ -144,5 +144,10 @@ public class NoticeboardContentDAO extends HibernateDaoSupport implements INotic
         this.getHibernateTemplate().saveOrUpdate(nbSession);
         this.getHibernateTemplate().saveOrUpdate(content);        
     }
+
+    @Override
+    public void delete(Object object) {
+	getHibernateTemplate().delete(object);
+    }
   
 }

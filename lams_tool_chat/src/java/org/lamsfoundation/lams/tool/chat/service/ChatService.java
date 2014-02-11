@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -242,12 +243,18 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	for (ChatSession session : (Set<ChatSession>) chat.getChatSessions()) {
 	    ChatUser user = chatUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		List<ChatMessage> messages = chatMessageDAO.getForUser(user);
+		List<ChatMessage> messages = chatMessageDAO.getSentByUser(user.getUid());
 		if (!messages.isEmpty()) {
 		    for (ChatMessage message : messages) {
 			chatMessageDAO.delete(message);
 			session.getChatMessages().remove(message);
 		    }
+		}
+
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ChatConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    chatDAO.delete(entry);
 		}
 
 		user.setFinishedActivity(false);

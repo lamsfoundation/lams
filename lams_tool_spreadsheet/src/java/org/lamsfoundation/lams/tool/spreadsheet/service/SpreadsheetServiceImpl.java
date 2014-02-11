@@ -608,13 +608,19 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		if (user.getUserModifiedSpreadsheet() != null) {
 		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, user
 			    .getUserModifiedSpreadsheet().getUid());
-		    user.setUserModifiedSpreadsheet(null);
 		}
-		spreadsheetUserDao.saveObject(user);
+
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			SpreadsheetConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+		
+		spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
 	    }
 	}
     }
-    
+
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SpreadsheetSession session = new SpreadsheetSession();
 	session.setSessionId(toolSessionId);

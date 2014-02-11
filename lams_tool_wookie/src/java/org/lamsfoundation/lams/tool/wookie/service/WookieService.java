@@ -26,34 +26,21 @@ package org.lamsfoundation.lams.tool.wookie.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -76,14 +63,12 @@ import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
-import org.lamsfoundation.lams.tool.wookie.util.WookieToolContentHandler;
 import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the IWookieService interface.
@@ -342,13 +327,33 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 			throws SessionDataExistsException, ToolException {
 		// TODO Auto-generated method stub
 	}
-	    
-	    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-		if (logger.isDebugEnabled()) {
-		    logger.debug("This tool does not support learner content removing yet.");
+
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Resetting Wookie completion flag for user ID " + userId + " and toolContentId "
+		    + toolContentId);
+	}
+
+	Wookie wookie = getWookieByContentId(toolContentId);
+	if (wookie == null) {
+	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (WookieSession session : wookie.getWookieSessions()) {
+	    WookieUser user = wookieUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			WookieConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    wookieDAO.delete(entry);
 		}
+		user.setFinishedActivity(false);
+		wookieUserDAO.update(user);
 	    }
-	    
+
+	}
+    }
 	/**
 	 * Export the XML fragment for the tool's content, along with any files
 	 * needed for the content.

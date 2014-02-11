@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -221,16 +222,32 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
 	    if (session.getAppointedScribe() != null
 		    && session.getAppointedScribe().getUserId().equals(userId.longValue())) {
+
+		for (ScribeUser user : (Set<ScribeUser>) session.getScribeUsers()) {
+		    if (user.getUserId().equals(userId.longValue())) {
+			scribeUserDAO.delete(user);
+		    } else {
+			user.setReportApproved(false);
+			scribeUserDAO.saveOrUpdate(user);
+		    }
+		}
+
 		session.setAppointedScribe(null);
+		session.setForceComplete(false);
+		session.setReportSubmitted(false);
+		session.getScribeReportEntries().clear();
 		scribeSessionDAO.update(session);
+	    } else {
+		ScribeUser user = scribeUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+		if (user != null) {
+		    scribeUserDAO.delete(user);
+		}
 	    }
 
-	    ScribeUser user = scribeUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
-	    if (user != null) {
-		user.setFinishedActivity(false);
-		user.setStartedActivity(false);
-		user.setReportApproved(false);
-		scribeUserDAO.saveOrUpdate(user);
+	    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ScribeConstants.TOOL_SIGNATURE, userId);
+	    if (entry != null) {
+		scribeDAO.delete(entry);
 	    }
 	}
     }

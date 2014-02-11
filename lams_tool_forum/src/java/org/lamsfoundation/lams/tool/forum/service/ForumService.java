@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -761,24 +762,61 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Hiding Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
+	    log.debug("Hiding or removing Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	List<ForumToolSession> sessionList = forumToolSessionDao.getByContentId(toolContentId);
 
 	for (ForumToolSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    ForumUser learner = forumUserDao.getByUserIdAndSessionId(userId.longValue(), sessionId);
-	    if (learner != null) {
-		List<Message> messages = messageDao.getByUserAndSession(learner.getUid(), sessionId);
-		for (Message message : messages) {
-		    message.setHideFlag(true);
-		    messageDao.update(message);
+	    ForumUser user = forumUserDao.getByUserIdAndSessionId(userId.longValue(), sessionId);
+	    if (user != null) {
+		List<Message> messages = messageDao.getByUserAndSession(user.getUid(), sessionId);
+		Iterator<Message> messageIterator = messages.iterator();
+		while (messageIterator.hasNext()) {
+		    Message message = messageIterator.next();
+
+		    if (userOwnMessageTree(message, user.getUid())) {
+			messageSeqDao.deleteByTopicId(message.getUid());
+			Timestamp timestamp = timestampDao.getTimestamp(message.getUid(), user.getUid());
+			if (timestamp != null) {
+			    timestampDao.delete(timestamp);
+			}
+			messageDao.delete(message.getUid());
+			messageIterator.remove();
+		    } else {
+			message.setHideFlag(true);
+			messageDao.update(message);
+		    }
 		}
-		
-		learner.setSessionFinished(false);
-		forumUserDao.save(learner);
+
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ForumConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    // hopefully it understands NotebookEntries
+		    activityDAO.delete(entry);
+		}
+
+		user.setSessionFinished(false);
+		forumUserDao.save(user);
+
+		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
 	    }
 	}
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean userOwnMessageTree(Message message, Long userUid) {
+	if (!message.getCreatedBy().getUid().equals(userUid)) {
+	    return false;
+	}
+	List<Message> children = messageDao.getChildrenTopics(message.getUid());
+	for (Message child : children) {
+	    if (!userOwnMessageTree(child, userUid)) {
+		return false;
+	    }
+	}
+
+	return true;
     }
 
     /**

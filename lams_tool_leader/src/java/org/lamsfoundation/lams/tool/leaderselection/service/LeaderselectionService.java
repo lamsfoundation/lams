@@ -194,10 +194,12 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 	}
 
 	for (LeaderselectionSession session : (Set<LeaderselectionSession>) selection.getLeaderselectionSessions()) {
+	    /*
 	    if (session.getGroupLeader() != null && session.getGroupLeader().getUserId().equals(userId.longValue())) {
 		session.setGroupLeader(null);
 		leaderselectionSessionDAO.update(session);
 	    }
+	    */
 
 	    LeaderselectionUser user = leaderselectionUserDAO.getByUserIdAndSessionId(userId.longValue(),
 		    session.getSessionId());

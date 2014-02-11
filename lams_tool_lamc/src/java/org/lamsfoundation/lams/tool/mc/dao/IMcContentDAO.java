@@ -137,4 +137,6 @@ public interface IMcContentDAO {
     public List findAll(Class objClass);
 
     public void flush();
+    
+    public void delete(Object object);
 }

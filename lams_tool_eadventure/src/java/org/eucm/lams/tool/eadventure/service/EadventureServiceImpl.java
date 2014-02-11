@@ -1050,13 +1050,41 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	}
 	eadventureDao.delete(eadventure);
     }
-    
+
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("This tool does not support learner content removing yet.");
+	    log.debug("Removing Eadventure content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
+	if (eadventure == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+	EadventureItemVisitLog visitLog = eadventureItemVisitDao.getEadventureItemLog(eadventure.getUid(),
+		userId.longValue());
+	if (visitLog != null) {
+	    eadventureItemVisitDao.removeObject(EadventureItemVisitLog.class, visitLog.getUid());
+	}
+
+	List<EadventureSession> sessions = eadventureSessionDao.getByContentId(toolContentId);
+	for (EadventureSession session : sessions) {
+	    EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			EadventureConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    eadventureDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+
+		eadventureUserDao.removeObject(EadventureUser.class, user.getUid());
+	    }
 	}
     }
-    
+
     public void removeParams(Long toolContentId){
 	List<EadventureParam> params = getEadventureParamByContentId(toolContentId);
 	if (params!=null){

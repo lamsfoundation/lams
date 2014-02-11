@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -289,22 +290,24 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 
 	for (WikiSession session : wiki.getWikiSessions()) {
+	    /*
 	    for (WikiPage page : session.getWikiPages()) {
-		if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
-		    page.setDeleted(true);
-		    wikiPageDAO.update(page);
-		}
+        	    if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
+        	        page.setDeleted(true);
+        	        wikiPageDAO.update(page);
+        	    }
 	    }
+	    */
 
 	    WikiUser user = wikiUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		if (user.getEntryUID() != null) {
-		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			WikiConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
 		    wikiDAO.delete(entry);
-		    user.setEntryUID(null);
 		}
 		user.setFinishedActivity(false);
-		user.setWikiEdits(0);
+		// user.setWikiEdits(0);
 		wikiUserDAO.update(user);
 	    }
 	}

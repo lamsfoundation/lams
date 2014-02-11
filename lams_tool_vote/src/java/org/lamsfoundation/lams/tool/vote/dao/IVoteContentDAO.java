@@ -60,4 +60,6 @@ public interface IVoteContentDAO {
     public void flush();
 
     public void removeNominationsFromCache(VoteContent voteContent);
+    
+    public void delete(Object object);
 }

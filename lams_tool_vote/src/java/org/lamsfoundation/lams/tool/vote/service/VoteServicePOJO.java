@@ -544,14 +544,14 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) itUserRecords.next();
 
 		    if (!showUserEntriesBySession) {
-			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
-			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
-			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+			    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+			    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+			    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+			    voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+			    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+			    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+			    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+			    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 			
 		    } else {
 			// showUserEntriesBySession is true: the case with learner export portfolio
@@ -560,39 +560,39 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 				.toString();
 
 			if (showUserEntriesByUserId) {
-			    if (userSessionId.equals(currentSessionId)) {
-				String localUserId = voteUsrAttempt.getVoteQueUsr().getQueUsrId().toString();
-				if (userId.equals(localUserId)) {
+				if (userSessionId.equals(currentSessionId)) {
+				    String localUserId = voteUsrAttempt.getVoteQueUsr().getQueUsrId().toString();
+				    if (userId.equals(localUserId)) {
+					voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+					voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+					voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+				    voteMonitoredUserDTO
+					    .setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+					voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+					listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+					voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+				    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+					if (voteUsrAttempt.isVisible() == false) {
+					    voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
+					}
+
+				    }
+				}
+			} else {
+			    // showUserEntriesByUserId is false
+			    // show user entries by same session
+				if (userSessionId.equals(currentSessionId)) {
 				    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
 				    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
 				    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-				    voteMonitoredUserDTO
-					    .setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+				voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 				    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 				    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 				    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
 				    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-				    if (voteUsrAttempt.isVisible() == false) {
-					voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
-				    }
-
 				}
 			    }
-			} else {
-			    // showUserEntriesByUserId is false
-			    // show user entries by same session
-			    if (userSessionId.equals(currentSessionId)) {
-				voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
-				voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-				voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-				voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-				voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-				listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
-				voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
-				voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-			    }
 			}
-		    }
 
 		}
 
@@ -1487,11 +1487,14 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    VoteQueUsr user = voteUserDAO.getVoteUserBySession(userId.longValue(), session.getUid());
 	    if (user != null) {
 		voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
-		user.getVoteUsrAttempts().clear();
-		
-		user.setFinalScreenRequested(false);
-		user.setResponseFinalised(false);
-		voteUserDAO.updateVoteUser(user);
+
+		NotebookEntry entry = getEntry(session.getVoteSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			VoteAppConstants.MY_SIGNATURE, userId);
+		if (entry != null) {
+		    voteContentDAO.delete(entry);
+		}
+
+		voteUserDAO.removeVoteUser(user);
 	    }
 	}
     }

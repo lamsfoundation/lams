@@ -144,4 +144,9 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 	}
 
     }
+
+    @Override
+    public void delete(Object object) {
+	getHibernateTemplate().delete(object);
+    }
 }

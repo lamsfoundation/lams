@@ -900,12 +900,58 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridgeDao.delete(commonCartridge);
     }
     
+    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("This tool does not support learner content removing yet.");
+	    log.debug("Removing Common Cartridge content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	CommonCartridge cartridge = commonCartridgeDao.getByContentId(toolContentId);
+	if (cartridge == null) {
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	Iterator<CommonCartridgeItem> itemIterator = cartridge.getCommonCartridgeItems().iterator();
+	while (itemIterator.hasNext()) {
+	    CommonCartridgeItem item = itemIterator.next();
+	    CommonCartridgeItemVisitLog visitLog = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(item.getUid(),
+		    userId.longValue());
+	    if (visitLog != null) {
+		commonCartridgeItemVisitDao.removeObject(CommonCartridgeItemVisitLog.class, visitLog.getUid());
+	    }
+
+	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		if (item.getFileUuid() != null) {
+		    try {
+			commonCartridgeToolContentHandler.deleteFile(item.getFileUuid());
+		    } catch (Exception e) {
+			throw new ToolException(
+				"Error while removing Common Cartridge file UUID " + item.getFileUuid(), e);
+		    }
+		}
+		commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, item.getUid());
+		itemIterator.remove();
+	    }
+	}
+
+	List<CommonCartridgeSession> sessions = commonCartridgeSessionDao.getByContentId(toolContentId);
+
+	for (CommonCartridgeSession session : sessions) {
+	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			CommonCartridgeConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    commonCartridgeDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUserId());
+	    }
 	}
     }
-    
+
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	CommonCartridgeSession session = new CommonCartridgeSession();
 	session.setSessionId(toolSessionId);

@@ -205,11 +205,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 		if (user.getEntryUID() != null) {
 		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
 		    notebookDAO.delete(entry);
-		    user.setEntryUID(null);
 		}
 
-		user.setFinishedActivity(false);
-		notebookUserDAO.update(user);
+		notebookUserDAO.delete(user);
 	    }
 	}
     }

@@ -111,4 +111,5 @@ public interface INoticeboardContentDAO {
      */
     public void addNbSession(Long nbContentId, NoticeboardSession nbSession);
     
+    public void delete(Object object);
   }

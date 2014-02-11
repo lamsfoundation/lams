@@ -303,7 +303,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	for (ScratchieUser user : users) {
 
 	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(), user
-		    .getSession().getSessionId(), true);
+		    .getSession().getSessionId(), false);
 
 	    // record mark change with audit service
 	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(), ""
@@ -437,7 +437,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 			    + user.getUserId() + " and ScratchieSession ID: " + user.getSession().getSessionId());
 		}
 		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(), user
-			.getSession().getSessionId(), true);
+			.getSession().getSessionId(), false);
 	    }
 	}
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {
@@ -1827,10 +1827,28 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("This tool does not support learner content removing yet.");
+	    log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
+	for (ScratchieSession session : sessions) {
+	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+
+	    if (user != null) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ScratchieConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
+
+		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
+
+		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+	    }
 	}
     }
-    
+
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {
