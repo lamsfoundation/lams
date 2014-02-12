@@ -33,7 +33,6 @@
 
 <bbNG:genericPage title="LAMS Options" ctxId="ctx">
 <%
-    // SECURITY!
     // Authorise current user for Course Access (automatic redirect)
     try{
         if (!PlugInUtil.authorizeForCourse(request, response))
@@ -87,9 +86,29 @@
         PlugInUtil.sendAccessDeniedRedirect(request, response);
     }
     
+    //Get lessson's title and description
+    String contentIdStr = request.getParameter("content_id");
+    String title = "";
+    String description = "";
+    //contentId is available in versions after 1.2.3
+    if (contentIdStr != null) {
+    	
+        Container bbContainer = bbPm.getContainer();
+        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
+        ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
+        Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
+        
+        title = courseDoc.getTitle();
+        description = courseDoc.getBody().getText();
+    } else {
+    
+    	title = request.getParameter("title");
+    	description = request.getParameter("description");
+    }
+
+    //display learning design image
     String strIsDisplayDesignImage = request.getParameter("isDisplayDesignImage");
     boolean isDisplayDesignImage = "true".equals(strIsDisplayDesignImage)?true:false;
-    
     String learningDesignImageUrl = "";
     if (isDisplayDesignImage) {
 		String strLearningDesignId = request.getParameter("ldid").trim();
@@ -111,7 +130,6 @@
 		    //no score availalbe
 		}
 	}
-
     boolean isScoreAvailable = (current_score != null);
 %>
 
@@ -122,7 +140,7 @@
 
     <%-- Page Header --%>
     <bbNG:pageHeader>    	
-        <bbNG:pageTitleBar title="LAMS Options"/>
+        <bbNG:pageTitleBar title="<%=title%>"/>
     </bbNG:pageHeader>
 
     <%-- Action Control Bar --%>
@@ -134,15 +152,9 @@
         <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
     </bbNG:actionControlBar>
     
-    <% if(request.getParameter("title") != null) { %>
-	    <h2>
-	    	<%=request.getParameter("title")%>
-	    </h2>
-    <% } %>
-    
-    <% if(request.getParameter("description") != null) { %>
+    <% if((description != "") && (description != null)) { %>
 	    <h4> 
-	    	<%=request.getParameter("description")%> 
+	    	<%=description%> 
 	    </h4>
     <% } %>
     
@@ -157,7 +169,6 @@
    			You have completed this lesson.
    		</div>
     <% } %>
-    
 
     <bbNG:jsBlock>
         <script language="JavaScript" type="text/javascript">

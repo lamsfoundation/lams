@@ -36,7 +36,6 @@
 
 <bbNG:genericPage title="LAMS Options" ctxId="ctx">
 <%
-    // SECURITY!
 		// Authorise current user for Course Access (automatic redirect)
 		try {
 		    if (!PlugInUtil.authorizeForCourse(request, response))
@@ -77,8 +76,12 @@
 		    throw new ServletException("lineitem not found");
 		}
 
+		//delete lineitem (can't delete it simply doing linePersister.deleteById(lineitem.getId()) due to BB9 bug)
+		PkId lineitemPkId = (PkId) lineitem.getId();
+		String lineitemIdStr = "_" + lineitemPkId.getPk1() + "_" + lineitemPkId.getPk2();
+		Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
 		LineitemDbPersister linePersister = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
-		linePersister.deleteById(lineitem.getId());
+		linePersister.deleteById(lineitemId);
 %>
 
     <%-- Page Header --%>
