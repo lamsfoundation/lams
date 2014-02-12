@@ -34,7 +34,6 @@
 <%
     String NOT_AVAILABLE = "<i>Item is not available.</i><br>";
 
-    // SECURITY!
     // Authorise current user for Course Control Panel (automatic redirect)
     try{
         if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
@@ -43,14 +42,10 @@
         throw new RuntimeException(e);
     }
 
-    // Retrieve the Db persistence manager from the persistence service
-    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();    
-    
-    // Get the content ID for this item 
+ 	// Get the Course Document (Lams Lesson)
+    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
     Container bbContainer = bbPm.getContainer();
-    Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );    
-    
-    // Load the Course Document (Lams Lesson)
+    Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
     ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
     Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
 
@@ -97,6 +92,11 @@
                     <input type="Radio" name="isAvailable" value="true" <%=(courseDoc.getIsAvailable())?"checked":""%>>Yes
                     <input type="Radio" name="isAvailable" value="false" <%=(courseDoc.getIsAvailable())?"":"checked"%>>No
                 </bbNG:dataElement>
+                
+                <bbNG:dataElement label="Do you want to add a mark/completion column in Gradecenter?" labelFor="isGradecenter">
+                    <input type="Radio" name="isGradecenter" value="true" <%=(courseDoc.getIsDescribed())?"checked":""%>>Yes
+                    <input type="Radio" name="isGradecenter" value="false" <%=(courseDoc.getIsDescribed())?"":"checked"%>>No
+                </bbNG:dataElement>                
                 
                 <bbNG:dataElement label="Track number of views">
                     <input type="radio" name="isTracked" value="true" <%=(courseDoc.getIsTracked())?"checked":""%>>Yes

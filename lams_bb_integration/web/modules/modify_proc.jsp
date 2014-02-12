@@ -31,7 +31,6 @@
 <bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
   
     <%
-        // SECURITY!
         // Authorise current user for Course Control Panel (automatic redirect)
         try{
             if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
@@ -59,8 +58,10 @@
         FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
         
         String strIsAvailable = request.getParameter("isAvailable");
+        String strIsGradecenter = request.getParameter("isGradecenter");
         String strIsTracked = request.getParameter("isTracked");
         boolean isAvailable = strIsAvailable.equals("true")?true:false;
+        boolean isGradecenter = strIsGradecenter.equals("true")?true:false;
         boolean isTracked = strIsTracked.equals("true")?true:false;
         
         String strStartDate = request.getParameter("lessonAvailability_start_datetime");
@@ -77,6 +78,7 @@
         // Set LAMS content data in Blackboard
         modifiedLesson.setTitle(strTitle);
         modifiedLesson.setIsAvailable(isAvailable);
+        modifiedLesson.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
         modifiedLesson.setIsTracked(isTracked);
         modifiedLesson.setBody(description);
     

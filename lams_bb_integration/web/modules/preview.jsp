@@ -41,7 +41,6 @@
 <bbNG:genericPage title="LAMS Learning Activity Management System" ctxId="ctx">
 
     <%
-        // SECURITY!
         // Authorise current user for Course Control Panel (automatic redirect)
         try{
             if (!PlugInUtil.authorizeForCourseControlPanel(request, response))

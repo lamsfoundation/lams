@@ -27,7 +27,6 @@
 <bbNG:cssFile href="css/treeview.css" />
 <bbNG:cssFile href="css/folders.css" />
 <%
-    // SECURITY!
     // Authorise current user for Course Control Panel (automatic redirect)
     try{
         if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
@@ -140,7 +139,6 @@
                     <input type="Radio" name="isGradecenter" value="true" checked>Yes
                     <input type="Radio" name="isGradecenter" value="false">No
                 </bbNG:dataElement>
-
 
                 <bbNG:dataElement label="Track number of views" labelFor="isTracked">
                     <input type="radio" name="isTracked" value="true">Yes

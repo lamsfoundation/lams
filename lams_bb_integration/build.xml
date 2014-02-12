@@ -2,7 +2,7 @@
 <project default="package" name="LAMS/Blackboard Plugin" basedir="./">
 	<property name="project" value="BlackboardPlugin"/>
 	<property name="product" value="lams2-bb-plugin"/>
-	<property name="version" value="1.2.2"/>
+	<property name="version" value="1.2.3"/>
 
 	<property name="build" value="${basedir}/build"/>
 	<property name="build.classes" value="${build}/classes"/>

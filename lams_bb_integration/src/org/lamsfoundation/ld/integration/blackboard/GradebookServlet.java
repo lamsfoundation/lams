@@ -34,6 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -51,23 +52,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import blackboard.data.content.Content;
+import blackboard.data.content.CourseDocument;
 import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
-import blackboard.data.gradebook.impl.Outcome;
-import blackboard.data.gradebook.impl.OutcomeDefinition.CalculationType;
-import blackboard.data.gradebook.impl.OutcomeDefinitionCategory;
-import blackboard.data.gradebook.impl.OutcomeDefinitionScale;
 import blackboard.data.user.User;
 import blackboard.persist.BbPersistenceManager;
+import blackboard.persist.Container;
+import blackboard.persist.Id;
 import blackboard.persist.KeyNotFoundException;
-import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
+import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.gradebook.LineitemDbLoader;
-import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.persist.gradebook.ScoreDbLoader;
 import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.user.UserDbLoader;
@@ -103,25 +103,51 @@ public class GradebookServlet extends HttpServlet {
 	    String userName = request.getParameter(Constants.PARAM_USER_ID);
 	    String timeStamp = request.getParameter(Constants.PARAM_TIMESTAMP);
 	    String hash = request.getParameter(Constants.PARAM_HASH);
-	    String lessonIdStr = request.getParameter(Constants.PARAM_LESSON_ID);
+	    String lessonId = request.getParameter(Constants.PARAM_LESSON_ID);
 
-	    // check paramaeters
-	    if (userName == null || timeStamp == null || hash == null) {
+	    // check parameters
+	    if (userName == null || timeStamp == null || hash == null || lessonId == null) {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "missing expected parameters");
 		return;
 	    }
 
+	    //check user rights
 	    String secretKey = LamsPluginUtil.getSecretKey();
 	    String serverId = LamsPluginUtil.getServerId();
-
 	    if (!sha1(
 		    timeStamp.toLowerCase() + userName.toLowerCase() + serverId.toLowerCase()
 			    + secretKey.toLowerCase()).equals(hash)) {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
 	    }
-
-	    // get the persistence manager
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    
+	    //check if isGradebookcenter
+	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
+	    ExtraInfo ei = pei.getExtraInfo();
+	    Set<String> internalLessonIds = ei.getKeys();
+	    String internalLessonId = null;
+	    for (String internalLessonIdIter : internalLessonIds) {
+		String externalLessonId = ei.getValue(internalLessonIdIter);
+		if (lessonId.equals(externalLessonId)) {
+		    internalLessonId = internalLessonIdIter;
+		    break;
+		}
+	    }
+	    
+	    // exit method as it was created in version prior to 1.2.1 and thus don't have lineitem
+	    if (internalLessonId == null) {
+	    	return;
+	    }
+	    
+	    // check if we need to store mark in Gradebook
+            BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+            Container bbContainer = bbPm.getContainer();
+            Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, internalLessonId );
+            ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
+            Content modifiedLesson = (Content)courseDocumentLoader.loadById( contentId );
+            if (!modifiedLesson.getIsDescribed()) {
+            	//isDescribed field is used for storing isGradecenter parameter and thus if it's false it means don't store mark to Gradecenter
+            	return;
+            }
 
 	    // get user list, but no role info since there are no course info
 	    UserDbLoader userLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);
@@ -136,7 +162,7 @@ public class GradebookServlet extends HttpServlet {
 	    Document document = null;
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(ctx) + "&courseId="
-		    + "&method=toolOutputsUser&lsId=" + lessonIdStr + "&outputsUser="
+		    + "&method=toolOutputsUser&lsId=" + lessonId + "&outputsUser="
 		    + URLEncoder.encode(userName, "UTF8");
 	    
 	    URL url = new URL(serviceURL);
@@ -201,7 +227,7 @@ public class GradebookServlet extends HttpServlet {
 		List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
 
 		for (Lineitem lineitemIter : lineitems) {
-		    if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(lessonIdStr)) {
+		    if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(lessonId)) {
 			lineitem = lineitemIter;
 			break;
 		    }
