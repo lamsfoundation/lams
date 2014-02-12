@@ -50,7 +50,6 @@ td#messageCell {
 #orgTabs li.orgTabsHeader {
 	width: 150px;
 	white-space: normal;
-	word-break: break-all;
 }
 
 #orgTabsPanelCell {
