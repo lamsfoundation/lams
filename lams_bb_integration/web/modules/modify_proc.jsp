@@ -26,6 +26,9 @@
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="blackboard.data.gradebook.*"%> 
+<%@ page import="org.lamsfoundation.ld.util.*"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
@@ -38,18 +41,21 @@
         } catch(PlugInException e) {
             throw new RuntimeException(e);
         }
+    
+	    String courseIdStr = request.getParameter("course_id");
+	    String contentIdStr = request.getParameter("content_id");
 
         // Retrieve the Db persistence manager from the persistence service
         BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
         Container bbContainer = bbPm.getContainer();
 
         // Internal Blackboard IDs for the course and parent content item
-        Id courseId = bbPm.generateId(Course.DATA_TYPE,request.getParameter("course_id"));
-        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
+        Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
+        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, contentIdStr);
 
         // Load the content item
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-        Content modifiedLesson = (Content)courseDocumentLoader.loadById( contentId );
+        Content modifiedBbContent = (Content)courseDocumentLoader.loadById( contentId );
 
         // Get the form parameters and convert into correct data types
         // TODO: Use bb text area instead
@@ -74,42 +80,51 @@
         
         String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
         String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
+        
+        //if teacher turned Gradecenter option ON (and it was OFF previously) - create lineitem
+        if (!modifiedBbContent.getIsDescribed() && isGradecenter) {
+            LineitemUtil.createLineitem(ctx, modifiedBbContent);
+            
+        //if teacher turned Gradecenter option OFF (and it was ON previously) - remove lineitem
+        } else if (modifiedBbContent.getIsDescribed() && !isGradecenter) {
+            LineitemUtil.removeLineitem(contentIdStr, courseIdStr);
+        }
     
         // Set LAMS content data in Blackboard
-        modifiedLesson.setTitle(strTitle);
-        modifiedLesson.setIsAvailable(isAvailable);
-        modifiedLesson.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
-        modifiedLesson.setIsTracked(isTracked);
-        modifiedLesson.setBody(description);
+        modifiedBbContent.setTitle(strTitle);
+        modifiedBbContent.setIsAvailable(isAvailable);
+        modifiedBbContent.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
+        modifiedBbContent.setIsTracked(isTracked);
+        modifiedBbContent.setBody(description);
     
         // Set Availability Dates
         // Clear the date (set to null) if the checkbox is unchecked
         // Start Date
         if (strStartDateCheckbox != null){
             if (strStartDateCheckbox.equals("1")){
-                modifiedLesson.setStartDate(startDate);
+                modifiedBbContent.setStartDate(startDate);
             } else {
-                modifiedLesson.setStartDate(null);
+                modifiedBbContent.setStartDate(null);
             }
         } else {
-            modifiedLesson.setStartDate(null);
+            modifiedBbContent.setStartDate(null);
         }
         // End Date
         if (strEndDateCheckbox != null){
             if (strEndDateCheckbox.equals("1")){
-                modifiedLesson.setEndDate(endDate);
+                modifiedBbContent.setEndDate(endDate);
             } else {
-                modifiedLesson.setEndDate(null);
+                modifiedBbContent.setEndDate(null);
             }
         } else {
-            modifiedLesson.setEndDate(null);
+            modifiedBbContent.setEndDate(null);
         }
 
         //Persist the Modified Lesson Object in Blackboard    
         ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-        persister.persist( modifiedLesson );
+        persister.persist( modifiedBbContent );
     
-        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(modifiedLesson.getParentId(), courseId);
+        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(modifiedBbContent.getParentId(), courseId);
     %>
 
     <%-- Breadcrumbs --%>

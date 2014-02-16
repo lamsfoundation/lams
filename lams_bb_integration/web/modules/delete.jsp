@@ -25,17 +25,19 @@
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
 <%@ page import="blackboard.portal.data.*" %>
 <%@ page import="blackboard.portal.servlet.PortalUtil" %>
 <%@ page import="blackboard.persist.PersistenceException" %>
 <%@ page import="blackboard.persist.gradebook.*" %>
 <%@ page import="blackboard.data.gradebook.*" %>
+<%@ page import="org.lamsfoundation.ld.util.*"%>
+<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 
 <bbNG:genericPage title="LAMS Options" ctxId="ctx">
-<%
+	<%
 		// Authorise current user for Course Access (automatic redirect)
 		try {
 		    if (!PlugInUtil.authorizeForCourse(request, response))
@@ -43,51 +45,16 @@
 		} catch (PlugInException e) {
 		    throw new RuntimeException(e);
 		}
-
-		String internalLessonId = request.getParameter("content_id");
-		String courseIdStr = request.getParameter("course_id");
-		BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-		Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
-
-		//get stored internalContentId -> externalContentId. 
-		PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-		ExtraInfo ei = pei.getExtraInfo();
-		String externalLessonId = ei.getValue(internalLessonId);
-
-		if (externalLessonId == null || "".equals(externalLessonId)) {
-		    throw new ServletException("externalLessonId not found in PortalExtraInfo LamsStorage");
-		}
-
-		CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-		LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
-
-		//search for appropriate lineitem
-		Lineitem lineitem = null;
-		List<Lineitem> lineitems = lineitemLoader.loadByCourseId(courseId);
-
-		for (Lineitem lineitemIter : lineitems) {
-		    if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(externalLessonId)) {
-				lineitem = lineitemIter;
-				break;
-		    }
-		}
-
-		if (lineitem == null) {
-		    throw new ServletException("lineitem not found");
-		}
-
-		//delete lineitem (can't delete it simply doing linePersister.deleteById(lineitem.getId()) due to BB9 bug)
-		PkId lineitemPkId = (PkId) lineitem.getId();
-		String lineitemIdStr = "_" + lineitemPkId.getPk1() + "_" + lineitemPkId.getPk2();
-		Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
-		LineitemDbPersister linePersister = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
-		linePersister.deleteById(lineitemId);
-%>
+	
+		String bbContentId = request.getParameter("content_id");
+		String courseId = request.getParameter("course_id");
+		
+		LineitemUtil.removeLineitem(bbContentId, courseId);
+	%>
 
     <%-- Page Header --%>
     <bbNG:pageHeader>    	
         <bbNG:pageTitleBar title="LAMS DELETE"/>
     </bbNG:pageHeader>
-
         
 </bbNG:genericPage>

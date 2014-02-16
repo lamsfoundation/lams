@@ -68,6 +68,7 @@ import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.gradebook.LineitemDbLoader;
+import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.persist.gradebook.ScoreDbLoader;
 import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.user.UserDbLoader;
@@ -103,10 +104,10 @@ public class GradebookServlet extends HttpServlet {
 	    String userName = request.getParameter(Constants.PARAM_USER_ID);
 	    String timeStamp = request.getParameter(Constants.PARAM_TIMESTAMP);
 	    String hash = request.getParameter(Constants.PARAM_HASH);
-	    String lessonId = request.getParameter(Constants.PARAM_LESSON_ID);
+	    String lamsLessonIdParam = request.getParameter(Constants.PARAM_LESSON_ID);
 
 	    // check parameters
-	    if (userName == null || timeStamp == null || hash == null || lessonId == null) {
+	    if (userName == null || timeStamp == null || hash == null || lamsLessonIdParam == null) {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "missing expected parameters");
 		return;
 	    }
@@ -121,32 +122,32 @@ public class GradebookServlet extends HttpServlet {
 	    }
 	    
 	    //check if isGradebookcenter
-	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-	    ExtraInfo ei = pei.getExtraInfo();
-	    Set<String> internalLessonIds = ei.getKeys();
-	    String internalLessonId = null;
-	    for (String internalLessonIdIter : internalLessonIds) {
-		String externalLessonId = ei.getValue(internalLessonIdIter);
-		if (lessonId.equals(externalLessonId)) {
-		    internalLessonId = internalLessonIdIter;
+	    PortalExtraInfo portalExtraInfo = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
+	    ExtraInfo extraInfo = portalExtraInfo.getExtraInfo();
+	    Set<String> bbContentIds = extraInfo.getKeys();
+	    String bbContentId = null;
+	    for (String bbContentIdIter : bbContentIds) {
+		String lamsLessonId = extraInfo.getValue(bbContentIdIter);
+		if (lamsLessonIdParam.equals(lamsLessonId)) {
+		    bbContentId = bbContentIdIter;
 		    break;
 		}
 	    }
 	    
 	    // exit method as it was created in version prior to 1.2.1 and thus don't have lineitem
-	    if (internalLessonId == null) {
+	    if (bbContentId == null) {
 	    	return;
 	    }
 	    
-	    // check if we need to store mark in Gradebook
+	    //check isGradecenter option is ON 
             BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
             Container bbContainer = bbPm.getContainer();
-            Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, internalLessonId );
-            ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-            Content modifiedLesson = (Content)courseDocumentLoader.loadById( contentId );
-            if (!modifiedLesson.getIsDescribed()) {
-            	//isDescribed field is used for storing isGradecenter parameter and thus if it's false it means don't store mark to Gradecenter
-            	return;
+            Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, bbContentId );
+            ContentDbLoader contentDbLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
+            Content bbContent = (Content)contentDbLoader.loadById( contentId );
+            //check isGradecenter option is ON 
+            if (!bbContent.getIsDescribed()) {//(isDescribed field is used for storing isGradecenter parameter)
+                return;
             }
 
 	    // get user list, but no role info since there are no course info
@@ -162,7 +163,7 @@ public class GradebookServlet extends HttpServlet {
 	    Document document = null;
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(ctx) + "&courseId="
-		    + "&method=toolOutputsUser&lsId=" + lessonId + "&outputsUser="
+		    + "&method=toolOutputsUser&lsId=" + lamsLessonIdParam + "&outputsUser="
 		    + URLEncoder.encode(userName, "UTF8");
 	    
 	    URL url = new URL(serviceURL);
@@ -214,26 +215,38 @@ public class GradebookServlet extends HttpServlet {
 		}
 		
 	    }
-                
-		
-	    CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-	    LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
-
-	    List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
-
-	    // search for appropriate lineitem
+            
+            //get lineitemid from the storage (bbContentId -> lineitemid)
+    	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
+    	    ExtraInfo ei = pei.getExtraInfo();
+    	    String lineitemIdStr = ei.getValue(bbContentId);
+	
+	    //TODO remove the following paragraph after a while. (It deals with lineitems created in versions after 1.2 and before 1.2.3)
 	    Lineitem lineitem = null;
-	    for (Course userCourse : userCourses) {
-		List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
-
-		for (Lineitem lineitemIter : lineitems) {
-		    if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(lessonId)) {
-			lineitem = lineitemIter;
-			break;
-		    }
-		}
-
-	    }
+	    if (lineitemIdStr == null) {
+        	CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
+        	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
+        
+        	List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
+        
+        	// search for appropriate lineitem
+        	lineitem = null;
+        	for (Course userCourse : userCourses) {
+        	    List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
+        
+        	    for (Lineitem lineitemIter : lineitems) {
+        		if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(lamsLessonIdParam)) {
+        		    lineitem = lineitemIter;
+        		    break;
+        		}
+        	    }
+        	}
+       	    } else {
+       	    
+		Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
+		LineitemDbLoader lineitemLoader = (LineitemDbLoader) bbPm.getLoader(LineitemDbLoader.TYPE);
+		lineitem = lineitemLoader.loadById(lineitemId);
+       	    }
 
 	    if (lineitem == null) {
 		throw new ServletException("lineitem not found");
@@ -262,7 +275,6 @@ public class GradebookServlet extends HttpServlet {
 	    current_score.setGrade(new DecimalFormat("##.##").format(gradebookMark));
 	    current_score.validate();
 	    scorePersister.persist(current_score);
-
 	    
 	} catch (MalformedURLException e) {
 	    errorMsg = "Unable to get LAMS learning designs, bad URL: " + ", please check lams.properties";

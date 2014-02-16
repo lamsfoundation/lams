@@ -35,6 +35,7 @@
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.Constants" %>
+<%@ page import="org.lamsfoundation.ld.util.*"%>
 <%@ page import="blackboard.portal.data.*" %>
 <%@ page import="blackboard.data.content.ExternalLink" %>
 <%@ page import="blackboard.portal.servlet.PortalUtil" %>
@@ -46,7 +47,7 @@
 
     <%
     	//Set the new LAMS Lesson Content Object
-    	ExternalLink newLesson = new blackboard.data.content.ExternalLink();
+    	ExternalLink bbContent = new blackboard.data.content.ExternalLink();
     
         // Authorise current user for Course Control Panel (automatic redirect)
         try{
@@ -105,129 +106,74 @@
 	    // Start Date
 	    if (strStartDateCheckbox != null){
 	        if (strStartDateCheckbox.equals("1")){
-	            newLesson.setStartDate(startDate);
+	            bbContent.setStartDate(startDate);
 	        }
 	    }
 	    // End Date
 	    if (strEndDateCheckbox != null){
 	        if (strEndDateCheckbox.equals("1")){
-	            newLesson.setEndDate(endDate);
+	            bbContent.setEndDate(endDate);
 	        }
 	    }
 
         // Set the New LAMS Lesson content data (in Blackboard)
-        newLesson.setTitle(strTitle);
-		newLesson.setIsAvailable(isAvailable);
-		newLesson.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
-        newLesson.setIsTracked(isTracked);
-        newLesson.setAllowGuests(false);
-        newLesson.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
-        //newLesson.setLaunchInNewWindow(true);
+        bbContent.setTitle(strTitle);
+		bbContent.setIsAvailable(isAvailable);
+		bbContent.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
+        bbContent.setIsTracked(isTracked);
+        bbContent.setAllowGuests(false);
+        bbContent.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
 
-        newLesson.setCourseId(courseId);
-        newLesson.setParentId(folderId);
+        bbContent.setCourseId(courseId);
+        bbContent.setParentId(folderId);
 
-        newLesson.setRenderType(Content.RenderType.URL);
-        newLesson.setBody(description);
+        bbContent.setRenderType(Content.RenderType.URL);
+        bbContent.setBody(description);
 
         // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-        String lessonIdStr = null;
-        try{
-            long lessonId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
-            //error checking
-            if (lessonId == -1) {
-                response.sendRedirect("lamsServerDown.jsp");
-                System.exit(1);
-            }
-
-            lessonIdStr = Long.toString(lessonId);
-        } catch (Exception e){
-            throw new ServletException(e.getMessage(), e);
+        long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
+        //error checking
+        if (LamsLessonIdLong == -1) {
+        	response.sendRedirect("lamsServerDown.jsp");
+        	System.exit(1);
         }
-        newLesson.setLinkRef(lessonIdStr);
+        String lamsLessonId = Long.toString(LamsLessonIdLong);
+        bbContent.setLinkRef(lamsLessonId);
 
 	    //Persist the New Lesson Object in Blackboard
 	    ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-	    persister.persist( newLesson );
-	
-		//Create new Gradebook column for current lesson
-        Lineitem lineitem = new Lineitem();
-		if (isGradecenter) {
-		    lineitem.setCourseId(courseId);
-		    lineitem.setName(strTitle);
-		    lineitem.setPointsPossible(Constants.GRADEBOOK_POINTS_POSSIBLE);
-		    lineitem.setType(Constants.GRADEBOOK_LINEITEM_TYPE);
-		    lineitem.setIsAvailable(true);
-		    lineitem.setDateAdded();
-		    lineitem.setAssessmentLocation( Lineitem.AssessmentLocation.EXTERNAL );
-		    lineitem.setAssessmentId(lessonIdStr, Lineitem.AssessmentLocation.EXTERNAL);
-			lineitem.validate();
-		    LineitemDbPersister linePersister= (LineitemDbPersister) bbPm.getPersister( LineitemDbPersister.TYPE );
-		    linePersister.persist(lineitem);
-	
-		    OutcomeDefinitionDbPersister ocdPersister = (OutcomeDefinitionDbPersister)bbPm.getPersister(OutcomeDefinitionDbPersister.TYPE);
-		    OutcomeDefinition ocd = lineitem.getOutcomeDefinition();
-		    ocd.setCourseId(courseId);
-		    ocd.setPosition(1);	
-	
-		    OutcomeDefinitionScaleDbLoader ods2Loader = (OutcomeDefinitionScaleDbLoader)bbPm.getLoader(OutcomeDefinitionScaleDbLoader.TYPE);
-		    OutcomeDefinitionScaleDbPersister uutcomeDefinitionScaleDbPersister = (OutcomeDefinitionScaleDbPersister)bbPm.getPersister(OutcomeDefinitionScaleDbPersister.TYPE);
-	
-		    boolean hasLessonScoreOutputs = LamsSecurityUtil.hasLessonScoreOutputs(ctx);
-		    OutcomeDefinitionScale ods;
-		    if (hasLessonScoreOutputs) {
-				ods = ods2Loader.loadByCourseIdAndTitle(courseId,OutcomeDefinitionScale.SCORE);
-				ods.setNumericScale(true);
-				ods.setPercentageScale(true);
-				ocd.setScorable(true);
-		    } else {
-				ods = ods2Loader.loadByCourseIdAndTitle(courseId,OutcomeDefinitionScale.COMPLETE_INCOMPLETE);
-				ods.setNumericScale(false);
-				ocd.setScorable(false);
-		    }
-	
-		    uutcomeDefinitionScaleDbPersister.persist(ods);
-		    ocd.setScale(ods);
-		    ocdPersister.persist(ocd);
-		}
-		
-		//Construct new lesson id
-		PkId newLessonPkId = (PkId) newLesson.getId();
-		String newLessonIdStr = "_" + newLessonPkId.getPk1() + "_" + newLessonPkId.getPk2();
-
-		// Add port to the url if the port is in the blackboard url.
-		int bbport = request.getServerPort();
+	    persister.persist( bbContent );
+		PkId bbContentPkId = (PkId) bbContent.getId();
+		String bbContentId = "_" + bbContentPkId.getPk1() + "_" + bbContentPkId.getPk2();
+	    
+		//Build and set the content URL. Include new lesson id parameter
+		int bbport = request.getServerPort();// Add port to the url if the port is in the blackboard url.
 		String bbportstr = bbport != 0 ? ":" + bbport : "";
-
-		//Build and set the content URL
 		String contentUrl = request.getScheme()
 			+ "://" +
 			request.getServerName() +
 			bbportstr +
 			request.getContextPath() +
-			"/modules/learnermonitor.jsp?lsid=" + lessonIdStr +
+			"/modules/learnermonitor.jsp?lsid=" + lamsLessonId +
 			"&course_id=" + request.getParameter("course_id") +
-			"&content_id=" + newLessonIdStr +
+			"&content_id=" + bbContentId +
 			"&ldid=" + ldId + 
 			"&isDisplayDesignImage=" + isDisplayDesignImage;
+		bbContent.setUrl(contentUrl);
+		persister.persist(bbContent);
 
-		// Add lineitemid to the url
-		if (isGradecenter) {
-			PkId lineitemPkId = (PkId) lineitem.getId();
-			String lineitemKeyId = "_" + lineitemPkId.getPk1() + "_" + lineitemPkId.getPk2();
-		 	contentUrl += "&lineitemid=" + lineitemKeyId;
-		}
-
-		newLesson.setUrl(contentUrl);
-		persister.persist(newLesson);
-
-		//store internalContentId -> externalContentId. This is required for lesson and according lineitem removal (see delete.jsp)
+		//store internalContentId -> externalContentId. It's used for lineitem removal (delete.jsp)
 		PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
 		ExtraInfo ei = pei.getExtraInfo();
-		ei.setValue(newLessonIdStr, lessonIdStr);
+		ei.setValue(bbContentId, lamsLessonId);
 		PortalUtil.savePortalExtraInfo(pei);
-
-        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(newLesson.getParentId(), courseId);
+		
+		//Create new Gradebook column for current lesson
+		if (isGradecenter) {
+		    LineitemUtil.createLineitem(ctx, bbContent);
+		}
+		
+        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);
 	%>
 
     <%-- Breadcrumbs --%>

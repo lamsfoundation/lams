@@ -59,16 +59,11 @@
         
         // Start the Lesson for preview in LAMS (via Webservices)
         // Capture the lesson ID
-        Long lsId = null;
-        try{  	
-            lsId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, true);
-            //error checking
-            if (lsId == -1) {
-                response.sendRedirect("lamsServerDown.jsp");
-                System.exit(1);
-            }
-        } catch (Exception e){
-            throw new ServletException(e.getMessage(), e);
+        Long lsId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, true);
+        //error checking
+        if (lsId == -1) {
+        	response.sendRedirect("lamsServerDown.jsp");
+            System.exit(1);
         }
         
         //redirect to preview lesson

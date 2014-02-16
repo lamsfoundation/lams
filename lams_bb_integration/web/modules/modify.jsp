@@ -47,12 +47,12 @@
     Container bbContainer = bbPm.getContainer();
     Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
     ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-    Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
+    Content bbContent = (Content)courseDocumentLoader.loadById( contentId );
 
     // Get the Item Attributes
-    Calendar startDate = courseDoc.getStartDate();
-    Calendar endDate = courseDoc.getEndDate();	
-    FormattedText desc = courseDoc.getBody();
+    Calendar startDate = bbContent.getStartDate();
+    Calendar endDate = bbContent.getEndDate();	
+    FormattedText desc = bbContent.getBody();
     String description = desc.getText().replaceFirst(NOT_AVAILABLE, ""); //remove the NOT_AVAILABLE substring
 
 %>
@@ -77,7 +77,7 @@
             <bbNG:step title="Name and describe the lesson">
             
                 <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
-                    <input id="title" type="text" name="title" value="<%=courseDoc.getTitle()%>">
+                    <input id="title" type="text" name="title" value="<%=bbContent.getTitle()%>">
                 </bbNG:dataElement>
         
                 <bbNG:dataElement label="Description" labelFor="description">
@@ -89,18 +89,18 @@
             <bbNG:step title="Lesson options">
             
                 <bbNG:dataElement label="Do you want to make LAMS visible?">
-                    <input type="Radio" name="isAvailable" value="true" <%=(courseDoc.getIsAvailable())?"checked":""%>>Yes
-                    <input type="Radio" name="isAvailable" value="false" <%=(courseDoc.getIsAvailable())?"":"checked"%>>No
+                    <input type="Radio" name="isAvailable" value="true" <%=(bbContent.getIsAvailable())?"checked":""%>>Yes
+                    <input type="Radio" name="isAvailable" value="false" <%=(bbContent.getIsAvailable())?"":"checked"%>>No
                 </bbNG:dataElement>
                 
                 <bbNG:dataElement label="Do you want to add a mark/completion column in Gradecenter?" labelFor="isGradecenter">
-                    <input type="Radio" name="isGradecenter" value="true" <%=(courseDoc.getIsDescribed())?"checked":""%>>Yes
-                    <input type="Radio" name="isGradecenter" value="false" <%=(courseDoc.getIsDescribed())?"":"checked"%>>No
+                    <input type="Radio" name="isGradecenter" value="true" <%=(bbContent.getIsDescribed())?"checked":""%>>Yes
+                    <input type="Radio" name="isGradecenter" value="false" <%=(bbContent.getIsDescribed())?"":"checked"%>>No
                 </bbNG:dataElement>                
                 
                 <bbNG:dataElement label="Track number of views">
-                    <input type="radio" name="isTracked" value="true" <%=(courseDoc.getIsTracked())?"checked":""%>>Yes
-                    <input type="radio" name="isTracked" value="false" <%=(courseDoc.getIsTracked())?"":"checked"%>>No
+                    <input type="radio" name="isTracked" value="true" <%=(bbContent.getIsTracked())?"checked":""%>>Yes
+                    <input type="radio" name="isTracked" value="false" <%=(bbContent.getIsTracked())?"":"checked"%>>No
                 </bbNG:dataElement>
                 
                 <bbNG:dataElement label="Choose date restrictions">
