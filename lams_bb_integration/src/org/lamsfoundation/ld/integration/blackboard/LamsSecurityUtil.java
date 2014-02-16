@@ -57,7 +57,7 @@ import blackboard.platform.context.Context;
  */
 public class LamsSecurityUtil {
 
-    static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
+    private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
 
     /**
      * Generates login requests to LAMS for author, monitor and learner
@@ -70,14 +70,6 @@ public class LamsSecurityUtil {
      * @throws Exception
      */
     public static String generateRequestURL(Context ctx, String method) throws Exception {
-//	Course c = CourseDbLoader.Default.getInstance().loadByCourseId("aa");              
-//        Id cID = c.getId();
-//	
-//        OutcomeDefinition def = new OutcomeDefinition();
-//        Id sID = OutcomeDefinitionScaleDbLoader.Default.getInstance().loadByCourseIdAndTitle(cID, OutcomeDefinitionScale.COMPLETE_INCOMPLETE).getId();              
-//        def.setScaleId(sID);
-//        //def.setScorable(false);
-//        OutcomeDefinitionDbPersister.Default.getInstance().persist(def);
 	
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
@@ -163,43 +155,6 @@ public class LamsSecurityUtil {
 
 	return url;
     }
-    
-    /**
-     * Checks whether lesson has scorable outputs (i.e. MCQ or Assessment activity).
-     * 
-     * @param ctx
-     *            the blackboard contect, contains session data
-     * @return a url pointing to the LAMS lesson, monitor, author session
-     * @throws Exception
-     */
-    public static boolean hasLessonScoreOutputs(Context ctx) throws Exception {
-	String ldId = ctx.getRequestParameter("sequence_id").trim();
-	String learningDesignSvgUrl = generateRequestLearningDesignImage(ctx, true) + "&ldId=" + ldId;
-
-	URL url = new URL(learningDesignSvgUrl);
-	URLConnection conn = url.openConnection();
-	if (!(conn instanceof HttpURLConnection)) {
-	    logger.error("Unable to open connection to: " + learningDesignSvgUrl);
-	}
-
-	HttpURLConnection httpConn = (HttpURLConnection) conn;
-
-	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-	    String errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
-		    + httpConn.getResponseMessage();
-	    logger.error(errorMsg);
-	    throw new RuntimeException(errorMsg);
-	}
-
-	// InputStream is = url.openConnection().getInputStream();
-	InputStream is = conn.getInputStream();
-
-	// parse xml response
-	String learningDesignSvg = IOUtils.toString(is, "UTF-8");
-	boolean hasLessonScoreOutputs = (learningDesignSvg.indexOf("icon_mcq.png") != -1) || (learningDesignSvg.indexOf("icon_assessment.png") != -1);
-
-	return hasLessonScoreOutputs;
-    }
 
     /**
      * Gets a list of learning designs for the current user from LAMS
@@ -209,16 +164,15 @@ public class LamsSecurityUtil {
      * @param mode
      *            the mode to call upon learning designes
      * @return a string containing the LAMS workspace tree in tigra format
-     * @throws Exception
      */
-    public static String getLearningDesigns(Context ctx, Integer mode) throws Exception {
+    public static String getLearningDesigns(Context ctx, Integer mode) {
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
 	String serverKey = getServerKey();
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null || serverKey == null) {
-	    throw new Exception("Configuration Exception " + serverAddr + ", " + serverId);
+	    throw new RuntimeException("lams.properties file could not be read. serverAddr:" + serverAddr + ", serverId:" + serverId);
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
@@ -273,41 +227,27 @@ public class LamsSecurityUtil {
 	    //String replacement = "'javascript:selectSequence($1)'";
 	    //learningDesigns = learningDesigns.replaceAll(pattern, replacement);
 
-	    // TODO better error handling
 	} catch (MalformedURLException e) {
-	    logger.error("Unable to get LAMS learning designs, bad URL: '" + serverAddr
+	    throw new RuntimeException("Unable to get LAMS learning designs, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
-	    e.printStackTrace();
-	    return "error";
 	} catch (IllegalStateException e) {
-	    logger.error(
+	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	    e.printStackTrace();
-	    return "error";
 	} catch (ConnectException e) {
-	    logger.error(
+	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	    e.printStackTrace();
-	    return "error";
 	} catch (UnsupportedEncodingException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    return "error";
+	    throw new RuntimeException(e);
 	} catch (IOException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    return "error";
+	    throw new RuntimeException(e);
 	} catch (ParserConfigurationException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    return "error";
+	    throw new RuntimeException(e);
 	} catch (SAXException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    return "error";
+	    throw new RuntimeException(e);
 	}
+	
 	return learningDesigns;
     }
 
@@ -338,8 +278,7 @@ public class LamsSecurityUtil {
 	String method = (isPreview) ? "preview" : "start";
 
 	if (serverId == null || serverAddr == null || serverKey == null) {
-	    logger.error("Unable to retrieve learning designs from LAMS, one or more lams configuration properties is null");
-	    return null;
+	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
 	}
 
 	try {
@@ -362,15 +301,14 @@ public class LamsSecurityUtil {
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
-		logger.error("Unable to open connection to: " + serviceURL);
+		throw new RuntimeException("Unable to open connection to: " + serviceURL);
 	    }
 
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		logger.error("HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
-			+ httpConn.getResponseMessage());
-		return error;
+		throw new RuntimeException("HTTP Response Code: " + httpConn.getResponseCode()
+			+ ", HTTP Response Message: " + httpConn.getResponseMessage());
 	    }
 
 	    // InputStream is = url.openConnection().getInputStream();
@@ -387,38 +325,26 @@ public class LamsSecurityUtil {
 	     * The getTextContext is not a java 1.4 method, so Blackboard 7.1 comes up with errors using getNodeValue()
 	     * instead
 	     */
-	    // return
-	    // Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
+	    // return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
 	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
 		    .getNamedItem("lessonId").getNodeValue());
 	} catch (MalformedURLException e) {
-	    logger.error("Unable to start LAMS lesson, bad URL: '" + serverAddr + "', please check lams.properties", e);
-	    e.printStackTrace();
-	    return error;
+	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
 	} catch (IllegalStateException e) {
-	    logger.error(
+	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	    e.printStackTrace();
-	    return error;
 	} catch (RemoteException e) {
-	    logger.error("Unable to start LAMS lesson, RMI Remote Exception", e);
-	    e.printStackTrace();
-	    return error;
+	    throw new RuntimeException("Unable to start LAMS lesson, RMI Remote Exception", e);
 	} catch (UnsupportedEncodingException e) {
-	    logger.error("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
-	    e.printStackTrace();
-	    return error;
+	    throw new RuntimeException("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
 	} catch (ConnectException e) {
-	    logger.error(
+	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	    e.printStackTrace();
-	    return error;
 	} catch (Exception e) {
-	    logger.error("Unable to start LAMS lesson. Please contact your system administrator.", e);
-	    e.printStackTrace();
-	    return error;
+	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
 	}
 
     }
@@ -450,39 +376,6 @@ public class LamsSecurityUtil {
     public static String getReqSrc() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
     }
-    
-
-
-//	    
-//	    	if (empty($array['#']['LearningDesign']) && empty($array['#']['Folder'])) {
-//	      		$output .= ",expanded:0,children:[{type:'HTML',html:'<i>-" . get_string('empty', 'lamslesson') . "-</i>', id:0}]}";
-//	      		return $output;
-//	    	} else {
-//	      		$output .= ",children:[";
-//	    	}
-//
-//	   	 if (!empty($array['#']['LearningDesign'])) {
-//	     	 	$lds = $array['#']['LearningDesign'];
-//	      		for($i=0; $i<sizeof($lds); $i++) {
-//				$output .= "," . lamslesson_process_sequence($lds[$i]) ;
-//	      		}
-//	    	}
-//
-//	    if (!empty($array['#']['Folder'])) {
-//
-//	      	$folders = $array['#']['Folder'];
-//
-//	      	for($i=0; $i<sizeof($folders); $i++) {
-//			$output .= "," . lamslesson_process_array($folders[$i]);
-//			if ($i < sizeof($folders)-1) {
-//		  		if (!empty($array['#']['Folder']['#'])) {
-//		   			 $output .= ']},';
-//		  		}
-//			}
-//	       }
-//	    }
-//	    $output .= "]}";
-
 
     /**
      * 

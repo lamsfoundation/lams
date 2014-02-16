@@ -40,11 +40,6 @@
     
     // Get the list of Learning Designs
     String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
-    // Error checking
-    if (learningDesigns.equals("error")) {
-        response.sendRedirect("lamsServerDown.jsp");
-        return;
-    }
     String lamsServerUrl = LamsSecurityUtil.getServerAddress();
 
 %>
@@ -97,7 +92,6 @@
 			    		</span>
 			    	</span>
 			    	
-			    	
 			    	<span id="refresh-button" class="yui-button yui-link-button">
 			    		<span class="first-child">
 			    			<button onclick="window.location.reload(); return false;">
@@ -111,7 +105,6 @@
 				<div id="updatesequence"></div>
 				<div style="vertical-align: text-bottom; margin-top: 15px;">
 					<input type="checkbox" name="isDisplayDesignImage" value="true">  Display image design?
-
 				</div>
 				
                 <%-- Display LAMS Sequence tree (Using tigra) --%>

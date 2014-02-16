@@ -27,6 +27,8 @@
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="blackboard.portal.servlet.*"%>
+<%@ page import="blackboard.portal.data.*"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
@@ -90,6 +92,7 @@
     String contentIdStr = request.getParameter("content_id");
     String title = "";
     String description = "";
+    String strLineitemId = null;
     //contentId is available in versions after 1.2.3
     if (contentIdStr != null) {
     	
@@ -97,13 +100,19 @@
         Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
         Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
-        
         title = courseDoc.getTitle();
         description = courseDoc.getBody().getText();
+        
+        //get lineitemid from the storage (bbContentId -> lineitemid)
+	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
+	    ExtraInfo ei = pei.getExtraInfo();
+	    strLineitemId = ei.getValue(contentIdStr);
+	    
     } else {
     
     	title = request.getParameter("title");
     	description = request.getParameter("description");
+        strLineitemId = request.getParameter("lineitemid");
     }
 
     //display learning design image
@@ -119,7 +128,6 @@
     
     //check whether user has score for this lesson
     Score current_score = null;
-    String strLineitemId = request.getParameter("lineitemid");
 	if (strLineitemId != null) { // there won't be "lineitemid" parameter in case lesson had been created in LAMS building block version prior to 1.2 
 	    
 	    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId.trim());
