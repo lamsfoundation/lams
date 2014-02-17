@@ -451,25 +451,31 @@ var MenuLib = {
 	/**
 	 * Removes existing activities and prepares canvas for a new sequence.
 	 */
-	newLearningDesign : function(force){
+	newLearningDesign : function(force, soft){
 		if (!force && layout.activities.length > 0 && !confirm('Are you sure you want to remove all existing activities?')){
 			return;
 		}
 		
-		$('.ldDescriptionField').text('');
-		
-		layout.ld = {
-			'maxUIID' : 0	
-		};
-		layout.activities = [];
-		if (paper) {
-			paper.clear();
+		if (soft) {
+			$('#ldDescriptionFieldTitle').text('');
+			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(null);
+			
+			layout.ld = {
+				'maxUIID' : 0
+			};
+			layout.activities = [];
+			if (paper) {
+				paper.clear();
+			} else {
+				// need to set size right away for Chrome
+				paper = Raphael('canvas', canvas.width() - 5, canvas.height() - 5);
+			}
+			
+			resizePaper();
 		} else {
-			// need to set size right away for Chrome
-			paper = Raphael('canvas', canvas.width() - 5, canvas.height() - 5);
+			// full window reload so new content ID gets generated
+			document.location.href = LAMS_URL + 'authoring/author.do?method=openAuthoring';
 		}
-		
-		resizePaper();
 	},
 	
 	

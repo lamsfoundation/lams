@@ -8,7 +8,7 @@ var paper = null,
 	
 // configuration and storage of various elements
 	layout = {
-	// 'isZoomed'   : false,
+	 // 'isZoomed'   : false,
 	'activities' : null,
 	'items' : {
 		'bin'               : null,
@@ -71,7 +71,8 @@ var paper = null,
  */
 $(document).ready(function() {
 	canvas = $('#canvas');
-	MenuLib.newLearningDesign(true);
+	MenuLib.newLearningDesign(true, true);
+	layout.ld.contentFolderID = initContentFolderID;
 	
 	initLayout();
 	initTemplates();
@@ -353,7 +354,7 @@ function openLearningDesign(learningDesignID) {
 			}
 			
 			// remove existing activities
-			MenuLib.newLearningDesign(true);
+			MenuLib.newLearningDesign(true, true);
 			layout.ld = {
 				'learningDesignID' : learningDesignID,
 				'folderID'		   : ld.workspaceFolderID,
@@ -362,7 +363,7 @@ function openLearningDesign(learningDesignID) {
 			};
 			
 			$('#ldDescriptionFieldTitle').text(ld.title);
-			$('#ldDescriptionFieldDescription').text(ld.description);
+			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
 			
 			var resizeNeeded = false,
 				arrangeNeeded = false,
@@ -672,7 +673,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		groupings = [],
 		// trim the 
 		title = title.trim(),
-		description = $('#ldDescriptionFieldDescription').val().trim(),
+		description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData(),
 		// final success/failure of the save
 		result = false;
 	

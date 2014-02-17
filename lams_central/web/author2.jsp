@@ -30,18 +30,14 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
 	<script type="text/javascript">
-		var LAMS_URL = '<lams:LAMSURL/>';
-		var LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=';
-		
-		var contentFolderID = '${contentFolderID}';
-		if (contentFolderID == '') {
-			contentFolderID = null;
-		}
+		var LAMS_URL = '<lams:LAMSURL/>',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
+			initContentFolderID = '${contentFolderID}';
 	</script>
 </lams:head>
 <body>
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
-		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign()">
+		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign(false, false)">
 			New
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
@@ -126,12 +122,16 @@
 		<div id="tabDescription">
 			<table>
 				<tr>
-					<td class="ldDescriptionLabel">Title</td>
-					<td id="ldDescriptionFieldTitle" class="ldDescriptionField"></td>
+					<td class="ldDescriptionLabel ldDescriptionCell">Title</td>
+					<td id="ldDescriptionFieldTitle" class="ldDescriptionCell"></td>
 				</tr>
 				<tr>
-					<td class="ldDescriptionLabel">Description</td>
-					<td><textarea id="ldDescriptionFieldDescription" class="ldDescriptionField"></textarea></td>
+					<td class="ldDescriptionLabel ldDescriptionCell">Description</td>
+					<td class="ldDescriptionCell">
+						<lams:CKEditor id="ldDescriptionFieldDescription" value=""
+									   height="300px"
+									   contentFolderID="${contentFolderID}"/>
+					</td>
 				</tr>
 			</table>
 		</div>

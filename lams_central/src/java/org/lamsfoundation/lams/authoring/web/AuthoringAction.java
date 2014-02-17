@@ -112,6 +112,7 @@ public class AuthoringAction extends LamsDispatchAction {
     public ActionForward openAuthoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(request.getRemoteUser()));
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
 	return mapping.findForward("openAutoring");
     }
 
@@ -379,7 +380,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	return null;
     }
-
+    
     /**
      * Creates a LD with the given activity and starts a lesson with default class and settings.
      */

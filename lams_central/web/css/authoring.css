@@ -281,15 +281,10 @@ div.template div {
 	padding-top: 180px;
 }
 
-#tabDescription > table td {
+.ldDescriptionCell {
 	padding: 0 0 30px 20px;
 }
 
 td.ldDescriptionLabel {
 	font-weight: bold;
-}
-
-#ldDescriptionFieldDescription {
-	width: 500px;
-	height: 200px;
 }
