@@ -203,15 +203,16 @@ public class LamsSecurityUtil {
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
-		logger.error("Unable to open connection to: " + serviceURL);
+		throw new RuntimeException("Unable to open connection to: " + serviceURL);
 	    }
 
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		logger.error("HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
-			+ httpConn.getResponseMessage());
-		return "error";
+		throw new RuntimeException(
+			"Problem with getting LAMS learning designs. LAMS server responded with HTTP response code: "
+				+ httpConn.getResponseCode() + ", HTTP response message: "
+				+ httpConn.getResponseMessage());
 	    }
 
 	    // InputStream is = url.openConnection().getInputStream();
