@@ -55,7 +55,7 @@
 
         // Load the content item
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-        Content modifiedBbContent = (Content)courseDocumentLoader.loadById( contentId );
+        Content bbContent = (Content)courseDocumentLoader.loadById( contentId );
 
         // Get the form parameters and convert into correct data types
         // TODO: Use bb text area instead
@@ -82,49 +82,53 @@
         String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
         
         //if teacher turned Gradecenter option ON (and it was OFF previously) - create lineitem
-        if (!modifiedBbContent.getIsDescribed() && isGradecenter) {
-            LineitemUtil.createLineitem(ctx, modifiedBbContent);
+        if (!bbContent.getIsDescribed() && isGradecenter) {
+            LineitemUtil.createLineitem(ctx, bbContent);
             
         //if teacher turned Gradecenter option OFF (and it was ON previously) - remove lineitem
-        } else if (modifiedBbContent.getIsDescribed() && !isGradecenter) {
+        } else if (bbContent.getIsDescribed() && !isGradecenter) {
             LineitemUtil.removeLineitem(contentIdStr, courseIdStr);
+            
+        //change existing lineitem's name if lesson name has been changed
+        } else if (isGradecenter && !strTitle.equals(bbContent.getTitle())) {
+            LineitemUtil.changeLineitemName(contentIdStr, courseIdStr, strTitle);
         }
     
         // Set LAMS content data in Blackboard
-        modifiedBbContent.setTitle(strTitle);
-        modifiedBbContent.setIsAvailable(isAvailable);
-        modifiedBbContent.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
-        modifiedBbContent.setIsTracked(isTracked);
-        modifiedBbContent.setBody(description);
+        bbContent.setTitle(strTitle);
+        bbContent.setIsAvailable(isAvailable);
+        bbContent.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
+        bbContent.setIsTracked(isTracked);
+        bbContent.setBody(description);
     
         // Set Availability Dates
         // Clear the date (set to null) if the checkbox is unchecked
         // Start Date
         if (strStartDateCheckbox != null){
             if (strStartDateCheckbox.equals("1")){
-                modifiedBbContent.setStartDate(startDate);
+                bbContent.setStartDate(startDate);
             } else {
-                modifiedBbContent.setStartDate(null);
+                bbContent.setStartDate(null);
             }
         } else {
-            modifiedBbContent.setStartDate(null);
+            bbContent.setStartDate(null);
         }
         // End Date
         if (strEndDateCheckbox != null){
             if (strEndDateCheckbox.equals("1")){
-                modifiedBbContent.setEndDate(endDate);
+                bbContent.setEndDate(endDate);
             } else {
-                modifiedBbContent.setEndDate(null);
+                bbContent.setEndDate(null);
             }
         } else {
-            modifiedBbContent.setEndDate(null);
+            bbContent.setEndDate(null);
         }
 
         //Persist the Modified Lesson Object in Blackboard    
         ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-        persister.persist( modifiedBbContent );
+        persister.persist( bbContent );
     
-        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(modifiedBbContent.getParentId(), courseId);
+        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);
     %>
 
     <%-- Breadcrumbs --%>

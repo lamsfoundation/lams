@@ -93,7 +93,6 @@ public class GradebookServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	ContextManager ctxMgr = null;
-	 String errorMsg = "error";
 	
 	try {
 	    // get Blackboard context
@@ -108,17 +107,18 @@ public class GradebookServlet extends HttpServlet {
 
 	    // check parameters
 	    if (userName == null || timeStamp == null || hash == null || lamsLessonIdParam == null) {
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "missing expected parameters");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing expected parameters");
 		return;
 	    }
 
 	    //check user rights
 	    String secretKey = LamsPluginUtil.getSecretKey();
 	    String serverId = LamsPluginUtil.getServerId();
-	    if (!sha1(
+	    if (!LamsSecurityUtil.sha1(
 		    timeStamp.toLowerCase() + userName.toLowerCase() + serverId.toLowerCase()
 			    + secretKey.toLowerCase()).equals(hash)) {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
+		return;
 	    }
 	    
 	    //check if isGradebookcenter
@@ -155,7 +155,7 @@ public class GradebookServlet extends HttpServlet {
 	    User user = userLoader.loadByUserName(userName);
 
 	    if (user == null) {
-		throw new ServletException("user not found");
+		throw new ServletException("User not found with userName:" + userName);
 	    }
 
 	    String serverAddr = LamsSecurityUtil.getServerAddress();
@@ -169,13 +169,13 @@ public class GradebookServlet extends HttpServlet {
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
-		logger.error("Unable to open connection to: " + serviceURL);
+		throw new RuntimeException("Unable to open connection to: " + serviceURL);
 	    }
 
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
+		String errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
 			+ httpConn.getResponseMessage();
 		logger.error(errorMsg);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMsg);
@@ -277,59 +277,36 @@ public class GradebookServlet extends HttpServlet {
 	    scorePersister.persist(current_score);
 	    
 	} catch (MalformedURLException e) {
-	    errorMsg = "Unable to get LAMS learning designs, bad URL: " + ", please check lams.properties";
-	    logger.error(errorMsg, e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException("Unable to get LAMS learning designs, bad URL: "
+		    + ", please check lams.properties", e);
 	} catch (IllegalStateException e) {
-	    errorMsg = "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator";
-	    logger.error(errorMsg, e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
 	} catch (ConnectException e) {
-	    errorMsg = "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator";
-	    logger.error(errorMsg, e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
 	} catch (UnsupportedEncodingException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(e);
 	} catch (IOException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(e);
 	} catch (ParserConfigurationException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(e);
 	} catch (SAXException e) {
-	    logger.error(e);
-	    e.printStackTrace();
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+	    throw new ServletException(e);
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    logger.error("Problem with gradebook servlet: " + e.getMessage(), e);
-	    logger.error(e.getStackTrace().toString());
 	    throw new ServletException(e);
 	} finally {
 	    // make sure context is released
-	    if (ctxMgr != null)
+	    if (ctxMgr != null) {
 		ctxMgr.releaseContext();
+	    }
 	}
 	
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
         out.write("OK");
-    }
-
-    private String sha1(String str) {
-	try {
-	    MessageDigest md = MessageDigest.getInstance("SHA1");
-	    return new String(Hex.encodeHex(md.digest(str.getBytes())));
-	} catch (NoSuchAlgorithmException e) {
-	    throw new RuntimeException(e);
-	}
     }
 
 }

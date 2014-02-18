@@ -129,8 +129,8 @@
                 </bbNG:dataElement>
 
                 <bbNG:dataElement label="Do you want to add a mark/completion column in Gradecenter?" labelFor="isGradecenter">
-                    <input type="Radio" name="isGradecenter" value="true" checked>Yes
-                    <input type="Radio" name="isGradecenter" value="false">No
+                    <input type="Radio" name="isGradecenter" value="true">Yes
+                    <input type="Radio" name="isGradecenter" value="false" checked>No
                 </bbNG:dataElement>
 
                 <bbNG:dataElement label="Track number of views" labelFor="isTracked">
