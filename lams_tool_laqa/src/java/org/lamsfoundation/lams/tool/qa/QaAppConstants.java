@@ -62,8 +62,6 @@ public interface QaAppConstants {
     public static final String EDIT_RESPONSE = "editResponse";
     public static final String EDITABLE_RESPONSE_ID = "editableResponseId";
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
-    public static final String ERROR_LIST = "errorList";
-    public static final String ERROR_LIST_LEARNER = "errorListLearner";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String DEFAULT_CONTENT_ID_STR = "defaultContentIdStr";
     public static final String TOOL_SESSION_ID = "toolSessionID";

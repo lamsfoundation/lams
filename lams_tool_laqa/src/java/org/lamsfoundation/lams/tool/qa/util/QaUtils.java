@@ -218,8 +218,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(EDIT_RESPONSE);
 	request.getSession().removeAttribute(EDITABLE_RESPONSE_ID);
 	request.getSession().removeAttribute(COPY_TOOL_CONTENT);
-	request.getSession().removeAttribute(ERROR_LIST);
-	request.getSession().removeAttribute(ERROR_LIST_LEARNER);
 	request.getSession().removeAttribute(DEFAULT_CONTENT_ID_STR);
 	request.getSession().removeAttribute(TOOL_SESSION_ID);
 	request.getSession().removeAttribute(LOAD);

@@ -94,8 +94,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 	boolean initData = initialiseMonitoringData(mapping, qaMonitoringForm, request, response, qaService,
 		generalMonitoringDTO);
-	if (initData == false)
-	    return (mapping.findForward(ERROR_LIST));
+	if (initData == false) {
+	    throw new ServletException("Data not initialised in Monitoring");
+	}
 
 	qaMonitoringForm.setCurrentTab("1");
 
@@ -227,24 +228,24 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
      * @param request
      * @param mapping
      * @return ActionForward
+     * @throws ServletException 
      */
     protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
-	    QaMonitoringForm qaMonitoringForm) {
+	    QaMonitoringForm qaMonitoringForm) throws ServletException {
 
 	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	if ((strToolContentId == null) || (strToolContentId.length() == 0)) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    return (mapping.findForward(ERROR_LIST));
+	    throw new ServletException("No Tool Content ID found");
 	} else {
 	    try {
 		long toolContentId = new Long(strToolContentId).longValue();
 
 		qaMonitoringForm.setToolContentID(new Long(toolContentId).toString());
 	    } catch (NumberFormatException e) {
-		logger.error("add error.contentId.numberFormatException to ActionMessages.");
 		QaUtils.cleanUpSessionAbsolute(request);
-		return (mapping.findForward(ERROR_LIST));
+		throw e;
 	    }
 	}
 	return null;

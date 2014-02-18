@@ -113,16 +113,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	if (!QaUtils.existsSession(new Long(toolSessionID).longValue(), qaService)) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    logger.error("error: The tool expects mcSession.");
-	    return (mapping.findForward(ERROR_LIST_LEARNER));
+	    throw new ServletException("No session found");
 	}
 
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    logger.error("error: The tool expects qaContent.");
-	    return (mapping.findForward(ERROR_LIST_LEARNER));
+	    throw new ServletException("No QA content found");
 	}
 	
 	QaQueUsr qaUser = null;

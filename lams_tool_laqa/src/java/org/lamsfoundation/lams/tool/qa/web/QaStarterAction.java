@@ -263,7 +263,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    return mapping.findForward(QaAppConstants.ERROR_LIST);
+	    throw new ServletException("No Tool Content ID found");
 	}
 
 	qaAuthoringForm.setToolContentID(strToolContentID);
@@ -290,10 +290,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    
 	    if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
 		QaUtils.cleanUpSessionAbsolute(request);
-		
-		//add error.content.inUse to ActionMessages.
-		persistError(request, "error.content.inUse");
-		return mapping.findForward(QaAppConstants.ERROR_LIST);
+		throw new ServletException("Content in use");
 	    }
 	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
 		    strToolContentID).longValue(), false, qaService, qaGeneralAuthoringDTO, sessionMap);
