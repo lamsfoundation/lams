@@ -76,7 +76,7 @@
         // Get the form parameters and convert into correct data types
         // TODO: Use bb text area instead
         String strTitle = request.getParameter("title").trim();
-        String strDescription = request.getParameter("description").trim();
+        String strDescription = request.getParameter("descriptiontext").trim();
         FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
 
         String strSequenceID = request.getParameter("sequence_id").trim();

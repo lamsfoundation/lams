@@ -101,7 +101,7 @@
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
         Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
         title = courseDoc.getTitle();
-        description = courseDoc.getBody().getText();
+        description = courseDoc.getBody().getFormattedText();
         
         //get lineitemid from the storage (bbContentId -> lineitemid)
 	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
@@ -161,9 +161,9 @@
     </bbNG:actionControlBar>
     
     <% if((description != "") && (description != null)) { %>
-	    <h4> 
+	    <div class="vtbegenerated"> 
 	    	<%=description%> 
-	    </h4>
+	    </div>
     <% } %>
     
     <% if(isDisplayDesignImage) { %>
