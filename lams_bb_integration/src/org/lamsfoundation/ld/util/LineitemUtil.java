@@ -23,8 +23,11 @@
 /* $Id$ */
 package org.lamsfoundation.ld.util;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil;
 
+import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
 import blackboard.data.content.CourseDocument;
 import blackboard.data.course.Course;
@@ -63,7 +67,7 @@ public class LineitemUtil {
     
     private static Logger logger = Logger.getLogger(LineitemUtil.class);
 
-    public static void createLineitem(Context ctx, Content bbContent) throws Exception {
+    public static void createLineitem(Context ctx, Content bbContent) throws ValidationException, PersistenceException, IOException {
 	
 	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 
@@ -132,9 +136,9 @@ public class LineitemUtil {
      * @param ctx
      *            the blackboard contect, contains session data
      * @return a url pointing to the LAMS lesson, monitor, author session
-     * @throws Exception
+     * @throws IOException 
      */
-    private static boolean hasLessonScoreOutputs(Context ctx, Content bbContent) throws Exception {
+    private static boolean hasLessonScoreOutputs(Context ctx, Content bbContent) throws IOException {
 	String ldId = ctx.getRequestParameter("sequence_id");
 	//sequence_id parameter is null in case we come from modify_proc
 	if (ldId == null) {
@@ -157,16 +161,14 @@ public class LineitemUtil {
 	URL url = new URL(learningDesignSvgUrl);
 	URLConnection conn = url.openConnection();
 	if (!(conn instanceof HttpURLConnection)) {
-	    logger.error("Unable to open connection to: " + learningDesignSvgUrl);
+	    throw new RuntimeException("Unable to open connection to: " + learningDesignSvgUrl);
 	}
 
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-	    String errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
-		    + httpConn.getResponseMessage();
-	    logger.error(errorMsg);
-	    throw new RuntimeException(errorMsg);
+	    throw new RuntimeException("HTTP Response Code: " + httpConn.getResponseCode()
+		    + ", HTTP Response Message: " + httpConn.getResponseMessage());
 	}
 
 	// InputStream is = url.openConnection().getInputStream();
@@ -190,6 +192,34 @@ public class LineitemUtil {
         if (!bbContent.getIsDescribed()) {//(isDescribed field is used for storing isGradecenter parameter)
             return;
         }
+        
+        Id lineitemId = getLineitem(bbContentId, courseIdStr);
+	LineitemDbPersister linePersister = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
+	linePersister.deleteById(lineitemId);
+
+    }
+    
+    public static void changeLineitemName(String bbContentId, String courseIdStr, String newLineitemName)
+	    throws PersistenceException, ServletException, ValidationException {
+	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+
+	Id lineitemId = getLineitem(bbContentId, courseIdStr);
+
+	LineitemDbLoader lineitemLoader = (LineitemDbLoader) bbPm.getLoader(LineitemDbLoader.TYPE);
+	Lineitem lineitem = (Lineitem) lineitemLoader.loadById(lineitemId);
+	lineitem.setName(newLineitemName);
+
+	LineitemDbPersister linePersister = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
+	linePersister.persist(lineitem);
+    }
+    
+    /**
+     * Gets existing lineitem object.
+     * @throws ServletException 
+     * @throws PersistenceException 
+     */
+    private static Id getLineitem(String bbContentId, String courseIdStr) throws ServletException, PersistenceException {
+	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 	
 	//get lineitemid from the storage (bbContentId -> lineitemid)
 	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
@@ -223,7 +253,7 @@ public class LineitemUtil {
 	    }
 
 	    if (lineitem == null) {
-		throw new ServletException("Lineitem that corresponds to bbContentId: " + bbContentId + "was not found");
+		throw new ServletException("Lineitem that corresponds to bbContentId: " + bbContentId + " was not found");
 	    }
 
 	    // delete lineitem (can't delete it simply doing linePersister.deleteById(lineitem.getId()) due to BB9 bug)
@@ -237,8 +267,6 @@ public class LineitemUtil {
 	}
 	
 	Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
-	LineitemDbPersister linePersister = (LineitemDbPersister) bbPm.getPersister(LineitemDbPersister.TYPE);
-	linePersister.deleteById(lineitemId);
-
+	return lineitemId;
     }
 }

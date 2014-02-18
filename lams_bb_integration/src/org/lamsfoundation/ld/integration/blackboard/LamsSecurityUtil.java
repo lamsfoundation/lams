@@ -35,6 +35,7 @@ import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,7 +70,7 @@ public class LamsSecurityUtil {
      * @return a url pointing to the LAMS lesson, monitor, author session
      * @throws Exception
      */
-    public static String generateRequestURL(Context ctx, String method) throws Exception {
+    public static String generateRequestURL(Context ctx, String method) {
 	
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
@@ -77,7 +78,7 @@ public class LamsSecurityUtil {
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null || reqSrc == null) {
-	    throw new Exception("Configuration Exception " + serverAddr + ", " + serverId);
+	    throw new RuntimeException("Configuration Exception " + serverAddr + ", " + serverId);
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
@@ -102,7 +103,7 @@ public class LamsSecurityUtil {
 		    + "&email=" + email;
 		    
 	} catch (UnsupportedEncodingException e) {
-	    throw new RuntimeException();
+	    throw new RuntimeException(e);
 	}
 
 	logger.info("LAMS Req: " + url);
@@ -113,15 +114,16 @@ public class LamsSecurityUtil {
     
     /**
      * Generates default
+     * @throws UnsupportedEncodingException 
      */
-    public static String generateAuthenticateParameters(Context ctx) throws Exception {
+    public static String generateAuthenticateParameters(Context ctx) throws UnsupportedEncodingException {
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
 	String reqSrc = getReqSrc();
 
 	// If lams.properties could not be read, throw exception
 	if (serverAddr == null || serverId == null || reqSrc == null) {
-	    throw new Exception("Configuration Exception " + serverAddr + ", " + serverId);
+	    throw new RuntimeException("Configuration Exception " + serverAddr + ", " + serverId);
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
@@ -140,9 +142,9 @@ public class LamsSecurityUtil {
      * @param ctx
      *            the blackboard contect, contains session data
      * @return a url pointing to the LAMS lesson, monitor, author session
-     * @throws Exception
+     * @throws UnsupportedEncodingException 
      */
-    public static String generateRequestLearningDesignImage(Context ctx, boolean isSvgImage) throws Exception {
+    public static String generateRequestLearningDesignImage(Context ctx, boolean isSvgImage) throws UnsupportedEncodingException {
 	String serverAddr = getServerAddress();
 	int svgFormat = (isSvgImage) ? 1 : 2;
 	
@@ -266,7 +268,6 @@ public class LamsSecurityUtil {
      * @return the learning session id
      */
     public static Long startLesson(Context ctx, long ldId, String title, String desc, boolean isPreview) {
-	Long error = new Long(-1);
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
@@ -442,7 +443,6 @@ public class LamsSecurityUtil {
     }
 
     // generate authentication hash code to validate parameters
-
     public static String generateAuthenticationHash(String datetime, String login, String serverId) {
 	String secretkey = getServerKey();
 
@@ -472,7 +472,7 @@ public class LamsSecurityUtil {
      *            The string to be hashed
      * @return The hased string
      */
-    private static String sha1(String str) {
+    public static String sha1(String str) {
 	try {
 	    MessageDigest md = MessageDigest.getInstance("SHA1");
 	    return new String(Hex.encodeHex(md.digest(str.getBytes())));
