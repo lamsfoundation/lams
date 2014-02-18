@@ -52,8 +52,8 @@
     // Get the Item Attributes
     Calendar startDate = bbContent.getStartDate();
     Calendar endDate = bbContent.getEndDate();	
-    FormattedText desc = bbContent.getBody();
-    String description = desc.getText().replaceFirst(NOT_AVAILABLE, ""); //remove the NOT_AVAILABLE substring
+    FormattedText description = bbContent.getBody();
+    //String description = desc.getText().replaceFirst(NOT_AVAILABLE, ""); //remove the NOT_AVAILABLE substring
 
 %>
 
@@ -80,8 +80,8 @@
                     <input id="title" type="text" name="title" value="<%=bbContent.getTitle()%>">
                 </bbNG:dataElement>
         
-                <bbNG:dataElement label="Description" labelFor="description">
-                    <textarea name="description" rows="12" cols="35"><%=description%></textarea>
+                <bbNG:dataElement label="Description" labelFor="descriptiontext">
+                    <bbNG:textbox name="description" text="<%=description%>" isContentLinking="true"/>
                 </bbNG:dataElement>
                 
             </bbNG:step> 

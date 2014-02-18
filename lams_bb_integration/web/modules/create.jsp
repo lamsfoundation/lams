@@ -66,8 +66,8 @@
                     <input id="title" type="text" name="title" value="" size="70">
                 </bbNG:dataElement>
                 
-                <bbNG:dataElement label="Description" labelFor="description">
-                    <textarea name="description" rows="12" cols="35"></textarea>
+                <bbNG:dataElement label="Description" labelFor="descriptiontext">
+                    <bbNG:textbox name="description" text="" isContentLinking="true"/>
                 </bbNG:dataElement>
             </bbNG:step> 
             
