@@ -47,5 +47,9 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 * LDEV-3102 Remove user call back URLs from Blackboard integration 
 * LDEV-3143 Create an option to opt out from Gradecenter column
 
+1.2.3 Release Fixes
+===================
+* LDEV-3176 Fix wrong URL format for starting LAMS lesson
+* LDEV-2790 Use html editor for lesson description
 
 
