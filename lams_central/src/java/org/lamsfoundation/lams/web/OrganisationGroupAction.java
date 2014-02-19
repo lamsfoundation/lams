@@ -266,7 +266,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	// check if any groups already exist in this grouping
 	Grouping lessonGrouping = getLessonGrouping(request, activityId, true);
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
-	if ((activityId != null) && (orgGroupingId != null) && isDefaultChosenGrouping(lessonGroups)) {
+	if ((activityId != null) && (orgGroupingId != null) && isDefaultChosenGrouping(lessonGrouping)) {
 	    if (OrganisationGroupAction.log.isDebugEnabled()) {
 		OrganisationGroupAction.log.debug("Removing default groups for grouping " + orgGroupingId);
 	    }
@@ -385,8 +385,8 @@ public class OrganisationGroupAction extends DispatchAction {
 	    duplicateCheckProperties.put("organisationId", organisationId);
 	    duplicateCheckProperties.put("name", orgGroupingName);
 
-	    List<OrganisationGrouping> duplicateOrgGrouping = getUserManagementService()
-		    .findByProperties(OrganisationGrouping.class, duplicateCheckProperties);
+	    List<OrganisationGrouping> duplicateOrgGrouping = getUserManagementService().findByProperties(
+		    OrganisationGrouping.class, duplicateCheckProperties);
 	    if (duplicateOrgGrouping.isEmpty()) {
 		orgGrouping.setName(orgGroupingName);
 	    } else {
@@ -394,7 +394,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    }
 
 	}
-	
+
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
 	return null;
     }
@@ -506,7 +506,7 @@ public class OrganisationGroupAction extends DispatchAction {
 		request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
 		// check if it is immutable (for branching) or default groups are allowed
-		return !groups.isEmpty() && (isUsedForBranching || allowDefault || !isDefaultChosenGrouping(groups)) ? grouping
+		return !groups.isEmpty() && (isUsedForBranching || allowDefault || !isDefaultChosenGrouping(grouping)) ? grouping
 			: null;
 	    }
 	}
@@ -515,10 +515,14 @@ public class OrganisationGroupAction extends DispatchAction {
     }
 
     /**
-     * Check if the give groups are default for chosen grouping.
+     * Check if the give groups are default for chosen grouping. There is actually no good way to detect this, but even
+     * if a custom grouping is mistaken for the default one, it should bring little harm.
      */
-    private boolean isDefaultChosenGrouping(Set<Group> groups) {
-	if ((groups == null) || (groups.size() != 2)) {
+    @SuppressWarnings("unchecked")
+    private boolean isDefaultChosenGrouping(Grouping grouping) {
+	Set<Group> groups = grouping.getGroups();
+	if (groups == null || grouping.getMaxNumberOfGroups() == null
+		|| !grouping.getMaxNumberOfGroups().equals(groups.size())) {
 	    return false;
 	}
 	for (Group group : groups) {
