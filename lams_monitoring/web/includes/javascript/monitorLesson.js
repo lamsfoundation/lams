@@ -644,21 +644,21 @@ function initSequenceTab(){
 		},
 		'buttons' : [
 		             {
-		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_YES,
-		            	'click'  : function() {
-							$(this).dialog('close');
-		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
-		            							 $(this).dialog('option', 'activityId'),
-		            							 true);
-						}
-		             },
-		             {
 		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_NO,
 		            	'click'  : function() {
 		            		$(this).dialog('close');
 		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
        							 				 $(this).dialog('option', 'activityId'),
        							 				 false);
+						}
+		             },
+		             {
+		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_YES,
+		            	'click'  : function() {
+							$(this).dialog('close');
+		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
+		            							 $(this).dialog('option', 'activityId'),
+		            							 true);
 						}
 		             },
 		             {

@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -209,7 +208,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	List rootNode = getAuthorRootNodeByMindmapId(fromContent.getUid());
 
 	MindmapNode rootMindmapNode = null;
-	if (rootNode == null || rootNode.size() == 0) {
+	if ((rootNode == null) || (rootNode.size() == 0)) {
 	    // Create default content
 	    rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, fromContent, null);
 	    saveOrUpdateMindmapNode(rootMindmapNode);
@@ -241,7 +240,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	List childMindmapNodes = getMindmapNodeByParentId(fromMindmapNode.getNodeId(), fromContent.getUid());
 
-	if (childMindmapNodes != null && childMindmapNodes.size() > 0) {
+	if ((childMindmapNodes != null) && (childMindmapNodes.size() > 0)) {
 	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext();) {
 		MindmapNode childMindmapNode = (MindmapNode) iterator.next();
 		cloneMindmapNodesForRuntime(childMindmapNode, toMindmapNode, fromContent, toContent);
@@ -291,7 +290,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    MindmapUser mindmapUser) {
 	List mindmapNodes = getMindmapNodeByParentId(rootNodeId, mindmapId);
 
-	if (mindmapNodes != null && mindmapNodes.size() > 0) {
+	if ((mindmapNodes != null) && (mindmapNodes.size() > 0)) {
 	    for (Iterator iterator = mindmapNodes.iterator(); iterator.hasNext();) {
 		MindmapNode mindmapNode = (MindmapNode) iterator.next();
 
@@ -341,7 +340,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    }
 
 	    MindmapNode currentMindmapNode = null;
-	    if (curMindmapNodeList != null && curMindmapNodeList.size() > 0) {
+	    if ((curMindmapNodeList != null) && (curMindmapNodeList.size() > 0)) {
 		currentMindmapNode = (MindmapNode) curMindmapNodeList.get(0);
 	    }
 	    nodesToDeleteCondition += " and uniqueId <> " + nodeConceptModel.getId();
@@ -381,13 +380,15 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (MindmapService.logger.isDebugEnabled()) {
+	    MindmapService.logger.debug("Removing Mindmap content for user ID " + userId + " and toolContentId "
+		    + toolContentId);
 	}
 
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 	if (mindmap == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    MindmapService.logger.warn("Did not find activity with toolContentId: " + toolContentId
+		    + " to remove learner content");
 	    return;
 	}
 
@@ -398,7 +399,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	    for (MindmapNode node : nodes) {
 		List<MindmapNode> descendants = new LinkedList<MindmapNode>();
-		if (node.getUser() != null && node.getUser().getUserId().equals(userId.longValue())
+		if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
 			&& !nodesToDelete.contains(node)
 			&& userOwnsChildrenNodes(node, userId.longValue(), descendants)) {
 		    // reverse so leafs are first and nodes closer to root are last
@@ -412,11 +413,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    mindmapNodeDAO.delete(node);
 	}
 
-	List<MindmapRequest> requests = mindmapRequestDAO.getRequestsByUserId(userId.longValue());
-	for (MindmapRequest request : requests) {
-	    mindmapRequestDAO.delete(request);
-	}
-
 	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
 	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
@@ -425,17 +421,19 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		    mindmapDAO.delete(entry);
 		}
 
-		mindmapUserDAO.delete(user);
+		user.setEntryUID(null);
+		user.setFinishedActivity(false);
+		mindmapDAO.update(user);
 	    }
 	}
     }
-    
+
     @SuppressWarnings("unchecked")
     private boolean userOwnsChildrenNodes(MindmapNode node, Long userId, List<MindmapNode> descendants) {
 	List<MindmapNode> children = mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(node.getNodeId(), node
 		.getMindmap().getUid(), node.getSession().getSessionId());
 	for (MindmapNode child : children) {
-	    boolean userOwnsChild = child.getUser() != null && child.getUser().getUserId().equals(userId)
+	    boolean userOwnsChild = (child.getUser() != null) && child.getUser().getUserId().equals(userId)
 		    && userOwnsChildrenNodes(child, userId, descendants);
 	    if (!userOwnsChild) {
 		return false;
@@ -444,15 +442,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
 	return true;
     }
-    
-    
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
@@ -466,13 +463,13 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	// generating Mindmap XML to export
 	String mindmapContent = null;
 	List mindmapNodeList = getAuthorRootNodeByMindmapId(mindmap.getUid());
-	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
+	if ((mindmapNodeList != null) && (mindmapNodeList.size() > 0)) {
 	    MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
 
 	    String rootMindmapUser = getMindmapMessageService().getMessage("node.instructor.label");
 
-	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode
-		    .getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
+	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
+		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
 	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmap.getUid(),
 		    rootNodeModel, null);
 
@@ -497,14 +494,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(MindmapImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, mindmapToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Mindmap)) {
@@ -561,11 +558,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
 	return getMindmapOutputFactory().getToolOutputDefinitions(mindmap, definitionType);
     }
-    
+
     public String getToolContentTitle(Long toolContentId) {
 	return getMindmapByContentId(toolContentId).getTitle();
     }
-    
+
     /* IMindmapService Methods */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
