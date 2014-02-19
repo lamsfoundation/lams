@@ -464,7 +464,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		String optionString = option.getOptionString().replaceAll("\\*", ".*");
+		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*");
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
 		    pattern = Pattern.compile(optionString);
@@ -473,7 +473,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    | java.util.regex.Pattern.UNICODE_CASE);
 		}
 		boolean isAnswerCorrect = (question.getAnswerString() != null) ? pattern.matcher(
-			question.getAnswerString()).matches() : false;
+			question.getAnswerString().trim()).matches() : false;
 
 		if (isAnswerCorrect) {
 		    mark = option.getGrade() * maxMark;
