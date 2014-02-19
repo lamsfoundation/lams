@@ -1,8 +1,24 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 
+<script type="text/javascript">
+	function verifyAllowRateMessagesCheckbox() {
+		var minRateDropDown = document.getElementById("minimumRate");
+		var minRatings  = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
+		var maxRateDropDown  = document.getElementById("maximumRate");
+		var maxRatings = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
+		
+		if((minRatings == 0) && (maxRatings == 0)){
+			var allowRateMessages = document.getElementById("allowRateMessages");
+			allowRateMessages.checked = false;
+		}
+		
+		return true;
+	}
+</script>
+
 <html:form action="authoring/update" method="post"
-	styleId="authoringForm" enctype="multipart/form-data">
+	styleId="authoringForm" enctype="multipart/form-data" onsubmit="return verifyAllowRateMessagesCheckbox();">
 	<html:hidden property="toolContentID" />
 	<html:hidden property="sessionMapID" />
 	<html:hidden property="contentFolderID" />

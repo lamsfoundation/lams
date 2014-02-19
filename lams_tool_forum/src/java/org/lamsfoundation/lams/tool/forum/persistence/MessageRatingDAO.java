@@ -46,7 +46,10 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
     
     private static final String FIND_AVERAGE_RATING_BY_MESSAGE = "SELECT AVG(r.rating), COUNT(*) from "
 	    + MessageRating.class.getName() + " as r where r.message.uid=?";
-
+    
+    private static final String FIND_COUNT_RATING_BY_USER_AND_FORUM = "SELECT COUNT(*) from " + MessageRating.class.getName()
+	    + " as r where r.user.uid = ? and r.message.forum.uid=?"; 
+    
     /**
      * Return responseRating by the given imageUid and userId.
      * 
@@ -89,6 +92,22 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
 	
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
 	return new AverageRatingDTO(averageRating, numberOfVotes);
+    }
+    
+    /**
+     * Return total number of posts done by current user in this forum activity
+     * 
+     * @param userUid
+     * @param forumUid
+     * @return
+     */
+    public int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid) {
+	List list = this.getHibernateTemplate().find(FIND_COUNT_RATING_BY_USER_AND_FORUM,
+		new Object[] { userUid, forumUid });
+	if (list != null && list.size() > 0)
+	    return ((Number) list.get(0)).intValue();
+	else
+	    return 0;
     }
 
     /**

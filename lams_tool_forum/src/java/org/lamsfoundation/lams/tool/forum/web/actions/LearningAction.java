@@ -215,8 +215,10 @@ public class LearningAction extends Action {
 	Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 	int allowNumber = forum.isLimitedInput() || forum.isAllowRichEditor() ? forum.getLimitedChar() : 0;
 
-	sessionMap.put(ForumConstants.FORUM_ID, forumId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(ForumConstants.ATTR_FORUM_ID, forumId);
+	sessionMap.put(ForumConstants.ATTR_FORUM_UID, forum.getUid());
+	sessionMap.put(ForumConstants.ATTR_USER_UID, forumUser.getUid());
 	sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
 	sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
@@ -239,6 +241,15 @@ public class LearningAction extends Action {
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+
+	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(forumUser.getUid(), forum.getUid());
+	boolean noMoreRatings = (forum.getMaximumRate() != 0) && (numOfRatings >= forum.getMaximumRate())
+		&& forum.isAllowRateMessages();
+	boolean isMinRatingsCompleted = (forum.getMinimumRate() == 0) || (numOfRatings >= forum.getMinimumRate())
+		&& forum.isAllowRateMessages();
+	sessionMap.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
+	sessionMap.put(ForumConstants.ATTR_IS_MIN_RATINGS_COMPLETED, isMinRatingsCompleted);
+	sessionMap.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 
 	// Should we show the reflection or not? We shouldn't show it when the screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
@@ -542,7 +553,7 @@ public class LearningAction extends Action {
 
 	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
-	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
+	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	List<MessageDTO> rootTopics = forumService.getRootTopics(sessionId);
 
@@ -699,7 +710,7 @@ public class LearningAction extends Action {
 	forumService.saveTimestamp(rootTopicId, forumUser);
 
 	// notify learners and teachers
-	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
+	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
 
 	return mapping.findForward("success");
@@ -894,16 +905,20 @@ public class LearningAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws JSONException
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
      */
     public ActionForward rateMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 
 	forumService = getForumManager();
-
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
+	Long forumUid = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_UID);
+	Long userUid = (Long) sessionMap.get(ForumConstants.ATTR_USER_UID);
+	boolean isAllowRateMessages = (Boolean) sessionMap.get(ForumConstants.ATTR_ALLOW_RATE_MESSAGES);
+	int forumMaximumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MAXIMUM_RATE);
+	int forumMinimumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MINIMUM_RATE);
+	
 	float rating = Float.parseFloat((String) request.getParameter("rate"));
 	Long responseId = WebUtil.readLongParam(request, "idBox");
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -911,10 +926,22 @@ public class LearningAction extends Action {
 	Long userId = new Long(user.getUserID().intValue());
 
 	AverageRatingDTO averageRatingDTO = forumService.rateMessage(responseId, userId, toolSessionID, rating);
+	
+	//refresh numOfRatings and noMoreRatings
+	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(userUid, forumUid);
+	boolean noMoreRatings = (forumMaximumRate != 0) && (numOfRatings >= forumMaximumRate)
+		&& isAllowRateMessages;
+	boolean isMinRatingsCompleted = (forumMinimumRate != 0) && (numOfRatings >= forumMinimumRate)
+		&& isAllowRateMessages;
+	sessionMap.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
+	sessionMap.put(ForumConstants.ATTR_IS_MIN_RATINGS_COMPLETED, isMinRatingsCompleted);
+	sessionMap.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("averageRating", averageRatingDTO.getRating());
 	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+	JSONObject.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
+	JSONObject.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;

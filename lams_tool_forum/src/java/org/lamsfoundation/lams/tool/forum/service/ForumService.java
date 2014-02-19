@@ -325,10 +325,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	messageDao.delete(topicUid);
     }
 
+    @Override
     public void deleteCondition(ForumCondition condition) throws PersistenceException {
 	forumDao.deleteCondition(condition);
     }
 
+    @Override
     public Message replyTopic(Long parentId, Long sessionId, Message replyMessage) throws PersistenceException {
 	// set parent
 	Message parent = this.getMessage(parentId);
@@ -362,6 +364,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return replyMessage;
     }
 
+    @Override
     public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
 	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
 	    throw new ForumException("Could not find upload file: " + uploadFile);
@@ -376,6 +379,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return file;
     }
 
+    @Override
     public List getTopicThread(Long rootTopicId) {
 
 	List unsortedThread = messageSeqDao.getTopicThread(rootTopicId);
@@ -389,6 +393,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getSortedMessageDTO(map);
     }
 
+    @Override
     public List<MessageDTO> getRootTopics(Long sessionId) {
 	ForumToolSession session = getSessionBySessionId(sessionId);
 	if (session == null || session.getForum() == null) {
@@ -408,30 +413,37 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return topicsBySession;
     }
 
+    @Override
     public int getTopicsNum(Long userID, Long sessionId) {
 	return messageDao.getTopicsNum(userID, sessionId);
     }
 
+    @Override
     public int getNumOfPostsByTopic(Long userId, Long topicId) {
 	return messageSeqDao.getNumOfPostsByTopic(userId, topicId);
     }
 
+    @Override
     public ForumUser getUserByID(Long userId) {
 	return forumUserDao.getByUserId(userId);
     }
 
+    @Override
     public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
 	return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
     }
 
+    @Override
     public void createUser(ForumUser forumUser) {
 	forumUserDao.save(forumUser);
     }
 
+    @Override
     public ForumToolSession getSessionBySessionId(Long sessionId) {
 	return forumToolSessionDao.getBySessionId(sessionId);
     }
 
+    @Override
     public Long getRootTopicId(Long topicId) {
 	MessageSeq seq = messageSeqDao.getByTopicId(topicId);
 	if (seq == null || seq.getRootMessage() == null) {
@@ -441,6 +453,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return seq.getRootMessage().getUid();
     }
 
+    @Override
     public List getAuthoredTopics(Long forumUid) {
 	List list = messageDao.getTopicsFromAuthor(forumUid);
 
@@ -456,34 +469,29 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
     }
 
-    public Long getToolDefaultContentIdBySignature(String toolSignature) {
-	Long contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (contentId.equals(0L)) {
-	    String error = "Could not retrieve default content id for this tool";
-	    ForumService.log.error(error);
-	    throw new ForumException(error);
-	}
-	return contentId;
-    }
-
+    @Override
     public List getSessionsByContentId(Long contentID) {
 	return forumToolSessionDao.getByContentId(contentID);
     }
 
+    @Override
     public List getUsersBySessionId(Long sessionID) {
 	return forumUserDao.getBySessionId(sessionID);
     }
 
+    @Override
     public List getMessagesByUserUid(Long userId, Long sessionId) {
 	List list = messageDao.getByUserAndSession(userId, sessionId);
 
 	return MessageDTO.getMessageDTO(list);
     }
 
+    @Override
     public ForumUser getUser(Long userUid) {
 	return forumUserDao.getByUid(userUid);
     }
 
+    @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
 	List list = messageDao.getBySession(sessionID);
@@ -546,11 +554,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     }
 
+    @Override
     public void finishUserSession(ForumUser currentUser) {
 	currentUser.setSessionFinished(true);
 	forumUserDao.save(currentUser);
     }
     
+    @Override
     public AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating) {
 	ForumUser imageGalleryUser = getUserByUserAndSession(userId, toolSessionID);
 	MessageRating messageRating = messageRatingDao.getRatingByMessageAndUser(messageId, userId);
@@ -569,8 +579,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
     }
     
+    @Override
     public AverageRatingDTO getAverageRatingDTOByMessage(Long messageId) {
 	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
+    }
+    
+    @Override
+    public int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid) {
+	return messageRatingDao.getNumOfRatingsByUserAndForum(userUid, forumUid);
     }
 
     // ***************************************************************************************************************
@@ -659,7 +675,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     private Forum getDefaultForum() {
-	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE);
+	Long defaultForumId = new Long(toolService.getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE));
+	if (defaultForumId.equals(0L)) {
+	    String error = "Could not retrieve default content id for this tool";
+	    ForumService.log.error(error);
+	    throw new ForumException(error);
+	}
+	
 	Forum defaultForum = getForumByContentId(defaultForumId);
 	if (defaultForum == null) {
 	    String error = "Could not retrieve default content record for this tool";

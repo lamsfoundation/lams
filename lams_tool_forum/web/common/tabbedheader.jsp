@@ -7,7 +7,6 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 
-
 <!-- HTTP 1.1 -->
 <meta http-equiv="Cache-Control" content="no-store" />
 <!-- HTTP 1.0 -->
@@ -18,7 +17,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 <c:choose>
 	<c:when test="${not empty localLinkPath}">
 		<lams:css localLinkPath="${localLinkPath}" style="tabbed"/>

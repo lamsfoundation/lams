@@ -65,7 +65,9 @@ public interface ForumConstants {
     // TODO:hard code!!! need to read from config
     public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
 
-    public static final String FORUM_ID = "forum_id";
+    public static final String ATTR_FORUM_ID = "forum_id";
+    
+    public static final String ATTR_FORUM_UID = "forumUid";
 
     public static final String ATTR_ALLOW_EDIT = "allowEdit";
 
@@ -131,6 +133,12 @@ public interface ForumConstants {
     public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
 
     public static final String ATTR_NUM_OF_POSTS = "numOfPosts";
+    
+    public static final String ATTR_NO_MORE_RATINGSS = "noMoreRatings";
+    
+    public static final String ATTR_NUM_OF_RATINGS = "numOfRatings";
+    
+    public static final String ATTR_IS_MIN_RATINGS_COMPLETED = "isMinRatingsCompleted";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 

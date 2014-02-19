@@ -412,5 +412,14 @@ public interface IForumService {
     AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating);
     
     AverageRatingDTO getAverageRatingDTOByMessage(Long responseId);
+    
+    /**
+     * Return total number of posts done by current user in this forum activity
+     * 
+     * @param userUid
+     * @param forumUid
+     * @return
+     */
+    int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid);
 
 }

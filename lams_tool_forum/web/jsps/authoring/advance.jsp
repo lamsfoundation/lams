@@ -4,8 +4,6 @@
 
 <!--   Advance Tab Content    -->
 
-<!-- Advance options Row -->
-
 <p class="small-space-top">
 	<html:checkbox property="forum.lockWhenFinished" styleClass="noBorder"
 		styleId="lockWhenFinished">
@@ -35,7 +33,7 @@
 
 <p style="margin-left:60px;">
 	<fmt:message key="label.authoring.advance.minimum.reply" />
-	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings()">
+	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.minimum" />
 		</html:option>
@@ -51,9 +49,8 @@
 		<html:option value="10">10</html:option>
 	</html:select>
 
-
 	<fmt:message key="label.authoring.advance.maximum.reply" />
-	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings()">
+	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.maximum" />
 		</html:option>
@@ -68,9 +65,7 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-
 </p>
-
 
 <p>
 	<html:checkbox property="forum.allowUpload" styleClass="noBorder"
@@ -287,16 +282,21 @@
 			}
 			checkRating();
 			
-			function validateRatings() {
+			function validateRatings(isMinimunRateDropdownUsed) {
 				var minRateDropDown = document.getElementById("minimumRate");
-				var minRatings  = minRateDropDown.options[minRateDropDown.selectedIndex].value;
+				var minRatings  = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
 				var maxRateDropDown  = document.getElementById("maximumRate");
-				var maxRatings = maxRateDropDown.options[maxRateDropDown.selectedIndex].value;
+				var maxRatings = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
 				
 				if((minRatings > maxRatings) && !(maxRatings == 0)){
+					if (isMinimunRateDropdownUsed) {
+						minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;	
+					} else {
+						maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+					}
+					
 					alert('<fmt:message key="js.error.validate.number"/>');
 				}
-				
 			}
 			
 			function checkReflection(){
@@ -309,5 +309,3 @@
 				}
 			}
 </script>
-
-
