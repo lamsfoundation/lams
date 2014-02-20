@@ -487,7 +487,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
 
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
-		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, true, learnerPresenceAvailable,
+		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, false, learnerPresenceAvailable,
 		learnerImAvailable, liveEditEnabled, true, false, null, null);
     }
 
