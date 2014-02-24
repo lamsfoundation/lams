@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="messageId" value="${msgDto.message.uid}"/>
 <c:choose>
-	<c:when test='${(sessionMap.mode == "teacher") || sessionMap.finishedLock || sessionMap.noMoreRatings}'>
+	<c:when test='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock || sessionMap.noMoreRatings}'>
 		<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 	</c:when>
 	<c:otherwise>

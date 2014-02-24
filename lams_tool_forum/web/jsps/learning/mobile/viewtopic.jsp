@@ -38,12 +38,20 @@
 		<script type="text/javascript">
 			$(document).bind('pageinit', function(){
 				$(".rating-stars").jRating({
-				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}",
+				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}",
 				    rateMax : 5,
 				    decimalLength : 1,
 					onSuccess : function(data, messageId){
 					    $("#averageRating" + messageId).html(data.averageRating);
 					    $("#numberOfVotes" + messageId).html(data.numberOfVotes);
+					    $("#numOfRatings").html(data.numOfRatings);
+					    
+					    //disable rating feature in case maxRate limit reached
+					    if (data.noMoreRatings) {
+					    	$(".rating-stars").each(function() {
+					    		$(this).jRating('readOnly');
+					    	});
+					    }
 					},
 					onError : function(){
 					    jError('Error : please retry');
@@ -120,7 +128,40 @@
 	                                </fmt:message>
 	                        </div>
 	                  </c:when>
-	                </c:choose>
+	            </c:choose>
+	                
+				<!-- Rating announcements -->
+				<c:if test="${sessionMap.allowRateMessages}">
+					<div class="info">
+					
+						<c:choose>
+							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate ne 0}">
+								<fmt:message key="label.rateLimits.forum.reminder">
+									<fmt:param value="${sessionMap.minimumRate}"/>
+									<fmt:param value="${sessionMap.maximumRate}"/>
+								</fmt:message>						
+							</c:when>
+							
+							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate eq 0}">
+								<fmt:message key="label.rateLimits.forum.reminder.min">
+									<fmt:param value="${sessionMap.minimumRate}"/>
+								</fmt:message>					
+							</c:when>
+							
+							<c:when test="${sessionMap.minimumRate eq 0 and sessionMap.maximumRate ne 0}">
+								<fmt:message key="label.rateLimits.forum.reminder.max">
+									<fmt:param value="${sessionMap.maximumRate}"/>
+								</fmt:message>					
+							</c:when>
+						</c:choose>
+						<br>
+						
+						<fmt:message key="label.rateLimits.topic.reminder">
+							<fmt:param value="<span id='numOfRatings'>${sessionMap.numOfRatings}</span>"/>
+						</fmt:message>
+						
+					</div>
+				</c:if>
 		</c:if>
 		<br>
 		

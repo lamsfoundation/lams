@@ -9,7 +9,7 @@
 	function finishForum() {
 		document.getElementById("finishButton").disabled = true;
 		location.href = '${finish}';
-	};			
+	};
 </script>
 
 <div data-role="page" data-dom-cache="false">
@@ -33,8 +33,7 @@
 				</div>
 			</c:if>
 		
-			<c:if
-				test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+			<c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
 				<c:if test="${sessionMap.lockedWhenFinished}">
 					<div class="info">
 						<c:choose>
@@ -51,8 +50,8 @@
 				<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
 					<div class="info">
 						<fmt:message key="label.postingLimits.forum.reminder">
-							<fmt:param value="${sessionMap.minimumReply}"></fmt:param>
-							<fmt:param value="${sessionMap.maximumReply}"></fmt:param>
+							<fmt:param value="${sessionMap.minimumReply}"/>
+							<fmt:param value="${sessionMap.maximumReply}"/>
 						</fmt:message>
 					</div>
 				</c:if>
@@ -60,7 +59,7 @@
 				<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply eq 0)}">
 					<div class="info">
 						<fmt:message key="label.postingLimits.forum.reminder.min">
-							<fmt:param value="${sessionMap.minimumReply}"></fmt:param>
+							<fmt:param value="${sessionMap.minimumReply}"/>
 						</fmt:message>
 					</div>
 				</c:if>
@@ -68,10 +67,43 @@
 				<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 and sessionMap.maximumReply ne 0)}">
 					<div class="info">
 						<fmt:message key="label.postingLimits.forum.reminder.max">
-							<fmt:param value="${sessionMap.maximumReply}"></fmt:param>
+							<fmt:param value="${sessionMap.maximumReply}"/>
 						</fmt:message>
 					</div>
 				</c:if>
+				
+				<!-- Rating announcements -->
+				<c:if test="${sessionMap.allowRateMessages}">
+				
+					<div class="info">
+						<c:choose>
+							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate ne 0}">
+								<fmt:message key="label.rateLimits.forum.reminder">
+									<fmt:param value="${sessionMap.minimumRate}"/>
+									<fmt:param value="${sessionMap.maximumRate}"/>
+								</fmt:message>						
+							</c:when>
+							
+							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate eq 0}">
+								<fmt:message key="label.rateLimits.forum.reminder.min">
+									<fmt:param value="${sessionMap.minimumRate}"/>
+								</fmt:message>					
+							</c:when>
+							
+							<c:when test="${sessionMap.minimumRate eq 0 and sessionMap.maximumRate ne 0}">
+								<fmt:message key="label.rateLimits.forum.reminder.max">
+									<fmt:param value="${sessionMap.maximumRate}"/>
+								</fmt:message>					
+							</c:when>				
+						</c:choose>
+						<br>
+								
+						<fmt:message key="label.rateLimits.topic.reminder">
+							<fmt:param value="<span id='numOfRatings'>${sessionMap.numOfRatings}</span>"/>
+						</fmt:message>
+					</div>
+					
+				</c:if>	
 		
 			</c:if>
 		
@@ -127,36 +159,33 @@
 					</c:if>
 				</div>
 			</c:if>
-		
-
 
 	</div><!-- /content -->
 
 	<div data-role="footer" data-theme="b" class="ui-bar">
 		<span class="ui-finishbtn-right">
-				<c:if test='${sessionMap.mode != "teacher"}'>
-					<c:choose>
-						<c:when
-							test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-							<button name="continue" onclick="javascript:location.href='${continue}';" data-icon="arrow-r">
-								<fmt:message key="label.continue" />
-							</button>
-						</c:when>
+			<c:if test='${(sessionMap.mode != "teacher") && sessionMap.isMinRatingsCompleted}'>
+				<c:choose>
+					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+						<button name="continue" onclick="javascript:location.href='${continue}';" data-icon="arrow-r">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:when>
 		
-						<c:otherwise>
-							<button name="finishButton" id="finishButton" data-icon="arrow-r" onclick="finishForum();">
-								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finish" />
-				 					</c:otherwise>
-				 				</c:choose>
-							</button>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
+					<c:otherwise>
+						<button name="finishButton" id="finishButton" data-icon="arrow-r" onclick="finishForum();">
+							<c:choose>
+				 				<c:when test="${sessionMap.activityPosition.last}">
+				 					<fmt:message key="label.submit" />
+				 				</c:when>
+				 				<c:otherwise>
+				 		 			<fmt:message key="label.finish" />
+				 				</c:otherwise>
+				 			</c:choose>
+						</button>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
 		</span>
 	</div><!-- /footer -->
 </div><!-- /page -->

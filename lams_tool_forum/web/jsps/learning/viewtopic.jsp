@@ -51,7 +51,7 @@
 					    //disable rating feature in case maxRate limit reached
 					    if (data.noMoreRatings) {
 					    	$(".rating-stars").each(function() {
-					    		$(this).rating('disable');
+					    		$(this).jRating('readOnly');
 					    	});
 					    }
 					},
