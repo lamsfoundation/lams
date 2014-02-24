@@ -3,7 +3,12 @@
 <c:set var="newtopic">
 	<html:rewrite page="/learning/newTopic.do?sessionMapID=${sessionMapID}" />
 </c:set>
-
+<c:set var="continue">
+	<html:rewrite page="/learning/newReflection.do?sessionMapID=${sessionMapID}" />
+</c:set>
+<c:set var="finish">
+	<html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" />
+</c:set>
 <c:set var="refresh">
 	<html:rewrite page="/learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}" />
 </c:set>
@@ -128,15 +133,6 @@
 	</div>
 
 	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
-
-	<c:set var="continue">
-		<html:rewrite
-			page="/learning/newReflection.do?sessionMapID=${sessionMapID}" />
-	</c:set>
-
-	<c:set var="finish">
-		<html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" />
-	</c:set>
 
 	<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
 		<div class="small-space-top">
