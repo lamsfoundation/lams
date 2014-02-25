@@ -36,6 +36,8 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
@@ -70,9 +72,11 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.web.HomeAction;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.dto.UpdateContentDTO;
+import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
 
 /**
  * @author Manpreet Minhas
@@ -199,7 +203,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @return String The acknowledgement/error message in WDDX format for FLASH
      * @throws IOException
      */
-    public String deleteFolder(Integer folderID, Integer userID) throws IOException {
+    private String deleteFolder(Integer folderID, Integer userID) throws IOException {
 	WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, folderID);
 	User user = (User) userMgmtService.findById(User.class, userID);
 	FlashMessage flashMessage = null;
@@ -303,21 +307,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     }
 
-    /**
-     * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you
-     * try to get anything from the folder.
-     */
     @Override
     public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID) {
 	return (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContentsExcludeHome(java.lang.Integer,
-     *      java.lang.Integer, java.lang.Integer)
-     */
     @Override
     public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
@@ -326,12 +320,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		(user.getWorkspace() != null) ? user.getWorkspace().getDefaultFolder() : null);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer,
-     *      java.lang.Integer, java.lang.Integer)
-     */
     @Override
     public Vector<FolderContentDTO> getFolderContents(Integer userID, WorkspaceFolder folder, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
@@ -346,7 +334,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @throws UserAccessDeniedException
      * @throws RepositoryCheckedException
      */
-    public Vector<FolderContentDTO> getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode,
+    private Vector<FolderContentDTO> getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode,
 	    String methodName, WorkspaceFolder skipFolder) throws UserAccessDeniedException, RepositoryCheckedException {
 	Vector<FolderContentDTO> contentDTO = new Vector<FolderContentDTO>();
 	if (user != null) {
@@ -406,6 +394,76 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	}
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	JSONObject result = new JSONObject();
+	Vector<FolderContentDTO> folderContents = null;
+
+	// get user accessible folders in the start
+	if (folderID == null) {
+	    folderContents = new Vector<FolderContentDTO>(3);
+
+	    FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
+	    if (userFolder != null) {
+		folderContents.add(userFolder);
+	    }
+
+	    FolderContentDTO myGroupsFolder = new FolderContentDTO(messageService.getMessage("organisations"),
+		    messageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+		    WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
+
+	    folderContents.add(myGroupsFolder);
+
+	    FolderContentDTO publicFolder = getPublicWorkspaceFolder(userID);
+	    if (publicFolder != null) {
+		folderContents.add(publicFolder);
+	    }
+	    // special behaviour for organisation folders
+	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
+	    folderContents = getAccessibleOrganisationWorkspaceFolders(userID);
+	    Collections.sort(folderContents);
+
+	    if (folderContents.size() == 1) {
+		FolderContentDTO folder = folderContents.firstElement();
+		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
+		    return getFolderContentsJSON(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID, allowInvalidDesigns);
+		}
+	    }
+	} else {
+	    WorkspaceFolder folder = getWorkspaceFolder(folderID);
+	    Integer mode = allowInvalidDesigns ? WorkspaceManagementService.AUTHORING
+		    : WorkspaceManagementService.MONITORING;
+	    folderContents = getFolderContents(userID, folder, mode);
+	    Collections.sort(folderContents);
+	}
+
+	// fill JSON object with folders and LDs
+	for (FolderContentDTO folderContent : folderContents) {
+	    String contentType = folderContent.getResourceType();
+	    if (FolderContentDTO.FOLDER.equals(contentType)) {
+		JSONObject subfolderJSON = new JSONObject();
+		subfolderJSON.put("name", folderContent.getName());
+		subfolderJSON.put("isRunSequencesFolder",
+			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID().intValue()));
+		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
+		result.append("folders", subfolderJSON);
+	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
+		JSONObject learningDesignJSON = new JSONObject();
+		learningDesignJSON.put("name", folderContent.getName());
+		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
+		result.append("learningDesigns", learningDesignJSON);
+	    } else {
+		if (log.isDebugEnabled()) {
+		    log.debug("Unsupported folder content found, named \"" + folderContent.getName() + "\"");
+		}
+	    }
+	}
+
+	return result.toString();
+    }
+
     /**
      * This method returns the permissions specific to the given <code>workspaceFolder</code> for the given user.
      * 
@@ -415,7 +473,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      *            The user for whom these permissions are set.
      * @return Integer The permissions
      */
-    public Integer getPermissions(WorkspaceFolder workspaceFolder, User user) {
+    private Integer getPermissions(WorkspaceFolder workspaceFolder, User user) {
 	Integer permission = null;
 
 	if ((workspaceFolder == null) || (user == null)) {
@@ -487,10 +545,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     }
 
-    /**
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#copyResource(Long, String, Integer,
-     *      Integer, Integer)
-     */
     @Override
     public String copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID,
 	    Integer userID) throws IOException {
@@ -772,7 +826,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @return String The acknowledgement/error message in WDDX format for FLASH
      * @throws IOException
      */
-    public String deleteLearningDesign(Long learningDesignID, Integer userID) throws IOException {
+    private String deleteLearningDesign(Long learningDesignID, Integer userID) throws IOException {
 	User user = (User) baseDAO.find(User.class, userID);
 	FlashMessage flashMessage = null;
 	if (user != null) {
@@ -851,12 +905,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     }
 
     /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#moveFolder(java.lang.Integer,
-     *      java.lang.Integer, java.lang.Integer)
      */
-    public String moveFolder(Integer currentFolderID, Integer targetFolderID, Integer userID) throws IOException {
+    private String moveFolder(Integer currentFolderID, Integer targetFolderID, Integer userID) throws IOException {
 	FlashMessage flashMessage = null;
 	try {
 	    if (currentFolderID == null) {
@@ -943,10 +993,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	return ticket;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer,
-     *      java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
-     */
     @Override
     public String createWorkspaceFolderContent(Integer contentTypeID, String name, String description,
 	    Integer workspaceFolderID, String mimeType, String path) throws Exception {
@@ -1024,12 +1070,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	return false;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#updateWorkspaceFolderContent(java.lang.Long,
-     *      java.io.InputStream)
-     */
     @Override
     public String updateWorkspaceFolderContent(Long folderContentID, String path) throws Exception {
 	FlashMessage flashMessage = null;
@@ -1093,12 +1133,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	return nodeKey;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteContentWithVersion(java.lang.Long,
-     *      java.lang.Long, java.lang.Long)
-     */
     @Override
     public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted, Long folderContentID) throws Exception {
 	FlashMessage flashMessage = null;
@@ -1168,7 +1202,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @return String Acknowledgement/error message in WDDX format for FLASH
      * @throws Exception
      */
-    public String deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
+    private String deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
 	FlashMessage flashMessage = null;
 	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO.find(
 		WorkspaceFolderContent.class, folderContentID);

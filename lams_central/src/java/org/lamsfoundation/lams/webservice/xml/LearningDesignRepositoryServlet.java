@@ -324,6 +324,30 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    if (method != null && method.equals("exportLD")) {
 		// do export
 		exportLD(request, response);
+		
+	    } else if (method != null && method.equals("getLearningDesignsJSONFormat")) {
+
+		ExtUserUseridMap userMap = null;
+		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+		if (firstName == null && lastName == null) {
+		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+		} else {
+		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
+			    lang, country, email, prefix);
+		}
+
+		// create group for external course if necessary
+		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+		Integer userId = userMap.getUser().getUserId();
+
+		Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
+		String folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
+
+		response.setContentType("application/json;charset=UTF-8");
+		response.getWriter().write(folderContentsJSON);
+	
+	    //TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
 
 		ExtUserUseridMap userMap = null;
@@ -337,8 +361,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 		// create group for external course if necessary
 		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+		Integer userId = userMap.getUser().getUserId();
 
-		String contentTree = buildContentTree(userMap.getUser().getUserId(), mode).toString();
+		String contentTree = buildContentTree(userId, mode).toString();
 
 		// generate response
 		response.setContentType("text/xml");

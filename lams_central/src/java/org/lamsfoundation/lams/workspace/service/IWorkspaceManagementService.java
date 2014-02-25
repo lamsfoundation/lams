@@ -4,15 +4,15 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General License version 2.0 
  * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -42,39 +43,39 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
  */
 public interface IWorkspaceManagementService {
 	
-	public static final String REPOSITORY_USERNAME ="workspaceManager";
-	public static final String REPOSITORY_PASSWORD ="flashClient";
-	public static final String REPOSITORY_WORKSPACE="FlashClientsWorkspace";
+	static final String REPOSITORY_USERNAME ="workspaceManager";
+	static final String REPOSITORY_PASSWORD ="flashClient";
+	static final String REPOSITORY_WORKSPACE="FlashClientsWorkspace";
 
 	/* Message keys used for Flash packets. */
-	public static final String MSG_KEY_MOVE = "moveResource";
-	public static final String MSG_KEY_COPY = "copyResource";
-	public static final String MSG_KEY_RENAME = "renameResource";
-	public static final String MSG_KEY_DELETE = "deleteResource";
-	public static final String MSG_KEY_CREATE_WKF_CONTENT = "createWorkspaceFolderContent";
-	public static final String MSG_KEY_UPDATE_WKF_CONTENT = "updateWorkspaceFolderContent";
-	public static final String MSG_KEY_DELETE_VERSION = "deleteContentWithVersion";
-	public static final String MSG_KEY_ORG = "getUserOrganisation";
-	public static final String MSG_KEY_ORG_BY_ROLE = "getOrganisationsByUserRole";
-	public static final String MSG_KEY_USER_BY_ROLE = "getUsersFromOrganisationByRole";
+	static final String MSG_KEY_MOVE = "moveResource";
+	static final String MSG_KEY_COPY = "copyResource";
+	static final String MSG_KEY_RENAME = "renameResource";
+	static final String MSG_KEY_DELETE = "deleteResource";
+	static final String MSG_KEY_CREATE_WKF_CONTENT = "createWorkspaceFolderContent";
+	static final String MSG_KEY_UPDATE_WKF_CONTENT = "updateWorkspaceFolderContent";
+	static final String MSG_KEY_DELETE_VERSION = "deleteContentWithVersion";
+	static final String MSG_KEY_ORG = "getUserOrganisation";
+	static final String MSG_KEY_ORG_BY_ROLE = "getOrganisationsByUserRole";
+	static final String MSG_KEY_USER_BY_ROLE = "getUsersFromOrganisationByRole";
 
 	/**
 	 * I18n Message service. The Workspace action class needs access to the message service.
 	 * @param messageSource
 	 */
-	public MessageService getMessageService();
+	MessageService getMessageService();
 
 	/**
 	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
 	 * anything from the folder.
 	 */
-	public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID);
+	WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID);
 	
         /**
          * Get the workspace folders for a particular name. Does not check the user permissions - that will be checked if
          * you try to get anything from the folder.
          */
-	public List<WorkspaceFolder> getWorkspaceFolder(String workspaceFolderName);
+	List<WorkspaceFolder> getWorkspaceFolder(String workspaceFolderName);
 	
 	/**
 	 * This method returns the contents of the folder with given
@@ -117,7 +118,7 @@ public interface IWorkspaceManagementService {
 	 * @return A list of the FolderContentDTOs in a format suitable for WDDX 
 	 * @throws Exception
 	 */
-	public Vector getFolderContents(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
+	Vector getFolderContents(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
 	
 	/**
 	 * This method does the same as getFolderContents() except that it doesn't return
@@ -131,7 +132,14 @@ public interface IWorkspaceManagementService {
 	 * @return A list of the FolderContentDTOs in a format suitable for WDDX 
 	 * @throws Exception
 	 */
-	public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
+	Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
+	
+	
+	/**
+	 * Returns Folder Contents in JSON format.
+	 */
+    String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns) throws JSONException,
+	    IOException, UserAccessDeniedException, RepositoryCheckedException;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder
@@ -145,7 +153,7 @@ public interface IWorkspaceManagementService {
 	 * @throws UserException
 	 * @throws WorkspaceFolderException
 	 */
-	public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException;
+	WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder
@@ -158,7 +166,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The folder_id and name of the newly created folder in WDDX format 
 	 * @throws IOException
 	 */
-	public String createFolderForFlash(Integer parentFolderID, String name, Integer userID)throws IOException;
+	String createFolderForFlash(Integer parentFolderID, String name, Integer userID)throws IOException;
 	
 	
 	/**
@@ -174,7 +182,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String deleteResource(Long resourceID, String resourceType, Integer userID)
+	String deleteResource(Long resourceID, String resourceType, Integer userID)
 		throws IOException;
 
 	/**
@@ -191,7 +199,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The acknowledgement/error message to be sent to FLASH
 	 * @throws IOException
 	 */
-	public String copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID, Integer userID)throws IOException;
+	String copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID, Integer userID)throws IOException;
 	
 	
 	/**
@@ -209,7 +217,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String moveResource(Long resourceID, Integer targetFolderID, String resourceType, Integer userID)
+	String moveResource(Long resourceID, Integer targetFolderID, String resourceType, Integer userID)
 		throws IOException;
 
 	/**
@@ -232,7 +240,7 @@ public interface IWorkspaceManagementService {
 	 * 				  FLASH client.
 	 * @throws Exception
 	 */
-	public String createWorkspaceFolderContent(Integer contentTypeID, String name, String description, Integer workspaceFolderID, String mimeType, String path) throws Exception;
+	String createWorkspaceFolderContent(Integer contentTypeID, String name, String description, Integer workspaceFolderID, String mimeType, String path) throws Exception;
 	
 	/**
 	 * This method updates an existing file(<code>workspaceFolderContet</code>)
@@ -244,7 +252,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws Exception
 	 */
-	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception;
+	String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception;
 	
 	/**
 	 * This method is called when the user knows which version of the
@@ -268,7 +276,7 @@ public interface IWorkspaceManagementService {
 	 * @return String Acknowledgement/error message in WDDX format for FLASH 
 	 * @throws Exception
 	 */	
-	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception;
+	String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception;
 	
 	/**
 	 * This method returns a list of organisation workspace folders. 
@@ -284,9 +292,9 @@ public interface IWorkspaceManagementService {
 	 * @return List of folders, in a format suitable for WDDX
 	 * @throws IOException
 	 */
-	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)throws IOException;
+	Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)throws IOException;
 	
-	public Vector getAccessibleOrganisationWorkspaceFolders(User user)throws IOException;
+	Vector getAccessibleOrganisationWorkspaceFolders(User user)throws IOException;
 	
 	/**
 	 * This method returns the root workspace folder for a particular user. 
@@ -296,17 +304,17 @@ public interface IWorkspaceManagementService {
 	 * @return FolderContentDTO for the user's root workspace folder 
 	 * @throws IOException
 	 */
-	public FolderContentDTO getUserWorkspaceFolder(Integer userID)throws IOException;
+	FolderContentDTO getUserWorkspaceFolder(Integer userID)throws IOException;
 	
 	/**
-	 * This method returns the public workspace folder for the server. 
+	 * This method returns the workspace folder for the server. 
 	 * 
 	 * @param userID The <code>user_id</code> of the user for whom the
 	 * 				 folders have to fetched
-	 * @return FolderContentDTO for the public workspace folder 
+	 * @return FolderContentDTO for the workspace folder 
 	 * @throws IOException
 	 */
-	public FolderContentDTO getPublicWorkspaceFolder(Integer userID) throws IOException;
+	FolderContentDTO getPublicWorkspaceFolder(Integer userID) throws IOException;
 	
 	/**
 	 * This method renames the workspaceFolder/learning design with the
@@ -323,7 +331,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String renameResource(Long resourceID, String resourceType, String newName, Integer userID)
+	String renameResource(Long resourceID, String resourceType, String newName, Integer userID)
 		throws IOException;
 
 
@@ -334,7 +342,7 @@ public interface IWorkspaceManagementService {
 	 * @return String The required information in WDDX format
 	 * @throws IOException
 	 */
-	public String getWorkspace(Integer userID) throws IOException;
+	String getWorkspace(Integer userID) throws IOException;
 	
 	/** 
 	 * Retrieves a tree of organisations in which the user has the specified role.
@@ -348,7 +356,7 @@ public interface IWorkspaceManagementService {
 	 * @param classID
 	 * @return organisationDTO hierarchy, in WDDX format. 
 	 */
-	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer courseId, List<Integer> restrictToClassIds) throws IOException;
+	String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer courseId, List<Integer> restrictToClassIds) throws IOException;
 	
 	/**
 	 * Returns the users within the Organisation with <code>organisationID</code>
@@ -357,13 +365,13 @@ public interface IWorkspaceManagementService {
 	 * @param role
 	 * @return
 	 */
-	public Vector<UserFlashDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
+	Vector<UserFlashDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
 
 	/**
 	 * Returns a single OrganisationDTO with the user's roles included. If the user does not have 
 	 * any roles in this organisation, then no organisation is returned.
 	 */
-	public String getUserOrganisation(Integer userID, Integer organisationId) throws IOException;
+	String getUserOrganisation(Integer userID, Integer organisationId) throws IOException;
 
 
 	/**
@@ -377,6 +385,6 @@ public interface IWorkspaceManagementService {
 	 * @throws UserException
 	 * @throws WorkspaceFolderException
 	 */
-	public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException;
+	boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException;
 
 }

@@ -338,8 +338,9 @@ public class HomeAction extends DispatchAction {
 	UserDTO userDTO = getUser();
 
 	// get all user accessible folders and LD descriptions as JSON
-	JSONObject learningDesigns = getFolderContents(null, userDTO.getUserID(), false);
-	req.setAttribute("folderContents", learningDesigns.toString());
+	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(null, userDTO.getUserID(),
+		false);
+	req.setAttribute("folderContents", folderContentsJSON);
 
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 	JSONObject users = new JSONObject();
@@ -399,10 +400,11 @@ public class HomeAction extends DispatchAction {
 	    RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
-	JSONObject responseJSON = getFolderContents(folderID, getUser().getUserID(), allowInvalidDesigns);
+	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID, getUser().getUserID(),
+		allowInvalidDesigns);
 
-	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(responseJSON.toString());
+	res.setContentType("application/json;charset=UTF-8");
+	res.getWriter().print(folderContentsJSON);
 	return null;
     }
 
@@ -427,76 +429,6 @@ public class HomeAction extends DispatchAction {
 	IOUtils.closeQuietly(output);
 
 	return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private JSONObject getFolderContents(Integer folderID, Integer userID, boolean allowInvalidDesigns)
-	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
-	JSONObject result = new JSONObject();
-	Vector<FolderContentDTO> folderContents = null;
-
-	// get user accessible folders in the start
-	if (folderID == null) {
-	    folderContents = new Vector<FolderContentDTO>(3);
-	    MessageService msgService = getWorkspaceManagementService().getMessageService();
-
-	    FolderContentDTO userFolder = getWorkspaceManagementService().getUserWorkspaceFolder(userID);
-	    if (userFolder != null) {
-		folderContents.add(userFolder);
-	    }
-
-	    FolderContentDTO myGroupsFolder = new FolderContentDTO(msgService.getMessage("organisations"),
-		    msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
-		    WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
-
-	    folderContents.add(myGroupsFolder);
-
-	    FolderContentDTO publicFolder = getWorkspaceManagementService().getPublicWorkspaceFolder(userID);
-	    if (publicFolder != null) {
-		folderContents.add(publicFolder);
-	    }
-	    // special behaviour for organisation folders
-	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
-	    folderContents = getWorkspaceManagementService().getAccessibleOrganisationWorkspaceFolders(userID);
-	    Collections.sort(folderContents);
-
-	    if (folderContents.size() == 1) {
-		FolderContentDTO folder = folderContents.firstElement();
-		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
-		    return getFolderContents(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID, allowInvalidDesigns);
-		}
-	    }
-	} else {
-	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
-	    Integer mode = allowInvalidDesigns ? WorkspaceManagementService.AUTHORING
-		    : WorkspaceManagementService.MONITORING;
-	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder, mode);
-	    Collections.sort(folderContents);
-	}
-
-	// fill JSON object with folders and LDs
-	for (FolderContentDTO folderContent : folderContents) {
-	    String contentType = folderContent.getResourceType();
-	    if (FolderContentDTO.FOLDER.equals(contentType)) {
-		JSONObject subfolderJSON = new JSONObject();
-		subfolderJSON.put("name", folderContent.getName());
-		subfolderJSON.put("isRunSequencesFolder",
-			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID().intValue()));
-		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
-		result.append("folders", subfolderJSON);
-	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
-		JSONObject learningDesignJSON = new JSONObject();
-		learningDesignJSON.put("name", folderContent.getName());
-		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
-		result.append("learningDesigns", learningDesignJSON);
-	    } else {
-		if (HomeAction.log.isDebugEnabled()) {
-		    HomeAction.log.debug("Unsupported folder content found, named \"" + folderContent.getName() + "\"");
-		}
-	    }
-	}
-
-	return result;
     }
 
     public ActionForward logout(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
