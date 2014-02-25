@@ -325,7 +325,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		// do export
 		exportLD(request, response);
 		
-	    } else if (method != null && method.equals("getLearningDesignsJSONFormat")) {
+	    } else if (method != null && method.equals("getLearningDesignsJSON")) {
 
 		ExtUserUseridMap userMap = null;
 		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
