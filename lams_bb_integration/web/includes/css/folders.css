@@ -61,4 +61,9 @@
 	text-decoration: none;
 }
 
+/* the style of the selected node */
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: #dfeffc;
+}
+
 

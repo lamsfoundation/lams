@@ -38,6 +38,7 @@ public class Constants {
     public static final String PARAM_LESSON_ID = "lsId";
     public static final String PARAM_LEARNING_DESIGN_ID = "ldid";
     public static final String PARAM_COURSE_ID = "course_id";
+    public static final String PARAM_FOLDER_ID = "folderId";
 
     public static final String SERVLET_LOGIN_REQUEST = "/lams/LoginRequest";
     public static final String SERVLET_ACTION_REQUEST = "/LamsActionRequest";

@@ -51,15 +51,13 @@
     
         // Get the form parameters and convert into correct data types
         String strTitle = request.getParameter("title").trim();
-        String strDescription = request.getParameter("description").trim();
-        FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
         
         String strLdId = request.getParameter("ldId").trim();
         long ldId = Long.parseLong(strLdId);               
         
         // Start the Lesson for preview in LAMS (via Webservices)
         // Capture the lesson ID
-        Long lsId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, true);
+        Long lsId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, "", true);
         //error checking
         if (lsId == -1) {
         	response.sendRedirect("lamsServerDown.jsp");

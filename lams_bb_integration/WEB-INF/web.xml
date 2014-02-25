@@ -10,8 +10,8 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.UserDataServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>LamsActionRequestServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsActionRequestServlet</servlet-class>
+    <servlet-name>LamsLearningDesignServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GradebookServlet</servlet-name>
@@ -19,8 +19,8 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>LamsActionRequestServlet</servlet-name>
-    <url-pattern>/LamsActionRequest</url-pattern>
+    <servlet-name>LamsLearningDesignServlet</servlet-name>
+    <url-pattern>/LamsLearningDesign</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UserDataServlet</servlet-name>

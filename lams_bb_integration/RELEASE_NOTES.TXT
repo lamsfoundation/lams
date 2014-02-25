@@ -51,5 +51,5 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 ===================
 * LDEV-3176 Fix wrong URL format for starting LAMS lesson
 * LDEV-2790 Use html editor for lesson description
-
+* LDEV-3180 Load LAMS sequences on demand 
 
