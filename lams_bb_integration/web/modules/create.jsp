@@ -21,11 +21,12 @@
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 
 <bbNG:genericPage title="Add New LAMS" ctxId="ctx">
-<bbNG:jsFile href="lib/tree/yahoo-dom-event.js" />
-<bbNG:jsFile href="lib/tree/treeview-min.js" />
+<bbNG:jsFile href="includes/javascript/yahoo-dom-event.js" />
+<bbNG:jsFile href="includes/javascript/treeview-min.js" />
+<bbNG:jsFile href="includes/javascript/jquery.js" />
 
-<bbNG:cssFile href="css/treeview.css" />
-<bbNG:cssFile href="css/folders.css" />
+<bbNG:cssFile href="../includes/css/treeview.css" />
+<bbNG:cssFile href="../includes/css/folders.css" />
 <%
     // Authorise current user for Course Control Panel (automatic redirect)
     try{
@@ -39,10 +40,91 @@
     String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
     
     // Get the list of Learning Designs
-    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
+    //String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
     String lamsServerUrl = LamsSecurityUtil.getServerAddress();
+    
+	// get all user accessible folders and LD descriptions as JSON
+	String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, ctx.getCourse().getCourseId(), null);
 
 %>
+
+<bbNG:jsBlock>
+	<script language="JavaScript" type="text/javascript">
+	var $j = jQuery.noConflict();
+	
+	$j(document).ready(function(){
+		
+		// generate LD initial tree; folderContents is declared in newLesson.jsp
+		var treeNodes = parseFolderContents(<%=learningDesigns%>);
+		
+		tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
+		tree.setDynamicLoad(function(node, callback){
+			
+			var folderId = node.data.folderID;
+			
+			// load subfolder contents
+			$j.ajax({
+				url : '../LamsLearningDesign',
+				data : 'courseId=<%=ctx.getCourse().getCourseId()%>&folderId=' + folderId,
+				cache : false,
+				async: false,
+				dataType : 'json',
+				success : function(result) {
+					var childNodeData = parseFolderContents(result);
+					$j.each(childNodeData, function(){
+						new YAHOO.widget.TextNode(this, node);
+					});
+				}
+			});
+			
+			// required by YUI
+			callback();
+		});
+		
+		tree.singleNodeHighlight = true;
+		tree.subscribe('clickEvent',function(event) {
+		    selectSequence(event.node.data.learningDesignId, event.node.label);
+		});
+		tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+		tree.render();
+		
+		// expand the first (user) folder
+		tree.getRoot().children[0].expand();
+
+	});	
+	
+	/**
+	 * Parses response in JSON format into readable for YUI.
+	 */
+	 function parseFolderContents(nodeJSON) {
+			var result = [];
+
+			if (nodeJSON.folders) {
+				$j.each(nodeJSON.folders, function(){
+					result.push({
+						'type'            : 'text',
+						'label'           : this.isRunSequencesFolder ? "Run sequences" : this.name,
+						'folderID'		   : this.folderID
+					});
+				});
+			}
+			if (nodeJSON.learningDesigns) {
+				$j.each(nodeJSON.learningDesigns, function(){
+					result.push({
+						'type'             : 'text',
+					  	'label'            : this.name,
+					  	'isLeaf'           : true,
+					  	'learningDesignId' : this.learningDesignId
+					});
+				});
+			}
+			
+			return result;
+		}
+
+	</script>
+</bbNG:jsBlock>
+
     <%-- Breadcrumbs --%>
     <bbNG:breadcrumbBar environment="COURSE" isContent="true">
         <bbNG:breadcrumb title="Add New LAMS" />
@@ -101,25 +183,11 @@
 			    	</span>
 			    </div> 
             
-            	<div id="treeDiv"></div>
+            	<div id="learningDesignTree"></div>
 				<div id="updatesequence"></div>
 				<div style="vertical-align: text-bottom; margin-top: 15px;">
 					<input type="checkbox" name="isDisplayDesignImage" value="true">  Display image design?
 				</div>
-				
-                <%-- Display LAMS Sequence tree (Using tigra) --%>
-		        <script language="JavaScript" type="text/javascript">
-		            <!-- 
-		     		var tree = new YAHOO.widget.TreeView("treeDiv", <%=learningDesigns%>);
-		        	tree.getNodeByIndex(1).expand(true);
-		        	tree.getNodeByIndex(2).expand(true);
-					tree.render();
-					tree.subscribe('clickEvent',function(oArgs) {
-					    selectSequence(oArgs.node.data.id, oArgs.node.label);
-					});
-		  
-				//-->
-		        </script>
             </bbNG:step>
                 
             <bbNG:step title="Lesson options">
@@ -187,7 +255,7 @@
             // Open the LAMS Seuence Preview Window
             function openPreview() {
             	
-                var previewUrl = "preview.jsp?course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value + "&description=" + document.lesson_form.description.value;
+                var previewUrl = "preview.jsp?course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
                 
                 //lams_central
             	//if (parentURL != "") {
@@ -216,10 +284,10 @@
             }
             
             // Refresh the LAMS sequence list (tigra tree)
-           function refreshSeqList() {
+            function refreshSeqList() {
                document.getElementById("sequence_id").value="0";
                document.location.reload();
-           }
+            }
             
             function selectSequence(obj, name){
                 // if the selected object is a sequence (id!=0) then we assign the id to the hidden sequence_id

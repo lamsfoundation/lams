@@ -24,6 +24,7 @@ package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -35,19 +36,13 @@ import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.ld.integration.Constants;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import blackboard.platform.context.Context;
 
@@ -162,43 +157,52 @@ public class LamsSecurityUtil {
      * Gets a list of learning designs for the current user from LAMS
      * 
      * @param ctx
-     *            the blackboard contect, contains session data
-     * @param mode
-     *            the mode to call upon learning designes
+     *            the blackboard context, contains session data
+     * @param courseId
+     *            blackboard courseid. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
+     *            from LamsLearningDesignServlet.
+     * @param folderId folderId. It can be null and then LAMS returns default workspace folders.
+     * 
      * @return a string containing the LAMS workspace tree in tigra format
      */
-    public static String getLearningDesigns(Context ctx, Integer mode) {
+    public static String getLearningDesigns(Context ctx, String courseId, String folderId) {
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
-	String serverKey = getServerKey();
 
 	// If lams.properties could not be read, throw exception
-	if (serverAddr == null || serverId == null || serverKey == null) {
+	if (serverAddr == null || serverId == null) {
 	    throw new RuntimeException("lams.properties file could not be read. serverAddr:" + serverAddr + ", serverId:" + serverId);
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
 	String username = ctx.getUser().getUserName();
 	String firstName = ctx.getUser().getGivenName();
-	String lastName  = ctx.getUser().getFamilyName();
+	String lastName = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
-	String courseId = ctx.getCourse().getCourseId();
 
 	String locale = ctx.getUser().getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
+	// LamsSecurityUtil.getLearningDesigns(null, userDTO.getUserID(), false);
+	// the mode to call upon learning designs
+	final Integer MODE = 2;
+
 	// TODO: Make locale settings work
-	String learningDesigns = "[]"; // empty javascript array
+	String learningDesigns = ""; // empty 
 	try {
-	    String serviceURL = serverAddr + "/services/xml/LearningDesignRepository?" + "datetime=" + timestamp
-		    + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
+
+	    String serviceURL = serverAddr
+		    + "/services/xml/LearningDesignRepository?method=getLearningDesignsJSON" + "&datetime="
+		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + mode
-		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
-		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
-		    + "&email=" + email;
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + MODE
+		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
+		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + email;
+	    if (folderId != null) {
+		serviceURL += "&folderID=" + folderId;
+	    }
 
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
@@ -215,20 +219,12 @@ public class LamsSecurityUtil {
 				+ httpConn.getResponseMessage());
 	    }
 
-	    // InputStream is = url.openConnection().getInputStream();
 	    InputStream is = conn.getInputStream();
 
-	    // parse xml response
-	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    Document document = db.parse(is);
-
-	    learningDesigns = "[" + convertToTigraFormat(document.getDocumentElement()) + "]";
-
-	    // replace sequence id with javascript method
-	    //String pattern = "'(\\d+)'";
-	    //String replacement = "'javascript:selectSequence($1)'";
-	    //learningDesigns = learningDesigns.replaceAll(pattern, replacement);
+	    // Read/convert response to a String 
+	    StringWriter writer = new StringWriter();
+	    IOUtils.copy(is, writer, "UTF-8");
+	    learningDesigns = writer.toString();
 
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to get LAMS learning designs, bad URL: '" + serverAddr
@@ -244,10 +240,6 @@ public class LamsSecurityUtil {
 	} catch (UnsupportedEncodingException e) {
 	    throw new RuntimeException(e);
 	} catch (IOException e) {
-	    throw new RuntimeException(e);
-	} catch (ParserConfigurationException e) {
-	    throw new RuntimeException(e);
-	} catch (SAXException e) {
 	    throw new RuntimeException(e);
 	}
 	
@@ -379,58 +371,58 @@ public class LamsSecurityUtil {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
     }
 
-    /**
-     * 
-     * @param node
-     *            the node from which to do the recursive conversion
-     * @return the string converted to tigra format
-     */
-    public static String convertToTigraFormat(Node node) {
-
-	StringBuilder sb = new StringBuilder();
-
-	if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
-
-	    StringBuilder attribute = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
-		    .getNodeValue().replace("'", "\\'"));
-
-	    sb.append("{type:'Text', label:'" + attribute + "',id:0");
-
-	    NodeList children = node.getChildNodes();
-	    if (children.getLength() == 0) {
-		sb.append(",expanded:0,children:[{type:'HTML',html:'<i>-empty-</i>', id:0}]}");
-		return sb.toString();
-	    } else {
-		sb.append(",children:[");
-		
-		
-		sb.append(convertToTigraFormat(children.item(0)));
-		for (int i = 1; i < children.getLength(); i++) {
-		    sb.append(',').append(convertToTigraFormat(children.item(i)));
-		}
-		
-		sb.append("]}");
-	    }
-	    
-	} else if (node.getNodeName().equals(Constants.ELEM_LEARNING_DESIGN)) {
-	    
-	    
-//		  $ld_name = preg_replace("/'/", "$1\'", $xml_node['@']['name']);
-//		  $output .= "{type:'Text',label:'" . $ld_name . "',id:'" . $xml_node['@']['resourceId'] . "'}";
-
-	    StringBuilder attrName = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
-		    .getNodeValue().replace("'", "\\'"));
-	    StringBuilder attrResId = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_RESOURCE_ID)
-		    .getNodeValue().replace("'", "\\'"));
-
-	    sb.append("{type:'Text',label:'");
-	    sb.append(attrName);
-	    sb.append("',id:'");
-	    sb.append(attrResId);
-	    sb.append("'}");
-	}
-	return sb.toString();
-    }
+//    /**
+//     * 
+//     * @param node
+//     *            the node from which to do the recursive conversion
+//     * @return the string converted to tigra format
+//     */
+//    public static String convertToTigraFormat(Node node) {
+//
+//	StringBuilder sb = new StringBuilder();
+//
+//	if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
+//
+//	    StringBuilder attribute = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
+//		    .getNodeValue().replace("'", "\\'"));
+//
+//	    sb.append("{type:'Text', label:'" + attribute + "',id:0");
+//
+//	    NodeList children = node.getChildNodes();
+//	    if (children.getLength() == 0) {
+//		sb.append(",expanded:0,children:[{type:'HTML',html:'<i>-empty-</i>', id:0}]}");
+//		return sb.toString();
+//	    } else {
+//		sb.append(",children:[");
+//		
+//		
+//		sb.append(convertToTigraFormat(children.item(0)));
+//		for (int i = 1; i < children.getLength(); i++) {
+//		    sb.append(',').append(convertToTigraFormat(children.item(i)));
+//		}
+//		
+//		sb.append("]}");
+//	    }
+//	    
+//	} else if (node.getNodeName().equals(Constants.ELEM_LEARNING_DESIGN)) {
+//	    
+//	    
+////		  $ld_name = preg_replace("/'/", "$1\'", $xml_node['@']['name']);
+////		  $output .= "{type:'Text',label:'" . $ld_name . "',id:'" . $xml_node['@']['resourceId'] . "'}";
+//
+//	    StringBuilder attrName = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
+//		    .getNodeValue().replace("'", "\\'"));
+//	    StringBuilder attrResId = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_RESOURCE_ID)
+//		    .getNodeValue().replace("'", "\\'"));
+//
+//	    sb.append("{type:'Text',label:'");
+//	    sb.append(attrName);
+//	    sb.append("',id:'");
+//	    sb.append(attrResId);
+//	    sb.append("'}");
+//	}
+//	return sb.toString();
+//    }
 
     // generate authentication hash code to validate parameters
     public static String generateAuthenticationHash(String datetime, String login, String method, String serverId) {
