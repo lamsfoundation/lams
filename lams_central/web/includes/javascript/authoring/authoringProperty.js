@@ -44,7 +44,7 @@ var PropertyLib = {
 			            	'text'   : 'OK',
 			            	'click'  : function() {
 			            		var dialog = $(this),
-			            			activity = dialog.dialog('option', 'activity');
+			            			activity = dialog.dialog('option', 'parentObject');
 			            		
 			            		// extract group names from text fields
 			            		$('input', dialog).each(function(index){
@@ -142,6 +142,40 @@ var PropertyLib = {
 	
 	
 	/**
+	 * Properties dialog content for transitions.
+	 */
+	transitionProperties : function() {
+		var transition = this,
+			content = transition.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = transition.propertiesContent = $('#propertiesContentTransition').clone().attr('id', null)
+													.show().data('parentObject', transition);
+			$('.propertiesContentFieldTitle', content).val(transition.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					transition = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				if (newTitle != transition.title) {
+					transition.title = newTitle;
+					if (transition.branch) {
+						transition.branch.title = newTitle;
+					}
+					redrawNeeded = true;
+				}
+				
+				if (redrawNeeded) {
+					transition.draw();
+				}
+			});
+		}
+	},
+	
+	
+	/**
 	 * Properties dialog content for Tool activities.
 	 */
 	toolProperties : function() {
@@ -150,13 +184,13 @@ var PropertyLib = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
-													.show().data('activity', activity);
+													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
 				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('activity'),
+					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
@@ -192,7 +226,7 @@ var PropertyLib = {
 			var changeFunction = function(){
 				// extract changed properties and redraw the activity, if needed
 				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('activity'),
+					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
@@ -231,7 +265,7 @@ var PropertyLib = {
 			
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null)
-													.show().data('activity', activity);
+													.show().data('parentObject', activity);
 			
 			// init widgets
 			$('.propertiesContentFieldTitle', content).val(activity.title);
@@ -276,14 +310,14 @@ var PropertyLib = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
-													.show().data('activity', activity);
+													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			$('.propertiesContentFieldGateType', content).val(activity.gateType);
 
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
 				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('activity'),
+					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
@@ -317,7 +351,7 @@ var PropertyLib = {
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
-													.show().data('activity', activity);
+													.show().data('parentObject', activity);
 			$('.propertiesContentFieldMatchGroups', content).button().click(function(){
 				PropertyLib.openGroupsToBranchesMappingDialog(activity);
 			});
@@ -325,7 +359,7 @@ var PropertyLib = {
 			var changeFunction = function(){
 				// extract changed properties and redraw the activity
 				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('activity'),
+					activity = content.data('parentObject'),
 					branchingActivity = activity.branchingActivity,
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
@@ -349,7 +383,7 @@ var PropertyLib = {
 				var inputRow = $('.propertiesContentFieldInput', content).closest('tr');
 				if (branchingActivity.branchingType == 'tool') {
 					branchingActivity.input = inputRow.show()
-						.find('option:selected').data('activity');
+						.find('option:selected').data('parentObject');
 				} else {
 					inputRow.hide();
 					branchingActivity.input = null;
@@ -407,7 +441,7 @@ var PropertyLib = {
 				var option = $('<option />').text(this.title)
 											.appendTo(inputDropdown)
 											// store reference to grouping object
-											.data('activity', this);
+											.data('parentObject', this);
 				if (this == input) {
 					option.attr('selected', 'selected');
 				}
@@ -426,7 +460,7 @@ var PropertyLib = {
 	openGroupNamingDialog : function(activity) {
 		var dialog = layout.items.groupNamingDialog;
 		// remove existing entries and add reference to the initiating activity
-		dialog.empty().dialog('option', 'activity', activity);
+		dialog.empty().dialog('option', 'parentObject', activity);
 		
 		activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount,
 				activity.groups, 'name', 'Group ');

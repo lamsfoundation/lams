@@ -203,7 +203,20 @@
 	</div>
 	
 	
-	<!-- PROPERTY DIALOG CONTENTS FOR DIFFERENT ACTIVITY TYPES -->
+	<!-- PROPERTY DIALOG CONTENTS FOR DIFFERENT OBJECT TYPES -->
+	
+	<div id="propertiesContentTransition" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+		</table>
+	</div>
 	
 	<div id="propertiesContentTool" class="dialogContainer">
 		<table>

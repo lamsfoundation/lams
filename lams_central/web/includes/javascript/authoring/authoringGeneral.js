@@ -8,12 +8,13 @@ var paper = null,
 	
 // configuration and storage of various elements
 	layout = {
+	'drawMode'   : false,
 	 // 'isZoomed'   : false,
 	'activities' : null,
 	'items' : {
 		'bin'               : null,
 		
-		'selectedActivity'  : null,
+		'selectedObject'    : null,
 		'copiedActivity'    : null,
 		
 		'propertiesDialog'  : null,
@@ -614,9 +615,9 @@ function openLearningDesign(learningDesignID) {
 							branchData = branchToActivities[branch.id];
 						
 						// add reference to the transition inside branch
-						branch.transitionFrom = ActivityLib.drawTransition(branchingActivity.start,
-								branchData.firstActivity, true);
-						ActivityLib.drawTransition(branchData.lastActivity, branchingActivity.end, true);	
+						branch.transitionFrom = ActivityLib.addTransition(branchingActivity.start,
+								branchData.firstActivity, true, null, null, branch.title);
+						ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);	
 					});
 				}
 			});
@@ -644,7 +645,7 @@ function openLearningDesign(learningDesignID) {
 					
 					// found both transition ends, draw it and stop the iteration
 					if (fromActivity && toActivity) {
-						ActivityLib.drawTransition(fromActivity, toActivity, true,
+						ActivityLib.addTransition(fromActivity, toActivity, true,
 								transition.transitionID, transition.transitionUIID);
 						return false;
 					}

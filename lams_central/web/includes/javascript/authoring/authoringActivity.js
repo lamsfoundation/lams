@@ -3,6 +3,27 @@
  */
 
 var ActivityLib = {
+		
+	/**
+	 * Constructor for a Transition
+	 */
+	Transition : function(id, uiid, fromActivity, toActivity, title) {
+		this.id = +id;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.fromActivity = fromActivity;
+		this.toActivity = toActivity;
+		if (title) {
+			this.title = title;
+			this.loadPropertiesDialogContent = PropertyLib.transitionProperties;
+		}
+		
+		this.draw = ActivityLib.draw.transition;
+		this.draw();
+		
+		// set up references in activities and the transition
+		fromActivity.transitions.from.push(this);
+		toActivity.transitions.to.push(this);
+	},
 	
 	/**
 	 * Constructor for a Tool Activity.
@@ -124,9 +145,9 @@ var ActivityLib = {
 	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.title = title;
-		this.transitionFrom = transitionFrom;
+		this.title = title || ('Branch ' + (branchingActivity.branches.length + 1));
 		this.branchingActivity = branchingActivity;
+		this.transitionFrom = transitionFrom;
 	},
 	
 	
@@ -134,6 +155,49 @@ var ActivityLib = {
 	 * Mehtods for drawing various kinds of activities.
 	 */
 	draw : {
+		
+		transition : function() {
+			if (this.items) {
+				this.items.remove();
+			}
+			
+			// calculate middle points of each activity
+			var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity);
+			
+			// create transition SVG elements
+			paper.setStart();
+			paper.path(Raphael.format('M {0} {1} L {2} {3}', points.startX, points.startY, points.endX, points.endY))
+			                  .attr({
+			                 	'stroke'       : layout.colors.transition,
+			                	'stroke-width' : 2
+			                  });
+
+			// draw the arrow and turn it in the same direction as the line
+			var angle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI,
+				arrowPath = Raphael.transformPath(Raphael.format('M {0} {1}' + layout.defs.transArrow, points.middleX, points.middleY), 
+					                              Raphael.format('R {0} {1} {2}', angle, points.middleX, points.middleY));
+			paper.path(arrowPath)
+							 .attr({
+								'stroke' : layout.colors.transition,
+								'fill'   : layout.colors.transition
+							 });
+			if (this.title) {
+				// adjust X & Y depending on the angle, so the lable does not overlap with the transition
+				// angle is -90 <= a <= 270
+				paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
+						   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
+						   this.title);
+			}
+			this.items = paper.setFinish();
+
+			this.items.toBack();
+			this.items.attr('cursor', 'pointer');
+			this.items.data('parentObject', this);
+			this.items.mousedown(HandlerLib.transitionMousedownHandler);
+			this.items.click(HandlerLib.itemClickHandler);
+		},
+		
+		
 		tool : function(x, y) {
 			if (x == undefined || y == undefined) {
 				// just redraw the activity
@@ -270,10 +334,9 @@ var ActivityLib = {
 	activityHandlersInit : function(activity) {
 		// set all the handlers
 		activity.items
-			.data('activity', activity)
+			.data('parentObject', activity)
 			.mousedown(HandlerLib.activityMousedownHandler)
-			.touchmove(HandlerLib.dragItemsMoveHandler)
-			.click(HandlerLib.activityClickHandler)
+			.click(HandlerLib.itemClickHandler)
 			.dblclick(HandlerLib.activityDblclickHandler)
 			.attr({
 				'cursor' : 'pointer'
@@ -335,7 +398,7 @@ var ActivityLib = {
 	/**
 	 * Draws a transition between two activities.
 	 */
-	drawTransition : function(fromActivity, toActivity, redraw, id, uiid) {
+	addTransition : function(fromActivity, toActivity, redraw, id, uiid, title) {
 		// only converge points are allowed to have few inbound transitions
 		if (!redraw
 				&& toActivity.transitions.to.length > 0
@@ -356,55 +419,30 @@ var ActivityLib = {
 			return;
 		}
 		
+		var branch = null;
 		// remove the existing transition
 		$.each(fromActivity.transitions.from, function(index) {
 			if (this.toActivity == toActivity) {
+				id = this.id;
 				uiid = this.uiid;
+				branch = this.branch;
 				ActivityLib.removeTransition(this);
 				return false;
 			}
 		});
 		
-		// calculate middle points of each activity
-		var points = ActivityLib.findTransitionPoints(fromActivity, toActivity);
-		
-		// do the actual drawing
-		paper.setStart();
-		paper.path(Raphael.format('M {0} {1} L {2} {3}', points.startX, points.startY, points.endX, points.endY))
-		                  .attr({
-		                 	'stroke'       : layout.colors.transition,
-		                	'stroke-width' : 2
-		                  });
-
-		// draw the arrow and turn it in the same direction as the line
-		var angle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI;
-		var arrowPath = Raphael.transformPath(Raphael.format('M {0} {1}' + layout.defs.transArrow, points.middleX, points.middleY), 
-				                              Raphael.format('R {0} {1} {2}', angle, points.middleX, points.middleY));
-		paper.path(arrowPath)
-						 .attr({
-							'stroke' : layout.colors.transition,
-							'fill'   : layout.colors.transition
-						 });
-		var transition = paper.setFinish();
-		transition.uiid = uiid || ++layout.ld.maxUIID;
-		transition.id = id;
-		transition.data('transition', transition);
-		
-		// set up references in activities and the transition
-		fromActivity.transitions.from.push(transition);
-		toActivity.transitions.to.push(transition);
-		transition.fromActivity = fromActivity;
-		transition.toActivity = toActivity;
-		transition.toBack();
-		transition.mousedown(HandlerLib.transitionMousedownHandler);
-		
-		if (!redraw && fromActivity.type == 'branchingEdge' && fromActivity.isStart
-				&& (toActivity.type != 'branchingEdge'
-					|| fromActivity.branchingActivity != toActivity.branchingActivity)) {
+		if (!branch && fromActivity.type == 'branchingEdge' && fromActivity.isStart) {
 			// create a new branch
-			var branch = new ActivityLib.BranchActivity(null, null, null, fromActivity.branchingActivity, transition);
+			branch = new ActivityLib.BranchActivity(null, null, null, fromActivity.branchingActivity);
+		}
+		
+		var transition = new ActivityLib.Transition(id, uiid, fromActivity, toActivity,
+						 branch ? branch.title : null);
+
+		if (branch) {
+			branch.transitionFrom = transition;
+			transition.branch = branch;
 			fromActivity.branchingActivity.branches.push(branch);
-			transition.data('branch', branch);
 		}
 		
 		return transition;
@@ -421,13 +459,12 @@ var ActivityLib = {
 		transitions = transition.toActivity.transitions.to;
 		transitions.splice(transitions.indexOf(transition), 1);
 		
-		var branch = transition[0].data('branch');
-		if (branch) {
-			var branches = branch.branchingActivity.branches;
-			branches.splice(branches.indexOf(branch), 1);
+		if (transition.branch) {
+			var branches = transition.branch.branchingActivity.branches;
+			branches.splice(branches.indexOf(transition.branch), 1);
 		}
 		
-		transition.remove();
+		transition.items.remove();
 	},
 	
 	
@@ -460,7 +497,7 @@ var ActivityLib = {
 			    branchPoints2 = ActivityLib.findTransitionPoints(fromActivity, toActivity2),
 			    branchEdgeStartX = branchPoints1.middleX + (branchPoints2.middleX - branchPoints1.middleX)/2,
 			    branchEdgeStartY = branchPoints1.middleY + (branchPoints2.middleY - branchPoints1.middleY)/2,
-			    branchingEdgeStart = new ActivityLib.BranchingEdgeActivity(null, branchEdgeStartX,
+			    branchingEdgeStart = new ActivityLib.BranchingEdgeActivity(null, null, branchEdgeStartX,
 			    		branchEdgeStartY, null, null, null);
 			layout.activities.push(branchingEdgeStart);
 			
@@ -470,67 +507,86 @@ var ActivityLib = {
 			};
 
 			var convergePoints = ActivityLib.findTransitionPoints(convergeActivity1, convergeActivity2),
-				branchingEdgeEnd = new ActivityLib.BranchingEdgeActivity(null, convergePoints.middleX,
+				branchingEdgeEnd = new ActivityLib.BranchingEdgeActivity(null, null, convergePoints.middleX,
 					convergePoints.middleY, null, null, branchingEdgeStart.branchingActivity);
 			layout.activities.push(branchingEdgeEnd);
 			
 			// draw all required transitions
-			ActivityLib.drawTransition(fromActivity, branchingEdgeStart);
-			ActivityLib.drawTransition(branchingEdgeStart, toActivity2);
-			ActivityLib.drawTransition(convergeActivity2, branchingEdgeEnd);
+			ActivityLib.addTransition(fromActivity, branchingEdgeStart);
+			ActivityLib.addTransition(branchingEdgeStart, toActivity2);
+			ActivityLib.addTransition(convergeActivity2, branchingEdgeEnd);
 		}
 
-		ActivityLib.drawTransition(branchingEdgeStart, toActivity1);
-		ActivityLib.drawTransition(convergeActivity1, branchingEdgeEnd);
+		ActivityLib.addTransition(branchingEdgeStart, toActivity1);
+		ActivityLib.addTransition(convergeActivity1, branchingEdgeEnd);
 	},
 	
 	
 	/**
 	 * Draws an extra border around the selected activity.
 	 */
-	addSelectEffect : function (activity) {
+	addSelectEffect : function (object) {
 		// do not draw twice
-		if (!activity.items.selectEffect) {
-			var box = activity.items.getBBox();
+		if (!object.items.selectEffect) {
+			if (object instanceof ActivityLib.Transition) {
+				// show only if Transition is selectable, i.e. has a title
+				if (object.loadPropertiesDialogContent) {
+					object.items.attr({
+						'stroke' : layout.colors.selectEffect,
+						'fill'   : layout.colors.selectEffect
+					 });
+					
+					object.items.selectEffect = true;
+				}
+			} else {
+				var box = object.items.getBBox();
+				
+				// a simple rectange a bit wider than the actual activity boundaries
+				object.items.selectEffect = paper.rect(
+						box.x - 7,
+						box.y - 7,
+						box.width + 14,
+						box.height + 14)
+					.attr({
+						'stroke'           : layout.colors.selectEffect,
+						'stroke-dasharray' : '-'
+					});
+				object.items.push(object.items.selectEffect);
+			}
 			
-			// a simple rectange a bit wider than the actual activity boundaries
-			activity.items.selectEffect = paper.rect(
-					box.x - 7,
-					box.y - 7,
-					box.width + 14,
-					box.height + 14)
-				.attr({
-					'stroke'           : layout.colors.selectEffect,
-					'stroke-dasharray' : '-'
-				});
-			activity.items.push(activity.items.selectEffect);
-			layout.items.selectedActivity = activity;
-			
-			// show the properties dialog for the selected activity
-			if (activity.loadPropertiesDialogContent) {
-				activity.loadPropertiesDialogContent();
-				var dialog = layout.items.propertiesDialog;
-				dialog.children().detach();
-				dialog.append(activity.propertiesContent);
-				dialog.dialog('open');
-				dialog.find('input').blur();
+			if (object.items.selectEffect){
+				layout.items.selectedObject = object;
+				// show the properties dialog for the selected object
+				if (object.loadPropertiesDialogContent) {
+					object.loadPropertiesDialogContent();
+					var dialog = layout.items.propertiesDialog;
+					dialog.children().detach();
+					dialog.append(object.propertiesContent);
+					dialog.dialog('open');
+					dialog.find('input').blur();
+				}
 			}
 		}
 	},
 	
 	
 	removeSelectEffect : function() {
-		var selectedActivity = layout.items.selectedActivity;
+		var selectedObject = layout.items.selectedObject;
 		// does selection exist at all?
-		if (selectedActivity) {
-			if (selectedActivity.items.selectEffect) {
-				selectedActivity.items.selectEffect.remove();
-				selectedActivity.items.selectEffect = null;
+		if (selectedObject) {
+			if (selectedObject.items.selectEffect) {
+				if (selectedObject instanceof ActivityLib.Transition) {
+					// just redraw, it's easier
+					selectedObject.draw();
+				} else {
+					selectedObject.items.selectEffect.remove();
+				}
+				selectedObject.items.selectEffect = null;
 			}
 			
 			// no selected activity = no properties dialog
 			layout.items.propertiesDialog.dialog('close');
-			layout.items.selectedActivity = null;
+			layout.items.selectedObject = null;
 		}
 	},
 	
@@ -576,10 +632,10 @@ var ActivityLib = {
 
 		// redraw transitions
 		$.each(activity.transitions.from.slice(), function(){
-			ActivityLib.drawTransition(activity, this.toActivity, true);
+			ActivityLib.addTransition(activity, this.toActivity, true);
 		});
 		$.each(activity.transitions.to.slice(), function(){
-			ActivityLib.drawTransition(this.fromActivity, activity, true);
+			ActivityLib.addTransition(this.fromActivity, activity, true);
 		});
 	},
 	
@@ -617,16 +673,6 @@ var ActivityLib = {
 					"HEIGHT=800,WIDTH=1024,resizable=yes,scrollbars=yes,status=false," +
 					"menubar=no,toolbar=no");
 		}
-	},
-	
-	
-	/**
-	 * Drop the dragged transition.
-	 */
-	dropTransition : function(transition) {
-		// if the transition was over rubbish bin, remove it
-		transition.transform('');
-		transition.toBack();
 	},
 	
 	
@@ -677,6 +723,12 @@ var ActivityLib = {
 			// include the first activity
 			var branchLength = 1,
 				activity = this.transitionFrom.toActivity;
+			if (activity.type == 'branchingEdge'
+					&& branchingActivity == activity.branchingActivity){
+				// branch with no activities
+				return true;
+			}
+			
 			while (activity.transitions.from.length > 0) {
 				activity = activity.transitions.from[0].toActivity;
 				// check if reached the end of branch

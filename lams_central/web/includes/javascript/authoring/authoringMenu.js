@@ -57,7 +57,7 @@ var MenuLib = {
 				y = translatedEvent[1] - 8;
 			
 			// if it is start point, branchingActivity is null and constructor acts accordingly
-			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, x, y, null, null, branchingActivity);
+			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, null, x, y, null, null, branchingActivity);
 			layout.activities.push(branchingEdge);
 			
 			if (branchingActivity) {
@@ -103,6 +103,7 @@ var MenuLib = {
 		
 		canvas.css('cursor', 'pointer').click(function(event){
 			HandlerLib.resetCanvasMode();
+			layout.drawMode = true;
 			dialog.text('');
 			dialog.dialog('close');
 			
@@ -110,7 +111,7 @@ var MenuLib = {
 				targetElement = paper.getElementByPoint(event.pageX, event.pageY);
 			
 			if (targetElement) {
-				startActivity = targetElement.data('activity');
+				startActivity = targetElement.data('parentObject');
 				if (startActivity) {
 					HandlerLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
 				}
@@ -132,7 +133,7 @@ var MenuLib = {
 				x = translatedEvent[0],
 				y = translatedEvent[1] + 2;
 			
-			layout.activities.push(new ActivityLib.GateActivity(null, x, y));
+			layout.activities.push(new ActivityLib.GateActivity(null, null, x, y));
 		});
 	},
 	
@@ -333,52 +334,69 @@ var MenuLib = {
 			}
 				
 			// markers for complex activity processing
-			var branchIndex = null,
-				complexActivityEnd = null;
+			var complex = null;
 			
 			// crawl through a sequence of activities
 			while (activity) {
 				if (activity.type == 'branchingEdge') {
-					// draw branching edges straight away and remove them from normall processing
-					branchingActivity = activity.branchingActivity;
+					if (activity.isStart) {
+						// draw branching edges straight away and remove them from normall processing
+						var branchingActivity = activity.branchingActivity,
+							start = branchingActivity.start,
+							end = branchingActivity.end,
+							complex = {
+								end : end
+							},
+							// can the whole branching fit in curren canvas width?
+							branchingFits = column + branchingActivity.longestBranchLength + 2 <= maxColumns;
+						if (!branchingFits) {
+							// start branching from the left side of canvas
+							row++;
+							column = 0;
+						}
+						// store the column of converge point
+						end.column = column + branchingActivity.longestBranchLength + 1;
+						
+						complex.branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
+						// edge points go to middle of rows with branches
+						var startX = layout.conf.arrangeHorizontalPadding +
+									 column * layout.conf.arrangeHorizontalSpace + 54,
+							edgeY = layout.conf.arrangeVerticalPadding +
+									complex.branchingRow * layout.conf.arrangeVerticalSpace + 17,
+							endX = layout.conf.arrangeHorizontalPadding +
+								   end.column * layout.conf.arrangeHorizontalSpace + 54;
+						
+						activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
+						activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
+						
+						// start point goes to very left, end goes wherever the longes branch ends
+						start.draw(startX, edgeY);
+						end.draw(endX, edgeY);
+	
+						complex.branchingColumn = column;
+						column++;
 
-					var start = branchingActivity.start,
-						end = branchingActivity.end,
-						complexActivityEnd = end,
-						// can the whole branching fit in curren canvas width?
-						branchingFits = column + branchingActivity.longestBranchLength + 2 <= maxColumns;
-					if (!branchingFits) {
-						// start branching from the left side of canvas
-						row++;
-						column = 0;
-					}
-					// store the column of converge point
-					end.column = column + branchingActivity.longestBranchLength + 1;
-					
-					// edge points go to middle of rows with branches
-					var branchingRow = row + Math.floor(branchingActivity.branches.length / 2),
-						startX = layout.conf.arrangeHorizontalPadding + column * layout.conf.arrangeHorizontalSpace + 54,
-						edgeY = layout.conf.arrangeVerticalPadding + branchingRow * layout.conf.arrangeVerticalSpace + 17,
-						endX = layout.conf.arrangeHorizontalPadding + end.column * layout.conf.arrangeHorizontalSpace + 54;
-					
-					activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
-					activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
-					
-					// start point goes to very left, end goes wherever the longes branch ends
-					start.draw(startX, edgeY);
-					end.draw(endX, edgeY);
-
-					column++;
-					if (branchingActivity.branches.length > 0) {
-						// set up branch drawing
-						branchIndex = 0;
-						// next activity for normal processing will be first one from the first branch
-						activity = branchingActivity.branches[branchIndex].transitionFrom.toActivity;
-						continue;
-					} else {
-						// no branches, nothing to do, carry on with normal activity processing
-						activity = complexActivityEnd;
-						complexActivityEnd = null;
+						$.each(branchingActivity.branches, function(){
+							if (this.transitionFrom.toActivity == branchingActivity.end) {
+								complex.emptyBranch = this;
+								return false;
+							}
+						});
+						
+						if (branchingActivity.branches.length > (complex.emptyBranch ? 1 : 0)) {
+							// set up branch drawing
+							// skip the first branch if it is the empty one
+							complex.branchIndex =
+								complex.emptyBranch == branchingActivity.branches[0] ? 1 : 0;
+							// next activity for normal processing will be first one from the first branch
+							activity = branchingActivity.branches[complex.branchIndex].transitionFrom.toActivity;
+							continue;
+						} else {
+							// no branches, nothing to do, carry on with normal activity processing
+							activity = complex.end;
+							activity.column = null;
+							complex = null;
+						}
 					}
 				} else {
 					// it is a simple activity, so redraw it
@@ -409,26 +427,38 @@ var MenuLib = {
 					activity = null;
 				}
 				
-				if (complexActivityEnd && (!activity || activity == complexActivityEnd)) {
+				if (complex && (!activity || activity == complex.end)) {
 					// end of branch
-					branchIndex++;
+					complex.branchIndex++;
 
-					if (complexActivityEnd.branchingActivity.branches.length > branchIndex) {
+					var branches = complex.end.branchingActivity.branches;
+					if (branches.length > complex.branchIndex) {
+						if (branches[complex.branchIndex] == complex.emptyBranch) {
+							// skip the empty branch
+							complex.branchIndex++;
+						}
+					}
+					
+					if (branches.length > complex.branchIndex) {
 						// there is another branch to process
-						activity = complexActivityEnd.branchingActivity.branches[branchIndex].transitionFrom.toActivity;
+						activity = branches[complex.branchIndex].transitionFrom.toActivity;
 						// go back to left side of canvas and draw next branch
 						row++;
-						column = 1;
+						if (complex.emptyBranch && complex.branchingRow == row) {
+							row++;
+						}
+						
+						column = complex.branchingColumn + 1;
 					} else {
 						// no more branches, return to normal activity processing
-						activity = complexActivityEnd.transitions.from.length == 0 ?
-								null : complexActivityEnd.transitions.from[0].toActivity;
-						column = (complexActivityEnd.column + 1) % maxColumns;
+						activity = complex.end.transitions.from.length == 0 ?
+								null : complex.end.transitions.from[0].toActivity;
+						column = (complex.end.column + 1) % maxColumns;
 						if (column == 0) {
 							row++;
 						}
-						branchIndex = null;
-						complexActivityEnd = null;
+						complex.end.column = null;
+						complex = null;
 					}
 				}
 				
@@ -442,7 +472,7 @@ var MenuLib = {
 		// redraw transitions one by one
 		$.each(layout.activities, function(){
 			$.each(this.transitions.from.slice(), function(){
-				ActivityLib.drawTransition(this.fromActivity, this.toActivity, true);
+				ActivityLib.addTransition(this.fromActivity, this.toActivity, true);
 			});
 		});
 	},
@@ -483,7 +513,7 @@ var MenuLib = {
 	 * Mark an activity as ready for pasting.
 	 */
 	copyActivity : function(){
-		layout.items.copiedActivity = layout.items.selectedActivity;
+		layout.items.copiedActivity = layout.items.selectedObject;
 	},
 	
 	
@@ -529,7 +559,7 @@ var MenuLib = {
 		// draw the new activity next to the existing one
 		var x = activity.items.shape.getBBox().x + 10,
 			y = activity.items.shape.getBBox().y + 10,
-			newActivity = new ActivityLib.ToolActivity(null, activity.toolID, x, y, title);
+			newActivity = new ActivityLib.ToolActivity(null, null, null, activity.toolID, x, y, title);
 		layout.activities.push(newActivity);
 		
 		if (activity.grouping) {

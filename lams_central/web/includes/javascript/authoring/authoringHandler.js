@@ -8,6 +8,8 @@ var HandlerLib = {
 	 * Default mode for canvas. Run after special mode is no longer needed.
 	 */
 	resetCanvasMode : function(){
+		layout.drawMode = false;
+		
 		// remove selection if exists
 		ActivityLib.removeSelectEffect();
 		
@@ -36,8 +38,7 @@ var HandlerLib = {
 		dialog.lastRun = thisRun;
 		
 		// is the dialog visible at all?
-		var activity = layout.items.selectedActivity;
-		if (activity) {
+		if (layout.items.selectedObject) {
 			// calculate dim/show threshold
 			var container = dialog.container,
 			    dialogPosition = container.offset(),
@@ -60,11 +61,12 @@ var HandlerLib = {
 	canvasClickHandler : function(event) {
 		// check if user clicked on empty space on canvas
 		// or on some element on top of it
-		var defaultPrevented = event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented;
-		if (!defaultPrevented) {
-			ActivityLib.removeSelectEffect();
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
 		}
+		
+		ActivityLib.removeSelectEffect();
 	},
 	
 	
@@ -78,6 +80,11 @@ var HandlerLib = {
 		if (items.dragStarter) {
 			// prevent confusion when double clicking
 			clearTimeout(items.dragStarter);
+		}
+		
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
 		}
 		
 		// run only if "click" event was not generated, i.e. user really wants to drag
@@ -187,8 +194,9 @@ var HandlerLib = {
 	 * Finalise transition drawing.
 	 */
 	drawTransitionEndHandler : function(activity, event) {
-		// prevent triggering event on several activity items; we just need on transition
+		// prevent triggering event on several activity items; we just need it on transition
 		event.stopImmediatePropagation();
+		event.preventDefault();
 		HandlerLib.resetCanvasMode();
 		
 		//remove the temporary transition (dashed line)
@@ -200,11 +208,11 @@ var HandlerLib = {
 		var endActivity = null,
 			targetElement = paper.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
-			endActivity = targetElement.data('activity');
+			endActivity = targetElement.data('parentObject');
 		}
 
 		if (endActivity && activity != endActivity) {
-			ActivityLib.drawTransition(activity, endActivity);
+			ActivityLib.addTransition(activity, endActivity);
 		}
 	},
 	
@@ -213,7 +221,7 @@ var HandlerLib = {
 	 * Lighthens up branching edges in the same colour for identifictation.
 	 */
 	branchingEdgeMouseoverHandler : function() {
-		var branchingActivity = this.data('activity').branchingActivity,
+		var branchingActivity = this.data('parentObject').branchingActivity,
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
@@ -227,7 +235,7 @@ var HandlerLib = {
 	 * Return branching edges to their normal colours.
 	 */
 	branchingEdgeMouseoutHandler : function() {
-		var branchingActivity = this.data('activity').branchingActivity,
+		var branchingActivity = this.data('parentObject').branchingActivity,
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		
@@ -242,7 +250,12 @@ var HandlerLib = {
 	 * Starts drawing a transition or dragging an activity.
 	 */
 	activityMousedownHandler : function(event, x, y){
-		var activity = this.data('activity');
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var activity = this.data('parentObject');
 		if (event.ctrlKey) {
 			 // when CTRL is held down, start drawing a transition
 			 HandlerLib.drawTransitionStartHandler(activity, event, x, y);
@@ -258,20 +271,27 @@ var HandlerLib = {
 			// start dragging the activity
 			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
 		}
+		
 	},
 	
 	
 	/**
 	 * Selects an activity.
 	 */
-	activityClickHandler : function(event) {
-		var activity = this.data('activity');
-		// inform that user wants to select, not drag the activity
-		activity.items.clicked = true;
-		if (activity != layout.items.selectedActivity) {
-			HandlerLib.canvasClickHandler(event);
-			ActivityLib.addSelectEffect(activity);
+	itemClickHandler : function(event) {
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
 		}
+		
+		var parentObject = this.data('parentObject');
+		// inform that user wants to select, not drag the activity
+		parentObject.items.clicked = true;
+		if (parentObject != layout.items.selectedObject) {
+			HandlerLib.canvasClickHandler(event);
+			ActivityLib.addSelectEffect(parentObject);
+		}	
+		
 		// so canvas handler unselectActivityHandler() is not run
 		event.preventDefault();
 	},
@@ -281,7 +301,7 @@ var HandlerLib = {
 	 * Opens activity authoring.
 	 */
 	activityDblclickHandler : function(event) {
-		var activity = this.data('activity');
+		var activity = this.data('parentObject');
 		// inform that user wants to open, not drag the activity
 		activity.items.clicked = true;
 		ActivityLib.openActivityAuthoring(activity);
@@ -292,18 +312,18 @@ var HandlerLib = {
 	 * Starts dragging a transition.
 	 */
 	transitionMousedownHandler : function(event, x, y){
-		var transition = this.data('transition');
+		var transition = this.data('parentObject');
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
 				// if the transition was over rubbish bin, remove it
 				ActivityLib.removeTransition(transition);
 			} else {
-				ActivityLib.dropTransition(transition);
+				transition.draw();
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(transition.items, this, mouseupHandler, event, x, y);
 	},
 	
 	
