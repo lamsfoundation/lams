@@ -67,10 +67,8 @@
                 <bbNG:dataElement label="BLACKBOARD REQUEST SRC" isRequired="true" labelFor="bb_req_src">
                     <input type="text" name="bb_req_src" size="70" value="<%=ReqSrc%>">
                 </bbNG:dataElement>
+		<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
             </bbNG:step>  
-            <bbNG:step title="Callback URL" instructions="Copy and paste the user data callback URL into LAMS">
-            	 <b>USER DATA CALLBACK URL</b>: http://<%=request.getServerName()%><%=bbportstr%><%=request.getContextPath()%>/UserData?uid=%username%&ts=%timestamp%&hash=%hash%
-            </bbNG:step> 
             <bbNG:stepSubmit title="Submit" />
         </bbNG:dataCollection>    
     </form>
