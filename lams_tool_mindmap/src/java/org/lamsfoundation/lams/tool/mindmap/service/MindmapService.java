@@ -332,11 +332,13 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    NodeConceptModel nodeConceptModel = nodeModel.getConcept();
 	    // saving branch
 	    List curMindmapNodeList = null;
-	    if (mindmapUser == null) {
-		curMindmapNodeList = getMindmapNodeByUniqueId(nodeConceptModel.getId(), mindmap.getUid());
-	    } else {
-		curMindmapNodeList = getMindmapNodeByUniqueIdMindmapIdUserId(nodeConceptModel.getId(),
-			mindmap.getUid(), mindmapUser.getUid());
+	    if (mindmap.getUid() != null) {
+		if (mindmapUser == null) {
+		    curMindmapNodeList = getMindmapNodeByUniqueId(nodeConceptModel.getId(), mindmap.getUid());
+		} else {
+		    curMindmapNodeList = getMindmapNodeByUniqueIdMindmapIdUserId(nodeConceptModel.getId(),
+			    mindmap.getUid(), mindmapUser.getUid());
+		}
 	    }
 
 	    MindmapNode currentMindmapNode = null;
