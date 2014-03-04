@@ -13,6 +13,7 @@ var ActivityLib = {
 		this.fromActivity = fromActivity;
 		this.toActivity = toActivity;
 		if (title) {
+			// only branches have titles
 			this.title = title;
 			this.loadPropertiesDialogContent = PropertyLib.transitionProperties;
 		}
@@ -24,6 +25,7 @@ var ActivityLib = {
 		fromActivity.transitions.from.push(this);
 		toActivity.transitions.to.push(this);
 	},
+	
 	
 	/**
 	 * Constructor for a Tool Activity.
@@ -157,6 +159,7 @@ var ActivityLib = {
 	draw : {
 		
 		transition : function() {
+			// clear previous canvas elements
 			if (this.items) {
 				this.items.remove();
 			}
@@ -182,11 +185,12 @@ var ActivityLib = {
 								'fill'   : layout.colors.transition
 							 });
 			if (this.title) {
-				// adjust X & Y depending on the angle, so the lable does not overlap with the transition
+				// adjust X & Y depending on the angle, so the label does not overlap with the transition;
 				// angle is -90 <= a <= 270
 				paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
 						   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
-						   this.title);
+						   this.title)
+					 .attr('text-anchor', 'start');
 			}
 			this.items = paper.setFinish();
 
@@ -200,7 +204,7 @@ var ActivityLib = {
 		
 		tool : function(x, y) {
 			if (x == undefined || y == undefined) {
-				// just redraw the activity
+				// if no new coordinates are given, just redraw the activity
 				x = this.items.shape.getBBox().x;
 				y = this.items.shape.getBBox().y;
 			}
@@ -215,6 +219,7 @@ var ActivityLib = {
 							 .attr({
 								'fill' : layout.colors.activity[layout.toolMetadata[this.toolID].activityCategoryID]
 							 });
+			// check for icon in the library
 			paper.image(layout.toolMetadata[this.toolID].iconPath, x + 47, y + 2, 30, 30);
 			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
 				 .attr({
@@ -440,6 +445,7 @@ var ActivityLib = {
 						 branch ? branch.title : null);
 
 		if (branch) {
+			// set the corresponding branch (again)
 			branch.transitionFrom = transition;
 			transition.branch = branch;
 			fromActivity.branchingActivity.branches.push(branch);
@@ -460,6 +466,7 @@ var ActivityLib = {
 		transitions.splice(transitions.indexOf(transition), 1);
 		
 		if (transition.branch) {
+			// remove corresponding branch
 			var branches = transition.branch.branchingActivity.branches;
 			branches.splice(branches.indexOf(transition.branch), 1);
 		}
@@ -523,13 +530,31 @@ var ActivityLib = {
 	
 	
 	/**
-	 * Draws an extra border around the selected activity.
+	 * Highlights the selected canvas element.
 	 */
-	addSelectEffect : function (object) {
+	addSelectEffect : function (object, markSelected) {
 		// do not draw twice
 		if (!object.items.selectEffect) {
-			if (object instanceof ActivityLib.Transition) {
-				// show only if Transition is selectable, i.e. has a title
+			// different effects for different types of objects
+			if (object instanceof DecorationLib.Region) {
+				object.items.shape.attr({
+					'stroke'           : layout.colors.selectEffect,
+					'stroke-dasharray' : '-'
+				});
+				object.items.resizeButton.show();
+				object.items.selectEffect = true;
+				
+				// also select encapsulated activities
+				var childActivities = DecorationLib.getChildActivities(object.items.shape);
+				if (childActivities.length > 0) {
+					object.items.fitButton.show();
+					
+					$.each(childActivities, function(){
+						ActivityLib.addSelectEffect(this, false);
+					});
+				}
+			} else if (object instanceof ActivityLib.Transition) {
+				// show only if Transition is selectable, i.e. is a branch, has a title
 				if (object.loadPropertiesDialogContent) {
 					object.items.attr({
 						'stroke' : layout.colors.selectEffect,
@@ -539,6 +564,7 @@ var ActivityLib = {
 					object.items.selectEffect = true;
 				}
 			} else {
+				// this goes for Activities and Labels
 				var box = object.items.getBBox();
 				
 				// a simple rectange a bit wider than the actual activity boundaries
@@ -554,7 +580,8 @@ var ActivityLib = {
 				object.items.push(object.items.selectEffect);
 			}
 			
-			if (object.items.selectEffect){
+			// make it officially marked?
+			if (markSelected && object.items.selectEffect){
 				layout.items.selectedObject = object;
 				// show the properties dialog for the selected object
 				if (object.loadPropertiesDialogContent) {
@@ -570,18 +597,33 @@ var ActivityLib = {
 	},
 	
 	
-	removeSelectEffect : function() {
-		var selectedObject = layout.items.selectedObject;
-		// does selection exist at all?
-		if (selectedObject) {
-			if (selectedObject.items.selectEffect) {
-				if (selectedObject instanceof ActivityLib.Transition) {
-					// just redraw, it's easier
-					selectedObject.draw();
+	removeSelectEffect : function(object) {
+		// remove the effect from the given object or the selected one, whatever it is
+		if (!object) {
+			object = layout.items.selectedObject;
+		}
+		
+		if (object) {
+			if (object.items.selectEffect) {
+				if (object instanceof DecorationLib.Region) {
+					object.items.shape.attr({
+						'stroke'           : 'black',
+						'stroke-dasharray' : ''
+					});
+					object.items.fitButton.hide();
+					object.items.resizeButton.hide();
+					
+					var childActivities = DecorationLib.getChildActivities(object.items.shape);
+					$.each(childActivities, function(){
+						ActivityLib.removeSelectEffect(this);
+					});
+				} else if (object instanceof ActivityLib.Transition) {
+					// just redraw the transition, it's easier
+					object.draw();
 				} else {
-					selectedObject.items.selectEffect.remove();
+					object.items.selectEffect.remove();
 				}
-				selectedObject.items.selectEffect = null;
+				object.items.selectEffect = null;
 			}
 			
 			// no selected activity = no properties dialog
@@ -611,7 +653,7 @@ var ActivityLib = {
 			activity.items.push(activity.items.groupingEffect);
 			
 			// this is needed, for some reason, otherwise the activity can not be selected
-			HandlerLib.resetCanvasMode();
+			HandlerLib.resetCanvasMode(true);
 		}
 	},
 	
@@ -620,16 +662,6 @@ var ActivityLib = {
 	 * Drop the dragged activity on the canvas.
 	 */
 	dropActivity : function(activity) {
-		// finally transform the dragged elements
-		var transformation = activity.items.shape.attr('transform');
-		activity.items.transform('');
-		if (transformation.length > 0) {
-			// find new X and Y and redraw the activity
-			var activityBox =  activity.items.shape.getBBox();
-			activity.draw(activityBox.x + transformation[0][1],
-						  activityBox.y + transformation[0][2]);
-		}
-
 		// redraw transitions
 		$.each(activity.transitions.from.slice(), function(){
 			ActivityLib.addTransition(activity, this.toActivity, true);

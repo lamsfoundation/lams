@@ -45,6 +45,7 @@ var MenuLib = {
 	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
 	 */
 	addBranching : function(){
+		HandlerLib.resetCanvasMode();
 		var dialog = layout.items.infoDialog.text('Place the branching point');
 		dialog.dialog('open');
 		
@@ -62,7 +63,7 @@ var MenuLib = {
 			
 			if (branchingActivity) {
 				// converge point was just place, end of function
-				HandlerLib.resetCanvasMode();
+				HandlerLib.resetCanvasMode(true);
 				
 				dialog.text('');
 				dialog.dialog('close');
@@ -76,13 +77,13 @@ var MenuLib = {
 	
 	
 	/**
-	 * Run when grouping is dropped on canvas. Creates a new grouping activity.
+	 * Creates a new grouping activity.
 	 */
 	addGrouping : function() {
+		HandlerLib.resetCanvasMode();
+		
 		canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
 			  .click(function(event){
-			HandlerLib.resetCanvasMode();
-			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
 			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
@@ -90,20 +91,72 @@ var MenuLib = {
 				y = translatedEvent[1] -  2;
 
 			layout.activities.push(new ActivityLib.GroupingActivity(null, null, x, y, 'Grouping'));
+			
+			HandlerLib.resetCanvasMode(true);
 		});
 	},
 	
 	
 	/**
-	 * Run when gate is dropped on canvas. Creates a new gate activity.
+	 * Creates a new annotation Region.
+	 */
+	addAnnotationRegion : function() {
+		HandlerLib.resetCanvasMode();
+		
+		var dialog = layout.items.infoDialog.text('Click and hold to start drawing an annotation region');
+		dialog.dialog('open');
+	
+		canvas.css('cursor', 'crosshair').mousedown(function(event){
+			dialog.text('');
+			dialog.dialog('close');
+			
+			var	targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+			
+			if (targetElement) {
+				// cancel
+				HandlerLib.resetCanvasMode(true);
+			} else {
+				HandlerLib.drawRegionStartHandler(event);
+			}
+		});
+	},
+	
+	
+	/**
+	 * Creates a new annotation label.
+	 */
+	addAnnotationLabel : function() {
+		HandlerLib.resetCanvasMode();
+		
+		var dialog = layout.items.infoDialog.text('Click to add an annotation label');
+		dialog.dialog('open');
+	
+		canvas.css('cursor', 'pointer').click(function(event){
+			dialog.text('');
+			dialog.dialog('close');
+
+
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0],
+				y = translatedEvent[1];
+			
+			HandlerLib.resetCanvasMode(true);
+			
+			DecorationLib.addLabel(x, y);
+		});
+	},
+	
+	
+	/**
+	 * Creates a new transition.
 	 */
 	addTransition : function() {
+		HandlerLib.resetCanvasMode();
+		
 		var dialog = layout.items.infoDialog.text('Click on an activity');
 		dialog.dialog('open');
 		
 		canvas.css('cursor', 'pointer').click(function(event){
-			HandlerLib.resetCanvasMode();
-			layout.drawMode = true;
 			dialog.text('');
 			dialog.dialog('close');
 			
@@ -121,12 +174,12 @@ var MenuLib = {
 	
 	
 	/**
-	 * Run when gate is dropped on canvas. Creates a new gate activity.
+	 * Creates a new gate activity.
 	 */
 	addGate : function() {
+		HandlerLib.resetCanvasMode();
+		
 		canvas.css('cursor', 'url("' + layout.toolMetadata.gate.iconPath + '"), move').click(function(event){
-			HandlerLib.resetCanvasMode();
-			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
 			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
@@ -134,6 +187,8 @@ var MenuLib = {
 				y = translatedEvent[1] + 2;
 			
 			layout.activities.push(new ActivityLib.GateActivity(null, null, x, y));
+			
+			HandlerLib.resetCanvasMode(true);
 		});
 	},
 	
@@ -253,8 +308,15 @@ var MenuLib = {
 	 * Sorts activities on canvas.
 	 */
 	arrangeActivities : function(){
+		if ((layout.regions.length > 0 || layout.labels.length > 0)
+				&& !confirm('There are annotations on the canvas.\n'
+				   + 'They will be not arranged automatically, you will have to adjust them manually later.\n'
+				   + 'Do you want to continue?')) {
+			return;
+		}
+		
 		// just to refresh the state of canvas
-		HandlerLib.resetCanvasMode();
+		HandlerLib.resetCanvasMode(true);
 
 		if (layout.activities.length == 0) {
 			// no activities, nothing to do
@@ -482,7 +544,10 @@ var MenuLib = {
 	 * Removes existing activities and prepares canvas for a new sequence.
 	 */
 	newLearningDesign : function(force, soft){
-		if (!force && layout.activities.length > 0 && !confirm('Are you sure you want to remove all existing activities?')){
+		if (!force && (layout.activities.length > 0
+					  || layout.regions.length > 0
+					  || layout.labels.length > 0)
+				&& !confirm('Are you sure you want to remove all existing elements?')){
 			return;
 		}
 		
@@ -494,6 +559,9 @@ var MenuLib = {
 				'maxUIID' : 0
 			};
 			layout.activities = [];
+			layout.regions = [];
+			layout.labels = [];
+			
 			if (paper) {
 				paper.clear();
 			} else {

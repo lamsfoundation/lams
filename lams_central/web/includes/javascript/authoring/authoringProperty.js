@@ -405,6 +405,68 @@ var PropertyLib = {
 	
 	
 	/**
+	 * Properties dialog content for regions (annotations).
+	 */
+	regionProperties : function() {
+		var region = this,
+			content = region.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = region.propertiesContent = $('#propertiesContentRegion').clone().attr('id', null)
+													.show().data('parentObject', region);
+			$('.propertiesContentFieldTitle', content).val(region.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					region = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				if (newTitle != region.title) {
+					region.title = newTitle;
+					redrawNeeded = true;
+				}
+				
+				if (redrawNeeded) {
+					region.draw();
+				}
+			});
+		}
+	},
+	
+	
+	/**
+	 * Properties dialog content for labels (annotations).
+	 */
+	labelProperties : function() {
+		var label = this,
+			content = label.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = label.propertiesContent = $('#propertiesContentLabel').clone().attr('id', null)
+													.show().data('parentObject', label);
+			$('.propertiesContentFieldTitle', content).val(label.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					label = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				if (newTitle != label.title) {
+					label.title = newTitle;
+					redrawNeeded = true;
+				}
+				
+				if (redrawNeeded) {
+					label.draw();
+				}
+			});
+		}
+	},
+	
+	
+	/**
 	 * 	Find all groupings on canvas and fill dropdown menu with their titles
 	 */
 	fillGroupingDropdown : function(content, grouping) {

@@ -7,20 +7,24 @@ var HandlerLib = {
 	/**
 	 * Default mode for canvas. Run after special mode is no longer needed.
 	 */
-	resetCanvasMode : function(){
-		layout.drawMode = false;
+	resetCanvasMode : function(init){
+		// so elements understand that no events should be triggered, i.e. canvas is "dead"
+		layout.drawMode = !init;
 		
 		// remove selection if exists
 		ActivityLib.removeSelectEffect();
-		
 		canvas.css('cursor', 'default')
 		      .off('click')
-		      // if clicked anywhere, activity selection is gone
-		      .click(HandlerLib.canvasClickHandler)
+		      .off('mousedown')
 		      .off('mouseup')
 		      .off('mousemove')
-		      // when mouse gets closer to properties dialog, make it fully visible
-		      .mousemove(HandlerLib.approachPropertiesDialogHandler);
+
+		if (init) {
+			 // if clicked anywhere, activity selection is gone
+			canvas.click(HandlerLib.canvasClickHandler)
+		     // when mouse gets closer to properties dialog, make it fully visible
+		    	  .mousemove(HandlerLib.approachPropertiesDialogHandler);
+		}
 	},
 	
 	
@@ -96,6 +100,8 @@ var HandlerLib = {
 				items.clicked = false;
 				return;
 			}
+			
+			HandlerLib.resetCanvasMode();
 			items.isDragged = true;
 			items.attr('cursor', 'move');
 			
@@ -107,11 +113,11 @@ var HandlerLib = {
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
 				items.unmouseup();
-				HandlerLib.resetCanvasMode();
 				layout.items.bin.attr('fill', 'transparent');
 				
 				// do whetver needs to be done with the dragged elements
 				mouseupHandler(mouseupEvent);
+				HandlerLib.resetCanvasMode(true);
 			};
 			
 			// if user moves mouse very quickly, mouseup event can be triggered
@@ -151,6 +157,8 @@ var HandlerLib = {
 			alert('Transition from this activity already exists');
 			return;
 		}
+		
+		HandlerLib.resetCanvasMode();
 		
 		var startX = x  + canvas.scrollLeft() - canvas.offset().left,
 			startY = y  + canvas.scrollTop()  - canvas.offset().top;
@@ -197,7 +205,6 @@ var HandlerLib = {
 		// prevent triggering event on several activity items; we just need it on transition
 		event.stopImmediatePropagation();
 		event.preventDefault();
-		HandlerLib.resetCanvasMode();
 		
 		//remove the temporary transition (dashed line)
 		if (activity.tempTransition) {
@@ -214,6 +221,119 @@ var HandlerLib = {
 		if (endActivity && activity != endActivity) {
 			ActivityLib.addTransition(activity, endActivity);
 		}
+		
+		HandlerLib.resetCanvasMode(true);
+	},
+	
+	
+	/**
+	 * Start drawing a region.
+	 */
+	drawRegionStartHandler : function(startEvent) {
+		HandlerLib.resetCanvasMode();
+		
+		// remember what were the drawing start coordinates
+		var translatedEvent = ActivityLib.translateEventOnCanvas(startEvent),
+			data = {
+				'startX' : translatedEvent[0],
+				'startY' : translatedEvent[1]
+			};
+			
+		canvas.mousemove(function(event){
+			HandlerLib.drawRegionMoveHandler(data, event);
+		})
+		.mouseup(function(event){
+			HandlerLib.drawRegionEndHandler(data);
+		});
+	},
+	
+	
+	/**
+	 * Keep drawing a region.
+	 */
+	drawRegionMoveHandler : function(data, event) {
+		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+			x = translatedEvent[0],
+			y = translatedEvent[1];
+		
+		if (data.shape) {
+			// remove the previous rectangle
+			data.shape.remove();
+		}
+		
+		data.shape = paper.path(Raphael.format('M {0} {1} h {2} v {3} h -{2} z',
+								x < data.startX ? x : data.startX,
+								y < data.startY ? y : data.startY,
+								Math.abs(x - data.startX),
+								Math.abs(y - data.startY)))
+						  .attr({
+							'fill'    : layout.colors.annotation,
+							'opacity' : 0.3
+						  });
+		
+		// immediatelly show which activities will be enveloped
+		var childActivities = DecorationLib.getChildActivities(data.shape);
+		$.each(layout.activities, function(){
+			if ($.inArray(this, childActivities) > -1){
+				ActivityLib.addSelectEffect(this, false);
+			} else {
+				ActivityLib.removeSelectEffect(this);
+			}
+		});
+	},
+	
+	
+	/**
+	 * Finalise region drawing.
+	 */
+	drawRegionEndHandler : function(data) {
+		// remove select effect from all activities
+		$.each(layout.activities, function(){
+			ActivityLib.removeSelectEffect(this);
+		});
+		
+		if (data.shape) {
+			var box = data.shape.getBBox(),
+				region = DecorationLib.addRegion(box.x, box.y, box.x2, box.y2);
+			data.shape.remove();
+			ActivityLib.addSelectEffect(region, true);
+		}
+		HandlerLib.resetCanvasMode(true);
+	},
+	
+	
+	/**
+	 * Start resizing a region.
+	 */
+	resizeRegionStartHandler : function(event) {
+		// otherwise mousedown handler (dragging) can be triggered
+		event.stopImmediatePropagation();
+		event.preventDefault();
+		
+		HandlerLib.resetCanvasMode();
+		
+		var region = this.data('parentObject');
+			
+		canvas.mousemove(function(event){
+			HandlerLib.resizeRegionMoveHandler(region, event);
+		})
+		.mouseup(function(){
+			HandlerLib.resetCanvasMode(true);
+			ActivityLib.addSelectEffect(region, true);
+		});
+	},
+	
+	
+	/**
+	 * Keep resising a region.
+	 */
+	resizeRegionMoveHandler : function(region, event){
+		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+			x = translatedEvent[0],
+			y = translatedEvent[1];
+	
+		// keep the initial coordinates and adjust end coordinates
+		region.draw(null, null, x, y);
 	},
 	
 	
@@ -265,6 +385,7 @@ var HandlerLib = {
 					// if the activity was over rubbish bin, remove it
 					ActivityLib.removeActivity(activity);
 				} else {
+					HandlerLib.dropObject(activity);
 					ActivityLib.dropActivity(activity);
 				}
 			}
@@ -289,8 +410,8 @@ var HandlerLib = {
 		parentObject.items.clicked = true;
 		if (parentObject != layout.items.selectedObject) {
 			HandlerLib.canvasClickHandler(event);
-			ActivityLib.addSelectEffect(parentObject);
-		}	
+			ActivityLib.addSelectEffect(parentObject, true);
+		}
 		
 		// so canvas handler unselectActivityHandler() is not run
 		event.preventDefault();
@@ -324,6 +445,70 @@ var HandlerLib = {
 		}
 			
 		HandlerLib.dragItemsStartHandler(transition.items, this, mouseupHandler, event, x, y);
+	},
+	
+	
+	/**
+	 * Starts dragging a region
+	 */
+	regionMousedownHandler : function(event, x, y){
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var region = this.data('parentObject');
+		// allow transition dragging
+		var mouseupHandler = function(event){
+			if (HandlerLib.isElemenentBinned(event)) {
+				// if the region was over rubbish bin, remove it
+				DecorationLib.removeRegion(region);
+			} else {
+				HandlerLib.dropObject(region);
+			}
+		}
+			
+		HandlerLib.dragItemsStartHandler(region.items, this, mouseupHandler, event, x, y);
+	},
+	
+	
+	/**
+	 * Starts dragging a label
+	 */
+	labelMousedownHandler : function(event, x, y){
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var label = this.data('parentObject');
+		// allow transition dragging
+		var mouseupHandler = function(event){
+			if (HandlerLib.isElemenentBinned(event)) {
+				// if the region was over rubbish bin, remove it
+				DecorationLib.removeLabel(label);
+			} else {
+				HandlerLib.dropObject(label);
+			}
+		}
+			
+		HandlerLib.dragItemsStartHandler(label.items, this, mouseupHandler, event, x, y);
+	},
+	
+	
+	dropObject : function(object) {
+		// finally transform the dragged elements
+		var transformation = object.items.shape.attr('transform');
+		object.items.transform('');
+		if (transformation.length > 0) {
+			// find new X and Y and redraw the object
+			var box = object.items.shape.getBBox(),
+				x = box.x,
+				// adjust this coordinate for annotation labels
+				y = box.y + (object instanceof DecorationLib.Label ? 6 : 0);
+			object.draw(x + transformation[0][1],
+						y + transformation[0][2]);
+		}
 	},
 	
 	

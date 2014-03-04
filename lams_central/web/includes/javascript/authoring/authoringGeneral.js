@@ -11,6 +11,8 @@ var paper = null,
 	'drawMode'   : false,
 	 // 'isZoomed'   : false,
 	'activities' : null,
+	'regions' : null,
+	'labels'	 : null,
 	'items' : {
 		'bin'               : null,
 		
@@ -62,7 +64,8 @@ var paper = null,
 		'branchingEdgeMatch'  : 'blue',
 		'transition'   		  : 'rgb(119,126,157)',
 		'binActive'    		  : 'red',
-		'selectEffect'        : 'blue'
+		'selectEffect'        : 'blue',
+		'annotation'		  : 'yellow'
 	},
 };
 
@@ -658,7 +661,7 @@ function openLearningDesign(learningDesignID) {
 			} else if (resizeNeeded) {
 				resizePaper(paperWidth, paperHeight);
 			} else {	
-				HandlerLib.resetCanvasMode();
+				HandlerLib.resetCanvasMode(true);
 			}
 		}
 	});
@@ -905,5 +908,5 @@ function resizePaper(width, height) {
 	binPath = Raphael.transformPath(binPath, Raphael.format('t {0} {1}', width, height - 50));
 	layout.items.bin = paper.path(binPath);
 	
-	HandlerLib.resetCanvasMode();
+	HandlerLib.resetCanvasMode(true);
 }

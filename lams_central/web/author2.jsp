@@ -26,6 +26,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringProperty.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
@@ -77,6 +78,18 @@
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
 			Group
+		</div>
+		<div>
+			<div class="split-ui-button">
+				<div>
+					<span>Annotate</span>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+			<ul>
+				<li onClick="javascript:MenuLib.addAnnotationLabel()">Label</li>
+				<li onClick="javascript:MenuLib.addAnnotationRegion()">Region</li>
+			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
@@ -375,6 +388,32 @@
 			<tr>
 				<td colspan="2">
 					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="propertiesContentRegion" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+		</table>
+	</div>	
+	
+	<div id="propertiesContentLabel" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
 		</table>
