@@ -81,6 +81,9 @@ Contents
 ================================================================================
 	1. Click on My Institution->Launch the Course Creation Wizard and follow all required steps.
 	2. To browse available courses head to Courses and there is a "Course List"
+	3. In order to be able to add new LAMS lessons in this course (using the module) 
+		get inside a course and then on the left side menu select "Customziation" and 
+		then "Tool availability". Make sure LAMS Lesson has a tick in front of it. 
 
 
 6. Creating LAMS lesson

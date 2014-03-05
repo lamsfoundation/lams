@@ -160,7 +160,7 @@
 			    
 			    	<span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button">
 			    		<span class="first-child">
-			    			<button onclick="openPreview(&quot;http:\/\/moodle.lamscommunity.org\/moodle2\/mod\/lamslesson\/preview.php?&quot;, &quot;preview&quot;, 0); return false;">
+			    			<button onclick="openPreview(); return false;">
 			    				Preview this lesson
 			    			</button>
 			    		</span>
@@ -261,17 +261,16 @@
             	//if (parentURL != "") {
             		//window.parent.opener.location.href = parentURL;
             	//}
-
                 
-                if(previewWin && previewWin.open && !previewWin.closed){
+                if(previewWin && !previewWin.closed){
                     try {
                         previewWin.focus();
                     }catch(e){
                         // popups blocked by a 3rd party
                         alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                     }
-                }
-                else{
+                    
+                } else{
                     try {
                         previewWin = window.open(previewUrl,'pWindow','width=1024,height=768,resizable');
                         previewWin.focus();
@@ -280,6 +279,7 @@
                         alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                     }
                 }
+                
                 return false;
             }
             
