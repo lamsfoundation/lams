@@ -110,7 +110,7 @@
 	    
     } else {
     
-    	title = request.getParameter("title");
+    	title = (request.getParameter("title") != null) ? request.getParameter("title") : "LAMS Options";
     	description = request.getParameter("description");
         strLineitemId = request.getParameter("lineitemid");
     }
