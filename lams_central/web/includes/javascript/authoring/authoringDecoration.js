@@ -5,16 +5,28 @@
 var DecorationLib = {
 		
 		/**
+		 * Abstract class for Region, Optional and Floating Activities.
+		 */
+		Container : function(title) {
+			this.title = title;
+			this.childActivities = [];
+			
+			this.drawContainer = DecorationLib.methods.container.draw;
+			this.fit = DecorationLib.methods.container.fit;
+		},
+		
+		/**
 		 * Constructor for region annotation.
 		 */
-		Region : function(x, y, width, height, color, title) {
-			this.title = title;
+		Region : function(x, y, x2, y2, color, title) {
+			DecorationLib.Container.call(this, title);
+			// we don't use it for region
+			this.childActivities = null;
 			
 			this.draw = DecorationLib.methods.region.draw;
-			this.fit = DecorationLib.methods.region.fit;
 			this.loadPropertiesDialogContent = PropertyLib.regionProperties;
 			
-			this.draw(x, y, width, height, color);
+			this.draw(x, y, x2, y2, color);
 		},
 		
 		
@@ -33,76 +45,46 @@ var DecorationLib = {
 		
 		
 		methods : {
-			
-			/**
-			 * Region methods
-			 */
-			region : {
-				draw : function(x, y, x2, y2, color, title){
+			container : {
+				
+				draw : function(x, y, x2, y2, color){
 					// check for new coordinates or just take them from the existing shape
-					var box = this.items && this.items.shape ? this.items.shape.getBBox() : null,
+					var box = this.items ? this.items.shape.getBBox() : null,
 						x = x   ? x : box.x,
 						y = y   ? y : box.y,
 						// take into account minimal size of rectangle
-						x2 = x2 ? (x2 < x + 20 ? x + 20 : x2) : x + box.width,
-						y2 = y2 ? (y2 < y + 20 ? y + 20 : y2) : y + box.height,
+						x2 = x2 ? Math.max(x2, x + 20) : x + box.width,
+						y2 = y2 ? Math.max(y2, y + 20) : y + box.height,
 						color =  color ? color : this.items.shape.attr('fill');
 		
-						if (box) {
-							this.items.remove();
-						}
+					if (box) {
+						this.items.remove();
+					}
+					
+					// the label
+					this.items = paper.set();
+					if (this.title) {
+						var label = paper.text(x + 7, y + 10, this.title)
+						 				 .attr('text-anchor', 'start')
+						 				 .toBack();
+						this.items.push(label);
 						
-						// the label
-						this.items = paper.set();
-						if (this.title) {
-							var label = paper.text(x + 7, y + 10, this.title)
-							 				 .attr('text-anchor', 'start')
-							 				 .toBack();
-							this.items.push(label);
-						}
-						
-						// the rectangle
-						this.items.shape = paper.path('M {0} {1} L {2} {1} L {2} {3} L {0} {3} z', x, y, x2, y2)
-								 				.attr({
-								 					'fill'    : color,
-													'cursor'  : 'pointer'
-												})
-												.mousedown(HandlerLib.regionMousedownHandler)
-												.click(HandlerLib.itemClickHandler)
-												.toBack();
-						this.items.push(this.items.shape);
-						
-						this.items.fitButton = paper.circle(x2 - 10, y + 10, 5)
-											 .attr({
-												'stroke' : null,
-												'fill'   : 'blue',
-												'cursor' : 'pointer',
-												'title'  : 'Fit'
-											 })
-											 .click(function(event){
-												event.stopImmediatePropagation();
-												var region = this.data('parentObject');
-												region.fit();
-												ActivityLib.addSelectEffect(region, true);
-											 })
-											 .hide();
-						this.items.push(this.items.fitButton);
-						
-						this.items.resizeButton = paper.path(Raphael.format('M {0} {1} v {2} h -{2} z',
-																	 x2, y2 - 15, 15))
-												.attr({
-													'stroke' : null,
-													'fill'   : 'blue',
-													'cursor' : 'se-resize'
-												})
-												.mousedown(HandlerLib.resizeRegionStartHandler)
-												.hide();
-						this.items.push(this.items.resizeButton);
-						
-						this.items.data('parentObject', this);
-					},
-				
-				
+						// make sure title fits
+						x2 = Math.max(x2, label.getBBox().x2 + 5);
+					}
+					
+					// the rectangle
+					this.items.shape = paper.path('M {0} {1} L {2} {1} L {2} {3} L {0} {3} z', x, y, x2, y2)
+							 				.attr({
+							 					'fill'    : color,
+												'cursor'  : 'pointer'
+											})
+											.mousedown(HandlerLib.containerMousedownHandler)
+											.click(HandlerLib.itemClickHandler)
+											.toBack();
+					this.items.push(this.items.shape);
+				},	
+		
 				/**
 				 * Adjust the annotation so it envelops its child activities and nothing more.
 				 */
@@ -111,7 +93,7 @@ var DecorationLib = {
 					if (childActivities.length == 0) {
 						return;
 					}
-	
+		
 					ActivityLib.removeSelectEffect(this);
 					
 					var allElements = paper.set();
@@ -123,6 +105,46 @@ var DecorationLib = {
 					
 					// add some padding
 					this.draw(box.x - 20, box.y - 20, box.x2 + 20, box.y2 + 20);
+				}
+			},
+			
+			/**
+			 * Region methods
+			 */
+			region : {
+				draw : function(x, y, x2, y2, color){
+					this.drawContainer(x, y, x2, y2, color);
+					
+					var box = this.items.shape.getBBox();
+					
+					this.items.fitButton = paper.circle(box.x2 - 10, box.y + 10, 5)
+										 .attr({
+											'stroke' : null,
+											'fill'   : 'blue',
+											'cursor' : 'pointer',
+											'title'  : 'Fit'
+										 })
+										 .click(function(event){
+											event.stopImmediatePropagation();
+											var region = this.data('parentObject');
+											region.fit();
+											ActivityLib.addSelectEffect(region, true);
+										 })
+										 .hide();
+					this.items.push(this.items.fitButton);
+					
+					this.items.resizeButton = paper.path(Raphael.format('M {0} {1} v {2} h -{2} z',
+																 box.x2, box.y2 - 15, 15))
+											.attr({
+												'stroke' : null,
+												'fill'   : 'blue',
+												'cursor' : 'se-resize'
+											})
+											.mousedown(HandlerLib.resizeRegionStartHandler)
+											.hide();
+					this.items.push(this.items.resizeButton);
+					
+					this.items.data('parentObject', this);
 				}
 			},
 			
@@ -171,19 +193,25 @@ var DecorationLib = {
 		
 		
 		/**
-		 * Get activities enveloped by given shape (usually annotation region)
+		 * Get activities enveloped by given container
 		 */
 		getChildActivities : function(shape){
 			var result = [];
 			$.each(layout.activities, function(){
-				var activityBox = this.items.shape.getBBox();
-				
-				if (shape.isPointInside(activityBox.x, activityBox.y)
-						&& shape.isPointInside(activityBox.x2, activityBox.y2)) {
-					result.push(this);
+				if (shape != this.items.shape) {
+					var activityBox = this.items.shape.getBBox();
+					
+					if (shape.isPointInside(activityBox.x, activityBox.y)
+							&& shape.isPointInside(activityBox.x2, activityBox.y2)) {
+						result.push(this);
+					}
 				}
 			});
 			
+			var parentObject = shape.data('parentObject');
+			if (parentObject && !(parentObject instanceof DecorationLib.Region)) {
+				parentObject.childActivities = result;
+			}
 			return result;
 		},
 		
@@ -200,3 +228,8 @@ var DecorationLib = {
 			label.items.remove();
 		}
 };
+
+// set prototype hierarchy
+DecorationLib.Region.prototype = new DecorationLib.Container;
+ActivityLib.OptionalActivity.prototype = new DecorationLib.Container;
+ActivityLib.FloatingActivity.prototype = new DecorationLib.Container;

@@ -34,7 +34,6 @@ var ActivityLib = {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
-		this.type = 'tool';
 		this.toolID = +toolID;
 		this.title = title;
 		this.supportsOutputs = supportsOutputs;
@@ -58,8 +57,7 @@ var ActivityLib = {
 		this.groupingID = +groupingID;
 		this.groupingUIID = +groupingUIID  || ++layout.ld.maxUIID;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.type = 'grouping';
-		this.title = title;
+		this.title = title || 'Grouping';
 		this.groupingType = groupingType || 'random';
 		this.groupDivide = groupDivide || 'groups';
 		this.groupCount = +groupCount || 2;
@@ -84,7 +82,6 @@ var ActivityLib = {
 	GateActivity : function(id, uiid, x, y, gateType) {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.type = 'gate';
 		this.gateType = gateType || 'permission';
 		this.transitions = {
 			'from' : [],
@@ -102,7 +99,6 @@ var ActivityLib = {
 	 * Either branching or converge point.
 	 */
 	BranchingEdgeActivity : function(id, uiid, x, y, title, branchingType, branchingActivity) {
-		this.type = 'branchingEdge';
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -154,7 +150,48 @@ var ActivityLib = {
 	
 	
 	/**
+	 * Constructor for an Optional Activity.
+	 */
+	OptionalActivity : function(id, uiid, x, y, title, minActivities, maxActivities) {
+		DecorationLib.Container.call(this, title || 'Optional Activity');
+		
+		this.id = +id;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.minActivities = minActivities || 0;
+		this.maxActivities = maxActivities || 0;
+		this.transitions = {
+			'from' : [],
+			'to'   : []
+		};
+		
+		this.loadPropertiesDialogContent = PropertyLib.optionalActivityProperties;
+		
+		this.draw = ActivityLib.draw.optionalActivity;
+		this.draw(x, y);
+	},
+	
+	
+	/**
+	 * Constructor for a Floating Activity.
+	 */
+	FloatingActivity : function(id, uiid, x, y) {
+		DecorationLib.Container.call(this, 'Support Activity');
+		
+		this.id = +id;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
+
+		this.draw = ActivityLib.draw.floatingActivity;
+		this.draw(x, y);
+		
+		// there can only be one
+		layout.floatingActivity = this;
+	},
+	
+	
+	/**
 	 * Mehtods for drawing various kinds of activities.
+	 * They are not defined in constructors so there is always a reference to an existing method,
+	 * not a separate definition for each object instance.
 	 */
 	draw : {
 		
@@ -329,6 +366,79 @@ var ActivityLib = {
 			this.items.shape = shape;
 			
 			ActivityLib.activityHandlersInit(this);
+		},
+		
+		
+		optionalActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
+			if (x == undefined || y == undefined) {
+				// if no new coordinates are given, just redraw the activity
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+			
+			// either check what children are on canvas or use the priovided parameter
+			if (childActivities) {
+				this.childActivities = childActivities;
+			}
+			
+			if (this.childActivities && this.childActivities.length > 0) {
+				// draw one by one, vertically
+				var activityY = y + 30,
+					allElements = paper.set(),
+					optionalActivity = this;
+				$.each(this.childActivities, function(){
+					this.parentActivity = optionalActivity;
+					this.draw(x + 20, activityY);
+					activityY = this.items.shape.getBBox().y2 + 10;
+					allElements.push(this.items.shape);
+				});
+				// area containing all drawn child activities
+				var box = allElements.getBBox();
+				
+				this.drawContainer(x, y, box.x2 + 20, box.y2 + 20, layout.colors.optionalActivity);
+			} else {
+				this.drawContainer(x, y, x + 50, y + 70, layout.colors.optionalActivity);
+			}
+			
+			// allow transition drawing and other activity behaviour
+			this.items.shape.unmousedown().mousedown(HandlerLib.activityMousedownHandler);
+			
+			this.items.data('parentObject', this);
+		},
+		
+		
+		floatingActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
+			if (x == undefined || y == undefined) {
+				// if no new coordinates are given, just redraw the activity
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+			
+			// either check what children are on canvas or use the priovided parameter
+			if (childActivities) {
+				this.childActivities = childActivities;
+			}
+			
+			if (this.childActivities && this.childActivities.length > 0) {
+				// draw one by one, horizontally
+				var activityX = x + 20,
+					allElements = paper.set(),
+					floatingActivity = this;
+				$.each(this.childActivities, function(){
+					this.parentActivity = floatingActivity;
+					this.draw(activityX, y + 30);
+					activityX = this.items.shape.getBBox().x2 + 10;
+					allElements.push(this.items.shape);
+				});
+				// area containing all drawn child activities
+				var box = allElements.getBBox();
+				
+				this.drawContainer(x, y, box.x2 + 20, box.y2 + 20, layout.colors.optionalActivity);
+			} else {
+				this.drawContainer(x, y, x + 50, y + 70, layout.colors.optionalActivity);
+			}
+			
+			this.items.data('parentObject', this);
 		}
 	},
 	
@@ -347,7 +457,8 @@ var ActivityLib = {
 				'cursor' : 'pointer'
 			});
 			
-			if (activity.type == 'branchingEdge' && activity.branchingActivity.end) {
+			if (activity instanceof ActivityLib.BranchingEdgeActivity
+					&& activity.branchingActivity.end) {
 				// highligh branching edges on hover
 				activity.branchingActivity.start.items.hover(HandlerLib.branchingEdgeMouseoverHandler,
 						HandlerLib.branchingEdgeMouseoutHandler);
@@ -361,7 +472,7 @@ var ActivityLib = {
 	 * Deletes the given activity.
 	 */
 	removeActivity : function(activity, forceRemove) {
-		if (!forceRemove && activity.type == 'branchingEdge'){
+		if (!forceRemove && activity instanceof ActivityLib.BranchingEdgeActivity){
 			// user removes one of the branching edges, so remove the whole activity
 			if (confirm('Are you sure you want to remove the whole branching activity?')){
 				var otherEdge = activity.isStart ? activity.branchingActivity.end
@@ -372,26 +483,46 @@ var ActivityLib = {
 			}
 		}
 		
-		// remove the transitions
-		// need to use slice() to copy the array as it gets modified in removeTransition()
-		$.each(activity.transitions.from.slice(), function() {
-			ActivityLib.removeTransition(this);
-		});
-		$.each(activity.transitions.to.slice(), function() {
-			ActivityLib.removeTransition(this);
-		});
-		
-		// remove the activity from reference tables
-		layout.activities.splice(layout.activities.indexOf(activity), 1);
-		if (layout.items.copiedActivity = activity) {
-			layout.items.copiedActivity = null;
+		if (activity instanceof ActivityLib.FloatingActivity) {
+			layout.floatingActivity = null;
+			// re-enable the button
+			$('#floatingActivityButton').attr('disabled', null)
+									 	.css('opacity', 1);
+		} else {
+			// remove the transitions
+			// need to use slice() to copy the array as it gets modified in removeTransition()
+			$.each(activity.transitions.from.slice(), function() {
+				ActivityLib.removeTransition(this);
+			});
+			$.each(activity.transitions.to.slice(), function() {
+				ActivityLib.removeTransition(this);
+			});
+			
+			// remove the activity from reference tables
+			layout.activities.splice(layout.activities.indexOf(activity), 1);
+			if (layout.items.copiedActivity = activity) {
+				layout.items.copiedActivity = null;
+			}
+			if (activity instanceof ActivityLib.GroupingActivity) {
+				$.each(layout.activities, function(){
+					if (activity == this.grouping) {
+						this.grouping = null;
+						this.draw();
+					}
+				});
+			}
 		}
-		if (activity.type == 'grouping') {
-			$.each(layout.activities, function(){
-				if (activity == this.grouping) {
-					this.grouping = null;
-					this.draw();
-				}
+		
+		// remove the activity from parent activity
+		if (activity.parentActivity) {
+			activity.parentActivity.childActivities.splice(layout.parentActivity.childActivities.indexOf(activity), 1);
+		}
+		
+		// remove child activities
+		if (activity instanceof ActivityLib.OptionalActivity
+			|| activity instanceof ActivityLib.FloatingActivity) {
+			$.each(activity.childActivities, function(){
+				ActivityLib.removeActivity(this);
 			});
 		}
 		
@@ -404,10 +535,21 @@ var ActivityLib = {
 	 * Draws a transition between two activities.
 	 */
 	addTransition : function(fromActivity, toActivity, redraw, id, uiid, title) {
+		if (toActivity.parentActivity){
+			toActivity = toActivity.parentActivity;
+		}
+		if (fromActivity.parentActivity){
+			fromActivity = fromActivity.parentActivity;
+		}
+		if (toActivity instanceof ActivityLib.FloatingActivity
+			|| fromActivity instanceof ActivityLib.FloatingActivity){
+			return;
+		}
+		
 		// only converge points are allowed to have few inbound transitions
 		if (!redraw
 				&& toActivity.transitions.to.length > 0
-				&& !(toActivity.type == 'branchingEdge' && !toActivity.isStart)) {
+				&& !(toActivity instanceof ActivityLib.BranchingEdgeActivity && !toActivity.isStart)) {
 			alert('Transition to this activity already exists');
 			return;
 		}
@@ -415,8 +557,8 @@ var ActivityLib = {
 		// user chose to create outbound transition from an activity that already has one
 		if (!redraw
 				&& fromActivity.transitions.from.length > 0
-				&& !(fromActivity.type == 'branchingEdge' && fromActivity.isStart)
-				&& !(toActivity.type == 'branchingEdge'   && toActivity.isStart)) {
+				&& !(fromActivity instanceof ActivityLib.BranchingEdgeActivity && fromActivity.isStart)
+				&& !(toActivity instanceof ActivityLib.BranchingEdgeActivity  && toActivity.isStart)) {
 			if (confirm('Transition from this activity already exists.\n' +
 					    'Do you want to create branching here?')) {
 				ActivityLib.addBranching(fromActivity, toActivity);
@@ -436,7 +578,7 @@ var ActivityLib = {
 			}
 		});
 		
-		if (!branch && fromActivity.type == 'branchingEdge' && fromActivity.isStart) {
+		if (!branch && fromActivity instanceof ActivityLib.BranchingEdgeActivity && fromActivity.isStart) {
 			// create a new branch
 			branch = new ActivityLib.BranchActivity(null, null, null, fromActivity.branchingActivity);
 		}
@@ -491,7 +633,7 @@ var ActivityLib = {
 			convergeActivity1 = convergeActivity1.transitions.from[0].toActivity;
 		};
 		
-		if (toActivity2.type == 'branchingEdge' && toActivity2.isStart) {
+		if (toActivity2 instanceof ActivityLib.BranchingEdgeActivity && toActivity2.isStart) {
 			// there is already a branching activity, reuse existing items
 			branchingEdgeStart = toActivity2;
 			branchingEdgeEnd = toActivity2.branchingActivity.end;
@@ -542,6 +684,7 @@ var ActivityLib = {
 					'stroke-dasharray' : '-'
 				});
 				object.items.resizeButton.show();
+				object.items.resizeButton.toFront();
 				object.items.selectEffect = true;
 				
 				// also select encapsulated activities
@@ -550,7 +693,9 @@ var ActivityLib = {
 					object.items.fitButton.show();
 					
 					$.each(childActivities, function(){
-						ActivityLib.addSelectEffect(this, false);
+						if (!this.parentActivity) {
+							ActivityLib.addSelectEffect(this, false);
+						}
 					});
 				}
 			} else if (object instanceof ActivityLib.Transition) {
@@ -605,6 +750,7 @@ var ActivityLib = {
 		
 		if (object) {
 			if (object.items.selectEffect) {
+				// different effects for different types of objects
 				if (object instanceof DecorationLib.Region) {
 					object.items.shape.attr({
 						'stroke'           : 'black',
@@ -661,14 +807,66 @@ var ActivityLib = {
 	/**
 	 * Drop the dragged activity on the canvas.
 	 */
-	dropActivity : function(activity) {
-		// redraw transitions
-		$.each(activity.transitions.from.slice(), function(){
-			ActivityLib.addTransition(activity, this.toActivity, true);
+	dropActivity : function(activity, x, y) {
+		if (!(activity instanceof DecorationLib.Container)) {
+			// check if it was removed from an Optional or Floating Activity
+			if (activity.parentActivity) {
+				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
+				if ($.inArray(activity, childActivities) == -1) {
+					activity.parentActivity.draw();
+					ActivityLib.redrawTransitions(activity.parentActivity);
+					activity.parentActivity = null;
+				}
+			}
+			
+			// check if it was added to an Optional or Floating Activity
+			var container = layout.floatingActivity && layout.floatingActivity.items.shape.isPointInside(x, y)
+							? layout.floatingActivity : null;
+			if (!container) {
+				$.each(layout.activities, function(){
+					if (this instanceof ActivityLib.OptionalActivity && this.items.shape.isPointInside(x, y)) {
+						container = this;
+						return false;
+					}
+				});
+			}
+			if (container) {
+				if ($.inArray(activity, container.childActivities) == -1) {
+					$.each(activity.transitions.from, function(){
+						ActivityLib.removeTransition(this);
+					});
+					$.each(activity.transitions.to, function(){
+						ActivityLib.removeTransition(this);
+					});
+	
+					// for properties dialog to reload
+					ActivityLib.removeSelectEffect(container);
+					
+					container.childActivities.push(activity);
+					container.draw(null, null, null, null, childActivities);
+					ActivityLib.redrawTransitions(container);
+				}
+			}
+		}
+		
+		ActivityLib.redrawTransitions(activity);
+		
+		$.each(layout.regions, function(){
+			// redraw all annotation regions so they are pushed to back
+			this.draw();
 		});
-		$.each(activity.transitions.to.slice(), function(){
-			ActivityLib.addTransition(this.fromActivity, activity, true);
-		});
+	},
+	
+	
+	redrawTransitions : function(activity) {
+		if (activity.transitions) {
+			$.each(activity.transitions.from.slice(), function(){
+				ActivityLib.addTransition(activity, this.toActivity, true);
+			});
+			$.each(activity.transitions.to.slice(), function(){
+				ActivityLib.addTransition(this.fromActivity, activity, true);
+			});
+		}
 	},
 	
 	
@@ -755,7 +953,7 @@ var ActivityLib = {
 			// include the first activity
 			var branchLength = 1,
 				activity = this.transitionFrom.toActivity;
-			if (activity.type == 'branchingEdge'
+			if (activity instanceof ActivityLib.BranchingEdgeActivity
 					&& branchingActivity == activity.branchingActivity){
 				// branch with no activities
 				return true;
@@ -764,7 +962,7 @@ var ActivityLib = {
 			while (activity.transitions.from.length > 0) {
 				activity = activity.transitions.from[0].toActivity;
 				// check if reached the end of branch
-				if (activity.type == 'branchingEdge') {
+				if (activity instanceof ActivityLib.BranchingEdgeActivity) {
 					break;
 				} else {
 					branchLength++;

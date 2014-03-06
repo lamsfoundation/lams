@@ -90,7 +90,7 @@ var MenuLib = {
 				x = translatedEvent[0] - 47,
 				y = translatedEvent[1] -  2;
 
-			layout.activities.push(new ActivityLib.GroupingActivity(null, null, x, y, 'Grouping'));
+			layout.activities.push(new ActivityLib.GroupingActivity(null, null, x, y));
 			
 			HandlerLib.resetCanvasMode(true);
 		});
@@ -143,6 +143,65 @@ var MenuLib = {
 			HandlerLib.resetCanvasMode(true);
 			
 			DecorationLib.addLabel(x, y);
+		});
+	},
+	
+	
+	/**
+	 * Creates a new optional activity.
+	 */
+	addOptionalActivity : function() {
+		HandlerLib.resetCanvasMode();
+		
+		var dialog = layout.items.infoDialog.text('Click to add an optional activity container.');
+		dialog.dialog('open');
+	
+		canvas.css('cursor', 'pointer').click(function(event){
+			dialog.text('');
+			dialog.dialog('close');
+
+
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0],
+				y = translatedEvent[1];
+			
+			HandlerLib.resetCanvasMode(true);
+
+			layout.activities.push(new ActivityLib.OptionalActivity(null, null, x, y));
+		});
+	},
+	
+	
+	/**
+	 * Creates a new floating activity.
+	 */
+	addFloatingActivity : function() {
+		if (layout.floatingActivity) {
+			// there can be only one
+			return;
+		}
+		HandlerLib.resetCanvasMode();
+		
+		var dialog = layout.items.infoDialog.text('Click to add a support activity container.');
+		dialog.dialog('open');
+	
+		canvas.css('cursor', 'pointer').click(function(event){
+			dialog.text('');
+			dialog.dialog('close');
+
+
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0],
+				y = translatedEvent[1];
+			
+			HandlerLib.resetCanvasMode(true);
+
+			// do not add it to layout.activities as it behaves differently
+			new ActivityLib.FloatingActivity(null, null, x, y);
+			
+			// there can be only one, so disable the button
+			$('#floatingActivityButton').attr('disabled', 'disabled')
+									 	.css('opacity', 0.2);
 		});
 	},
 	
@@ -314,17 +373,19 @@ var MenuLib = {
 				   + 'Do you want to continue?')) {
 			return;
 		}
-		
-		// just to refresh the state of canvas
-		HandlerLib.resetCanvasMode(true);
 
 		if (layout.activities.length == 0) {
 			// no activities, nothing to do
 			return;
 		}
 		
+		// just to refresh the state of canvas
+		HandlerLib.resetCanvasMode(true);
+		
 		// activities are arranged in a grid
 		var row = 0,
+			// for special cases when row needs to shifted more
+			forceRowY = null,
 			column = 0,
 			// check how many columns current paper can hold
 			maxColumns = Math.floor((paper.width - layout.conf.arrangeHorizontalPadding)
@@ -334,15 +395,21 @@ var MenuLib = {
 			// check how many rows current paper can hold
 			maxRows = Math.floor((paper.height - layout.conf.arrangeVerticalPadding)
 	                 			  / layout.conf.arrangeVerticalSpace),
-	        // make a shallow copy of activities array
-			activitiesCopy = layout.activities.slice(),
+	        // a shallow copy of activities array without inner activities
+			activitiesCopy = [],
 			// just to speed up processing when there are only activities with no transitions left
 			onlyDetachedLeft = false;
+	
+		$.each(layout.activities, function(){
+			if (!this.parentActivity){
+				activitiesCopy.push(this);
+			}
+		});
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
 		// find the longes branch to find the new paper size
 		$.each(layout.activities, function(){
-			if (this.type == 'branchingEdge' && this.isStart) {
+			if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
 				// refresh branching metadata
 				ActivityLib.updateBranchesLength(this.branchingActivity);
 				// add start and end edges to the result
@@ -352,6 +419,12 @@ var MenuLib = {
 				}
 			}
 		});
+		
+		// check how many child activities are in Floating Activity, if any
+		if (layout.floatingActivity && layout.floatingActivity.childActivities.length > subsequenceMaxLength) {
+				subsequenceMaxLength = childActivities.length;
+		}
+		
 		// resize paper horizontally, if needed
 		if (subsequenceMaxLength > maxColumns) {
 			maxColumns = subsequenceMaxLength;
@@ -400,7 +473,7 @@ var MenuLib = {
 			
 			// crawl through a sequence of activities
 			while (activity) {
-				if (activity.type == 'branchingEdge') {
+				if (activity instanceof ActivityLib.BranchingEdgeActivity) {
 					if (activity.isStart) {
 						// draw branching edges straight away and remove them from normall processing
 						var branchingActivity = activity.branchingActivity,
@@ -409,7 +482,7 @@ var MenuLib = {
 							complex = {
 								end : end
 							},
-							// can the whole branching fit in curren canvas width?
+							// can the whole branching fit in current canvas width?
 							branchingFits = column + branchingActivity.longestBranchLength + 2 <= maxColumns;
 						if (!branchingFits) {
 							// start branching from the left side of canvas
@@ -465,21 +538,39 @@ var MenuLib = {
 					var x = layout.conf.arrangeHorizontalPadding + column * layout.conf.arrangeHorizontalSpace,
 						y = layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace;
 					
-					if (activity.type == 'gate') {
+					if (activity instanceof ActivityLib.GateActivity) {
 						// adjust placement for gate activity, so it's in the middle of its cell
 						x += 57;
 						y += 10;
+					} else if (activity instanceof ActivityLib.OptionalActivity){
+						x -= 20;
 					}
 					
 					activity.draw(x, y);
 					// remove the activity so we do not process it twice
 					activitiesCopy.splice(activitiesCopy.indexOf(activity), 1);
+					
+					// learn where a tall Optional Activity has its end
+					// and later start drawing activities lower than in the next row
+					if (activity instanceof ActivityLib.OptionalActivity && activity.childActivities.length > 1) {
+						var activityEndY = activity.items.shape.getBBox().y2;
+						if (!forceRowY || activityEndY > forceRowY) {
+							forceRowY = activityEndY;
+						}
+					}
 				}
 				
 				// find the next row and column
 				column = (column + 1) % maxColumns;
 				if (column == 0) {
 					row++;
+					// if an Optional Activity forced next activities to be drawn lower than usual
+					if (forceRowY) {
+						while (forceRowY > layout.conf.arrangeVerticalPadding + 10 + row * layout.conf.arrangeVerticalSpace) {
+							row++;
+						}
+						forceRowY = null;
+					}
 				}
 				
 				// does the activity has further activities?
@@ -531,6 +622,15 @@ var MenuLib = {
 			};
 		};
 		
+		if (layout.floatingActivity) {
+			row++;
+			column = 0;
+			var x = layout.conf.arrangeHorizontalPadding,
+				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;
+			
+			layout.floatingActivity.draw(x, y);
+		}
+		
 		// redraw transitions one by one
 		$.each(layout.activities, function(){
 			$.each(this.transitions.from.slice(), function(){
@@ -544,6 +644,7 @@ var MenuLib = {
 	 * Removes existing activities and prepares canvas for a new sequence.
 	 */
 	newLearningDesign : function(force, soft){
+		// force means that user should not be asked for confirmation.
 		if (!force && (layout.activities.length > 0
 					  || layout.regions.length > 0
 					  || layout.labels.length > 0)
@@ -551,6 +652,7 @@ var MenuLib = {
 			return;
 		}
 		
+		// soft means that data is manually reset, instead of simply reloading the page.
 		if (soft) {
 			$('#ldDescriptionFieldTitle').text('');
 			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(null);
@@ -561,6 +663,7 @@ var MenuLib = {
 			layout.activities = [];
 			layout.regions = [];
 			layout.labels = [];
+			layout.floatingActivity = null;
 			
 			if (paper) {
 				paper.clear();
@@ -599,7 +702,7 @@ var MenuLib = {
 			return;
 		}
 		// only tool activities can be copied (todo?)
-		if (activity.type != 'tool') {
+		if (!(activity instanceof ActivityLib.ToolActivity)) {
 			alert('Sorry, you can not paste this type of activity');
 			return;
 		}

@@ -405,6 +405,67 @@ var PropertyLib = {
 	
 	
 	/**
+	 * Properties dialog content for Optional Activity.
+	 */
+	optionalActivityProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+
+		activity.minActivities = Math.min(activity.minActivities, activity.childActivities.length);
+		activity.maxActivities = Math.min(activity.maxActivities, activity.childActivities.length);
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentOptionalActivity').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				if (newTitle != activity.title) {
+					activity.title = newTitle;
+					activity.draw();
+				}
+			});
+				
+			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.minActivities = Math.min(value, activity.childActivities.length);
+				  if (value != activity.minActivities) {
+					  $(this, content).spinner('value', activity.minActivities);
+				  }
+				  if (activity.minActivities > activity.maxActivities) {
+					  $('.propertiesContentFieldOptionalActivityMax', content).spinner('value', value);
+				  }
+				  $('.propertiesContentFieldOptionalActivityMax', content).spinner('option', 'min', value);
+			  });
+			
+			
+			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.maxActivities = Math.min(value, activity.childActivities.length);
+				  if (value != activity.maxActivities) {
+					  $(this, content).spinner('value', activity.maxActivities);
+				  }
+			  });
+		}
+		
+		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minActivities)
+																.spinner('option', 'max', activity.childActivities.length);
+		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxActivities)
+																.spinner('option', {
+																	'min' : activity.minActivities,
+																	'max' : activity.childActivities.length
+																});
+	},
+	
+	
+	/**
 	 * Properties dialog content for regions (annotations).
 	 */
 	regionProperties : function() {
@@ -474,7 +535,7 @@ var PropertyLib = {
 		var emptyOption = $('<option />'),
 			groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
 		$.each(layout.activities, function(){
-			if (this.type == 'grouping') {
+			if (this instanceof ActivityLib.GropuingActivity) {
 				var option = $('<option />').text(this.title)
 											.appendTo(groupingDropdown)
 											// store reference to grouping object
@@ -499,7 +560,7 @@ var PropertyLib = {
 		var emptyOption = $('<option />'),
 			inputDropdown = $('.propertiesContentFieldInput', content).empty().append(emptyOption);
 		$.each(layout.activities, function(){
-			if (this.type == 'tool' && layout.toolMetadata[this.toolID].supportsOutputs) {
+			if (this instanceof ActivityLib.ToolActivity && layout.toolMetadata[this.toolID].supportsOutputs) {
 				var option = $('<option />').text(this.title)
 											.appendTo(inputDropdown)
 											// store reference to grouping object

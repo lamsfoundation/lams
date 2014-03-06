@@ -67,6 +67,18 @@
 		<div>
 			<div class="split-ui-button">
 				<div>
+					<span>Optional</span>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+			<ul>
+				<li onClick="javascript:MenuLib.addOptionalActivity()">Activity</li>
+				<li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()">Support</li>
+			</ul>
+		</div>
+		<div>
+			<div class="split-ui-button">
+				<div>
 					<span>Flow</span>
 				</div>
 				<div>&nbsp;</div>
@@ -393,6 +405,37 @@
 		</table>
 	</div>
 	
+	
+	<div id="propertiesContentOptionalActivity" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Min activities:
+				</td>
+				<td>
+					<input class="propertiesContentFieldOptionalActivityMin spinner" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Max activities:
+				</td>
+				<td>
+					<input class="propertiesContentFieldOptionalActivityMax spinner" type="text"></input>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	
 	<div id="propertiesContentRegion" class="dialogContainer">
 		<table>
 			<tr>
@@ -404,7 +447,8 @@
 				</td>
 			</tr>
 		</table>
-	</div>	
+	</div>
+	
 	
 	<div id="propertiesContentLabel" class="dialogContainer">
 		<table>

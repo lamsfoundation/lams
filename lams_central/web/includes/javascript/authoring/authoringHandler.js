@@ -105,6 +105,15 @@ var HandlerLib = {
 			items.isDragged = true;
 			items.attr('cursor', 'move');
 			
+			var parentObject = draggedElement.data('parentObject');
+				sticky = parentObject && (parentObject instanceof ActivityLib.OptionalActivity
+										  || parentObject instanceof ActivityLib.FloatingActivity);
+			if (sticky) {
+				$.each(parentObject.childActivities, function(){
+					this.items.hide();
+				});
+			}
+			
 			canvas.mousemove(function(event) {
 				 HandlerLib.dragItemsMoveHandler(items, event, startX, startY);
 			});
@@ -153,7 +162,7 @@ var HandlerLib = {
 	 * Start drawing a transition.
 	 */
 	drawTransitionStartHandler : function(activity, event, x, y) {
-		if (activity.fromTransition && activity.type != 'branchingEdge') {
+		if (activity.fromTransition && !(activity instanceof ActivityLib.BranchingEdgeActivity)) {
 			alert('Transition from this activity already exists');
 			return;
 		}
@@ -274,7 +283,7 @@ var HandlerLib = {
 		// immediatelly show which activities will be enveloped
 		var childActivities = DecorationLib.getChildActivities(data.shape);
 		$.each(layout.activities, function(){
-			if ($.inArray(this, childActivities) > -1){
+			if (!this.parentActivity && $.inArray(this, childActivities) > -1){
 				ActivityLib.addSelectEffect(this, false);
 			} else {
 				ActivityLib.removeSelectEffect(this);
@@ -386,13 +395,16 @@ var HandlerLib = {
 					ActivityLib.removeActivity(activity);
 				} else {
 					HandlerLib.dropObject(activity);
-					ActivityLib.dropActivity(activity);
+
+					var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+						endX = translatedEvent[0],
+						endY = translatedEvent[1];
+					ActivityLib.dropActivity(activity, endX, endY);
 				}
 			}
 			// start dragging the activity
 			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
 		}
-		
 	},
 	
 	
@@ -449,26 +461,33 @@ var HandlerLib = {
 	
 	
 	/**
-	 * Starts dragging a region
+	 * Starts dragging a container
 	 */
-	regionMousedownHandler : function(event, x, y){
+	containerMousedownHandler : function(event, x, y){
 		if (layout.drawMode || (event.originalEvent ?
 				event.originalEvent.defaultPrevented : event.defaultPrevented)){
 			return;
 		}
 		
-		var region = this.data('parentObject');
+		var container = this.data('parentObject');
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
-				// if the region was over rubbish bin, remove it
-				DecorationLib.removeRegion(region);
+				// if the container was over rubbish bin, remove it
+				if (container instanceof DecorationLib.Region) {
+					DecorationLib.removeRegion(container);
+				} else {
+					ActivityLib.removeActivity(container);
+				}
 			} else {
-				HandlerLib.dropObject(region);
+				HandlerLib.dropObject(container);
+				if (container instanceof ActivityLib.FloatingActivity) {
+					ActivityLib.dropActivity(container);
+				}
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(region.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(container.items, this, mouseupHandler, event, x, y);
 	},
 	
 	

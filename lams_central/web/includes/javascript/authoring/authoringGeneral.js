@@ -11,6 +11,7 @@ var paper = null,
 	'drawMode'   : false,
 	 // 'isZoomed'   : false,
 	'activities' : null,
+	'floatingActivity' : null,
 	'regions' : null,
 	'labels'	 : null,
 	'items' : {
@@ -65,7 +66,8 @@ var paper = null,
 		'transition'   		  : 'rgb(119,126,157)',
 		'binActive'    		  : 'red',
 		'selectEffect'        : 'blue',
-		'annotation'		  : 'yellow'
+		'annotation'		  : 'yellow',
+		'optionalActivity'    : 'rgb(194,213,254)'
 	},
 };
 
@@ -141,9 +143,14 @@ function initTemplates(){
 			    var toolID = draggable.draggable.attr('toolId'),
 			    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 			    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
-			    	label = $('div', draggable.draggable).text();
-				
-				layout.activities.push(new ActivityLib.ToolActivity(null, null, null, toolID, x, y, label));
+			    	label = $('div', draggable.draggable).text(),
+			    	activity = new ActivityLib.ToolActivity(null, null, null, toolID, x, y, label),
+			    	translatedEvent = ActivityLib.translateEventOnCanvas(event),
+					eventX = translatedEvent[0],
+					eventY = translatedEvent[1];
+			    
+				layout.activities.push(activity); 
+				ActivityLib.dropActivity(activity, eventX, eventY);
 		   }
 	});
 }
@@ -489,7 +496,7 @@ function openLearningDesign(learningDesignID) {
 					// Sequence Activity, i.e. a branch
 					case 8: 
 						$.each(layout.activities, function(){
-							if (this.type == 'branchingEdge'
+							if (this instanceof ActivityLib.BranchingEdgeActivity
 								&& activityData.parentActivityID == this.branchingActivity.id) {
 								// create a branch inside the branching activity
 								this.branchingActivity.branches.push(
@@ -555,9 +562,9 @@ function openLearningDesign(learningDesignID) {
 					var groupedActivity = this.activity,
 						groupingID = this.groupingID;
 					$.each(layout.activities, function(){
-						if (this.type == 'grouping' && groupingID == this.groupingID) {
+						if (this instanceof ActivityLib.GroupingActivity && groupingID == this.groupingID) {
 							// add reference and redraw the grouped activity
-							if (groupedActivity.type == 'branchingEdge') {
+							if (groupedActivity instanceof ActivityLib.BranchingEdgeActivity) {
 								groupedActivity.branchingActivity.grouping = this;
 							} else {
 								groupedActivity.grouping = this;
@@ -577,7 +584,7 @@ function openLearningDesign(learningDesignID) {
 					branch = null;
 				$.each(layout.activities, function(){
 					// is it the branch we're looking for?
-					if (this.type == 'branchingEdge' && this.isStart) {
+					if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
 						$.each(this.branchingActivity.branches, function(){
 							if (branchUIID == this.uiid) {
 								branch = this;
@@ -585,7 +592,7 @@ function openLearningDesign(learningDesignID) {
 							}
 						});
 					// is it the grouping we're looking for
-					} else if (this.type == 'grouping') {
+					} else if (this instanceof ActivityLib.GroupingActivity) {
 						$.each(this.groups, function(){
 							if (groupUIID == this.uiid) {
 								group = this;
@@ -611,7 +618,7 @@ function openLearningDesign(learningDesignID) {
 			
 			// draw starting and ending transitions in branches
 			$.each(layout.activities, function(){
-				if (this.type == 'branchingEdge' && this.isStart) {
+				if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
 					var branchingActivity = this.branchingActivity;
 					$.each(branchingActivity.branches, function(){
 						var branch = this,
@@ -635,7 +642,7 @@ function openLearningDesign(learningDesignID) {
 				// find which activities the transition belongs to
 				$.each(layout.activities, function(){
 					var activity = this,
-						isBranching = activity.type == 'branchingEdge';
+						isBranching = activity instanceof ActivityLib.BranchingEdgeActivity;
 					
 					// check if transition IDs match either a plain activity or a complex one
 					if (isBranching ? !activity.isStart && transition.fromActivityID == activity.branchingActivity.id 
@@ -717,14 +724,14 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'groupingSupportType' 	 : 2,
 			'applyGrouping' 		 : isGrouped,
 			'groupingUIID'			 : isGrouped ? activity.grouping.groupingUIID : null,
-		    'createGroupingUIID'	 : activity.type == 'grouping' ? activity.groupingUIID : null,
+		    'createGroupingUIID'	 : activity instanceof ActivityLib.GroupingActivity ? activity.groupingUIID : null,
 			'parentActivityID' 		 : null,
 			'parentUIID' 			 : null,
 			'libraryActivityUIImage' : iconPath,
 			'xCoord' 				 : activityBox.x,
 			'yCoord' 				 : activityBox.y,
 			'activityTitle' 		 : activity.title,
-			'activityCategoryID' 	 : activity.type == 'tool' ?
+			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity ?
 											layout.toolMetadata[toolID].activityCategoryID : 1,
 			'activityTypeID'     	 : activityTypeID,
 			
@@ -746,7 +753,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			});
 		});
 		
-		if (activity.type == 'grouping') {
+		if (activity instanceof ActivityLib.GroupingActivity) {
 			// create a list of groupings
 			var groups = [],
 				groupingType = null;
