@@ -37,11 +37,10 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
-import org.lamsfoundation.lams.tool.vote.SessionDTO;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -98,8 +97,7 @@ public interface IVoteService {
      */
     LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
 
-    List<VoteMonitoredAnswersDTO> processUserEnteredNominations(Long voteContentUid, String currentSessionId,
-	    boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId);
+    List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId);
     
     List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
 
@@ -143,25 +141,25 @@ public interface IVoteService {
 
     void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
 
-    int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException;
+    int getAttemptsForQuestionContent(final Long questionUid) throws VoteApplicationException;
 
     boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException;
 
     int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException;
 
-    List<VoteUsrAttempt> getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+    List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
 	    final Long voteSessionUid);
 
-    int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId)
+    int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionId)
 	    throws VoteApplicationException;
 
     int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
 
-    List getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
+    List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
 	    throws VoteApplicationException;
 
     VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException;
+	    final Long questionUid, final Long toolSessionUid) throws VoteApplicationException;
 
     List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException;
 
@@ -181,7 +179,7 @@ public interface IVoteService {
 
     void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException;
 
-    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId);
+    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long questionUid);
 
     VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
 
@@ -238,18 +236,19 @@ public interface IVoteService {
 
     void saveVoteContent(VoteContent vote) throws VoteApplicationException;
 
+    /**
+     * checks the parameter content in the user responses table
+     * 
+     * @param voteContent
+     * @return boolean
+     * @throws VoteApplicationException
+     */
     boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException;
-
-    int countIncompleteSession(VoteContent vote) throws VoteApplicationException;
-
-    boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException;
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
     void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException;
-
-    boolean existsSession(Long toolSessionId);
 
     void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException;
 

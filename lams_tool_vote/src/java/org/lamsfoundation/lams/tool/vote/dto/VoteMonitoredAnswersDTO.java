@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.List;
 import java.util.Map;

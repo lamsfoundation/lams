@@ -52,18 +52,19 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -357,9 +358,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		if (voteQueContent != null) {
 		    String entry = voteQueContent.getQuestion();
 
-		    String voteQueContentId = attempt.getVoteQueContent().getUid().toString();
+		    String questionUid = attempt.getVoteQueContent().getUid().toString();
 		    if (entry != null) {
-			if (entry.equals("sample nomination") && voteQueContentId.equals("1")) {
+			if (entry.equals("sample nomination") && questionUid.equals("1")) {
 			    localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());
 			} else {
 			    localMapQuestionsContent.put(new Integer(order).toString(), voteQueContent.getQuestion());

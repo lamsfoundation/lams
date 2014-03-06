@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.List;
 import java.util.Map;
@@ -361,15 +361,15 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the sessionDTOs.
+     * @return Returns the sessionDtos.
      */
     public List<SessionDTO> getSessionDTOs() {
 	return sessionDTOs;
     }
 
     /**
-     * @param sessionDTOs
-     *            The sessionDTOs to set.
+     * @param sessionDtos
+     *            The sessionDtos to set.
      */
     public void setSessionDTOs(List<SessionDTO> sessionDTOs) {
 	this.sessionDTOs = sessionDTOs;
@@ -571,7 +571,7 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 		.append("isPortfolioExport: ", isPortfolioExport)
 		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
 		.append("listUserEntries: ", listUserEntries).append("existsOpenVotes: ", existsOpenVotes)
-		.append("sessionDTOs: ", sessionDTOs).append("mapStudentsVoted: ", mapStudentsVoted)
+		.append("sessionDtos: ", sessionDTOs).append("mapStudentsVoted: ", mapStudentsVoted)
 		.append("responseId: ", responseId).append("currentUid: ", currentUid)
 		.append("sessionUserCount: ", sessionUserCount)
 		.append("completedSessionUserCount: ", completedSessionUserCount).toString();

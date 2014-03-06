@@ -22,7 +22,7 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 

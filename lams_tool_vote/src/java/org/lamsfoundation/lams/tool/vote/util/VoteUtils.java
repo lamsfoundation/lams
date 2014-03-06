@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.util;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -34,10 +34,13 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
-import org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm;
+import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.web.form.VoteAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;

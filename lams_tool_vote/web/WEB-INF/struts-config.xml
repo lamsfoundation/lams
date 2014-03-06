@@ -4,11 +4,11 @@
 <struts-config>
 	  <!-- ========== Form Bean Definitions =================================== -->
 	<form-beans>
-		<form-bean name="VoteAuthoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm"/>
-		<form-bean name="VoteLearningForm" type="org.lamsfoundation.lams.tool.vote.web.VoteLearningForm"/>
-		<form-bean name="VoteMonitoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringForm"/>
-		<form-bean name="VoteChartForm" type="org.lamsfoundation.lams.tool.vote.web.VoteChartForm"/>
-		<form-bean name="VotePedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.vote.web.VotePedagogicalPlannerForm"/>				
+		<form-bean name="VoteAuthoringForm" type="org.lamsfoundation.lams.tool.vote.web.form.VoteAuthoringForm"/>
+		<form-bean name="VoteLearningForm" type="org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm"/>
+		<form-bean name="VoteMonitoringForm" type="org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm"/>
+		<form-bean name="VoteChartForm" type="org.lamsfoundation.lams.tool.vote.web.form.VoteChartForm"/>
+		<form-bean name="VotePedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.vote.web.form.VotePedagogicalPlannerForm"/>				
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->

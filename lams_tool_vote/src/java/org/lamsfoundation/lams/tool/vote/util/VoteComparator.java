@@ -19,22 +19,43 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-package org.lamsfoundation.lams.tool.vote;
 
+package org.lamsfoundation.lams.tool.vote.util;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * <p> Null Object pattern. This interface is defined to avoid the use of NULL. 
- * The domain object that allows NULL as return value should implement this
- * interface. </p>
- * 
- * @author Ozgur Demirtas
+ * @author Ozgur Demirtas A comparator implementation that can be used as a constructor to collections. The TreeMap in
+ *         the web layer makes use of it.
  * 
  */
-public interface Nullable
-{
-    /**
-     * contract to indicate whether current object is null.
-     * @return
-     */
-    public boolean isNull();
+public class VoteComparator implements Comparator, Serializable {
+
+    public int compare(Object o1, Object o2) {
+	
+	int key1;
+	int key2;
+	
+	if (o1 instanceof Long) {
+	    Long s1 = (Long) o1;
+	    Long s2 = (Long) o2;
+
+	    key1 = s1.intValue();
+	    key2 = s2.intValue();
+	    
+	} else {
+	    String s1 = (String) o1;
+	    String s2 = (String) o2;
+
+	    key1 = new Long(s1).intValue();
+	    key2 = new Long(s2).intValue();	    
+	}
+
+	return key1 - key2;
+    }
+
+    public boolean equals(Object o) {
+	return compare(this, o) == 0;
+    }
 }

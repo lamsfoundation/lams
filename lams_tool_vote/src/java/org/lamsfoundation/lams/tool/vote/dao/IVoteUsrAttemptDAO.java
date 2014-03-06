@@ -41,7 +41,7 @@ public interface IVoteUsrAttemptDAO {
 
     List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId);
 
-    List<VoteUsrAttempt> getUserRecords(final Long voteContentUid, final String userEntry);
+    List<VoteUsrAttempt> getUserAttempts(final Long voteContentUid, final String userEntry);
 
     Set<String> getUserEntries(final Long voteContentUid);
 
@@ -53,13 +53,13 @@ public interface IVoteUsrAttemptDAO {
 
     int getSessionEntriesCount(final Long voteSessionId);
 
-    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId);
+    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long questionUid);
 
     int getAttemptsForQuestionContent(final Long voteQueContentId);
 
     int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 
-    List<VoteUsrAttempt> getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+    List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId,
 	    final Long voteSessionUid);
 
     void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid);
@@ -75,5 +75,6 @@ public interface IVoteUsrAttemptDAO {
 
     Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid);
 
-    List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+    List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+    
 }

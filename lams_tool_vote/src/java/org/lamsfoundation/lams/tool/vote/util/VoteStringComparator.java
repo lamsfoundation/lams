@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.util;
 
 import java.io.Serializable;
 import java.util.Comparator;

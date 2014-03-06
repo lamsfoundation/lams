@@ -47,21 +47,18 @@ import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.vote.EditActivityDTO;
-import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
-import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
-import org.lamsfoundation.lams.tool.vote.VoteAllGroupsDTO;
-import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
-import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
-import org.lamsfoundation.lams.tool.vote.VoteStringComparator;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.dto.EditActivityDTO;
+import org.lamsfoundation.lams.tool.vote.dto.ExportPortfolioDTO;
+import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteAllGroupsDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteNominationContentDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -69,6 +66,10 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.util.VoteStringComparator;
+import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -152,7 +153,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	List<VoteUsrAttempt> userAttempts;
 	//in regular case when we need info for particular session
 	if (StringUtils.isNotBlank(sessionUid)) {
-	    userAttempts = voteService.getStandardAttemptUsersForQuestionContentAndSessionUid(new Long(questionUid),
+	    userAttempts = voteService.getAttemptsForQuestionContentAndSessionUid(new Long(questionUid),
 		    new Long(sessionUid));
 	    
 	//in case of All sessions

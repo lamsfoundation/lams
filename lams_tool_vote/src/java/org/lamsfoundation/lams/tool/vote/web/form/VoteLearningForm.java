@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.web;
+package org.lamsfoundation.lams.tool.vote.web.form;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,7 +128,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	checkedVotes = new String[0];
     }
 
-    protected void resetUserActions() {
+    public void resetUserActions() {
 	this.getNextQuestion = null;
 	this.getPreviousQuestion = null;
 	this.viewAllResults = null;

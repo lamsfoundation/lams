@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote;
+package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +46,7 @@ public class SessionDTO implements Comparable {
     private Map<Long, Long> mapStandardUserCount;
     private Map mapStandardRatesContent;
     private List<VoteMonitoredAnswersDTO> openVotes;
+    private List<VoteMonitoredAnswersDTO> answers;
 
     /**
      * @return Returns the mapStandardQuestionUid.
@@ -77,7 +78,6 @@ public class SessionDTO implements Comparable {
 	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
 
-
     /**
      * @return Returns the openVotes.
      */
@@ -91,6 +91,21 @@ public class SessionDTO implements Comparable {
      */
     public void setOpenVotes(List<VoteMonitoredAnswersDTO> openVotes) {
 	this.openVotes = openVotes;
+    }
+    
+    /**
+     * @return Returns the openVotes.
+     */
+    public List<VoteMonitoredAnswersDTO> getAnswers() {
+	return answers;
+    }
+
+    /**
+     * @param openVotes
+     *            The openVotes to set.
+     */
+    public void setAnswers(List<VoteMonitoredAnswersDTO> answers) {
+	this.answers = answers;
     }
 
     /**

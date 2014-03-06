@@ -36,12 +36,12 @@ import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 
 public class VoteOutputFactory extends OutputFactory {
 

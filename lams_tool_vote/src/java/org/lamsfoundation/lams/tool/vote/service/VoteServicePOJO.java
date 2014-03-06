@@ -70,27 +70,25 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
-import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.MonitoringUtil;
-import org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -111,9 +109,7 @@ import org.springframework.dao.DataAccessException;
  * 
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, VoteAppConstants
-
-{
+	ToolContentImport102Manager, VoteAppConstants {
     static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 
     private IVoteContentDAO voteContentDAO;
@@ -428,8 +424,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    sessionDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 	    sessionDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 
-	    List<VoteMonitoredAnswersDTO> openVotes = this.processUserEnteredNominations(voteContent.getUid(), session
-		    .getVoteSessionId().toString(), true, null, false);
+	    List<VoteMonitoredAnswersDTO> openVotes = this.getOpenVotes(voteContent.getUid(),
+		    session.getVoteSessionId(), null);
 	    sessionDTO.setOpenVotes(openVotes);
 	    boolean isExistsOpenVote = openVotes.size() > 0;
 	    sessionDTO.setExistsOpenVote(isExistsOpenVote);
@@ -521,92 +517,86 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     @Override
-    public List<VoteMonitoredAnswersDTO> processUserEnteredNominations(Long voteContentUid, String currentSessionId,
-	    boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId) {
+    public List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId) {
 	Set<String> userEntries = voteUsrAttemptDAO.getUserEntries(voteContentUid);
 
-	List<VoteMonitoredAnswersDTO> listUserEntries = new LinkedList<VoteMonitoredAnswersDTO>();
+	List<VoteMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<VoteMonitoredAnswersDTO>();
+	for (String userEntry : userEntries) {
 
-	Iterator itListNominations = userEntries.iterator();
-	while (itListNominations.hasNext()) {
-	    String userEntry = (String) itListNominations.next();
+	    if (userEntry == null || userEntry.length() == 0) {
+		continue;
+	    }
+	    
+	    VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
+	    voteMonitoredAnswersDTO.setQuestion(userEntry);
 
-	    if (userEntry != null && userEntry.length() > 0) {
-		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
-		voteMonitoredAnswersDTO.setQuestion(userEntry);
+	    List<VoteUsrAttempt> userAttempts = voteUsrAttemptDAO.getUserAttempts(voteContentUid, userEntry);
+	    List<VoteMonitoredUserDTO> monitoredUserContainerDTOs = new LinkedList<VoteMonitoredUserDTO>();
 
-		List<VoteUsrAttempt> userRecords = voteUsrAttemptDAO.getUserRecords(voteContentUid, userEntry);
-		List listMonitoredUserContainerDTO = new LinkedList();
+	    for (VoteUsrAttempt voteUsrAttempt : userAttempts) {
+		VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 
-		Iterator itUserRecords = userRecords.iterator();
-		while (itUserRecords.hasNext()) {
-		    VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-		    VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) itUserRecords.next();
+		if (currentSessionId == null) {
+		    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+		    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+		    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+		    voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+		    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+		    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+		    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+		    monitoredUserContainerDTOs.add(voteMonitoredUserDTO);
 
-		    if (!showUserEntriesBySession) {
+		} else {
+		    // showUserEntriesBySession is true: the case with learner export portfolio
+		    // show user entries by same same session and same user
+		    Long userSessionId = voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId();
+
+		    if (userId != null) {
+			if (userSessionId.equals(currentSessionId)) {
+			    Long localUserId = voteUsrAttempt.getVoteQueUsr().getQueUsrId();
+			    if (userId.equals(localUserId)) {
+				voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
+				voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+				voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+				voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+				voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+				monitoredUserContainerDTOs.add(voteMonitoredUserDTO);
+				voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+				voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
+				if (voteUsrAttempt.isVisible() == false) {
+				    voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
+				}
+
+			    }
+			}
+		    } else {
+			// showUserEntriesByUserId is false
+			// show user entries by same session
+			if (userSessionId.equals(currentSessionId)) {
 			    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
 			    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
 			    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 			    voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 			    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+			    monitoredUserContainerDTOs.add(voteMonitoredUserDTO);
 			    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
 			    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-			    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
-			
-		    } else {
-			// showUserEntriesBySession is true: the case with learner export portfolio
-			// show user entries by same same session and same user
-			String userSessionId = voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId()
-				.toString();
-
-			if (showUserEntriesByUserId) {
-				if (userSessionId.equals(currentSessionId)) {
-				    String localUserId = voteUsrAttempt.getVoteQueUsr().getQueUsrId().toString();
-				    if (userId.equals(localUserId)) {
-					voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
-					voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-					voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-				    voteMonitoredUserDTO
-					    .setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-					voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-					listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
-					voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
-				    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-					if (voteUsrAttempt.isVisible() == false) {
-					    voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
-					}
-
-				    }
-				}
-			} else {
-			    // showUserEntriesByUserId is false
-			    // show user entries by same session
-				if (userSessionId.equals(currentSessionId)) {
-				    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
-				    voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-				    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-				voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-				    voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-				    listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
-				    voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
-				    voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
-				}
-			    }
 			}
-
+		    }
 		}
 
-		if (listMonitoredUserContainerDTO.size() > 0) {
-		    Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringUtil
-			    .convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+	    }
 
-		    voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);
-		    listUserEntries.add(voteMonitoredAnswersDTO);
-		}
+	    if (monitoredUserContainerDTOs.size() > 0) {
+		Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringUtil
+			.convertToVoteMonitoredUserDTOMap(monitoredUserContainerDTOs);
+
+		voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);
+		monitoredAnswersDTOs.add(voteMonitoredAnswersDTO);
 	    }
 	}
 
-	return listUserEntries;
+	return monitoredAnswersDTOs;
     }
     
     @Override
@@ -729,10 +719,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List<VoteUsrAttempt> getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+    public List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
 	    final Long voteSessionUid) {
 	try {
-	    return voteUsrAttemptDAO.getStandardAttemptUsersForQuestionContentAndSessionUid(voteQueContentId,
+	    return voteUsrAttemptDAO.getAttemptsForQuestionContentAndSessionUid(questionUid,
 		    voteSessionUid);
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException("Exception occured when lams is retrieving usernames for votes: "
@@ -1282,7 +1272,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
+    @Override
+    public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
 	    throws VoteApplicationException {
 	try {
 	    return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(userUid, questionUid);
@@ -1293,13 +1284,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * checks the parameter content in the user responses table
-     * 
-     * @param voteContent
-     * @return boolean
-     * @throws VoteApplicationException
-     */
+    @Override
     public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException {
 	Iterator questionIterator = voteContent.getVoteQueContents().iterator();
 
@@ -1316,6 +1301,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return false;
     }
 
+    @Override
     public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException {
 	boolean studentActivityOccurredGlobal = studentActivityOccurredGlobal(voteContent);
 
@@ -1328,41 +1314,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return false;
     }
 
-    public int countIncompleteSession(VoteContent vote) throws VoteApplicationException {
-	int countIncompleteSession = 2;
-	return countIncompleteSession;
-    }
-
-    /**
-     * checks the parameter content in the tool sessions table
-     * 
-     * find out if any student has ever used (logged in through the url and replied) to this content return true even if
-     * you have only one content passed as parameter referenced in the tool sessions table
-     * 
-     * @param vote
-     * @return boolean
-     * @throws VoteApplicationException
-     */
-    public boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException {
-
-	int countStudentActivity = 2;
-
-	if (countStudentActivity > 0) {
-	    return true;
-	}
-	return false;
-    }
-
-    /**
-     * implemented as part of the Tool Contract copyToolContent(Long fromContentId, Long toContentId) throws
-     * ToolException
-     * 
-     * @param fromContentId
-     * @param toContentId
-     * @return
-     * @throws ToolException
-     * 
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (fromContentId == null) {
@@ -1424,14 +1376,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * implemented as part of the tool contract. Removes content and uploaded files from the content repository.
-     * 
-     * @param toContentId
-     * @param removeSessionData
-     * @return
-     * @throws ToolException
-     */
+    @Override
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 
@@ -1472,6 +1417,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Removing Vote attempts for user ID " + userId + " and toolContentId " + toolContentId);
@@ -1499,15 +1445,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *                 if no tool content matches the toolSessionID
-     * @throws ToolException
-     *                 if any other error occurs
-     */
-
+    @Override
     public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
 	VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentID);
 	if (toolContentObj == null) {
@@ -1539,12 +1477,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *                 if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
@@ -1567,23 +1500,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
-    }
-
-    /**
-     * it is possible that the tool session id already exists in the tool sessions table as the users from the same
-     * session are involved. existsSession(long toolSessionID)
-     * 
-     * @param toolSessionID
-     * @return boolean
-     */
-    public boolean existsSession(Long toolSessionID) {
-	VoteSession voteSession = retrieveVoteSession(toolSessionID);
-
-	if (voteSession == null) {
-	    VoteServicePOJO.logger.error("voteSession does not exist yet: " + toolSessionID);
-	    return false;
-	}
-	return true;
     }
 
     /**
@@ -1641,9 +1557,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	/*
 	 * create a new a new tool session if it does not already exist in the tool session table
 	 */
-	if (!existsSession(toolSessionID)) {
+	VoteSession voteSession = retrieveVoteSession(toolSessionID);
+	if (voteSession == null) {
 	    try {
-		VoteSession voteSession = new VoteSession(toolSessionID, new Date(System.currentTimeMillis()),
+		voteSession = new VoteSession(toolSessionID, new Date(System.currentTimeMillis()),
 			VoteSession.INCOMPLETE, toolSessionName, voteContent, new TreeSet());
 
 		voteSessionDAO.saveVoteSession(voteSession);

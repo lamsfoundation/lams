@@ -259,6 +259,7 @@ public interface VoteAppConstants {
     /*
      * Monitoring Mode constants
      */
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     public static final String REPORT_TITLE_MONITOR = "reportTitleMonitor";
     public static final String MONITOR_USER_ID = "userId";
     public static final String MONITORING_REPORT = "monitoringReport";

@@ -21,7 +21,7 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.vote.web;
+package org.lamsfoundation.lams.tool.vote.web.form;
 
 import java.util.ArrayList;
 import java.util.List;

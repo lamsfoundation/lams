@@ -23,49 +23,42 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.vote.EditActivityDTO;
-import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
-import org.lamsfoundation.lams.tool.vote.ReflectionDTO;
-import org.lamsfoundation.lams.tool.vote.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.VoteGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
-import org.lamsfoundation.lams.tool.vote.VoteNominationContentDTO;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.dto.EditActivityDTO;
+import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteNominationContentDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
-import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -161,8 +154,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 	request.setAttribute(TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
-	VoteMonitoringStarterAction.refreshSummaryData(request, voteContent, voteService, false, null, null, false,
-		voteGeneralMonitoringDTO, null);
+	VoteMonitoringStarterAction.refreshSummaryData(request, voteContent, voteService, voteGeneralMonitoringDTO);
 
 	voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
 
@@ -215,26 +207,17 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
     }
 
     public static void refreshSummaryData(HttpServletRequest request, VoteContent voteContent,
-	    IVoteService voteService, boolean isLearnerRequest, String currentSessionId, String userId,
-	    boolean showUserEntriesBySession, VoteGeneralMonitoringDTO voteGeneralMonitoringDTO,
-	    ExportPortfolioDTO exportPortfolioDTO) {
-
+	    IVoteService voteService, VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) {
+	
 	/* this section is related to summary tab. Starts here. */
 
 	if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
-	    if (voteGeneralMonitoringDTO != null) {
-		voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-	    }
+	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
-	    if (voteGeneralMonitoringDTO != null) {
-		voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-	    }
+	    voteGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
 	String userExceptionNoToolSessions = voteGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-	if (exportPortfolioDTO != null) {
-	    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
-	}
 	
 	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
 
@@ -250,60 +233,36 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
 
 		String questionUid = voteQueContent.getUid().toString();
-		
+
 		List<Map<String, VoteMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, VoteMonitoredUserDTO>>();
 
-		Map<String, String> summaryToolSessions = MonitoringUtil.populateToolSessionsId(voteContent, voteService);
+		Map<String, String> summaryToolSessions = MonitoringUtil.populateToolSessionsId(voteContent,
+			voteService);
 
-		/* request is for monitoring summary */
-		if (!isLearnerRequest) {
-		    for (Entry<String, String> pairs : summaryToolSessions.entrySet()) {
+		for (Entry<String, String> pairs : summaryToolSessions.entrySet()) {
 
-			if (!(pairs.getValue().equals("None")) && !(pairs.getValue().equals("All"))) {
-			    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue()));
-			    if (voteSession != null) {
-				List<VoteQueUsr> users = voteService.getUserBySessionOnly(voteSession);
-				Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = VoteMonitoringStarterAction
-					.populateSessionUsersAttempts(request, voteContent,
-						voteSession.getVoteSessionId(), users, questionUid, isLearnerRequest,
-						userId, voteService);
-				listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-			    }
+		    if (!(pairs.getValue().equals("None")) && !(pairs.getValue().equals("All"))) {
+			VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue()));
+			if (voteSession != null) {
+			    List<VoteQueUsr> users = voteService.getUserBySessionOnly(voteSession);
+			    Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = VoteMonitoringStarterAction
+				    .populateSessionUsersAttempts(request, voteContent, voteSession.getVoteSessionId(),
+					    users, questionUid, false, null, voteService);
+			    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 			}
 		    }
+		}
 		    
-//		    //create data for All sessions in total
-//		    if (summaryToolSessions.size() > 1) {
+//		//create data for All sessions in total
+//		if (summaryToolSessions.size() > 1) {
 //			Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = populateSessionUsersAttempts(request,
 //				voteContent, voteSession.getVoteSessionId(), users, questionUid, isUserNamesVisible,
 //				isLearnerRequest, userId, voteService);
 //			listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-//		    }
-
-		} else {
-		    /* request is for learner report, use only the passed tool session in the report */
-		    for (Entry<String, String> pairs : summaryToolSessions.entrySet()) {
-
-			if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-
-			    if (currentSessionId.equals(pairs.getValue())) {
-				VoteSession voteSession = voteService
-					.retrieveVoteSession(new Long(pairs.getValue().toString()));
-				if (voteSession != null) {
-				    List<VoteQueUsr> listUsers = voteService.getUserBySessionOnly(voteSession);
-				    Map<String, VoteMonitoredUserDTO> sessionUsersAttempts = VoteMonitoringStarterAction
-					    .populateSessionUsersAttempts(request, voteContent,
-						    voteSession.getVoteSessionId(), listUsers, questionUid,
-						    isLearnerRequest, userId, voteService);
-				    listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-				}
-			    }
-			}
-		    }
-		}
+//		}
 
 		Map<String, Map> questionAttemptData = MonitoringUtil.convertToMap(listMonitoredAttemptsContainerDTO);
-		
+
 		voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 		listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
 
@@ -311,22 +270,15 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	}
 	/* ends here. */
 
-	List<VoteMonitoredAnswersDTO> listUserEntries = voteService.processUserEnteredNominations(voteContent.getUid(),
-		currentSessionId, showUserEntriesBySession, userId, isLearnerRequest);
+	List<VoteMonitoredAnswersDTO> userEnteredNominations = voteService.getOpenVotes(
+		voteContent.getUid(), null, null);
 
-	if (exportPortfolioDTO != null) {
-	    exportPortfolioDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
-	    exportPortfolioDTO.setListUserEntries(listUserEntries);
-	}
+	voteGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
+	voteGeneralMonitoringDTO.setListUserEntries(userEnteredNominations);
 
-	if (voteGeneralMonitoringDTO != null) {
-	    voteGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(listMonitoredAnswersContainerDTO);
-	    voteGeneralMonitoringDTO.setListUserEntries(listUserEntries);
-
-	    voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
-	    if (listUserEntries.size() > 0) {
-		voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(true).toString());
-	    }
+	voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(false).toString());
+	if (userEnteredNominations.size() > 0) {
+	    voteGeneralMonitoringDTO.setExistsOpenVotes(new Boolean(true).toString());
 	}
 
 	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
@@ -368,9 +320,9 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
     }
     
-    private static Map<String, VoteMonitoredUserDTO> populateSessionUsersAttempts(HttpServletRequest request,
+    public static Map<String, VoteMonitoredUserDTO> populateSessionUsersAttempts(HttpServletRequest request,
 	    VoteContent voteContent, Long sessionId, List listUsers, String questionUid, boolean isLearnerRequest,
-	    String userId, IVoteService voteService) {
+	    Long userId, IVoteService voteService) {
 
 	List listMonitoredUserContainerDTO = new LinkedList();
 	Iterator itUsers = listUsers.iterator();
@@ -402,14 +354,13 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
 				String entry = voteQueContent.getQuestion();
 
-				Long voteQuestionUid = voteUsrResp.getVoteQueContent().getUid();
-				String voteQueContentId = voteQuestionUid.toString();
+				String voteQuestionUid = voteUsrResp.getVoteQueContent().getUid().toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
 				if (voteContent.getVoteContentId().toString()
 					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
-					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
+					if (entry.equals("sample nomination") && (voteQuestionUid.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
@@ -453,13 +404,13 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
 				String entry = voteQueContent.getQuestion();
-				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
+				String questionUid2 = voteUsrResp.getVoteQueContentId().toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
 				if (voteContent.getVoteContentId().toString()
 					.equals(localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
-					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
+					if (entry.equals("sample nomination") && (questionUid2.equals("1"))) {
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
@@ -488,7 +439,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 			VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
 
 			if (voteUsrResp != null) {
-			    if (userId.equals(voteQueUsr.getQueUsrId().toString())) {
+			    if (userId.equals(voteQueUsr.getQueUsrId())) {
 				// this is the user requested , include his name for learner progress
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());

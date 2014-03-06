@@ -70,7 +70,7 @@ public class VoteUsrAttempt implements Serializable {
 	this.attemptTime = attemptTime;
 	this.timeZone = timeZone;
 	this.voteQueContent = voteQueContent;
-	this.voteQueContentId = voteQueContent.getVoteQueContentId();
+	//this.voteQueContentId = voteQueContent.getVoteQueContentId();
 	this.voteQueUsr = voteQueUsr;
 	this.userEntry = userEntry;
 	this.visible = visible;

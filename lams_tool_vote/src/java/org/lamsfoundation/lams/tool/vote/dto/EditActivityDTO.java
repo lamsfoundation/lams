@@ -22,9 +22,7 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.vote;
-
-import java.util.List;
+package org.lamsfoundation.lams.tool.vote.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -35,70 +33,37 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteAllGroupsDTO implements Comparable
+public class EditActivityDTO implements Comparable
 {
-
-    private String sessionId;
-    
-    private String sessionName;
-    
-    private List  groupData;
-    
+    private String monitoredContentInUse;
 	
 	
+    /**
+     * @return Returns the monitoredContentInUse.
+     */
+    public String getMonitoredContentInUse() {
+        return monitoredContentInUse;
+    }
+    /**
+     * @param monitoredContentInUse The monitoredContentInUse to set.
+     */
+    public void setMonitoredContentInUse(String monitoredContentInUse) {
+        this.monitoredContentInUse = monitoredContentInUse;
+    }
 	public String toString() {
         return new ToStringBuilder(this)
-        	.append("sessionId:", sessionId)
-            .append("sessionName:", sessionName)
-            .append("groupData: ", groupData)
+            .append("monitoredContentInUse", monitoredContentInUse)
             .toString();
     }
 	
 	public int compareTo(Object o)
     {
-	    VoteAllGroupsDTO qaAllGroupsDTO = (VoteAllGroupsDTO) o;
+	    EditActivityDTO editActivityDTO = (EditActivityDTO) o;
      
-        if (qaAllGroupsDTO == null)
+        if (editActivityDTO == null)
         	return 1;
 		else
 			return 0;
     }
 	
-
-    /**
-     * @return Returns the groupData.
-     */
-    public List getGroupData() {
-        return groupData;
-    }
-    /**
-     * @param groupData The groupData to set.
-     */
-    public void setGroupData(List groupData) {
-        this.groupData = groupData;
-    }
-    /**
-     * @return Returns the sessionName.
-     */
-    public String getSessionName() {
-        return sessionName;
-    }
-    /**
-     * @param sessionName The sessionName to set.
-     */
-    public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
-    }
-    /**
-     * @return Returns the sessionId.
-     */
-    public String getSessionId() {
-        return sessionId;
-    }
-    /**
-     * @param sessionId The sessionId to set.
-     */
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
 }

@@ -44,9 +44,6 @@ public class VoteQueContent implements Serializable, Comparable {
     /** identifier field */
     private Long uid;
 
-    /** persistent field */
-    private Long voteQueContentId;
-
     /** nullable persistent field */
     private String question;
     
@@ -61,14 +58,6 @@ public class VoteQueContent implements Serializable, Comparable {
     
     /** persistent field */
     private Set voteUsrAttempts;
-
-    /** full constructor */
-    public VoteQueContent(Long voteQueContentId, String question,  VoteContent voteContent, Set voteUsrAttempts) {
-        this.voteQueContentId = voteQueContentId;
-        this.question = question;
-        this.voteContent=voteContent;
-        this.voteUsrAttempts = voteUsrAttempts;
-    }
     
     public VoteQueContent(String question,  VoteContent voteContent, Set voteUsrAttempts) {
         this.question = question;
@@ -83,29 +72,8 @@ public class VoteQueContent implements Serializable, Comparable {
         this.voteUsrAttempts = voteUsrAttempts;
     }
 
-    
-    public VoteQueContent(Long voteQueContentId, String question, Set voteUsrAttempts) {
-        this.voteQueContentId = voteQueContentId;
-        this.question = question;
-        this.voteUsrAttempts = voteUsrAttempts;
-    }
-    
-    public VoteQueContent(String question, Set voteUsrAttempts) {
-        this.question = question;
-        this.voteUsrAttempts = voteUsrAttempts;
-    }
-    
-    
-
     /** default constructor */
     public VoteQueContent() {
-    }
-
-    /** minimal constructor */
-    public VoteQueContent(Long voteQueContentId, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteUsrAttempts) {
-        this.voteQueContentId = voteQueContentId;
-        this.voteContent = voteContent;
-        this.voteUsrAttempts = voteUsrAttempts;
     }
     
     
@@ -116,16 +84,11 @@ public class VoteQueContent implements Serializable, Comparable {
      * @param queContent the original qa question content
      * @return the new qa question content object
      */
-    public static VoteQueContent newInstance(VoteQueContent queContent, int displayOrder,
-    										VoteContent newMcContent)
-    										
-    {
-    	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(),
-    	        										displayOrder, 
-													  newMcContent,
-                                                      new TreeSet());
-    	
-    	return newQueContent;
+    public static VoteQueContent newInstance(VoteQueContent queContent, int displayOrder, VoteContent newMcContent) {
+	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(), displayOrder, newMcContent,
+		new TreeSet());
+
+	return newQueContent;
     }
     
     
@@ -172,27 +135,15 @@ public class VoteQueContent implements Serializable, Comparable {
     }
 	
 
-	public int compareTo(Object o)
-    {
-        VoteQueContent queContent = (VoteQueContent) o;
-        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-        if (voteQueContentId == null)
-        	return 1;
-		else
-			return (int) (voteQueContentId.longValue() - queContent.voteQueContentId.longValue());
+    public int compareTo(Object o) {
+	VoteQueContent queContent = (VoteQueContent) o;
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (uid == null)
+	    return 1;
+	else
+	    return (int) (uid.longValue() - queContent.uid.longValue());
     }
-    /**
-     * @return Returns the voteQueContentId.
-     */
-    public Long getVoteQueContentId() {
-        return voteQueContentId;
-    }
-    /**
-     * @param voteQueContentId The voteQueContentId to set.
-     */
-    public void setVoteQueContentId(Long voteQueContentId) {
-        this.voteQueContentId = voteQueContentId;
-    }
+    
     /**
      * @return Returns the voteContentId.
      */
