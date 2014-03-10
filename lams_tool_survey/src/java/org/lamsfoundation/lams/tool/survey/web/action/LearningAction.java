@@ -393,25 +393,10 @@ public class LearningAction extends Action {
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	Survey survey = service.getSurveyBySessionId(sessionId);
-	HttpSession ss = SessionManager.getSession();
-	UserDTO surveyUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (survey.isNotifyTeachersOnAnswerSumbit()) {
-	    final boolean isHtmlFormat = false;
-
-	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		}
-		String fullName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
-		service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
-			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			service.getLocalisedMessage("event.answer.submit.subject", null),
-			service.getLocalisedMessage("event.answer.submit.body", new Object[] { fullName }),
-			isHtmlFormat);
-	    }
+	    service.notifyTeachersOnAnswerSumbit(sessionId, surveyLearner);
 	}
+	
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 

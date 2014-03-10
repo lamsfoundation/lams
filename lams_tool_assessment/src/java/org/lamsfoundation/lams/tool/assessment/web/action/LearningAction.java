@@ -167,7 +167,7 @@ public class LearningAction extends Action {
 	    assessmentUser = getSpecifiedUser(service, toolSessionId, WebUtil.readIntParam(request,
 		    AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    assessmentUser = getCurrentUser(service, toolSessionId);
+	    assessmentUser = getCurrentUser(toolSessionId);
 	}
 	
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
@@ -833,6 +833,7 @@ public class LearningAction extends Action {
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
     private void storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
+	
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
@@ -842,29 +843,13 @@ public class LearningAction extends Action {
 	
 	// notify teachers
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	if ((mode != null) && !mode.isTeacher() && !isAutosave) {
-	    
-	    Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	    if (assessment.isNotifyTeachersOnAttemptCompletion()) {
-		
-		Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		final boolean isHtmlFormat = false;
-		List<User> monitoringUsers = service.getMonitorsByToolSessionId(toolSessionId);
-		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		    Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		    for (int i = 0; i < monitoringUsersIds.length; i++) {
-			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		    }
-		    AssessmentUser assessmentUser = getCurrentUser(service, toolSessionId);
-		    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
-		    service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
-			    IEventNotificationService.DELIVERY_METHOD_MAIL,
-			    service.getLocalisedMessage("event.learner.completes.attempt.subject", null),
-			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }),
-			    isHtmlFormat);
-		}
-		
-	    }
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	if ((mode != null) && !mode.isTeacher() && !isAutosave && assessment.isNotifyTeachersOnAttemptCompletion()) {
+
+	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    AssessmentUser assessmentUser = getCurrentUser(toolSessionId);
+	    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
+	    service.notifyTeachersOnAttemptCompletion(toolSessionId, fullName);
 	}
     }
     
@@ -874,7 +859,9 @@ public class LearningAction extends Action {
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
     }
 
-    private AssessmentUser getCurrentUser(IAssessmentService service, Long sessionId) {
+    private AssessmentUser getCurrentUser(Long sessionId) {
+	IAssessmentService service = getAssessmentService();
+	
 	// try to get form system session
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO

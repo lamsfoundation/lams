@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -90,15 +89,11 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
- * 
  * @author Dapeng.Ni
- * 
  */
 public class SurveyServiceImpl implements ISurveyService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager
-
-{
-    static Logger log = Logger.getLogger(SurveyServiceImpl.class.getName());
+	ToolContentImport102Manager {
+    private static Logger log = Logger.getLogger(SurveyServiceImpl.class.getName());
 
     // DAO
     private SurveyDAO surveyDao;
@@ -130,8 +125,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     private IEventNotificationService eventNotificationService;
 
-    private ILessonService lessonService;
-
     private SurveyOutputFactory surveyOutputFactory;
 
     private Random generator = new Random();
@@ -140,6 +133,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // Service method
     // *******************************************************************************
 
+    @Override
     public Survey getSurveyByContentId(Long contentId) {
 	Survey rs = surveyDao.getByContentId(contentId);
 	if (rs == null) {
@@ -148,6 +142,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return rs;
     }
 
+    @Override
     public Survey getDefaultContent(Long contentId) throws SurveyApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -165,26 +160,27 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return content;
     }
 
+    @Override
     public void createUser(SurveyUser surveyUser) {
 	surveyUserDao.saveObject(surveyUser);
     }
 
+    @Override
     public SurveyUser getUserByIDAndContent(Long userId, Long contentId) {
-
 	return surveyUserDao.getUserByUserIDAndContentID(userId, contentId);
-
     }
 
+    @Override
     public SurveyUser getUserByIDAndSession(Long userId, Long sessionId) {
-
 	return surveyUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-
     }
 
+    @Override
     public void saveOrUpdateSurvey(Survey survey) {
 	surveyDao.saveObject(survey);
     }
 
+    @Override
     public Survey getSurveyBySessionId(Long sessionId) {
 	SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -193,14 +189,17 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return res;
     }
 
+    @Override
     public SurveySession getSurveySessionBySessionId(Long sessionId) {
 	return surveySessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateSurveySession(SurveySession resSession) {
 	surveySessionDao.saveObject(resSession);
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException {
 	SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -221,6 +220,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return nextUrl;
     }
 
+    @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -251,12 +251,14 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return map;
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
@@ -266,26 +268,28 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
     }
 
-    /**
-     * @param notebookEntry
-     */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public SurveyUser getUser(Long uid) {
 	return (SurveyUser) surveyUserDao.getObject(SurveyUser.class, uid);
     }
 
+    @Override
     public List<SurveyUser> getSessionUsers(Long sessionId) {
 	return surveyUserDao.getBySessionID(sessionId);
     }
 
+    @Override
     public void deleteQuestion(Long uid) {
 	surveyQuestionDao.removeObject(SurveyQuestion.class, uid);
 
     }
 
+    @Override
     public List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid) {
 	List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
 	SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
@@ -311,12 +315,14 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return answers;
     }
 
+    @Override
     public void updateAnswerList(List<SurveyAnswer> answerList) {
 	for (SurveyAnswer ans : answerList) {
 	    surveyAnswerDao.saveObject(ans);
 	}
     }
 
+    @Override
     public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid) {
 	SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
 	AnswerDTO answerDto = new AnswerDTO(question);
@@ -384,6 +390,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     }
 
+    @Override
     public SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long toolContentId) {
 
 	SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<SurveySession, List<AnswerDTO>>(
@@ -406,6 +413,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return summary;
     }
 
+    @Override
     public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
 	SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
 	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
@@ -422,10 +430,12 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     }
 
+    @Override
     public SurveyQuestion getQuestion(Long questionUid) {
 	return surveyQuestionDao.getByUid(questionUid);
     }
 
+    @Override
     public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID) {
 
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
@@ -454,6 +464,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return summary;
     }
 
+    @Override
     public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
 
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
@@ -477,6 +488,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return summary;
     }
 
+    @Override
     public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner) {
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
 		new SurveySessionComparator());
@@ -493,6 +505,44 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public String createConditionName(Collection<SurveyCondition> existingConditions) {
+	String uniqueNumber = null;
+	do {
+	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
+	    for (SurveyCondition condition : existingConditions) {
+		String[] splitedName = getSurveyOutputFactory().splitConditionName(condition.getName());
+		if (uniqueNumber.equals(splitedName[1])) {
+		    uniqueNumber = null;
+		}
+	    }
+	} while (uniqueNumber == null);
+	return getSurveyOutputFactory().buildConditionName(uniqueNumber);
+    }
+
+    @Override
+    public void deleteCondition(SurveyCondition condition) {
+	surveyDao.deleteCondition(condition);
+    }
+
+    @Override
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getSurveyOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    @Override
+    public void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser) {
+	
+	//it appears surveyUser can be null (?)
+	if (surveyUser == null) {
+	    return;
+	}
+	
+	String userName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
+	String message = getLocalisedMessage("event.answer.submit.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
     // *****************************************************************************
@@ -999,55 +1049,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return messageService.getMessage(key, args);
     }
 
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
-    }
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
-    }
-
     public SurveyOutputFactory getSurveyOutputFactory() {
 	return surveyOutputFactory;
     }
 
     public void setSurveyOutputFactory(SurveyOutputFactory surveyOutputFactory) {
 	this.surveyOutputFactory = surveyOutputFactory;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String createConditionName(Collection<SurveyCondition> existingConditions) {
-	String uniqueNumber = null;
-	do {
-	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
-	    for (SurveyCondition condition : existingConditions) {
-		String[] splitedName = getSurveyOutputFactory().splitConditionName(condition.getName());
-		if (uniqueNumber.equals(splitedName[1])) {
-		    uniqueNumber = null;
-		}
-	    }
-	} while (uniqueNumber == null);
-	return getSurveyOutputFactory().buildConditionName(uniqueNumber);
-    }
-
-    public void deleteCondition(SurveyCondition condition) {
-	surveyDao.deleteCondition(condition);
-    }
-
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return getSurveyOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 }

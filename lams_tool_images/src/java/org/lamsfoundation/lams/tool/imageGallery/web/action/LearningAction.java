@@ -824,20 +824,7 @@ public class LearningAction extends Action {
 
 	// notify teachers
 	if (imageGallery.isNotifyTeachersOnImageSumbit()) {
-	    final boolean isHtmlFormat = false;
-
-	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		}
-		String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
-		service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
-			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			service.getLocalisedMessage("event.imagesubmit.subject", null),
-			service.getLocalisedMessage("event.imagesubmit.body", new Object[] { fullName }), isHtmlFormat);
-	    }
+	    service.notifyTeachersOnImageSumbit(sessionId, imageGalleryUser);
 	}
     }
 

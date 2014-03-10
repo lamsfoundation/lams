@@ -1459,19 +1459,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	if (forum.isNotifyTeachersOnForumPosting()) {
-	    List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		ArrayList<Integer> monitoringUsersIds = new ArrayList<Integer>();
-		for (User monitoringUser : monitoringUsers) {
-		    monitoringUsersIds.add(monitoringUser.getUserId());
-		}
-
-		getEventNotificationService().sendMessage(null, monitoringUsersIds.toArray(new Integer[0]),
-			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
-			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }),
-			isHtmlFormat);
-	    }
+	    String emailMessage = getLocalisedMessage("event.newposting.body",
+		    new Object[] { fullName, message.getBody() });
+	    getEventNotificationService().notifyLessonMonitors(sessionId, emailMessage, isHtmlFormat);
 	}
     }
 

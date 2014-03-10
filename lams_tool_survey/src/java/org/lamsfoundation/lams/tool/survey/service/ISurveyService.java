@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
@@ -236,7 +235,7 @@ public interface ISurveyService {
      * @param userId
      * @param entryText
      */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText);
 
     /**
@@ -248,12 +247,12 @@ public interface ISurveyService {
      * @param userID
      * @return
      */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * @param notebookEntry
      */
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
     /**
      * Get Reflect DTO list grouped by sessionID.
@@ -262,28 +261,8 @@ public interface ISurveyService {
      * @return
      */
     Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
-
-    /**
-     * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
-     * @param key
-     *                key of the message
-     * @param args
-     *                arguments for the message
-     * @return message content
-     */
-    String getLocalisedMessage(String key, Object[] args);
-
-    IEventNotificationService getEventNotificationService();
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    
+    void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
      * Creates an unique name for a SurveyCondition. It consists of the tool output definition name and a unique
@@ -293,9 +272,9 @@ public interface ISurveyService {
      *                existing conditions; required to check if a condition with the same name does not exist.
      * @return unique SurveyCondition name
      */
-    public String createConditionName(Collection<SurveyCondition> existingConditions);
+    String createConditionName(Collection<SurveyCondition> existingConditions);
 
-    public void deleteCondition(SurveyCondition condition);
+    void deleteCondition(SurveyCondition condition);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

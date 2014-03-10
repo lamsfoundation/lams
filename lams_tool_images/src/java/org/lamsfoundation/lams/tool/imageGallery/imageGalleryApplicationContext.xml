@@ -120,8 +120,7 @@
    		</property>
    		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
-		</property>   
-		<property name="lessonService"><ref bean="lessonService"/></property> 
+		</property>
    		<property name="messageService"><ref bean="laimagMessageService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>  
 		<property name="imageGalleryOutputFactory"><ref bean="imageGalleryOutputFactory"/></property> 

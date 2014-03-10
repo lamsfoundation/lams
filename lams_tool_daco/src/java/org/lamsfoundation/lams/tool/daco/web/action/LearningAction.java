@@ -237,20 +237,7 @@ public class LearningAction extends Action {
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
 
 	if (daco.isNotifyTeachersOnLearnerEntry()) {
-	    final boolean isHtmlFormat = false;
-	    
-	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		}
-		String fullName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
-		service.getEventNotificationService().sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
-			service.getLocalisedMessage("event.learnerentry.subject", null),
-			service.getLocalisedMessage("event.learnerentry.body", new Object[] { fullName }),
-			isHtmlFormat);
-	    }
+	    service.notifyTeachersOnLearnerEntry(sessionId, dacoUser);
 	}
 
 	return mapping.findForward(DacoConstants.SUCCESS);
@@ -496,23 +483,8 @@ public class LearningAction extends Action {
 	    request.setAttribute(DacoConstants.ATTR_RECORD_OPERATION_SUCCESS, DacoConstants.RECORD_OPERATION_ADD);
 
 	    // notify teachers
-
 	    if (daco.isNotifyTeachersOnRecordSumbit()) {
-		final boolean isHtmlFormat = false;
-		
-		List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
-		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		    Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		    for (int i = 0; i < monitoringUsersIds.length; i++) {
-			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		    }
-		    String fullName = user.getLastName() + " " + user.getFirstName();
-		    service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
-			    IEventNotificationService.DELIVERY_METHOD_MAIL,
-			    service.getLocalisedMessage("event.recordsubmit.subject", null),
-			    service.getLocalisedMessage("event.recordsubmit.body", new Object[] { fullName }),
-			    isHtmlFormat);
-		}
+		service.notifyTeachersOnRecordSumbit(sessionId, user);
 	    }
 	}
 

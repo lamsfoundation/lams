@@ -3,12 +3,21 @@ package org.lamsfoundation.lams.events;
 import java.security.InvalidParameterException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.dao.EventDAO;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -56,6 +65,10 @@ class EventNotificationService implements IEventNotificationService {
     protected IUserManagementService userManagementService;
 
     protected MessageService messageService;
+    
+    protected ILessonService lessonService;
+    
+    protected ILamsToolService toolService;
 
     /**
      * Quartz scheduler used for resending messages.
@@ -175,10 +188,6 @@ class EventNotificationService implements IEventNotificationService {
 	return EventNotificationService.availableDeliveryMethods;
     }
 
-    public EventDAO getEventDAO() {
-	return eventDAO;
-    }
-
     @Override
     public boolean isSubscribed(String scope, String name, Long eventSessionId, Long userId)
 	    throws InvalidParameterException {
@@ -265,13 +274,40 @@ class EventNotificationService implements IEventNotificationService {
 	}
 	return true;
     }
+    
+    @Override
+    public boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
+	final String NEW_LINE_CHARACTER = "\r\n";
 
-    public void setEventDAO(EventDAO eventDAO) {
-	this.eventDAO = eventDAO;
-    }
+	List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
+	if (monitoringUsers == null || monitoringUsers.isEmpty()) {
+	    return true;
+	}
+	
+	Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
+	for (int i = 0; i < monitoringUsersIds.length; i++) {
+	    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
+	}
+	
+	ToolSession toolSession = toolService.getToolSession(sessionId);
+	Lesson lesson = toolSession.getLesson();
+	ToolActivity toolActivity = toolSession.getToolActivity();
+	String lessonName = lesson.getLessonName();
+	String activityTitle = toolActivity.getTitle();
+	String toolName = toolActivity.getTool().getToolDisplayName();
+	String emailSubject = toolName + " " + messageService.getMessage("email.notifications.tool") + ": " + 
+		activityTitle + " " + messageService.getMessage("email.notifications.activity") + " - " + 
+		lessonName + " " + messageService.getMessage("email.notifications.lesson");
 
-    public void setUserManagementService(IUserManagementService userManagementService) {
-	this.userManagementService = userManagementService;
+	String courseName = lesson.getOrganisation().getName();
+	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL).trim();
+	String emailBody = messageService.getMessage("email.notifications.course") + ": " + courseName + NEW_LINE_CHARACTER + 
+		messageService.getMessage("email.notifications.lesson.caption") + ": " + lessonName + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + 
+		message	+ NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + 
+		serverUrl;
+	
+	return sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject,
+		emailBody, isHtmlFormat);
     }
 
     @Override
@@ -555,10 +591,6 @@ class EventNotificationService implements IEventNotificationService {
 	return result;
     }
 
-    protected IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
     /**
      * Saves the event into the database
      * 
@@ -577,6 +609,22 @@ class EventNotificationService implements IEventNotificationService {
 	}
     }
 
+    public EventDAO getEventDAO() {
+	return eventDAO;
+    }
+
+    public void setEventDAO(EventDAO eventDAO) {
+	this.eventDAO = eventDAO;
+    }
+
+    protected IUserManagementService getUserManagementService() {
+	return userManagementService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
+
     private Scheduler getScheduler() {
 	return scheduler;
     }
@@ -587,5 +635,21 @@ class EventNotificationService implements IEventNotificationService {
 
     protected MessageService getMessageService() {
 	return messageService;
+    }
+    
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
+    protected ILessonService getLessonService() {
+	return lessonService;
+    }
+    
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
+    
+    protected ILamsToolService getToolService() {
+	return toolService;
     }
 }

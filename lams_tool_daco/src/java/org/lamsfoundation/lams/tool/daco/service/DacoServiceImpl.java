@@ -45,7 +45,6 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -53,7 +52,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -86,17 +84,12 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
  * @author Dapeng.Ni
- * 
  */
-public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSessionManager
-
-{
-    static Logger log = Logger.getLogger(DacoServiceImpl.class.getName());
+public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSessionManager {
+    private static Logger log = Logger.getLogger(DacoServiceImpl.class.getName());
 
     private DacoDAO dacoDao;
 
@@ -128,10 +121,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     private IEventNotificationService eventNotificationService;
 
-    private ILessonService lessonService;
-
     private DacoOutputFactory dacoOutputFactory;
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the Data Collection tool seession");
@@ -153,12 +145,14 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	dacoDao.saveObject(toContent);
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	DacoSession session = new DacoSession();
 	session.setSessionId(toolSessionId);
@@ -168,24 +162,29 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	dacoSessionDao.saveObject(session);
     }
 
+    @Override
     public void createUser(DacoUser dacoUser) {
 	dacoUserDao.saveObject(dacoUser);
     }
 
+    @Override
     public void deleteDacoAnswer(Long uid) {
 	dacoAnswerDao.removeObject(DacoAnswer.class, uid);
     }
 
+    @Override
     public void deleteDacoQuestion(Long uid) {
 	dacoQuestionDao.removeObject(DacoQuestion.class, uid);
     }
 
+    @Override
     public void deleteDacoRecord(List<DacoAnswer> record) {
 	for (DacoAnswer answer : record) {
 	    deleteDacoAnswer(answer.getUid());
 	}
     }
 
+    @Override
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws DacoApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
@@ -196,6 +195,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Daco toolContentObj = dacoDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -219,15 +219,18 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws DacoApplicationException {
 	DacoUser user = dacoUserDao.getUserByUserIdAndSessionId(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -244,10 +247,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return nextUrl;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
+    @Override
     public List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid) {
 	DacoUser user = getUser(userUid);
 	Set<DacoAnswer> answers = user.getAnswers();
@@ -270,6 +270,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return result;
     }
 
+    @Override
     public Daco getDacoByContentId(Long contentId) {
 	Daco daco = dacoDao.getByContentId(contentId);
 	if (daco == null) {
@@ -278,15 +279,18 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return daco;
     }
 
+    @Override
     public Daco getDacoBySessionId(Long sessionId) {
 	DacoSession session = dacoSessionDao.getSessionBySessionId(sessionId);
 	return session.getDaco();
     }
 
+    @Override
     public DacoQuestion getDacoQuestionByUid(Long questionUid) {
 	return dacoQuestionDao.getByUid(questionUid);
     }
 
+    @Override
     public Daco getDefaultContent(Long contentId) throws DacoApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -316,12 +320,44 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return defaultDaco;
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
+	}
+    }
+
+    @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    @Override
+    public void uploadDacoAnswerFile(DacoAnswer answer, FormFile file) throws UploadDacoFileException {
+	try {
+	    InputStream is = file.getInputStream();
+	    String fileName = file.getFileName();
+	    String fileType = file.getContentType();
+	    // For file only upload one sigle file
+	    if (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE
+		    || answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_IMAGE) {
+		NodeKey nodeKey = processFile(file);
+		answer.setFileUuid(nodeKey.getUuid());
+		answer.setFileVersionId(nodeKey.getVersion());
+	    }
+
+	    // create the package from the directory contents
+	    answer.setFileType(fileType);
+	    answer.setFileName(fileName);
+	} catch (FileNotFoundException e) {
+	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
+	    throw new UploadDacoFileException(messageService.getMessage("error.msg.file.not.found"));
+	} catch (IOException e) {
+	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
+	    throw new UploadDacoFileException(messageService.getMessage("error.msg.io.exception"));
 	}
     }
 
@@ -366,6 +402,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
     public IVersionedNode getFileNode(Long answerUid, String relPathString) throws DacoApplicationException {
 	DacoAnswer answer = (DacoAnswer) dacoAnswerDao.getObject(DacoQuestion.class, answerUid);
 	if (answer == null) {
@@ -374,7 +411,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
 	return getFile(answer.getFileUuid(), answer.getFileVersionId(), relPathString);
     }
-
+    
+    @Override
     public Integer getGroupRecordCount(Long sessionId) {
 	List<DacoUser> users = dacoUserDao.getBySessionId(sessionId);
 	
@@ -385,6 +423,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return groupRecordCount;
     }
 
+    @Override
     public Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary) {
 	if (monitoringSummary == null) {
 	    return null;
@@ -396,10 +435,12 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return groupRecordCount;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
 
+    @Override
     public List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid) {
 	List<DacoSession> sessions = dacoSessionDao.getByContentId(contentId);
 	List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
@@ -437,6 +478,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return result;
     }
 
+    @Override
     public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid) {
 	List<QuestionSummaryDTO> result = new ArrayList<QuestionSummaryDTO>();
 	DacoUser user = (DacoUser) dacoUserDao.getObject(DacoUser.class, userUid);
@@ -481,6 +523,20 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    result = dacoAnswerDao.getQuestionSummaries(userUid, result);
 	}
 	return result;
+    }
+    
+    @Override
+    public void notifyTeachersOnLearnerEntry(Long sessionId, DacoUser dacoUser) {
+	String userName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
+	String message = getLocalisedMessage("event.learnerentry.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
+    }
+    
+    @Override
+    public void notifyTeachersOnRecordSumbit(Long sessionId, DacoUser dacoUser) {
+	String userName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
+	String message = getLocalisedMessage("event.recordsubmit.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
     /**
@@ -584,10 +640,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     }
 
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
+    /*
+     * ===============Methods implemented from ToolContentImport102Manager ===============
+     */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -778,15 +833,17 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     // set methods for Spring Bean
     // *****************************************************************************
 
+    public ICoreNotebookService getCoreNotebookService() {
+	return coreNotebookService;
+    }
+    
+    public IUserManagementService getUserManagementService() {
+	return userManagementService;
+    }
+    
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-
-    /*
-     * ===============Methods implemented from ToolContentImport102Manager ===============
-     */
-
-    /* =================================================================================== */
 
     public void setDacoDao(DacoDAO dacoDao) {
 	this.dacoDao = dacoDao;
@@ -832,38 +889,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	this.userManagementService = userManagementService;
     }
 
-    /**
-     * @param notebookEntry
-     */
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    public void uploadDacoAnswerFile(DacoAnswer answer, FormFile file) throws UploadDacoFileException {
-	try {
-	    InputStream is = file.getInputStream();
-	    String fileName = file.getFileName();
-	    String fileType = file.getContentType();
-	    // For file only upload one sigle file
-	    if (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE
-		    || answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_IMAGE) {
-		NodeKey nodeKey = processFile(file);
-		answer.setFileUuid(nodeKey.getUuid());
-		answer.setFileVersionId(nodeKey.getVersion());
-	    }
-
-	    // create the package from the directory contents
-	    answer.setFileType(fileType);
-	    answer.setFileName(fileName);
-	} catch (FileNotFoundException e) {
-	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
-	    throw new UploadDacoFileException(messageService.getMessage("error.msg.file.not.found"));
-	} catch (IOException e) {
-	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
-	    throw new UploadDacoFileException(messageService.getMessage("error.msg.io.exception"));
-	}
-    }
-
     public DacoAnswerDAO getDacoAnswerDao() {
 	return dacoAnswerDao;
     }
@@ -878,18 +903,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
-    }
-
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
     }
 
     public int getRecordNum(Long userID, Long sessionId) {

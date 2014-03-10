@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -64,7 +63,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -110,15 +108,11 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
- * 
  * @author Dapeng.Ni
- * 
  */
 public class ResourceServiceImpl implements IResourceService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager
-
-{
-    static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
+	ToolContentImport102Manager {
+    private static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
 
     private ResourceDAO resourceDao;
 
@@ -152,10 +146,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     private IEventNotificationService eventNotificationService;
 
-    private ILessonService lessonService;
-
     private ResourceOutputFactory resourceOutputFactory;
 
+    @Override
     public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 	ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class, itemUid);
 	if (item == null) {
@@ -232,6 +225,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public Resource getResourceByContentId(Long contentId) {
 	Resource rs = resourceDao.getByContentId(contentId);
 	if (rs == null) {
@@ -240,6 +234,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return rs;
     }
 
+    @Override
     public Resource getDefaultContent(Long contentId) throws ResourceApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -254,26 +249,31 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return content;
     }
 
+    @Override
     public List getAuthoredItems(Long resourceUid) {
 	return resourceItemDao.getAuthoringItems(resourceUid);
     }
 
+    @Override
     public void createUser(ResourceUser resourceUser) {
 	resourceUserDao.saveObject(resourceUser);
     }
 
+    @Override
     public ResourceUser getUserByIDAndContent(Long userId, Long contentId) {
 
 	return resourceUserDao.getUserByUserIDAndContentID(userId, contentId);
 
     }
 
+    @Override
     public ResourceUser getUserByIDAndSession(Long userId, Long sessionId) {
 
 	return resourceUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 
     }
 
+    @Override
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
@@ -284,18 +284,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public void saveOrUpdateResource(Resource resource) {
 	resourceDao.saveObject(resource);
     }
 
-    public void saveOrUpdateResourceItem(ResourceItem item) {
-	resourceItemDao.saveObject(item);
-    }
-
+    @Override
     public void deleteResourceItem(Long uid) {
 	resourceItemDao.removeObject(ResourceItem.class, uid);
     }
 
+    @Override
     public List<ResourceItem> getResourceItemsBySessionId(Long sessionId) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -313,6 +312,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return items;
     }
 
+    @Override
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -350,6 +350,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return itemList;
     }
 
+    @Override
     public List<List<Summary>> exportByContentId(Long contentId) {
 	Resource resource = resourceDao.getByContentId(contentId);
 	List<List<Summary>> groupList = new ArrayList();
@@ -387,6 +388,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return groupList;
     }
 
+    @Override
     public Resource getResourceBySessionId(Long sessionId) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -399,14 +401,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return res;
     }
 
+    @Override
     public ResourceSession getResourceSessionBySessionId(Long sessionId) {
 	return resourceSessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateResourceSession(ResourceSession resSession) {
 	resourceSessionDao.saveObject(resSession);
     }
 
+    @Override
     public void retrieveComplete(SortedSet<ResourceItem> resourceItemList, ResourceUser user) {
 	for (ResourceItem item : resourceItemList) {
 	    ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(item.getUid(), user.getUserId());
@@ -418,6 +423,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public void setItemComplete(Long resourceItemUid, Long userId, Long sessionId) {
 	ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid, userId);
 	if (log == null) {
@@ -434,6 +440,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resourceItemVisitDao.saveObject(log);
     }
 
+    @Override
     public void setItemAccess(Long resourceItemUid, Long userId, Long sessionId) {
 	ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid, userId);
 	if (log == null) {
@@ -449,6 +456,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws ResourceApplicationException {
 	ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -469,6 +477,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return nextUrl;
     }
 
+    @Override
     public int checkMiniView(Long toolSessionId, Long userUid) {
 	int miniView = resourceItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
@@ -481,10 +490,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return reqView - miniView;
     }
 
+    @Override
     public ResourceItem getResourceItemByUid(Long itemUid) {
 	return resourceItemDao.getByUid(itemUid);
     }
 
+    @Override
     public List<List<Summary>> getSummary(Long contentId) {
 	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
 	List<Summary> group = new ArrayList<Summary>();
@@ -534,6 +545,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     }
 
+    @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -564,6 +576,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return map;
     }
 
+    @Override
     public List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
 	List<ResourceItemVisitLog> logList = resourceItemVisitDao.getResourceItemLogBySession(sessionId, itemUid);
 	List<ResourceUser> userList = new ArrayList(logList.size());
@@ -579,6 +592,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return userList;
     }
 
+    @Override
     public void setItemVisible(Long itemUid, boolean visible) {
 	ResourceItem item = resourceItemDao.getByUid(itemUid);
 	if (item != null) {
@@ -599,12 +613,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
@@ -614,15 +630,21 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
-    /**
-     * @param notebookEntry
-     */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public ResourceUser getUser(Long uid) {
 	return (ResourceUser) resourceUserDao.getObject(ResourceUser.class, uid);
+    }
+    
+    @Override
+    public void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser) {
+	String userName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
+	String message = getLocalisedMessage("event.assigment.submit.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
     // *****************************************************************************
@@ -691,6 +713,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return node;
     }
 
+    @Override
     public void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException {
 	try {
 	    InputStream is = file.getInputStream();
@@ -750,7 +773,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.application"));
 	}
     }
-
+    
     /**
      * Find out default.htm/html or index.htm/html in the given directory folder
      * 
@@ -782,62 +805,24 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    return null;
 	}
     }
+
+    /**
+     * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
+     * 
+     * @param key
+     *                key of the message
+     * @param args
+     *                arguments for the message
+     * @return message content
+     */
+    private String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-
-    // *****************************************************************************
-    // set methods for Spring Bean
-    // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public void setResourceDao(ResourceDAO resourceDao) {
-	this.resourceDao = resourceDao;
-    }
-
-    public void setResourceItemDao(ResourceItemDAO resourceItemDao) {
-	this.resourceItemDao = resourceItemDao;
-    }
-
-    public void setResourceSessionDao(ResourceSessionDAO resourceSessionDao) {
-	this.resourceSessionDao = resourceSessionDao;
-    }
-
-    public void setResourceToolContentHandler(ResourceToolContentHandler resourceToolContentHandler) {
-	this.resourceToolContentHandler = resourceToolContentHandler;
-    }
-
-    public void setResourceUserDao(ResourceUserDAO resourceUserDao) {
-	this.resourceUserDao = resourceUserDao;
-    }
-
-    public void setToolService(ILamsToolService toolService) {
-	this.toolService = toolService;
-    }
-
-    public ResourceItemVisitDAO getResourceItemVisitDao() {
-	return resourceItemVisitDao;
-    }
-
-    public void setResourceItemVisitDao(ResourceItemVisitDAO resourceItemVisitDao) {
-	this.resourceItemVisitDao = resourceItemVisitDao;
-    }
-
+    
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
@@ -1259,7 +1244,60 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	toolContentObj.setReflectInstructions(description);
     }
 
-    /* =================================================================================== */
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getResourceOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    // *****************************************************************************
+    // set methods for Spring Bean
+    // *****************************************************************************
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+	this.repositoryService = repositoryService;
+    }
+
+    public void setResourceDao(ResourceDAO resourceDao) {
+	this.resourceDao = resourceDao;
+    }
+
+    public void setResourceItemDao(ResourceItemDAO resourceItemDao) {
+	this.resourceItemDao = resourceItemDao;
+    }
+
+    public void setResourceSessionDao(ResourceSessionDAO resourceSessionDao) {
+	this.resourceSessionDao = resourceSessionDao;
+    }
+
+    public void setResourceToolContentHandler(ResourceToolContentHandler resourceToolContentHandler) {
+	this.resourceToolContentHandler = resourceToolContentHandler;
+    }
+
+    public void setResourceUserDao(ResourceUserDAO resourceUserDao) {
+	this.resourceUserDao = resourceUserDao;
+    }
+
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
+
+    public ResourceItemVisitDAO getResourceItemVisitDao() {
+	return resourceItemVisitDao;
+    }
+
+    public void setResourceItemVisitDao(ResourceItemVisitDAO resourceItemVisitDao) {
+	this.resourceItemVisitDao = resourceItemVisitDao;
+    }
 
     public IExportToolContentService getExportContentService() {
 	return exportContentService;
@@ -1291,33 +1329,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
-    }
-
-    public String getLocalisedMessage(String key, Object[] args) {
-	return messageService.getMessage(key, args);
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
-    }
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
-    }
-
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return getResourceOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
     public ResourceOutputFactory getResourceOutputFactory() {

@@ -107,7 +107,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  */
 public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
-    static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
+    private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
 
@@ -998,6 +998,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
+    
+    @Override
+    public void notifyTeachersOnAttemptCompletion(Long sessionId, String userName) {
+	String message = getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
+    }
 
     // *****************************************************************************
     // private methods
@@ -1429,23 +1435,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.assessmentOutputFactory = assessmentOutputFactory;
     }
 
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
-    }
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

@@ -298,9 +298,9 @@ public interface IImageGalleryService {
      *                imageGallery item
      * @return
      */
-    public List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
+    List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
 
-    public List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId);
+    List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -311,7 +311,7 @@ public interface IImageGalleryService {
      * @param userId
      * @param entryText
      */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText);
 
     /**
@@ -323,12 +323,12 @@ public interface IImageGalleryService {
      * @param userID
      * @return
      */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * @param notebookEntry
      */
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
     /**
      * Get Reflect DTO list grouped by sessionID.
@@ -363,18 +363,16 @@ public interface IImageGalleryService {
      * @param key
      * @return
      */
-    public ImageGalleryConfigItem getConfigItem(String key);
+    ImageGalleryConfigItem getConfigItem(String key);
 
     /**
      * Save a ImageGallery configItem
      * 
      * @param item
      */
-    public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);    
+    void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);
     
-    IEventNotificationService getEventNotificationService();
-
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

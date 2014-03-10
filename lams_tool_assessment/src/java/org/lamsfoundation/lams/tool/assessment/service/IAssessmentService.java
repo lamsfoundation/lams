@@ -279,7 +279,7 @@ public interface IAssessmentService {
      */
     AssessmentUser getUser(Long uid);
 
-    public IEventNotificationService getEventNotificationService();
+    void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);
 
     /**
      * Gets a message from assessment bundle. Same as <code><fmt:message></code> in JSP pages.
@@ -291,22 +291,13 @@ public interface IAssessmentService {
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *            tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
     
     /**
      * Get a message from the language files with the given key
      * @param key
      * @return
      */
-    public String getMessage(String key);
+    String getMessage(String key);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

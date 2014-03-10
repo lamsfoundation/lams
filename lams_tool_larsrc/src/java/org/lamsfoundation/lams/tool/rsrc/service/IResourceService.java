@@ -219,9 +219,9 @@ public interface IResourceService {
      *                resource item
      * @return
      */
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
+    List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
 
-    public List<List<Summary>> exportByContentId(Long contentId);
+    List<List<Summary>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -232,7 +232,7 @@ public interface IResourceService {
      * @param userId
      * @param entryText
      */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText);
 
     /**
@@ -244,12 +244,12 @@ public interface IResourceService {
      * @param userID
      * @return
      */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * @param notebookEntry
      */
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
     /**
      * Get Reflect DTO list grouped by sessionID.
@@ -267,27 +267,7 @@ public interface IResourceService {
      */
     ResourceUser getUser(Long uid);
 
-    public IEventNotificationService getEventNotificationService();
-
-    /**
-     * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
-     * @param key
-     *                key of the message
-     * @param args
-     *                arguments for the message
-     * @return message content
-     */
-    String getLocalisedMessage(String key, Object[] args);
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

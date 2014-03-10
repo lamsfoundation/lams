@@ -91,11 +91,8 @@
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
-		</property>   
-		<property name="lessonService">
-   			<ref bean="lessonService"/>
-   		</property>
-				<property name="resourceOutputFactory"><ref bean="resourceOutputFactory"/></property>
+		</property>
+		<property name="resourceOutputFactory"><ref bean="resourceOutputFactory"/></property>
     </bean>
 
     <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

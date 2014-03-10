@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
@@ -222,6 +221,10 @@ public interface IDacoService {
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
+    
+    void notifyTeachersOnLearnerEntry(Long sessionId, DacoUser dacoUser);
+    
+    void notifyTeachersOnRecordSumbit(Long sessionId, DacoUser dacoUser);
 
     /**
      * Returns summaries for particular questions. A list of {@link QuestionSummaryDTO question summaries} is created,
@@ -283,10 +286,6 @@ public interface IDacoService {
      */
     List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 
-    IEventNotificationService getEventNotificationService();
-
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
-
     /**
      * Get how many records has the given user posted.
      * 
@@ -294,7 +293,7 @@ public interface IDacoService {
      * @param sessionId
      * @return
      */
-    public int getRecordNum(Long userID, Long sessionId);
+    int getRecordNum(Long userID, Long sessionId);
     
     boolean isGroupedActivity(long toolContentID);
 }

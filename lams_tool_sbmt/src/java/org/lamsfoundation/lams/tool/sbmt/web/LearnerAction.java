@@ -268,21 +268,13 @@ public class LearnerAction extends DispatchAction {
 
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	if (content.isNotifyTeachersOnFileSubmit()) {
-	    boolean isHtmlFormat = false;
-	    List<User> monitoringUsers = submitFilesService.getMonitorsByToolSessionId(sessionID);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
-		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
-		}
-		String fullName = learner.getLastName() + " " + learner.getFirstName();
-		submitFilesService.getEventNotificationService().sendMessage(null, monitoringUsersIds,
-			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			submitFilesService.getLocalisedMessage("event.file.submit.subject", null),
-			submitFilesService.getLocalisedMessage("event.file.submit.body", new Object[] { fullName }),
-			isHtmlFormat);
-	    }
+
+	    String fullName = learner.getLastName() + " " + learner.getFirstName();
+	    String message = submitFilesService
+		    .getLocalisedMessage("event.file.submit.body", new Object[] { fullName });
+	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
+	
 	return mapping.getInputForward();
     }
 

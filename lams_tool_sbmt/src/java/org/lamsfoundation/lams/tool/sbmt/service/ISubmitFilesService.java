@@ -280,15 +280,6 @@ public interface ISubmitFilesService {
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    List<User> getMonitorsByToolSessionId(Long sessionId);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

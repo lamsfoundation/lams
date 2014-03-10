@@ -44,18 +44,9 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -164,12 +155,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     private IEventNotificationService eventNotificationService;
 
-    private ILessonService lessonService;
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
 
+    @Override
     public ImageGallery getImageGalleryByContentId(Long contentId) {
 	ImageGallery rs = imageGalleryDao.getByContentId(contentId);
 	if (rs == null) {
@@ -178,6 +168,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return rs;
     }
 
+    @Override
     public ImageGallery getDefaultContent(Long contentId) throws ImageGalleryException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -193,34 +184,42 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return content;
     }
 
+    @Override
     public List getAuthoredItems(Long imageGalleryUid) {
 	return imageGalleryItemDao.getAuthoringItems(imageGalleryUid);
     }
 
+    @Override
     public void saveUser(ImageGalleryUser imageGalleryUser) {
 	imageGalleryUserDao.saveObject(imageGalleryUser);
     }
 
+    @Override
     public ImageGalleryUser getUserByIDAndContent(Long userId, Long contentId) {
 	return imageGalleryUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
+    @Override
     public ImageGalleryUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return imageGalleryUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
+    @Override
     public void saveOrUpdateImageGallery(ImageGallery imageGallery) {
 	imageGalleryDao.saveObject(imageGallery);
     }
 
+    @Override
     public ImageGalleryItem getImageGalleryItemByUid(Long itemUid) {
 	return imageGalleryItemDao.getByUid(itemUid);
     }
 
+    @Override
     public void saveOrUpdateImageGalleryItem(ImageGalleryItem image) {
 	imageGalleryItemDao.saveObject(image);
     }
     
+    @Override
     public void deleteImage(Long toolSessionId, Long imageUid) {
 	ImageGallery imageGallery = getImageGalleryBySessionId(toolSessionId);
 	ImageGalleryItem image = getImageGalleryItemByUid(imageUid);
@@ -231,10 +230,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	saveOrUpdateImageGallery(imageGallery);
     }
 
+    @Override
     public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
 	return imageRatingDao.getImageRatingByImageAndUser(imageUid, userId);
     }
 
+    @Override
     public void saveOrUpdateImageRating(ImageRating rating) {
 	imageRatingDao.saveObject(rating);
     }
@@ -243,30 +244,37 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return imageVoteDao.getImageVoteByImageAndUser(imageUid, userId);
     }
 
+    @Override
     public int getNumberVotesByUserId(Long userId) {
 	return imageVoteDao.getNumImageVotesByUserId(userId);
     }
 
+    @Override
     public void saveOrUpdateImageVote(ImageVote vote) {
 	imageVoteDao.saveObject(vote);
     }
 
+    @Override
     public ImageComment getImageCommentByUid(Long commentUid) {
 	return imageCommentDao.getCommentByUid(commentUid);
     }
 
+    @Override
     public void saveImageComment(ImageComment comment) {
 	imageCommentDao.saveObject(comment);
     }
 
+    @Override
     public void deleteImageComment(Long uid) {
 	imageCommentDao.removeObject(ImageComment.class, uid);
     }
 
+    @Override
     public void deleteImageGalleryItem(Long uid) {
 	imageGalleryItemDao.removeObject(ImageGalleryItem.class, uid);
     }
 
+    @Override
     public ImageGallery getImageGalleryBySessionId(Long sessionId) {
 	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -275,14 +283,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return res;
     }
 
+    @Override
     public ImageGallerySession getImageGallerySessionBySessionId(Long sessionId) {
 	return imageGallerySessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateImageGallerySession(ImageGallerySession resSession) {
 	imageGallerySessionDao.saveObject(resSession);
     }
 
+    @Override
     public void setItemAccess(Long imageGalleryItemUid, Long userId, Long sessionId) {
 	ImageGalleryItemVisitLog log = imageGalleryItemVisitDao.getImageGalleryItemLog(imageGalleryItemUid, userId);
 	if (log == null) {
@@ -298,6 +309,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws ImageGalleryException {
 	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -318,10 +330,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return nextUrl;
     }
 
+    @Override
     public List<ImageGalleryUser> getUserListBySessionId(Long sessionId) {
 	return imageGalleryUserDao.getBySessionID(sessionId);
     }
 
+    @Override
     public void setItemVisible(Long itemUid, boolean visible) {
 	ImageGalleryItem item = imageGalleryItemDao.getByUid(itemUid);
 	if (item != null) {
@@ -342,12 +356,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
@@ -357,17 +373,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
-    /**
-     * @param notebookEntry
-     */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public ImageGalleryUser getUser(Long uid) {
 	return (ImageGalleryUser) imageGalleryUserDao.getObject(ImageGalleryUser.class, uid);
     }
 
+    @Override
     public List<List<Summary>> getSummary(Long contentId) {
 	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
 	List<Summary> group = new ArrayList<Summary>();
@@ -403,6 +419,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return groupList;
     }
 
+    @Override
     public List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid) {
 	List<List<UserImageContributionDTO>> imageSummary = new ArrayList<List<UserImageContributionDTO>>();
 	List<UserImageContributionDTO> group = new ArrayList<UserImageContributionDTO>();
@@ -434,6 +451,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     }
 
+    @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -464,6 +482,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return map;
     }
 
+    @Override
     public List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user,
 	    boolean skipHide) {
 	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
@@ -497,6 +516,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return sessionList;
     }
 
+    @Override
     public List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId) {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
 	List<List<List<UserImageContributionDTO>>> sessionList = new ArrayList();
@@ -528,6 +548,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return sessionList;
     }
 
+    @Override
     public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file)
 	    throws UploadImageGalleryFileException {
 	try {
@@ -617,8 +638,16 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return node;
     }
     
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser) {
+	String userName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
+	String message = getLocalisedMessage("event.imagesubmit.body", new Object[] { userName });
+	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
     // *****************************************************************************
@@ -1045,24 +1074,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.coreNotebookService = coreNotebookService;
     }
 
-    public IEventNotificationService getEventNotificationService() {
-	return eventNotificationService;
-    }
-
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
-    }
-
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
     }
 
     public String getLocalisedMessage(String key, Object[] args) {

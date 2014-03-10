@@ -65,7 +65,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -137,8 +136,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     private IEventNotificationService eventNotificationService;
 
     private MessageService messageService;
-
-    private ILessonService lessonService;
 
     private IGradebookService gradebookService;
 
@@ -1146,18 +1143,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
     }
 
     public void setGradebookService(IGradebookService gradebookService) {

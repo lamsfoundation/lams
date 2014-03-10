@@ -242,14 +242,16 @@
 		<property name ="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.events.EventNotificationService">
+				<constructor-arg>
+         			<ref bean="scheduler"/>
+        		</constructor-arg>
 				<property name="eventDAO"><ref bean="eventDAO" /></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
-				<constructor-arg>
-         		  <ref bean="scheduler"/>
-        		</constructor-arg>
         		<property name="messageService"><ref bean="commonMessageService"/></property>
+        		<property name="lessonService"><ref bean="lessonService"/></property>
+        		<property name="toolService"><ref bean="lamsToolService"/></property>
 			</bean>	
-		</property>  
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createEvent">PROPAGATION_REQUIRED</prop>

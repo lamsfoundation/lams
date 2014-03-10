@@ -92,8 +92,7 @@
 		</property>
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
-		</property>   
-		<property name="lessonService"><ref bean="lessonService"/></property> 
+		</property>
 		<property name="dacoOutputFactory"><ref bean="dacoOutputFactory"/></property>
     </bean>
 
