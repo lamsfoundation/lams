@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -163,67 +164,63 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     /**
-     * Factory method to create a new tool session for a single user when he is
-     * running current activity. Does not check to see if a tool session already
-     * exists.
+     * Factory method to create a new tool session for a single user when he is running current activity. Does not check
+     * to see if a tool session already exists.
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_NONE then a
-     * new tool session is created for each learner.
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_NONE then a new tool session is created for each
+     * learner.
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_REQUIRED then
-     * a new tool session is created for each group of learners. It will fall
-     * back to a class group if no grouping is found - the user interface should
-     * not have allowed this!
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_REQUIRED then a new tool session is created for each
+     * group of learners. It will fall back to a class group if no grouping is found - the user interface should not
+     * have allowed this!
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_OPTIONAL then
-     * a new tool session is created for each group of learners. If no grouping
-     * is available then a whole of class group is created.
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_OPTIONAL then a new tool session is created for each
+     * group of learners. If no grouping is available then a whole of class group is created.
      * <p>
-     * If groupingSupportType is not set then defaults to GROUPING_SUPPORT_NONE.
-     * If for some reason a grouped session if also does the equivalent of
-     * GROUPING_SUPPORT_NONE. This way the system will still function, if not as
-     * expected!
+     * If groupingSupportType is not set then defaults to GROUPING_SUPPORT_NONE. If for some reason a grouped session if
+     * also does the equivalent of GROUPING_SUPPORT_NONE. This way the system will still function, if not as expected!
      * <p>
      * 
      * @param learner
-     *                the user who should be using this tool session.
+     *            the user who should be using this tool session.
      * @return the new tool session.
      */
+    @SuppressWarnings("unchecked")
     public ToolSession createToolSessionForActivity(User learner, Lesson lesson) {
 	Date now = new Date(System.currentTimeMillis());
 	Integer supportType = getGroupingSupportType();
 	ToolSession session = null;
 
 	if (supportType != null
-		&& (supportType.intValue() == GROUPING_SUPPORT_REQUIRED || supportType.intValue() == GROUPING_SUPPORT_OPTIONAL)) {
+		&& (supportType.equals(GROUPING_SUPPORT_REQUIRED) || supportType.equals(GROUPING_SUPPORT_OPTIONAL))) {
 
 	    // Both cases create a small group if a grouping exists, otherwise creates a class group.
-	    Group learners = null;
+	    Group group = null;
 	    if (getApplyGrouping().booleanValue()) {
-		learners = this.getGroupFor(learner);
-	    }
+		group = this.getGroupFor(learner);
+		if (group == null || group.isNull()) {
+		    throw new LamsToolServiceException("Activity " + getActivityId()
+			    + " requires existing grouping but no group for user " + learner.getUserId()
+			    + " exists yet.");
+		}
 
-	    if (supportType.intValue() == GROUPING_SUPPORT_REQUIRED && learners == null) {
-		log
-			.error("Activity "
-				+ getActivityId()
-				+ " requires grouping (groupingSupportType=GROUPING_SUPPORT_REQUIRED) but no grouping was available. "
-				+ " applyGrouping = " + getApplyGrouping() + " grouping = " + getGrouping()
-				+ ". Falling back to a class grouping.");
-	    }
-
-	    if (learners == null || learners.isNull()) {
-		LessonClass lessonClass = lesson.getLessonClass();
-		learners = this.getGroupFor(learner, lessonClass);
-	    }
-
-	    if (learners != null && !learners.isNull()) {
-		session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, learners, lesson);
+		for (ToolSession toolSession : (Set<ToolSession>) group.getToolSessions()) {
+		    if (this.equals(toolSession.getToolActivity())) {
+			session = toolSession;
+			break;
+		    }
+		}
 	    } else {
-		log
-			.error("Unable to get the group for a new tool session for Activity " + getActivityId()
-				+ " Falling back to one learner per session." + " Learner " + learner + ", lesson is "
-				+ lesson);
+		LessonClass lessonClassGrouping = lesson.getLessonClass();
+		group = this.getGroupFor(learner, lessonClassGrouping);
+
+		if (group != null && !group.isNull()) {
+		    session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, group, lesson);
+		} else {
+		    log.error("Unable to get a lesson class group for a new tool session for activity "
+			    + getActivityId() + " and user " + learner
+			    + ". Falling back to one learner per session.");
+		}
 	    }
 	}
 

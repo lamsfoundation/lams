@@ -1346,9 +1346,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity,
 		stopPreviousActivity, new ArrayList<Long>());
 
-	// without this, there are errors when target is in branching
-	learnerService.createToolSessionsIfNecessary(stopActivity, learnerProgress);
-
 	return stopReason != null ? stopReason : messageService
 		.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
     }
@@ -1490,7 +1487,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		stopReason = messageService.getMessage(
 			MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,
 			new Object[] { activity.getTitle() });
-
+		
+		// without this, there are errors when target is in branching
+		learnerService.createToolSessionsIfNecessary(stopActivity, learnerProgress);
 	    } else {
 		Activity nextActivity = learnerProgress.getNextActivity();
 
