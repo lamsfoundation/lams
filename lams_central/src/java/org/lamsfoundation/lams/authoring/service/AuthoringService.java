@@ -707,8 +707,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	if (activity == null) {
 	    // no read-only activities, insert gate at start of sequence
-	    fromTransition = newTransition;
-
 	    toActivity = design.getFirstActivity();
 
 	    newTransition.setToActivity(toActivity);
@@ -716,8 +714,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    newTransition.setFromActivity(gate);
 	    newTransition.setFromUIID(gate.getActivityUIID());
 
-	    gate.setTransitionFrom(fromTransition);
-	    toActivity.setTransitionTo(fromTransition);
+	    gate.setTransitionFrom(newTransition);
+	    toActivity.setTransitionTo(newTransition);
 
 	    // set gate as first activity in sequence
 	    design.setFirstActivity(gate);
