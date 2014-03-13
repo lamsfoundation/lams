@@ -471,6 +471,17 @@ function openLearningDesign(learningDesignID) {
 							gateType);
 						break;
 
+					// Optional Activity
+					case 7:
+						activity = new ActivityLib.OptionalActivity(activityData.activityID,
+								activityData.activityUIID,
+								activityData.xCoord,
+								activityData.yCoord,
+								activityData.activityTitle,
+								activityData.minOptions,
+								activityData.maxOptions);
+						break;
+						
 					// Branching Activity
 					case 10: var branchingType = 'chosen';
 					case 11: var branchingType = branchingType || 'group';
@@ -488,13 +499,13 @@ function openLearningDesign(learningDesignID) {
 						activityData.activity = branchingEdge;
 						
 						branchingEdge = new ActivityLib.BranchingEdgeActivity(
-								null, 0, 0, null, null, branchingEdge.branchingActivity);
+								null, null, 0, 0, null, null, branchingEdge.branchingActivity);
 						layout.activities.push(branchingEdge);
 
 						break;
 					
-					// Sequence Activity, i.e. a branch
-					case 8: 
+					// Branch (i.e. Sequence Activity)
+					case 8:
 						$.each(layout.activities, function(){
 							if (this instanceof ActivityLib.BranchingEdgeActivity
 								&& activityData.parentActivityID == this.branchingActivity.id) {
@@ -508,6 +519,14 @@ function openLearningDesign(learningDesignID) {
 							}
 						});
 						break;
+						
+					// Support (Floating) activity
+					case 15:
+						activity = new ActivityLib.FloatingActivity(activityData.activityID,
+								activityData.activityUIID,
+								activityData.xCoord,
+								activityData.yCoord);
+						break;
 				}
 				
 				
@@ -515,24 +534,27 @@ function openLearningDesign(learningDesignID) {
 					// activity type not supported yet
 					return true;
 				}
-				layout.activities.push(activity);
 				
+				if (!(activity instanceof ActivityLib.FloatingActivity)) {
+					layout.activities.push(activity);
+				}
 				
 				// store information about the branch the activity belongs to
 				if (activityData.parentActivityID) {
 					var branchData = branchToActivities[activityData.parentActivityID];
-					if (!branchData) {
+					if (branchData) {
+						if (activityData.orderID > branchData.lastActivityOrderID) {
+							// is it the last activity in the branch?
+							branchData.lastActivityOrderID = activityData.orderID;
+							branchData.lastActivity = activity;
+						}
+					} else {
 						branchData = branchToActivities[activityData.parentActivityID] = {
-							'lastActivityOrderID' : activityData.orderID,
-							'lastActivity'        : activity
-						};
+								'lastActivityOrderID' : activityData.orderID,
+								'lastActivity'        : activity
+							};
 					}
 					
-					if (activityData.orderID > branchData.lastActivityOrderID) {
-						// is it the last activity in the branch?
-						branchData.lastActivityOrderID = activityData.orderID;
-						branchData.lastActivity = activity;
-					}
 					if (activityData.orderID == 1) {
 						// is it the first activity in the branch
 						branchData.firstActivity = activity;
@@ -556,23 +578,60 @@ function openLearningDesign(learningDesignID) {
 				}
 			});
 			
-			// apply existing groupings to activities 
+			// apply existing groupings and parent-child references to activities 
 			$.each(ld.activities, function(){
-				if (this.applyGrouping && this.activity) {
-					var groupedActivity = this.activity,
-						groupingID = this.groupingID;
-					$.each(layout.activities, function(){
-						if (this instanceof ActivityLib.GroupingActivity && groupingID == this.groupingID) {
-							// add reference and redraw the grouped activity
-							if (groupedActivity instanceof ActivityLib.BranchingEdgeActivity) {
-								groupedActivity.branchingActivity.grouping = this;
-							} else {
-								groupedActivity.grouping = this;
-								groupedActivity.draw();
+				var activityData = this,
+					activity = this.activity;
+				
+				if (activity) {
+					if (activityData.applyGrouping) {
+						var groupedActivity = activityData.activity;
+						
+						$.each(layout.activities, function(){
+							if (this instanceof ActivityLib.GroupingActivity && groupingID == activityData.groupingID) {
+								// add reference and redraw the grouped activity
+								if (groupedActivity instanceof ActivityLib.BranchingEdgeActivity) {
+									groupedActivity.branchingActivity.grouping = this;
+								} else {
+									groupedActivity.grouping = this;
+									groupedActivity.draw();
+								}
+								return false;
 							}
-							return false;
+						});
+					} else if (layout.floatingActivity && layout.floatingActivity.id == activityData.parentActivityID) {
+						// add a Tool Activity as a Floating Activity element
+						if (!layout.floatingActivity.childActivities) {
+							layout.floatingActivity.childActivities = [];
 						}
-					});
+						layout.floatingActivity.childActivities.push(activity);
+						activity.parentActivity = layout.floatingActivity;
+						if (!arrangeNeeded){
+							// if no auto re-arrange will be done, just redraw the container with its child activities 
+							layout.floatingActivity.draw();
+						}	
+					}
+					
+					// find Optional Activity
+					if (activityData.parentActivityID && !activity.parentActivity) {
+						$.each(layout.activities, function(){
+							if (activityData.parentActivityID == this.id && this instanceof ActivityLib.OptionalActivity) {
+								// add a Tool Activity as a Optional Activity element
+								if (!this.childActivities) {
+									this.childActivities = [];
+								}
+								this.childActivities.push(activity);
+								activity.parentActivity = this;
+								if (!arrangeNeeded) {
+									// if no auto re-arrange will be done, just redraw the container with its child activities
+									this.draw();
+								}
+								
+								// stop iteration
+								return false;
+							}
+						});
+					}
 				}
 			});
 			
@@ -591,7 +650,7 @@ function openLearningDesign(learningDesignID) {
 								return false;
 							}
 						});
-					// is it the grouping we're looking for
+					// is it the grouping we're looking for?
 					} else if (this instanceof ActivityLib.GroupingActivity) {
 						$.each(this.groups, function(){
 							if (groupUIID == this.uiid) {
@@ -619,15 +678,22 @@ function openLearningDesign(learningDesignID) {
 			// draw starting and ending transitions in branches
 			$.each(layout.activities, function(){
 				if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
-					var branchingActivity = this.branchingActivity;
-					$.each(branchingActivity.branches, function(){
+					var branchingActivity = this.branchingActivity,
+						branches = branchingActivity.branches.slice();
+					branchingActivity.branches = [];
+					
+					$.each(branches, function(){
 						var branch = this,
+							// if there is no branch data, the branch is empty
 							branchData = branchToActivities[branch.id];
 						
 						// add reference to the transition inside branch
 						branch.transitionFrom = ActivityLib.addTransition(branchingActivity.start,
-								branchData.firstActivity, true, null, null, branch.title);
-						ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);	
+								branchData ? branchData.firstActivity : branchingActivity.end,
+								true, null, null, branch.title);
+						if (branchData) {
+							ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);
+						}
 					});
 				}
 			});
@@ -665,10 +731,12 @@ function openLearningDesign(learningDesignID) {
 			
 			if (arrangeNeeded) {
 				MenuLib.arrangeActivities();
-			} else if (resizeNeeded) {
-				resizePaper(paperWidth, paperHeight);
-			} else {	
-				HandlerLib.resetCanvasMode(true);
+			} else {
+				if (resizeNeeded) {
+					resizePaper(paperWidth, paperHeight);
+				} else {
+					HandlerLib.resetCanvasMode(true);
+				}
 			}
 		}
 	});

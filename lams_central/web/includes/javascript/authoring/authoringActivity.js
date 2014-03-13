@@ -580,7 +580,7 @@ var ActivityLib = {
 		
 		if (!branch && fromActivity instanceof ActivityLib.BranchingEdgeActivity && fromActivity.isStart) {
 			// create a new branch
-			branch = new ActivityLib.BranchActivity(null, null, null, fromActivity.branchingActivity);
+			branch = new ActivityLib.BranchActivity(null, null, title, fromActivity.branchingActivity);
 		}
 		
 		var transition = new ActivityLib.Transition(id, uiid, fromActivity, toActivity,
