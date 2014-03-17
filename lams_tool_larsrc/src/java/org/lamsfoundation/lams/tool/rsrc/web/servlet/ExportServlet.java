@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.rsrc.web.servlet;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
@@ -139,10 +140,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-		List<Summary> group = service.exportBySessionId(toolSessionID,true);
+		List<ItemSummary> group = service.exportBySessionId(toolSessionID,true);
 		saveFileToLocal(group, directoryName);
 		
-		List<List> groupList = new ArrayList<List>();
+		List<List<ItemSummary>> groupList = new ArrayList<List<ItemSummary>>();
 		if(group.size() > 0)
 			groupList.add(group);
 		
@@ -151,15 +152,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		// Create reflectList if reflection is enabled.
 		if (content.isReflectOnActivity()) {
+		    	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
+			
 			// Create reflectList, need to follow same structure used in teacher
 			// see service.getReflectList();
-			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
-			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-			reflectDTOSet.add(getReflectionEntry(learner));
-			map.put(toolSessionID, reflectDTOSet);
+			reflectList.add(getReflectionEntry(learner));
 			
 			// Add reflectList to sessionMap
-			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, map);
+			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
 		}
 		
 		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
@@ -184,9 +184,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new ResourceApplicationException(error);
 		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
+		List<List<ItemSummary>> groupList = service.exportByContentId(toolContentID);
 		if(groupList != null) {
-			for (List<Summary> list : groupList) {
+			for (List<ItemSummary> list : groupList) {
 				saveFileToLocal(list, directoryName);
 			}
 		}
@@ -196,7 +196,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		// Create reflectList if reflection is enabled.
 		if (content.isReflectOnActivity()) {
-			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
+		    	List<ReflectDTO> reflectList = service.getReflectList(content.getContentId());
 			// Add reflectList to sessionMap
 			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
 		}
@@ -207,19 +207,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
-    private void saveFileToLocal(List<Summary> list, String directoryName) {
+    private void saveFileToLocal(List<ItemSummary> list, String directoryName) {
     	handler = getToolContentHandler();
-		for (Summary summary : list) {
+		for (ItemSummary itemSummary : list) {
 			//for learning object, it just display "No offline package available" information.
-			if(summary.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-				|| summary.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
-				|| summary.getItemType() == 0){
+			if(itemSummary.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
+				|| itemSummary.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
+				|| itemSummary.getItemType() == 0){
 			    continue;
 			}
 				
 			try{
 				int idx= 1;
-				String userName = summary.getUsername();
+				String userName = itemSummary.getUsername();
 				String localDir;
 				while(true){
 					localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
@@ -230,8 +230,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					}
 					idx++;
 				}
-				summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.' + FileUtil.getFileExtension(summary.getFileName()));
-				handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary.getAttachmentLocalUrl()));
+				itemSummary.setAttachmentLocalUrl(userName + "/" + idx + "/" + itemSummary.getFileUuid() + '.' + FileUtil.getFileExtension(itemSummary.getFileName()));
+				handler.saveFile(itemSummary.getFileUuid(), FileUtil.getFullPath(directoryName, itemSummary.getAttachmentLocalUrl()));
 			} catch (Exception e) {
 				logger.error("Export forum topic attachment failed: " + e.toString());
 			}

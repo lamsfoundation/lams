@@ -23,18 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
-import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements ResourceItemVisitDAO{
 	

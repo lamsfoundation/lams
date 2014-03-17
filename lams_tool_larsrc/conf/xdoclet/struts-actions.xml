@@ -224,27 +224,20 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/getSubgridData"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="getSubgridData" >
+		</action>
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="listuser" >
 			<forward name="success" path="/pages/monitoring/userlist.jsp" />
 		</action>
-		<action path="/monitoring/hideitem"
+		<action path="/monitoring/changeItemVisibility"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
-			parameter="hideitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
-		<action path="/monitoring/showitem"
-			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
-			parameter="showitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+			parameter="changeItemVisibility" >
 		</action>
 		
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/notebook.jsp" />
-		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.ClearSessionAction">

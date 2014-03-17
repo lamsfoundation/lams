@@ -6,28 +6,38 @@
 
 <lams:html>
 	<lams:head>
-		 <%@ include file="/common/tabbedheader.jsp" %>
-	 <script>
+		<%@ include file="/common/tabbedheader.jsp" %>
+		<style media="screen,projection" type="text/css">
+			#tabbody1 {
+				margin-left: 15px;
+			}
+			
+			table.forms {
+				margin-left: 15px;
+			}
+		</style>
+		 
+		<script>
 			var initialTabId = "${initialTabId}";
-
-		   function init(){
-			 	if (initialTabId) {
+	
+			function init(){
+				if (initialTabId) {
 					selectTab(initialTabId);
 				} else {
 					selectTab(1);
 				}
-	        }     
-	        
-	        function doSelectTab(tabId) {
-		    	// end optional tab controller stuff
-		    	selectTab(tabId);
-	        } 
-	        
-		    function viewItem(itemUid,sessionMapID){
-				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID="+sessionMapID;
+		    }     
+		        
+		    function doSelectTab(tabId) {
+			   // end optional tab controller stuff
+			   selectTab(tabId);
+		    } 
+		        
+			function viewItem(itemUid){
+				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID=${sessionMapID}";
 				launchPopup(myUrl,"MonitoringReview");
 			}
-	    </script>		 
+		</script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
 	<div id="page">

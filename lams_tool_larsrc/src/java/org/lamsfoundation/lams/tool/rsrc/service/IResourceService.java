@@ -32,8 +32,9 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
@@ -197,7 +198,7 @@ public interface IResourceService {
      * @param contentId
      * @return
      */
-    List<List<Summary>> getSummary(Long contentId);
+    List<GroupSummary> getSummary(Long contentId);
 
     List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 
@@ -211,7 +212,7 @@ public interface IResourceService {
     void setItemVisible(Long itemUid, boolean visible);
 
     /**
-     * Get resource item <code>Summary</code> list according to sessionId and skipHide flag.
+     * Get resource item <code>ItemSummary</code> list according to sessionId and skipHide flag.
      * 
      * @param sessionId
      * @param skipHide
@@ -219,9 +220,9 @@ public interface IResourceService {
      *                resource item
      * @return
      */
-    List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
+    List<ItemSummary> exportBySessionId(Long sessionId, boolean skipHide);
 
-    List<List<Summary>> exportByContentId(Long contentId);
+    List<List<ItemSummary>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -252,12 +253,12 @@ public interface IResourceService {
     void updateEntry(NotebookEntry notebookEntry);
 
     /**
-     * Get Reflect DTO list grouped by sessionID.
+     * Get Reflect DTO list.
      * 
      * @param contentId
      * @return
      */
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
+    List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * Get user by UID

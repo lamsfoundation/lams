@@ -7,7 +7,6 @@
 	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
 	<lams:css style="tabbed"/>
 
-
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

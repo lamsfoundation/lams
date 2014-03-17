@@ -186,29 +186,22 @@
 				</c:forEach>
 			</table>
 
-			<%-- Display reflection entries --%>
-			<c:if test="${not group[0].initGroup}">
-
-				<c:if test="${sessionMap.reflectOn}">
-					<%-- End all answers for this question --%>
-					<h3>
-						<fmt:message key="label.export.reflection" />
-					</h3>
-					<c:set var="reflectDTOSet"
-						value="${sessionMap.reflectList[group[0].sessionId]}" />
-					<c:forEach var="reflectDTO" items="${reflectDTOSet}">
-						<h4>
-							${reflectDTO.fullName}
-						</h4>
-						<p>
-							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
-						</p>
-					</c:forEach>
-				</c:if>
-
-			</c:if>
-
 		</c:forEach>
+
+		<%-- Display reflection entries --%>
+		<c:if test="${sessionMap.reflectOn}">
+			<h3>
+				<fmt:message key="label.export.reflection" />
+			</h3>
+			<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
+				<h4>
+					${reflectDTO.fullName}
+				</h4>
+				<p>
+					<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
+				</p>
+			</c:forEach>
+		</c:if>
 
 	</div>
 	<!--closes content-->

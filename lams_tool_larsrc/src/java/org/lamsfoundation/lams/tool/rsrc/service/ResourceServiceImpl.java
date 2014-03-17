@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,8 +82,9 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
+import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
@@ -313,14 +315,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
+    public List<ItemSummary> exportBySessionId(Long sessionId, boolean skipHide) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
 	    ResourceServiceImpl.log.error("Failed get ResourceSession by ID [" + sessionId + "]");
 	    return null;
 	}
 	// initial resource items list
-	List<Summary> itemList = new ArrayList();
+	List<ItemSummary> itemList = new ArrayList();
 	Set<ResourceItem> resList = session.getResource().getResourceItems();
 	for (ResourceItem item : resList) {
 	    if (skipHide && item.isHide()) {
@@ -328,7 +330,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 	    // if item is create by author
 	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
 		itemList.add(sum);
 	    }
 	}
@@ -342,7 +344,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // to skip all item create by author
 	    if (!item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
 		itemList.add(sum);
 	    }
 	}
@@ -351,17 +353,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<List<Summary>> exportByContentId(Long contentId) {
+    public List<List<ItemSummary>> exportByContentId(Long contentId) {
 	Resource resource = resourceDao.getByContentId(contentId);
-	List<List<Summary>> groupList = new ArrayList();
+	List<List<ItemSummary>> groupList = new ArrayList();
 
 	// create init resource items list
-	List<Summary> initList = new ArrayList();
+	List<ItemSummary> initList = new ArrayList();
 	groupList.add(initList);
 	Set<ResourceItem> resList = resource.getResourceItems();
 	for (ResourceItem item : resList) {
 	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(null, null, item, true);
+		ItemSummary sum = new ItemSummary(null, null, item, true);
 		initList.add(sum);
 	    }
 	}
@@ -369,18 +371,18 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	// session by session
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 	for (ResourceSession session : sessionList) {
-	    List<Summary> group = new ArrayList<Summary>();
+	    List<ItemSummary> group = new ArrayList<ItemSummary>();
 	    // get this session's all resource items
 	    Set<ResourceItem> sessList = session.getResourceItems();
 	    for (ResourceItem item : sessList) {
 		// to skip all item create by author
 		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		    ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
 		    group.add(sum);
 		}
 	    }
 	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
+		group.add(new ItemSummary(session.getSessionId(), session.getSessionName(), null, false));
 	    }
 	    groupList.add(group);
 	}
@@ -496,84 +498,78 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<List<Summary>> getSummary(Long contentId) {
-	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-	List<Summary> group = new ArrayList<Summary>();
+    public List<GroupSummary> getSummary(Long contentId) {
+	List<GroupSummary> groupList = new ArrayList<GroupSummary>();
 
 	// get all item which is accessed by user
 	Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId);
 
 	Resource resource = resourceDao.getByContentId(contentId);
-	Set<ResourceItem> resItemList = resource.getResourceItems();
+	Set<ResourceItem> items = resource.getResourceItems();
 
 	// get all sessions in a resource and retrieve all resource items under this session
 	// plus initial resource items by author creating (resItemList)
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 	for (ResourceSession session : sessionList) {
 	    // one new group for one session.
-	    group = new ArrayList<Summary>();
+	    GroupSummary group = new GroupSummary();
+	    group.setSessionId(session.getSessionId());
+	    group.setSessionName(session.getSessionName());
+	    
 	    // firstly, put all initial resource item into this group.
-	    for (ResourceItem item : resItemList) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
+	    for (ResourceItem item : items) {
+		ItemSummary itemSummary = new ItemSummary(item);
 		// set viewNumber according visit log
 		if (visitCountMap.containsKey(item.getUid())) {
-		    sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+		    itemSummary.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
-		group.add(sum);
+		group.getItems().add(itemSummary);
 	    }
+	    
 	    // get this session's all resource items
 	    Set<ResourceItem> sessItemList = session.getResourceItems();
 	    for (ResourceItem item : sessItemList) {
 		// to skip all item create by author
 		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
+		    ItemSummary itemSummary = new ItemSummary(item);
 		    // set viewNumber according visit log
 		    if (visitCountMap.containsKey(item.getUid())) {
-			sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+			itemSummary.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		    }
-		    group.add(sum);
+		    group.getItems().add(itemSummary);
 		}
 	    }
-	    // so far no any item available, so just put session name info to Summary
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
-	    }
+	    
 	    groupList.add(group);
 	}
 
 	return groupList;
-
     }
 
     @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+    public List<ReflectDTO> getReflectList(Long contentId) {
+	List<ReflectDTO> reflections = new LinkedList<ReflectDTO>();
 
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 	for (ResourceSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getResource().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
 	    // get all users in this session
 	    List<ResourceUser> users = resourceUserDao.getBySessionID(sessionId);
 	    for (ResourceUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
 
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
+		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		if (entry != null) {
+		    ReflectDTO ref = new ReflectDTO(user);
+		    ref.setReflect(entry.getEntry());
+		    reflections.add(ref);
 		}
 
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
 	    }
-	    map.put(sessionId, list);
+	    
 	}
 
-	return map;
+	return reflections;
     }
 
     @Override

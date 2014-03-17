@@ -1,147 +1,169 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+<style media="screen,projection" type="text/css">
+	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
+	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
+	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
+	.ui-jqgrid tr.jqgrow td {
+	    white-space: normal !important;
+	    height:auto;
+	    vertical-align:text-top;
+	    padding-top:2px;
+	}
+</style>
 
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+		
+			jQuery("#group${groupSummary.sessionId}").jqGrid({
+				datatype: "local",
+				height: 'auto',
+				autowidth: true,
+				shrinkToFit: false,
+			   	colNames:['#',
+						'sessionId',
+						'itemUid',
+						"<fmt:message key="monitoring.label.title" />",
+						"<fmt:message key="monitoring.label.type" />",
+					    "<fmt:message key="monitoring.label.suggest" />",
+					    "<fmt:message key="monitoring.label.views" />",
+					    "<fmt:message key="monitoring.label.actions" />" 
+				],
+			   	colModel:[
+			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
+			   		{name:'itemUid', index:'itemUid', width:0, hidden: true},
+			   		{name:'title', index:'title', width:260},
+			   		{name:'type', index:'type', width:90},
+			   		{name:'suggest', index:'suggest', width:160},
+			   		{name:'viewNumber', index:'viewNumber', width:100, align:"right", sorttype:"int"},
+			   		{name:'actions', index:'actions', width:120, align:"center"}		
+			   	],
+			   	caption: "${groupSummary.sessionName}",
+				subGrid: true,
+				subGridRowExpanded: function(subgrid_id, row_id) {
+					var subgridTableId = subgrid_id+"_t";
+					var sessionId = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["sessionId"];
+					var itemUid = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["itemUid"];
+					   
+					jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>");
+					   
+					jQuery("#"+subgridTableId).jqGrid({
+						datatype: "json",
+						url: "<c:url value='/monitoring/getSubgridData.do'/>?itemUid=" + itemUid + '&toolSessionID=' + sessionId,
+						height: "100%",
+						autowidth:true,
+						colNames: [
+						   '',
+						   "<fmt:message key="monitoring.label.user.name"/>",
+						   "<fmt:message key="monitoring.label.access.time"/>", 
+						   "<fmt:message key="monitoring.label.complete.time"/>", 
+						   "<fmt:message key="monitoring.label.time.taken"/>"
+						],
+						colModel:[
+						   {name:'id', index:'id', hidden:true},
+						   {name:'userName',index:'userName'},
+						   {name:'startTime', index:'startTime', width:140, align:"center"},
+						   {name:'completeTime', index:'completeTime', width:140, align:"center"},
+						   {name:'timeTaken',index:'timeTaken', width:70, align:"center"}
+						],
+						loadError: function(xhr,st,err) {
+					    	jQuery("#"+subgridTableId).clearGridData();
+					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+					    }
+					})
+				}
+			});
+			
+   	        <c:forEach var="item" items="${groupSummary.items}" varStatus="i">
+				<c:choose>
+					<c:when test="${item.itemHide}">
+						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, false); return false;'> <fmt:message key='monitoring.label.show' /> </a></c:set>
+					</c:when>
+					<c:otherwise>
+						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, true); return false;'> <fmt:message key='monitoring.label.hide' /> </a></c:set>
+					</c:otherwise>
+				</c:choose>
+				
+				<c:choose>
+					<c:when test="${item.itemType == 1}">
+						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.url" /></c:set>
+					</c:when>
+					<c:when test="${item.itemType == 2}">
+						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.file" /></c:set>
+					</c:when>
+					<c:when test="${item.itemType == 3}">
+						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.website" /></c:set>
+					</c:when>
+					<c:when test="${item.itemType == 4}">
+						<c:set var="itemTypeLabel"><fmt:message key="label.authoring.basic.resource.learning.object" /></c:set>
+					</c:when>
+				</c:choose>
+   	        
+   	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
+   	   	     		id:		"${i.index + 1}",
+   	   	     		sessionId:	"${groupSummary.sessionId}",
+   	   	     		itemUid:	"${item.itemUid}",
+   	   	     		title:	"<a href='#nogo' onclick='javascript:viewItem(${item.itemUid}); return false;'>${item.itemTitle}</a>",
+   	   	     		type:	"${itemTypeLabel}",
+   	   	     		suggest:	"${item.username}",
+   	   	     		viewNumber:"	${item.viewNumber}",
+   	   	     		actions:	"${changeItemVisibility}"
+   	   	   	    });
+	        </c:forEach>
+			
+		</c:forEach>
+        
+		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		$(window).bind('resize', function() {
+			var grid;
+		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		    	grid.each(function(index) {
+		        	var gridId = $(this).attr('id');
+		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		    	});
+		    }
+		});
+		
+	});
+	
+	function changeItemVisibility(linkObject, itemUid, isHideItem) {
+		<c:set var="hideShowLink"><a href='<c:url value='/monitoring/changeItemVisibility.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}' class='button'> <fmt:message key='monitoring.label.show' /> </a></c:set>
+        $.ajax({
+            url: '<c:url value="/monitoring/changeItemVisibility.do"/>',
+            data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid + '&isHideItem=' + isHideItem,
+            dataType: 'json',
+            type: 'post',
+            success: function (json) {
+            	if (isHideItem) {
+            		linkObject.innerHTML = '<fmt:message key='monitoring.label.show' />' ;
+            		linkObject.onclick = function (){
+            			changeItemVisibility(this, itemUid, false); 
+            			return false;
+            		}
+            	} else {
+            		linkObject.innerHTML = '<fmt:message key='monitoring.label.hide' />' ;
+            		linkObject.onclick = function (){
+            			changeItemVisibility(this, itemUid, true); 
+            			return false;
+            		}
+            	}
+            }
+       	});
+	}
 
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.lock.on.finished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.lockWhenFinished == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.run.content.auto" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.runAuto == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.mini.number.resources.view" />
-		</td>
-		
-		<td>
-			${sessionMap.resource.miniViewResourceNumber}
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.allowAddUrls == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.learner.add.files" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.allowAddFiles == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.notify.onassigmentsubmit" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.notifyTeachersOnAssigmentSumbit == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.resource.reflectOnActivity == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${sessionMap.resource.reflectOnActivity == true}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					${sessionMap.resource.reflectInstructions}	
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-</table>
-</div>
-
-
-
+</script>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
@@ -149,152 +171,22 @@
 	</div>
 </c:if>
 
-<table cellpadding="0">
-	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:forEach var="item" items="${group}" varStatus="status">
-			<%-- display group name on first row--%>
-			<c:if test="${status.first}">
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<tr>
-						<td colspan="5">
-							<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
-						</td>
-					</tr>
-				</c:if>
-				
-				<c:if test="${firstGroup.index==0}">
-					<tr>
-						<td colspan="5">
-							<SPAN style="font-size: 12px;"> 
-								<fmt:message key="monitoring.summary.note" />
-							</SPAN>
-						</td>
-					</tr>
-				</c:if> 
-				
-				<tr>
-					<th width="18%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
-					<th width="25%">
-						<fmt:message key="monitoring.label.title" />
-					</th>
-					<th width="20%">
-						<fmt:message key="monitoring.label.suggest" />
-					</th>
-					<th width="22%" align="center">
-						<fmt:message key="monitoring.label.number.learners" />
-					</th>
-					<th width="15%">
-						<!--hide/show-->
-					</th>
-				</tr>
-				<%-- End group title display --%>
-			</c:if>
-			<c:if test="${item.itemUid == -1}">
-				<tr>
-					<td colspan="5">
-						<div class="align-left">
-							<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
-						</div>
-					</td>
-				</tr>
-			</c:if>
-			<c:if test="${item.itemUid != -1}">
-				<tr>
-					<td>
-						<c:choose>
-							<c:when test="${item.itemType == 1}">
-								<fmt:message key="label.authoring.basic.resource.url" />
-							</c:when>
-							<c:when test="${item.itemType == 2}">
-								<fmt:message key="label.authoring.basic.resource.file" />
-							</c:when>
-							<c:when test="${item.itemType == 3}">
-								<fmt:message key="label.authoring.basic.resource.website" />
-							</c:when>
-							<c:when test="${item.itemType == 4}">
-								<fmt:message key="label.authoring.basic.resource.learning.object" />
-							</c:when>
-						</c:choose>
-					</td>
-					<td>
-						<a href="javascript:;" onclick="viewItem(${item.itemUid},'${sessionMapID}')">${item.itemTitle}</a>
-					</td>
-					<td>
-						<c:if test="${!item.itemCreateByAuthor}">
-											${item.username}
-										</c:if>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.viewNumber > 0}">
-								<c:set var="listUrl">
-									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}' />
-								</c:set>
-								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
-							</c:when>
-							<c:otherwise>
-									0
-							</c:otherwise>
-						</c:choose>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
-							</c:when>
-							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:if>
-			
-				<%-- Reflection list  --%>
-				<c:if test="${sessionMap.resource.reflectOnActivity && status.last}">
-					<c:set var="userList" value="${sessionMap.reflectList[item.sessionId]}"/>
-					<c:forEach var="user" items="${userList}" varStatus="refStatus">
-						<c:if test="${refStatus.first}">
-							<tr>
-								<td colspan="5">
-									<h2><fmt:message key="title.reflection"/>	</h2>
-								</td>
-							</tr>
-							<tr>
-								<th colspan="2">
-									<fmt:message key="monitoring.user.fullname"/>
-								</th>
-								<th colspan="2">
-									<fmt:message key="monitoring.label.user.loginname"/>
-								</th>
-								<th>
-									<fmt:message key="monitoring.user.reflection"/>
-								</th>
-							</tr>
-						</c:if>
-						<tr>
-							<td colspan="2">
-								${user.fullName}
-							</td>
-							<td colspan="2">
-								${user.loginName}
-							</td>
-							<td >
-								<c:set var="viewReflection">
-									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
-								</c:set>
-								<html:link href="javascript:launchPopup('${viewReflection}')">
-									<fmt:message key="label.view" />
-								</html:link>
-							</td>
-						</tr>
-					</c:forEach>
-				</c:if>
-			
-		</c:forEach>
+<c:forEach var="groupSummary" items="${summaryList}">
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<h1>
+			<fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}
+		</h1>
+		<br>
+	</c:if>
+	
+	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<br>
 		
-	</c:forEach>
-</table>
+</c:forEach>
+	
+<c:if test="${sessionMap.resource.reflectOnActivity}">
+	<%@ include file="reflections.jsp"%>
+</c:if>
+
+<%@ include file="advanceoptions.jsp"%>

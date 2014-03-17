@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
  * 
  * @version $Revision$
  */
-public class Summary {
+public class ItemSummary {
 
     private Long sessionId;
     private String sessionName;
@@ -67,7 +67,7 @@ public class Summary {
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
 
-    public Summary() {
+    public ItemSummary() {
     }
 
     /**
@@ -79,7 +79,7 @@ public class Summary {
      * @param item
      * @param isInitGroup
      */
-    public Summary(Long sessionId, String sessionName, ResourceItem item) {
+    public ItemSummary(ResourceItem item) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
 	if (item != null) {
@@ -106,7 +106,7 @@ public class Summary {
      * @param item
      * @param isInitGroup
      */
-    public Summary(Long sessionId, String sessionName, ResourceItem item, boolean isInitGroup) {
+    public ItemSummary(Long sessionId, String sessionName, ResourceItem item, boolean isInitGroup) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
 	if (item != null) {

@@ -66,6 +66,8 @@ public class ResourceConstants {
     public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 
     public static final String PARAM_TITLE = "title";
+    
+    public static final String PARAM_IS_HIDE_ITEM = "isHideItem";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";

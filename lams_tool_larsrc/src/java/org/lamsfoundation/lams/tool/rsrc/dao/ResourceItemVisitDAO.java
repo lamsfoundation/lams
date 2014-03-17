@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.rsrc.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
 public interface ResourceItemVisitDAO extends DAO {
