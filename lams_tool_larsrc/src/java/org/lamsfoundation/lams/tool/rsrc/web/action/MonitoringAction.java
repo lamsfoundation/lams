@@ -151,8 +151,8 @@ public class MonitoringAction extends Action {
 	    userData.put(user.getFirstName() + " " + user.getLastName());
 	    userData.put(user.getAccessDate());
 	    userData.put(user.getCompleteDate());
-	    Date timeTaken = DateUtil.convertToUTC(user.getTimeTaken());
-	    userData.put(sfm.format(timeTaken));
+	    String timeTaken = (user.getTimeTaken() == null) ? "" : sfm.format(DateUtil.convertToUTC(user.getTimeTaken()));
+	    userData.put(timeTaken);
 	    
 	    JSONObject userRow = new JSONObject();
 	    userRow.put("id", user.getUserId());
