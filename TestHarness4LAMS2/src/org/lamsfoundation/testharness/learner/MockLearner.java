@@ -337,9 +337,11 @@ public class MockLearner extends MockUser implements Runnable {
 	    nextResp = handlePageWithoutForms(resp);
 	}
 
-	boolean isActivityFinished = (resp != null)
-		&& ((resp.getText().indexOf(MockLearner.ACTIVITY_FINISHED_FLAG) != -1) || (resp.getText().indexOf(
-			MockLearner.LESSON_FINISHED_FLAG) != -1));
+	String asText = nextResp == null ? null : nextResp.getText();
+	boolean isActivityFinished = (asText != null)
+		&& (asText.contains(MockLearner.ACTIVITY_FINISHED_FLAG)
+			|| asText.contains(MockLearner.LESSON_FINISHED_FLAG) || asText
+			    .contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG));
 	return isActivityFinished ? nextResp : handleActivity(nextResp);
     }
 
