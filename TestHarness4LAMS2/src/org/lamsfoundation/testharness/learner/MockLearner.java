@@ -127,11 +127,21 @@ public class MockLearner extends MockUser implements Runnable {
 	super(test, username, password, MockAdmin.LEARNER_ROLE, userId);
     }
 
-    private static String[] chooseArbitraryValues(String[] values) {
+    private static String[] chooseArbitraryValues(String[] values, boolean unique) {
 	int length = 1 + TestUtil.generateRandomNumber(values.length);
 	String[] answers = new String[length];
 	for (int i = 0; i < length; i++) {
 	    answers[i] = values[TestUtil.generateRandomNumber(values.length)];
+
+	    if (unique) {
+		for (int j = 0; j < i; j++) {
+		    if (answers[j].equals(answers[i])) {
+			// repeat choice so there are no duplicates
+			i--;
+			break;
+		    }
+		}
+	    }
 	}
 	return answers;
     }
@@ -261,10 +271,10 @@ public class MockLearner extends MockUser implements Runnable {
 			MockLearner.log.debug(username + " uploaded file " + file.getName() + " for form field "
 				+ param);
 		    } else if (form.isMultiValuedParameter(param)) {
-			String[] values = MockLearner.chooseArbitraryValues(form.getOptionValues(param));
+			String[] values = MockLearner.chooseArbitraryValues(form.getOptionValues(param), true);
 			form.setParameter(param, values);
-			MockLearner.log.debug(username + " set " + values.length + " values for form field " + param);
-			Arrays.toString(values);
+			MockLearner.log.debug(username + " set " + values.length + " values for form field " + param
+				+ ": " + Arrays.toString(values));
 		    } else {
 			MockLearner.log.debug(param + " may be a radio button. Current value is "
 				+ form.getParameterValue(param));
