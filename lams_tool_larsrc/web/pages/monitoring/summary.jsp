@@ -60,8 +60,10 @@
 					   
 					jQuery("#"+subgridTableId).jqGrid({
 						datatype: "json",
+						loadonce: true,
 						url: "<c:url value='/monitoring/getSubgridData.do'/>?itemUid=" + itemUid + '&toolSessionID=' + sessionId,
 						height: "100%",
+						rowNum: 10000,
 						autowidth:true,
 						colNames: [
 						   '',
@@ -164,6 +166,14 @@
 	}
 
 </script>
+
+<h2>
+	${sessionMap.resource.title}
+</h2>
+
+<h2>
+	${sessionMap.resource.instructions}
+</h2>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
