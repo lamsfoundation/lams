@@ -210,6 +210,10 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 			break;
 		    }
 		}
+		
+		if (session == null) {
+		    session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, group, lesson);
+		}
 	    } else {
 		LessonClass lessonClassGrouping = lesson.getLessonClass();
 		group = this.getGroupFor(learner, lessonClassGrouping);
