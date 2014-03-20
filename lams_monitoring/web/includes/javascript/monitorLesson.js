@@ -179,7 +179,7 @@ function initLessonTab(){
 		            		});
 		            		
 		            		// check if monitoring user really wants to remove progress
-		            		if (removedLearners.length > 0 && !confirm(LEARNER_GROUP_REMOVE_PROGRESS)){
+		            		if (removedLearners.length > 0 && !confirm(LABELS.LEARNER_GROUP_REMOVE_PROGRESS)){
 		            			removedLearners = [];
 		            		}
 		            		
