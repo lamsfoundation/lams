@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
@@ -12,6 +14,7 @@ public class ReflectDTO {
     private String reflectInstrctions;
     private boolean finishReflection;
     private String reflect;
+    private Date date;
 
     public ReflectDTO(ResourceUser user) {
 	this.setLoginName(user.getLoginName());
@@ -65,5 +68,13 @@ public class ReflectDTO {
 
     public void setUserUid(Long userUid) {
 	this.userUid = userUid;
+    }
+    
+    public Date getDate() {
+	return date;
+    }
+
+    public void setDate(Date date) {
+	this.date = date;
     }
 }

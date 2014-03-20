@@ -553,6 +553,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
+			    .getCreateDate();
+		    ref.setDate(postedDate);
 		    reflections.add(ref);
 		}
 

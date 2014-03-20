@@ -1,33 +1,20 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<br>
-<h2>
-	<fmt:message key="title.reflection"/>
-</h2>
+<br><br>
 
-<table class="forms">
+<table class="alternative-color">
 
 	<tr>
-		<th style="width: 20%">
-			<fmt:message key="monitoring.user.fullname"/>
-		</th>
-		<th style="width: 20%">
-			<fmt:message key="monitoring.label.user.loginname"/>
-		</th>
 		<th>
-			<fmt:message key="monitoring.user.reflection"/>
+			<fmt:message key="title.reflection"/>
 		</th>
 	</tr>
 										
 	<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
 		<tr>
 			<td>
-				${reflectDTO.fullName}
-			</td>
-			<td>
-				${reflectDTO.loginName}
-			</td>
-			<td>
+				${reflectDTO.fullName} <lams:Date value="${reflectDTO.date}"/>
+				<br>
 				<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 			</td>
 		</tr>
