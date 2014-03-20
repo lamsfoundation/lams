@@ -144,14 +144,20 @@ public class MonitoringAction extends Action {
 	
 	JSONArray rows = new JSONArray();
 	for (ResourceUser user : userList) {
-	    DateFormat sfm = new SimpleDateFormat("HH:mm:ss");
+	    DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
+	    DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
 	    
 	    JSONArray userData = new JSONArray();
 	    userData.put(user.getUserId());
 	    userData.put(user.getFirstName() + " " + user.getLastName());
-	    userData.put(user.getAccessDate());
-	    userData.put(user.getCompleteDate());
-	    String timeTaken = (user.getTimeTaken() == null) ? "" : sfm.format(DateUtil.convertToUTC(user.getTimeTaken()));
+	    String accessDate = (user.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil.convertToUTC(user
+		    .getAccessDate()));
+	    userData.put(accessDate);
+	    String completeDate = (user.getCompleteDate() == null) ? "" : dateFormatter.format(DateUtil
+		    .convertToUTC(user.getCompleteDate()));
+	    userData.put(completeDate);
+	    String timeTaken = (user.getTimeTaken() == null) ? "" : timeTakenFormatter.format(DateUtil
+		    .convertToUTC(user.getTimeTaken()));
 	    userData.put(timeTaken);
 	    
 	    JSONObject userRow = new JSONObject();

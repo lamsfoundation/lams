@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -503,20 +504,24 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	// get all item which is accessed by user
 	Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId);
-
 	Resource resource = resourceDao.getByContentId(contentId);
-	Set<ResourceItem> items = resource.getResourceItems();
 
 	// get all sessions in a resource and retrieve all resource items under this session
 	// plus initial resource items by author creating (resItemList)
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
+	
 	for (ResourceSession session : sessionList) {
 	    // one new group for one session.
 	    GroupSummary group = new GroupSummary();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
-	    
+
+	    Set<ResourceItem> items = new TreeSet<ResourceItem>(new ResourceItemComparator());
 	    // firstly, put all initial resource item into this group.
+	    items.addAll(resource.getResourceItems());
+	    // add this session's resource items
+	    items.addAll(session.getResourceItems());
+	    
 	    for (ResourceItem item : items) {
 		ItemSummary itemSummary = new ItemSummary(item);
 		// set viewNumber according visit log
@@ -524,20 +529,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		    itemSummary.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
 		group.getItems().add(itemSummary);
-	    }
-	    
-	    // get this session's all resource items
-	    Set<ResourceItem> sessItemList = session.getResourceItems();
-	    for (ResourceItem item : sessItemList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    ItemSummary itemSummary = new ItemSummary(item);
-		    // set viewNumber according visit log
-		    if (visitCountMap.containsKey(item.getUid())) {
-			itemSummary.setViewNumber(visitCountMap.get(item.getUid()).intValue());
-		    }
-		    group.getItems().add(itemSummary);
-		}
 	    }
 	    
 	    groupList.add(group);
