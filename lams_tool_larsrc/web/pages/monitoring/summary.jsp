@@ -171,9 +171,7 @@
 	${sessionMap.resource.title}
 </h2>
 
-<h2>
 	${sessionMap.resource.instructions}
-</h2>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
