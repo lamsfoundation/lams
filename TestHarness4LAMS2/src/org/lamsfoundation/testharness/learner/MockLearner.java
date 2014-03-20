@@ -88,6 +88,8 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
     private static final int CHAT_REPLIES = 3;
 
+    private static final String VOTE_FINISH_SUBSTRING = "/lams/tool/lavote11/learning.do";
+
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
     private static final Pattern ASSESSMENT_FINISH_PATTERN = Pattern
@@ -104,6 +106,8 @@ public class MockLearner extends MockUser implements Runnable {
 
     private static final String VOTE_VIEW_ALL_RESULTS_BUTTON_STRING = "submitMethod('viewAllResults')";
     private static final String VOTE_LEARNER_FINISHED_BUTTON_STRING = "submitMethod('learnerFinished')";
+    private static final String VOTE_MIN_NOMINATION_PARAM = "minNominationCount";
+    private static final String VOTE_MAX_NOMINATION_PARAM = "maxNominationCount";
 
     private static final String WIKI_EDIT_BUTTON_STRING = "doEditOrAdd('editPage')";
 
@@ -127,9 +131,12 @@ public class MockLearner extends MockUser implements Runnable {
 	super(test, username, password, MockAdmin.LEARNER_ROLE, userId);
     }
 
-    private static String[] chooseArbitraryValues(String[] values, boolean unique) {
-	int length = 1 + TestUtil.generateRandomNumber(values.length);
+    private static String[] chooseArbitraryValues(String[] values, boolean unique, Integer minValues, Integer maxValues) {
+	int min = minValues == null ? 1 : minValues;
+	int max = maxValues == null ? values.length : Math.min(maxValues, values.length);
+	int length = min + TestUtil.generateRandomNumber(max);
 	String[] answers = new String[length];
+	
 	for (int i = 0; i < length; i++) {
 	    answers[i] = values[TestUtil.generateRandomNumber(values.length)];
 
@@ -271,7 +278,13 @@ public class MockLearner extends MockUser implements Runnable {
 			MockLearner.log.debug(username + " uploaded file " + file.getName() + " for form field "
 				+ param);
 		    } else if (form.isMultiValuedParameter(param)) {
-			String[] values = MockLearner.chooseArbitraryValues(form.getOptionValues(param), true);
+			String minValuesParam = form.getParameterValue(VOTE_MIN_NOMINATION_PARAM);
+			String maxValuesParam = form.getParameterValue(VOTE_MAX_NOMINATION_PARAM);
+			Integer minValues = minValuesParam == null ? null : Integer.parseInt(minValuesParam);
+			Integer maxValues = maxValuesParam == null ? null : Integer.parseInt(maxValuesParam);
+
+			String[] values = MockLearner.chooseArbitraryValues(form.getOptionValues(param), true,
+				minValues, maxValues);
 			form.setParameter(param, values);
 			MockLearner.log.debug(username + " set " + values.length + " values for form field " + param
 				+ ": " + Arrays.toString(values));
@@ -688,6 +701,17 @@ public class MockLearner extends MockUser implements Runnable {
     }
 
     private WebForm handleToolWiki(WebForm form, String action) throws IOException, SAXException {
+	// add one random page...
+	form.setAttribute("action", action + "?dispatch=addPage");
+	WebResponse nextResp = (WebResponse) new Call(wc, test, username + " adds Wiki page", fillFormArbitrarily(form))
+		.execute();
+	form = nextResp.getForms()[1];
+	// ...and mark the activity to be finished
+	form.setAttribute("action", action + "?dispatch=finishActivity");
+	return form;
+    }
+
+    private WebForm handleToolVote(WebForm form, String action) throws IOException, SAXException {
 	// add one random page...
 	form.setAttribute("action", action + "?dispatch=addPage");
 	WebResponse nextResp = (WebResponse) new Call(wc, test, username + " adds Wiki page", fillFormArbitrarily(form))
