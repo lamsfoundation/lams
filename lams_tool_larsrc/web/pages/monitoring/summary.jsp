@@ -170,9 +170,9 @@
 <h2>
 	${sessionMap.resource.title}
 </h2>
-
+<div class="instructions">
 	${sessionMap.resource.instructions}
-
+</div>
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
