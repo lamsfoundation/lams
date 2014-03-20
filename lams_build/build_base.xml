@@ -386,7 +386,7 @@
 	<!-- =================================================================== -->
 	
 	<!-- Runs if jsp.precompile setting is set in lams_build/common.properties -->
-	<target name="_jsp-precompile" if="jsp.precompile">
+	<target name="_jsp-precompile" if="jsp.precompile" depends="_compile-java">
 		<!-- Internal target: Precompiles JSP files. -->
 		<echo>${ant.project.name}: Precompiling JSP files</echo>
 		
