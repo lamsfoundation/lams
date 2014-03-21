@@ -44,6 +44,9 @@
 	
 
 	<target name="deploy-jar" depends="_target-not-available" description="Deploys JAR." />
+	
+	
+	<target name="_compile-java" depends="_target-not-available"/>
 
 			
 	<target name="deploy-war" depends="_target-not-available" description="Deploys WAR." />
