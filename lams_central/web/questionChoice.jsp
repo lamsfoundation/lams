@@ -83,10 +83,12 @@
 		
 		$(document).ready(function(){
 			$('.question').change(function(){
-				var checked = $(this).is(':checked');
-				var selector = '#' + $(this).attr('id');
-				var answerDiv = $(selector + 'answerDiv');
-				var answersVisible = answerDiv.find('input[type="checkbox"]').length > 0;
+				var checked = $(this).is(':checked'),
+					selector = '#' + $(this).attr('id'),
+					answerDiv = $(selector + 'answerDiv'),
+					answersVisible = answerDiv.find('input[type="checkbox"]').length > 0;
+					
+				$(this).attr('checked', checked);
 				// enable/disable answers and feedback fields
 				// so they do not get posted when not needed
 				if (answersVisible) {
@@ -123,6 +125,11 @@
 					$('.answerDiv').hide('slow')
 					   .find('input').attr('disabled', 'disabled');
 				}
+			});
+			
+			$('.answer').change(function(){
+				// FF does not seem to do it right
+				$(this).attr('checked', $(this).is(':checked'));
 			});
 		});
 	</script>
@@ -196,7 +203,7 @@
 						<c:choose>
 							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'fb'}">
 								<input name="question${questionStatus.index}answer${answerStatus.index}"
-					       			   value="<c:out value='${answer.text}' />"
+					       			   value="<c:out value='${answer.text}' />" class="answer"
 					       			   type="checkbox" checked="checked" disabled="disabled" />${answer.text}<br />
 			       			</c:when>
 			       			<c:otherwise>

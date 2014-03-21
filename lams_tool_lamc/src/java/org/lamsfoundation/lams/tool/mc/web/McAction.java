@@ -468,7 +468,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
-		    String answerText = QuestionParser.processHTMLField(answer.getText(), true, null, null);
+		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
 		    if (answerText == null) {
 			LamsDispatchAction.log.warn("Skipping a blank answer");
 			continue;
