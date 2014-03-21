@@ -381,6 +381,7 @@ function openLearningDesign(learningDesignID) {
 				// current paper dimensions 
 				paperWidth = paper.width,
 				paperHeight = paper.height,
+				branchToBranching = {},
 				// helper for finding last activity in a branch
 				branchToActivities = {};
 			
@@ -391,7 +392,7 @@ function openLearningDesign(learningDesignID) {
 				
 				// find max uiid so newly created elements have, unique ones
 				if (activityData.activityUIID && layout.ld.maxUIID < activityData.activityUIID) {
-					layout.ld,maxUIID = activityData.activityUIID;
+					layout.ld.maxUIID = activityData.activityUIID;
 				}
 
 				switch(activityData.activityTypeID) {
@@ -506,18 +507,13 @@ function openLearningDesign(learningDesignID) {
 					
 					// Branch (i.e. Sequence Activity)
 					case 8:
-						$.each(layout.activities, function(){
-							if (this instanceof ActivityLib.BranchingEdgeActivity
-								&& activityData.parentActivityID == this.branchingActivity.id) {
-								// create a branch inside the branching activity
-								this.branchingActivity.branches.push(
-										new ActivityLib.BranchActivity(activityData.activityID,
-																	   activityData.activityUIID,
-																	   activityData.activityTitle,
-																	   this.branchingActivity));
-								return false;
-							}
-						});
+						var branches = branchToBranching[activityData.parentActivityID];
+						if (!branches) {
+							branches =  branchToBranching[activityData.parentActivityID] = [];
+						}
+						branches.push(new ActivityLib.BranchActivity(activityData.activityID,
+																	 activityData.activityUIID,
+																	 activityData.activityTitle));
 						break;
 						
 					// Support (Floating) activity
@@ -578,6 +574,23 @@ function openLearningDesign(learningDesignID) {
 				}
 			});
 			
+			// assign previously extracted branches to branching activities
+			$.each(branchToBranching, function(branchingID, branches){
+				$.each(layout.activities, function(){
+					if (this instanceof ActivityLib.BranchingEdgeActivity
+							&& this.branchingActivity.id == branchingID){
+						var branchingActivity = this.branchingActivity;
+						branchingActivity.branches = branches;
+						$.each(branches, function(){
+							this.branchingActivity = branchingActivity;
+						});
+						
+						return false;
+					}
+				});
+			});
+			
+			
 			// apply existing groupings and parent-child references to activities 
 			$.each(ld.activities, function(){
 				var activityData = this,
@@ -588,7 +601,8 @@ function openLearningDesign(learningDesignID) {
 						var groupedActivity = activityData.activity;
 						
 						$.each(layout.activities, function(){
-							if (this instanceof ActivityLib.GroupingActivity && groupingID == activityData.groupingID) {
+							if (this instanceof ActivityLib.GroupingActivity
+									&& this.groupingID == activityData.groupingID) {
 								// add reference and redraw the grouped activity
 								if (groupedActivity instanceof ActivityLib.BranchingEdgeActivity) {
 									groupedActivity.branchingActivity.grouping = this;
@@ -637,15 +651,14 @@ function openLearningDesign(learningDesignID) {
 			
 			// apply group -> branch mappings
 			$.each(ld.branchMappings, function(){
-				var groupUIID = this.groupUIID,
-					branchUIID = this.sequenceActivityUIID,
+				var entry = this,
 					group = null,
 					branch = null;
 				$.each(layout.activities, function(){
 					// is it the branch we're looking for?
 					if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
 						$.each(this.branchingActivity.branches, function(){
-							if (branchUIID == this.uiid) {
+							if (entry.sequenceActivityUIID == this.uiid) {
 								branch = this;
 								return false;
 							}
@@ -653,7 +666,7 @@ function openLearningDesign(learningDesignID) {
 					// is it the grouping we're looking for?
 					} else if (this instanceof ActivityLib.GroupingActivity) {
 						$.each(this.groups, function(){
-							if (groupUIID == this.uiid) {
+							if (entry.groupUIID == this.uiid) {
 								group = this;
 								return false;
 							}
@@ -668,12 +681,13 @@ function openLearningDesign(learningDesignID) {
 				
 				if (group && branch) {
 					branch.branchingActivity.groupsToBranches.push({
-						'group'  : group,
-						'branch' : branch 
+						'id'	: entry.entryID,
+						'uiid' : entry.entryUIID,
+						'group'     : group,
+						'branch'    : branch
 					});
 				}
 			});
-			
 			
 			// draw starting and ending transitions in branches
 			$.each(layout.activities, function(){
@@ -688,9 +702,9 @@ function openLearningDesign(learningDesignID) {
 							branchData = branchToActivities[branch.id];
 						
 						// add reference to the transition inside branch
-						branch.transitionFrom = ActivityLib.addTransition(branchingActivity.start,
+						ActivityLib.addTransition(branchingActivity.start,
 								branchData ? branchData.firstActivity : branchingActivity.end,
-								true, null, null, branch.title);
+								true, null, null, branch);
 						if (branchData) {
 							ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);
 						}
@@ -750,6 +764,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 	var activities = [],
 		transitions = [],
 		groupings = [],
+		branchMappings = [],
+		layoutActivities = [],
 		// trim the 
 		title = title.trim(),
 		description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData(),
@@ -757,71 +773,67 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		result = false;
 	
 	$.each(layout.activities, function(){
+		if (this.parentActivity	&& (this.parentActivity instanceof ActivityLib.BranchingActivity
+						|| this.parentActivity instanceof ActivityLib.BranchActivity)){
+			// remove previously set parent activities as they will be re-set from the start
+			this.parentActivity = null;
+			this.orderID = null;
+		}
+	});
+	
+	$.each(layout.activities, function(){
+		// add all branch activities for iteration and saving
+		if (this instanceof ActivityLib.BranchingEdgeActivity){
+			if (this.isStart){
+				var branchingActivity = this.branchingActivity;
+				layoutActivities.push(branchingActivity);
+				
+				$.each(branchingActivity.branches, function(){
+					this.parentActivity = branchingActivity;
+					layoutActivities.push(this);
+					
+					var childActivity = this.transitionFrom.toActivity,
+						orderID = 1;
+					while (!(childActivity instanceof ActivityLib.BranchingEdgeActivity
+							&& !childActivity.isStart)) {
+						childActivity.parentActivity = this;
+						childActivity.orderID = orderID;
+						orderID++;
+						
+						childActivity = childActivity.transitions.from[0].toActivity;
+					}
+				});
+			}
+		} else {
+			layoutActivities.push(this);
+		}
+	});
+	
+	if (layout.floatingActivity){
+		layoutActivities.push(layout.floatingActivity);
+	}
+	
+	$.each(layoutActivities, function(){
 		var activity = this,
-			activityBox = activity.items.shape.getBBox(),
+			activityBox = activity.items ? activity.items.shape.getBBox() : null,
 			activityTypeID = null,
 			toolID = activity.toolID,
 			iconPath = null,
-			isGrouped = activity.grouping ? true : false;
+			isGrouped = activity.grouping ? true : false,
+			parentActivityID = activity.parentActivity ? activity.parentActivity.id : null;
 		
 		if (toolID) {
+			activityTypeID = 1;
 			// find out what is the icon for tool acitivty
 			var templateIcon = $('.template[toolId=' + toolID +'] img');
 			if (templateIcon.width() > 0) {
 				 iconPath = layout.toolMetadata[toolID].iconPath;
 			}
 		}
-		// translate grouping type to back-end understandable
-		switch(activity.type) {
-			case 'tool' :
-				activityTypeID = 1;
-				break;
-			case 'grouping' :
-				activityTypeID = 2;
-				break;
-		}
-		
-		// add activity
-		activities.push({
-			'activityID' 			 : activity.id,
-			'activityUIID' 			 : activity.uiid,
-			'toolID' 				 : toolID,
-			'learningLibraryID' 	 : toolID,
-			'toolContentID' 	 	 : activity.toolContentID,
-			'stopAfterActivity' 	 : false,
-			'groupingSupportType' 	 : 2,
-			'applyGrouping' 		 : isGrouped,
-			'groupingUIID'			 : isGrouped ? activity.grouping.groupingUIID : null,
-		    'createGroupingUIID'	 : activity instanceof ActivityLib.GroupingActivity ? activity.groupingUIID : null,
-			'parentActivityID' 		 : null,
-			'parentUIID' 			 : null,
-			'libraryActivityUIImage' : iconPath,
-			'xCoord' 				 : activityBox.x,
-			'yCoord' 				 : activityBox.y,
-			'activityTitle' 		 : activity.title,
-			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity ?
-											layout.toolMetadata[toolID].activityCategoryID : 1,
-			'activityTypeID'     	 : activityTypeID,
+		// translate activity type to back-end understandable
+		else if (activity instanceof ActivityLib.GroupingActivity){
+			activityTypeID = 2;	
 			
-			'gradebookToolOutputDefinitionName' : null,
-			'helpText' : null,
-			'description' : null
-		});
-
-		// iterate over transitions and create a list
-		$.each(activity.transitions.from, function(){
-			var transition = this;
-			
-			transitions.push({
-				'transitionID'   : transition.id,
-				'transitionUIID' : transition.uiid,
-				'fromUIID' 		 : activity.uiid,
-				'toUIID'   		 : transition.toActivity.uiid,
-				'transitionType' : 0
-			});
-		});
-		
-		if (activity instanceof ActivityLib.GroupingActivity) {
 			// create a list of groupings
 			var groups = [],
 				groupingType = null;
@@ -856,6 +868,97 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				'numberOfGroups' 				: groups.length,
 				'groups' 						: groups
 			});
+			
+		} else if (activity instanceof  ActivityLib.GateActivity){
+			switch(activity.gateType) {
+				case 'sync'      : activityTypeID = 3; break;
+				case 'schedule'  : activityTypeID = 4; break;
+				case 'permision' : activityTypeID = 5; break;
+				case 'condition' : activityTypeID = 6; break;
+			}
+		} else if (activity instanceof ActivityLib.OptionalActivity) {
+			activityTypeID = 7;
+		} else if (activity instanceof ActivityLib.BranchingActivity) {
+			activityBox = activity.start.items.shape.getBBox();
+			
+			switch(activity.branchingType) {
+				case 'chosen' : activityTypeID = 10; break;
+				case 'group'  :
+					activityTypeID = 11;
+					$.each(activity.groupsToBranches, function(){
+						branchMappings.push({
+							'entryID'			   : this.id,
+							'entryUIID'			   : this.uiid,
+							'groupUIID' 		   : this.group.uiid,
+							'branchingActivityUIID': this.branch.branchingActivity.uiid,
+							'sequenceActivityUIID' : this.branch.uiid,
+							'condition'			   : null
+						});
+					});
+					
+					break;
+				case 'tool'   : activityTypeID = 12; break;
+			}
+		} else if (activity instanceof ActivityLib.BranchActivity){
+			activityTypeID = 8;
+		} else if (activity instanceof ActivityLib.FloatingActivity){
+			activityTypeID = 15;			
+		}
+
+		
+		// add activity
+		activities.push({
+			'activityID' 			 : activity.id,
+			'activityUIID' 			 : activity.uiid,
+			'toolID' 				 : toolID,
+			'learningLibraryID' 	 : toolID,
+			'toolContentID' 	 	 : activity.toolContentID,
+			'stopAfterActivity' 	 : false,
+			'groupingSupportType' 	 : 2,
+			'applyGrouping' 		 : isGrouped,
+			'groupingUIID'			 : isGrouped ? activity.grouping.groupingUIID : null,
+		    'createGroupingUIID'	 : activity instanceof ActivityLib.GroupingActivity ? activity.groupingUIID : null,
+			'parentActivityID' 		 : activity.parentActivity ? activity.parentActivity.id : null,
+			'parentUIID' 			 : null,
+			'libraryActivityUIImage' : iconPath,
+			'xCoord' 				 : activityBox ? parseInt(activityBox.x) : null,
+			'yCoord' 				 : activityBox ? parseInt(activityBox.y) : null,
+			'activityTitle' 		 : activity.title,
+			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity ?
+											layout.toolMetadata[toolID].activityCategoryID : 1,
+			'activityTypeID'     	 : activityTypeID,
+			'orderID'				 : activity.orderID,
+			
+			'gradebookToolOutputDefinitionName' : null,
+			'helpText' : null,
+			'description' : null
+		});
+
+		var activityTransitions = activity instanceof ActivityLib.BranchingActivity ?
+				activity.end.transitions : activity.transitions;
+		
+		if (activityTransitions) {
+			// iterate over transitions and create a list
+			$.each(activityTransitions.from, function(){
+				var transition = this,
+					toActivity = transition.toActivity;
+				if (toActivity instanceof ActivityLib.BranchingEdgeActivity) {
+					if (toActivity.isStart) {
+						toActivity = toActivity.branchingActivity;
+					} else {
+						// skip transition from last activity in branch to branching edge marker
+						return true;
+					}
+				}
+				
+				transitions.push({
+					'transitionID'   : transition.id,
+					'transitionUIID' : transition.uiid,
+					'fromUIID' 		 : activity.uiid,
+					'toUIID'   		 : toActivity.uiid,
+					'transitionType' : 0
+				});
+			});
 		}
 	});
 	
@@ -880,7 +983,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'activities'		 : activities,
 		'transitions'		 : transitions,
 		'groupings'			 : groupings,
-		'branchMappings'     : null,
+		'branchMappings'     : branchMappings,
 		
 		'helpText'           : null,
 		'duration'			 : null,
@@ -890,6 +993,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 	
 	// get LD details
 	$.ajax({
+		type  : 'POST',
 		cache : false,
 		async : false,
 		url : LAMS_URL + "authoring/author.do",
@@ -934,13 +1038,26 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				$.each(response.activities, function() {
 					var updatedActivity = this;
 					$.each(layout.activities, function(){
-						var activity = this;
-						if (updatedActivity.activityUIID == activity.uiid) {
-							activity.id = updatedActivity.activityID;
-							activity.toolContentID = updatedActivity.toolContentID;
+						if (this instanceof ActivityUtil.BranchingEdgeActivity && this.isStart) {
+							if (updatedActivity.activityUIID == this.branchingActivity.uiid){
+								this.branchingActivity.id = updatedActivity.activityID;
+							} else {
+								$.each(this.branchingActivity.branches, function(){
+									if (updatedActivity.activityUIID == this.branchingActivity.uiid){
+										this.id = updatedActivity.activityID;
+									} 
+								});
+							}
+						} else if (updatedActivity.activityUIID == this.uiid) {
+							this.id = updatedActivity.activityID;
+							this.toolContentID = updatedActivity.toolContentID;
 						}
 					});
 				});
+				
+				if (layout.floatingActivity) {
+					layout.floatingActivity.id = response.floatingActivityID;
+				}
 				
 				alert('Congratulations! Your design is valid and has been saved.');
 				result = true;

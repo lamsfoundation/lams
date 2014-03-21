@@ -534,7 +534,7 @@ var ActivityLib = {
 	/**
 	 * Draws a transition between two activities.
 	 */
-	addTransition : function(fromActivity, toActivity, redraw, id, uiid, title) {
+	addTransition : function(fromActivity, toActivity, redraw, id, uiid, branchData) {
 		if (toActivity.parentActivity){
 			toActivity = toActivity.parentActivity;
 		}
@@ -566,24 +566,42 @@ var ActivityLib = {
 			return;
 		}
 		
-		var branch = null;
+		// branchData can be either existing branch or a title for the new branch
+		var branch = branchData && branchData instanceof ActivityLib.BranchActivity ? branchData : null,
+			transition = null;
 		// remove the existing transition
 		$.each(fromActivity.transitions.from, function(index) {
 			if (this.toActivity == toActivity) {
 				id = this.id;
 				uiid = this.uiid;
-				branch = this.branch;
-				ActivityLib.removeTransition(this);
+				transition = this;
+				if (!branch){
+					branch = this.branch;
+				}
+
 				return false;
 			}
 		});
 		
 		if (!branch && fromActivity instanceof ActivityLib.BranchingEdgeActivity && fromActivity.isStart) {
-			// create a new branch
-			branch = new ActivityLib.BranchActivity(null, null, title, fromActivity.branchingActivity);
+			$.each(fromActivity.branchingActivity.branches, function(){
+				if (branchData == this.title) {
+					branch = this;
+					return false;
+				}
+			});
+			if (!branch) {
+				// create a new branch
+				branch = new ActivityLib.BranchActivity(null, null, branchData, fromActivity.branchingActivity);
+			}
 		}
 		
-		var transition = new ActivityLib.Transition(id, uiid, fromActivity, toActivity,
+		
+		if (transition) {
+			ActivityLib.removeTransition(transition);
+		}
+		
+		transition = new ActivityLib.Transition(id, uiid, fromActivity, toActivity,
 						 branch ? branch.title : null);
 
 		if (branch) {

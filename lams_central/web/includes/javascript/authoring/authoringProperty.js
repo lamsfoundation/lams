@@ -107,6 +107,7 @@ var PropertyLib = {
 			            			
 			            			// add the mapping
 			            			branchingActivity.groupsToBranches.push({
+			            				'uiid'   : ++layout.ld.maxUIID,
 			            				'group'  : group,
 			            				'branch' : branch
 			            			});

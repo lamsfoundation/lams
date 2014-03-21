@@ -2762,7 +2762,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	// (which is used for doing deletions later).
 	oldbranchActivityEntryList.remove(entry);
 
-	BranchCondition condition = extractCondition(details.getJSONObject(AuthoringJsonTags.BRANCH_CONDITION), entry);
+	BranchCondition condition = extractCondition(details.optJSONObject(AuthoringJsonTags.BRANCH_CONDITION), entry);
 
 	Integer groupUIID = details.getInt(AuthoringJsonTags.GROUP_UIID);
 	Group group = null;
