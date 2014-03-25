@@ -90,7 +90,10 @@ public class ExcelUtil {
 	redColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
 	greenColor = workbook.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
-	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);	
+	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	Font whiteFont = workbook.createFont();
+	whiteFont.setColor(IndexedColors.WHITE.getIndex());
+	greenColor.setFont(whiteFont);
 	yellowColor = workbook.createCellStyle();
 	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
 	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
