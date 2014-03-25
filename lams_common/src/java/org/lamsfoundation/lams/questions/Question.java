@@ -32,6 +32,9 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Question {
+    // just for convenience when returning from methods
+    public static final Question[] QUESTION_ARRAY_TYPE = new Question[] {};
+    
     public static final String QUESTION_TYPE_MULTIPLE_CHOICE = "mc";
     public static final String QUESTION_TYPE_MULTIPLE_RESPONSE = "mr";
     public static final String QUESTION_TYPE_TRUE_FALSE = "tf";

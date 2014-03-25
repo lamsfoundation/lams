@@ -1,0 +1,469 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.questions;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+/**
+ * Packs questions and answers into files. They can be later used in question-based 3rd party applications. Currently it
+ * supports only IMS QTI but other methods can be added as needed.
+ * 
+ * @author Marcin Cieslak
+ * 
+ */
+public class QuestionExporter {
+    private static final Logger log = Logger.getLogger(QuestionExporter.class);
+
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("<img.*?src=['\"]/+lams/+www/+([\\w\\.\\/]+).+?>",
+	    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+    private static final String IMAGE_MARKER = "[matimage]";
+
+    private static final String EXPORT_TEMP_FOLDER_SUFFIX = "qti";
+
+    private static final String EAR_IMAGE_FOLDER = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+	    + FileUtil.LAMS_WWW_DIR;
+    private static final File MANIFEST_TEMPLATE_FILE = new File(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
+	    + File.separator + "lams-central.war" + File.separator + "questions" + File.separator
+	    + "imsmanifest_template.xml");
+
+    private String packageTitle = null;
+    private Question[] questions = null;
+
+    private Document doc = null;
+    private Integer itemId = null;
+    private Map<String, File> images = new TreeMap<String, File>();
+
+    public QuestionExporter(String title, Question[] questions) {
+	if (StringUtils.isBlank(title)) {
+	    this.packageTitle = "export";
+	} else {
+	    // make sure the title can be used everywhere
+	    this.packageTitle = FileUtil.stripInvalidChars(title).replaceAll(" ", "_");
+	}
+
+	this.questions = questions;
+    }
+
+    /**
+     * Writes the exported QTI package to HTTP response, so it can be downloaded by user via browser.
+     */
+    public void exportQTIPackage(HttpServletRequest request, HttpServletResponse response) {
+	String packagePath = exportQTIPackage();
+	File packageFile = new File(packagePath);
+
+	try {
+	    String fileName = FileUtil.getFileName(packagePath);
+	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
+		    + fileName);
+
+	    // write out the ZIP to respose error
+	    FileUtils.copyFile(packageFile, response.getOutputStream());
+
+	    // remove the directory containing the ZIP from file system
+	    FileUtils.deleteDirectory(packageFile.getParentFile());
+	} catch (IOException e) {
+	    QuestionExporter.log.error("Error while exporti QTI package", e);
+	}
+    }
+
+    /**
+     * Builds a QTI ZIP package (manifest, QTI file, resources) with the given questions.
+     * 
+     * @return Path to the created ZIP file
+     */
+    public String exportQTIPackage() {
+	if (log.isDebugEnabled()) {
+	    log.debug("Exporting QTI ZIP package \"" + packageTitle + "\"");
+	}
+	try {
+	    String rootDir = FileUtil.createTempDirectory(QuestionExporter.EXPORT_TEMP_FOLDER_SUFFIX);
+	    File dir = new File(rootDir, "content");
+
+	    // main QTI file
+	    String xmlFileName = packageTitle + ".xml";
+	    File xmlFile = new File(dir, xmlFileName);
+	    String xmlFileContent = exportQTIFile();
+	    FileUtils.writeStringToFile(xmlFile, xmlFileContent, "UTF-8");
+
+	    File manifestFile = new File(dir, "imsmanifest.xml");
+	    String manifestContent = createManifest();
+	    FileUtils.writeStringToFile(manifestFile, manifestContent, "UTF-8");
+
+	    // copy images used in activities from lams-www to ZIP folder
+	    for (String imageName : images.keySet()) {
+		File imageFile = new File(dir, imageName);
+		FileUtils.copyFile(images.get(imageName), imageFile);
+	    }
+
+	    String targetZipFileName = "lams_qti_" + packageTitle + ".zip";
+
+	    return ZipFileUtil.createZipFile(targetZipFileName, dir.getAbsolutePath(), rootDir);
+	} catch (Exception e) {
+	    QuestionExporter.log.error("Error while exporti QTI package", e);
+	}
+
+	return null;
+    }
+
+    /**
+     * Builds QTI XML file containing structured questions & answers content.
+     * 
+     * @return XML file content
+     */
+    public String exportQTIFile() {
+	itemId = 1000;
+	DocumentBuilder docBuilder;
+	try {
+	    docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    doc = docBuilder.newDocument();
+	} catch (ParserConfigurationException e) {
+	    QuestionExporter.log.error("Error while instantinating Document Builder", e);
+	    return null;
+	}
+
+	Element rootElem = (Element) doc.appendChild(doc.createElement("questestinterop"));
+	Element assessmentElem = (Element) rootElem.appendChild(doc.createElement("assessment"));
+	assessmentElem.setAttribute("title", packageTitle);
+	assessmentElem.setAttribute("ident", "A1001");
+	Element sectionElem = (Element) assessmentElem.appendChild(doc.createElement("section"));
+	sectionElem.setAttribute("title", "Main");
+	sectionElem.setAttribute("ident", "S1002");
+
+	for (Question question : questions) {
+	    Element itemElem = null;
+	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())) {
+		itemElem = exportMultipleChoiceQuestion(question);
+	    }
+
+	    if (itemElem == null) {
+		QuestionExporter.log.warn("Unknow type \"" + question.getType() + " of question \""
+			+ question.getTitle() + "\"");
+	    } else {
+		sectionElem.appendChild(itemElem);
+	    }
+	}
+
+	return writeOutDoc();
+    }
+
+    /**
+     * Creates a XML element with contents of a single multiple choice question.
+     */
+    private Element exportMultipleChoiceQuestion(Question question) {
+	Element itemElem = doc.createElement("item");
+	itemElem.setAttribute("title", question.getTitle());
+	itemId++;
+	itemElem.setAttribute("ident", "QUE_" + itemId);
+
+	// question text
+	Element presentationElem = (Element) itemElem.appendChild(doc.createElement("presentation"));
+	if (!StringUtils.isBlank(question.getText())) {
+	    Element materialElem = (Element) presentationElem.appendChild(doc.createElement("material"));
+	    appendMaterialElements(materialElem, question.getText());
+	}
+
+	itemId++;
+	String responseLidIdentifier = "QUE_" + itemId + "_RL";
+	Element responseLidElem = (Element) presentationElem.appendChild(doc.createElement("response_lid"));
+	responseLidElem.setAttribute("ident", responseLidIdentifier);
+	responseLidElem.setAttribute("rcardinality", "Single");
+	responseLidElem.setAttribute("rtiming", "No");
+
+	// question feedback (displayed no matter what answer was choosed)
+	List<Element> feedbackList = new ArrayList<Element>();
+	String incorrectFeedbackLabel = null;
+	Element overallFeedbackElem = null;
+	if (!StringUtils.isBlank(question.getFeedback())) {
+	    overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback());
+	    feedbackList.add(overallFeedbackElem);
+	}
+
+	Element renderChoiceElem = (Element) responseLidElem.appendChild(doc.createElement("render_choice"));
+	short answerId = 0;
+	List<Element> respconditionList = new ArrayList<Element>(question.getAnswers().size());
+
+	// iterate through answers, collecting some info along the way
+	for (Answer answer : question.getAnswers()) {
+	    Element responseLabelElem = (Element) renderChoiceElem.appendChild(doc.createElement("response_label"));
+	    itemId++;
+	    answerId++;
+	    String answerLabel = "QUE_" + itemId + "_A" + answerId;
+	    responseLabelElem.setAttribute("ident", answerLabel);
+
+	    // answer text
+	    if (!StringUtils.isBlank(answer.getText())) {
+		Element materialElem = (Element) responseLabelElem.appendChild(doc.createElement("material"));
+		appendMaterialElements(materialElem, answer.getText());
+	    }
+
+	    // just labels for feedback for correct/incorrect answer
+	    boolean isCorrect = answer.getScore() > 0;
+	    Element feedbackElem = null;
+	    if (!StringUtils.isBlank(answer.getFeedback())) {
+		feedbackElem = createFeedbackElem((isCorrect ? "_C" : "_IC"), answer.getFeedback());
+		feedbackList.add(feedbackElem);
+
+		if (!isCorrect && (incorrectFeedbackLabel == null)) {
+		    incorrectFeedbackLabel = feedbackElem.getAttribute("ident");
+		}
+	    }
+
+	    // mark which answer is correct by setting score for each of them
+	    Element respconditionElem = doc.createElement("respcondition");
+	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
+	    Element varequalElem = (Element) conditionvarElem.appendChild(doc.createElement("varequal"));
+	    varequalElem.setAttribute("respident", responseLidIdentifier);
+	    varequalElem.setTextContent(answerLabel);
+
+	    Element setvarElem = (Element) respconditionElem.appendChild(doc.createElement("setvar"));
+	    setvarElem.setAttribute("varname", "que_score");
+	    setvarElem.setAttribute("action", isCorrect ? "Set" : "Add");
+	    setvarElem.setTextContent(String.valueOf(answer.getScore()));
+
+	    // link feedback for correct/incorrect answer
+	    if (feedbackElem != null) {
+		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
+			.createElement("displayfeedback"));
+		displayfeedbackElem.setAttribute("feedbacktype", "Response");
+		displayfeedbackElem.setAttribute("linkrefid", feedbackElem.getAttribute("ident"));
+	    } else if (!isCorrect && (incorrectFeedbackLabel != null)) {
+		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
+			.createElement("displayfeedback"));
+		displayfeedbackElem.setAttribute("feedbacktype", "Response");
+		displayfeedbackElem.setAttribute("linkrefid", incorrectFeedbackLabel);
+	    }
+
+	    if (overallFeedbackElem != null) {
+		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
+			.createElement("displayfeedback"));
+		displayfeedbackElem.setAttribute("feedbacktype", "Response");
+		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
+	    }
+
+	    respconditionList.add(respconditionElem);
+	}
+
+	if (overallFeedbackElem != null) {
+	    Element respconditionElem = doc.createElement("respcondition");
+	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
+	    conditionvarElem.appendChild(doc.createElement("elem"));
+	    Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc.createElement("displayfeedback"));
+	    displayfeedbackElem.setAttribute("feedbacktype", "Response");
+	    displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
+
+	    respconditionList.add(respconditionElem);
+	}
+
+	Element resprocessingElem = (Element) itemElem.appendChild(doc.createElement("resprocessing"));
+	Element outcomesElem = (Element) resprocessingElem.appendChild(doc.createElement("outcomes"));
+	Element decvarElem = (Element) outcomesElem.appendChild(doc.createElement("decvar"));
+	decvarElem.setAttribute("vartype", "decimal");
+	decvarElem.setAttribute("defaultval", "0");
+	decvarElem.setAttribute("varname", "que_score");
+
+	// write out elements collected during answer iteration
+	for (Element respconditionElem : respconditionList) {
+	    resprocessingElem.appendChild(respconditionElem);
+	}
+
+	for (Element feedbackElem : feedbackList) {
+	    itemElem.appendChild(feedbackElem);
+	}
+
+	return itemElem;
+    }
+
+    /**
+     * Creates a feedback XML element.
+     */
+    private Element createFeedbackElem(String labelSuffix, String feedback) {
+	itemId++;
+	String label = "QUE_" + itemId + labelSuffix;
+	Element feedbackElem = doc.createElement("itemfeedback");
+	feedbackElem.setAttribute("ident", label);
+	Element materialElem = (Element) feedbackElem.appendChild(doc.createElement("material"));
+	appendMaterialElements(materialElem, feedback);
+
+	return feedbackElem;
+    }
+
+    /**
+     * Transforms a DOM object to String representation.
+     */
+    private String writeOutDoc() {
+	DOMSource domSource = new DOMSource(doc);
+	StringWriter writer = new StringWriter();
+	StreamResult streamResult = new StreamResult(writer);
+	TransformerFactory tf = TransformerFactory.newInstance();
+	try {
+	    Transformer transformer = tf.newTransformer();
+	    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+	    // a bit of beautification
+	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+	    transformer.transform(domSource, streamResult);
+	} catch (Exception e) {
+	    QuestionExporter.log.error("Error while writing out XML document", e);
+	    return null;
+	}
+
+	String result = writer.toString();
+	try {
+	    writer.close();
+	} catch (IOException e) {
+	    QuestionExporter.log.warn("Writer could not be closed", e);
+	}
+
+	return result;
+    }
+
+    /**
+     * Extracts images from HTML text (probably created by CKEditor) and substitutes them with markers, so further
+     * processing knows how to handle them.
+     */
+    private String[] parseImages(String text) {
+	List<String> result = new ArrayList<String>();
+	int index = 0;
+	// looks for images stored in LAMS WWW secure folder
+	Matcher matcher = QuestionExporter.IMAGE_PATTERN.matcher(text);
+
+	while (matcher.find()) {
+	    // add HTML which is before the image
+	    result.add(text.substring(index, matcher.start()));
+	    index = matcher.end();
+
+	    // find the image in file system
+	    String relativePath = matcher.group(1);
+	    File image = new File(QuestionExporter.EAR_IMAGE_FOLDER, relativePath);
+	    if (!image.isFile() || !image.canRead()) {
+		QuestionExporter.log.warn("Image could not be parsed: " + matcher.group());
+		continue;
+	    }
+
+	    // was it already added?
+	    String imageName = null;
+	    for (String key : images.keySet()) {
+		if (image.equals(images.get(key))) {
+		    imageName = key;
+		    break;
+		}
+	    }
+
+	    // if it wasn't added, store the reference so ZIP packing knows where to copy from and how to name the file
+	    if (imageName == null) {
+		String baseImageName = FileUtil.getFileName(relativePath);
+		imageName = baseImageName;
+		short prefix = 1;
+		while (images.containsKey(imageName)) {
+		    // if the name is the same, use an arbitrary prefix
+		    imageName = prefix + "_" + baseImageName;
+		    prefix++;
+		}
+
+		images.put(imageName, image);
+	    }
+
+	    result.add(QuestionExporter.IMAGE_MARKER + imageName);
+	}
+
+	// write out the rest of HTML text
+	if (index < text.length()) {
+	    result.add(text.substring(index));
+	}
+
+	return result.toArray(new String[] {});
+    }
+
+    /**
+     * Appends material XML element, i.e. list of HTML & image parts
+     */
+    private void appendMaterialElements(Element materialElem, String text) {
+	String[] answerParts = parseImages(text);
+	for (String answerPart : answerParts) {
+	    if (answerPart.startsWith(QuestionExporter.IMAGE_MARKER)) {
+		String imageName = answerPart.substring(QuestionExporter.IMAGE_MARKER.length());
+		String imageType = "image/" + FileUtil.getFileExtension(imageName);
+		Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
+		matimageElem.setAttribute("imagtype", imageType);
+		matimageElem.setAttribute("uri", imageName);
+	    } else {
+		Element mattextElem = (Element) materialElem.appendChild(doc.createElement("mattext"));
+		mattextElem.setAttribute("texttype", "text/html");
+		mattextElem.appendChild(doc.createCDATASection(answerPart));
+	    }
+	}
+    }
+
+    /**
+     * Fill the existing template file with current data.
+     * @return contents of XML template file
+     */
+    private String createManifest() throws IOException {
+	String id = UUID.randomUUID().toString();
+	String fileName = packageTitle + ".xml";
+
+	StringBuilder resourceEntries = new StringBuilder("<file href=\"").append(fileName).append("\" />\n");
+	for (String imageName : images.keySet()) {
+	    resourceEntries.append("<file href=\"").append(imageName).append("\" />").append("\n");
+	}
+
+	String manifest = FileUtils.readFileToString(QuestionExporter.MANIFEST_TEMPLATE_FILE);
+	manifest = manifest.replace("[ID]", id).replace("[TITLE]", packageTitle).replace("[FILE_NAME]", fileName)
+		.replace("[FILE_LIST]", resourceEntries);
+	return manifest;
+    }
+}

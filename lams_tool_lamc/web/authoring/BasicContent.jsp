@@ -44,28 +44,22 @@
 	};
         
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questionFile.jsp?limitType=mc',
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
 	
-    function saveQTI(formHTML, formName) {
-    	var form = $($.parseHTML(formHTML));
-		$.ajax({
-			type: "POST",
-			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
-			data: form.serializeArray(),
-			success: function(response) {
-				$(questionListTargetDiv).html(response);
-				refreshThickbox();
-			}
-		});
-    }
-    
     function saveQTI(formHTML, formName) {
     	document.body.innerHTML += formHTML;
     	var form = document.getElementById(formName);
     	form.action = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}"/>';
     	form.submit();
+    }
+    
+    function exportQTI(){
+    	var frame = document.getElementById("downloadFileDummyIframe"),
+    		title = encodeURIComponent(document.getElementsByName("title")[0].value);
+    	frame.src = '<html:rewrite page="/authoring.do?dispatch=exportQTI&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}" />'
+    			+ '&title=' + title;
     }
 
 </script>
@@ -111,6 +105,9 @@
 		<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px">
 			<fmt:message key="label.authoring.import.qti" />
 		</a>
+		<a href="#" onClick="javascript:exportQTI()" style="margin-left: 40px">
+			<fmt:message key="label.authoring.export.qti" />
+		</a>
 	</c:if>
 	
 	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
@@ -127,3 +124,6 @@
 			<fmt:message key="label.save" /> </a>
 	</p>
 </c:if>
+
+<!-- For exporting QTI packages -->
+<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

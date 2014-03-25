@@ -69,8 +69,6 @@ import org.xml.sax.SAXParseException;
 public class QuestionParser {
     private static Logger log = Logger.getLogger(QuestionParser.class);
 
-    // just for convenience when returning from methods
-    private static final Question[] QUESTION_ARRAY_TYPE = new Question[] {};
     // can be anything
     private static final String TEMP_PACKAGE_NAME_PREFIX = "QTI_PACKAGE_";
     private static final Pattern IMAGE_PATTERN = Pattern.compile("\\[IMAGE: (.*)\\]");
@@ -124,7 +122,7 @@ public class QuestionParser {
 	    }
 	}
 
-	return result.toArray(QuestionParser.QUESTION_ARRAY_TYPE);
+	return result.toArray(Question.QUESTION_ARRAY_TYPE);
     }
 
     /**
@@ -362,7 +360,7 @@ public class QuestionParser {
 	    result.add(question);
 	}
 
-	return result.toArray(QuestionParser.QUESTION_ARRAY_TYPE);
+	return result.toArray(Question.QUESTION_ARRAY_TYPE);
     }
 
     /**
@@ -463,7 +461,7 @@ public class QuestionParser {
 	    }
 	}
 
-	return result.toArray(QuestionParser.QUESTION_ARRAY_TYPE);
+	return result.toArray(Question.QUESTION_ARRAY_TYPE);
     }
 
     /**

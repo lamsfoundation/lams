@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
@@ -469,7 +470,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		for (Answer answer : question.getAnswers()) {
 		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
 		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
+			    question.getResourcesFolderPath());
 		    if (answerText == null) {
 			LamsDispatchAction.log.warn("Skipping a blank answer");
 			continue;
@@ -531,7 +532,50 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	return (mapping.findForward(McAppConstants.LOAD));
+	return mapping.findForward(McAppConstants.LOAD);
+    }
+
+    /**
+     * Prepares MC questions for QTI packing
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	String httpSessionID = request.getParameter("httpSessionID");
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+
+	List<McQuestionContentDTO> listQuestionContentDTO = (List<McQuestionContentDTO>) sessionMap
+		.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
+	List<Question> questions = new LinkedList<Question>();
+
+	for (McQuestionContentDTO mcQuestion : listQuestionContentDTO) {
+	    Question question = new Question();
+
+	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+	    question.setTitle("Question " + mcQuestion.getDisplayOrder());
+	    question.setText(mcQuestion.getQuestion());
+	    question.setFeedback(mcQuestion.getFeedback());
+	    List<Answer> answers = new ArrayList<Answer>();
+
+	    for (McCandidateAnswersDTO mcAnswer : (List<McCandidateAnswersDTO>) mcQuestion.getListCandidateAnswersDTO()) {
+		Answer answer = new Answer();
+		answer.setText(mcAnswer.getCandidateAnswer());
+		answer.setScore("Correct".equalsIgnoreCase(mcAnswer.getCorrect()) ? Float.parseFloat(mcQuestion
+			.getMark()) : 0);
+
+		answers.add(answer);
+		question.setAnswers(answers);
+	    }
+
+	    // put the question in the right place
+	    questions.add(Integer.parseInt(mcQuestion.getDisplayOrder()) - 1, question);
+	}
+
+	String title = request.getParameter("title");
+	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	exporter.exportQTIPackage(request, response);
+
+	return null;
     }
 
     protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO,
@@ -1235,7 +1279,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	return (mapping.findForward("itemList"));
     }
- 
 
     /**
      * 
