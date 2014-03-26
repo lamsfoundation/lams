@@ -43,7 +43,8 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
  * Utilities for producing .xlsx files.
  */
 public class ExcelUtil {
-
+    
+    private static CellStyle defaultStyle;
     private static CellStyle boldStyle;
     
     private static CellStyle greenColor;
@@ -55,6 +56,8 @@ public class ExcelUtil {
     private static CellStyle borderStyleRightThick;
     private static CellStyle borderStyleLeftThinBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
+    
+    private final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
     /**
      * Create .xlsx file out of provided data and then write out it to an OutputStream.
@@ -75,34 +78,48 @@ public class ExcelUtil {
 	    String dateHeader, boolean displaySheetTitle) throws IOException {
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
 
+	Font defaultFont = workbook.createFont();
+	defaultFont.setFontName(DEFAULT_FONT_NAME);
+
+	//create default style with default font name
+	ExcelUtil.defaultStyle = workbook.createCellStyle();
+	ExcelUtil.defaultStyle.setFont(defaultFont);
+	
 	//create bold style
 	boldStyle = workbook.createCellStyle();
 	Font boldFont = workbook.createFont();
 	boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	boldFont.setFontName(DEFAULT_FONT_NAME);
 	boldStyle.setFont(boldFont);
 	
 	//create color style
 	blueColor = workbook.createCellStyle();
 	blueColor.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
 	blueColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	blueColor.setFont(defaultFont);
 	redColor = workbook.createCellStyle();
 	redColor.setFillForegroundColor(IndexedColors.RED.getIndex());
 	redColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	redColor.setFont(defaultFont);
 	greenColor = workbook.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
 	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
 	Font whiteFont = workbook.createFont();
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
+	whiteFont.setFontName(DEFAULT_FONT_NAME);
 	greenColor.setFont(whiteFont);
 	yellowColor = workbook.createCellStyle();
 	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
 	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	yellowColor.setFont(defaultFont);
 	
 	//create border style
 	borderStyleLeftThin = workbook.createCellStyle();
 	borderStyleLeftThin.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThin.setFont(defaultFont);
 	borderStyleRightThick = workbook.createCellStyle();
 	borderStyleRightThick.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThick.setFont(defaultFont);
 	borderStyleLeftThinBoldFont = workbook.createCellStyle();
 	borderStyleLeftThinBoldFont.setBorderLeft(CellStyle.BORDER_THIN);
 	borderStyleLeftThinBoldFont.setFont(boldFont);
@@ -190,6 +207,9 @@ public class ExcelUtil {
 	    } else if (excelCell.getCellValue() != null) {
 		cell.setCellValue(excelCell.getCellValue().toString());
 	    }
+	    
+	    //set default font
+	    cell.setCellStyle(defaultStyle);
 
 	    if (excelCell.isBold()) {
 		cell.setCellStyle(boldStyle);
