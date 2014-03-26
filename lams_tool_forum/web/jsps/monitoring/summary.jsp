@@ -322,7 +322,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${forum.reflectInstructions}	
+					<c:out value="${forum.reflectInstructions}" escapeXml="true" />
 				</td>
 			</tr>
 		</c:when>
