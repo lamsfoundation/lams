@@ -23,7 +23,7 @@
 <div id="content">
 
 	<h1>
-		<c:out value="${sessionMap.title}" escapeXml="false" />
+		<c:out value="${sessionMap.title}" escapeXml="true" />
 	</h1>
 
 	<div class="small-space-top">

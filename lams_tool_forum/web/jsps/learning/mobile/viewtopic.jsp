@@ -83,7 +83,7 @@
 			Back
 		</a>
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}" escapeXml="true"/>
 		</h1>
 	</div>
 

@@ -9,7 +9,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${title}" escapeXml="false" />
+			<c:out value="${title}" escapeXml="true" />
 		</td>
 	</tr>
 	<!-- Instructions Row -->

@@ -37,7 +37,7 @@
 	<div id="content">
 
 	<h1>
-		${title}
+		<c:out value="${title}" escapeXml="true" />
 	</h1>
 
 		<c:forEach var="entry" items="${ToolContentTopicList}">

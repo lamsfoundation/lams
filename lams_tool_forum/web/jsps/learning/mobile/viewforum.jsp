@@ -16,7 +16,7 @@
 
 	<div data-role="header" data-theme="b">
 		<h1>
-			<c:out value="${sessionMap.title}" escapeXml="false" />
+			<c:out value="${sessionMap.title}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 
