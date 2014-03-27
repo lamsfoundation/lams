@@ -24,8 +24,6 @@
 	window.onresize = resizeIframe;
 </script>
 
-<br />
-
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
@@ -33,18 +31,23 @@
 </c:if>
 
 <c:forEach var="group" items="${summaryList}">
-
-	<c:if test="${sessionMap.isGroupedActivity}">
+	<c:choose>
+	 <c:when test="${sessionMap.isGroupedActivity}">
 		<h1>
 			<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}	
 		</h1>
-	</c:if>
-	
-	<h2 style="color:black; margin-left: 20px;">
+		<h2 style="color:black; margin-left: 20px;">
+                  <fmt:message key="label.monitoring.summary.overall.summary" />
+                </h2>
+	</c:when>
+	<c:otherwise>
+	  <h1 style="margin-left: 20px;">
 		<fmt:message key="label.monitoring.summary.overall.summary" />	
-	</h2>
+	  </h1>
+         </c:otherwise>
+	</c:choose>
 
-	<table cellpadding="0" class="alternative-color">
+	<table cellpadding="0" class="alternative-color" style="margin-top: 5px;">
 		<tr>
 			<th width="4%" align="center">
 				<!--thumbnail-->
@@ -185,14 +188,19 @@
 </div>
 
 
-<h1>
+<br />
+
+<h1 class="space-top">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
 		<fmt:message key="monitor.summary.th.advancedSettings" />
 	</a>
 </h1>
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+
+<br />
+
+<div class="monitoring-advanced space-top" id="advancedDiv" style="display:none">
 	<table class="alternative-color">
 		<tr>
 			<td>
