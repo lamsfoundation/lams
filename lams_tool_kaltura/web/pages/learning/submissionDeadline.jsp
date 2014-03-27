@@ -20,7 +20,7 @@
 
 <div id="content">
 	<h1>
-		${kaltura.title}
+		<c:out value="${kaltura.title}" escapeXml="true"/>
 	</h1>
 
 	<div class="warning">

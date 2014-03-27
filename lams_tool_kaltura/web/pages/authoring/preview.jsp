@@ -64,7 +64,7 @@
 	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content">
 			<h1>
-				${item.title}
+				<c:out value="${item.title}" escapeXml="true"/>
 			</h1>
 			
 			<br>

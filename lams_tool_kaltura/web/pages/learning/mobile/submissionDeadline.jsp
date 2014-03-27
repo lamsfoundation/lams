@@ -20,7 +20,7 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${kaltura.title}
+		<c:out value="${kaltura.title}" escapeXml="true"/>
 	</h1>
 </div>
 	

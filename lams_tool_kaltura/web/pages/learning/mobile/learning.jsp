@@ -151,14 +151,14 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${kaltura.title}
+		<c:out value="${kaltura.title}" escapeXml="true"/>
 	</h1>
 </div>
 
 <div data-role="content">
 
 	<p>
-		${kaltura.instructions}
+		<c:out value="${kaltura.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -237,7 +237,7 @@
 								        	<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
 										</span>
 								    </span>
-								    <span class="thumb-title">${previewItem.title}</span>
+								    <span class="thumb-title"><c:out value="${previewItem.title}" escapeXml="true"/></span>
 								    
 								    <span class="thumb-stat">
 								    	<c:choose>
@@ -248,13 +248,13 @@
 											</c:when>
 											<c:otherwise>
 												<c:set var="videoAuthor" >
-													${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}
+													<c:out value="${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}" escapeXml="true"/>
 												</c:set>
 											</c:otherwise>
 										</c:choose>
 										
 								        <fmt:message key="label.uploaded.by" >
-								        	<fmt:param>${videoAuthor}</fmt:param>
+								        	<fmt:param><c:out value="${videoAuthor}" escapeXml="true"/></fmt:param>
 								        </fmt:message>
 								    </span>
 								    
@@ -290,7 +290,7 @@
 	<c:if test="${sessionMap.userFinished && sessionMap.reflectOn && !sessionMap.isGroupMonitoring}">
 		<div class="small-space-top">
 			<h2>
-				${sessionMap.reflectInstructions}
+				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</h2>
 
 			<c:choose>

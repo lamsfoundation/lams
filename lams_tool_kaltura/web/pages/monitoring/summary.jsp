@@ -36,6 +36,23 @@
 	}
 //-->
 </script>
+<table class="space-left space-top">
+	<tr>
+		<th class="field-name">
+			<fmt:message key="label.select.group.name" />
+		</th>
+	</tr>
+
+	<c:forEach var="session" items="${sessionDTOs}">
+		<tr>
+			<td>
+			<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&keepThis=true&TB_iframe=true&height=630&width=800" class="button thickbox" title="<fmt:message key='heading.notebookEntry' />">
+				${session.sessionName}
+			</a>
+			</td>
+		</tr>
+	</c:forEach>
+</table>
 
 <h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
@@ -174,7 +191,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${kaltura.reflectInstructions}	
+					<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>
@@ -185,20 +202,4 @@
 
 <%@include file="daterestriction.jsp"%>
 
-<table class="space-left space-top">
-	<tr>
-		<th class="field-name">
-			<fmt:message key="label.select.group.name" />
-		</th>
-	</tr>
 
-	<c:forEach var="session" items="${sessionDTOs}">
-		<tr>
-			<td>
-			<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&keepThis=true&TB_iframe=true&height=630&width=800" class="button thickbox" title="<fmt:message key='heading.notebookEntry' />">
-				${session.sessionName}
-			</a>
-			</td>
-		</tr>
-	</c:forEach>
-</table>

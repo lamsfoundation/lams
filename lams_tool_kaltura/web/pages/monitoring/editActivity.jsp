@@ -13,7 +13,7 @@
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
-				<c:out value="${kaltura.title}" escapeXml="false" />
+				<c:out value="${kaltura.title}" escapeXml="true" />
 			</td>
 		</tr>
 		<tr>

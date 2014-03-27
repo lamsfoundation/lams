@@ -16,7 +16,7 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${kaltura.title}
+		<c:out value="${kaltura.title}" escapeXml="true"/>
 	</h1>
 </div>
 	
@@ -29,7 +29,7 @@
 		<%@ include file="/common/messages.jsp"%>
 	
 		<p>
-			<lams:out value="${kaltura.reflectInstructions}" />
+			<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true" />
 		</p>
 	
 		<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area" />

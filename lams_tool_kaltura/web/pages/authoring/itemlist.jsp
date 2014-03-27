@@ -28,7 +28,7 @@
 				
 				<td style="vertical-align:middle;">
 					<a href="${previewUrl}" class="thickbox" title="<fmt:message key="label.item.preview" />">
-						${item.title}
+						<c:out value="${item.title}" escapeXml="true"/>
 					</a>
 				</td>
 				

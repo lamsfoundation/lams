@@ -20,13 +20,13 @@
 
 	<div id="content">
 		<h1>
-			${kaltura.title}
+			<c:out value="${kaltura.title}" escapeXml="true"/>
 		</h1>
 
 		<%@ include file="/common/messages.jsp"%>
 
 		<p>
-			<lams:out value="${kaltura.reflectInstructions}" />
+			<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area" />
