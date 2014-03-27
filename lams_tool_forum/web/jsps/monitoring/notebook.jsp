@@ -5,14 +5,14 @@
 <table class="alternative-color" cellspacing="0">
 	<tr>
 		<th class="first">
-			<lams:out value="${userDTO.reflectInstrctions}"/>
+			<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
 		</th>
 	</tr>
 	<tr>
 		<td>
 			<c:choose>
 				<c:when test="${userDTO.finishReflection}">
-					<lams:out value="${userDTO.reflect}"/>
+					<lams:out value="${userDTO.reflect}" escapeHtml="true"/>
 				</c:when>
 				<c:otherwise>
 					<fmt:message key="message.not.avaliable" />

@@ -134,7 +134,7 @@
 			<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
 				<div class="small-space-top">
 					<h2>
-						<c:out value="${sessionMap.reflectInstructions}" escapeXml="true" />
+						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 					</h2>
 		
 					<c:choose>

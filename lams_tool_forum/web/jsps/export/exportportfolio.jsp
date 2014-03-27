@@ -149,7 +149,7 @@
 			<c:if test="${userDTOSet ne null}">
 				<h3><fmt:message key="label.export.reflection" /></h3>
 				<c:forEach var="userDTO" items="${userDTOSet}">
-					<h4>${userDTO.fullName}</h4>
+					<h4><c:out value="${userDTO.fullName}" escapeXml="true"/></h4>
 					<p>
 						<lams:out value="${userDTO.reflect}" escapeHtml="true" /> 
 					</p>	

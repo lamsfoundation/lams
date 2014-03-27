@@ -322,7 +322,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					<c:out value="${forum.reflectInstructions}" escapeXml="true" />
+					<lams:out value="${forum.reflectInstructions}" escapeHtml="true" />
 				</td>
 			</tr>
 		</c:when>
@@ -361,9 +361,6 @@
 					<th>
 						<fmt:message key="monitoring.user.fullname"/>
 					</th>
-					<th>
-						<fmt:message key="monitoring.user.loginname"/>
-					</th>
 					<c:if test="${user.hasRefection}">
 						<th>
 							<fmt:message key="monitoring.user.reflection"/>
@@ -377,10 +374,7 @@
 			</c:if>
 			<tr>
 				<td>
-					<c:out value="${user.fullName}" />
-				</td>
-				<td>
-					<c:out value="${user.loginName}" />
+					<c:out value="${user.fullName}" escapeXml="true" />
 				</td>
 				<c:if test="${user.hasRefection}">
 				<td>
