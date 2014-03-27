@@ -155,17 +155,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public Scratchie getScratchieByContentId(Long contentId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getScratchieByContentId(), getting Scratchie by content ID: " + contentId);
-	}
 	Scratchie rs = scratchieDao.getByContentId(contentId);
 	if (rs == null) {
 	    ScratchieServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leafing getScratchieByContentId(), retrieved Scratchie by content ID: " + contentId);
 	}
 	return rs;
     }
@@ -187,24 +179,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public List getAuthoredItems(Long scratchieUid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getAuthoredItems(), getting ScratchieItems by Scratchie UID: " + scratchieUid);
-	}
 	List res = scratchieItemDao.getAuthoringItems(scratchieUid);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getAuthoredItems(), retrieved ScratchieItems by Scratchie UID: " + scratchieUid);
-	}
 	return res;
     }
 
     @Override
     public void createUser(ScratchieUser scratchieUser) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered createUser(), saving ScratchieUser login: " + scratchieUser.getLoginName());
-	}
 	scratchieUserDao.saveObject(scratchieUser);
     }
 
@@ -216,47 +196,24 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public void saveOrUpdateScratchie(Scratchie scratchie) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered saveOrUpdateScratchie(), saving Scratchie UID: " + scratchie.getUid());
-	}
 	scratchieDao.saveObject(scratchie);
     }
 
     @Override
     public void deleteScratchieItem(Long uid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered deleteScratchieItem(), deleting ScratchieItem UID: " + uid);
-	}
 	scratchieItemDao.removeObject(ScratchieItem.class, uid);
     }
 
     @Override
     public ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: checkLeaderSelectToolForSessionLeader(), for ScratchieUser ID: " + user.getUserId()
-		    + " and ScratchieSession ID: " + toolSessionId);
-	}
 	if ((user == null) || (toolSessionId == null)) {
 	    return null;
-	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieSession by ID: " + toolSessionId);
 	}
 	ScratchieSession scratchieSession = getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser leader = scratchieSession.getGroupLeader();
 	// check leader select tool for a leader only in case scratchie tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
-	    
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting LeaderUserId by toolSessionId: " + toolSessionId + " and userId: "
-			+ user.getUserId().intValue());
-	    }
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
 	    if (leaderUserId != null) {
 		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
@@ -264,10 +221,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		// create new user in a DB
 		if (leader == null) {
 		    ScratchieServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
-		    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-			ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-				+ Thread.activeCount() + "]: getting User by ID: " + leaderUserId);
-		    }
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
 		    this.createUser(leader);
@@ -277,11 +230,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		scratchieSession.setGroupLeader(leader);
 		saveOrUpdateScratchieSession(scratchieSession);
 	    }
-	}
-
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving checkLeaderSelectToolForSessionLeader()");
 	}
 	return leader;
     }
@@ -314,85 +262,39 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public Scratchie getScratchieBySessionId(Long sessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getScratchieBySessionId(), getting ScratchieSession by ID: " + sessionId);
-	}
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
 	Long contentId = session.getScratchie().getContentId();
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting Scratchie by content ID: " + contentId);
-	}
-	Scratchie res = scratchieDao.getByContentId(contentId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getScratchieBySessionId(), retrieved Scratchie by ScratchieSession ID: " + sessionId
-		    + " and content ID: " + contentId);
-	}
-	return res;
+	return scratchieDao.getByContentId(contentId);
     }
 
     @Override
     public ScratchieSession getScratchieSessionBySessionId(Long sessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getScratchieSessionBySessionId(), getting ScratchieSession by ID: " + sessionId);
-	}
-	ScratchieSession res = scratchieSessionDao.getSessionBySessionId(sessionId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getScratchieSessionBySessionId(), session retrieved by ID: " + sessionId);
-	}
-	return res;
+	return scratchieSessionDao.getSessionBySessionId(sessionId);
     }
 
     @Override
     public void saveOrUpdateScratchieSession(ScratchieSession resSession) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered saveOrUpdateScratchieSession(), saving ScratchieSession with ID: "
-		    + resSession.getSessionId());
-	}
 	scratchieSessionDao.saveObject(resSession);
     }
 
     @Override
     public void recordItemScratched(Long sessionId, Long answerUid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered recordItemScratched(), getting ScratchieAnswer by UID: " + answerUid);
-	}
 	ScratchieAnswer answer = this.getScratchieAnswerByUid(answerUid);
 	if (answer == null) {
 	    return;
 	}
 
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieAnswerVisitLog by ScratchieAnswer UID : " + answerUid + " and sessionId: "
-		    + sessionId);
-	}
 	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, sessionId);
 	if (log == null) {
 	    log = new ScratchieAnswerVisitLog();
 	    log.setScratchieAnswer(answer);
 	    log.setSessionId(sessionId);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: saving ScratchieAnswerVisitLog for ScratchieAnswer UID : " + answerUid
-			+ " and ScratchieSession ID: " + sessionId);
-	    }
 	    scratchieAnswerVisitDao.saveObject(log);
 	}
 
 	this.recalculateMarkForSession(sessionId, false);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving recordItemScratched() for ScratchieAnswer UID: " + answerUid);
-	}
     }
 
     /**
@@ -403,11 +305,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      */
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered recalculateMarkForSession(), getting ScratchieAnswerVisitLog by sessionId : "
-		    + sessionId);
-	}
 	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
@@ -429,76 +326,32 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount()
-			    + "]: using GradebookService to update ActivityMark for ScratchieUser ID: "
-			    + user.getUserId() + " and ScratchieSession ID: " + user.getSession().getSessionId());
-		}
 		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(), user
 			.getSession().getSessionId(), false);
 	    }
-	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving recalculateMarkForSession() for sessionId: " + sessionId);
 	}
     }
 
     @Override
     public ScratchieAnswer getScratchieAnswerByUid(Long answerUid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getScratchieAnswerByUid() for UID: " + answerUid);
-	}
 	ScratchieAnswer res = (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getScratchieAnswerByUid() for UID: " + answerUid);
-	}
 	return res;
     }
 
     @Override
     public void setScratchingFinished(Long toolSessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered setScratchingFinished() for session ID: " + toolSessionId);
-	}
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: saving Scratchiesession uid: " + session.getUid());
-	}
-	scratchieSessionDao.saveObject(session);
 
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving setScratchingFinished() for session ID: " + toolSessionId);
-	}
+	scratchieSessionDao.saveObject(session);
     }
 
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered finishToolSession() for user ID: " + userId + " and session ID: " + toolSessionId);
-	}
 	String nextUrl = null;
 	try {
-
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ScratchieUser by user ID: " + userId + " and session ID: " + toolSessionId);
-	    }
 	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	    user.setSessionFinished(true);
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: saving ScratchieUser with user ID: " + userId);
-	    }
 	    scratchieUserDao.saveObject(user);
 
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);
@@ -507,35 +360,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	} catch (ToolException e) {
 	    throw new ScratchieApplicationException(e);
 	}
-
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving finishToolSession() for user ID: " + userId + " and session ID: " + toolSessionId);
-	}
 	return nextUrl;
     }
 
     @Override
     public ScratchieItem getScratchieItemByUid(Long itemUid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getScratchieItemByUid(), getting ScratchieItem UID: " + itemUid);
-	}
 	return scratchieItemDao.getByUid(itemUid);
     }
 
     @Override
     public Set<ScratchieUser> getAllLeaders(Long contentId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getAllLeaders() for content ID: " + contentId);
-	}
-
 	Set<ScratchieUser> leaders = new TreeSet<ScratchieUser>();
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieSession with content ID: " + contentId);
-	}
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    ScratchieUser leader = session.getGroupLeader();
@@ -543,50 +378,22 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		leaders.add(leader);
 	    }
 	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getAllLeaders() for content ID: " + contentId);
-	}
 	return leaders;
     }
 
     @Override
     public List<ScratchieUser> getUsersBySession(Long toolSessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log
-		    .debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			    + "]: entered getUsersBySession(), getting ScratchieUsers by ScratchieSession ID: "
-			    + toolSessionId);
-	}
-	List<ScratchieUser> res = scratchieUserDao.getBySessionID(toolSessionId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getUsersBySession(), retrieved ScratchieUsers by ScratchieSession ID: "
-		    + toolSessionId);
-	}
-	return res;
+	return scratchieUserDao.getBySessionID(toolSessionId);
     }
 
     @Override
     public void saveUser(ScratchieUser user) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered saveUser(), saving ScratchieUser ID: " + user.getUserId());
-	}
 	scratchieUserDao.saveObject(user);
     }
 
     @Override
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getMonitoringSummary() for content ID: " + contentId);
-	}
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieSessions with content ID: " + contentId);
-	}
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 
 	for (ScratchieSession session : sessionList) {
@@ -598,10 +405,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 	    groupSummary.setTotalAttempts(totalAttempts);
 
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ScratchieUsers with session ID: " + sessionId);
-	    }
 	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
 	    List<ScratchieUser> usersToShow = new LinkedList<ScratchieUser>();
 	    for (ScratchieUser user : sessionUsers) {
@@ -616,36 +419,18 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    groupSummary.setUsers(usersToShow);
 	    groupSummaryList.add(groupSummary);
 	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getMonitoringSummary() for content ID: " + contentId);
-	}
 	return groupSummaryList;
     }
 
     @Override
     public void getScratchesOrder(Collection<ScratchieItem> items, Long sessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getScratchesOrder() for toolSessionId: " + sessionId);
-	}
 	for (ScratchieItem item : items) {
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ScratchieAnswerVisitLogs by toolSessionId: " + sessionId + ") and item UID: "
-			+ item.getUid());
-	    }
 	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    item.getUid());
 
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 
 		int attemptNumber;
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount() + "]: getting ScratchieAnswerVisitLog by toolSessionId: "
-			    + sessionId + " ans answer UID: " + answer.getUid());
-		}
 		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getUid(), sessionId);
 		if (log == null) {
 		    // -1 if there is no log
@@ -658,18 +443,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		answer.setAttemptOrder(attemptNumber);
 	    }
 	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getScratchesOrder() for sessionId: " + sessionId);
-	}
     }
 
     @Override
     public Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getItemsWithIndicatedScratches() for session ID: " + toolSessionId);
-	}
 	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(toolSessionId);
 
 	Scratchie scratchie = this.getScratchieBySessionId(toolSessionId);
@@ -697,10 +474,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    boolean isItemUnraveled = this.isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
-	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getItemsWithIndicatedScratches() for session ID: " + toolSessionId);
 	}
 	return items;
     }
@@ -776,23 +549,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getQuestionSummary() for content ID: " + contentId + " and item UID: " + itemUid);
-	}
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
 
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieItem by UID: " + itemUid);
-	}
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
 	Collection<ScratchieAnswer> answers = item.getAnswers();
-
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieSession by content ID: " + contentId);
-	}
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -810,18 +570,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		answer.setAttempts(attempts);
 		answerMap.put(dbAnswer.getUid(), answer);
 	    }
-
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ScratchieAnswerVisitLog by item UID: " + itemUid);
-	    }
 	    List<ScratchieAnswerVisitLog> sessionAttempts = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    itemUid);
 
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ScratchieUsers by session ID: " + sessionId);
-	    }
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 
 	    // calculate attempts table
@@ -875,10 +626,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    sortedAnswers.addAll(answerMapTotal.values());
 	    groupSummaryTotal.setAnswers(sortedAnswers);
 	    groupSummaryList.add(0, groupSummaryTotal);
-	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getQuestionSummary() for content ID: " + contentId + " and item UID: " + itemUid);
 	}
 
 	return groupSummaryList;
@@ -941,16 +688,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public ScratchieUser getUser(Long uid) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getUser() for UID: " + uid);
-	}
-	ScratchieUser res = (ScratchieUser) scratchieUserDao.getObject(ScratchieUser.class, uid);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getUser() for UID: " + uid);
-	}
-	return res;
+	return (ScratchieUser) scratchieUserDao.getObject(ScratchieUser.class, uid);
     }
 
     @Override
@@ -1620,16 +1358,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public boolean isGroupedActivity(long toolContentID) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered isGroupedActivity() for content ID: " + toolContentID);
-	}
-	boolean res = toolService.isGroupedActivity(toolContentID);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving isGroupedActivity() for content ID: " + toolContentID);
-	}
-	return res;
+	return toolService.isGroupedActivity(toolContentID);
     }
 
     // *****************************************************************************
@@ -1851,38 +1580,16 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered createToolSession() for session ID: " + toolSessionId + " and content ID: "
-		    + toolContentId);
-	}
 	ScratchieSession session = new ScratchieSession();
 	session.setSessionId(toolSessionId);
 	session.setSessionName(toolSessionName);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting Scratchie by content ID: " + toolContentId);
-	}
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
 	session.setScratchie(scratchie);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: creating ScratchieSession with ID: " + toolSessionId);
-	}
 	scratchieSessionDao.saveObject(session);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving createToolSession() for session ID: " + toolSessionId + " and content ID: "
-		    + toolContentId);
-	}
     }
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered leaveToolSession() for user ID: " + learnerId + " and session ID: " + toolSessionId);
-	}
 	if (toolSessionId == null) {
 	    ScratchieServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
@@ -1891,17 +1598,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    ScratchieServiceImpl.log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting ScratchieSession with ID: " + toolSessionId);
-	}
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(toolSessionId);
 	if (session != null) {
 	    session.setStatus(ScratchieConstants.COMPLETED);
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: saving ScratchieSession with ID: " + toolSessionId);
-	    }
 	    scratchieSessionDao.saveObject(session);
 	} else {
 	    ScratchieServiceImpl.log.error("Fail to leave tool Session.Could not find shared scratchie "
@@ -1909,17 +1608,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared scratchie session by given session id: " + toolSessionId);
 	}
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: calling LearnerService.completeToolSession() for user ID: " + learnerId + " and session ID: "
-		    + toolSessionId);
-	}
-	String res = learnerService.completeToolSession(toolSessionId, learnerId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving leaveToolSession() for user ID: " + learnerId + " and session ID: " + toolSessionId);
-	}
-	return res;
+	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
