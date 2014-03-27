@@ -5,7 +5,7 @@
 
 <lams:html>
 	<lams:head>
-		<title><c:out value="${chatDTO.title}" escapeXml="false" /></title>
+		<title><c:out value="${chatDTO.title}" escapeXml="true" /></title>
 		<lams:css localLinkPath="../" />
 
 		<style>
@@ -17,7 +17,7 @@
 
 			<div id="content">
 			<h1>
-				<c:out value="${chatDTO.title}" escapeXml="false" />
+				<c:out value="${chatDTO.title}" escapeXml="true" />
 			</h1>
 
 				<div class="space-left space-right">
@@ -61,10 +61,9 @@
 								<c:if test="${user.finishedReflection}">
 
 									<p>
-										<span style="font-weight: bold">${user.firstName}
-											${user.lastName} </span>
+										<span style="font-weight: bold"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/> </span>
 										<br />
-										<lams:out value="${user.notebookEntry}"/>
+										<lams:out value="${user.notebookEntry}" escapeHtml="true"/>
 									</p>
 								</c:if>
 							</c:forEach>

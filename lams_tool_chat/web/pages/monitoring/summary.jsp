@@ -77,7 +77,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${monitoringDTO.reflectInstructions}	
+					<lams:out value="${monitoringDTO.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>
@@ -107,7 +107,7 @@
 					<fmt:message key="monitor.summary.td.filteredWords" />
 				</td>
 				<td>
-					${monitoringDTO.filteredKeyWords}	
+					<lams:out value="${monitoringDTO.filteredKeyWords}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>

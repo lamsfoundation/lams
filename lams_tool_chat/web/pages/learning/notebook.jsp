@@ -12,13 +12,13 @@
 
 <div id="content">
 	<h1>
-		${chatDTO.title}
+		<c:out value="${chatDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 
 		<p class="small-space-top">
-			<lams:out value="${chatDTO.reflectInstructions}" />
+			<lams:out value="${chatDTO.reflectInstructions}" escapeHtml="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText"

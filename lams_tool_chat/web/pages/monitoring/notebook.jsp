@@ -4,14 +4,14 @@
 	<tr>
 		<td>
 			<h2>
-				${chatUserDTO.firstName} ${chatUserDTO.lastName}
+				<c:out value="${chatUserDTO.firstName} ${chatUserDTO.lastName}" escapeXml="true"/>
 			</h2>
 		</td>
 	</tr>
 	<tr>
 		<td>
 			<p>
-				<lams:out value="${chatUserDTO.notebookEntry}" />
+				<lams:out value="${chatUserDTO.notebookEntry}" escapeHtml="true"/>
 			</p>
 		</td>
 	</tr>

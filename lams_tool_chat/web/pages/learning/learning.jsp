@@ -31,7 +31,7 @@
 
 <div id="content">
 	<h1>
-		<c:out value="${chatDTO.title}" escapeXml="false" />
+		<c:out value="${chatDTO.title}" escapeXml="true" />
 	</h1>
 
 	<p>
