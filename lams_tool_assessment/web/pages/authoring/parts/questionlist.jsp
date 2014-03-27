@@ -59,7 +59,7 @@
 							<fmt:message key="label.authoring.basic.random.question" />
 						</c:when>
 						<c:otherwise>
-							${question.title}
+							<c:out value="${question.title}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
 				</td>
@@ -112,7 +112,7 @@
 				</c:if>
 				
 				<c:forEach var="question" items="${availableQuestions}" varStatus="status">
-					<option value="${question.sequenceId}">${question.title}</option>
+					<option value="${question.sequenceId}"><c:out value="${question.title}" escapeXml="true"/></option>
 				</c:forEach>
 			</select>
 			
@@ -167,7 +167,7 @@
 				</td>
 
 				<td>
-					${question.title}
+					<c:out value="${question.title}" escapeXml="true" />
 				</td>
 				
 				<td width="20px" style="vertical-align:middle;">

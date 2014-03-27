@@ -212,7 +212,7 @@
 
 	<div id="content">
 		<h1>
-			${assessment.title}
+			<c:out value="${assessment.title}" escapeXml="true"/>
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
@@ -241,7 +241,7 @@
 
 		<c:if test="${not finishedLock}">
 			<p>
-				${assessment.instructions}
+				<c:out value="${assessment.instructions}" escapeXml="false"/>
 			</p>
 		</c:if>
 		
@@ -266,7 +266,7 @@
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<c:out value="${sessionMap.reflectInstructions}" escapeXml="true"/>
 				</h2>
 
 				<c:choose>

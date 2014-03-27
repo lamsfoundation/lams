@@ -152,7 +152,7 @@
 						<fmt:message key="label.monitoring.question.summary.title" />
 					</th>
 					<td >
-						${questionSummary.question.title}
+						<c:out value="${questionSummary.question.title}" escapeXml="true"/>
 					</td>
 				</tr>
 				
@@ -161,7 +161,7 @@
 						<fmt:message key="label.monitoring.question.summary.question" />
 					</th>
 					<td>
-						${questionSummary.question.question}
+						<c:out value="${questionSummary.question.question}" escapeXml="false"/>
 					</td>
 				</tr>
 					
@@ -170,7 +170,7 @@
 						<fmt:message key="label.monitoring.question.summary.default.mark" />
 					</th>
 					<td>
-						${questionSummary.question.defaultGrade}
+						<c:out value="${questionSummary.question.defaultGrade}" escapeXml="true"/>
 					</td>
 				</tr>
 					
@@ -179,7 +179,7 @@
 						<fmt:message key="label.monitoring.question.summary.penalty" />
 					</th>
 					<td>
-						${questionSummary.question.penaltyFactor}
+						<c:out value="${questionSummary.question.penaltyFactor}" escapeXml="true"/>
 					</td>
 				</tr>
 				

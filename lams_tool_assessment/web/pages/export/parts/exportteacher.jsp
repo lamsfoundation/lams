@@ -140,9 +140,9 @@
 	<body class="stripes" >
 		<div id="content" >
 		
-			<h1>${assessment.title} </h1>
+			<h1><c:out value="${assessment.title}" escapeXml="true"/> </h1>
 			
-			<h2>${assessment.instructions} </h2>
+			<h2><c:out value="${assessment.instructions}" escapeXml="false"/> </h2>
 			
 			<br>		
 			<h3><fmt:message key="label.export.portfolio.activity.summary" /></h3>
@@ -169,7 +169,7 @@
 							<fmt:message key="label.monitoring.question.summary.title" />
 						</th>
 						<td >
-							${questionSummary.question.title}
+							<c:out value="${questionSummary.question.title}" escapeXml="true"/>
 						</td>
 					</tr>
 					
@@ -178,7 +178,7 @@
 							<fmt:message key="label.monitoring.question.summary.question" />
 						</th>
 						<td>
-							${questionSummary.question.question}
+							<c:out value="${questionSummary.question.question}" escapeXml="false"/>
 						</td>
 					</tr>
 						
@@ -235,7 +235,7 @@
 				<c:set var="reflectDTOSet" value="${sessionMap.reflectList[summary.sessionId]}" />
 				<c:forEach var="reflectDTO" items="${reflectDTOSet}">
 					<h4>
-						${reflectDTO.fullName}
+						<c:out value="${reflectDTO.fullName}" escapeXml="false" />
 					</h4>
 					<p>
 						<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />

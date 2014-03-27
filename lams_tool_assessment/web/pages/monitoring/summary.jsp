@@ -254,7 +254,7 @@
 			<select id="questionUid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="question" items="${assessment.questions}">
-					<option value="${question.uid}">${question.title}</option>
+					<option value="${question.uid}"><c:out value="${question.title}" escapeXml="true"/></option>
 			   	</c:forEach>
 			</select>
 			

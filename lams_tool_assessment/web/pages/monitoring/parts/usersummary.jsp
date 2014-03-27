@@ -184,7 +184,7 @@
 								<fmt:message key="label.monitoring.user.summary.title" />
 							</td>
 							<td>
-								 ${userSummaryItem.question.title}
+								 <c:out value="${userSummaryItem.question.title}" escapeXml="true"/>
 							</td>
 						</tr>					
 						<tr>
@@ -192,7 +192,7 @@
 								<fmt:message key="label.monitoring.user.summary.question" />
 							</td>
 							<td>
-								${userSummaryItem.question.question}
+								<c:out value="${userSummaryItem.question.question}" escapeXml="false"/>
 							</td>
 						</tr>
 					</table>

@@ -33,7 +33,7 @@
 		</td>
 		
 		<td>
-			${assessment.questionsPerPage}
+			<c:out value="${assessment.questionsPerPage}" escapeXml="true"/>
 		</td>
 	</tr>
 	
@@ -82,7 +82,7 @@
 					<fmt:message key="label.authoring.advance.unlimited" />
 				</c:when>
 				<c:otherwise>
-					${assessment.attemptsAllowed}
+					<c:out value="${assessment.attemptsAllowed}" escapeXml="true"/>
 				</c:otherwise>
 			</c:choose>	
 		</td>
@@ -99,7 +99,7 @@
 					-
 				</c:when>
 				<c:otherwise>
-					${assessment.passingMark}
+					<c:out value="${assessment.passingMark}" escapeXml="true"/>
 				</c:otherwise>
 			</c:choose>	
 		</td>
@@ -244,7 +244,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${assessment.reflectInstructions}	
+					<c:out value="${assessment.reflectInstructions}" escapeXml="true"/>
 				</td>
 			</tr>
 		</c:when>
