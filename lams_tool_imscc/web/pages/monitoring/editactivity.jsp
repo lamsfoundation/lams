@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${commonCartridge.title}" escapeXml="false" />
+			<c:out value="${commonCartridge.title}" escapeXml="true" />
 		</td>
 	</tr>
 

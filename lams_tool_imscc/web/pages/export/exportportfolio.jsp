@@ -5,7 +5,9 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="summaryList" value="${sessionMap.summaryList}" />
 <c:set var="mode" value="${sessionMap.mode}" />
-<c:set var="title" value="${sessionMap.title}" />
+<c:set var="title">
+	<c:out value="${sessionMap.title}" escapeXml="true"/>
+</c:set>
 <c:set var="instructions" value="${sessionMap.instructions}" />
 
 <lams:html>
@@ -43,7 +45,7 @@
 		</h1>
 		
 		<div>
-			${instructions}
+			<c:out value="${instructions}" escapeXml="false"/>
 		</div>
 
 		<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
@@ -123,7 +125,7 @@
 							</td>
 
 							<td>
-								${item.itemTitle}
+								<c:out value="${item.itemTitle}" escapeXml="true"/>
 							</td>
 
 							<td align="center">
@@ -169,7 +171,7 @@
 						value="${sessionMap.reflectList[group[0].sessionId]}" />
 					<c:forEach var="reflectDTO" items="${reflectDTOSet}">
 						<h4>
-							${reflectDTO.fullName}
+							<c:out value="${reflectDTO.fullName}" escapeXml="true"/>
 						</h4>
 						<p>
 							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />

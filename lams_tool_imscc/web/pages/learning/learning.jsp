@@ -47,11 +47,11 @@
 
 	<div id="content">
 		<h1>
-			${commonCartridge.title}
+			<c:out value="${commonCartridge.title}" escapeXml="true"/>
 		</h1>
 
 		<p>
-			${commonCartridge.instructions}
+			<c:out value="${commonCartridge.instructions}" escapeXml="false"/>
 		</p>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -81,7 +81,7 @@
 			<c:forEach var="item" items="${sessionMap.commonCartridgeList}">
 				<tr>
 					<td>
-						<a href="#" onclick="viewItem(${item.uid})"> ${item.title} </a>
+						<a href="#" onclick="viewItem(${item.uid})"> <c:out value="${item.title}"/> </a>
 					</td>
 					<td align="center">
 						<c:choose>
@@ -108,7 +108,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>

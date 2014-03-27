@@ -19,9 +19,6 @@
 	<table border="0" cellspacing="3" width="98%">
 		<tr>
 			<th>
-				<fmt:message key="monitoring.label.user.loginname" />
-			</th>
-			<th>
 				<fmt:message key="monitoring.label.access.time" />
 			</th>
 			<th>
@@ -31,13 +28,10 @@
 		<c:forEach var="user" items="${userList}">
 			<tr>
 				<td>
-					${user.loginName}
-				</td>
-				<td>
 					<lams:Date value="${user.accessDate}"/>
 				</td>
 				<td>
-					${user.firstName},${user.lastName}
+					<c:out value="${user.firstName},${user.lastName}" escapeXml="true"/>
 				</td>
 			</tr>
 		</c:forEach>

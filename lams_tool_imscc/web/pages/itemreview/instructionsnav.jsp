@@ -27,7 +27,7 @@
 
 <lams:html>
 	<lams:head>
-		<title>${instructions.title}</title>
+		<title><c:out value="${instructions.title}"/></title>
 
 		<%@ include file="/common/header.jsp"%>
 		

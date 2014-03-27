@@ -51,7 +51,7 @@
 						<span class="field-name"> 
 							<fmt:message key="label.authoring.basic.resource.url" /> : 
 						</span>
-						${resource.title}
+						<c:out value="${resource.title}" escapeXml="true"/>
 						<br/>
 						
 						<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon${status.index}" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv${status.index}'), document.getElementById('treeIcon${status.index}'), '<lams:LAMSURL/>');" />

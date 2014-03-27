@@ -23,7 +23,7 @@
 						<span class="field-name"> 
 							<fmt:message key="label.authoring.basic.resource.url" /> : 
 						</span>
-						${commonCartridge.title}
+						<c:out value="${commonCartridge.title}" escapeXml="true"/>
 					</td>
 					<td width="9%">
 						<a href="#"
@@ -52,7 +52,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.file" /> : </span>
-						${commonCartridge.title}
+						<c:out value="${commonCartridge.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"
@@ -76,7 +76,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.website" /> : </span>
-						${commonCartridge.title}
+						<c:out value="${commonCartridge.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"
@@ -99,7 +99,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.learning.object" /> : </span>
-						${commonCartridge.title}
+						<c:out value="${commonCartridge.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"

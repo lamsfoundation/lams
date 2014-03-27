@@ -61,7 +61,7 @@
 						</c:choose>
 					</td>
 					<td>
-						${item.itemTitle}
+						<c:out value="${item.itemTitle}" escapeXml="true"/>
 					</td>
 					<td align="center">
 						<c:choose>
