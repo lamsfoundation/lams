@@ -12,7 +12,7 @@
 
 <div id="content">
 	<h1>
-		${notebookDTO.title}
+		<c:out value="${notebookDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<div class="warning">

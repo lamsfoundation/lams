@@ -45,14 +45,14 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${notebookDTO.title}
+		<c:out value="${notebookDTO.title}" escapeXml="true"/>
 	</h1>
 </div>
 
 <html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="messageForm">
 	<div data-role="content">
 		<p>
-			${notebookDTO.instructions}
+			<c:out value="${notebookDTO.instructions}" escapeXml="false"/>
 		</p>
 	
 		<c:if test="${not empty notebookDTO.submissionDeadline}">

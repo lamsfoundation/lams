@@ -5,7 +5,7 @@
 
 <html>
 	<lams:head>
-		<title><c:out value="${notebookDTO.title}" escapeXml="false" />
+		<title><c:out value="${notebookDTO.title}" escapeXml="true" />
 		</title>
 		<lams:css localLinkPath="../" />
 	</lams:head>
@@ -15,7 +15,7 @@
 			<div id="content">
 
 			<h1>
-				<c:out value="${notebookDTO.title}" escapeXml="false" />
+				<c:out value="${notebookDTO.title}" escapeXml="true" />
 			</h1>
 
 				<p>

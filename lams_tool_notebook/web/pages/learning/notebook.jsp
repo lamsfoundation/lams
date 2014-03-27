@@ -45,11 +45,11 @@
 
 <div id="content">
 	<h1>
-		${notebookDTO.title}
+		<c:out value="${notebookDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<p>
-		${notebookDTO.instructions}
+		<c:out value="${notebookDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${not empty notebookDTO.submissionDeadline}">

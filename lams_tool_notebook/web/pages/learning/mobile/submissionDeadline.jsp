@@ -12,7 +12,7 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${notebookDTO.title}
+		<c:out value="${notebookDTO.title}" escapeXml="true"/>
 	</h1>
 </div>
 
