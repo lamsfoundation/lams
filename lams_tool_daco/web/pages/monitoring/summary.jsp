@@ -140,7 +140,6 @@
 		<table cellpadding="0" class="alternative-color">
 			<tr>
 				<th><fmt:message key="label.monitoring.fullname" /></th>
-				<th><fmt:message key="label.monitoring.loginname" /></th>
 				<th><fmt:message key="label.monitoring.recordcount" /></th>
 				<c:if test="${daco.reflectOnActivity}">
 					<th><fmt:message key="label.monitoring.notebook" /></th>
@@ -157,10 +156,7 @@
 				<c:forEach var="user" items="${sessionSummary.users}">
 					<tr>
 						<td>
-							${user.fullName}
-						</td>
-						<td>
-							${user.loginName}
+							<c:out value="${user.fullName}" escapeXml="true"/>
 						</td>
 						<td  style="text-align: center; font-weight: bold;">
 							<c:choose>

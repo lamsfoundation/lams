@@ -23,7 +23,7 @@
 				<h1>
 					<fmt:message key="label.monitoring.reflection.heading"/>
 				</h1>
-				${user.fullName}<BR><BR>
+				<c:out value="${user.fullName}" escapeXml="true"/><BR><BR>
 				<table class="alternative-color" cellspacing="0">
 					<tr>
 						<th class="first">

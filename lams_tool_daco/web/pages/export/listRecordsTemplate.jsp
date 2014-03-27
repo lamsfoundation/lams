@@ -36,7 +36,7 @@
 <body class="stripes">
 <div id="content">
 	<%-- It displays user's full name, his records and summary table --%>
-	<h1>${userFullName}</h1>
+	<h1><c:out value="${userFullName}" escapeXml="true"/></h1>
 	<%@ include file="/pages/learning/listRecords.jsp" %>
 	<%@ include file="/pages/learning/questionSummaries.jsp" %>
 </div>

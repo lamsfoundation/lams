@@ -66,7 +66,7 @@
 										<c:if test="${userUid==nextUser.uid}">
 											selected="selected"
 										</c:if>
-										>${nextUser.fullName}</option>
+										><c:out value="${nextUser.fullName}" escapeXml="true"/></option>
 									</c:forEach>
 								</c:forEach>
 								<option value="-1" disabled="disabled">----------</option>
@@ -98,7 +98,6 @@
 					<table cellpadding="0" class="alternative-color">
 						<tr>
 							<th><fmt:message key="label.monitoring.fullname" /></th>
-							<th><fmt:message key="label.monitoring.loginname" /></th>
 							<th><fmt:message key="label.monitoring.recordcount" /></th>
 						</tr>
 						<c:if test="${userStatus.first || userUid==user.uid}">
@@ -110,10 +109,7 @@
 						</c:if>
 						<tr>
 							<td style="height: 20px;">
-								 ${user.fullName}
-							</td>
-							<td>
-								 ${user.loginName}
+								 <c:out value="${user.fullName}" escapeXml="true"/>
 							</td>
 							<td>
 								 ${user.recordCount}
