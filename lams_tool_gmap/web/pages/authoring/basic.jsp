@@ -89,8 +89,8 @@ function addAuthorMarkers()
 	<c:forEach var="marker" items="${formBean.gmap.gmapMarkers}">
 	addMarker(new GLatLng('${marker.latitude}', 
 		'${marker.longitude}' ), 
-		decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), 
-		decode_utf8('<c:out value="${marker.title}" />'), 
+		decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), 
+		decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), 
 		'${marker.uid}', 
 		true, 
 		true, 

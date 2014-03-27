@@ -34,14 +34,14 @@
 					<tr>
 						<td>
 							<h2>
-								${gmapUserDTO.firstName} ${gmapUserDTO.lastName}
+								<c:out value="${gmapUserDTO.firstName} ${gmapUserDTO.lastName}" escapeXml="true"/>
 							</h2>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<p>
-								<lams:out value="${gmapUserDTO.notebookEntry}" />
+								<lams:out value="${gmapUserDTO.notebookEntry}" escapeHtml="true"/>
 							</p>
 						</td>
 					</tr>

@@ -20,12 +20,12 @@
 
 <div id="content">
 	<h1>
-		${gmapDTO.title}
+		<c:out value="${gmapDTO.title}" escapeXml="true"/>
 	</h1>
 
 	
 	<p>
-		${gmapDTO.instructions}
+		<c:out value="${gmapDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<br />

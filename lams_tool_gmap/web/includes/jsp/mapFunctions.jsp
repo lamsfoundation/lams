@@ -84,7 +84,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     {
     	marker.infoMessage = "";
     }
-    marker.title = title;
+    marker.title = <c:out value="title" escapeXml="true"/>;
     
     // set the state of the marker, determines how the info window will display for this marker, and the sidebar 
     marker.editingOn = !isSaved;
@@ -250,9 +250,10 @@ function refreshSideBar(groupName)
 		{
 			if (markers[i].createdById == users[j].id && markers[i].state != "remove" && markers[i].state != "unsaved")
 			{
+				var sideBarTitle = markers[i].title;
 				sideBarText += "&nbsp;&nbsp;&nbsp;&nbsp;<span id='markerSpan" + markers[i].sideBarIndex + "'><nobr>";
 				sideBarText += "<a href='javascript:GEvent.trigger(markers[" + markers[i].sideBarIndex + "],\"click\");' ";
-				sideBarText += "title='" + markers[i].title + "' >" + markers[i].title + "</a>"
+				sideBarText += "title='" + sideBarTitle + "' >" + sideBarTitle + "</a>"
 				sideBarText += "</span></nobr><br />";
 			}
 		}

@@ -17,7 +17,7 @@
 	<html:hidden property="markersXML" value="" />
 		<div class="space-top">
 			<h2>
-				${gmapDTO.reflectInstructions}
+				<lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/>
 			</h2>
 
 			<p>

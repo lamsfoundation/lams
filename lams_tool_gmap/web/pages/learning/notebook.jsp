@@ -27,7 +27,7 @@
 			<div id="content">
 			
 			<h1>
-				${gmapDTO.title}
+				<c:out value="${gmapDTO.title}" escapeXml="true"/>
 			</h1>
 		
 			<html:form action="/learning" method="post">
@@ -36,7 +36,7 @@
 				<html:hidden property="mode" value="${mode}" />
 				
 				<p class="small-space-top">
-					<lams:out value="${gmapDTO.reflectInstructions}" />
+					<lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/>
 				</p>
 		
 				<html:textarea cols="60" rows="8" property="entryText"

@@ -169,7 +169,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${dto.reflectInstructions}	
+					<lams:out value="${dto.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>
@@ -273,7 +273,7 @@
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
 				<td>
-					${user.firstName} ${user.lastName}
+					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</td>
 				<td>
 					<c:if test="${user.finishedReflection}">
@@ -320,10 +320,10 @@
 		<c:forEach var="marker" items="${session.markerDTOs}">
 			<c:choose>
 			<c:when test="${marker.isAuthored == true}">
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, true, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}" escapeXml="true"/> (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 			</c:when>
 			<c:otherwise>
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, true, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}"escapeXml="true"/>', '${marker.createdBy.uid}');
 			</c:otherwise>
 		</c:choose>
 		</c:forEach>

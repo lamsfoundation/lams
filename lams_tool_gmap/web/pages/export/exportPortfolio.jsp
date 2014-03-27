@@ -24,7 +24,7 @@
 <html>
 	<lams:head>
 	
-		<title><c:out value="${gmapDTO.title}" escapeXml="false" />
+		<title><c:out value="${gmapDTO.title}" escapeXml="true" />
 		</title>
 		<lams:css localLinkPath="../" />
 		
@@ -105,7 +105,7 @@
 			<div id="content">
 
 			<h1>
-				<c:out value="${gmapDTO.title}" escapeXml="false" />
+				<c:out value="${gmapDTO.title}" escapeXml="true" />
 			</h1>
 
 			<p>
@@ -184,11 +184,11 @@
 					<c:forEach var="user" items="${session.userDTOs}">
 						<tr>
 							<td width="15%">
-								<span style="font-weight: bold">${user.firstName} ${user.lastName}</span>
+								<span style="font-weight: bold"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></span>
 							</td>
 							<td width="85%">
 								<c:if test="${user.finishedReflection}">
-									${user.notebookEntry}
+									<lams:out value="${user.notebookEntry}" escapeHtml="true"/>
 								</c:if>
 							</td>
 						</tr>	
@@ -203,10 +203,9 @@
 					<br /><br />
 					<h1><fmt:message key="heading.reflection"></fmt:message></h1>
 					<p>
-						<span style="font-weight: bold">${gmapUserDTO.firstName}
-							${gmapUserDTO.lastName} </span>
+						<span style="font-weight: bold"><c:out value="${gmapUserDTO.firstName} ${gmapUserDTO.lastName}" escapeXml="true"/> </span>
 						<br />
-						<lams:out value="${gmapUserDTO.notebookEntry}"/>
+						<lams:out value="${gmapUserDTO.notebookEntry}" escapeHtml="true"/>
 					</p>
 				</c:if>
 			</c:otherwise>
@@ -232,7 +231,7 @@
 			{
 				addUserToList('0',"<fmt:message key="label.authoring.basic.authored"></fmt:message>" );
 				<c:forEach var="user" items="${session.userDTOs}">
-					addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
+					addUserToList('${user.uid}','<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>' );
 				</c:forEach>
 			}
 			
@@ -241,10 +240,10 @@
 				<c:forEach var="marker" items="${session.markerDTOs}">
 					<c:choose>
 					<c:when test="${marker.isAuthored == true}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, false, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}" escapeXml="true"/> (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 					</c:when>
 					<c:otherwise>
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, false, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}" escapeXml="true"/>', '${marker.createdBy.uid}');
 					</c:otherwise>
 				</c:choose>
 				</c:forEach>
@@ -270,12 +269,12 @@
 			<c:forEach var="marker" items="${gmapDTO.gmapMarkers}">							
 				<c:choose>
 					<c:when test="${marker.isAuthored == true}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, false, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}" escapeXml="true"/> (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 					</c:when>
 					<c:otherwise>
 						<c:choose>
 							<c:when test="${gmapDTO.allowShowAllMarkers == true || marker.createdBy.loginName == gmapUserDTO.loginName}">
-								addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+								addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}" escapeXml="true"/>'), decode_utf8('<c:out value="${marker.title}" escapeXml="true"/>'), '${marker.uid}', true, false, '<c:out value="${marker.createdBy.firstName} ${marker.createdBy.lastName}" escapeXml="true"/>', '${marker.createdBy.uid}');
 							</c:when>
 						</c:choose>
 					</c:otherwise>
