@@ -53,7 +53,7 @@
 							<fmt:message key="label.notebookEntry" />
 						</td>
 						<td>
-							<c:out value="${userDTO.entryDTO.entry}" escapeXml="false"></c:out>
+							<c:out value="${userDTO.entryDTO.entry}" escapeXml="true"></c:out>
 						</td>
 					</tr>
 				</table>

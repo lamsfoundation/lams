@@ -72,7 +72,7 @@
 											<fmt:message key="label.notebookEntry" />
 										</td>
 										<td>
-											<c:out value="${user.entryDTO.entry}" escapeXml="false"></c:out>
+											<c:out value="${user.entryDTO.entry}" escapeXml="true"></c:out>
 										</td>
 									</tr>
 								</c:if>
