@@ -77,7 +77,7 @@ function showReport(toolSessionID,sessionMapID,userUid){
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${sessionMap.eadventure.reflectInstructions}	
+					<lams:out value="${sessionMap.eadventure.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>

@@ -39,7 +39,7 @@
 	<div id="content">
 
 		<h1>
-			${title}
+			<c:out value="${title}" escapeXml="true"/>
 		</h1>
 		
 		<div style="height:40px">
@@ -50,7 +50,7 @@
 		
 		
 		<div style="height:40px">
-			${instructions}
+			<c:out value="${instructions}" escapeXml="false"/>
 		</div>
 
 		<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
@@ -64,11 +64,6 @@
 			
 		<c:forEach var="user" items="${group.users}" varStatus="status" >
 			<tr>
-				
-			<th>
-				<fmt:message key="monitoring.label.user.loginname" />
-			</th>
-			<th> 
 				<fmt:message key="monitoring.label.access.time" />
 			</th> 
 			<th>
@@ -78,13 +73,10 @@
 		</tr>
 			<tr>
 				<td>
-					${user.loginName}
-				</td>
-				<td>
 					<lams:Date value="${user.accessDate}"/>
 				</td> 
 				<td>
-					${user.firstName},${user.lastName}
+					<c:out value="${user.firstName},${user.lastName}" escapeXml="true"/>
 				</td>	
 				
 	
@@ -128,7 +120,7 @@
 						value="${sessionMap.reflectList[group[0].sessionId]}" />
 					<c:forEach var="reflectDTO" items="${reflectDTOSet}">
 						<h4>
-							${reflectDTO.fullName}
+							<c:out value="${reflectDTO.fullName}" escapeXml="true"/>
 						</h4>
 						<p>
 							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />

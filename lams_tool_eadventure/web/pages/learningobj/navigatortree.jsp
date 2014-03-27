@@ -90,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:when>
 		<c:otherwise>
 			<h2>
-				<c:out value="${cpPackage.title}" />
+				<c:out value="${cpPackage.title}" escapeXml="true"/>
 			</h2>
 			<BR><BR>
 			<script language="JavaScript">

@@ -10,10 +10,6 @@
 				</tr>
 			
 			<tr>
-				
-			<th>
-				<fmt:message key="monitoring.label.user.loginname" />
-			</th>
 			<th> 
 				<fmt:message key="monitoring.label.access.time" />
 			</th> 
@@ -25,13 +21,10 @@
 		<c:forEach var="user" items="${group.users}" varStatus="status" >
 			<tr>
 				<td>
-					${user.loginName}
-				</td>
-				<td>
 					<lams:Date value="${user.accessDate}"/>
 				</td> 
 				<td>
-					${user.firstName},${user.lastName}
+					<c:out value="${user.firstName},${user.lastName}" escapeXml="true"/>
 				</td>	
 				
 				<c:choose>
@@ -61,9 +54,6 @@
 								<th colspan="2">
 									<fmt:message key="monitoring.user.fullname"/>
 								</th>
-								<th colspan="2">
-									<fmt:message key="monitoring.label.user.loginname"/>
-								</th>
 								<th>
 									<fmt:message key="monitoring.user.reflection"/>
 								</th>
@@ -71,10 +61,7 @@
 						</c:if>
 						<tr>
 							<td colspan="2">
-								${userRef.fullName}
-							</td>
-							<td colspan="2">
-								${userRef.loginName}
+								<c:out value="${userRef.fullName}" escapeXml="true"/>
 							</td>
 							<td >
 								<c:set var="viewReflection">

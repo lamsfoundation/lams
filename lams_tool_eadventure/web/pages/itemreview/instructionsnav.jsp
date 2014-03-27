@@ -40,7 +40,7 @@
 
 <lams:html>
 	<lams:head>
-		<title>${instructions.title}</title>
+		<title><c:out value="${instructions.title}" escapeXml="true"/></title>
 
 		<%@ include file="/common/header.jsp"%>
 		
@@ -161,7 +161,7 @@
 						<fmt:message key="msg.no.instruction" />
 					</c:when>
 					<c:otherwise>
-					${instructions.instruction}
+					<c:out value="${instructions.instruction}" escapeXml="false"/>
 				</c:otherwise>
 				</c:choose>
 			</p>

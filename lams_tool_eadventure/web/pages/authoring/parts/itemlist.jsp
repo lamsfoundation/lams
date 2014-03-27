@@ -16,7 +16,7 @@
 			<tr>
 					<td>
 						<span class="field-name"> eAdventure: </span>
-						${eadventure.title}
+						<c:out value="${eadventure.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"

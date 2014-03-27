@@ -71,11 +71,11 @@
 
 	<div id="content">
 		<h1>
-			${eadventure.title}
+			<c:out value="${eadventure.title}" escapeXml="true"/>
 		</h1>
 
 		<p>
-			${eadventure.instructions}
+			<c:out value="${eadventure.instructions}" escapeXml="false"/>
 		</p>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -107,7 +107,7 @@
 				<tr>
 					<td>
 						<a href="#" onclick="viewItem(${eadventure.contentId})">
-							${eadventure.title} </a>
+							<c:out value="${eadventure.title}" escapeXml="true"/> </a>
 						
 						
 					</td>
@@ -132,7 +132,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>
