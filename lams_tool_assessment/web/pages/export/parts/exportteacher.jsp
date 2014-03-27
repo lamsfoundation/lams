@@ -235,7 +235,7 @@
 				<c:set var="reflectDTOSet" value="${sessionMap.reflectList[summary.sessionId]}" />
 				<c:forEach var="reflectDTO" items="${reflectDTOSet}">
 					<h4>
-						<c:out value="${reflectDTO.fullName}" escapeXml="false" />
+						<c:out value="${reflectDTO.fullName}" escapeXml="true" />
 					</h4>
 					<p>
 						<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />

@@ -266,7 +266,7 @@
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
 			<div class="small-space-top">
 				<h2>
-					<c:out value="${sessionMap.reflectInstructions}" escapeXml="true"/>
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>

@@ -244,7 +244,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					<c:out value="${assessment.reflectInstructions}" escapeXml="true"/>
+					<lams:out value="${assessment.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>
