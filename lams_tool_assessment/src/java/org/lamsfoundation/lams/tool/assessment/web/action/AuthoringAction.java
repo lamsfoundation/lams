@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -140,6 +142,9 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("saveQTI")) {
 	    return saveQTI(mapping, form, request, response);
+	}
+	if (param.equals("exportQTI")) {
+	    return exportQTI(mapping, form, request, response);
 	}
 	if (param.equals("removeQuestion")) {
 	    return removeQuestion(mapping, form, request, response);
@@ -372,7 +377,7 @@ public class AuthoringAction extends Action {
 	}
 
 	assessmentPO.setCreatedBy(assessmentUser);
-	
+
 	// ************************* Handle assessment questions *******************
 	// Handle assessment questions
 	Set questions = new LinkedHashSet();
@@ -572,8 +577,8 @@ public class AuthoringAction extends Action {
 	    assessmentQuestion.setTitle(question.getTitle());
 	    assessmentQuestion.setQuestion(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
-	    assessmentQuestion.setGeneralFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
+	    assessmentQuestion.setGeneralFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
+		    contentFolderID, question.getResourcesFolderPath()));
 	    assessmentQuestion.setPenaltyFactor(0);
 
 	    int questionGrade = 1;
@@ -759,6 +764,118 @@ public class AuthoringAction extends Action {
     }
 
     /**
+     * Prepares Assessment content for QTI packing
+     */
+    @SuppressWarnings("rawtypes")
+    private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws UnsupportedEncodingException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	List<Question> questions = new LinkedList<Question>();
+	for (AssessmentQuestion assessmentQuestion : questionList) {
+	    Question question = new Question();
+	    List<Answer> answers = new ArrayList<Answer>();
+
+	    switch (assessmentQuestion.getType()) {
+
+	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+		if (assessmentQuestion.isMultipleAnswersAllowed()) {
+		    question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
+		    int correctAnswerCount = 0;
+
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+			if (assessmentAnswer.getGrade() > 0) {
+			    correctAnswerCount++;
+			}
+		    }
+
+		    Float correctAnswerScore = correctAnswerCount > 0 ? new Integer(100 / correctAnswerCount)
+			    .floatValue() : null;
+		    int incorrectAnswerCount = assessmentQuestion.getQuestionOptions().size() - correctAnswerCount;
+		    Float incorrectAnswerScore = incorrectAnswerCount > 0 ? new Integer(-100 / incorrectAnswerCount)
+			    .floatValue() : null;
+
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+			Answer answer = new Answer();
+			boolean isCorrectAnswer = assessmentAnswer.getGrade() > 0;
+
+			answer.setText(assessmentAnswer.getOptionString());
+			answer.setScore(isCorrectAnswer ? correctAnswerScore : incorrectAnswerScore);
+			answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
+				: assessmentQuestion.getFeedbackOnIncorrect());
+
+			answers.add(assessmentAnswer.getSequenceId(), answer);
+		    }
+		} else {
+		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+			Answer answer = new Answer();
+			boolean isCorrectAnswer = assessmentAnswer.getGrade() == 1F;
+
+			answer.setText(assessmentAnswer.getOptionString());
+			answer.setScore(isCorrectAnswer ? new Integer(assessmentQuestion.getDefaultGrade())
+				.floatValue() : 0);
+			answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
+				: assessmentQuestion.getFeedbackOnIncorrect());
+
+			answers.add(assessmentAnswer.getSequenceId(), answer);
+		    }
+		}
+
+		break;
+
+	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+		question.setType(Question.QUESTION_TYPE_TRUE_FALSE);
+		boolean isTrueCorrect = assessmentQuestion.getCorrectAnswer();
+
+		// true/false question is basically the same for QTI, just with special answers
+		Answer trueAnswer = new Answer();
+		trueAnswer.setText("True");
+		trueAnswer.setScore(isTrueCorrect ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
+		trueAnswer.setFeedback(isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect() : assessmentQuestion
+			.getFeedbackOnIncorrect());
+		answers.add(trueAnswer);
+
+		Answer falseAnswer = new Answer();
+		falseAnswer.setText("False");
+		falseAnswer.setScore(!isTrueCorrect ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue()
+			: 0);
+		falseAnswer.setFeedback(!isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect() : assessmentQuestion
+			.getFeedbackOnIncorrect());
+		answers.add(falseAnswer);
+
+		break;
+		
+	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
+		// not much to do with essay
+		question.setType(Question.QUESTION_TYPE_ESSAY);
+		answers = null;
+		
+		break;
+		
+	    default:
+		continue;
+	    }
+
+	    question.setTitle(assessmentQuestion.getTitle());
+	    question.setText(assessmentQuestion.getQuestion());
+	    question.setFeedback(assessmentQuestion.getGeneralFeedback());
+	    question.setAnswers(answers);
+
+	    questions.add(assessmentQuestion.getSequenceId() - 1, question);
+	}
+
+	String title = request.getParameter("title");
+	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	exporter.exportQTIPackage(request, response);
+
+	return null;
+    }
+
+    /**
      * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
      * 
@@ -796,9 +913,9 @@ public class AuthoringAction extends Action {
 		    questionReferenceToDelete = questionReference;
 		}
 	    }
-	    //check if we need to delete random question reference
+	    // check if we need to delete random question reference
 	    if ((questionReferenceToDelete == null) && (questionReferences.size() > questionList.size())) {
-		//find the first random question
+		// find the first random question
 		for (QuestionReference questionReference : questionReferences) {
 		    if (questionReference.isRandomQuestion()) {
 			questionReferenceToDelete = questionReference;

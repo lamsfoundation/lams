@@ -150,7 +150,7 @@
 	};	
 	
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questionFile.jsp',
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
 	
@@ -167,7 +167,12 @@
 		});
     }
 
-
+    function exportQTI(){
+    	var frame = document.getElementById("downloadFileDummyIframe"),
+    		title = encodeURIComponent(document.getElementsByName("assessment.title")[0].value);
+    	frame.src = '<c:url value="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />'
+    			+ '&title=' + title;
+    }
 </script>
 
 <!-- Basic Tab Content -->
@@ -225,8 +230,17 @@
 		<fmt:message key="label.authoring.basic.export.questions" />
 	</a>
 	
-	<a href="#" onClick="javascript:importQTI()" style="float: right; margin-right: 50px">
+	<a href="#" onClick="javascript:exportQTI()" style="float: right; margin-right: 50px">
+		<fmt:message key="label.authoring.basic.export.qti" />
+	</a>
+	
+	<a href="#" onClick="javascript:importQTI()" style="float: right; margin-right: 30px">
 			<fmt:message key="label.authoring.basic.import.qti" /> 
 	</a>
+	
+
 </p>
 <br>
+
+<!-- For exporting QTI packages -->
+<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

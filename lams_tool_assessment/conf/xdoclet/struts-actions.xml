@@ -85,6 +85,13 @@
 			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
 		</action>
 		
+		<action path="/authoring/exportQTI"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			scope="request" 
+			parameter="exportQTI" 
+			validate="false">
+		</action>
+		
 		<action path="/authoring/removeQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
 			parameter="removeQuestion">

@@ -126,8 +126,8 @@ public class QuestionExporter {
      * @return Path to the created ZIP file
      */
     public String exportQTIPackage() {
-	if (log.isDebugEnabled()) {
-	    log.debug("Exporting QTI ZIP package \"" + packageTitle + "\"");
+	if (QuestionExporter.log.isDebugEnabled()) {
+	    QuestionExporter.log.debug("Exporting QTI ZIP package \"" + packageTitle + "\"");
 	}
 	try {
 	    String rootDir = FileUtil.createTempDirectory(QuestionExporter.EXPORT_TEMP_FOLDER_SUFFIX);
@@ -189,12 +189,16 @@ public class QuestionExporter {
 
 	for (Question question : questions) {
 	    Element itemElem = null;
-	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())) {
+	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
+		    || Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())
+		    || Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
 		itemElem = exportMultipleChoiceQuestion(question);
+	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
+		itemElem = exportEssayQuestion(question);
 	    }
 
 	    if (itemElem == null) {
-		QuestionExporter.log.warn("Unknow type \"" + question.getType() + " of question \""
+		QuestionExporter.log.warn("Unknow type \"" + question.getType() + "\" of question \""
 			+ question.getTitle() + "\"");
 	    } else {
 		sectionElem.appendChild(itemElem);
@@ -205,7 +209,7 @@ public class QuestionExporter {
     }
 
     /**
-     * Creates a XML element with contents of a single multiple choice question.
+     * Creates a XML element with contents of a single multiple choice or true/false or multiple response question.
      */
     private Element exportMultipleChoiceQuestion(Question question) {
 	Element itemElem = doc.createElement("item");
@@ -224,15 +228,17 @@ public class QuestionExporter {
 	String responseLidIdentifier = "QUE_" + itemId + "_RL";
 	Element responseLidElem = (Element) presentationElem.appendChild(doc.createElement("response_lid"));
 	responseLidElem.setAttribute("ident", responseLidIdentifier);
-	responseLidElem.setAttribute("rcardinality", "Single");
+	responseLidElem.setAttribute("rcardinality",
+		Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType()) ? "Multiple" : "Single");
 	responseLidElem.setAttribute("rtiming", "No");
 
 	// question feedback (displayed no matter what answer was choosed)
 	List<Element> feedbackList = new ArrayList<Element>();
+	String correctFeedbackLabel = null;
 	String incorrectFeedbackLabel = null;
 	Element overallFeedbackElem = null;
 	if (!StringUtils.isBlank(question.getFeedback())) {
-	    overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback());
+	    overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback(), "All");
 	    feedbackList.add(overallFeedbackElem);
 	}
 
@@ -241,6 +247,23 @@ public class QuestionExporter {
 	List<Element> respconditionList = new ArrayList<Element>(question.getAnswers().size());
 
 	// iterate through answers, collecting some info along the way
+	for (Answer answer : question.getAnswers()) {
+	    // just labels for feedback for correct/incorrect answer
+	    boolean isCorrect = answer.getScore() > 0;
+	    if (!StringUtils.isBlank(answer.getFeedback())) {
+		if (!isCorrect && (incorrectFeedbackLabel == null)) {
+		    Element feedbackElem = createFeedbackElem("_IC", answer.getFeedback(), "Candidate");
+		    feedbackList.add(feedbackElem);
+		    incorrectFeedbackLabel = feedbackElem.getAttribute("ident");
+		} else if (isCorrect && (correctFeedbackLabel == null)) {
+		    Element feedbackElem = createFeedbackElem("_C", answer.getFeedback(), "Candidate");
+		    feedbackList.add(feedbackElem);
+		    correctFeedbackLabel = feedbackElem.getAttribute("ident");
+		}
+	    }
+	}
+
+	// proper iteration
 	for (Answer answer : question.getAnswers()) {
 	    Element responseLabelElem = (Element) renderChoiceElem.appendChild(doc.createElement("response_label"));
 	    itemId++;
@@ -254,18 +277,6 @@ public class QuestionExporter {
 		appendMaterialElements(materialElem, answer.getText());
 	    }
 
-	    // just labels for feedback for correct/incorrect answer
-	    boolean isCorrect = answer.getScore() > 0;
-	    Element feedbackElem = null;
-	    if (!StringUtils.isBlank(answer.getFeedback())) {
-		feedbackElem = createFeedbackElem((isCorrect ? "_C" : "_IC"), answer.getFeedback());
-		feedbackList.add(feedbackElem);
-
-		if (!isCorrect && (incorrectFeedbackLabel == null)) {
-		    incorrectFeedbackLabel = feedbackElem.getAttribute("ident");
-		}
-	    }
-
 	    // mark which answer is correct by setting score for each of them
 	    Element respconditionElem = doc.createElement("respcondition");
 	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
@@ -273,18 +284,20 @@ public class QuestionExporter {
 	    varequalElem.setAttribute("respident", responseLidIdentifier);
 	    varequalElem.setTextContent(answerLabel);
 
+	    boolean isCorrect = answer.getScore() > 0;
 	    Element setvarElem = (Element) respconditionElem.appendChild(doc.createElement("setvar"));
 	    setvarElem.setAttribute("varname", "que_score");
-	    setvarElem.setAttribute("action", isCorrect ? "Set" : "Add");
+	    setvarElem.setAttribute("action",
+		    isCorrect && !Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType()) ? "Set" : "Add");
 	    setvarElem.setTextContent(String.valueOf(answer.getScore()));
 
 	    // link feedback for correct/incorrect answer
-	    if (feedbackElem != null) {
+	    if (isCorrect) {
 		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
 			.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
-		displayfeedbackElem.setAttribute("linkrefid", feedbackElem.getAttribute("ident"));
-	    } else if (!isCorrect && (incorrectFeedbackLabel != null)) {
+		displayfeedbackElem.setAttribute("linkrefid", correctFeedbackLabel);
+	    } else {
 		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
 			.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
@@ -304,7 +317,7 @@ public class QuestionExporter {
 	if (overallFeedbackElem != null) {
 	    Element respconditionElem = doc.createElement("respcondition");
 	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
-	    conditionvarElem.appendChild(doc.createElement("elem"));
+	    conditionvarElem.appendChild(doc.createElement("other"));
 	    Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc.createElement("displayfeedback"));
 	    displayfeedbackElem.setAttribute("feedbacktype", "Response");
 	    displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
@@ -332,13 +345,61 @@ public class QuestionExporter {
     }
 
     /**
+     * Creates a XML element with contents of a single essay question.
+     */
+    private Element exportEssayQuestion(Question question) {
+	Element itemElem = doc.createElement("item");
+	itemElem.setAttribute("title", question.getTitle());
+	itemId++;
+	itemElem.setAttribute("ident", "QUE_" + itemId);
+
+	// question text
+	Element presentationElem = (Element) itemElem.appendChild(doc.createElement("presentation"));
+	if (!StringUtils.isBlank(question.getText())) {
+	    Element materialElem = (Element) presentationElem.appendChild(doc.createElement("material"));
+	    appendMaterialElements(materialElem, question.getText());
+	}
+
+	// just a single response element
+	itemId++;
+	Element responseStrElem = (Element) presentationElem.appendChild(doc.createElement("response_str"));
+	responseStrElem.setAttribute("ident", "QUE_" + itemId + "_RS");
+	Element renderFibElem = (Element) responseStrElem.appendChild(doc.createElement("render_fib"));
+	renderFibElem.setAttribute("fibtype", "String");
+	renderFibElem.setAttribute("prompt", "Box");
+	renderFibElem.setAttribute("rows", "5");
+	renderFibElem.setAttribute("columns", "50");
+	itemId++;
+	Element responseLabelElem = (Element) renderFibElem.appendChild(doc.createElement("response_label"));
+	responseLabelElem.setAttribute("ident", "QUE_" + itemId + "_ANS");
+
+	// just a single feedback element
+	if (!StringUtils.isBlank(question.getFeedback())) {
+	    Element overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback(), "All");
+
+	    Element resprocessingElem = (Element) itemElem.appendChild(doc.createElement("resprocessing"));
+	    Element respconditionElem = (Element) resprocessingElem.appendChild(doc.createElement("respcondition"));
+	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
+	    conditionvarElem.appendChild(doc.createElement("other"));
+	    Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc.createElement("displayfeedback"));
+	    displayfeedbackElem.setAttribute("feedbacktype", "Response");
+	    displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
+
+	    itemElem.appendChild(overallFeedbackElem);
+	}
+
+	return itemElem;
+    }
+
+    /**
      * Creates a feedback XML element.
      */
-    private Element createFeedbackElem(String labelSuffix, String feedback) {
+    private Element createFeedbackElem(String labelSuffix, String feedback, String type) {
 	itemId++;
 	String label = "QUE_" + itemId + labelSuffix;
 	Element feedbackElem = doc.createElement("itemfeedback");
 	feedbackElem.setAttribute("ident", label);
+	feedbackElem.setAttribute("view", type);
 	Element materialElem = (Element) feedbackElem.appendChild(doc.createElement("material"));
 	appendMaterialElements(materialElem, feedback);
 
