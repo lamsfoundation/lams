@@ -82,7 +82,7 @@
 				<c:forEach var="user" items="${session.userDTOs}">
 					<tr>
 						<td>
-							${user.firstName} ${user.lastName}
+							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 						</td>
 						<td>
 							<c:choose>

@@ -15,7 +15,7 @@
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
-				<c:out value="${dto.title}" escapeXml="false" />
+				<c:out value="${dto.title}" escapeXml="true" />
 			</td>
 		</tr>
 		<tr>

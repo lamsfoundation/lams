@@ -42,11 +42,11 @@
 
 <div id="content">
 	<h1>
-		${contentDTO.title}
+		<c:out value="${contentDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<p>
-		${contentDTO.instructions}
+		<c:out value="${contentDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${contentDTO.lockOnFinish and mode == 'learner'}">

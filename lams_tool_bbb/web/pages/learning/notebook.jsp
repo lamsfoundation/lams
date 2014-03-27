@@ -8,14 +8,14 @@
 
 <div id="content">
 	<h1>
-		${contentDTO.title}
+		<c:out value="${contentDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<html:form action="/learning" method="post"
 		onsubmit="disableFinishButton();">
 
 		<p class="small-space-top">
-			<lams:out value="${contentDTO.reflectInstructions}" />
+			<lams:out value="${contentDTO.reflectInstructions}" escapeHmtl="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText"
