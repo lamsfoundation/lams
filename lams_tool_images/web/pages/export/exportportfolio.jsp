@@ -34,9 +34,9 @@
 	
 		<div id="content">
 	
-			<h1>${title} </h1>
+			<h1><c:out value="${title}" escapeXml="true"/> </h1>
 			
-			<h1>${instructions} </h1>
+			<p><c:out value="${instructions}" escapeXml="false"/> </p>
 	
 			<c:choose>
 				<c:when test="${not empty sessionList}">
@@ -68,7 +68,7 @@
 						<c:forEach var="reflectDTOList" items="${sessionMap.reflectList}">
 							<c:forEach var="reflectDTO" items="${reflectDTOList.value}">
 								<h4>
-									${reflectDTO.fullName}
+									<c:out value="${reflectDTO.fullName}" escapeHtml="true" />
 								</h4>
 								<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 							</c:forEach>

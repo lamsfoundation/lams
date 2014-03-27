@@ -10,7 +10,7 @@
 	<c:set var="commentsAddedBy" >
 		<fmt:message key="label.learning.added.by" /> 
 		<br>
-			${commentsImage.createBy.loginName}
+			<c:out value="${commentsImage.createBy.loginName}" escapeXml="true"/>
 		<br>
 	</c:set>
 </c:if>

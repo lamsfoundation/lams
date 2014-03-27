@@ -57,11 +57,11 @@
 			<c:if test="${summary.itemUid != -1}">
 				<tr>
 					<td>
-						${summary.itemTitle}
+						<c:out value="${summary.itemTitle}" escapeXml="true"/>
 					</td>
 					<td>
 						<c:if test="${!summary.itemCreateByAuthor}">
-							${summary.username}
+							<c:out value="${summary.username}" escapeXml="true"/>
 						</c:if>
 					</td>
 					<c:choose>

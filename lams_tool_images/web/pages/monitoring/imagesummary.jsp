@@ -39,7 +39,10 @@
 				<c:set var="mediumImagePath">
 			   		<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 				</c:set>	
-				<img src="${mediumImagePath}" alt="${image.title}" title="${image.title}"/>
+				<c:set var="title">
+					<c:out value="${image.title}" escapeXml="true"/>
+				</c:set>
+				<img src="${mediumImagePath}" alt="${title}" title="${title}"/>
 					
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.resource.title.input" />
@@ -109,7 +112,7 @@
 					
 						<tr>
 							<td>
-								${userImageContribution.user.loginName}
+								<c:out value="${userImageContribution.user.loginName}" escapeXml="true"/>
 							</td>
 							
 							<c:if test="${imageGallery.allowVote}">								

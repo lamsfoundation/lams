@@ -23,14 +23,17 @@
 				 	<c:set var="mediumImagePath">
 	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 					</c:set>					
-					<a href="${mediumImagePath}" rel="lyteframe" title="${image.title}" style="border-style: none;" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: no;">
-						<img src="${thumbnailPath}" alt="${image.title}" style="border-style: none;"/>
+					<c:set var="title">
+						<c:out value="${image.title}" escapeXml="true"/>
+					</c:set>
+					<a href="${mediumImagePath}" rel="lyteframe" title="${title}" style="border-style: none;" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: no;">
+						<img src="${thumbnailPath}" alt="${title}" style="border-style: none;"/>
 					</a>
 				</td>
 				
 				<td style="vertical-align:middle;">
-					<a href="${mediumImagePath}" rel="lyteframe" title="${image.title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
-						${image.title}
+					<a href="${mediumImagePath}" rel="lyteframe" title="${title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
+						<c:out value="${image.title}" escapeXml="true"/>
 					</a>
 				</td>
 

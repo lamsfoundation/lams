@@ -314,10 +314,10 @@
 		<%--ImageGallery information-----------------------------------%>
 
 		<h1>
-			${imageGallery.title}
+			<c:out value="${imageGallery.title}" escapeXml="true"/>
 		</h1>
 		<p>
-			${imageGallery.instructions}
+			<c:out value="${imageGallery.instructions}" escapeXml="false"/>
 		</p>
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 				<div class="info">
@@ -407,9 +407,11 @@
 							<li>
 						</c:otherwise>
 					</c:choose>
-				
-						<a href="<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false" title="${image.title}" id="${image.uid}" width="${image.mediumImageWidth}" height="${image.mediumImageHeight}">
-							<img src="<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false" alt="${image.title}" id="${image.uid}">
+					<c:set var="title">
+						<c:out value="${image.title}" escapeXml="true"/>	
+				        </c:set>
+						<a href="<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false" title="${title}" id="${image.uid}" width="${image.mediumImageWidth}" height="${image.mediumImageHeight}">
+							<img src="<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false" alt="${title}" id="${image.uid}">
 						</a>
 					</li>
 				</c:forEach>
@@ -443,7 +445,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>

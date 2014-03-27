@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${imageGallery.title}" escapeXml="false" />
+			<c:out value="${imageGallery.title}" escapeXml="true" />
 		</td>
 	</tr>
 
