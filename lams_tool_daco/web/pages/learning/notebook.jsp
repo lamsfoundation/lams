@@ -27,13 +27,13 @@
 		
 		<div id="content">
 			<h1>
-				${daco.title}
+				<c:out value="${daco.title}" escapeXml="true"/>
 			</h1>
 
 			<%@ include file="/common/messages.jsp"%>
 
 			<p>
-				<lams:out value="${daco.reflectInstructions}" />
+				<lams:out value="${daco.reflectInstructions}" escapeHtml="true" />
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText"

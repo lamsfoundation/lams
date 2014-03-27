@@ -121,7 +121,7 @@
 					<fmt:message key="label.monitoring.advancedsettings.notebookinstructions" />
 				</td>
 				<td>
-					${daco.reflectInstructions}	
+					<lams:out value="${daco.reflectInstructions}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:if>

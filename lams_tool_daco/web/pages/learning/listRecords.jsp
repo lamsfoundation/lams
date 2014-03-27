@@ -49,11 +49,11 @@
 	<table>
 		<tr>
 			<td>
-			<h1>${daco.title}</h1>
+			<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
 			</td>
 		</tr>
 		<tr>
-			<td>${daco.instructions}</td>
+			<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
 		</tr>
 	</table>
 </c:if>
@@ -108,7 +108,7 @@
 							<tr>
 								<td class="fixedCellHeight" style="width: 160px">
 									<div class="bigNumber">${questionStatus.index+1}</div>
-									${question.description}
+									<c:out value="${question.description}" escapeXml="false"/>
 								</td>	
 							</tr>
 						</c:forEach>
@@ -187,7 +187,7 @@
 										<tr>
 											<td>
 											<div class="bigNumber">${questionStatus.index+1}</div>
-											${question.description}
+											<c:out value="${question.description}" escapeXml="false"/>
 											<c:choose>
 												<c:when test="${question.type==1}">
 													<input type="text" size="72" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
@@ -244,7 +244,7 @@
 														checked="checked"
 														</c:if>
 														>
-														${answerOption.answerOption}</input><br />
+														<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 													</c:forEach>
 												</c:when>
 												<c:when test="${question.type==8}">
@@ -255,7 +255,7 @@
 														<c:otherwise>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 																<c:if test="${status.index+1==answer.answer}">
-																	<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
+																	<fmt:message key="label.learning.dropdown.selected" /> <c:out value="${answerOption.answerOption}" escapeXml="true"/>
 																</c:if>
 															</c:forEach>
 														</c:otherwise>
@@ -263,7 +263,7 @@
 												</c:when>
 												<c:when test="${question.type==9}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">${answerOption.answerOption}</input><br />
+														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 													</c:forEach>
 												</c:when>
 												<c:when test="${question.type==10}">

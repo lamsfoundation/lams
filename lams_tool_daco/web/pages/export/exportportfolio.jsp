@@ -36,11 +36,11 @@
 	<table>
 		<tr>
 			<td>
-			<h1>${daco.title}</h1>
+			<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
 			</td>
 		</tr>
 		<tr>
-			<td>${daco.instructions}</td>
+			<td><c:out value-"${daco.instructions}" escapeXml="false"/></td>
 		</tr>
 	</table>
 	<c:choose>
@@ -51,14 +51,14 @@
 			<%@ include file="/pages/learning/questionSummaries.jsp" %>
 			<c:if test="${daco.reflectOnActivity}">
 				<div>
-					<h2>${daco.reflectInstructions }</h2>
+					<h2><lams:out value="${daco.reflectInstructions}" escapeHtml="true"/></h2>
 					<p>
 						<c:choose>
 							<c:when test="${empty reflectEntry}">
 								<fmt:message key="message.no.reflection.available" />
 							</c:when>
 							<c:otherwise>
-								${reflectEntry}
+								<lams:out value="${reflectEntry}" escapeHtml="true"/>
 							</c:otherwise>
 						</c:choose>
 					</p>
@@ -82,7 +82,6 @@
 							<table cellpadding="0" class="alternative-color">
 								<tr>
 									<th><fmt:message key="label.monitoring.fullname" /></th>
-									<th><fmt:message key="label.monitoring.loginname" /></th>
 									<th><fmt:message key="label.monitoring.recordcount" /></th>
 									<th><fmt:message key="label.monitoring.notebook" /></th>
 								</tr>
@@ -95,10 +94,7 @@
 								</c:if>
 								<tr>
 									<td>
-										 ${user.fullName}
-									</td>
-									<td>
-										 ${user.loginName}
+										 <c:out value="${user.fullName}" escapeXml="true"/>
 									</td>
 									<td style="text-align: center; font-weight: bold;">
 										<c:choose>

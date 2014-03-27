@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${daco.title}" escapeXml="false" />
+			<c:out value="${daco.title}" escapeXml="true" />
 		</td>
 	</tr>
 

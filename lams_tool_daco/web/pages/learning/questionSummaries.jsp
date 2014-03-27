@@ -26,11 +26,11 @@
 	<table>
 		<tr>
 			<td>
-			<h1>${daco.title}</h1>
+			<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
 			</td>
 		</tr>
 		<tr>
-			<td>${daco.instructions}</td>
+			<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
 		</tr>
 	</table>
 </c:if>
@@ -47,7 +47,7 @@
 				<fmt:message key="label.learning.tableheader.summary.learner" />
 			</c:when>
 			<c:otherwise>
-				${userFullName}
+				<c:out value="${userFullName}" escapeXml="true"/>
 			</c:otherwise>
 		</c:choose>
 		</th>
@@ -69,7 +69,7 @@
 		<tr>
 			<td>
 				<div class="bigNumber">${questionStatus.index+1}</div>
-				${question.description}
+				<c:out value="${question.description}" escapeXml="false"/>
 				<div class="hint">
 					<c:choose>
 						<c:when test="${question.summary==1}">

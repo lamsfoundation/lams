@@ -24,11 +24,11 @@
 <table>
 	<tr>
 		<td>
-		<h1>${daco.title}</h1>
+		<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
 		</td>
 	</tr>
 	<tr>
-		<td>${daco.instructions}</td>
+		<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
 	</tr>
 </table>
 <c:if test="${not finishedLock }">
@@ -65,7 +65,7 @@
 				<tr>
 					<td>
 					<div class="bigNumber">${questionStatus.index+1}</div>
-					${question.description}
+					<c:out value="${question.description}" escapeXml="false"/>
 					<c:choose>
 						<%-- The content varies depending on the question type --%>
 						<c:when test="${question.type==1}"><%-- Single line text --%>
@@ -153,7 +153,7 @@
 							</c:if>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							<%-- It displays for example A) instead of 1) --%>
-							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}">${answerOption.answerOption}</html:radio><br />
+							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></html:radio><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
@@ -165,7 +165,7 @@
 							<html:select property="answer[${answerIndex}]">
 							<html:option value="0"><fmt:message key="label.learning.dropdown.select" /></html:option>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-								<html:option value="${status.index+1}">${answerOption.answerOption}</html:option>
+								<html:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></html:option>
 							</c:forEach>
 							</html:select>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
@@ -179,7 +179,7 @@
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							${fn:substring(ordinal,status.index,status.index+1)})
 							<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}">
-								${answerOption.answerOption}
+								<c:out value="${answerOption.answerOption}" escapeXml="true"/>
 							</input><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />

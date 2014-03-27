@@ -27,14 +27,14 @@
 				<table class="alternative-color" cellspacing="0">
 					<tr>
 						<th class="first">
-							<lams:out value="${daco.reflectInstructions}"/>
+							<lams:out value="${daco.reflectInstructions}" escapeHtml="true"/>
 						</th>
 					</tr>
 					<tr>
 						<td>
 							<c:choose>
 								<c:when test="${not empty user.reflectionEntry}">
-									<lams:out value="${user.reflectionEntry}"/>
+									<lams:out value="${user.reflectionEntry}" escapeHtml="true"/>
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="message.no.reflection.available" />

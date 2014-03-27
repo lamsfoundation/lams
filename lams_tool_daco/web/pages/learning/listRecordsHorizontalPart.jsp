@@ -197,7 +197,7 @@
 																checked="checked"
 																</c:if>
 																>
-																${answerOption.answerOption}</input><br />
+																<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 															</c:forEach>
 														</td>
 													</tr>
@@ -211,7 +211,7 @@
 													<c:otherwise>
 														<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 															<c:if test="${status.index+1==answer.answer}">
-																<fmt:message key="label.learning.dropdown.selected" /> ${answerOption.answerOption}
+																<fmt:message key="label.learning.dropdown.selected" /> <c:out value="${answerOption.answerOption}" escapeXml="true"/>
 															</c:if>
 														</c:forEach>
 													</c:otherwise>
@@ -226,7 +226,7 @@
 																	</td>
 																	<td>
 																</c:if>
-																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">${answerOption.answerOption}</input><br />
+																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 															</c:forEach>
 														</td>
 													</tr>
