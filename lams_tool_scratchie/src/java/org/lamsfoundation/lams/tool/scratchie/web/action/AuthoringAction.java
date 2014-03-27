@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
@@ -130,6 +132,9 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("saveQTI")) {
 	    return saveQTI(mapping, form, request, response);
+	}
+	if (param.equals("exportQTI")) {
+	    return exportQTI(mapping, form, request, response);
 	}
 	if (param.equals("removeItem")) {
 	    return removeItem(mapping, form, request, response);
@@ -530,6 +535,48 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Prepares Scratchie content for QTI packing
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws UnsupportedEncodingException {
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
+	List<Question> questions = new LinkedList<Question>();
+
+	for (ScratchieItem item : itemList) {
+	    Question question = new Question();
+	    
+	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+	    question.setTitle(item.getTitle());
+	    question.setText(item.getDescription());
+	    List<Answer> answers = new ArrayList<Answer>();
+
+	    for (ScratchieAnswer itemAnswer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		Answer answer = new Answer();
+
+		answer.setText(itemAnswer.getDescription());
+		// there is no LAMS interface to adjust, so use the default 1 point 
+		Float score = itemAnswer.isCorrect() ? 1F : 0;
+		answer.setScore(score);
+		// answer order ID is 0-based, but questions is 1-based...
+		answers.add(itemAnswer.getOrderId(), answer);
+	    }
+
+	    question.setAnswers(answers);
+	    questions.add(item.getOrderId() - 1, question);
+	}
+
+	String title = request.getParameter("title");
+	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	exporter.exportQTIPackage(request, response);
+
+	return null;
     }
 
     /**

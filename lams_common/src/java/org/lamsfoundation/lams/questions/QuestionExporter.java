@@ -150,8 +150,12 @@ public class QuestionExporter {
 	    }
 
 	    String targetZipFileName = "lams_qti_" + packageTitle + ".zip";
+	    String zipPath = ZipFileUtil.createZipFile(targetZipFileName, dir.getAbsolutePath(), rootDir);
 
-	    return ZipFileUtil.createZipFile(targetZipFileName, dir.getAbsolutePath(), rootDir);
+	    // remove the directory containing the original sources from file system
+	    FileUtils.deleteDirectory(dir);
+
+	    return zipPath;
 	} catch (Exception e) {
 	    QuestionExporter.log.error("Error while exporti QTI package", e);
 	}
@@ -450,6 +454,7 @@ public class QuestionExporter {
 
     /**
      * Fill the existing template file with current data.
+     * 
      * @return contents of XML template file
      */
     private String createManifest() throws IOException {

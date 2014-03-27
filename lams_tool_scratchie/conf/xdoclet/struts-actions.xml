@@ -72,6 +72,13 @@
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		
+		<action path="/authoring/exportQTI"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			scope="request" 
+			parameter="exportQTI" 
+			validate="false">
+		</action>
+		
 		<action path="/authoring/removeItem"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
 			scope="request" 

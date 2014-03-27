@@ -84,7 +84,7 @@
 	};
 	
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questionFile.jsp?limitType=mc',
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
 	
@@ -99,6 +99,13 @@
 				refreshThickbox();
 			}
 		});
+    }
+    
+    function exportQTI(){
+    	var frame = document.getElementById("downloadFileDummyIframe"),
+    		title = encodeURIComponent(document.getElementsByName("scratchie.title")[0].value);
+    	frame.src = '<html:rewrite page="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />'
+    			+ '&title=' + title;
     }
 </script>
 <!-- Basic Tab Content -->
@@ -136,8 +143,14 @@
 		<a href="${addItemUrl}" class="button-add-item right-buttons thickbox">
 			<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
 		</a>
-		<a href="#" onClick="javascript:importQTI()">
+		<a href="#" onClick="javascript:importQTI()" style="margin-right: 30px">
 			<fmt:message key="label.authoring.import.qti" /> 
+		</a>
+		<a href="#" onClick="javascript:exportQTI()">
+			<fmt:message key="label.authoring.export.qti" />
 		</a>
 	</div>
 </div>
+
+<!-- For exporting QTI packages -->
+<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
