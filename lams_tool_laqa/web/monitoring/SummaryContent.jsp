@@ -1,275 +1,142 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <%@ include file="/common/taglibs.jsp"%>
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
+<div class="instructions">
+	${content.title}
+</div>
 
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-	
-	<tr>
-		<td>
-			<fmt:message key="label.learner.answer" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${content.showOtherAnswers}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+<div class="instructions">
+	${content.instructions}
+</div>
 
-	<tr>
-		<td>
-			<fmt:message key="label.show.names" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${content.usernameVisible}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.allow.rate.answers" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${content.allowRateAnswers}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>	
-	
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>	
-		<td>
-			<c:choose>
-				<c:when test="${content.reflect}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>
-		</td>
-	</tr>
-	 		
-	<c:choose>
-		<c:when test="${content.reflect}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>	
-				<td>
-					${content.reflectionSubject}
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-	
-	<tr>
-		<td>
-			<fmt:message key="radiobox.questionsSequenced" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${content.questionsSequenced}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.lockWhenFinished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${content.lockWhenFinished}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.allowRichEditor" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${content.allowRichEditor}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+<c:if test="${empty listAllGroupsDTO}">
+	<div align="center">
+		<b> <fmt:message key="error.noLearnerActivity"/> </b>
+	</div>
+</c:if>
 
-	<tr>
-		<td>
-			<fmt:message key="label.use.select.leader.tool.output" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${content.useSelectLeaderToolOuput}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+<c:if test="${content.useSelectLeaderToolOuput && not empty listAllGroupsDTO}">
+	<div class="info">
+		<fmt:message key="label.info.use.select.leader.outputs" />
+	</div>
+</c:if>
 
-</table>
-</div>	
+<c:forEach var="groupDto" items="${listAllGroupsDTO}">
+	<c:set var="sessionId" scope="request" value="${groupDto.sessionId}"/>
+	<c:set var="sessionName" scope="request" value="${groupDto.sessionName}"/>
+	<c:set var="groupData" scope="request" value="${groupDto.groupData}"/>
+			  	 		
+	<c:if test="${isGroupedActivity}">
+		<h1 class="group-name-title">
+			<fmt:message key="group.label" />: <c:out value="${sessionName}"/>
+		</h1>
+	</c:if>
 
-	<%@include file="dateRestriction.jsp"%>
+	<c:forEach var="currentDto" items="${groupData}">
+		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 		
-	<html:hidden property="responseId"/>	 
-	<html:hidden property="sessionId"/>	 
-	
-	
-		<c:if test="${(qaGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
-			<c:if test="${notebookEntriesExist != 'true' }"> 			
-				<table class="forms">
-					<tr> 
-						<td NOWRAP valign=top align=center> 
-							<b> <fmt:message key="error.noLearnerActivity"/> </b>
-						</td> 
-					<tr>
-				</table>
-			</c:if>							
-		</c:if>			
+		<div class="tablesorter-container">
+		<div class="question-title">
+			<c:out value="${currentDto.question}" escapeXml="false"/>
+		</div>	
 		
+		<table class="tablesorter">	
+		
+			<thead>
+				<tr>
+					<th title="<fmt:message key='label.sort.by.answer'/>" >
+						<fmt:message key="label.learning.answer" />
+					</th>
 					
-		<c:if test="${(qaGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }"> 	
-		
-				<table class="forms">
-					<tr> 
-						<td NOWRAP valign=top align=center> 
-							<b> <fmt:message key="label.learners.answers"/> </b>
-						</td> 
-					<tr>
-				</table>
-		
-		
-			<html:hidden property="selectedToolSessionId"/>							
-			<input type="hidden" name="isToolSessionChanged"/>
-				<table class="forms">
-				
-				<c:if test="${fn:length(requestScope.summaryToolSessions) > 2 }">
-					<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
-
-					<c:if test="${(generalLearnerFlowDTO.requestLearningReport != 'true')}"> 	
-						<tr> 
-							<td NOWRAP width="60" valign=top align=center> <b> <fmt:message key="label.selectGroup"/> </b>
-								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-									<c:forEach var="toolSessionName" items="${requestScope.summaryToolSessions}">
-										<c:forEach var="toolSessionId" items="${requestScope.summaryToolSessionsId}">
-											<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-										
-												<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
-											
-													<c:set var="SELECTED_SESSION" scope="request" value=""/>
-													<c:if test="${requestScope.selectionCase == 2}"> 			
-														<c:set var="currentMonitoredToolSession" scope="request" value="All"/>
-													</c:if>						
-													
-													<c:if test="${toolSessionId.value == requestScope.currentMonitoredToolSession}"> 			
-															<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-													</c:if>						
-													
-													<c:if test="${toolSessionId.value != 'All'}"> 		
-														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-													</c:if>						
-													
-													<c:if test="${toolSessionId.value == 'All'}"> 	
-														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-													</c:if>						
-											</c:if>							
-										</c:forEach>		  	
-									</c:forEach>		  	
-								</select>
-							</td> 
-						<tr>
+					<c:if test="${content.allowRateAnswers}">
+						<th title="<fmt:message key='label.sort.by.rating'/>" width="19%">
+							<fmt:message key="label.learning.rating" />
+						</th>
 					</c:if>
-				</c:if>			
+				</tr>
+			</thead>
+			
+			<tbody>
 
-			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
-					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />					
-			</c:if> 	    	  
+		  		<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+					<c:forEach var="sData" items="${questionAttemptData.value}">
+						<c:set var="userData" scope="request" value="${sData.value}"/>
+						<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+						<c:set var="userSessionId" scope="request" value="${userData.sessionId}"/>
+								  	 		
+	  	 				<c:if test="${(sessionId == userSessionId) && (currentQuestionId == userData.questionUid)}"> 											  	 		
 
-			<c:if test="${currentMonitoredToolSession == 'All'}"> 							
-					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />								
-					
-					<jsp:include page="/monitoring/Reflections.jsp" />										
-			</c:if> 	    	  
-		
-			</table>  	
-		</c:if>						
-		
-			<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
-						<jsp:include page="/monitoring/Reflections.jsp" />
-			</c:if>						
-		
-		
-
-
-
+							<tr> 
+								<td id="td-response-${responseUid}" valign=top <c:if test="${userData.visible != 'true' }">class="hidden"</c:if>>  
+									<c:out value="${userData.userName}"/> <lams:Date value="${userData.attemptTime}"/>
 	
+				   					<div class="float-right" valign=top>
+										<a href="#nogo" title="<fmt:message key='label.tooltip.edit'/>" class="image-link"
+												onclick="javascript:editResponse(${userData.uid});">
+									    	<img src="<c:out value="${tool}"/>images/edit.gif" border="0">
+										</a>
+				   						
+				   						<c:choose>
+				   							<c:when test="${userData.visible == 'true'}">
+												<a href='#nogo' title="<fmt:message key='label.hide'/>" class="image-link"
+														onclick="changeResponseVisibility(this, ${responseUid}, true);">						                                             
+													<img src="<c:out value="${tool}"/>images/display-eye.png" border="0">
+												</a>				   							
+				   							</c:when>
+				   							<c:otherwise>
+												<a href='#nogo' title="<fmt:message key='label.show'/>" 
+														onclick="changeResponseVisibility(this, ${responseUid}, false);">						                                             
+													<img src="<c:out value="${tool}"/>images/hidden-eye.png" border="0">
+												 </a>				   							
+				   							</c:otherwise>
+				   						</c:choose>																
+									</div>
+									 
+								 	<br>
+										
+									<span id="response-${responseUid}"><c:out value="${userData.response}" escapeXml="false"/></span>
+								</td>
+								
+								<c:if test="${content.allowRateAnswers}">
+									<td>
+										<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
+									</td>
+								</c:if>								
+							</tr>
+						</c:if>										  					 									  													  														
+
+	 				</c:forEach>		  	
+				</c:forEach>
+			</tbody>
+		</table>
+		
+		<!-- pager -->
+		<div class="pager">
+			<form>
+				<img class="tablesorter-first"/>
+				<img class="tablesorter-prev"/>
+				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+				<img class="tablesorter-next"/>
+				<img class="tablesorter-last"/>
+				<select class="pagesize">
+					<option selected="selected" value="10">10</option>
+					<option value="20">20</option>
+					<option value="30">30</option>
+					<option value="40">40</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
+				</select>
+			</form>
+		</div>
+		</div>
+		
+	</c:forEach>
+			  	
+</c:forEach>
+		
+<c:if test="${content.reflect && not empty reflectionsContainerDTO}"> 							
+	<jsp:include page="/monitoring/Reflections.jsp" />
+</c:if>
+
+<%@include file="AdvanceOptions.jsp"%>
+
+<%@include file="dateRestriction.jsp"%>
