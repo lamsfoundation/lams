@@ -24,8 +24,6 @@
             
             initEditor("Title");
             initEditor("Instructions");
-            initEditor("OnlineInstruction");
-            initEditor("OfflineInstruction");
             
         }     
         
