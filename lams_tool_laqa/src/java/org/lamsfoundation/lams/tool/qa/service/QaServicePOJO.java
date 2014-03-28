@@ -494,21 +494,27 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    "Exception occured when lams is deleting" + " the resp: " + e.getMessage(), e);
 	}
     }
-
-    /**
-     * logs hiding of a user entered vote
-     */
-    public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException {
-	auditService.logHideEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(), qaUsrResp.getQaQueUser()
-		.getUsername(), qaUsrResp.getAnswer());
-    }
-
-    /**
-     * logs showing of a user entered vote
-     */
-    public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException {
-	auditService.logShowEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(), qaUsrResp.getQaQueUser()
-		.getUsername(), qaUsrResp.getAnswer());
+    
+    @Override
+    public void updateResponseVisibility(Long responseUid, boolean isHideItem) {
+	
+	QaUsrResp response = getResponseById(responseUid);
+	if (response != null) {
+	    // createBy should be null for system default value.
+	    Long userId = 0L;
+	    String loginName = "No user";
+	    if (response.getQaQueUser() != null) {
+		userId = response.getQaQueUser().getQueUsrId();
+		loginName = response.getQaQueUser().getUsername();
+	    }
+	    if (isHideItem) {
+		auditService.logHideEntry(QaAppConstants.MY_SIGNATURE, userId, loginName, response.getAnswer());
+	    } else {
+		auditService.logShowEntry(QaAppConstants.MY_SIGNATURE, userId, loginName, response.getAnswer());
+	    }
+	    response.setVisible(!isHideItem);
+	    updateUserResponse(response);
+	}
     }
 
     public int getTotalNumberOfUsers(QaContent qa) {
@@ -744,8 +750,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    // all users mode
 	    for (QaSession session : sessions) {
 
-		for (Iterator userIter = session.getQaQueUsers().iterator(); userIter.hasNext();) {
-		    QaQueUsr user = (QaQueUsr) userIter.next();
+		for (QaQueUsr user : (Set<QaQueUsr>) session.getQaQueUsers()) {
 
 		    NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
 			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
@@ -757,6 +762,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			reflectionDTO.setSessionId(session.getQaSessionId().toString());
 			reflectionDTO.setUserName(user.getFullname());
 			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry.getLastModified()
+				: notebookEntry.getCreateDate();
+			reflectionDTO.setDate(postedDate);
 			String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
 			reflectionDTO.setEntry(notebookEntryPresentable);
 			reflectionDTOs.add(reflectionDTO);
@@ -767,8 +775,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    // single user mode
 	    for (QaSession session : sessions) {
 
-		for (Iterator userIter = session.getQaQueUsers().iterator(); userIter.hasNext();) {
-		    QaQueUsr user = (QaQueUsr) userIter.next();
+		for (QaQueUsr user : (Set<QaQueUsr>) session.getQaQueUsers()) {
 
 		    if (user.getQueUsrId().toString().equals(userID)) {
 			NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
@@ -781,6 +788,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			    reflectionDTO.setSessionId(session.getQaSessionId().toString());
 			    reflectionDTO.setUserName(user.getFullname());
 			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry
+				    .getLastModified() : notebookEntry.getCreateDate();
+			    reflectionDTO.setDate(postedDate);
 			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
 			    reflectionDTO.setEntry(notebookEntryPresentable);
 			    reflectionDTOs.add(reflectionDTO);

@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
+<c:if test="${(generalLearnerFlowDTO.allowRateAnswers == 'true') || content.allowRateAnswers}">
 	<div class="rating-stars-div">
 		<div class="rating-stars-disabled" data-average="${userData.averageRating}" data-id="${responseUid}"></div>
 		<div class="rating-stars-caption">

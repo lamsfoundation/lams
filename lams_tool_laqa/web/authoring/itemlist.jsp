@@ -28,9 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			style="display:none" id="resourceListArea_Busy" />
 	</h2>
 
-	<c:set var="formBean"
-		value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 	<table id="itemTable" class="alternative-color">
 		<c:set var="queIndex" scope="request" value="0" />

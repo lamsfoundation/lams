@@ -1,25 +1,4 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -56,8 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 		<h1>${generalLearnerFlowDTO.activityInstructions} </h1>
 
-		<c:if
-			test="${(userExceptionNoToolSessions == 'true') and (portfolioExportMode != 'learner')}">
+		<c:if test="${(portfolioExportMode != 'learner') && !isToolSessionAvailable}">
 			<p>
 				<fmt:message key="error.noLearnerActivity" />
 			</p>
@@ -65,12 +43,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<!-- LEARNER EXPORT -->
 
-		<c:if test="${(userExceptionNoToolSessions != 'true') }">
+		<c:if test="${isToolSessionAvailable}">
 
 			<c:if test="${(portfolioExportMode == 'learner')}">
 
-				<c:forEach var="currentDto"
-					items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+				<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
 
 					<div>
 						<p>
@@ -98,14 +75,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</th>
 							</tr>
 
-							<c:forEach var="questionAttemptData"
-								items="${currentDto.questionAttempts}">
+							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 
 								<c:forEach var="sData" items="${questionAttemptData.value}">
 
 									<c:set var="userData" scope="request" value="${sData.value}" />
-									<c:set var="responseUid" scope="request"
-										value="${userData.uid}" />
+									<c:set var="responseUid" scope="request" value="${userData.uid}" />
 
 									<c:if test="${currentDto.questionUid == userData.questionUid}">
 
@@ -146,12 +121,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${(portfolioExportMode != 'learner')}">
 
 				<c:forEach var="groupDto" items="${listAllGroupsDTO}">
-					<c:set var="sessionId" scope="request"
-						value="${groupDto.sessionId}" />
-					<c:set var="sessionName" scope="request"
-						value="${groupDto.sessionName}" />
-					<c:set var="groupData" scope="request"
-						value="${groupDto.groupData}" />
+					<c:set var="sessionId" scope="request" value="${groupDto.sessionId}" />
+					<c:set var="sessionName" scope="request" value="${groupDto.sessionName}" />
+					<c:set var="groupData" scope="request" value="${groupDto.groupData}" />
 
 					<h2>
 						<fmt:message key="group.label" />
@@ -182,14 +154,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</th>
 							</tr>
 
-							<c:forEach var="questionAttemptData"
-								items="${currentDto.questionAttempts}">
+							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 								<c:forEach var="sData" items="${questionAttemptData.value}">
 									<c:set var="userData" scope="request" value="${sData.value}" />
-									<c:set var="responseUid" scope="request"
-										value="${userData.uid}" />
-									<c:set var="userSessionId" scope="request"
-										value="${userData.sessionId}" />
+									<c:set var="responseUid" scope="request" value="${userData.uid}" />
+									<c:set var="userSessionId" scope="request" value="${userData.sessionId}" />
 
 									<c:if test="${sessionId == userSessionId}">
 										<c:if test="${currentDto.questionUid == userData.questionUid}">
@@ -232,13 +201,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:forEach var="currentDto" items="${reflectionsContainerDTO}">
 
 					<%-- The actual output of a reflection --%>
-					<c:set var="userName" scope="request"
-						value="${currentDto.userName}" />
+					<c:set var="userName" scope="request" value="${currentDto.userName}" />
 					<c:set var="userId" scope="request" value="${currentDto.userId}" />
-					<c:set var="sessionId" scope="request"
-						value="${currentDto.sessionId}" />
-					<c:set var="reflectionUid" scope="request"
-						value="${currentDto.reflectionUid}" />
+					<c:set var="sessionId" scope="request" value="${currentDto.sessionId}" />
+					<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}" />
 					<c:set var="entry" scope="request" value="${currentDto.entry}" />
 
 					<h4>

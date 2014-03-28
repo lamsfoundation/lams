@@ -980,46 +980,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * calls monitoring action summary screen generation ActionForward
-     * getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest
-     * request, HttpServletResponse response) throws IOException,
-     * ServletException
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	return qaMonitoringAction.getSummary(mapping, form, request, response);
-    }
-
-    /**
-     * calls monitoring action instructions screen generation ActionForward
-     * getInstructions(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws
-     * IOException, ServletException
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward getInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	return qaMonitoringAction.getInstructions(mapping, form, request, response);
-    }
-
-    /**
      * calls monitoring action stats screen generation
      * 
      * ActionForward getStats(ActionMapping mapping, ActionForm form,

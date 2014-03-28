@@ -60,20 +60,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
-	String basePath =WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 	    learner(request, response, directoryName, cookies);
 	} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
 	    teacher(request, response, directoryName, cookies);
 	}
-	
+
 	// Attempting to export required images
 	try {
 	    QaBundler qaBundler = new QaBundler();
 	    qaBundler.bundle(request, cookies, directoryName);
-	    
+
 	} catch (Exception e) {
 	    logger.error("Could not export Q&A javascript files, some files may be missing in export portfolio", e);
 	}
@@ -95,7 +94,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	QaSession qaSession = qaService.getSessionById(toolSessionID.longValue());
 
 	// If the learner hasn't answered yet, then they won't exist in the session.
-	// Yet we might be asked for their page, as the activity has been commenced. 
+	// Yet we might be asked for their page, as the activity has been commenced.
 	// So need to do a "blank" page in that case
 	QaQueUsr learner = qaService.getUserByIdAndSession(userID, qaSession.getQaSessionId());
 	QaContent content = qaSession.getQaContent();
@@ -106,26 +105,24 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    throw new QaApplicationException(error);
 	}
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-
-	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
-	generalLearnerFlowDTO.setUserUid(learner != null ? learner.getQueUsrId().toString() : null);
-
 	// if learner is null, don't want to show other people's answers
 	if (learner != null) {
-	    qaMonitoringAction
-		    .refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID
-			    .toString(), userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
+	    boolean isNoToolSessions = qaService.isStudentActivityOccurredGlobal(content);
+	    request.getSession().setAttribute(QaAppConstants.IS_TOOL_SESSION_AVAILABLE, isNoToolSessions);
+
+	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
+	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, content, qaService,
+		    content.isUsernameVisible(), true, toolSessionID.toString(), userID.toString());
+	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
+	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
+	    generalLearnerFlowDTO.setUserUid(userID.toString());
+	    request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+
+	    MonitoringUtil.setUpMonitoring(request, qaService, content);
 
 	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
-	    request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 	    request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 	}
-
-	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
-
-	//for the special case of export portfolio we place generalLearnerFlowDTO into session scope
-	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
     }
@@ -147,22 +144,22 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    throw new QaApplicationException(error);
 	}
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
-	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null,
-		generalLearnerFlowDTO, false, "All");
-	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
+	boolean isToolSessionAvailable = qaService.isStudentActivityOccurredGlobal(content);
+	request.getSession().setAttribute(QaAppConstants.IS_TOOL_SESSION_AVAILABLE, isToolSessionAvailable);
 
+	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+
+	MonitoringUtil.setUpMonitoring(request, qaService, content);
+
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 
 	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
-	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 	request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	request.setAttribute("currentMonitoredToolSession", "All");
-	
-	//generateGroupsSessionData
+
+	// generateGroupsSessionData
 	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(request, content, qaService);
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 	request.getSession().setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);

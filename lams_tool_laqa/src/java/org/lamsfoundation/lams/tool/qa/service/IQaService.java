@@ -163,9 +163,7 @@ public interface IQaService {
 
     void createQa(QaContent qa) throws QaApplicationException;
 
-    void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
-
-    void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
+    void updateResponseVisibility(Long responseUid, boolean visible);
 
     QaContent retrieveQaBySession(long qaSessionId) throws QaApplicationException;
 

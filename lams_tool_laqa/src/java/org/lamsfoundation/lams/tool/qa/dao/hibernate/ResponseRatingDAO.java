@@ -29,7 +29,6 @@ import java.util.Locale;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;

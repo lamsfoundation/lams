@@ -159,11 +159,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
  * @author Ozgur Demirtas
  */
 public class QaStarterAction extends Action implements QaAppConstants {
-    static Logger logger = Logger.getLogger(QaStarterAction.class.getName());
+    private static Logger logger = Logger.getLogger(QaStarterAction.class.getName());
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,

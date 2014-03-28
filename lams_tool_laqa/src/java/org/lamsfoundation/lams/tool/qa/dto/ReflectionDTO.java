@@ -23,6 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dto;
 
+import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -42,6 +44,8 @@ public class ReflectionDTO implements Comparable {
     protected String reflectionUid;
 
     protected String entry;
+    
+    protected Date date;
 
     public int compareTo(Object o) {
 	ReflectionDTO reflectionDTO = (ReflectionDTO) o;
@@ -130,5 +134,13 @@ public class ReflectionDTO implements Comparable {
      */
     public void setUserName(String userName) {
 	this.userName = userName;
+    }
+    
+    public Date getDate() {
+	return date;
+    }
+
+    public void setDate(Date date) {
+	this.date = date;
     }
 }

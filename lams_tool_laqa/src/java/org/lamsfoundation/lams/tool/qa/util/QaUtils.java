@@ -215,7 +215,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(LEARNING_STARTER);
 	request.getSession().removeAttribute(MONITORING_STARTER);
 	request.getSession().removeAttribute(LOAD_MONITORING);
-	request.getSession().removeAttribute(EDIT_RESPONSE);
 	request.getSession().removeAttribute(EDITABLE_RESPONSE_ID);
 	request.getSession().removeAttribute(COPY_TOOL_CONTENT);
 	request.getSession().removeAttribute(DEFAULT_CONTENT_ID_STR);
@@ -228,7 +227,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(IS_ADD_QUESTION);
 	request.getSession().removeAttribute(IS_REMOVE_QUESTION);
 	request.getSession().removeAttribute(IS_REMOVE_CONTENT);
-	request.getSession().removeAttribute(SELECTION_CASE);
 	request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
 	request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
 	request.getSession().removeAttribute(END_LEARNING_MESSSAGE);
@@ -245,11 +243,9 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(MAX_TOOL_SESSION_COUNT.toString());
 	request.getSession().removeAttribute(IS_TOOL_SESSION_CHANGED);
 	request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
-	request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
 	request.getSession().removeAttribute(COUNT_ALL_USERS);
 	request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
 	request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS);
-	request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS_ID);
 	request.getSession().removeAttribute(MODE);
 	request.getSession().removeAttribute(LEARNER);
 	request.getSession().removeAttribute(TEACHER);
@@ -363,17 +359,6 @@ public abstract class QaUtils implements QaAppConstants {
 	} else {
 	    //request is from an unknown source. return null
 	    return null;
-	}
-    }
-
-    public static void setDefineLater(HttpServletRequest request, boolean value, IQaService qaService,
-	    String toolContentID) {
-
-	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
-	
-	if (qaContent != null) {
-	    qaContent.setDefineLater(value);
-	    qaService.updateQa(qaContent);
 	}
     }
 

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Monitoring environment */
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
@@ -37,10 +36,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants {
     //controls which method is called by the Lookup map */
     protected String method;
-    protected String selectedToolSessionId;
-    protected String isToolSessionChanged;
 
-    protected String editResponse;
     protected String hideResponse;
     protected String showResponse;
     protected String currentUid;
@@ -48,29 +44,6 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
     protected String sessionId;
 
     protected IQaService qaService;
-
-    public String toString() {
-	super.toString();
-	return new ToStringBuilder(this).append("Listing current QaMonitoringForm properties: ").append("method: ",
-		method).append("selectedToolSessionId: ", selectedToolSessionId).append("isToolSessionChanged: ",
-		isToolSessionChanged).append("editResponse: ", editResponse).append("hideResponse: ", hideResponse)
-		.append("showResponse: ", showResponse).append("currentUid: ", currentUid).toString();
-    }
-
-    /**
-     * @return Returns the editResponse.
-     */
-    public String getEditResponse() {
-	return editResponse;
-    }
-
-    /**
-     * @param editResponse
-     *                The editResponse to set.
-     */
-    public void setEditResponse(String editResponse) {
-	this.editResponse = editResponse;
-    }
 
     /**
      * @return Returns the qaService.
@@ -130,36 +103,6 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
      */
     public void setShowResponse(String showResponse) {
 	this.showResponse = showResponse;
-    }
-
-    /**
-     * @return Returns the isToolSessionChanged.
-     */
-    public String getIsToolSessionChanged() {
-	return isToolSessionChanged;
-    }
-
-    /**
-     * @param isToolSessionChanged
-     *                The isToolSessionChanged to set.
-     */
-    public void setIsToolSessionChanged(String isToolSessionChanged) {
-	this.isToolSessionChanged = isToolSessionChanged;
-    }
-
-    /**
-     * @return Returns the selectedToolSessionId.
-     */
-    public String getSelectedToolSessionId() {
-	return selectedToolSessionId;
-    }
-
-    /**
-     * @param selectedToolSessionId
-     *                The selectedToolSessionId to set.
-     */
-    public void setSelectedToolSessionId(String selectedToolSessionId) {
-	this.selectedToolSessionId = selectedToolSessionId;
     }
 
     /**

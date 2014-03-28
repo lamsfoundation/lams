@@ -84,7 +84,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * removed by: QaUtils.cleanupSession(request)
  * 
  */
-
 public class QaLearningStarterAction extends Action implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
     
@@ -278,13 +277,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    /* the report should have the all entries for the users in this tool session,
 	     * and display under the "my answers" section the answers for the user id in the url */
 	    Long learnerProgressUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 
-	    qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, qaContent.isUsernameVisible(), true,
-		    toolSessionID, userId.toString(), generalLearnerFlowDTO, false, toolSessionID);
+	    QaLearningAction.refreshSummaryData(request, qaContent, qaService, qaContent.isUsernameVisible(),
+		    toolSessionID, userId.toString(), generalLearnerFlowDTO);
 
 	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 	}
@@ -329,8 +327,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    // the learner is in the same session and has already responsed to this content
 
 		    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(qaContent.isLockWhenFinished()).toString());
-
-		    QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 		    /*
 		     * the report should have all the users' entries OR the report should have only the current
 		     * session's entries
@@ -338,8 +334,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
 		    boolean isUserNamesVisible = qaContent.isUsernameVisible();
-		    qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true,
-			    currentToolSessionID.toString(), userId.toString(), generalLearnerFlowDTO, false, toolSessionID);
+		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible,
+			    currentToolSessionID.toString(), userId.toString(), generalLearnerFlowDTO);
 
 		    if (qaUser.isLearnerFinished()) {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());

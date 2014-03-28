@@ -19,85 +19,13 @@ USA
 http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-/**
- * @author Ozgur Demirtas
- * 
- <action
- path="/learning"
- type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
- name="QaLearningForm"
- scope="request"
- input="/learning/AnswersContent.jsp"
- parameter="method"
- unknown="false"
- validate="false">
-
- <forward
- name="loadLearner"
- path="/learning/AnswersContent.jsp"	        
- redirect="false"
- />
-
- <forward
- name="loadMonitoring"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="refreshMonitoring"
- path="/monitoring/MonitoringMaincontent.jsp"
- redirect="false"
- />
-
- <forward
- name="learningStarter"
- path="/learningIndex.jsp"
- redirect="false"
- />
-
- <forward
- name="individualLearnerRep"
- path="/learning/LearnerRep.jsp"
- redirect="false"
- />
-
-
- <forward
- name="learnerRep"
- path="/monitoring/LearnerRep.jsp"
- redirect="false"
- />
-
- <forward
- name="individualLearnerResults"
- path="/learning/IndividualLearnerResults.jsp"
- redirect="false"
- />
-
-
- <forward
- name="viewAllResults"
- path="/learning/AllResults.jsp"
- redirect="false"
- />
-
- <forward
- name="notebook"
- path="/learning/Notebook.jsp"
- redirect="false"
- />   
-
- </action>
-
- * 
- */
 
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -140,8 +68,11 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
+/**
+ * @author Ozgur Demirtas
+ */
 public class QaLearningAction extends LamsDispatchAction implements QaAppConstants {
-    static Logger logger = Logger.getLogger(QaLearningAction.class.getName());
+    private static Logger logger = Logger.getLogger(QaLearningAction.class.getName());
 
     private static IQaService qaService;
 
@@ -425,9 +356,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    QaLearningForm qaLearningForm, String toolSessionID, String userID, QaSession qaSession,
 	    QaContent qaContent, GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean isUserNamesVisible) {
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
-		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
+	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible,
+		toolSessionID, userID, generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
@@ -499,8 +429,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
-	String toolContentID = qaSession.getQaContent().getQaContentId().toString();
-
 	QaContent qaContent = qaSession.getQaContent();
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
@@ -513,17 +441,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.setHttpSessionID(httpSessionID);
 	generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
-
 	/*recreate the users and responses*/
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
-		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
+	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible,
+		toolSessionID, userID, generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
@@ -863,9 +786,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	Boolean isUserNamesVisibleBoolean = new Boolean(qaContent.isUsernameVisible());
 	boolean isUserNamesVisible = isUserNamesVisibleBoolean.booleanValue();
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	qaMonitoringAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible, true,
-		toolSessionID, userID, generalLearnerFlowDTO, false, toolSessionID);
+	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, isUserNamesVisible,
+		toolSessionID, userID, generalLearnerFlowDTO);
 
 	int sessionUserCount = 0;
 	if (qaSession.getQaQueUsers() != null) {
@@ -999,6 +921,39 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.resetAll();
 	return (mapping.findForward(QaAppConstants.NOTEBOOK));
     }
+    
+    /**
+     * populates data for summary screen, view all results screen and export
+     * portfolio.
+     * 
+     * User id is needed if isUserNamesVisible is false && learnerRequest is
+     * true, as it is required to work out if the data being analysed is the
+     * current user.
+     * 
+     * @param request
+     * @param qaContent
+     * @param qaService
+     * @param isUserNamesVisible
+     * @param isLearnerRequest
+     * @param userId
+     */
+    public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
+	    boolean isUserNamesVisible, String sessionId, String userId,
+	    GeneralLearnerFlowDTO generalLearnerFlowDTO) {
+
+	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService,
+		isUserNamesVisible, true, sessionId, userId);
+
+	if (generalLearnerFlowDTO != null) {
+	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
+	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
+	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	}
+
+	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
+    }
+
+
 
     private void initializeQAService() {
 	if (QaLearningAction.qaService == null) {

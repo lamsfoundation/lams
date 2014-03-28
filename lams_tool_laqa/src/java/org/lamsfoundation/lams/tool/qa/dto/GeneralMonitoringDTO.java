@@ -23,209 +23,198 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dto;
 
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds learner flow decision properties and some other view-only properties
+ * <p>
+ * DTO that holds learner flow decision properties and some other view-only properties
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class GeneralMonitoringDTO implements Comparable
-{
-    protected String userExceptionNoToolSessions;
+public class GeneralMonitoringDTO implements Comparable {
     protected String userExceptionNoStudentActivity;
     protected String userExceptionContentInUse;
     protected String monitoredContentInUse;
-    
+
     protected String defineLaterInEditMode;
-    
+
     protected String countAllUsers;
     protected String countSessionComplete;
-    
+
     protected String activityTitle;
     protected String activityInstructions;
-    
-    protected String editResponse;
-    
+
     protected String defaultQuestionContent;
-    
+
     protected String contentFolderID;
-    
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-            .append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
-            .append("userExceptionContentInUse: ", userExceptionContentInUse)
-            .append("defineLaterInEditMode: ", defineLaterInEditMode)
-            .append("monitoredContentInUse: ", monitoredContentInUse)
-            .append("activityTitle: ", activityTitle)
-            .append("activityInstructions: ", activityInstructions)
-            .append("editResponse: ", editResponse)
-            .append("defaultQuestionContent: ", defaultQuestionContent)
-            .append("countAllUsers: ", countAllUsers)
-            .append("countSessionComplete: ", countSessionComplete)      
-            .toString();
+
+    public String toString() {
+	return new ToStringBuilder(this).append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
+		.append("userExceptionContentInUse: ", userExceptionContentInUse)
+		.append("defineLaterInEditMode: ", defineLaterInEditMode)
+		.append("monitoredContentInUse: ", monitoredContentInUse).append("activityTitle: ", activityTitle)
+		.append("activityInstructions: ", activityInstructions)
+		.append("defaultQuestionContent: ", defaultQuestionContent).append("countAllUsers: ", countAllUsers)
+		.append("countSessionComplete: ", countSessionComplete).toString();
     }
 
-	public int compareTo(Object o)
-    {
-	    GeneralMonitoringDTO generalMonitoringDTO = (GeneralMonitoringDTO) o;
-     
-        if (generalMonitoringDTO == null)
-        	return 1;
-		else
-			return 0;
+    public int compareTo(Object o) {
+	GeneralMonitoringDTO generalMonitoringDTO = (GeneralMonitoringDTO) o;
+
+	if (generalMonitoringDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
 
-	
     /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
-        return defineLaterInEditMode;
+	return defineLaterInEditMode;
     }
+
     /**
-     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     * @param defineLaterInEditMode
+     *            The defineLaterInEditMode to set.
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-        this.defineLaterInEditMode = defineLaterInEditMode;
+	this.defineLaterInEditMode = defineLaterInEditMode;
     }
+
     /**
      * @return Returns the monitoredContentInUse.
      */
     public String getMonitoredContentInUse() {
-        return monitoredContentInUse;
+	return monitoredContentInUse;
     }
+
     /**
-     * @param monitoredContentInUse The monitoredContentInUse to set.
+     * @param monitoredContentInUse
+     *            The monitoredContentInUse to set.
      */
     public void setMonitoredContentInUse(String monitoredContentInUse) {
-        this.monitoredContentInUse = monitoredContentInUse;
+	this.monitoredContentInUse = monitoredContentInUse;
     }
+
     /**
      * @return Returns the userExceptionContentInUse.
      */
     public String getUserExceptionContentInUse() {
-        return userExceptionContentInUse;
+	return userExceptionContentInUse;
     }
+
     /**
-     * @param userExceptionContentInUse The userExceptionContentInUse to set.
+     * @param userExceptionContentInUse
+     *            The userExceptionContentInUse to set.
      */
     public void setUserExceptionContentInUse(String userExceptionContentInUse) {
-        this.userExceptionContentInUse = userExceptionContentInUse;
+	this.userExceptionContentInUse = userExceptionContentInUse;
     }
-    /**
-     * @return Returns the editResponse.
-     */
-    public String getEditResponse() {
-        return editResponse;
-    }
-    /**
-     * @param editResponse The editResponse to set.
-     */
-    public void setEditResponse(String editResponse) {
-        this.editResponse = editResponse;
-    }
+
     /**
      * @return Returns the defaultQuestionContent.
      */
     public String getDefaultQuestionContent() {
-        return defaultQuestionContent;
+	return defaultQuestionContent;
     }
+
     /**
-     * @param defaultQuestionContent The defaultQuestionContent to set.
+     * @param defaultQuestionContent
+     *            The defaultQuestionContent to set.
      */
     public void setDefaultQuestionContent(String defaultQuestionContent) {
-        this.defaultQuestionContent = defaultQuestionContent;
+	this.defaultQuestionContent = defaultQuestionContent;
     }
+
     /**
      * @return Returns the userExceptionNoStudentActivity.
      */
     public String getUserExceptionNoStudentActivity() {
-        return userExceptionNoStudentActivity;
+	return userExceptionNoStudentActivity;
     }
+
     /**
-     * @param userExceptionNoStudentActivity The userExceptionNoStudentActivity to set.
+     * @param userExceptionNoStudentActivity
+     *            The userExceptionNoStudentActivity to set.
      */
-    public void setUserExceptionNoStudentActivity(
-            String userExceptionNoStudentActivity) {
-        this.userExceptionNoStudentActivity = userExceptionNoStudentActivity;
+    public void setUserExceptionNoStudentActivity(String userExceptionNoStudentActivity) {
+	this.userExceptionNoStudentActivity = userExceptionNoStudentActivity;
     }
+
     /**
      * @return Returns the countAllUsers.
      */
     public String getCountAllUsers() {
-        return countAllUsers;
+	return countAllUsers;
     }
+
     /**
-     * @param countAllUsers The countAllUsers to set.
+     * @param countAllUsers
+     *            The countAllUsers to set.
      */
     public void setCountAllUsers(String countAllUsers) {
-        this.countAllUsers = countAllUsers;
+	this.countAllUsers = countAllUsers;
     }
+
     /**
      * @return Returns the countSessionComplete.
      */
     public String getCountSessionComplete() {
-        return countSessionComplete;
+	return countSessionComplete;
     }
+
     /**
-     * @param countSessionComplete The countSessionComplete to set.
+     * @param countSessionComplete
+     *            The countSessionComplete to set.
      */
     public void setCountSessionComplete(String countSessionComplete) {
-        this.countSessionComplete = countSessionComplete;
+	this.countSessionComplete = countSessionComplete;
     }
-    /**
-     * @return Returns the userExceptionNoToolSessions.
-     */
-    public String getUserExceptionNoToolSessions() {
-        return userExceptionNoToolSessions;
-    }
-    /**
-     * @param userExceptionNoToolSessions The userExceptionNoToolSessions to set.
-     */
-    public void setUserExceptionNoToolSessions(
-            String userExceptionNoToolSessions) {
-        this.userExceptionNoToolSessions = userExceptionNoToolSessions;
-    }
+
     /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
-        return activityInstructions;
+	return activityInstructions;
     }
+
     /**
-     * @param activityInstructions The activityInstructions to set.
+     * @param activityInstructions
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
-        this.activityInstructions = activityInstructions;
+	this.activityInstructions = activityInstructions;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
+
     /**
      * @return Returns the contentFolderID.
      */
     public String getContentFolderID() {
-        return contentFolderID;
+	return contentFolderID;
     }
+
     /**
-     * @param contentFolderID The contentFolderID to set.
+     * @param contentFolderID
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
 }

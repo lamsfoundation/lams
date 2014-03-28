@@ -75,15 +75,6 @@ public class QaUsrResp implements Serializable, Comparable {
     }
 
     public QaUsrResp(String answer, Date attemptTime, String timezone, QaQueContent qaQuestion,
-	    QaQueUsr qaQueUser) {
-	this.answer = answer;
-	this.attemptTime = attemptTime;
-	this.timezone = timezone;
-	this.qaQuestion = qaQuestion;
-	this.qaQueUser = qaQueUser;
-    }
-
-    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQueContent qaQuestion,
 	    QaQueUsr qaQueUser, boolean visible) {
 	this.answer = answer;
 	this.attemptTime = attemptTime;

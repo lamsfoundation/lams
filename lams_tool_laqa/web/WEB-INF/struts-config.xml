@@ -218,12 +218,6 @@
 		  />
 	  	
 	      <forward
-	        name="learnerRep"
-	        path="/monitoring/LearnerRep.jsp"
-		    redirect="false"
-	      />
-
-	      <forward
 	        name="individualLearnerRep"
 	        path="/learning/LearnerRep.jsp"
 		    redirect="false"
@@ -322,15 +316,6 @@
 	        path="/learning/LearnerRep.jsp"
 		    redirect="false"
 	      />
-
-      
-	     <forward
-	        name="learnerRep"
-	        path="/monitoring/LearnerRep.jsp"
-		    redirect="false"
-	      />
-	      
-
 
 	     <forward
 	        name="individualLearnerResults"
@@ -448,12 +433,6 @@
 			path="/monitoring/editQuestionBox.jsp"
 			redirect="false"
 	    />
-	  	
-        <forward
-          name="learnerNotebook"
-          path="/monitoring/LearnerNotebook.jsp"
-          redirect="false"
-        />
 
 	</action>
 	

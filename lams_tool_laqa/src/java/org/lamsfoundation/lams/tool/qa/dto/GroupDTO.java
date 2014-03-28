@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class QaAllGroupsDTO implements Comparable {
+public class GroupDTO implements Comparable {
 
     private String sessionId;
 
@@ -49,9 +49,9 @@ public class QaAllGroupsDTO implements Comparable {
     }
 
     public int compareTo(Object o) {
-	QaAllGroupsDTO qaAllGroupsDTO = (QaAllGroupsDTO) o;
+	GroupDTO groupDTO = (GroupDTO) o;
 
-	if (qaAllGroupsDTO == null)
+	if (groupDTO == null)
 	    return 1;
 	else
 	    return 0;

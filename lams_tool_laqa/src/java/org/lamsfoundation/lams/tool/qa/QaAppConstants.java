@@ -59,8 +59,9 @@ public interface QaAppConstants {
     public static final String LOAD_MONITORING = "refreshMonitoring";
     public static final String SOURCE_QA_STARTER = "sourceQaStarter";
     public static final String LOAD_VIEW_ONLY = "loadViewOnly";
-    public static final String EDIT_RESPONSE = "editResponse";
     public static final String EDITABLE_RESPONSE_ID = "editableResponseId";
+    public static final String RESPONSE_UID = "responseUid";
+    public static final String IS_HIDE_ITEM = "isHideItem";
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String DEFAULT_CONTENT_ID_STR = "defaultContentIdStr";
@@ -70,11 +71,9 @@ public interface QaAppConstants {
     public static final String ENTRY_TEXT = "entryText";
     public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
     public static final String LEARNER_NOTEBOOK = "learnerNotebook";
-    public static final String NOTEBOOK_ENTRIES_EXIST = "notebookEntriesExist";
-    public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST = "noSessionsNotebookEntriesExist";
     public static final String QA_STATS_DTO = "qaStatsDTO";
     public static final String LIST_ALL_GROUPS_DTO = "listAllGroupsDTO";
-    public static final String CURRENT_SESSION_NAME = "currentSessionName";
+    public static final String IS_TOOL_SESSION_AVAILABLE = "isToolSessionAvailable";
 
     public static final String ACTIVE_MODULE = "activeModule";
     public static final String AUTHORING = "authoring";
@@ -123,7 +122,6 @@ public interface QaAppConstants {
     public static final String IS_ADD_QUESTION = "isAddQuestion";
     public static final String IS_REMOVE_QUESTION = "isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT = "isRemoveContent";
-    public static final String SELECTION_CASE = "selectionCase";
 
     /*
      * authoring mode constants
@@ -172,12 +170,10 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTIONS_DUPLICATE = "userExceptionQuestionsDuplicate";
     public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
-    public static final String CURRENT_MONITORED_TOOL_SESSION = "currentMonitoredToolSession";
 
     public static final String COUNT_ALL_USERS = "countAllUsers";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
     public static final String SUMMARY_TOOL_SESSIONS = "summaryToolSessions";
-    public static final String SUMMARY_TOOL_SESSIONS_ID = "summaryToolSessionsId";
     public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
 
     public static final String ACTIVITY_TITLE = "activityTitle";
