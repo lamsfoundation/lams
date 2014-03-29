@@ -35,7 +35,7 @@
 	<div id="content">
 
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 
 		<html:form action="/learning?method=displayMc&validate=false"
@@ -135,7 +135,7 @@
 
 						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
 							<div style="overflow: auto;">
-								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
+								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="true" /> 
 							</div>		
 						</c:if>	
 				</div>

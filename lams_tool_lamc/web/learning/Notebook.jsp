@@ -30,19 +30,19 @@
 		<div id="content">
 
 			<h1>
-				<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+				<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 			</h1>
 
 
 
 			<p>
-				<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
+				<lams:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText"
 				styleClass="text-area">
 				<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-					<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>										
+					<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/>		
 				</c:if>
 			</html:textarea>
 

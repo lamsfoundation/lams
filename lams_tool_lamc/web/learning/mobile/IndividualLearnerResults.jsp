@@ -27,7 +27,7 @@
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 	
@@ -133,7 +133,7 @@
 
 						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
 							<div style="overflow: auto;">
-								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
+								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="true" /> 
 							</div>		
 						</c:if>												
 					

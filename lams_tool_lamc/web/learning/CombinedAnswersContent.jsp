@@ -10,7 +10,7 @@
 <!--options content goes here-->
 
 <p>
-	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" /> 
 </p>
 
 <c:if test="${not empty mcLearnerStarterDTO.submissionDeadline}">

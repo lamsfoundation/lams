@@ -122,7 +122,7 @@
 <div id="content">
 
 	<h1>
-		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 	</h1>
 
 	<html:form styleId="learningForm" action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">

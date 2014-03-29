@@ -113,7 +113,7 @@
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>	
 	</div>
 

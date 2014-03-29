@@ -82,7 +82,7 @@
 
 				<td width="20px">
 					<c:set var="editItemUrl" >
-						<html:rewrite page="/authoring.do"/>?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&reflectionSubject=${mcGeneralAuthoringDTO.reflectionSubject}&KeepThis=true&TB_iframe=true&height=540&width=950&modal=true
+						<html:rewrite page="/authoring.do"/>?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&KeepThis=true&TB_iframe=true&height=540&width=950&modal=true
 					</c:set>
 					<a href="${editItemUrl}" class="thickbox"> 
 						<img src="${tool}images/edit.gif" border="0" title="<fmt:message key='label.tip.editQuestion'/>">

@@ -33,7 +33,7 @@
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"	escapeXml="false" />
+			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"	escapeXml="true" />
 		</h1>
 	</div>
 
@@ -131,7 +131,7 @@
 							<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
 								<c:if test="${(feedbackEntry.value != null) && (feedbackEntry.value != '')}">
 									<div style="overflow: auto;">									  							
-										<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="false" />
+										<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="true" />
 									</div>								
 								</c:if>																			
 							</c:if>
@@ -180,13 +180,13 @@
 									
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection && hasEditRight}">
 				<h2>
-							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
+							<lams:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 				</h2>
 
 				<p>
 					<c:choose>
 						<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-							<c:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/>
+							<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/>
 						</c:when>
 						<c:otherwise>
 							<em><fmt:message key="message.no.reflection.available" /></em>  

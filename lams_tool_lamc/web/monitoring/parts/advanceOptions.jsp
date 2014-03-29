@@ -158,7 +158,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>	
-					${reflectionSubject}
+					<lams:out value="${reflectionSubject}" escapeHtml="true"/>
 				</td>
 			</tr>
 		</c:when>

@@ -22,7 +22,7 @@
 
 	<div id="content">
 		<h1>
-			${content.title}
+			<c:out value="${content.title}" escapeXml="true"/>
 		</h1>
 		
 		<h2>
@@ -36,7 +36,7 @@
 		<div>
 			<c:forEach var="user" items="${groupUsers}" varStatus="status">
 				<div>
-					${user.fullname}
+					<c:out value="${user.fullname}" escapeXml="true"/>
 				</div>
 			</c:forEach>
 		</div>
