@@ -35,7 +35,7 @@
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
-		${content.title}
+		<c:out value="${content.title}" escapeXml="true"/>
 	</h1>
 </div>
 
@@ -45,7 +45,7 @@
 		<fmt:message key="label.group.leader" />
 		<c:choose>
 			<c:when test="${not empty groupLeader}">
-				${groupLeader.firstName} ${groupLeader.lastName}
+				<c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true"/>
 			</c:when>
 			<c:otherwise>
 				<i><fmt:message key="label.no.leader.yet" /></i>
@@ -61,7 +61,7 @@
 		<ul>
 			<c:forEach var="user" items="${groupUsers}" varStatus="status">
 				<li>
-					${user.firstName} ${user.lastName}
+					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</li>
 			</c:forEach>
 		</ul>

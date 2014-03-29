@@ -5,7 +5,7 @@
 
 <html>
 	<lams:head>
-		<title><c:out value="${leaderselectionDTO.title}" escapeXml="false" />
+		<title><c:out value="${leaderselectionDTO.title}" escapeXml="true" />
 		</title>
 		<lams:css localLinkPath="../" />
 	</lams:head>
@@ -15,7 +15,7 @@
 		<div id="content">
 
 			<h1>
-				<c:out value="${leaderselectionDTO.title}" escapeXml="false" />
+				<c:out value="${leaderselectionDTO.title}" escapeXml="true" />
 			</h1>
 
 			<p>
@@ -38,7 +38,7 @@
 						<fmt:message key="heading.leader" /> 
 						<c:choose>
 							<c:when test="${session.groupLeader != null}">
-								${session.groupLeader.firstName} ${session.groupLeader.lastName}
+								<c:out value="${session.groupLeader.firstName} ${session.groupLeader.lastName}" escapeXml="true"/>
 							</c:when>
 							<c:otherwise>
 								<fmt:message key="label.no.leader.yet" />

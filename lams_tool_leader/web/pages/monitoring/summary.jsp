@@ -26,7 +26,7 @@
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
 				<td width="30%" style="padding: 5px 0;">
-					${user.firstName} ${user.lastName}
+					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</td>
 				<td width="70%">
 					<c:choose>

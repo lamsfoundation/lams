@@ -54,7 +54,7 @@
 						<c:forEach var="user" items="${session.userDTOs}">
 							<div>
 								<input type="radio" name="sessionId${session.sessionID}" value="${user.uid}" <c:if test="${session.groupLeader.uid == user.uid}">checked="checked"</c:if>/>
-								${user.firstName} ${user.lastName}
+								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 							</div>
 						</c:forEach>
 					</div>

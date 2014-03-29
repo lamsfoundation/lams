@@ -34,16 +34,20 @@
     }
 </script>
 
+<c:set var="contentTitle">
+  <c:out value="${content.title}" escapeXml="true"/>
+</c:set>
+
 <div id="content">
 	<h1>
-		${content.title}
+		<c:out value="${contentTitle}" escapeXml="false"/>
 	</h1>
 	
 	<h4>
 		<fmt:message key="label.group.leader" />
 		<c:choose>
 			<c:when test="${not empty groupLeader}">
-				${groupLeader.firstName} ${groupLeader.lastName}
+				<c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true"/>
 			</c:when>
 			<c:otherwise>
 				<i><fmt:message key="label.no.leader.yet" /></i>
@@ -59,7 +63,7 @@
 		<ul>
 			<c:forEach var="user" items="${groupUsers}" varStatus="status">
 				<li>
-					${user.firstName} ${user.lastName}
+					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</li>
 			</c:forEach>
 		</ul>
@@ -81,10 +85,12 @@
 	</div>
 
 </div>
-
-<div id="leaderSelectionDialog" title="${content.title}" class="dialog">
+<c:set var="title">
+	<c:out value="${contentTitle}" escapeXml="true"/>
+</c:set>
+<div id="leaderSelectionDialog" title="${title}" class="dialog">
 	<div style="font-weight:bold; margin: 10px 0 20px;">
-		${content.instructions}
+		<c:out value="${content.instructions}" escapeXml="false"/>
 		<br>
 		<fmt:message key="label.are.you.going.to.be.leader" />
 	</div>
@@ -96,7 +102,7 @@
 	<div style="text-align: right;">
 		<c:forEach var="user" items="${groupUsers}" varStatus="status">
 			<div>
-				${user.firstName} ${user.lastName}
+				<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 			</div>
 		</c:forEach>
 	</div>
