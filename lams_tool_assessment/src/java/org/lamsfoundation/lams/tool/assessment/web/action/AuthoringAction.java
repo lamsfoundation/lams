@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -586,8 +587,10 @@ public class AuthoringAction extends Action {
 	    // options are different depending on the type
 	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
 		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())) {
+		boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+		
 		// setting answers is very similar in both types, so they were put together here
-		if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())) {
+		if (isMultipleChoice) {
 		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 		    assessmentQuestion.setMultipleAnswersAllowed(false);
 		    assessmentQuestion.setShuffle(false);
@@ -615,10 +618,11 @@ public class AuthoringAction extends Action {
 			assessmentAnswer.setFeedback(answer.getFeedback());
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    if (correctAnswer == null) {
+			    // for fill in blanks question all answers are correct and get full grade
+			    if (!isMultipleChoice || correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
 				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
-				// 100% goes to single correct answer
+				// 100% goes to the correct answer
 				assessmentAnswer.setGrade(1);
 				correctAnswer = answerText;
 			    } else {
@@ -781,6 +785,7 @@ public class AuthoringAction extends Action {
 	    switch (assessmentQuestion.getType()) {
 
 	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+		
 		if (assessmentQuestion.isMultipleAnswersAllowed()) {
 		    question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
 		    int correctAnswerCount = 0;
@@ -808,6 +813,7 @@ public class AuthoringAction extends Action {
 
 			answers.add(assessmentAnswer.getSequenceId(), answer);
 		    }
+		    
 		} else {
 		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 
@@ -824,7 +830,21 @@ public class AuthoringAction extends Action {
 			answers.add(assessmentAnswer.getSequenceId(), answer);
 		    }
 		}
+		break;
 
+	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
+		question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
+
+		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		    // only answer which has more than 0% is considered a correct one
+		    if (assessmentAnswer.getGrade() > 0) {
+			Answer answer = new Answer();
+			answer.setText(assessmentAnswer.getOptionString());
+			answer.setScore(new Integer(assessmentQuestion.getDefaultGrade()).floatValue());
+
+			answers.add(answer);
+		    }
+		}
 		break;
 
 	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
@@ -846,16 +866,38 @@ public class AuthoringAction extends Action {
 		falseAnswer.setFeedback(!isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect() : assessmentQuestion
 			.getFeedbackOnIncorrect());
 		answers.add(falseAnswer);
+		break;
+
+	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+		question.setType(Question.QUESTION_TYPE_MATCHING);
+
+		int answerIndex = 0;
+		float score = assessmentQuestion.getDefaultGrade() / assessmentQuestion.getQuestionOptions().size();
+		question.setMatchAnswers(new ArrayList<Answer>(assessmentQuestion.getQuestionOptions().size()));
+		question.setMatchMap(new TreeMap<Integer, Integer>());
+		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		    Answer answer = new Answer();
+
+		    answer.setText(assessmentAnswer.getQuestion());
+		    answer.setScore(score);
+		    answer.setFeedback(assessmentAnswer.getFeedback());
+		    answers.add(answer);
+
+		    Answer matchingAnswer = new Answer();
+		    matchingAnswer.setText(assessmentAnswer.getOptionString());
+		    question.getMatchAnswers().add(matchingAnswer);
+		    question.getMatchMap().put(answerIndex, answerIndex);
+		    answerIndex++;
+		}
 
 		break;
-		
+
 	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
 		// not much to do with essay
 		question.setType(Question.QUESTION_TYPE_ESSAY);
 		answers = null;
-		
 		break;
-		
+
 	    default:
 		continue;
 	    }

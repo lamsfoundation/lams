@@ -193,6 +193,10 @@ public class QuestionExporter {
 		    || Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())
 		    || Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
 		itemElem = exportMultipleChoiceQuestion(question);
+	    } else if (Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())) {
+		itemElem = exportFillInBlankQuestion(question);
+	    } else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+		itemElem = exportMatchingPairsQuestion(question);
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
 		itemElem = exportEssayQuestion(question);
 	    }
@@ -345,6 +349,112 @@ public class QuestionExporter {
     }
 
     /**
+     * Creates a XML element with contents of a single matchin pairs question.
+     */
+    private Element exportMatchingPairsQuestion(Question question) {
+	Element itemElem = doc.createElement("item");
+	itemElem.setAttribute("title", question.getTitle());
+	itemId++;
+	itemElem.setAttribute("ident", "QUE_" + itemId);
+
+	// QTI metadata indicating that this is a matching pairs question
+	Element itemmetadataElem = (Element) itemElem.appendChild(doc.createElement("itemmetadata"));
+	Element itemtypeElem = (Element) itemmetadataElem.appendChild(doc.createElement("qmd_itemtype"));
+	itemtypeElem.setTextContent("Matching");
+
+	// question text
+	Element presentationElem = (Element) itemElem.appendChild(doc.createElement("presentation"));
+	if (!StringUtils.isBlank(question.getText())) {
+	    Element materialElem = (Element) presentationElem.appendChild(doc.createElement("material"));
+	    appendMaterialElements(materialElem, question.getText());
+	}
+
+	int answerIndex = 0;
+	List<String> matchAnswerIdents = new ArrayList<String>(question.getAnswers().size());
+	List<Element> respconditionElems = new ArrayList<Element>(question.getAnswers().size());
+	for (Answer answer : question.getAnswers()) {
+	    itemId++;
+	    String responseLidIdentifier = "QUE_" + itemId + "_RL";
+	    Element responseLidElem = (Element) presentationElem.appendChild(doc.createElement("response_lid"));
+	    responseLidElem.setAttribute("ident", responseLidIdentifier);
+	    // answer text
+	    Element materialElem = (Element) responseLidElem.appendChild(doc.createElement("material"));
+	    appendMaterialElements(materialElem, answer.getText());
+
+	    Element renderchoiceElem = (Element) responseLidElem.appendChild(doc.createElement("render_choice"));
+	    renderchoiceElem.setAttribute("shuffle", "No");
+
+	    // find matching answers
+	    int matchAnswerIndex = 0;
+	    for (Answer matchAnswer : question.getMatchAnswers()) {
+		Element responselabelElem = (Element) renderchoiceElem.appendChild(doc.createElement("response_label"));
+
+		// repeat each matchin answer for each answer, keeping the same IDs
+		String matchAnswerIdent = null;
+		if (matchAnswerIdents.size() > matchAnswerIndex) {
+		    matchAnswerIdent = matchAnswerIdents.get(matchAnswerIndex);
+		} else {
+		    itemId++;
+		    matchAnswerIdent = "QUE_" + itemId + "_A" + (matchAnswerIndex + 1);
+		    matchAnswerIdents.add(matchAnswerIdent);
+		}
+		responselabelElem.setAttribute("ident", matchAnswerIdent);
+
+		materialElem = (Element) responselabelElem.appendChild(doc.createElement("material"));
+		appendMaterialElements(materialElem, matchAnswer.getText());
+
+		if (matchAnswerIndex == question.getMatchMap().get(answerIndex)) {
+		    Element respconditionElem = doc.createElement("respcondition");
+		    respconditionElem.setAttribute("title", "Matching " + responseLidIdentifier + " Resp Condition 1");
+		    Element conditionvarElem = (Element) respconditionElem.appendChild(doc
+			    .createElement("conditionvar"));
+		    Element varequalElem = (Element) conditionvarElem.appendChild(doc.createElement("varequal"));
+		    varequalElem.setAttribute("respident", responseLidIdentifier);
+		    varequalElem.setTextContent(matchAnswerIdent);
+
+		    Element setvarElem = (Element) respconditionElem.appendChild(doc.createElement("setvar"));
+		    setvarElem.setAttribute("varname", "que_score");
+		    setvarElem.setAttribute("action", "Add");
+		    setvarElem.setTextContent(String.valueOf(answer.getScore()));
+
+		    respconditionElems.add(respconditionElem);
+		}
+
+		matchAnswerIndex++;
+	    }
+
+	    answerIndex++;
+	}
+
+	Element resprocessingElem = (Element) itemElem.appendChild(doc.createElement("resprocessing"));
+	Element outcomesElem = (Element) resprocessingElem.appendChild(doc.createElement("outcomes"));
+	Element decvarElem = (Element) outcomesElem.appendChild(doc.createElement("decvar"));
+	decvarElem.setAttribute("vartype", "decimal");
+	decvarElem.setAttribute("defaultval", "0");
+	decvarElem.setAttribute("varname", "que_score");
+
+	for (Element respconditionElem : respconditionElems) {
+	    resprocessingElem.appendChild(respconditionElem);
+	}
+
+	// just a single feedback element
+	if (!StringUtils.isBlank(question.getFeedback())) {
+	    Element overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback(), "All");
+
+	    Element respconditionElem = (Element) resprocessingElem.appendChild(doc.createElement("respcondition"));
+	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
+	    conditionvarElem.appendChild(doc.createElement("other"));
+	    Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc.createElement("displayfeedback"));
+	    displayfeedbackElem.setAttribute("feedbacktype", "Response");
+	    displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
+
+	    itemElem.appendChild(overallFeedbackElem);
+	}
+
+	return itemElem;
+    }
+
+    /**
      * Creates a XML element with contents of a single essay question.
      */
     private Element exportEssayQuestion(Question question) {
@@ -385,6 +495,74 @@ public class QuestionExporter {
 	    displayfeedbackElem.setAttribute("feedbacktype", "Response");
 	    displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
 
+	    itemElem.appendChild(overallFeedbackElem);
+	}
+
+	return itemElem;
+    }
+
+    /**
+     * Creates a XML element with contents of a single fill in blanks question.
+     */
+    private Element exportFillInBlankQuestion(Question question) {
+	Element itemElem = doc.createElement("item");
+	itemElem.setAttribute("title", question.getTitle());
+	itemId++;
+	itemElem.setAttribute("ident", "QUE_" + itemId);
+
+	// question text
+	Element presentationElem = (Element) itemElem.appendChild(doc.createElement("presentation"));
+	if (!StringUtils.isBlank(question.getText())) {
+	    Element materialElem = (Element) presentationElem.appendChild(doc.createElement("material"));
+	    appendMaterialElements(materialElem, question.getText());
+	}
+
+	// just a single response element
+	itemId++;
+	Element responseStrElem = (Element) presentationElem.appendChild(doc.createElement("response_str"));
+	responseStrElem.setAttribute("ident", "QUE_" + itemId + "_RS");
+	Element renderFibElem = (Element) responseStrElem.appendChild(doc.createElement("render_fib"));
+	renderFibElem.setAttribute("fibtype", "String");
+	renderFibElem.setAttribute("prompt", "Box");
+	itemId++;
+	Element responseLabelElem = (Element) renderFibElem.appendChild(doc.createElement("response_label"));
+	responseLabelElem.setAttribute("ident", "QUE_" + itemId + "_ANS");
+
+	// just a single feedback element
+	Element overallFeedbackElem = null;
+	if (!StringUtils.isBlank(question.getFeedback())) {
+	    overallFeedbackElem = createFeedbackElem("_ALL", question.getFeedback(), "All");
+	}
+
+	Element resprocessingElem = (Element) itemElem.appendChild(doc.createElement("resprocessing"));
+	Element outcomesElem = (Element) resprocessingElem.appendChild(doc.createElement("outcomes"));
+	Element decvarElem = (Element) outcomesElem.appendChild(doc.createElement("decvar"));
+	decvarElem.setAttribute("vartype", "decimal");
+	decvarElem.setAttribute("defaultval", "0");
+	decvarElem.setAttribute("varname", "que_score");
+
+	for (Answer answer : question.getAnswers()) {
+	    // mark which answer is correct by setting score for each of them
+	    Element respconditionElem = (Element) resprocessingElem.appendChild(doc.createElement("respcondition"));
+	    Element conditionvarElem = (Element) respconditionElem.appendChild(doc.createElement("conditionvar"));
+	    Element varequalElem = (Element) conditionvarElem.appendChild(doc.createElement("varequal"));
+	    varequalElem.setAttribute("respident", responseStrElem.getAttribute("ident"));
+	    varequalElem.setTextContent(answer.getText());
+
+	    Element setvarElem = (Element) respconditionElem.appendChild(doc.createElement("setvar"));
+	    setvarElem.setAttribute("varname", "que_score");
+	    setvarElem.setAttribute("action", "Add");
+	    setvarElem.setTextContent(String.valueOf(answer.getScore()));
+
+	    if (overallFeedbackElem != null) {
+		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
+			.createElement("displayfeedback"));
+		displayfeedbackElem.setAttribute("feedbacktype", "Response");
+		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
+	    }
+	}
+
+	if (overallFeedbackElem != null) {
 	    itemElem.appendChild(overallFeedbackElem);
 	}
 
