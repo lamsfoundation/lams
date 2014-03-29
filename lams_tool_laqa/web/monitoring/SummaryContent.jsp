@@ -1,11 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="instructions">
-	${content.title}
-</div>
+<h1><c:out value="${content.title}" escapeXml="true"/></h1>
 
-<div class="instructions">
-	${content.instructions}
+<div class="instructions space-top">
+	<c:out value="${content.instructions}" escapeXml="false"/>
 </div>
 
 <c:if test="${empty listAllGroupsDTO}">

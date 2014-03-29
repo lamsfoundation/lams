@@ -30,7 +30,7 @@
 <body class="stripes">
 	<div id="content">
 		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -59,7 +59,7 @@
 				<div class="shading-bg">
 					<p>
 						<strong>
-							<fmt:message key="label.question" /> <c:out value="${questionEntry.key}" />:
+							<fmt:message key="label.question" /> <c:out value="${questionEntry.key}" escapeXml="false"/>:
 						</strong>
 						<br>
 						<c:out value="${questionEntry.value.question}" escapeXml="false" />

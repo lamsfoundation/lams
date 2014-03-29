@@ -111,7 +111,7 @@
 
 	<div id="content">
 		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -123,9 +123,12 @@
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
+			<c:set var="fullName">
+				<c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true"/>
+			</c:set>
 			<h4>
 				<fmt:message key="label.group.leader" >
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+					<fmt:param>${fullName}</fmt:param> 
 				</fmt:message>
 			</h4>
 		</c:if>

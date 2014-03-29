@@ -106,7 +106,7 @@
 	<div id="content">
 		<h1>
 			<c:out value="${generalLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+				escapeXml="true" />
 		</h1>
 
 		<c:if test="${not empty sessionMap.submissionDeadline}">

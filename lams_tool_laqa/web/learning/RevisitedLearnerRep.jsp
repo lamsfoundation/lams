@@ -111,8 +111,7 @@
 
 	<div id="content">
 		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -274,10 +273,10 @@
 
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 			<h2>
-				<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />						
+				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</h2>
 
-			<p><c:out value="${QaLearningForm.entryText}" escapeXml="false" /></p>
+			<p><c:out value="${QaLearningForm.entryText}" escapeXml="true" /></p>
 			
 			<c:if test="${hasEditRight}">
 				<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 

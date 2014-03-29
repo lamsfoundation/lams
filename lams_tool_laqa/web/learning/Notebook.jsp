@@ -46,12 +46,12 @@
 
 			<h1>
 				<c:out value="${generalLearnerFlowDTO.activityTitle}"
-					escapeXml="false" />
+					escapeXml="true" />
 			</h1>
 
 			<p>
 				<c:out value="${generalLearnerFlowDTO.reflectionSubject}"
-					escapeXml="false" />
+					escapeXml="true" />
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText"
@@ -79,11 +79,3 @@
 
 </body>
 </lams:html>
-
-
-
-
-
-
-
-

@@ -31,9 +31,9 @@
 
 	<div id="content">
 
-		<h1>${generalLearnerFlowDTO.activityTitle} </h1>
+		<h1><c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true"/> </h1>
 			
-		<h1>${generalLearnerFlowDTO.activityInstructions} </h1>
+		<h1><c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false"/> </h1>
 
 		<c:if test="${(portfolioExportMode != 'learner') && !isToolSessionAvailable}">
 			<p>
@@ -97,8 +97,7 @@
 												<c:choose>
 													<c:when
 														test="${generalLearnerFlowDTO.userUid == userData.queUsrId or userData.visible == 'true'}">
-														<c:out value="${userData.responsePresentable}"
-															escapeXml="false" />
+														<c:out value="${userData.responsePresentable}" escapeXml="true" />
 														<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
 													</c:when>
 													<c:otherwise>
@@ -138,7 +137,7 @@
 						
 						<c:if test="${not empty currentDto.feedback}">
 							<strong> <fmt:message key="label.feedback" /> : </strong>
-							<c:out value="${currentDto.feedback}" escapeXml="false" />
+							<c:out value="${currentDto.feedback}" escapeXml="true" />
 						</c:if>
 
 						<table cellspacing="0" class="alternative-color">
@@ -210,10 +209,10 @@
 					<h4>
 						<fmt:message key="label.user" />
 						:
-						<c:out value="${userName}" escapeXml="false" />
+						<c:out value="${userName}" escapeXml="true" />
 					</h4>
 					<p>
-						<c:out value="${entry}" escapeXml="false" />
+						<lams:out value="${entry}" escapeHtml="true" />
 					</p>
 
 				</c:forEach>
