@@ -12,11 +12,11 @@
 
 <div id="content">
 	<h1>
-		<c:out value="${reflectTitle}" escapeXml="false" />
+		<c:out value="${reflectTitle}" escapeXml="true" />
 	</h1>
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<p>
-			<lams:out value="${reflectInstructions}" />
+			<lams:out value="${reflectInstructions}" escapeHtml="true"/>
 		</p>
 		
 		<c:choose>

@@ -1,14 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 	<h1>
-		<c:out value="${reflectTitle}" escapeXml="false" />
+		<c:out value="${reflectTitle}" escapeXml="true" />
 	</h1>
 	
 	<h2>
-		${mindmapUser}
+		<c:out value="${mindmapUser}" escapeXml="true"/>
 	</h2>
 	
-	<c:out value="${reflectEntry}" escapeXml="false" />
+	<c:out value="${reflectEntry}" escapeXml="true" />
 		
 	<div align="right" class="space-bottom-top">
 		<html:button styleClass="button" property="backButton" onclick="history.go(-1)">

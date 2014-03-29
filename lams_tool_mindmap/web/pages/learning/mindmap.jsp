@@ -58,11 +58,11 @@
 
 <div id="content">
 	<h1>
-		${mindmapDTO.title}
+		<c:out value="${mindmapDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<p>
-		${mindmapDTO.instructions}
+		<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${mindmapDTO.lockOnFinish and mode == 'learner'}">
