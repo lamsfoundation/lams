@@ -8,7 +8,7 @@
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 		<div class="space-top">
 			<h2>
-				${chatDTO.reflectInstructions}
+				<lams:out value="${chatDTO.reflectInstructions}" escapeHtml="true"/>
 			</h2>
 
 			<p>
