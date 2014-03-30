@@ -24,13 +24,17 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 
-<h1><c:out value="${monitoringDTO.title}" escapeXml="true"/></h1>
+<h1>
+	<c:out value="${monitoringDTO.title}" escapeXml="true"/>
+</h1>
 
+<div class="space-top instructions">
+	<c:out value="${monitoringDTO.instructions}" escapeXml="false"/>
+</div>
 
-
+<br/>&nbsp;<br/>
 <c:forEach var="session" items="${dto.sessionDTOs}">
 	<table cellspacing="0">
 		<c:if test="${isGroupedActivity}">
@@ -90,6 +94,21 @@
 			</td>
 		</tr>
 		</table>
+			<html:form action="/monitoring" method="get" target="_blank" style="display:inline;">
+				<html:hidden property="dispatch" value="openChatHistory" />
+				<html:hidden property="toolSessionID"	value="${session.sessionID}" />
+				<html:submit styleClass="button">
+					<fmt:message>summary.editMessages</fmt:message>
+				</html:submit>
+			</html:form>
+			<html:form action="/learning" method="get" target="_blank" style="display:inline;">
+				<html:hidden property="toolSessionID"
+					value="${session.sessionID}" />
+				<html:hidden property="mode" value="teacher" />
+				<html:submit styleClass="button">
+					<fmt:message>summary.openChat</fmt:message>
+				</html:submit>
+			</html:form>
 		<c:if test="${dto.reflectOnActivity}">
 					<h3>
 						Reflections
@@ -117,7 +136,7 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						${user.nickname}
+						<c:out value="${user.nickname}" escapeXml="true"/>
 					</td>
 					<td>
 						${user.postCount}
@@ -141,36 +160,7 @@
 			</c:forEach>
            	</table>
 		</c:if>
-		<table>
-		  <tr>
-		    <td>
-					<html:form action="/monitoring" method="get" target="_blank">
-						<div>
-							<html:hidden property="dispatch" value="openChatHistory" />
-							<html:hidden property="toolSessionID"
-								value="${session.sessionID}" />
-							<html:submit styleClass="button">
-								<fmt:message>summary.editMessages</fmt:message>
-							</html:submit>
-						</div>
-					</html:form>
-		     </td>
-		     <td>
-
-					<html:form action="/learning" method="get" target="_blank">
-						<div>
-							<html:hidden property="toolSessionID"
-								value="${session.sessionID}" />
-							<html:hidden property="mode" value="teacher" />
-							<html:submit styleClass="button">
-								<fmt:message>summary.openChat</fmt:message>
-							</html:submit>
-						</div>
-					</html:form>
-		     </td>
-		  </tr>
-		</table>
-	<hr width="100%">
+	<hr width="100%"/>
 </c:forEach>
 
 
