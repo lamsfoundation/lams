@@ -39,6 +39,12 @@
 
 <c:set var="dto" value="${notebookDTO}" />
 
+<h1><c:out value="${notebookDTO.title}" escapeXml="true"/></h1>
+
+<div class="instructions space-top">
+<c:out value="${notebookDTO.instructions}" escapeXml="false"/>
+</div>
+
 <h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
