@@ -19,7 +19,7 @@
 <div id="content">
 
 	<h1>
-		<c:out value="${NbLearnerForm.title}" escapeXml="false" />
+		<c:out value="${NbLearnerForm.title}" escapeXml="true" />
 	</h1>
 
 	<p>
@@ -42,7 +42,7 @@
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="small-space-top">
 				<h2>
-					${reflectInstructions}
+					<lams:out value="${reflectInstructions}"/>
 				</h2>
 
 				<c:choose>

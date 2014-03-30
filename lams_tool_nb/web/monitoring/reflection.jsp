@@ -25,18 +25,18 @@
 		</h1>
 		
 		<!-- if nbEntry is empty, display 'has not reflected' message -->
-		<table>
+		<table class="alternative-color">
 			<tr>
-				<td>
-					<h2>
+				<th>
+					<b>
 						<c:out value="${name}" />
-					</h2>
-				</td>
+					</b>
+				</th>
 			</tr>
 			<tr>
 				<td>
 					<p>
-						<lams:out value="${nbEntry}" />
+						<lams:out value="${nbEntry}" escapeHtml="true" />
 					</p>
 				</td>
 			</tr>

@@ -13,12 +13,12 @@
 
 <div id="content">
 <h1>
-	<c:out value="${title}" escapeXml="false" />
+	<c:out value="${title}" escapeXml="true" />
 </h1>
 
 	<html:form action="/learner" method="post" onsubmit="disableFinishButton();" styleId="learnerForm">
 	 
-		<p><lams:out value="${reflectInstructions}" /></p>				
+		<p><lams:out value="${reflectInstructions}" escapeHtml="true"/></p>				
 			 
 		<html:textarea cols="60" rows="8" property="reflectionText" value="${reflectEntry}" styleClass="text-area"></html:textarea>
 		 

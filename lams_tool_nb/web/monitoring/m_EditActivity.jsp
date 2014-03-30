@@ -12,7 +12,7 @@
 					<fmt:message key="basic.title" />
 				</td>
 				<td>
-					<c:out value="${formBean.title}" escapeXml="false" />
+					<c:out value="${formBean.title}" escapeXml="true" />
 				</td>
 			</tr>
 			<tr>

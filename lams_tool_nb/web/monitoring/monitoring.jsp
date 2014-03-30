@@ -66,7 +66,7 @@
 			<div id="content">
 				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 				
-				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" />
+				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" /> 
 				<lams:TabBody id="2" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
 				<lams:TabBody id="3" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
 			</div>
