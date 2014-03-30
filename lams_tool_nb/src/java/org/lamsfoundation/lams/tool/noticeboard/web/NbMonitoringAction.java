@@ -80,9 +80,8 @@ public class NbMonitoringAction extends LamsDispatchAction {
     public final static String FORM="NbMonitoringForm";
     
     public static final String SUMMARY_TABID = "1";
-    public static final String INSTRUCTIONS_TABID = "2";
-    public static final String EDITACTIVITY_TABID = "3";
-    public static final String STATISTICS_TABID = "4";
+    public static final String EDITACTIVITY_TABID = "2";
+    public static final String STATISTICS_TABID = "3";
    
     public ActionForward unspecified(
     		ActionMapping mapping,
