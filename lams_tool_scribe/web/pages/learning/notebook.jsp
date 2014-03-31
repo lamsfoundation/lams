@@ -13,7 +13,7 @@
 <div id="content">
 
 	<h1>
-		${scribeDTO.title}
+		<c:out value="${scribeDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
@@ -21,7 +21,7 @@
 		<html:hidden property="scribeUserUID" />
 
 		<p>
-			${scribeDTO.reflectInstructions}
+			<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText"

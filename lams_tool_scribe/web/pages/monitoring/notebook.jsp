@@ -4,13 +4,13 @@
 	<tr>
 		<td>
 			<h2>
-				${scribeUserDTO.firstName} ${scribeUserDTO.lastName}
+				<c:out value="${scribeUserDTO.firstName} ${scribeUserDTO.lastName}" escapeXml="true"/>
 			</h2>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<p>${scribeUserDTO.notebookEntry}</p>
+			<p><lams:out value="${scribeUserDTO.notebookEntry}" escapeHtml="true"/></p>
 		</td>
 	</tr>
 </table>

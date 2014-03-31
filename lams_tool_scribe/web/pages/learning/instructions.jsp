@@ -2,7 +2,7 @@
 
 <div id="content">
 	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="false" />
+		<c:out value="${scribeDTO.title}" escapeXml="true" />
 	</h1>
 
 	<c:if test="${role == 'scribe'}">

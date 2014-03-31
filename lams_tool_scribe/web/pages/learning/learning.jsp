@@ -15,11 +15,11 @@
 <div id="content">
 
 	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="false" />
+		<c:out value="${scribeDTO.title}" escapeXml="true" />
 	</h1>
 
 	<p>
-		${scribeDTO.instructions}
+		<c:out value="${scribeDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<%@include file="/pages/parts/voteDisplay.jsp"%>
@@ -36,14 +36,17 @@
 
 			<div class="shading-bg">
 				<p>
-					${reportDTO.headingDTO.headingText}
+					<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false"/> 
 				</p>
 
 				<c:if test="${not empty reportDTO.entryText}">
 					<ul>
 						<li>
 							<p>
-								<lams:out value="${reportDTO.entryText}" />
+								<c:set var="entry">
+									<lams:out value="${reportDTO.entryText}" escapeHtml="true"/>
+								</c:set>
+								<c:out value="${entry}" escapeXml="false"/> 
 							</p>
 						</li>
 					</ul>

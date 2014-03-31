@@ -1,13 +1,13 @@
 	<%@ include file="/common/taglibs.jsp"%>
 	
 	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="false" />
+		<c:out value="${scribeDTO.title}" escapeXml="true" />
 	</h1>
 
 	<div class="space-left space-right">
 
 		<p>
-			${scribeDTO.instructions}
+			<c:out value="${scribeDTO.instructions}" escapeXml="false"/>
 		</p>
 	
 		<%@include file="/pages/parts/voteDisplay.jsp"%>
@@ -19,14 +19,17 @@
 	
 			<div class="shading-bg">
 				<p>
-					${reportDTO.headingDTO.headingText}
+					<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false"/>
 				</p>
 	
 				<c:if test="${not empty reportDTO.entryText}">
 					<ul>
 						<li>
 							<p>
-								<lams:out value="${reportDTO.entryText}" />
+								<c:set var="entry">
+									<lams:out value="${reportDTO.entryText}" escapeHtml="true"/>
+								</c:set>
+								<c:out value="${entry}" escapeXml="false"/>
 							</p>
 						</li>
 					</ul>
@@ -38,10 +41,10 @@
 			test="${scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
 			<div>
 				<h4>
-					${scribeDTO.reflectInstructions}
+					<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true"/>
 				</h4>
 				<p>
-					${scribeUserDTO.notebookEntry}
+					<lams:out value="${scribeUserDTO.notebookEntry}" escapeHtml="true"/>
 				</p>
 			</div>
 		</c:if>
@@ -59,14 +62,17 @@
 				<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 					<div class="shading-bg">
 						<p>
-							${reportDTO.headingDTO.headingText}
+							<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false"/>
 						</p>
 			
 						<c:if test="${not empty reportDTO.entryText}">
 							<ul>
 								<li>
 									<p>
-										<lams:out value="${reportDTO.entryText}" />
+										<c:set var="entry">
+											<lams:out value="${reportDTO.entryText}" escapeHtml="true"/> 
+										</c:set>
+										<c:out value="${entry}" escapeXml="false"/>
 									</p>
 								</li>
 							</ul>

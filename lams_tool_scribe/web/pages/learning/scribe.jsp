@@ -58,11 +58,11 @@
 <div id="content">
 
 	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="false" />
+		<c:out value="${scribeDTO.title}" escapeXml="true" />
 	</h1>
 
 	<p>
-		${scribeDTO.instructions}
+		<c:out value="${scribeDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<html:form action="learning">
@@ -80,7 +80,7 @@
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 			<div class="shading-bg">
 				<p>
-					${reportDTO.headingDTO.headingText}
+					<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false"/>
 				</p>
 
 
@@ -88,14 +88,17 @@
 					<ul>
 						<li>
 							<p>
-								<lams:out value="${reportDTO.entryText}" />
+								<c:set var="entry">
+									<lams:out value="${reportDTO.entryText}" escapeHtml="true"/>
+								</c:set>
+								<c:out value="${entry}" escapeXml="false"/>
 							</p>
 						</li>
 					</ul>
 				</c:if>
 
 				<c:if test="${not scribeUserDTO.finishedActivity}">
-					<html:textarea property="report(${reportDTO.uid})" rows="4"
+					<html:textarea property="report(${reportDTO.uid})" rows="7"
 						cols="20" value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
 				</c:if>
 			</div>
