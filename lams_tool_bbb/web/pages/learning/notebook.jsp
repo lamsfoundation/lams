@@ -15,7 +15,7 @@
 		onsubmit="disableFinishButton();">
 
 		<p class="small-space-top">
-			<lams:out value="${contentDTO.reflectInstructions}" escapeHmtl="true"/>
+			<lams:out value="${contentDTO.reflectInstructions}" escapeHtml="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText"
