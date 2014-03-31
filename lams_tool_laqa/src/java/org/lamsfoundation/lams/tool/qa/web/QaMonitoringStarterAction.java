@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -50,9 +49,8 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
-import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -98,9 +96,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
 
-	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
-
 	if (qaContent.getTitle() == null) {
 	    generalMonitoringDTO.setActivityTitle("Questions and Answers");
 	    generalMonitoringDTO.setActivityInstructions("Please answer the questions.");
@@ -129,8 +125,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	
 
 	/* this section is related to summary tab. Starts here. */
-	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
 	boolean isContentInUse = qaContent.isContentLocked();
@@ -147,9 +141,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaMonitoringForm.setActiveModule(MONITORING);
 
 	/*for Edit Activity screen, BasicTab-ViewOnly*/
-	qaMonitoringAction.prepareEditActivityScreenData(request, qaContent);
+	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
+	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
+	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
 	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
 
@@ -174,7 +171,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	conditionSet.addAll(qaContent.getConditions());
 	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
 
-	request.setAttribute("currentMonitoredToolSession", "All");
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
 
 	return (mapping.findForward(LOAD_MONITORING));

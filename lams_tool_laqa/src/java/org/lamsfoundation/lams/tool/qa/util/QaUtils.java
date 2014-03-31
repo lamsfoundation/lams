@@ -25,10 +25,6 @@ package org.lamsfoundation.lams.tool.qa.util;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -171,31 +167,6 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     /**
-     * builds a String based map from a list convertToMap(List sessionsList)
-     * 
-     * @param sessionsList
-     * @return Map
-     */
-    public static Map convertToStringMap(List sessionsList, String listType) {
-	Map map = new TreeMap(new QaComparator());
-
-	Iterator listIterator = sessionsList.iterator();
-	Long mapIndex = new Long(1);
-
-	while (listIterator.hasNext()) {
-	    if (listType.equals("String")) {
-		String text = (String) listIterator.next();
-		map.put(mapIndex.toString(), text);
-	    } else if (listType.equals("Long")) {
-		Long LongValue = (Long) listIterator.next();
-		map.put(mapIndex.toString(), LongValue.toString());
-	    }
-	    mapIndex = new Long(mapIndex.longValue() + 1);
-	}
-	return map;
-    }
-
-    /**
      * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and
      * ACTIVITY_TITLE ACTIVITY_INSTRUCTIONS
      * cleanUpSessionAbsolute(HttpServletRequest request)
@@ -241,11 +212,9 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(COMPLETED);
 	request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
 	request.getSession().removeAttribute(MAX_TOOL_SESSION_COUNT.toString());
-	request.getSession().removeAttribute(IS_TOOL_SESSION_CHANGED);
 	request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
 	request.getSession().removeAttribute(COUNT_ALL_USERS);
 	request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
-	request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS);
 	request.getSession().removeAttribute(MODE);
 	request.getSession().removeAttribute(LEARNER);
 	request.getSession().removeAttribute(TEACHER);

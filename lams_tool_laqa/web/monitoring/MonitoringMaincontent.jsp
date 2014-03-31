@@ -254,40 +254,8 @@
 			document.QaMonitoringForm.submit();
 		}
 		
-		function submitAuthoringMethod(actionMethod) {
-			document.QaAuthoringForm.dispatch.value=actionMethod; 
-			document.QaAuthoringForm.submit();
-		}
-		
-		function submitModifyQuestion(questionIndexValue, actionMethod) {
-			document.QaMonitoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitEditGroupResponse(sessionId, responseId, actionMethod) {
-			document.QaMonitoringForm.sessionId.value=sessionId; 
-			document.QaMonitoringForm.responseId.value=responseId; 
-			submitMethod(actionMethod);
-		}
-		
 		function submitMethod(actionMethod) {
 			submitMonitoringMethod(actionMethod);
-		}
-		
-		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.QaMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
-			submitMethod(actionMethod);
-		}
-
-		function submitResponse(currentUid, actionMethod) {
-			document.QaMonitoringForm.currentUid.value=currentUid;
-	        submitMethod(actionMethod);
-		}
-
-		function submitGroupResponse(sessionId, currentUid, actionMethod) {
-			document.QaMonitoringForm.sessionId.value=sessionId;
-			document.QaMonitoringForm.currentUid.value=currentUid;
-	        submitMethod(actionMethod);
 		}
 
 		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) {

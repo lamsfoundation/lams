@@ -157,8 +157,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
 	request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
-	request.setAttribute("currentMonitoredToolSession", "All");
-
 	// generateGroupsSessionData
 	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(request, content, qaService);
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);

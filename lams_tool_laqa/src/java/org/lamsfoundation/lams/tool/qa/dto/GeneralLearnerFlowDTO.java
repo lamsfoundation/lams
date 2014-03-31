@@ -30,8 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * <p>
- * DTO that holds learner flow decision properties and some other view-only
- * properties
+ * DTO that holds learner flow decision properties and some other view-only properties
  * </p>
  * 
  * @author Ozgur Demirtas
@@ -92,11 +91,9 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapQuestions;
 
-    protected Map<String,QaQuestionDTO> mapQuestionContentLearner;
+    protected Map<String, QaQuestionDTO> mapQuestionContentLearner;
 
     protected List listMonitoredAnswersContainerDTO;
-
-    protected String currentMonitoredToolSession;
 
     protected String initialScreen;
 
@@ -107,11 +104,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected String existMultipleUserResponses;
 
     protected String usernameVisible;
-    
+
     protected String allowRichEditor;
-    
+
     protected String useSelectLeaderToolOuput;
-    
+
     protected String allowRateAnswers;
 
     /**
@@ -123,25 +120,10 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param usernameVisible
-     *                The usernameVisible to set.
+     *            The usernameVisible to set.
      */
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
-    }
-
-    /**
-     * @return Returns the currentMonitoredToolSession.
-     */
-    public String getCurrentMonitoredToolSession() {
-	return currentMonitoredToolSession;
-    }
-
-    /**
-     * @param currentMonitoredToolSession
-     *                The currentMonitoredToolSession to set.
-     */
-    public void setCurrentMonitoredToolSession(String currentMonitoredToolSession) {
-	this.currentMonitoredToolSession = currentMonitoredToolSession;
     }
 
     /**
@@ -153,7 +135,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param currentAnswer
-     *                The currentAnswer to set.
+     *            The currentAnswer to set.
      */
     public void setCurrentAnswer(String currentAnswer) {
 	this.currentAnswer = currentAnswer;
@@ -164,15 +146,15 @@ public class GeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapQuestionContentLearner.
      */
-    public Map<String,QaQuestionDTO> getMapQuestionContentLearner() {
+    public Map<String, QaQuestionDTO> getMapQuestionContentLearner() {
 	return mapQuestionContentLearner;
     }
 
     /**
      * @param mapQuestionContentLearner
-     *                The mapQuestionContentLearner to set.
+     *            The mapQuestionContentLearner to set.
      */
-    public void setMapQuestionContentLearner(Map<String,QaQuestionDTO> mapQuestionContentLearner) {
+    public void setMapQuestionContentLearner(Map<String, QaQuestionDTO> mapQuestionContentLearner) {
 	this.mapQuestionContentLearner = mapQuestionContentLearner;
     }
 
@@ -185,7 +167,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param userFeedback
-     *                The userFeedback to set.
+     *            The userFeedback to set.
      */
     public void setUserFeedback(String userFeedback) {
 	this.userFeedback = userFeedback;
@@ -200,7 +182,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param activityInstructions
-     *                The activityInstructions to set.
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
 	this.activityInstructions = activityInstructions;
@@ -215,7 +197,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param activityTitle
-     *                The activityTitle to set.
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
 	this.activityTitle = activityTitle;
@@ -230,7 +212,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param countSessionComplete
-     *                The countSessionComplete to set.
+     *            The countSessionComplete to set.
      */
     public void setCountSessionComplete(String countSessionComplete) {
 	this.countSessionComplete = countSessionComplete;
@@ -245,7 +227,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param questionListingMode
-     *                The questionListingMode to set.
+     *            The questionListingMode to set.
      */
     public void setQuestionListingMode(String questionListingMode) {
 	this.questionListingMode = questionListingMode;
@@ -261,25 +243,25 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     public String toString() {
-	return new ToStringBuilder(this).append(
-		"remainingQuestionCount: ", remainingQuestionCount).append("totalQuestionCount : ", totalQuestionCount)
+	return new ToStringBuilder(this).append("remainingQuestionCount: ", remainingQuestionCount)
+		.append("totalQuestionCount : ", totalQuestionCount)
 		.append("activityInstructions: ", activityInstructions).append("teacherViewOnly: ", teacherViewOnly)
-		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle).append(
-			"countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
-		.append("currentQuestionIndex: ", currentQuestionIndex).append("questionListingMode: ",
-			questionListingMode).append("reportTitleLearner: ", reportTitleLearner).append(
-			"userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
-		.append("requestLearningReportProgress: ", requestLearningReportProgress).append(
-			"requestLearningReportViewOnly: ", requestLearningReportViewOnly).append("mapAnswers: ",
-			mapAnswers).append("mapQuestions: ", mapQuestions).append("mapQuestionContentLearner: ",
-			mapQuestionContentLearner).append("listMonitoredAnswersContainerDTO: ",
-			listMonitoredAnswersContainerDTO).append("currentMonitoredToolSession: ",
-			currentMonitoredToolSession).toString();
+		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle)
+		.append("countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
+		.append("currentQuestionIndex: ", currentQuestionIndex)
+		.append("questionListingMode: ", questionListingMode)
+		.append("reportTitleLearner: ", reportTitleLearner).append("userNameVisible: ", userNameVisible)
+		.append("requestLearningReport: ", requestLearningReport)
+		.append("requestLearningReportProgress: ", requestLearningReportProgress)
+		.append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)
+		.append("mapAnswers: ", mapAnswers).append("mapQuestions: ", mapQuestions)
+		.append("mapQuestionContentLearner: ", mapQuestionContentLearner)
+		.append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO).toString();
     }
 
     /**
      * @param currentQuestionIndex
-     *                The currentQuestionIndex to set.
+     *            The currentQuestionIndex to set.
      */
     public void setCurrentQuestionIndex(Integer currentQuestionIndex) {
 	this.currentQuestionIndex = currentQuestionIndex;
@@ -287,7 +269,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param totalQuestionCount
-     *                The totalQuestionCount to set.
+     *            The totalQuestionCount to set.
      */
     public void setTotalQuestionCount(Integer totalQuestionCount) {
 	this.totalQuestionCount = totalQuestionCount;
@@ -302,7 +284,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param toolContentID
-     *                The toolContentID to set.
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
@@ -317,7 +299,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param toolSessionID
-     *                The toolSessionID to set.
+     *            The toolSessionID to set.
      */
     public void setToolSessionID(String toolSessionID) {
 	this.toolSessionID = toolSessionID;
@@ -346,7 +328,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param endLearningMessage
-     *                The endLearningMessage to set.
+     *            The endLearningMessage to set.
      */
     public void setEndLearningMessage(String endLearningMessage) {
 	this.endLearningMessage = endLearningMessage;
@@ -361,7 +343,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param reportTitleLearner
-     *                The reportTitleLearner to set.
+     *            The reportTitleLearner to set.
      */
     public void setReportTitleLearner(String reportTitleLearner) {
 	this.reportTitleLearner = reportTitleLearner;
@@ -376,7 +358,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param userNameVisible
-     *                The userNameVisible to set.
+     *            The userNameVisible to set.
      */
     public void setUserNameVisible(String userNameVisible) {
 	this.userNameVisible = userNameVisible;
@@ -391,7 +373,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param mapAnswers
-     *                The mapAnswers to set.
+     *            The mapAnswers to set.
      */
     public void setMapAnswers(Map mapAnswers) {
 	this.mapAnswers = mapAnswers;
@@ -406,7 +388,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param mapQuestions
-     *                The mapQuestions to set.
+     *            The mapQuestions to set.
      */
     public void setMapQuestions(Map mapQuestions) {
 	this.mapQuestions = mapQuestions;
@@ -421,7 +403,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param httpSessionID
-     *                The httpSessionID to set.
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
 	this.httpSessionID = httpSessionID;
@@ -436,7 +418,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param requestLearningReport
-     *                The requestLearningReport to set.
+     *            The requestLearningReport to set.
      */
     public void setRequestLearningReport(String requestLearningReport) {
 	this.requestLearningReport = requestLearningReport;
@@ -451,7 +433,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param requestLearningReportProgress
-     *                The requestLearningReportProgress to set.
+     *            The requestLearningReportProgress to set.
      */
     public void setRequestLearningReportProgress(String requestLearningReportProgress) {
 	this.requestLearningReportProgress = requestLearningReportProgress;
@@ -466,7 +448,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param requestLearningReportViewOnly
-     *                The requestLearningReportViewOnly to set.
+     *            The requestLearningReportViewOnly to set.
      */
     public void setRequestLearningReportViewOnly(String requestLearningReportViewOnly) {
 	this.requestLearningReportViewOnly = requestLearningReportViewOnly;
@@ -481,7 +463,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param listMonitoredAnswersContainerDTO
-     *                The listMonitoredAnswersContainerDTO to set.
+     *            The listMonitoredAnswersContainerDTO to set.
      */
     public void setListMonitoredAnswersContainerDTO(List listMonitoredAnswersContainerDTO) {
 	this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
@@ -496,7 +478,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param mapAnswersPresentable
-     *                The mapAnswersPresentable to set.
+     *            The mapAnswersPresentable to set.
      */
     public void setMapAnswersPresentable(Map mapAnswersPresentable) {
 	this.mapAnswersPresentable = mapAnswersPresentable;
@@ -511,7 +493,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param reflection
-     *                The reflection to set.
+     *            The reflection to set.
      */
     public void setReflection(String reflection) {
 	this.reflection = reflection;
@@ -526,7 +508,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
@@ -541,7 +523,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param notebookEntry
-     *                The notebookEntry to set.
+     *            The notebookEntry to set.
      */
     public void setNotebookEntry(String notebookEntry) {
 	this.notebookEntry = notebookEntry;
@@ -556,7 +538,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param notebookEntriesVisible
-     *                The notebookEntriesVisible to set.
+     *            The notebookEntriesVisible to set.
      */
     public void setNotebookEntriesVisible(String notebookEntriesVisible) {
 	this.notebookEntriesVisible = notebookEntriesVisible;
@@ -571,7 +553,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param userName
-     *                The userName to set.
+     *            The userName to set.
      */
     public void setUserName(String userName) {
 	this.userName = userName;
@@ -586,7 +568,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param teacherViewOnly
-     *                The teacherViewOnly to set.
+     *            The teacherViewOnly to set.
      */
     public void setTeacherViewOnly(String teacherViewOnly) {
 	this.teacherViewOnly = teacherViewOnly;
@@ -601,7 +583,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param remainingQuestionCount
-     *                The remainingQuestionCount to set.
+     *            The remainingQuestionCount to set.
      */
     public void setRemainingQuestionCount(String remainingQuestionCount) {
 	this.remainingQuestionCount = remainingQuestionCount;
@@ -616,7 +598,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param initialScreen
-     *                The initialScreen to set.
+     *            The initialScreen to set.
      */
     public void setInitialScreen(String initialScreen) {
 	this.initialScreen = initialScreen;
@@ -631,7 +613,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param lockWhenFinished
-     *                The lockWhenFinished to set.
+     *            The lockWhenFinished to set.
      */
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -646,7 +628,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param showOtherAnswers
-     *                The showOtherAnswers to set.
+     *            The showOtherAnswers to set.
      */
     public void setShowOtherAnswers(String showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
@@ -661,7 +643,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param userUid
-     *                The userUid to set.
+     *            The userUid to set.
      */
     public void setUserUid(String userUid) {
 	this.userUid = userUid;
@@ -676,33 +658,33 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     /**
      * @param existMultipleUserResponses
-     *                The existMultipleUserResponses to set.
+     *            The existMultipleUserResponses to set.
      */
     public void setExistMultipleUserResponses(String existMultipleUserResponses) {
 	this.existMultipleUserResponses = existMultipleUserResponses;
     }
 
     public String getAllowRichEditor() {
-        return allowRichEditor;
+	return allowRichEditor;
     }
 
     public void setAllowRichEditor(String allowRichEditor) {
-        this.allowRichEditor = allowRichEditor;
-    } 
-    
+	this.allowRichEditor = allowRichEditor;
+    }
+
     public String getUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
+
     public String getAllowRateAnswers() {
-        return allowRateAnswers;
+	return allowRateAnswers;
     }
 
     public void setAllowRateAnswers(String allowRateAnswers) {
-        this.allowRateAnswers = allowRateAnswers;
+	this.allowRateAnswers = allowRateAnswers;
     }
 }

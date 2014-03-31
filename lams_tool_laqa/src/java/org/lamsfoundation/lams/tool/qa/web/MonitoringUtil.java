@@ -59,51 +59,11 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
  * Keeps all operations needed for Monitoring mode.
  * 
  * @author Ozgur Demirtas
- * 
  */
 public class MonitoringUtil implements QaAppConstants {
-
-    /**
-     * populates all the tool sessions in a map
-     * 
-     * @param request
-     * @param mcContent
-     * @return Map
-     */
-    public static Map populateToolSessions(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
-	List sessionsList = qaService.getSessionNamesFromContent(qaContent);
-	
-	Map sessionsMap = QaUtils.convertToStringMap(sessionsList, "String");
-	if (sessionsMap.isEmpty()) {
-	    sessionsMap.put(new Long(1).toString(), "None");
-	} else {
-	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
-	}
-	return sessionsMap;
-    }
-
-    /**
-     * populates all the tool sessions in a map
-     * 
-     * @param request
-     * @param mcContent
-     * @return Map
-     */
-    public static Map populateToolSessionsId(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
-	List sessionsList = qaService.getSessionsFromContent(qaContent);
-
-	Map sessionsMap = QaUtils.convertToStringMap(sessionsList, "Long");
-	if (sessionsMap.isEmpty()) {
-	    sessionsMap.put(new Long(1).toString(), "None");
-	} else {
-	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
-	}
-	return sessionsMap;
-    }
 
     /**
      * User id is needed if learnerRequest = true, as it is required to work out
@@ -198,14 +158,11 @@ public class MonitoringUtil implements QaAppConstants {
 		qaMonitoredUserDTOs.add(qaMonitoredUserDTO);
 	    }
 	}
-	return convertToMcMonitoredUserDTOMap(qaMonitoredUserDTOs);
-    }
-
-    private static Map<String, QaMonitoredUserDTO> convertToMcMonitoredUserDTOMap(List<QaMonitoredUserDTO> list) {
+	
+	//convert To McMonitoredUserDTOMap
 	Map<String, QaMonitoredUserDTO> map = new TreeMap<String, QaMonitoredUserDTO>(new QaStringComparator());
-
 	Long mapIndex = new Long(1);
-	for (QaMonitoredUserDTO data : list) {
+	for (QaMonitoredUserDTO data : qaMonitoredUserDTOs) {
 	    map.put(mapIndex.toString(), data);
 	    mapIndex = mapIndex + 1;
 	}

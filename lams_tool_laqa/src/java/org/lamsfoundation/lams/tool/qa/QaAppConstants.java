@@ -145,7 +145,6 @@ public interface QaAppConstants {
 
     public static final String MAP_TOOL_SESSIONS = "mapToolSessions";
     public static final Integer MAX_TOOL_SESSION_COUNT = new Integer(500);
-    public static final String IS_TOOL_SESSION_CHANGED = "isToolSessionChanged";
     public static final String USER_EXCEPTION_WRONG_FORMAT = "userExceptionWrongFormat";
     public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS = "userExceptionUncompatibleIds";
     public static final String USER_EXCEPTION_NUMBERFORMAT = "userExceptionNumberFormat";
@@ -173,7 +172,6 @@ public interface QaAppConstants {
 
     public static final String COUNT_ALL_USERS = "countAllUsers";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
-    public static final String SUMMARY_TOOL_SESSIONS = "summaryToolSessions";
     public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
 
     public static final String ACTIVITY_TITLE = "activityTitle";
@@ -257,8 +255,8 @@ public interface QaAppConstants {
     public static final String SUBMIT_SUCCESS = "sbmtSuccess";
     // for condition management use
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
-    public static final Object ATTR_CONDITION_SET = "conditionList";
-    public static final Object ATTR_QA_AUTHORING_FORM = "QaAuthoringForm";
+    public static final String ATTR_CONDITION_SET = "conditionList";
+    public static final String ATTR_QA_AUTHORING_FORM = "QaAuthoringForm";
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final int QUESTION_CUTOFF_INDEX = 40;

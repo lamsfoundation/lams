@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -95,17 +94,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      */
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
+	
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	
-
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	
-
 	if (qaService == null) {
 	    qaService = qaMonitoringForm.getQaService();
 	}
-
-	QaStarterAction qaStarterAction = new QaStarterAction();
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	
@@ -123,10 +117,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 * "in use" and content in use is not modifiable
 	 */
 	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-
-	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	
-	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
@@ -155,11 +145,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
-	prepareEditActivityScreenData(request, qaContent);
+	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
+	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
+	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
 
 	/* note that we are casting monitoring form subclass into Authoring form */
+	QaStarterAction qaStarterAction = new QaStarterAction();	
 	return qaStarterAction.executeDefineLater(mapping, qaMonitoringForm, request, response, qaService);
     }
 
@@ -202,7 +196,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	QaUtils.setDefineLater(request, true, strToolContentID, qaService);
 
-	prepareEditActivityScreenData(request, qaContent);
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
@@ -220,14 +213,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = (QaGeneralAuthoringDTO) request
-		.getAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO);
+	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
+	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
+	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());	
 	qaGeneralAuthoringDTO.setActiveModule(QaAppConstants.MONITORING);
-
 	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
@@ -278,17 +270,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaService.updateResponseVisibility(responseUid, isHideItem);
 	
 	return null;
-    }
-    
-    public void prepareEditActivityScreenData(HttpServletRequest request, QaContent qaContent) {
-	
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
-
-	
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
     }
 
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -937,8 +918,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	AuthoringUtil authoringUtil = new AuthoringUtil();
-
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
@@ -1135,8 +1114,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setTitle(richTextTitle);
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
