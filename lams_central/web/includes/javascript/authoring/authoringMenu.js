@@ -274,10 +274,8 @@ var MenuLib = {
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
 	saveLearningDesign : function(showDialog){
-		if (!showDialog && layout.ld.learningDesignID) {
-			if (confirm('Are you sure you want to overwrite the existing sequence?')) {
-				saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
-			}
+		if (!showDialog) {
+			saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
 			return;
 		}
 		
@@ -439,7 +437,7 @@ var MenuLib = {
 			if (row > maxRows) {
 				maxRows++;
 				resizePaper(paper.width, layout.conf.arrangeVerticalPadding
-		                   				   + maxColumns * layout.conf.arrangeVerticalSpace);
+		                   				   + maxRows * layout.conf.arrangeVerticalSpace);
 			}
 			
 			// look for activities with transitions first; detached ones go to the very end
@@ -487,6 +485,12 @@ var MenuLib = {
 						if (!branchingFits) {
 							// start branching from the left side of canvas
 							row++;
+							if (forceRowY) {
+								while (forceRowY > layout.conf.arrangeVerticalPadding + 10 + row * layout.conf.arrangeVerticalSpace) {
+									row++;
+								}
+								forceRowY = null;
+							}
 							column = 0;
 						}
 						// store the column of converge point
@@ -628,6 +632,11 @@ var MenuLib = {
 		
 		if (layout.floatingActivity) {
 			row++;
+			if (row >= maxRows) {
+				resizePaper(paper.width, layout.conf.arrangeVerticalPadding
+					   + layout.floatingActivity.items.shape.getBBox().height
+    				   + row * layout.conf.arrangeVerticalSpace);
+			}
 			column = 0;
 			var x = layout.conf.arrangeHorizontalPadding,
 				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;

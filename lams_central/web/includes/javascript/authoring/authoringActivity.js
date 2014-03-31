@@ -386,8 +386,9 @@ var ActivityLib = {
 				var activityY = y + 30,
 					allElements = paper.set(),
 					optionalActivity = this;
-				$.each(this.childActivities, function(){
+				$.each(this.childActivities, function(orderID){
 					this.parentActivity = optionalActivity;
+					this.orderID = orderID + 1;
 					this.draw(x + 20, activityY);
 					activityY = this.items.shape.getBBox().y2 + 10;
 					allElements.push(this.items.shape);
@@ -424,8 +425,9 @@ var ActivityLib = {
 				var activityX = x + 20,
 					allElements = paper.set(),
 					floatingActivity = this;
-				$.each(this.childActivities, function(){
+				$.each(this.childActivities, function(orderID){
 					this.parentActivity = floatingActivity;
+					this.orderID = orderID;
 					this.draw(activityX, y + 30);
 					activityX = this.items.shape.getBBox().x2 + 10;
 					allElements.push(this.items.shape);

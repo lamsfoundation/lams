@@ -370,7 +370,8 @@ function openLearningDesign(learningDesignID) {
 				'learningDesignID' : learningDesignID,
 				'folderID'		   : ld.workspaceFolderID,
 				'contentFolderID'  : ld.contentFolderID,
-				'title'			   : ld.title
+				'title'			   : ld.title,
+				'maxUIID'		   : 0
 			};
 			
 			$('#ldDescriptionFieldTitle').text(ld.title);
@@ -788,7 +789,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				var branchingActivity = this.branchingActivity;
 				layoutActivities.push(branchingActivity);
 				
-				$.each(branchingActivity.branches, function(){
+				$.each(branchingActivity.branches, function(branchOrderID){
+					this.defaultActivityUIID = null;
+					this.orderID = branchOrderID + 1;
 					this.parentActivity = branchingActivity;
 					layoutActivities.push(this);
 					
@@ -798,6 +801,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 							&& !childActivity.isStart)) {
 						childActivity.parentActivity = this;
 						childActivity.orderID = orderID;
+						if (orderID == 1){
+							this.defaultActivityUIID = childActivity.uiid;
+						}
 						orderID++;
 						
 						childActivity = childActivity.transitions.from[0].toActivity;
@@ -919,7 +925,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'groupingUIID'			 : isGrouped ? activity.grouping.groupingUIID : null,
 		    'createGroupingUIID'	 : activity instanceof ActivityLib.GroupingActivity ? activity.groupingUIID : null,
 			'parentActivityID' 		 : activity.parentActivity ? activity.parentActivity.id : null,
-			'parentUIID' 			 : null,
+			'parentUIID' 			 : activity.parentActivity ? activity.parentActivity.uiid : null,
 			'libraryActivityUIImage' : iconPath,
 			'xCoord' 				 : activityBox ? parseInt(activityBox.x) : null,
 			'yCoord' 				 : activityBox ? parseInt(activityBox.y) : null,
@@ -928,6 +934,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 											layout.toolMetadata[toolID].activityCategoryID : 1,
 			'activityTypeID'     	 : activityTypeID,
 			'orderID'				 : activity.orderID,
+			'defaultActivityUIID'    : activity.defaultActivityUIID,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,
@@ -977,7 +984,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'dateReadOnly'       : null,
 		'version'        	 : null,
 		'contentFolderID'    : layout.ld.contentFolderID,
-		'saveMode'			 : 0,
+		'saveMode'			 : learningDesignID ? 1 : 0,
 		'originalLearningDesignID' : null,
 		
 		'activities'		 : activities,
@@ -1038,7 +1045,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				$.each(response.activities, function() {
 					var updatedActivity = this;
 					$.each(layout.activities, function(){
-						if (this instanceof ActivityUtil.BranchingEdgeActivity && this.isStart) {
+						if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
 							if (updatedActivity.activityUIID == this.branchingActivity.uiid){
 								this.branchingActivity.id = updatedActivity.activityID;
 							} else {
