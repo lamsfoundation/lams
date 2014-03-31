@@ -40,7 +40,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td><c:out value-"${daco.instructions}" escapeXml="false"/></td>
+			<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
 		</tr>
 	</table>
 	<c:choose>
