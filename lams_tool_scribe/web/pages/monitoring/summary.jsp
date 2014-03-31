@@ -22,6 +22,7 @@ function confirmForceComplete() {
 <c:out value="${monitoringDTO.instructions}" escapeXml="false"/>
 </div>
 
+<br/>&nbsp;<br/>
 <c:forEach var="session" items="${dto.sessionDTOs}">
 	
 	<c:if test="${isGroupedActivity}">
@@ -49,7 +50,7 @@ function confirmForceComplete() {
 							style="min-width: 150px;">
 							<c:forEach var="user" items="${session.userDTOs}">
 								<html:option value="${user.uid}">
-												<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+												${user.firstName} ${user.lastName}
 											</html:option>
 							</c:forEach>
 						</html:select>
@@ -70,17 +71,12 @@ function confirmForceComplete() {
 		</c:when>
 
 		<c:otherwise>
-			<div class="field-name">
-				<fmt:message key="heading.appointedScribe" />
-			</div>
-
-			<p>
-				<c:out value="${session.appointedScribe}" escapeXml="true"/>
-			</p>
+			<b>
+				<fmt:message key="heading.appointedScribe" />: <c:out value="${session.appointedScribe}" escapeXml="true"/>
+			</b>
 
 			<c:set var="scribeSessionDTO" value="${session}" scope="request">
 			</c:set>
-			<%@include file="/pages/parts/voteDisplay.jsp"%>
 
 			<div class="field-name">
 				<fmt:message key="heading.report" />
@@ -95,6 +91,8 @@ function confirmForceComplete() {
 				</p>
 				<hr />
 			</c:forEach>
+
+			<%@include file="/pages/parts/voteDisplay.jsp"%>
 
 			<c:if test="${session.forceComplete eq false}">
 				<html:form action="monitoring" onsubmit="return confirmForceComplete();">
@@ -241,7 +239,7 @@ function confirmForceComplete() {
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					<c:out value="${dto.reflectInstructions}" />	
+					<lams:out value="${dto.reflectInstructions}" escapeHtml="true" />	
 				</td>
 			</tr>
 		</c:when>
