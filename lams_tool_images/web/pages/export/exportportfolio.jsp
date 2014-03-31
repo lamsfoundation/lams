@@ -68,7 +68,7 @@
 						<c:forEach var="reflectDTOList" items="${sessionMap.reflectList}">
 							<c:forEach var="reflectDTO" items="${reflectDTOList.value}">
 								<h4>
-									<c:out value="${reflectDTO.fullName}" escapeHtml="true" />
+									<c:out value="${reflectDTO.fullName}" escapeXml="true" />
 								</h4>
 								<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 							</c:forEach>
