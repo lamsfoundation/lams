@@ -73,7 +73,7 @@
 				datatype: "local",
 				gridstate:"hidden",
 				//hiddengrid:true,
-				height: 90,
+				height: 180,
 				autowidth: true,
 				shrinkToFit: false,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
