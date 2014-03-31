@@ -31,7 +31,7 @@
 					<lams:Date value="${user.accessDate}"/>
 				</td>
 				<td>
-					<c:out values="${user.firstName},${user.lastName}" escapeXml="true"/>
+					<c:out value="${user.firstName},${user.lastName}" escapeXml="true"/>
 				</td>
 			</tr>
 		</c:forEach>
