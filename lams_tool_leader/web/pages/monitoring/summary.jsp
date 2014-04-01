@@ -3,6 +3,10 @@
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 <c:set var="dto" value="${leaderselectionDTO}" />
+<h1><c:out value="${leaderselectionDTO.title}" escapeXml="true"/></h1>
+<div class="instructions space-top space-bottom">
+<c:out value="${leaderselectionDTO.instructions}" escapeXml="false"/>
+</div>
 
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
