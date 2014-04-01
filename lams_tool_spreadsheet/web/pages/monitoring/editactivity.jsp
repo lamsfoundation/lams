@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${spreadsheet.title}" escapeXml="false" />
+			<c:out value="${spreadsheet.title}" escapeXml="true" />
 		</td>
 	</tr>
 

@@ -45,11 +45,11 @@
 	<div id="content">
 
 		<h1>
-			${title}
+			<c:out value="${title}" escapeXml="true"/>
 		</h1>
 		
 		<div>
-			${instructions}
+			<c:out value="${instructions}" escapeXml="false"/>
 		</div>
 		
 		<c:if test="${spreadsheet.lockWhenFinished || spreadsheet.learnerAllowedToSave || spreadsheet.markingEnabled || spreadsheet.reflectOnActivity}">

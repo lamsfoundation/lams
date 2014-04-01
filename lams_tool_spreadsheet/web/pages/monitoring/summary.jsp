@@ -87,6 +87,37 @@
 	}	
 </script>
 
+<h1>
+	<c:out value="${spreadsheet.title}" escapeXml="true"/>
+</h1>
+
+<div class="instructions space-top">
+	<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
+</div>
+
+<%-- Summary list  --%>
+
+<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+<span id="messageArea"></span>
+
+<%@ include file="/common/messages.jsp"%>
+
+<div id="summariesArea">
+	<%@ include file="/pages/monitoring/parts/summarylist.jsp"%>
+</div>
+
+<c:if test="${spreadsheet.markingEnabled}">	
+	<p>
+		<iframe
+			onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+			id="marksInputArea" name="marksInputArea"
+			style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+			scrolling="no">
+		</iframe>
+	</p>
+</c:if>
+
+
 
 <h1>
 
@@ -168,27 +199,15 @@
 				</c:choose>	
 			</td>	
 		</tr>
+		<c:if test="${spreadsheet.reflectOnActivity}">
+		<tr>
+			<td>
+				<fmt:message key="label.monitoring.summary.notebook.reflection" />
+			</td>
+			<td>
+				<lams:out value="${spreadsheet.reflectInstructions}" escapeHtml="true"/>
+			</td>	
+		</tr>
+		</c:if>		
 	</table>
 </div>
-
-<%-- Summary list  --%>
-
-<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-<span id="messageArea"></span>
-
-<%@ include file="/common/messages.jsp"%>
-
-<div id="summariesArea">
-	<%@ include file="/pages/monitoring/parts/summarylist.jsp"%>
-</div>
-
-<c:if test="${spreadsheet.markingEnabled}">	
-	<p>
-		<iframe
-			onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-			id="marksInputArea" name="marksInputArea"
-			style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-			scrolling="no">
-		</iframe>
-	</p>
-</c:if>

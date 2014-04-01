@@ -103,7 +103,7 @@
 		
 	<c:forEach var="reflectDTO" items="${summary.reflectDTOList}">
 			<h4>
-				${reflectDTO.fullName}
+				<c:out value="${reflectDTO.fullName}" escapeXml="true"/>
 			</h4>
 			<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 	</c:forEach>

@@ -52,11 +52,11 @@
 
 	<div id="content">
 		<h1>
-			${spreadsheet.title}
+			<c:out value="${spreadsheet.title}" escapeXml="true"/>
 		</h1>
 
 		<p>
-			${spreadsheet.instructions}
+			<c:out value="</c:out> ${spreadsheet.instructions}" escapeXml="false"/>
 		</p>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -138,7 +138,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}"/>
 				</h2>
 
 				<c:choose>
@@ -150,7 +150,7 @@
 					</c:when>
 					<c:otherwise>
 						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}"/>
 						</p>
 					</c:otherwise>
 				</c:choose>
