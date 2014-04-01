@@ -8,7 +8,7 @@
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<tr>
 				<td style="padding-top:15px; padding-bottom:15px;">
-					${item.title}			
+					<c:out value="${item.title}" escapeXml="true"/>			
 				</td>
 					
 				<td width="20px" style="padding-left:10px; vertical-align:middle; text-align: center;">

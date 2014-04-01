@@ -56,8 +56,8 @@
 </script>
 
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-			<h3>${item.title}</h3>
-			<div>${item.description}</div>
+			<h3><c:out value="${item.title}" escapeXml="true"/></h3>
+			<div><c:out value="${item.description}" escapeXml="false"/></div>
 	
 			<table id="scratches" class="alternative-color">
 				<c:forEach var="answer" items="${item.answers}" varStatus="status">

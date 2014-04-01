@@ -198,11 +198,11 @@
 
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<h1><c:out value="${scratchie.title}" escapeXml="true"/></h1>
 
-<%@ include file="parts/advanceOptions.jsp"%>
-
-<%@ include file="parts/dateRestriction.jsp"%>
-
+<div class"instructions space-top space-bottom>
+<c:out value="${scratchie.instructions }" escapeXml="false" />
+</div>
 <c:choose>
 	<c:when test="${empty summaryList}">
 		<div align="center">
@@ -241,7 +241,7 @@
 			<select id="item-uid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="item" items="${scratchie.scratchieItems}">
-					<option value="${item.uid}">${item.title}</option>
+					<option value="${item.uid}"><c:out value="${item.title}" escapeXml="true"/></option>
 			   	</c:forEach>
 			</select>
 			
@@ -259,7 +259,7 @@
 			<select id="userid-dropdown" class="float-left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="learner" items="${sessionMap.learners}">
-					<option value="${learner.userId}" alt="${learner.session.sessionId}">${learner.firstName} ${learner.lastName} (${learner.session.sessionName})</option>
+					<option value="${learner.userId}" alt="${learner.session.sessionId}"><c:out value="${learner.firstName} ${learner.lastName} (${learner.session.sessionName})" escapeXml="true"/></option>
 			   	</c:forEach>
 			</select>
 		</div>
@@ -295,3 +295,8 @@
 	
 	</c:otherwise>
 </c:choose>
+
+
+<%@ include file="parts/advanceOptions.jsp"%>
+
+<%@ include file="parts/dateRestriction.jsp"%>

@@ -100,7 +100,7 @@
 
 	<div id="content">
 		<h1>
-			${scratchie.title}
+			<c:out value="${scratchie.title}" escapeXml="true"/>
 		</h1>
 		
 		<h4>
@@ -110,7 +110,7 @@
 		</h4>
 
 		<p style="font-style: italic;">
-			${scratchie.instructions}
+			<c:out value="${scratchie.instructions}" escapeXml="false"/>
 		</p>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">

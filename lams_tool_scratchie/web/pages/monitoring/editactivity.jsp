@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${scratchie.title}" escapeXml="false" />
+			<c:out value="${scratchie.title}" escapeXml="true" />
 		</td>
 	</tr>
 

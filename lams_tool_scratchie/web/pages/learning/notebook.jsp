@@ -28,13 +28,13 @@
 
 		<div id="content">
 			<h1>
-				${sessionMap.title}
+				<c:out value="${sessionMap.title}" escapeXml="true"/>
 			</h1>
 
 			<%@ include file="/common/messages.jsp"%>
 
 			<p>
-				<lams:out value="${sessionMap.reflectInstructions}" />
+				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area" />

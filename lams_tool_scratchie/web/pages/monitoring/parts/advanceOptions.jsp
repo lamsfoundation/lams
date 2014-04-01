@@ -53,7 +53,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${sessionMap.scratchie.reflectInstructions}	
+					<lams:out value="${sessionMap.scratchie.reflectInstructions}" escapeHtml="true"/>	
 				</td>
 			</tr>
 		</c:when>
