@@ -27,11 +27,11 @@
 
 		<div id="content">
 			<h1>
-				${sessionMap.title}
+				<c:out value="${sessionMap.title}" escapeXml="true"/>
 			</h1>
 
 			<p>
-				<lams:out value="${sessionMap.reflectInstructions}" />
+				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 			
 			<%@ include file="/common/messages.jsp"%>

@@ -7,6 +7,10 @@
 		<input type="hidden" name="instructionCount" id="instructionCount">
 		<table id="questionTable">
 			<c:forEach var="item" items="${instructionList}" varStatus="status">
+				<c:set var="item">
+					<c:out value="${item}" escapeXml="true"/>
+				</c:set>
+					
 				<tr id="instructionItem${status.index}">
 					<td width="3px">
 						${status.index+1}

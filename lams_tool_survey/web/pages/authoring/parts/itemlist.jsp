@@ -29,7 +29,7 @@
 				</td>
 
 				<td>
-					${question.shortTitle}
+					<c:out value="${question.shortTitle}" escapeXml="true"/>
 				</td>
 
 				<td width="80px" align="center">

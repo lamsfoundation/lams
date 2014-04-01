@@ -36,7 +36,7 @@
 
 	<div id="content">
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}" escapeXml="true"/>
 		</h1>
 		<p>
 			<c:out value="${sessionMap.instructions}" escapeXml="false" />
@@ -89,19 +89,19 @@
 							</c:if>
 
 							<c:if test="${checked}">
-								${option.description}
+								<c:out value="${option.description}" escapeXml="true"/>
 							</c:if>
 						</div>
 					</c:forEach>
 
 				</p>
 				<c:if test="${question.type == 3}">
-					<lams:out value="${answerText}" />
+					<lams:out value="${answerText}" escapeHtml="true"/>
 				</c:if>
 
 				<c:if test="${question.appendText && (not empty answerText)}">
 					<fmt:message key="label.append.text" />
-					<lams:out value="${answerText}" />
+					<lams:out value="${answerText}" escapeHtml="true" />
 				</c:if>
 			</div>
 		</c:forEach>
@@ -116,7 +116,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>

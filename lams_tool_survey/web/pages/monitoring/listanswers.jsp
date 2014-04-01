@@ -37,7 +37,7 @@
 								<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
 							</td>
 							<td>
-								${option.description}
+								<c:out value="${option.description}" escapeXml="true"/>
 							</td>
 						</tr>
 					</c:forEach>
@@ -93,7 +93,7 @@
 							<c:if test="${question.appendText ||question.type == 3}">
 								<td>
 									<c:if test="${not empty question.answer}">
-										<lams:out value="${question.answer.answerText}"/>
+										<lams:out value="${question.answer.answerText}" escapeHtml="true"/>
 									</c:if>
 									&nbsp;
 								</td>

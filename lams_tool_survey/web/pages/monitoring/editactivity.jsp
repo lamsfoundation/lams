@@ -9,7 +9,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${survey.title}" escapeXml="false" />
+			<c:out value="${survey.title}" escapeXml="true" />
 		</td>
 	</tr>
 

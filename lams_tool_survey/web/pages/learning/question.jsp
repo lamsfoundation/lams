@@ -31,13 +31,13 @@
 				<c:when test="${question.type == 1}">
 					<input type="radio" name="optionChoice${question.uid}" class="noBorder"
 						value="${option.uid}" ${checked} />
-					${option.description}
+					<c:out value="${option.description}" escapeXml="true"/>
 				</c:when>
 				<c:when test="${question.type == 2}">
 					<input type="checkbox" class="noBorder"
 					 name="optionChoice${question.uid}"
 						value="${option.uid}" ${checked}/>
-					${option.description}
+					<c:out value="${option.description}" escapeXml="true"/>
 				</c:when>
 			</c:choose>
 		</p>
@@ -51,7 +51,7 @@
 	</c:if>
 	<c:if test="${question.appendText}">
 		<c:set var="jsfunc" value="" />
-		<%-- for single choice question, use javascript to ensure only one optino or openText can be chosen --%>
+		<%-- for single choice question, use javascript to ensure only one option or openText can be chosen --%>
 		<c:if test="${question.type == 1}">
 			<c:set var="jsfunc" value="onclick=\" singleChoice('optionChoice${question.uid}')\""/>
 		</c:if>
@@ -66,3 +66,4 @@
 	</c:if>
 
 </div>
+
