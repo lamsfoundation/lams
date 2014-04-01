@@ -13,7 +13,8 @@
 			<td valign=top class="align-left">
 				<c:out value="${reflectDTO.userName}" escapeXml="true"/> <lams:Date value="${reflectDTO.date}"/>
 				<br>
-				<lams:out value="${reflectDTO.entry}" escapeHtml="true" />
+				<c:out value="${reflectDTO.entry}" escapeXml="true"/>
+
 			</td>
 		</tr>	
 	</c:forEach>

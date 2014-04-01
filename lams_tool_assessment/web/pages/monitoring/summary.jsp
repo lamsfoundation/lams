@@ -192,10 +192,12 @@
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
+<h1><c:out value="${assessment.title}" escapeXml="true"/></h1>
 
-<%@ include file="parts/advanceoptions.jsp"%>
+<div class="instructions space-top">
+	<c:out value="${assessment.instructions}" escapeXml="false"/>
+</div>
 
-<%@ include file="parts/dateRestriction.jsp"%>
 
 <c:choose>
 	<c:when test="${empty summaryList}">
@@ -263,3 +265,9 @@
 	
 	</c:otherwise>
 </c:choose>
+
+<br/>
+
+<%@ include file="parts/advanceoptions.jsp"%>
+
+<%@ include file="parts/dateRestriction.jsp"%>
