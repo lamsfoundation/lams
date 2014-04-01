@@ -74,9 +74,9 @@
 						</c:otherwise>
 					</c:choose>
 										
-						${item.title} 
+						<c:out value="${item.title}" escapeXml="true"/>
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[${item.createBy.loginName}]
+								[<c:out value="${item.createBy.loginName}" escapeXml="true"/>]
 						</c:if>
 						<c:if test="${item.required}">
 							*

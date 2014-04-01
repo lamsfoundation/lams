@@ -81,7 +81,7 @@
 		<!--Task Information-->
 	
 		<h1>
-			${taskList.title}
+			<c:out value="${taskList.title}" escapeXml="true"/>
 		</h1>
 		
  	   	<%@ include file="/common/messages.jsp"%>
@@ -96,7 +96,7 @@
 		
 
 		<p>
-			${taskList.instructions}
+			<c:out value="${taskList.instructions}" escapeXml="false"/>
 		</p>
 		
 		<c:if test="${(mode != 'teacher') && taskList.lockWhenFinished}">
@@ -161,7 +161,7 @@
 		
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
+				<h2><lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}"/></h2>
 			
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">

@@ -13,18 +13,18 @@
 		<h1>
 			<fmt:message key="page.title.monitoring.view.reflection"/>
 		</h1>
-		${userDTO.fullName}<BR><BR>
+		<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
 		<table class="alternative-color" cellspacing="0">
 			<tr>
 				<th class="first">
-					<lams:out value="${userDTO.reflectInstrctions}"/>
+					<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
 				</th>
 			</tr>
 			<tr>
 				<td>
 					<c:choose>
 						<c:when test="${userDTO.finishReflection}">
-							<lams:out value="${userDTO.reflect}"/>
+							<lams:out value="${userDTO.reflect}" escapeHtml="true"/>
 						</c:when>
 						<c:otherwise>
 							<fmt:message key="message.no.reflection.available" />

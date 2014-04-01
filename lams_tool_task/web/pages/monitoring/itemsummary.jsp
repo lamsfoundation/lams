@@ -104,7 +104,7 @@
 					
 						<tr>
 							<td>
-								${visitLogSummary.user.loginName}
+								<c:out value="${visitLogSummary.user.loginName}" escapeXml="true"/>
 							</td>
 							
 							<td align="center">
@@ -129,7 +129,7 @@
 									<ul>
 										<c:forEach var="comment" items="${visitLogSummary.comments}">
 											<li>
-												<c:out value="${comment.comment}"></c:out>
+												<c:out value="${comment.comment}" escapeXml="false"/>
 											</li>
 										</c:forEach>
 										

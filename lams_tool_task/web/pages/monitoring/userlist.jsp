@@ -29,13 +29,13 @@
 			<c:forEach var="user" items="${userList}">
 				<tr>
 					<td>
-						${user.loginName}
+						<c:out value="${user.loginName}" escapeXml="true"/>
 					</td>
 					<td>
 						<lams:Date value="${user.accessDate}"/>
 					</td>
 					<td>
-						${user.firstName},${user.lastName}
+						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 					</td>
 				</tr>
 			</c:forEach>

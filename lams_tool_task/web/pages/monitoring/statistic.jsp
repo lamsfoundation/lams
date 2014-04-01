@@ -41,10 +41,10 @@
 			<c:if test="${item.uid != -1}">
 				<tr>
 					<td>
-						${item.title}
+						<c:out value="${item.title}" escapeXml="true"/>
 					</td>
 					<td>
-						${item.createBy.loginName}
+						<c:out value="${item.createBy.loginName}" escapeXml="true"/>
 					</td>
 					<td align="center">
 						${summary.visitNumbers[status.index]}

@@ -23,7 +23,7 @@
 					<fmt:message key="label.authoring.basic.resource.task" />
 				</td>
                                 <td>
-					${taskList.title}
+					<c:out value="${taskList.title}" escapeXml="true"/>
 				</td>
 
 				<td width="40px" align="center">

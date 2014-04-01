@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${taskList.title}" escapeXml="false" />
+			<c:out value="${taskList.title}" escapeXml="true" />
 		</td>
 	</tr>
 

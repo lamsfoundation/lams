@@ -83,7 +83,7 @@
 					
 			<tr>
 				<td>
-					${visitLogSummary.user.loginName}
+					<c:out value="${visitLogSummary.user.loginName}" escapeXml="true"/>
 				</td>
 							
 				<td align="center">
@@ -107,7 +107,7 @@
 						<ul>
 							<c:forEach var="comment" items="${visitLogSummary.comments}">
 								<li>
-									<c:out value="${comment.comment}" escapeXml="false"></c:out>
+									<c:out value="${comment.comment}" escapeXml="true"></c:out>
 								</li>
 							</c:forEach>
 										
@@ -137,7 +137,7 @@
 		<c:forEach var="visitLogSummary" items="${groupSummary.taskListItemVisitLogSummaries}">
 			<c:set var="reflectDTO" value="${visitLogSummary.reflectDTO}" />
 			<h4>
-				${reflectDTO.fullName}
+				<c:out value="${reflectDTO.fullName}" escapeXml="true"/>
 			</h4>
 			<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 		</c:forEach>

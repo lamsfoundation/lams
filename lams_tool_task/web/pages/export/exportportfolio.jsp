@@ -20,7 +20,7 @@
 
 	<div id="content">
 
-		<h1>${title} </h1>
+		<h1><c:out value="${title}" escapeXml="true"/></h1>
 
 		<table border="0" cellspacing="3" width="98%">
 			<c:forEach var="itemSummary" items="${itemSummaryList}">

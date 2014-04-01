@@ -13,10 +13,10 @@
 			<c:if test="${item.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 			
 				<li>
-					<c:out value="${file.fileName}" />
+					<c:out value="${file.fileName}" escapeXml="true"/>
 												
 					<c:if test="${file.createBy != null}">
-						[${file.createBy.loginName}]
+						[<c:out value="${file.createBy.loginName}" escapeXml="true"/>]
 					</c:if>
 													
 					<c:set var="downloadURL">
