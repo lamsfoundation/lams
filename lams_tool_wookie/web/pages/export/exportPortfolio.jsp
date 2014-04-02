@@ -5,7 +5,7 @@
 
 <html>
 <lams:head>
-	<title><c:out value="${wookieDTO.title}" escapeXml="false" /></title>
+	<title><c:out value="${wookieDTO.title}" escapeXml="true" /></title>
 	<lams:css localLinkPath="../" />
 
 	<script type="text/javascript">
@@ -33,7 +33,7 @@
 
 <div id="content">
 
-<h1><c:out value="${wookieDTO.title}" escapeXml="false" /></h1>
+<h1><c:out value="${wookieDTO.title}" escapeXml="true" /></h1>
 
 <p><c:out value="${wookieDTO.instructions}" escapeXml="false" /></p>
 
@@ -111,13 +111,13 @@
 						<c:forEach var="user" items="${session.userDTOs}">
 							<tr>
 								<td>
-									${user.firstName} ${user.lastName}
+									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 								</td>
 								
 									<td >
 										<c:choose>
 											<c:when test="${user.finishedReflection}">
-												${user.notebookEntry}
+												<lams:out escapeHtml="true" value="${user.notebookEntry}"/>
 											</c:when>
 											<c:otherwise>
 												<fmt:message key="label.notAvailable" />
@@ -137,7 +137,7 @@
 	<c:otherwise>
 		<br />
 		<h2>
-			${userDTO.firstName} ${userDTO.lastName}
+			<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
 		</h2>
 		
 		<c:choose>
@@ -172,13 +172,13 @@
 			</h2>
 			
 			<h4>
-				${wookieDTO.reflectInstructions}
+				<lams:out value="${wookieDTO.reflectInstructions}" escapeHtml="true"/>
 			</h4>
 			
 			<c:choose>
 				<c:when test="${userDTO.finishedReflection}">
 					<p>
-						${userDTO.notebookEntry}
+						<lams:out value="${userDTO.notebookEntry}" escapeHtml="true"/>
 					</p>
 				</c:when>
 				<c:otherwise>

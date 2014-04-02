@@ -10,66 +10,6 @@
 	}
 </script>
 
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.lockOnFinished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.lockOnFinish}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.reflectOnActivity == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${dto.reflectOnActivity == true}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					${dto.reflectInstructions}	
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-</table>
-</div>
-
 
 <html:form action="/monitoring" method="post" styleId="monitoringForm">
 	
@@ -127,13 +67,13 @@
 				<c:forEach var="user" items="${session.userDTOs}">
 					<tr>
 						<td>
-							${user.firstName} ${user.lastName}
+							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 						</td>
 						
 							<td >
 								<c:choose>
 									<c:when test="${user.finishedReflection}">
-										${user.notebookEntry}
+										<lams:out value="${user.notebookEntry}" escapeXml="true"/>
 									</c:when>
 									<c:otherwise>
 										<fmt:message key="label.notAvailable" />
@@ -151,3 +91,65 @@
 	</c:forEach>
 
 </html:form>
+
+
+<h1>
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+<br />
+
+<div class="monitoring-advanced" id="advancedDiv" style="display:none">
+<table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.lockOnFinished" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.lockOnFinish}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.reflectOnActivity == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${dto.reflectOnActivity == true}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>
+					<lams:out value="${dto.reflectInstructions}" escapeHtml="true"/>	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+</table>
+</div>
+

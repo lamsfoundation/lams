@@ -15,12 +15,12 @@
 					</tr>
 					<tr align="center">
 						<td class="wookie-title" align="center" valign="top">
-							<a href="javascript:selectWookieWidget('${widget.identifier}')">${widget.title}</a>
+							<a href="javascript:selectWookieWidget('${widget.identifier}')"><c:out value="${widget.title}" escapeXml="true"/></a>
 						</td>
 					</tr>
 					<tr align="center">
 						<td class="wookie-description" align="center" valign="top">
-							${widget.description}
+							<c:out value="${widget.description}" escapeXml="false"/>
 						</td>
 					</tr>				    			    
 				</table>			    
@@ -50,7 +50,7 @@
 					
 					<tr align="center">
 						<td class="wookie-description" align="center" valign="top">
-							${widget.description}
+							<c:out value="${widget.description}" escapeXml="false"/>
 						</td>
 					</tr>				    			    
 				</table>			    

@@ -34,14 +34,14 @@
 					<tr>
 						<td>
 							<h2>
-								${wookieUserDTO.firstName} ${wookieUserDTO.lastName}
+								<c:out value="${wookieUserDTO.firstName} ${wookieUserDTO.lastName}" escapeXml="true"/>
 							</h2>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<p>
-								<lams:out value="${wookieUserDTO.notebookEntry}" />
+								<lams:out value="${wookieUserDTO.notebookEntry}" escapeHtml="true"/>
 							</p>
 						</td>
 					</tr>

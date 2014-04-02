@@ -37,7 +37,7 @@
 			<div id="content">
 			
 			<h1>
-				${wookieDTO.title}
+				<c:out value="${wookieDTO.title}" escapeXml="true"/>
 			</h1>
 		
 			<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">

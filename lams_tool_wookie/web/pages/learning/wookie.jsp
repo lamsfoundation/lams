@@ -16,11 +16,11 @@
 
 <div id="content">
 	<h1>
-		${wookieDTO.title}
+		<c:out value="${wookieDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<p>
-		${wookieDTO.instructions}
+		<c:out value="${wookieDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${wookieDTO.lockOnFinish and mode == 'learner'}">
