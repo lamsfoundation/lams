@@ -239,7 +239,7 @@ table#authoringTable {
 }
 
 td#templateContainerCell {
-	width: 152px;
+	width: 150px;
 	border: black thin solid;
 	vertical-align: top;
 	background-color: rgb(219, 230, 252);
@@ -262,7 +262,7 @@ div.template img {
 
 div.template div {
 	float: right;
-	width: 92px;
+	width: 89px;
 	padding-top: 11px;
 	font-size: 10pt;
 	font-family: serif;

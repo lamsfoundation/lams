@@ -181,12 +181,15 @@ var PropertyLib = {
 	 */
 	toolProperties : function() {
 		var activity = this,
-			content = activity.propertiesContent;
+			content = activity.propertiesContent,
+			allowsGrouping = !this.parentActivity || !(this.parentActivity instanceof ActivityLib.ParallelActivity);
+		
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
+			$('.propertiesContentFieldGrouping', content).closest('tr').remove();
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
@@ -198,11 +201,15 @@ var PropertyLib = {
 					activity.title = newTitle;
 					redrawNeeded = true;
 				}
-				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
-									.data('grouping');
-				if (newGroupingValue != activity.grouping) {
-					activity.grouping = newGroupingValue;
-					redrawNeeded = true;
+				
+				var selectedGrouping = $('.propertiesContentFieldGrouping option:selected', content);
+				if (selectedGrouping.length > 0){
+					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
+										.data('grouping');
+					if (newGroupingValue != activity.grouping) {
+						activity.grouping = newGroupingValue;
+						redrawNeeded = true;
+					}
 				}
 				
 				if (redrawNeeded) {
@@ -211,7 +218,9 @@ var PropertyLib = {
 			});
 		}
 		
-		PropertyLib.fillGroupingDropdown(content, activity.grouping);
+		if (allowsGrouping){
+			PropertyLib.fillGroupingDropdown(content, activity.grouping);
+		}
 	},
 	
 	
@@ -406,6 +415,46 @@ var PropertyLib = {
 	
 	
 	/**
+	 * Properties dialog content for Parallel activities.
+	 */
+	parallelProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentParallel').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			
+			$('input, select', content).change(function(){
+				// extract changed properties and redraw the activity
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				if (newTitle != activity.title) {
+					activity.title = newTitle;
+					redrawNeeded = true;
+				}
+				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
+									.data('grouping');
+				if (newGroupingValue != activity.grouping) {
+					activity.grouping = newGroupingValue;
+					redrawNeeded = true;
+				}
+				
+				if (redrawNeeded) {
+					activity.draw();
+				}
+			});
+		}
+		
+		PropertyLib.fillGroupingDropdown(content, activity.grouping);
+	},
+	
+	
+	/**
 	 * Properties dialog content for Optional Activity.
 	 */
 	optionalActivityProperties : function() {
@@ -536,7 +585,7 @@ var PropertyLib = {
 		var emptyOption = $('<option />'),
 			groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
 		$.each(layout.activities, function(){
-			if (this instanceof ActivityLib.GropuingActivity) {
+			if (this instanceof ActivityLib.GroupingActivity) {
 				var option = $('<option />').text(this.title)
 											.appendTo(groupingDropdown)
 											// store reference to grouping object

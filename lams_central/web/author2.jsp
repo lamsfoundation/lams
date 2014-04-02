@@ -126,8 +126,9 @@
 					<td id="templateContainerCell">
 						<div id="templateContainer">
 							<c:forEach var="tool" items="${tools}">
-								<div toolId="${tool.toolId}" supportsOutputs="${tool.supportsOutputs}"
-									 activityCategoryID="${tool.activityCategoryID}"
+								<div learningLibraryId="${tool.learningLibraryId}"
+									 supportsOutputs="${tool.supportsOutputs}"
+									 activityCategoryId="${tool.activityCategoryID}"
 									 class="template">
 									<c:if test="${not empty tool.iconPath}">
 										<img src="<lams:LAMSURL/>${tool.iconPath}" />
@@ -400,6 +401,28 @@
 			<tr>
 				<td colspan="2">
 					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+		
+	<div id="propertiesContentParallel" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Grouping:
+				</td>
+				<td>
+					  <select class="propertiesContentFieldGrouping"></select>
 				</td>
 			</tr>
 		</table>

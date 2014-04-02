@@ -209,29 +209,37 @@ public class LearningDesignService implements ILearningDesignService {
     /**
      * Gets basic information on available tools.
      */
-    public List<ToolDTO> getToolDTOs(String userName) throws IOException {
+    public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException {
 	User user = (User) learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
 	String languageCode = user.getLocale().getLanguageIsoCode();
-	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(
-		languageCode);
+	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(languageCode);
 	List<ToolDTO> tools = new ArrayList<ToolDTO>();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
-	    // skip invalid and complex tools
-	    if (learningLibrary.getValidFlag() && (learningLibrary.getTemplateActivities().size() == 1)) {
-		LibraryActivityDTO libraryActivityDTO = (LibraryActivityDTO) learningLibrary.getTemplateActivities().get(0);
+	    // skip invalid tools
+	    boolean isParallel = learningLibrary.getTemplateActivities().size() > 1;
+	    if (learningLibrary.getValidFlag() && (includeParallel || !isParallel)) {
+		LibraryActivityDTO libraryActivityDTO = (LibraryActivityDTO) learningLibrary.getTemplateActivities()
+			.get(0);
 		ToolDTO toolDTO = new ToolDTO();
-		toolDTO.setToolId(learningLibrary.getLearningLibraryID());
-		toolDTO.setToolDisplayName(libraryActivityDTO.getActivityTitle());
-		toolDTO.setActivityCategoryID(libraryActivityDTO.getActivityCategoryID());
-		
-		Tool tool = (Tool) learningLibraryDAO.find(Tool.class, learningLibrary.getLearningLibraryID());
-		if (tool != null) {
-		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
-		    iconPath = iconPath.substring(0, iconPath.lastIndexOf('/') + 1);
-		    iconPath += "icon_" + tool.getToolIdentifier() + ".svg";
-		    toolDTO.setIconPath(iconPath);
-		    
-		    toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
+		if (!isParallel) {
+		    toolDTO.setToolId(libraryActivityDTO.getToolID());
+		}
+		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
+		toolDTO.setToolDisplayName(isParallel ? learningLibrary.getTitle() : libraryActivityDTO
+			.getActivityTitle());
+		toolDTO.setActivityCategoryID(isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO
+			.getActivityCategoryID());
+
+		if (libraryActivityDTO.getToolID() != null) {
+		    Tool tool = (Tool) learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
+		    if (tool != null) {
+			String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
+			iconPath = iconPath.substring(0, iconPath.lastIndexOf('/') + 1);
+			iconPath += "icon_" + tool.getToolIdentifier() + ".svg";
+			toolDTO.setIconPath(iconPath);
+
+			toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
+		    }
 		}
 		
 		tools.add(toolDTO);

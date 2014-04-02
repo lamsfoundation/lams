@@ -103,5 +103,5 @@ public interface ILearningDesignService {
 
     String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException;
     
-    public List<ToolDTO> getToolDTOs(String userName) throws IOException;
+    public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException;
 }

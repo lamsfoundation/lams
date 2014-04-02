@@ -92,12 +92,37 @@ $(document).ready(function() {
  */
 function initTemplates(){
 	$('.template').each(function(){
-		var toolId = +$(this).attr('toolId');
+		var learningLibraryID = +$(this).attr('learningLibraryId'),
+			activityCategoryID = +$(this).attr('activityCategoryId'),
+			parallelChildActivities = null;
+		
+		if (activityCategoryID == 5) {
+				// mark which HTML templates construct this parallel activity
+				switch(learningLibraryID){
+		    	case 28:
+		    		// share resources and forum
+		    		parallelChildActivities = $('.template[learningLibraryId=12]')
+		    								  .add($('.template[learningLibraryId=6]'));
+		    		break;
+		    	case 29:
+		    		// chat and scribe
+		    		parallelChildActivities = $('.template[learningLibraryId=3]')
+		    								  .add($('.template[learningLibraryId=20]'));
+		    		break;
+		    	case 30:
+		    		// forum and scribe
+		    		parallelChildActivities = $('.template[learningLibraryId=6]')
+		    								  .add($('.template[learningLibraryId=20]'));
+		    		break;
+		    	}
+		}
+		
 		// register tool properties so they are later easily accessible
-		layout.toolMetadata[toolId] = {
-			'iconPath' 			 : $('img', this).attr('src'),
-			'supportsOutputs' 	 : $(this).attr('supportsOutputs'),
-			'activityCategoryID' : +$(this).attr('activityCategoryID')
+		layout.toolMetadata[learningLibraryID] = {
+			'iconPath' 			 	  : $('img', this).attr('src'),
+			'supportsOutputs' 	 	  : $(this).attr('supportsOutputs'),
+			'activityCategoryID' 	  : activityCategoryID,
+			'parallelChildActivities' : parallelChildActivities
 		};
 		
 		// if a tool's name is too long and gets broken into two lines
@@ -140,14 +165,33 @@ function initTemplates(){
 				$(draggable.helper).remove();
 				
 				// calculate the position and create an instance of the tool activity
-			    var toolID = draggable.draggable.attr('toolId'),
+			    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
+					activityCategoryID = +draggable.draggable.attr('activityCategoryId'),
 			    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 			    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
 			    	label = $('div', draggable.draggable).text(),
-			    	activity = new ActivityLib.ToolActivity(null, null, null, toolID, x, y, label),
+			    	activity = null,
 			    	translatedEvent = ActivityLib.translateEventOnCanvas(event),
 					eventX = translatedEvent[0],
 					eventY = translatedEvent[1];
+			    
+			    if (activityCategoryID == 5) {
+			    	// construct child activities out of previously referenced HTML templates
+			    	var childActivities = [];
+			    	layout.toolMetadata[learningLibraryID].parallelChildActivities.each(function(){
+			    		var toolActivityLibraryID = +$(this).attr('learningLibraryId'),
+			    			toolLabel = $('div', this).text(),
+			    			childActivity = new ActivityLib.ToolActivity(null, null, null,
+				    				toolActivityLibraryID, x, y, toolLabel);
+			    		
+			    		layout.activities.push(childActivity);
+			    		childActivities.push(childActivity);
+			    	});
+			    	
+			    	activity = new ActivityLib.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivities);
+			    } else {
+			    	activity = new ActivityLib.ToolActivity(null, null, null, learningLibraryID, x, y, label);
+			    }
 			    
 				layout.activities.push(activity); 
 				ActivityLib.dropActivity(activity, eventX, eventY);
@@ -464,7 +508,7 @@ function openLearningDesign(learningDesignID) {
 					case 3: var gateType = 'sync';
 					case 4: var gateType = gateType || 'schedule';
 					case 5: var gateType = gateType || 'permision';
-					case 6:
+					case 14:
 						var gateType = gateType || 'condition';
 						activity = new ActivityLib.GateActivity(activityData.activityID,
 							activityData.activityUIID,
@@ -473,6 +517,16 @@ function openLearningDesign(learningDesignID) {
 							gateType);
 						break;
 
+					// Parallel Activity
+					case 6:
+						activity = new ActivityLib.ParallelActivity(activityData.activityID,
+								activityData.activityUIID,
+								activityData.learningLibraryID,
+								activityData.xCoord,
+								activityData.yCoord,
+								activityData.activityTitle);
+						break;
+						
 					// Optional Activity
 					case 7:
 						activity = new ActivityLib.OptionalActivity(activityData.activityID,
@@ -627,11 +681,13 @@ function openLearningDesign(learningDesignID) {
 						}	
 					}
 					
-					// find Optional Activity
+					// find Optional/Parallel Activity
 					if (activityData.parentActivityID && !activity.parentActivity) {
 						$.each(layout.activities, function(){
-							if (activityData.parentActivityID == this.id && this instanceof ActivityLib.OptionalActivity) {
-								// add a Tool Activity as a Optional Activity element
+							if (activityData.parentActivityID == this.id
+									&& (this instanceof ActivityLib.ParallelActivity
+										|| this instanceof ActivityLib.OptionalActivity)) {
+								// add a Tool Activity as a Optional/Parallel Activity element
 								if (!this.childActivities) {
 									this.childActivities = [];
 								}
@@ -824,6 +880,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			activityBox = activity.items ? activity.items.shape.getBBox() : null,
 			activityTypeID = null,
 			toolID = activity.toolID,
+			learningLibraryID = toolID ? toolID : activity.learningLibraryID,
 			iconPath = null,
 			isGrouped = activity.grouping ? true : false,
 			parentActivityID = activity.parentActivity ? activity.parentActivity.id : null;
@@ -831,9 +888,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		if (toolID) {
 			activityTypeID = 1;
 			// find out what is the icon for tool acitivty
-			var templateIcon = $('.template[toolId=' + toolID +'] img');
+			var templateIcon = $('.template[learningLibraryId=' + learningLibraryID +'] img');
 			if (templateIcon.width() > 0) {
-				 iconPath = layout.toolMetadata[toolID].iconPath;
+				 iconPath = layout.toolMetadata[learningLibraryID].iconPath;
 			}
 		}
 		// translate activity type to back-end understandable
@@ -880,8 +937,10 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				case 'sync'      : activityTypeID = 3; break;
 				case 'schedule'  : activityTypeID = 4; break;
 				case 'permision' : activityTypeID = 5; break;
-				case 'condition' : activityTypeID = 6; break;
+				case 'condition' : activityTypeID = 14; break;
 			}
+		} else if (activity instanceof ActivityLib.ParallelActivity) {
+			activityTypeID = 6;
 		} else if (activity instanceof ActivityLib.OptionalActivity) {
 			activityTypeID = 7;
 		} else if (activity instanceof ActivityLib.BranchingActivity) {
@@ -917,7 +976,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'activityID' 			 : activity.id,
 			'activityUIID' 			 : activity.uiid,
 			'toolID' 				 : toolID,
-			'learningLibraryID' 	 : toolID,
+			'learningLibraryID' 	 : learningLibraryID,
 			'toolContentID' 	 	 : activity.toolContentID,
 			'stopAfterActivity' 	 : false,
 			'groupingSupportType' 	 : 2,
@@ -930,8 +989,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'xCoord' 				 : activityBox ? parseInt(activityBox.x) : null,
 			'yCoord' 				 : activityBox ? parseInt(activityBox.y) : null,
 			'activityTitle' 		 : activity.title,
-			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity ?
-											layout.toolMetadata[toolID].activityCategoryID : 1,
+			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity
+									   || activity instanceof ActivityLib.ParallelActivity ?
+									   layout.toolMetadata[learningLibraryID].activityCategoryID : 1,
 			'activityTypeID'     	 : activityTypeID,
 			'orderID'				 : activity.orderID,
 			'defaultActivityUIID'    : activity.defaultActivityUIID,

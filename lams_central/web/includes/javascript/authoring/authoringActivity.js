@@ -72,7 +72,7 @@ var ActivityLib = {
 		
 		this.loadPropertiesDialogContent = PropertyLib.groupingProperties;
 
-		this.draw = ActivityLib.draw.grouping;		
+		this.draw = ActivityLib.draw.grouping;
 		this.draw(x, y);
 	},
 
@@ -148,6 +148,26 @@ var ActivityLib = {
 		this.transitionFrom = transitionFrom;
 	},
 	
+	
+	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivities){
+		DecorationLib.Container.call(this, title);
+		
+		this.id = +id;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.learningLibraryID = +learningLibraryID;
+		this.transitions = {
+			'from' : [],
+			'to'   : []
+		};
+		if (childActivities){
+			this.childActivities = childActivities;
+		}
+		
+		this.loadPropertiesDialogContent = PropertyLib.parallelProperties;
+		
+		this.draw = ActivityLib.draw.parallelActivity;
+		this.draw(x, y);
+	},
 	
 	/**
 	 * Constructor for an Optional Activity.
@@ -366,6 +386,40 @@ var ActivityLib = {
 			this.items.shape = shape;
 			
 			ActivityLib.activityHandlersInit(this);
+		},
+		
+		
+		parallelActivity : function(x, y) {
+			if (x == undefined || y == undefined) {
+				// if no new coordinates are given, just redraw the activity
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+			
+			if (this.childActivities && this.childActivities.length > 0) {
+				// draw one by one, vertically
+				var activityY = y + 30,
+					allElements = paper.set(),
+					optionalActivity = this;
+				$.each(this.childActivities, function(orderID){
+					this.parentActivity = optionalActivity;
+					this.orderID = orderID + 1;
+					this.draw(x + 20, activityY);
+					activityY = this.items.shape.getBBox().y2 + 10;
+					allElements.push(this.items.shape);
+				});
+				// area containing all drawn child activities
+				var box = allElements.getBBox();
+				
+				this.drawContainer(x, y, box.x2 + 20, box.y2 + 20, layout.colors.optionalActivity);
+			} else {
+				this.drawContainer(x, y, x + 50, y + 70, layout.colors.optionalActivity);
+			}
+			
+			// allow transition drawing and other activity behaviour
+			this.items.shape.unmousedown().mousedown(HandlerLib.activityMousedownHandler);
+			
+			this.items.data('parentObject', this);
 		},
 		
 		

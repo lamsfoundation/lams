@@ -106,7 +106,8 @@ var HandlerLib = {
 			items.attr('cursor', 'move');
 			
 			var parentObject = draggedElement.data('parentObject');
-				sticky = parentObject && (parentObject instanceof ActivityLib.OptionalActivity
+				sticky = parentObject && (parentObject instanceof ActivityLib.ParallelActivity
+										  || parentObject instanceof ActivityLib.OptionalActivity
 										  || parentObject instanceof ActivityLib.FloatingActivity);
 			if (sticky) {
 				$.each(parentObject.childActivities, function(){
@@ -388,7 +389,8 @@ var HandlerLib = {
 		if (event.ctrlKey) {
 			 // when CTRL is held down, start drawing a transition
 			 HandlerLib.drawTransitionStartHandler(activity, event, x, y);
-		} else {
+		} else if (!activity.parentActivity
+				|| !(activity.parentActivity instanceof ActivityLib.ParallelActivity)){
 			var mouseupHandler = function(event){
 				if (HandlerLib.isElemenentBinned(event)) {
 					// if the activity was over rubbish bin, remove it
@@ -481,7 +483,9 @@ var HandlerLib = {
 				}
 			} else {
 				HandlerLib.dropObject(container);
-				if (container instanceof ActivityLib.FloatingActivity) {
+				if (container instanceof ActivityLib.FloatingActivity
+					|| container instanceof ActivityLib.OptionalActivity
+					|| container instanceof ActivityLib.ParallelActivity) {
 					ActivityLib.dropActivity(container);
 				}
 			}

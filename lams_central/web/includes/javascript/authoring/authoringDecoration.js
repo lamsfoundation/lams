@@ -65,7 +65,10 @@ var DecorationLib = {
 					this.items = paper.set();
 					if (this.title) {
 						var label = paper.text(x + 7, y + 10, this.title)
-						 				 .attr('text-anchor', 'start')
+						 				 .attr({
+						 					 'text-anchor' : 'start',
+						 					 'cursor'  : 'pointer'
+						 				 })
 						 				 .toBack();
 						this.items.push(label);
 						
@@ -79,10 +82,11 @@ var DecorationLib = {
 							 					'fill'    : color,
 												'cursor'  : 'pointer'
 											})
-											.mousedown(HandlerLib.containerMousedownHandler)
-											.click(HandlerLib.itemClickHandler)
 											.toBack();
 					this.items.push(this.items.shape);
+					
+					this.items.mousedown(HandlerLib.containerMousedownHandler)
+							  .click(HandlerLib.itemClickHandler);
 				},	
 		
 				/**
@@ -231,5 +235,6 @@ var DecorationLib = {
 
 // set prototype hierarchy
 DecorationLib.Region.prototype = new DecorationLib.Container;
+ActivityLib.ParallelActivity.prototype = new DecorationLib.Container;
 ActivityLib.OptionalActivity.prototype = new DecorationLib.Container;
 ActivityLib.FloatingActivity.prototype = new DecorationLib.Container;

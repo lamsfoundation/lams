@@ -274,7 +274,7 @@ var MenuLib = {
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
 	saveLearningDesign : function(showDialog){
-		if (!showDialog) {
+		if (!showDialog && layout.ld.learningDesignID) {
 			saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
 			return;
 		}

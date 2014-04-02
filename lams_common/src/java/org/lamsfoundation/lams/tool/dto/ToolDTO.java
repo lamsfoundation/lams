@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.dto;
 
 public class ToolDTO {
     private Long toolId;
+    private Long learningLibraryId;
     private String toolDisplayName;
     private String iconPath;
     private Boolean supportsOutputs;
@@ -71,5 +72,13 @@ public class ToolDTO {
 
     public void setActivityCategoryID(Integer activityCategoryID) {
 	this.activityCategoryID = activityCategoryID;
+    }
+
+    public Long getLearningLibraryId() {
+        return learningLibraryId;
+    }
+
+    public void setLearningLibraryId(Long learningLibraryId) {
+        this.learningLibraryId = learningLibraryId;
     }
 }
