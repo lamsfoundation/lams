@@ -53,6 +53,7 @@
 			</p>
 			<c:if test="${not empty sessionMap.submissionDeadline}">
 				<div class="info">
+				 	<fmt:message>
 						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 					</fmt:message>
 				</div>
