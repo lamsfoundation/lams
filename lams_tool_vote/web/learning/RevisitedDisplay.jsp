@@ -122,7 +122,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="vote"
 						items="${requestScope.listUserEntriesContent}">
 						<div>
-							<c:out value="${vote.userEntry}" escapeXml="false" />
+							<c:out value="${vote.userEntry}" escapeXml="true" />
 						</div>
 					</c:forEach>
 					<div>&nbsp;</div>
@@ -145,7 +145,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</div>
 				</c:forEach>
 				<div>
-					<c:out value="${VoteLearningForm.userEntry}" />
+					<lams:out value="${VoteLearningForm.userEntry}" escapeHtml="true"/>
 				</div>
 
 				<div id="chartDiv0" style="height: 220px; display: none;"></div>

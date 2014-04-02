@@ -139,7 +139,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 
 		<html:form onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">

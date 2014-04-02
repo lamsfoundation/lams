@@ -143,7 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 

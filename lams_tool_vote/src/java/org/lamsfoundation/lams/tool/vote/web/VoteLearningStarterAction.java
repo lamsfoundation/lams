@@ -164,8 +164,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteGeneralLearnerFlowDTO.setToolContentUID(voteContent.getUid().toString());
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	String mode = voteLearningForm.getLearningMode();
 	voteGeneralLearnerFlowDTO.setLearningMode(mode);
@@ -174,8 +174,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
 		CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(userId));
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);

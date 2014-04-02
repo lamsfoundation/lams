@@ -60,11 +60,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<div id="content">
 			<h1>
-				<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+				<lams:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeHtml="true" />
 			</h1>
 
 			<p>
-				<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
+				<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true"/>
+
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>

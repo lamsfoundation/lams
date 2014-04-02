@@ -66,7 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content">
 
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
@@ -107,12 +107,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
 
-				<h2>
-						<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
-				</h2>
+				<h4>
+						<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
+				</h4>
 
-				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					escapeXml="false" />
+				<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+					escapeHtml="true" />
 			
 				<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
 				<br>

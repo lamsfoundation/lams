@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 
@@ -114,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${not empty VoteLearningForm.userEntry}">
 					<li>
-						<c:out value="${VoteLearningForm.userEntry}" />
+						<c:out value="${VoteLearningForm.userEntry}" escapeXml="true" />
 					</li>
 				</c:if>
 			</ul>

@@ -67,7 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 
@@ -202,7 +202,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						items="${requestScope.listUserEntriesContent}">
 						<c:if test="${vote.userEntry != null}">
 							<div>
-								<c:out value="${vote.userEntry}" escapeXml="false" /> 
+								<c:out value="${vote.userEntry}" escapeXml="true" /> 
 							</div>
 						</c:if>
 					</c:forEach>
@@ -242,8 +242,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</h2>
 	
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
+					<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+						escapeHtml="true" />
 				</p>
 			</c:if>			
 							

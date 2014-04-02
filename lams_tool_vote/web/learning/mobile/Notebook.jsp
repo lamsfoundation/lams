@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div>
 
@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="useSelectLeaderToolOuput" />
 	
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
+					<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 				</p>
 	
 				<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>

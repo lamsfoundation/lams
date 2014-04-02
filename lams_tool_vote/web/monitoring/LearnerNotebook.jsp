@@ -32,13 +32,13 @@
 				<tr>
 					<td>
 						<h2>
-							<c:out value="${voteGeneralLearnerFlowDTO.userName}" escapeXml="false"/>
+							<c:out value="${voteGeneralLearnerFlowDTO.userName}" escapeXml="true"/>
 						</h2>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<p><c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false"/></p>
+						<p><lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/></p>
 					</td>
 				</tr>
 			</table>

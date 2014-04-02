@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
@@ -216,12 +216,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:forEach var="entry"
 				items="${requestScope.listGeneralCheckedOptionsContent}">
 				<div>
-					<c:out value="${entry}" escapeXml="false" />
+					<c:out value="${entry}" escapeXml="true" />
 				</div>
 			</c:forEach>
 
 			<div>
-				<c:out value="${VoteLearningForm.userEntry}" />
+				<c:out value="${VoteLearningForm.userEntry}" escapeXml="true"/>
 			</div>
 
 
@@ -232,7 +232,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</h2>
 	
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false" />
+					<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 				</p>
 			</c:if>							
 

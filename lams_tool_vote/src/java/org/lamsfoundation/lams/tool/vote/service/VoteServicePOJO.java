@@ -620,8 +620,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 			reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
 			reflectionDTO.setUserName(user.getFullname());
 			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
+			//String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntry.getEntry());
 			reflectionsContainerDTO.add(reflectionDTO);
 		    }
 		}
@@ -642,8 +642,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 			    reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
 			    reflectionDTO.setUserName(user.getFullname());
 			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    // String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntry.getEntry());
 			    reflectionsContainerDTO.add(reflectionDTO);
 			}
 		    }

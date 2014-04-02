@@ -66,7 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<h1>
 			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+				escapeXml="true" />
 		</h1>
 		
 		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
@@ -112,13 +112,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${VoteLearningForm.showResults != 'true'}">
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
+			
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
 					<h2>
-							<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />												
+							<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
 					</h2>
 	
-					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
+					<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
+						escapeHtml="true" />
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">

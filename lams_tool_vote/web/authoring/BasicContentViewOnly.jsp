@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<div class="field-name">
 									<fmt:message key="label.authoring.title.col"></fmt:message>
 								</div>
-						  			<c:out value="${voteGeneralAuthoringDTO.activityTitle}" escapeXml="false"/> 								
+						  			<c:out value="${voteGeneralAuthoringDTO.activityTitle}" escapeXml="true"/> 								
 							</td>
 						</tr>
 						

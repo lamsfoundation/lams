@@ -208,8 +208,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	    voteGeneralLearnerFlowDTO.setUserName(userName);
 	}
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
@@ -454,8 +454,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 			voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
-			String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
-			voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
+			// String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
+			voteMonitoredUserDTO.setResponsePresentable(voteUsrResp.getUserEntry());
 
 			voteMonitoredUserDTO.setQuestionUid(questionUid);
 			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrResp.isVisible()).toString());

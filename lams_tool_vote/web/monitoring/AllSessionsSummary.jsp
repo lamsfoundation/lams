@@ -3,9 +3,13 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<h3>
+<h1>
+	<c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
+</h1>
+
+<div class="instructions space-top">
 	<c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/> 
-</h3>
+</div>
 
 <c:forEach var="sessionDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
 
@@ -114,7 +118,7 @@
 		  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
 					<tr> 
 						<td  valign=top class="align-left"> 
-							<c:out value="${openVoteDto.question}" escapeXml="false"/> 
+							<c:out value="${openVoteDto.question}" escapeXml="true"/> 
 							<c:if test="${userData.visible != 'true' }"> 			
 								<i><fmt:message key="label.hidden"/> </i> 
 							</c:if> 								

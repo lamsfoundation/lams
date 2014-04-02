@@ -85,11 +85,11 @@
 					
 		<tr>							
 			<td>
-				<c:out value="${userName}" escapeXml="false"/> 
+				<c:out value="${userName}" escapeXml="true"/> 
 			</td>
 
 			<td>
-				<c:out value="${entry}" escapeXml="false"/> 
+				<c:out value="${entry}" escapeXml="true"/> 
 			</td>
 		</tr>	
 	</c:forEach>		

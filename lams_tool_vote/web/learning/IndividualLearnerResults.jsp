@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes">
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 		
 		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
@@ -105,7 +105,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${not empty VoteLearningForm.userEntry}">
 					<li>
-						<c:out value="${VoteLearningForm.userEntry}" />
+						<c:out value="${VoteLearningForm.userEntry}" escapeXml="true"/> 
 					</li>
 				</c:if>
 			</ul>

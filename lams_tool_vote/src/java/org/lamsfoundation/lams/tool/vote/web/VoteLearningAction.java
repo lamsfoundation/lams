@@ -143,8 +143,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	voteLearningForm.resetCommands();
 
@@ -260,8 +260,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	setContentInUse(request, voteService, toolContentID);
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	voteLearningForm.resetCommands();
 
@@ -311,8 +311,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
@@ -576,6 +576,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteLearningForm.setUserID(userID);
 
 	String reflectionEntry = request.getParameter(ENTRY_TEXT);
+	logger.info("reflection entry: " + reflectionEntry);
 
 	voteService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
 		new Integer(userID), reflectionEntry);
@@ -597,9 +598,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 
 	String reflectionSubject = voteContent.getReflectionSubject();
-	reflectionSubject = VoteUtils.replaceNewLines(reflectionSubject);
+	//reflectionSubject = VoteUtils.replaceNewLines(reflectionSubject);
 
-	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	String userID = request.getParameter("userID");
 	voteLearningForm.setUserID(userID);

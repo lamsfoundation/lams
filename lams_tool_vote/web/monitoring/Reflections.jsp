@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 				<c:if test="${notebookEntriesExist == 'true' }"> 			
-					<table class="forms">
+					<table class="alternative-color">
 						
 								<tr>			
-									<td colspan=2 valign=top class="align-left">
+									<th colspan=2 valign=top class="align-left">
 										<b>  <fmt:message key="label.reflection"/>  </b> 
-									 </td>
+									 </th>
 								</tr>	
 						
 						
@@ -17,7 +17,7 @@
 					  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 								<tr>			
 									<td valign=top class="align-left">
-										 <c:out value="${userName}" escapeXml="false"/> 
+										 <c:out value="${userName}" escapeXml="true"/> 
 									 </td>
 	
 									<td valign=top class="align-left">
