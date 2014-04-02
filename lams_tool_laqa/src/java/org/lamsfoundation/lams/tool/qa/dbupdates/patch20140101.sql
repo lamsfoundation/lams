@@ -8,7 +8,15 @@ ALTER TABLE tl_laqa11_content ADD COLUMN use_select_leader_tool_ouput TINYINT(1)
 ALTER TABLE tl_laqa11_session ADD COLUMN qa_group_leader_uid BIGINT;
 ALTER TABLE tl_laqa11_session ADD INDEX FK_laqa11_session1 (qa_group_leader_uid), ADD CONSTRAINT FK_laqa11_session1 FOREIGN KEY (qa_group_leader_uid) REFERENCES tl_laqa11_que_usr (uid) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- adding a constraint to the QA user table so no same user_id and session_id can be repetead 
+-- Adding a constraint to the QA user table so no same que_usr_id and qa_session_id can be repetead 
+-- In order to achieve this remove duplicate users and according responses. 
+CREATE TABLE temp_select AS SELECT MAX(uid) uid
+FROM tl_laqa11_que_usr GROUP BY que_usr_id, qa_session_id;
+ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
+DELETE FROM tl_laqa11_usr_resp WHERE que_usr_id NOT IN (SELECT uid FROM temp_select);
+DELETE FROM tl_laqa11_que_usr WHERE uid NOT IN (SELECT uid FROM temp_select);
+DROP TABLE temp_select;
+
 ALTER TABLE tl_laqa11_que_usr ADD UNIQUE INDEX(que_usr_id, qa_session_id);
 
 ----------------------Put all sql statements above here-------------------------
