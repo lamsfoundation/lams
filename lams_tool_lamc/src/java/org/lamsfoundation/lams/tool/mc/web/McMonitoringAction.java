@@ -2473,8 +2473,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	    mcGeneralLearnerFlowDTO.setUserName(userName);
 	}
 

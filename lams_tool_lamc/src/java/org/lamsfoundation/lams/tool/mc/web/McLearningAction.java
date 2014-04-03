@@ -356,8 +356,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	mcGeneralLearnerFlowDTO.setLatestAttemptMark(mcQueUsr.getLastAttemptTotalMark());
 
@@ -417,8 +417,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 
@@ -505,15 +505,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setAttemptMap(attemptMap);
 
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		McAppConstants.MY_SIGNATURE, new Integer(mcQueUsr.getQueUsrId().intValue()));
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = notebookEntry.getEntry();
-	    notebookEntryPresentable = McUtils.replaceNewLines(notebookEntryPresentable);
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
@@ -581,8 +579,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	//String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 
@@ -699,10 +697,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
 	mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
-	String reflectionSubject = mcContent.getReflectionSubject();
-
-	reflectionSubject = McUtils.replaceNewLines(reflectionSubject);
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	String userID = "";
 	HttpSession ss = SessionManager.getSession();

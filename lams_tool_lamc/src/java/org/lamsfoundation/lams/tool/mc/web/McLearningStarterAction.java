@@ -185,16 +185,16 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	Boolean displayAnswers = mcContent.isDisplayAnswers();
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	String userID = mcLearningForm.getUserID();
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		McAppConstants.MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 	

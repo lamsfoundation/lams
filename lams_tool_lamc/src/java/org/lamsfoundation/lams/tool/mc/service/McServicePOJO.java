@@ -1973,8 +1973,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
 			reflectionDTO.setUserName(user.getFullname());
 			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
+			// String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntry.getEntry());
 			reflectionsContainerDTO.add(reflectionDTO);
 		    }
 		}
@@ -1996,8 +1996,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
 			    reflectionDTO.setUserName(user.getFullname());
 			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntry.getEntry());
 			    reflectionsContainerDTO.add(reflectionDTO);
 			}
 		    }
