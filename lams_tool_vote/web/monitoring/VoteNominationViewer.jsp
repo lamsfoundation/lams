@@ -14,7 +14,7 @@
 <body class="stripes">
 <div id="content">
 
-    <table>
+    <table class="alternative-color">
 	    <tr> <th NOWRAP colspan=2 align=center>  <fmt:message key="label.learnersVoted"/> </th> </tr>
 	
 		<tr> 
