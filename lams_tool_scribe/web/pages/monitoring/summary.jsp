@@ -22,7 +22,7 @@ function confirmForceComplete() {
 <c:out value="${monitoringDTO.instructions}" escapeXml="false"/>
 </div>
 
-<br/>&nbsp;<br/>
+<br/>
 <c:forEach var="session" items="${dto.sessionDTOs}">
 	
 	<c:if test="${isGroupedActivity}">
@@ -84,7 +84,7 @@ function confirmForceComplete() {
 			<hr />
 			<c:forEach var="report" items="${session.reportDTOs}">
 				<p>
-					<lams:out value="${report.headingDTO.headingText}" />
+					<c:out value="${report.headingDTO.headingText}" escapeXml="false" />
 				</p>
 				<p>
 					<lams:out value="${report.entryText}" escapeHtml="true"/>
@@ -136,7 +136,7 @@ function confirmForceComplete() {
 						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 					</td>
 					<c:if test="${dto.reflectOnActivity}">
-						<td>
+						<td align="right">
 							<c:if test="${user.finishedReflection}">
 								<c:url value="monitoring.do" var="openNotebook">
 									<c:param name="dispatch" value="openNotebook" />

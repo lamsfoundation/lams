@@ -41,8 +41,10 @@
 			test="${scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
 			<div>
 				<h4>
-					<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true"/>
+				  <fmt:message key="heading.reflection" />
 				</h4>
+				
+				<strong><lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true"/></strong>
 				<p>
 					<lams:out value="${scribeUserDTO.notebookEntry}" escapeHtml="true"/>
 				</p>
