@@ -61,24 +61,12 @@
 	<c:set var="toolSessionDto" value="${element.key}" />
 	<c:set var="userlist" value="${element.value}" />
 
-	<table cellpadding="0">
-		<tr>
-			<td colspan="3">
-				<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-				<span id="messageArea"></span>
-			</td>
-		</tr>
-		<c:if test="${isGroupedActivity}">	
-			<tr>
-				<td colspan="3" >
-					<h2>
-						<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
+	<c:if test="${isGroupedActivity}">	
+	  <h2>
+ 	    <fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
 					</h2>
-				</td>
-			</tr>
-		</c:if>
-	</table>
-	<table cellpadding="0">
+        </c:if>
+	<table cellpadding="0" class="small-space-top alternative-color">
 		<c:forEach var="user" items="${userlist}" varStatus="status">
 			<c:if test="${status.first}">
 				<tr>
@@ -93,7 +81,6 @@
 					<th>
 						<fmt:message key="monitoring.marked.question"/>
 					</th>
-					<th>&nbsp;</th>
 				</tr>
 			</c:if>
 			<tr>
@@ -119,13 +106,11 @@
 						<fmt:message key="label.no"/>
 					</c:otherwise>
 					</c:choose>
-				</td>
-				<td>
 					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
 						<c:param name="userID" value="${user.userUid}" />
 						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
 					</c:url>
-					<html:link href="javascript:launchPopup('${viewuserurl}')" styleClass="button">
+					<html:link href="javascript:launchPopup('${viewuserurl}')" style="float: right;" styleClass="button">
 						<fmt:message key="lable.topic.title.mark" />
 					</html:link>
 				</td>

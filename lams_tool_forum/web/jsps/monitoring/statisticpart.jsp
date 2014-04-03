@@ -16,7 +16,7 @@
 		</c:if>
 	</c:forEach>
 
-	<table cellpadding="0">
+	<table cellpadding="0" class="alternative-color">
 		<tr>
 			<th colspan="2">
 				<fmt:message key="message.session.name" />
