@@ -24,6 +24,13 @@
 	window.onresize = resizeIframe;
 </script>
 
+<h1>
+  <c:out value="${sessionMap.imageGallery.title}" escapeXml="true"/>
+</h1>
+<div class="instructions small-space-top">
+  <c:out value="${sessionMap.imageGallery.instructions}" escapeXml="false"/>
+</div>
+
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>

@@ -3,7 +3,6 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 
-<table cellspacing="3">
 	<c:if test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
@@ -11,21 +10,19 @@
 	</c:if>
 	
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
+		
 		<c:forEach var="summary" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
-				<tr>
-					<td colspan="4">
-						<B><fmt:message key="monitoring.label.group" /> ${summary.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
-								<fmt:message key="monitoring.summary.note" />
-							</c:if> </SPAN>
-					</td>
-				</tr>
+					<h2>
+						<fmt:message key="monitoring.label.group" /> ${summary.sessionName}
+					</h2> 
+				<table cellspacing="3" class="alternative-color space-top">
 				<tr>
 					<th width="35%">
 						<fmt:message key="monitoring.label.title" />
 					</th>
-					<th width="25%">
+					<th width="25%" align="center">
 						<fmt:message key="monitoring.label.suggest" />
 					</th>
 					<c:choose>
@@ -59,7 +56,7 @@
 					<td>
 						<c:out value="${summary.itemTitle}" escapeXml="true"/>
 					</td>
-					<td>
+					<td align="center">
 						<c:if test="${!summary.itemCreateByAuthor}">
 							<c:out value="${summary.username}" escapeXml="true"/>
 						</c:if>
@@ -82,5 +79,5 @@
 				</tr>
 			</c:if>
 		</c:forEach>
+	       </table>
 	</c:forEach>
-</table>
