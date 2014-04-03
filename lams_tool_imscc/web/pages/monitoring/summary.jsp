@@ -3,15 +3,20 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-<br />
+<h1>
+  <c:out value="${sessionMap.commonCartridge.title}" escapeXml="true"/>  
+</h1>
+<div class="instructions space-top">
+  <c:out value="${sessionMap.commonCartridge.instructions}" escapeXml="false"/>
+</div>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 	</div>
 </c:if>
-
-<table cellpadding="0">
+<br/>
+<table cellpadding="0" class="alternative-color">
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 		<c:set var="groupSize" value="${fn:length(group)}" />
 		<c:forEach var="item" items="${group}" varStatus="status">

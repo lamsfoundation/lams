@@ -3,7 +3,7 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 
-<table cellspacing="3">
+<table cellspacing="3" class="alternative-color">
 	<c:if test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
