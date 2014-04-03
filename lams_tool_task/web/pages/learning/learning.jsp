@@ -161,7 +161,8 @@
 		
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2><lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}"/></h2>
+				<h3><fmt:message key="label.monitoring.summary.title.reflection" /></h3>
+				<strong><lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}"/></strong>
 			
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
