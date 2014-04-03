@@ -4,7 +4,7 @@
 
 <table cellpadding="0">
 	<tr>
-		<td>
+		<td nowrap width="10%">
 			<fmt:message key="label.authoring.basic.title" />
 			:
 		</td>
@@ -14,7 +14,7 @@
 	</tr>
 
 	<tr>
-		<td>
+		<td nowrap width="10%" valign="top">
 			<fmt:message key="label.authoring.basic.instruction" />
 			:
 		</td>
@@ -37,8 +37,8 @@
 					</html:link>
 				</c:when>
 				<c:otherwise>
-					<div align="center">
-						<b> <fmt:message key="message.monitoring.edit.activity.not.editable" /> </b>
+					<div class="warning">
+						<fmt:message key="message.monitoring.edit.activity.not.editable" />
 					</div>
 				</c:otherwise>
 			</c:choose>

@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="survey" value="${sessionMap.survey}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 <c:set var="lams">
@@ -43,6 +44,14 @@
 		location.href=url;
 	}
 </script>
+
+<h1>
+	<c:out value="${survey.title}" escapeXml="true" />
+</h1>
+<div class="instructions small-space-top">
+	<c:out value="${survey.instructions}" escapeXml="false"/>
+</div>
+<br/>
 
 <c:if test="${empty summaryList}">
 	<div align="center">
