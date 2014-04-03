@@ -155,10 +155,14 @@
 
 </script>
 
+<h1><c:out value="${mcGeneralMonitoringDTO.activityTitle}" escapeXml="true"/></h1>
+<div class="instructions space-top">
+ <c:out value="${mcGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
+</div>
 <%@ include file="parts/advanceQuestions.jsp"%>
 
 <c:if test="${useSelectLeaderToolOuput}">
-	<div class="info">
+	<div class="info space-top">
 		<fmt:message key="label.info.use.select.leader.outputs" />
 	</div>
 	<br>
@@ -177,7 +181,7 @@
 </c:if>
 			
 <c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
-
+	<br/>
 	<h2 style="font-size: 15px; margin-left: 30px;">    
 		<fmt:message key="label.studentMarks"/>
 	</h2>

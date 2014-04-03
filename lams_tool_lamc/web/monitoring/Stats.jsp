@@ -3,21 +3,21 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<table>
+		<table class="alternative-color">
 						<tr> 
-						<td NOWRAP valign=top>
+							<th>
 				  				<b> <fmt:message key="count.total.user" /> </b>
-				  			</td>
-							<td NOWRAP valign=top>
+				  			</th>
+							<td align="right">
 							  	  <c:out value="${mcGeneralMonitoringDTO.countAllUsers}"/>
 							</td> 
 						</tr>
 						
 						<tr> 
-							<td NOWRAP valign=top>
+							<th>
 				  				<b>  <fmt:message key="count.finished.session" /> </b>
-				  			</td>
-							<td NOWRAP valign=top>
+				  			</th>
+							<td align="right">
 							  	 <c:out value="${mcGeneralMonitoringDTO.countSessionComplete}"/>
 							</td> 
 						</tr>

@@ -14,12 +14,10 @@
 		</c:if> 				
 	</c:if> 											
 
-	<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 			
-		<table border="0" cellspacing="2" cellpadding="2">									
-			<tr> <td NOWRAP valign=top>
-					<fmt:message key="error.content.inUse"/> 
-			</td> </tr>
-		</table>
+	<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 
+		<div class="warning">
+			<fmt:message key="error.content.inUse"/> 
+		</div>
 	</c:if> 																									
 
 		

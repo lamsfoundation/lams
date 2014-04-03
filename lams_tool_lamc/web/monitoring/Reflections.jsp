@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 				<c:if test="${notebookEntriesExist == 'true' }"> 			
-					<table class="forms">
+					<table class="alternative-color">
 						
 								<tr>			
-									<td colspan=2 valign=top class="align-left">
+									<th colspan=2 class="align-left">
 										<b>  <fmt:message key="label.reflection"/>  </b> 
-									 </td>
+									 </th>
 								</tr>	
 						
 						
@@ -20,7 +20,7 @@
 										 <c:out value="${userName}" escapeXml="false"/> 
 									 </td>
 	
-									<td valign=top class="align-left">
+									<td valign=top class="align-right">
 										<c:url value="monitoring.do" var="openNotebook">
 											<c:param name="dispatch" value="openNotebook" />
 											<c:param name="uid" value="${reflectionUid}" />
