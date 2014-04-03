@@ -142,7 +142,7 @@
 							<fmt:message key="msg.no.instruction" />
 						</c:when>
 						<c:otherwise>
-						${instructions.instruction.description}
+						<c:out value="${instructions.instruction.description}" escapeXml="true"/>
 					</c:otherwise>
 					</c:choose>
 				</p>

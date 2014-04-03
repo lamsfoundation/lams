@@ -24,7 +24,7 @@
 
 <lams:html>
 	<lams:head>
-		<title>${instructions.title}</title>
+		<title><c:out value="${instructions.title}" escapeXml="true"/></title>
 
 		<%@ include file="/common/header.jsp"%>
 		
@@ -140,7 +140,7 @@
 					</c:when>
 					
 					<c:otherwise>
-						${instructions.instruction.description}
+						<c:out value="${instructions.instruction.description}" escapeXml="true"/>
 					</c:otherwise>
 				</c:choose>
 				
