@@ -34,6 +34,13 @@
 </script>
 
 
+<h1>
+  <c:out value="${mindmapDTO.title}" escapeXml="true"/>
+</h1>
+<div class="instructions small-space-top">
+  <c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
+</div>
+
 <c:set var="dto" value="${mindmapDTO}" />
 <c:if test="${empty dto.sessionDTOs}">
 	<p class="warning">
@@ -60,7 +67,7 @@
 		</tr>
 	</table>
 
-	<table cellpadding="0">
+	<table cellpadding="0" class="alternative-color">
 
 		<tr>
 			<th>
