@@ -36,9 +36,9 @@
 		</html:link>
 	</c:when>
 	<c:otherwise>
-		<p>
-			<fmt:message key="message.contentInUseSet" />
-		</p>
+		<div class="warning">
+			<fmt:message key="message.contentInUseSet" /> 
+		</div>
 	</c:otherwise>
 </c:choose>
 

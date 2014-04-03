@@ -9,23 +9,23 @@
 			<fmt:message key="heading.sessionName" />	
 		</th>
 		
-		<th class="first">
+		<th align="center">
 			<fmt:message key="heading.totalLearners" />
 		</th>
 		
-		<th class="first">
+		<th align="center">
 			<fmt:message key="heading.numberOfVotes" />
 		</th>
 	</tr>
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 		<tr>
-			<td>
+			<td align="left">
 				${session.sessionName}
 			</td>
-			<td>
+			<td align="center">
 				${session.numberOfLearners}			
 			</td>
-			<td>
+			<td align="center">
 				${session.numberOfVotes}
 			</td>
 		</tr>
