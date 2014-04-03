@@ -118,7 +118,7 @@
 								<th colspan="2">
 									<fmt:message key="monitoring.user.fullname"/>
 								</th>
-								<th>
+								<th colspan="2">
 									<fmt:message key="monitoring.user.reflection"/>
 								</th>
 							</tr>
@@ -127,7 +127,7 @@
 							<td colspan="2">
 								<c:out value="${user.fullName}" escapeXml="true"/>
 							</td>
-							<td >
+							<td colspan="2" class="align-right">
 								<c:set var="viewReflection">
 									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
 								</c:set>
