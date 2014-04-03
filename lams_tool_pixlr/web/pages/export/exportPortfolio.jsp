@@ -56,7 +56,7 @@
 
 <div id="content">
 
-<h1><c:out value="${pixlrDTO.title}" escapeXml="false" /></h1>
+<h1><c:out value="${pixlrDTO.title}" escapeXml="true" /></h1>
 
 <p><c:out value="${pixlrDTO.instructions}" escapeXml="false" /></p>
 
@@ -124,7 +124,7 @@
 						<c:if test="${pixlrDTO.reflectOnActivity}">
 							<td><c:choose>
 								<c:when test="${user.finishedReflection}">
-															${user.notebookEntry}
+															<lams:out value="${user.notebookEntry}" escapeHtml="true"/>
 														</c:when>
 								<c:otherwise>
 									<fmt:message key="label.notAvailable" />
@@ -141,7 +141,7 @@
 	<c:otherwise>
 		<br />
 		<h2>
-			${userDTO.firstName} ${userDTO.lastName}
+			<c:out value="${userDTO.firstName} ${userDTO.lastName}"/>
 		</h2>
 		<c:choose>
 			<c:when
@@ -161,13 +161,13 @@
 			</h2>
 			
 			<h4>
-				${pixlrDTO.reflectInstructions}
+				<lams:out value="${pixlrDTO.reflectInstructions}" escapeHtml="true"/>
 			</h4>
 			
 			<c:choose>
 				<c:when test="${userDTO.finishedReflection}">
 					<p>
-						${userDTO.notebookEntry}
+						<lams:out value="${userDTO.notebookEntry}" escapeHtml="true"/>
 					</p>
 				</c:when>
 				<c:otherwise>

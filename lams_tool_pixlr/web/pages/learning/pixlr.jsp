@@ -28,11 +28,11 @@
 
 <div id="content">
 	<h1>
-		${pixlrDTO.title}
+		<c:out value="${pixlrDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<p>
-		${pixlrDTO.instructions}
+		<c:out value="${pixlrDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${pixlrDTO.lockOnFinish and mode == 'learner'}">

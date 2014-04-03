@@ -40,7 +40,7 @@
 			<div id="content">
 			
 			<h1>
-				${pixlrDTO.title}
+				<c:out value="${pixlrDTO.title}" escapeXml="true"/>
 			</h1>
 		
 			<html:form action="/learning" method="post" styleId="messageForm">
@@ -58,7 +58,7 @@
 								<tr>
 									<td width="30%">
 										<a href="javascript:openPopup('${pixlrImageFolderURL}/${learner.imageFileName}', ${learner.imageHeight}, ${learner.imageWidth})">
-										${learner.firstName} ${learner.lastName}
+										<c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/>
 										</a>
 									</td>
 									<td>
