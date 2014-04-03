@@ -2,16 +2,20 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<div class="info">
-<fmt:message key="monitoring.summary.note" />
-</div>
 
-
-	<c:if test="${empty summaryList}">
+	<c:choose>
+	<c:when test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>
-	</c:if>
+	</c:when>
+	<c:otherwise>
+		<div class="info">
+			<fmt:message key="monitoring.summary.note" />
+		</div>
+	</c:otherwise>
+	</c:choose>
+	
 	<br/>
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 	  
@@ -78,7 +82,7 @@
 						</c:choose>
 					</td>
 				</tr>
-		</table>
+		
 		</c:forEach>
-       
+       </table>
 	</c:forEach>

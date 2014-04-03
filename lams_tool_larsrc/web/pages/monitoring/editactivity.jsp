@@ -10,9 +10,8 @@
 
 <table cellpadding="0">
 	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.title" />
-			:
+		<td width="15%" nowrap>
+			<fmt:message key="label.authoring.basic.title" />:
 		</td>
 		<td>
 			<c:out value="${resource.title}" escapeXml="true" />
@@ -20,9 +19,8 @@
 	</tr>
 
 	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.instruction" />
-			:
+		<td width="15%" nowrap>
+			<fmt:message key="label.authoring.basic.instruction" />:
 		</td>
 		<td>
 			<c:out value="${resource.instructions}" escapeXml="false" />

@@ -49,9 +49,6 @@
 					<fmt:message key="monitoring.label.user.name" />
 				</th>		
 				<th>
-					<fmt:message key="monitoring.label.user.loginname" />
-				</th>
-				<th>
 					<fmt:message key="monitoring.label.access.time" />
 				</th>
 				<th>
@@ -73,11 +70,8 @@
 			<c:forEach var="user" items="${userList}">
 				<tr>
 					<td>
-						${user.firstName},${user.lastName}
+						<c:out value="${user.firstName},${user.lastName} (${user.loginName})" escapeXml="true"/>
 					</td>			
-					<td>
-						${user.loginName}
-					</td>
 					<td>
 						<lams:Date value="${user.accessDate}"/>
 					</td>

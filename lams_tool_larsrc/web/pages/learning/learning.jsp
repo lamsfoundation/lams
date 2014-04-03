@@ -111,7 +111,7 @@
 							<c:out value="${item.title}" escapeXml="true"/></a>
 						
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[<c:out value="${item.createBy.loginName}" escapeXml="true"/>]
+								(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
 						</c:if>
 					</td>
 					<td align="center">
