@@ -3,14 +3,6 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<h1>
-	<c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
-</h1>
-
-<div class="instructions space-top">
-	<c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/> 
-</div>
-
 <c:forEach var="sessionDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
 
 	<c:if test="${isGroupedActivity}">
@@ -124,7 +116,7 @@
 							</c:if> 								
 						</td>
 																 
-						<td valign=top class="align-left">    <c:out value="${userData.userName}"/>   </td>  
+						<td valign=top class="align-left">    <c:out value="${userData.userName}" escapeXml="true"/>   </td>  
 						<td valign=top class="align-left">    <lams:Date value="${userData.attemptTime}"/>  </td>
 																  							
 						<td valign=top class="align-left">

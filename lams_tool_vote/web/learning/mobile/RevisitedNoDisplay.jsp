@@ -42,5 +42,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 </c:forEach>
 <div>
-	<c:out value="${VoteLearningForm.userEntry}" />
+	<lams:out value="${VoteLearningForm.userEntry}" escapeHtml="true"/>
 </div>

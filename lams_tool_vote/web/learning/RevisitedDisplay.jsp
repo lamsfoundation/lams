@@ -145,7 +145,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</div>
 				</c:forEach>
 				<div>
-					<lams:out value="${VoteLearningForm.userEntry}" escapeHtml="true"/>
+					<c:out value="${VoteLearningForm.userEntry}" escapeXml="true"/>
 				</div>
 
 				<div id="chartDiv0" style="height: 220px; display: none;"></div>

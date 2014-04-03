@@ -114,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
 			</h4>
 
-			<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="false" />
+			<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 			
 			<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
 				<br>

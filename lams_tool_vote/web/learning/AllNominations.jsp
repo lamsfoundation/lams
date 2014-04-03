@@ -193,7 +193,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						items="${requestScope.listUserEntriesContent}">
 						<c:if test="${vote.userEntry != null}">
 							<div>
-								<c:out value="${vote.userEntry}" escapeXml="false" /> 
+								<c:out value="${vote.userEntry}" escapeXml="true" /> 
 							</div>
 						</c:if>
 					</c:forEach>
@@ -216,7 +216,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:forEach var="entry"
 				items="${requestScope.listGeneralCheckedOptionsContent}">
 				<div>
-					<c:out value="${entry}" escapeXml="true" />
+					<c:out value="${entry}" escapeXml="false" />
 				</div>
 			</c:forEach>
 

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
@@ -36,6 +35,14 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
+<h1>
+	<c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
+</h1>
+<div class="instructions small-space-top">
+	<c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
+</div>
+<br/>
 
 <c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
 	<c:if test="${notebookEntriesExist != 'true' }"> 			
