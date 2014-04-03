@@ -50,6 +50,151 @@
 	}
 </script>
 
+<h1>
+    <c:out value="${title}" escapeXml="true"/>
+</h1>
+<div class="instructions space-top">
+    <c:out value="${instruction}" escapeXml="false"/>
+</div>
+<br/>
+<c:forEach var="element" items="${sessionUserMap}">
+	<c:set var="toolSessionDto" value="${element.key}" />
+	<c:set var="userlist" value="${element.value}" />
+
+	<table cellpadding="0">
+		<tr>
+			<td colspan="3">
+				<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+				<span id="messageArea"></span>
+			</td>
+		</tr>
+		<c:if test="${isGroupedActivity}">	
+			<tr>
+				<td colspan="3" >
+					<h2>
+						<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
+					</h2>
+				</td>
+			</tr>
+		</c:if>
+	</table>
+	<table cellpadding="0">
+		<c:forEach var="user" items="${userlist}" varStatus="status">
+			<c:if test="${status.first}">
+				<tr>
+					<th>
+						<fmt:message key="monitoring.user.fullname"/>
+					</th>
+					<c:if test="${user.hasRefection}">
+						<th>
+							<fmt:message key="monitoring.user.reflection"/>
+						</th>
+					</c:if>
+					<th>
+						<fmt:message key="monitoring.marked.question"/>
+					</th>
+					<th>&nbsp;</th>
+				</tr>
+			</c:if>
+			<tr>
+				<td>
+					<c:out value="${user.fullName}" escapeXml="true" />
+				</td>
+				<c:if test="${user.hasRefection}">
+				<td>
+						<c:set var="viewReflection">
+							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
+						</c:set>
+						<html:link href="javascript:launchPopup('${viewReflection}')">
+							<fmt:message key="label.view" />
+						</html:link>
+				</td>
+				</c:if>
+				<td>
+					<c:choose>
+					<c:when test="${user.anyPostsMarked}">
+						<fmt:message key="label.yes"/>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.no"/>
+					</c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
+						<c:param name="userID" value="${user.userUid}" />
+						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
+					</c:url>
+					<html:link href="javascript:launchPopup('${viewuserurl}')" styleClass="button">
+						<fmt:message key="lable.topic.title.mark" />
+					</html:link>
+				</td>
+			</tr>
+		</c:forEach>
+		<c:if test="${empty userlist}">
+			<tr>
+				<td colspan="3">
+					<b><fmt:message key="message.monitoring.summary.no.users" /></b>
+				</td>
+			</tr>
+		</c:if>
+ 	 </table>
+
+	<table cellpadding="0">
+		<tr>
+			<td>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/learning/viewForum.do" target="_blank">
+						<html:hidden property="mode" value="teacher"/>
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:hidden property="hideReflection" value="true"/>
+						<html:submit property="viewForum" styleClass="button">
+							<fmt:message key="label.monitoring.summary.view.forum" />
+						</html:submit>
+					</html:form>
+				</div>
+				<!-- 
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/monitoring/viewAllMarks" target="_blank">
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:submit property="Mark" styleClass="button">
+							<fmt:message key="lable.topic.title.mark" />
+						</html:submit>
+					</html:form>
+				</div>
+				 -->
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
+						<fmt:message key="button.release.mark" />
+					</html:button>
+				</div>
+				<div style="float:left;padding:5px;margin-left:5px">
+					<html:form action="/monitoring/downloadMarks">
+						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
+						<html:submit property="downloadMarks" styleClass="button">
+							<fmt:message key="message.download.marks" />
+						</html:submit>
+					</html:form>
+				</div>
+				<div style="float:left;padding:9px">
+					<c:url value="/monitoring.do" var="refreshMonitoring">
+						<c:param name="contentFolderID" value="${contentFolderID}"/>
+						<c:param name="toolContentID" value="${toolContentID}" />
+					</c:url>
+					<html:link href="${refreshMonitoring}" styleClass="button">
+							<fmt:message key="label.refresh" />
+					</html:link>
+				</div>
+			</td>
+		</tr>
+	</table>
+</c:forEach>
+
+<c:if test="${empty sessionUserMap}">
+	<p>
+		<fmt:message key="message.monitoring.summary.no.session" />
+	</p>
+</c:if>
 
 <h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
@@ -332,143 +477,3 @@
 </div>
 
 <%@include file="daterestriction.jsp"%>
-
-<c:forEach var="element" items="${sessionUserMap}">
-	<c:set var="toolSessionDto" value="${element.key}" />
-	<c:set var="userlist" value="${element.value}" />
-
-	<table cellpadding="0">
-		<tr>
-			<td colspan="3">
-				<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-				<span id="messageArea"></span>
-			</td>
-		</tr>
-		<c:if test="${isGroupedActivity}">	
-			<tr>
-				<td colspan="3" >
-					<h2>
-						<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
-					</h2>
-				</td>
-			</tr>
-		</c:if>
-	</table>
-	<table cellpadding="0">
-		<c:forEach var="user" items="${userlist}" varStatus="status">
-			<c:if test="${status.first}">
-				<tr>
-					<th>
-						<fmt:message key="monitoring.user.fullname"/>
-					</th>
-					<c:if test="${user.hasRefection}">
-						<th>
-							<fmt:message key="monitoring.user.reflection"/>
-						</th>
-					</c:if>
-					<th>
-						<fmt:message key="monitoring.marked.question"/>
-					</th>
-					<th>&nbsp;</th>
-				</tr>
-			</c:if>
-			<tr>
-				<td>
-					<c:out value="${user.fullName}" escapeXml="true" />
-				</td>
-				<c:if test="${user.hasRefection}">
-				<td>
-						<c:set var="viewReflection">
-							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
-						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link>
-				</td>
-				</c:if>
-				<td>
-					<c:choose>
-					<c:when test="${user.anyPostsMarked}">
-						<fmt:message key="label.yes"/>
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.no"/>
-					</c:otherwise>
-					</c:choose>
-				</td>
-				<td>
-					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
-						<c:param name="userID" value="${user.userUid}" />
-						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
-					</c:url>
-					<html:link href="javascript:launchPopup('${viewuserurl}')" styleClass="button">
-						<fmt:message key="lable.topic.title.mark" />
-					</html:link>
-				</td>
-			</tr>
-		</c:forEach>
-		<c:if test="${empty userlist}">
-			<tr>
-				<td colspan="3">
-					<b><fmt:message key="message.monitoring.summary.no.users" /></b>
-				</td>
-			</tr>
-		</c:if>
- 	 </table>
-
-	<table cellpadding="0">
-		<tr>
-			<td>
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/learning/viewForum.do" target="_blank">
-						<html:hidden property="mode" value="teacher"/>
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:hidden property="hideReflection" value="true"/>
-						<html:submit property="viewForum" styleClass="button">
-							<fmt:message key="label.monitoring.summary.view.forum" />
-						</html:submit>
-					</html:form>
-				</div>
-				<!-- 
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/monitoring/viewAllMarks" target="_blank">
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="Mark" styleClass="button">
-							<fmt:message key="lable.topic.title.mark" />
-						</html:submit>
-					</html:form>
-				</div>
-				 -->
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
-						<fmt:message key="button.release.mark" />
-					</html:button>
-				</div>
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/monitoring/downloadMarks">
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="downloadMarks" styleClass="button">
-							<fmt:message key="message.download.marks" />
-						</html:submit>
-					</html:form>
-				</div>
-				<div style="float:left;padding:9px">
-					<c:url value="/monitoring.do" var="refreshMonitoring">
-						<c:param name="contentFolderID" value="${contentFolderID}"/>
-						<c:param name="toolContentID" value="${toolContentID}" />
-					</c:url>
-					<html:link href="${refreshMonitoring}" styleClass="button">
-							<fmt:message key="label.refresh" />
-					</html:link>
-				</div>
-			</td>
-		</tr>
-	</table>
-</c:forEach>
-
-<c:if test="${empty sessionUserMap}">
-	<p>
-		<fmt:message key="message.monitoring.summary.no.session" />
-	</p>
-</c:if>
-

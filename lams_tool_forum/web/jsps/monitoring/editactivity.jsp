@@ -2,7 +2,7 @@
 <html:errors />
 <table cellpadding="0">
 	<tr>
-		<td class="field-name" width="30%">
+		<td class="field-name" width="10%" valign="top">
 			<fmt:message key="label.authoring.basic.title" />
 			:
 		</td>
@@ -12,7 +12,7 @@
 	</tr>
 
 	<tr>
-		<td class="field-name" width="30%">
+		<td class="field-name" width="10%" valign="top" NOWRAP>
 			<fmt:message key="label.authoring.basic.instruction" />
 			:
 		</td>
