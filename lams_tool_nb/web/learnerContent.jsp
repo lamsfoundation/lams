@@ -42,7 +42,7 @@
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="small-space-top">
 				<h2>
-					<lams:out value="${reflectInstructions}"/>
+					<lams:out value="${reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>
