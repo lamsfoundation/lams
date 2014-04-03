@@ -8,7 +8,7 @@
 		<c:out value="${mindmapUser}" escapeXml="true"/>
 	</h2>
 	
-	<c:out value="${reflectEntry}" escapeXml="true" />
+	<lams:out value="${reflectEntry}" escapeHtml="true" />
 		
 	<div align="right" class="space-bottom-top">
 		<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
