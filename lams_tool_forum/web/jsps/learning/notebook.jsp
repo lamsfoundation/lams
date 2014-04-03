@@ -25,7 +25,7 @@
 		<%@ include file="/common/messages.jsp"%>
 
 		<p>
-			<c:out value="${sessionMap.reflectInstructions}" escapeXml="true" />
+			<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 		</p>
 
 		<html:textarea cols="52" rows="6" property="entryText"
