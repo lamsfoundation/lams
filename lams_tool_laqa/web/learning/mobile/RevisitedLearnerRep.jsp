@@ -286,10 +286,10 @@
 
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
 			<h2>
-				<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />						
+				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</h2>
 
-			<p><c:out value="${QaLearningForm.entryText}" escapeXml="false" /></p>
+			<p><lams:out value="${QaLearningForm.entryText}" escapeHtml="true" /></p>
 
 			<c:if test="${hasEditRight}">
 				<span class="button-inside">

@@ -1,20 +1,20 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table>
+<table class="alternative-color">
 	<tr> 
-		<td NOWRAP valign=top>
+		<th>
 			<b> <fmt:message key="count.total.user" /> </b>
-		</td>
-		<td NOWRAP valign=top>
+		</th>
+		<td align="right">
 			<c:out value="${qaStatsDTO.countAllUsers}"/>
 		</td> 
 	</tr>
 						
 	<tr> 
-		<td NOWRAP valign=top>
+		<th>
 			<b>  <fmt:message key="count.finished.session" /> </b>
-		</td>
-		<td NOWRAP valign=top>
+		</th>
+		<td align="right">
 			<c:out value="${qaStatsDTO.countSessionComplete}"/>
 		</td> 
 	</tr>

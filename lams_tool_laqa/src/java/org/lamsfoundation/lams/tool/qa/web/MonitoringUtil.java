@@ -142,8 +142,8 @@ public class MonitoringUtil implements QaAppConstants {
 		qaMonitoredUserDTO.setSessionId(sessionId.toString());
 		qaMonitoredUserDTO.setResponse(response.getAnswer());
 
-		String responsePresentable = QaUtils.replaceNewLines(response.getAnswer());
-		qaMonitoredUserDTO.setResponsePresentable(responsePresentable);
+		//String responsePresentable = QaUtils.replaceNewLines(response.getAnswer());
+		qaMonitoredUserDTO.setResponsePresentable(response.getAnswer());
 
 		qaMonitoredUserDTO.setQuestionUid(questionUid);
 		qaMonitoredUserDTO.setVisible(new Boolean(response.isVisible()).toString());

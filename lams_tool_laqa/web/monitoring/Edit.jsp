@@ -4,7 +4,7 @@
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 <%@ include file="/common/messages.jsp"%>
-		
+
 <c:if test="${editActivityDTO.monitoredContentInUse != 'true'}"> 
 	<c:if test="${qaGeneralMonitoringDTO.defineLaterInEditMode != 'true'}">
 		<jsp:include page="/authoring/BasicContentViewOnly.jsp" />

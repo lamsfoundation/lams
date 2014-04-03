@@ -41,7 +41,7 @@
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="false" />
+			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 	</div><!-- /header -->
 
@@ -54,7 +54,7 @@
 			<html:hidden property="totalQuestionCount" />
 	
 			<p>
-				<c:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
+				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 	
 			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>

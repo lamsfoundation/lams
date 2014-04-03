@@ -129,11 +129,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 		String answerParamName = "answer" + questionIndex + (isTestHarness ? "__textarea" : "");
 		String answer = request.getParameter(answerParamName);
-		String answerPresentable = QaUtils.replaceNewLines(answer);
+		// String answerPresentable = QaUtils.replaceNewLines(answer);
 
 		String questionIndexString = new Integer(questionIndex).toString();
 		mapAnswers.put(questionIndexString, answer);
-		mapAnswersPresentable.put(questionIndexString, answerPresentable);
+		mapAnswersPresentable.put(questionIndexString, answer);
 
 		Map<String, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 		QaQuestionDTO dto = questionContentMap.get(questionIndexString);
@@ -817,8 +817,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-	    qaLearningForm.setEntryText(notebookEntryPresentable);
+	    // String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+	    qaLearningForm.setEntryText(notebookEntry.getEntry());
 	}
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
@@ -901,7 +901,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 	generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 	String reflectionSubject = qaContent.getReflectionSubject();
-	reflectionSubject = QaUtils.replaceNewLines(reflectionSubject);
+	// reflectionSubject = QaUtils.replaceNewLines(reflectionSubject);
 	generalLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 
 	// attempt getting notebookEntry

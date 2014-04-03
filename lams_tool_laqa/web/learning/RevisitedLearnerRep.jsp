@@ -272,11 +272,20 @@
 		</c:if>
 
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">					
-			<h2>
-				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
-			</h2>
-
-			<p><c:out value="${QaLearningForm.entryText}" escapeXml="true" /></p>
+			<h2><fmt:message key="label.reflection"/></h2>
+			<table class="alternative-color">
+			    <tr>
+				<td>
+				  <strong><lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" /></strong>
+				</td>
+			    </tr>
+			    <tr>
+				<td>
+				  <lams:out value="${QaLearningForm.entryText}" escapeHtml="true" />
+				</td>
+			    </tr>
+			</table>
+			
 			
 			<c:if test="${hasEditRight}">
 				<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 

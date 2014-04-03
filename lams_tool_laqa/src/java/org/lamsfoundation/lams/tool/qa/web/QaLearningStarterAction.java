@@ -197,9 +197,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		MY_SIGNATURE, userId.intValue());
 	if (notebookEntry != null) {
-	    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-	    qaLearningForm.setEntryText(notebookEntryPresentable);
-	    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    //String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+	    qaLearningForm.setEntryText(notebookEntry.getEntry());
+	    generalLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
 	/*

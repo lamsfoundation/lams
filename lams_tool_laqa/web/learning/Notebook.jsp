@@ -45,13 +45,13 @@
 		<div id="content">
 
 			<h1>
-				<c:out value="${generalLearnerFlowDTO.activityTitle}"
-					escapeXml="true" />
+				<lams:out value="${generalLearnerFlowDTO.activityTitle}"
+					escapeHtml="true" />
 			</h1>
 
 			<p>
-				<c:out value="${generalLearnerFlowDTO.reflectionSubject}"
-					escapeXml="true" />
+				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}"
+					escapeHtml="true" />
 			</p>
 
 			<html:textarea cols="60" rows="8" property="entryText"

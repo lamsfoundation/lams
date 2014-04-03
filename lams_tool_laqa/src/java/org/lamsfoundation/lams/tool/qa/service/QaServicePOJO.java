@@ -765,8 +765,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry.getLastModified()
 				: notebookEntry.getCreateDate();
 			reflectionDTO.setDate(postedDate);
-			String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
+			// String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntry.getEntry());
 			reflectionDTOs.add(reflectionDTO);
 		    }
 		}
@@ -791,8 +791,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			    Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry
 				    .getLastModified() : notebookEntry.getCreateDate();
 			    reflectionDTO.setDate(postedDate);
-			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    // String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntry.getEntry());
 			    reflectionDTOs.add(reflectionDTO);
 			}
 		    }
