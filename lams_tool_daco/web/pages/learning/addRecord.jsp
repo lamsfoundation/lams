@@ -229,7 +229,10 @@
 <c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
 	<%-- Buttons that either move onto the next activity or display the reflection screen --%>
 	<p class="small-space-top">
-		<h2 style="padding-left: 20px;">${daco.reflectInstructions}</h2>
+		<h2><fmt:message key="label.export.reflection.heading" /></h2>
+		<p style="padding-left: 20px;">
+		  <strong><lams:out escapeHtml="true" value="${daco.reflectInstructions}"/></strong>
+		</p>
 		<div class="button-add-div">
 			<c:choose>
 				<c:when test="${empty sessionMap.reflectEntry}">
