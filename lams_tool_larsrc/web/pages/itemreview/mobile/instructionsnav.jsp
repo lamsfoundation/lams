@@ -28,7 +28,7 @@
 
 <lams:html>
 	<lams:head>
-		<title>${instructions.title}</title>
+		<title><c:out value="${instructions.title}" escapeXml="true"/></title>
 
 		<%@ include file="/common/mobileheader.jsp"%>
 		<style media="screen,projection" type="text/css">

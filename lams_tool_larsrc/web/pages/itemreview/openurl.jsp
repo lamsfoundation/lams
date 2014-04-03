@@ -9,7 +9,7 @@
 
 		<div id="content">
 			<p>
-				${title}
+				<c:out value="${title}" escapeXml="true"/>
 			</p>
 			<p>
 				<a href="javascript:;"

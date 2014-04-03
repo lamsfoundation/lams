@@ -10,7 +10,7 @@
 		
 			<div data-role="content">
 				<h1>
-					${title}
+					<c:out value="${title}" escapeXml="true"/>
 				</h1>
 			
 				<p>

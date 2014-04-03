@@ -13,7 +13,7 @@
 	<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
 		<tr>
 			<td>
-				${reflectDTO.fullName} <lams:Date value="${reflectDTO.date}"/>
+				<strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong> - <lams:Date value="${reflectDTO.date}"/>
 				<br>
 				<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
 			</td>

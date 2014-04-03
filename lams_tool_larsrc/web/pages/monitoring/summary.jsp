@@ -44,9 +44,9 @@
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
 			   		{name:'itemUid', index:'itemUid', width:0, hidden: true},
 			   		{name:'title', index:'title', width:260},
-			   		{name:'type', index:'type', width:90},
-			   		{name:'suggest', index:'suggest', width:160},
-			   		{name:'viewNumber', index:'viewNumber', width:100, align:"right", sorttype:"int"},
+			   		{name:'type', index:'type', width:90, align:"center"},
+			   		{name:'suggest', index:'suggest', width:160, align:"center"},
+			   		{name:'viewNumber', index:'viewNumber', width:100, align:"center", sorttype:"int"},
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
 			   	caption: "${groupSummary.sessionName}",
@@ -112,11 +112,15 @@
 					</c:when>
 				</c:choose>
    	        
+				<c:set var="itemTitle">
+					<c:out value="${item.itemTitle}" escapeXml="true"/>
+				</c:set>
+				
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:		"${i.index + 1}",
    	   	     		sessionId:	"${groupSummary.sessionId}",
    	   	     		itemUid:	"${item.itemUid}",
-   	   	     		title:	"<a href='#nogo' onclick='javascript:viewItem(${item.itemUid}); return false;'>${item.itemTitle}</a>",
+   	   	     		title:	"<a href='#nogo' onclick='javascript:viewItem(${item.itemUid}); return false;'>${itemTitle}</a>",
    	   	     		type:	"${itemTypeLabel}",
    	   	     		suggest:	"${item.username}",
    	   	     		viewNumber:"	${item.viewNumber}",
@@ -167,12 +171,16 @@
 
 </script>
 
-<h2>
-	${sessionMap.resource.title}
-</h2>
+<h1>
+	<c:out value="${sessionMap.resource.title}" escapeXml="true"/>
+</h1>
+
 <div class="instructions">
-	${sessionMap.resource.instructions}
+	<c:out value="${sessionMap.resource.instructions}" escapeXml="false"/>
 </div>
+
+<br/>
+
 <c:if test="${empty summaryList}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>

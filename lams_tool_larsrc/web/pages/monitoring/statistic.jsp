@@ -2,26 +2,28 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<table cellspacing="3">
+<div class="info">
+<fmt:message key="monitoring.summary.note" />
+</div>
+
 
 	<c:if test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>
 	</c:if>
-	
+	<br/>
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
+	  
+	  
 		<c:forEach var="item" items="${group.items}" varStatus="status">
-		
+				
 			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
-				<tr>
-					<td colspan="4">
 						<c:if test="${sessionMap.isGroupedActivity}">
-							<B><fmt:message key="monitoring.label.group" /> ${group.sessionName}</B> 
+							<h1><fmt:message key="monitoring.label.group" /> ${group.sessionName}</h1> 
 						</c:if>
-					</td>
-				</tr>
+				<table cellspacing="3" class="alternative-color">
 				<tr>
 					<th width="20%">
 						<fmt:message key="monitoring.label.type" />
@@ -55,11 +57,11 @@
 						</c:choose>
 					</td>
 					<td>
-						${item.itemTitle}
+						<c:out value="${item.itemTitle}" escapeXml="true"/>
 					</td>
 					<td>
 						<c:if test="${!item.itemCreateByAuthor}">
-							${item.username}
+							<c:out value="${item.username}" escapeXml="true"/>
 						</c:if>
 					</td>
 					<td align="center">
@@ -76,6 +78,7 @@
 						</c:choose>
 					</td>
 				</tr>
+		</table>
 		</c:forEach>
+       
 	</c:forEach>
-</table>

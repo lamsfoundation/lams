@@ -24,7 +24,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.url" /> : </span>
-						${resource.title}
+						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
 					<td width="10%">
 						<a href="#"

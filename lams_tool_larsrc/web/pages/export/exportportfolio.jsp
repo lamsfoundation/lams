@@ -39,11 +39,11 @@
 	<div id="content">
 
 		<h1>
-			${title}
+			<c:out value="${title}" escapeXml="true"/>
 		</h1>
 		
 		<div>
-			${instructions}
+			<c:out value="${instructions}" escapeXml="false"/>
 		</div>
 
 		<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
@@ -138,7 +138,7 @@
 										<ol>
 											<c:forEach var="itemInstruction" items="${item.itemInstructions}">
 												<li>
-													${itemInstruction}
+													<c:out value="${itemInstruction}" escapeXml="true"/>
 												</li>
 											</c:forEach>
 										</ol>
@@ -150,7 +150,7 @@
 							</td>
 
 							<td>
-								${item.username}
+								<c:out value="${item.username}" escapeXml="true"/>
 							</td>
 
 							<td align="center">
@@ -195,7 +195,7 @@
 			</h3>
 			<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
 				<h4>
-					${reflectDTO.fullName}
+					<c:out value="${reflectDTO.fullName}" escapeXml="true"/>
 				</h4>
 				<p>
 					<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />

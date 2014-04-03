@@ -73,11 +73,11 @@
 
 	<div id="content">
 		<h1>
-			${resource.title}
+			<c:out value="${resource.title}" escapeXml="true"/>
 		</h1>
 
 		<p>
-			${resource.instructions}
+			<c:out value="${resource.instructions}" escapeXml="false"/>
 		</p>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -108,10 +108,10 @@
 				<tr>
 					<td>
 						<a href="#" onclick="viewItem(${item.uid})">
-							${item.title} </a>
+							<c:out value="${item.title}" escapeXml="true"/></a>
 						
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[${item.createBy.loginName}]
+								[<c:out value="${item.createBy.loginName}" escapeXml="true"/>]
 						</c:if>
 					</td>
 					<td align="center">
@@ -217,9 +217,10 @@
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h2>
-					${sessionMap.reflectInstructions}
-				</h2>
+				<h3><fmt:message key="title.reflection" /></h3>
+				<strong>
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
+				</strong>
 
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">

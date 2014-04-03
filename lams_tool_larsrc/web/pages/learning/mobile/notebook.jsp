@@ -29,7 +29,7 @@
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}" escapeXml="true"/>
 		</h1>
 	</div>
 	
@@ -38,7 +38,7 @@
 		<%@ include file="/common/messages.jsp"%>
 
 		<h2>
-			<lams:out value="${sessionMap.reflectInstructions}" />
+			<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 		</h2>
 
 		<html:textarea cols="52" rows="6" property="entryText"

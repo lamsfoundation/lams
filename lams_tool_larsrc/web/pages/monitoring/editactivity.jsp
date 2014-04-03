@@ -3,9 +3,9 @@
 <c:set var="resource" value="${sessionMap.resource}"/>
 
 <c:if test="${sessionMap.isPageEditable}">
-	<p class="warning">
+	<div class="warning">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</div>
 </c:if>
 
 <table cellpadding="0">
@@ -15,7 +15,7 @@
 			:
 		</td>
 		<td>
-			<c:out value="${resource.title}" escapeXml="false" />
+			<c:out value="${resource.title}" escapeXml="true" />
 		</td>
 	</tr>
 

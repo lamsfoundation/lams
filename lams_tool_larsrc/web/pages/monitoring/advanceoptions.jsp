@@ -129,7 +129,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${sessionMap.resource.reflectInstructions}	
+					<lams:out escapeHtml="true" value="${sessionMap.resource.reflectInstructions}"/>	
 				</td>
 			</tr>
 		</c:when>
