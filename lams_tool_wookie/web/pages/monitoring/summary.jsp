@@ -73,7 +73,7 @@
 							<td >
 								<c:choose>
 									<c:when test="${user.finishedReflection}">
-										<lams:out value="${user.notebookEntry}" escapeXml="true"/>
+										<lams:out value="${user.notebookEntry}" escapeHtml="true"/>
 									</c:when>
 									<c:otherwise>
 										<fmt:message key="label.notAvailable" />
