@@ -13,13 +13,13 @@
 				<tr>
 					<th >
 						<fmt:message key="lable.preview.by" />
-						<c:set var="author" value="${comment.createBy.loginName}" />
+						<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
 						<c:if test="${empty author}">
 							<c:set var="author">
 								<fmt:message key="label.default.user.name" />
 							</c:set>
 						</c:if>
-						${author}
+						<c:out value="${author}" escapeXml="true"/>
 								-				
 						<lams:Date value="${comment.createDate}" />
 					</th>

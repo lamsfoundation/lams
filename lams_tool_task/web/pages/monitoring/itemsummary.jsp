@@ -19,7 +19,7 @@
 			</h2>
 				
 			<div>
-				<c:out value="${item.title}"></c:out>
+				<c:out value="${item.title}" escapeXml="true"/>
 				
 				<c:if test="${item.required}">
 						(<fmt:message key="label.monitoring.tasksummary.task.required.to.finish" />)
@@ -104,7 +104,7 @@
 					
 						<tr>
 							<td>
-								<c:out value="${visitLogSummary.user.loginName}" escapeXml="true"/>
+								<c:out value="${visitLogSummary.user.firstName} ${visitLogSummary.user.firstName} (${visitLogSummary.user.loginName})" escapeXml="true"/>
 							</td>
 							
 							<td align="center">

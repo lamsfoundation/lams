@@ -16,7 +16,7 @@
 					<c:out value="${file.fileName}" escapeXml="true"/>
 												
 					<c:if test="${file.createBy != null}">
-						[<c:out value="${file.createBy.loginName}" escapeXml="true"/>]
+						[<c:out value="${file.createBy.firstName} ${file.createBy.lastName}" escapeXml="true"/>]
 					</c:if>
 													
 					<c:set var="downloadURL">

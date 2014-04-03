@@ -8,13 +8,12 @@
 	</div>
 </c:if>
 
+<c:out value="${sessionMap.isGroupedActivity}"/>
 <c:forEach var="summary" items="${summaryList}">
 	<%-- display group name on first row--%>
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>	
-	</c:if>
+	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>	
 		
-	<table cellspacing="3">
+	<table cellspacing="3" class="alternative-color small-space-top">
 		<tr>
 			<th width="45%">
 				<fmt:message key="monitoring.label.title" />

@@ -85,7 +85,7 @@
 		
 			<tr>
 				<td>
-					${user.loginName}
+					<c:out value="${user.firstName} ${user.lastName} (${user.loginName})" escapeXml="true"/>
 				</td>
 				
 				<c:forEach var="item" items="${summary.taskListItems}" varStatus="itemStatus">
@@ -134,7 +134,7 @@
 				<th>
 					<fmt:message key="label.monitoring.summary.user"/>
 				</th>
-				<th>
+				<th align="center">
 					<fmt:message key="label.monitoring.summary.reflection"/>
 				</th>
 			</tr>				
@@ -143,9 +143,9 @@
 		
 				<tr>
 					<td>
-						${user.loginName}
+						<c:out value="${user.firstName} ${user.lastName} (${user.loginName})" escapeXml="true"/>
 					</td>
-					<td >
+					<td align="center">
 						<c:set var="viewReflection">
 							<c:url value="/monitoring/viewReflection.do?userUid=${user.uid}"/>
 						</c:set>

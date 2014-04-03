@@ -13,12 +13,12 @@
 		<h1>
 			<fmt:message key="page.title.monitoring.view.reflection"/>
 		</h1>
-		<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
+		<b><c:out value="${userDTO.fullName}" escapeXml="true"/></b><BR><BR>
 		<table class="alternative-color" cellspacing="0">
 			<tr>
-				<th class="first">
-					<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
-				</th>
+				<td class="first">
+					<strong><lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/></strong>
+				</td>
 			</tr>
 			<tr>
 				<td>

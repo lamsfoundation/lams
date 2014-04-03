@@ -10,7 +10,7 @@
 
 <table cellpadding="0">
 	<tr>
-		<td>
+		<td width="15%" nowrap>
 			<fmt:message key="label.authoring.basic.title" />
 			:
 		</td>
@@ -20,7 +20,7 @@
 	</tr>
 
 	<tr>
-		<td>
+		<td nowrap width="15%">
 			<fmt:message key="label.authoring.basic.description" />
 			:
 		</td>
