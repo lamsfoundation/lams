@@ -36,7 +36,8 @@ public interface AuthoringJsonTags {
     public static final String TRANSITIONS = "transitions";
     public static final String ACTIVITIES = "activities";
     public static final String BRANCH_MAPPINGS = "branchMappings";
-
+    public static final String ANNOTATIONS = "annotations";
+    
     /* Learning Library specific tags */
     public static final String LEARNING_LIBRARY_ID = "learningLibraryID";
     public static final String LIB_ACTIVITIES = "templateActivities";
@@ -131,6 +132,7 @@ public interface AuthoringJsonTags {
     public static final String FIRST_ACTIVITY_UIID = "firstActivityUIID";
     public static final String FLOATING_ACTIVITY_ID = "floatingActivityID";
     public static final String FLOATING_ACTIVITY_UIID = "floatingActivityUIID";
+    public static final String ANNOTATION_UIID = "annotationUIID";
 
     public static final String MAX_ID = "maxID";
     public static final String VALID_DESIGN = "validDesign";
@@ -168,7 +170,8 @@ public interface AuthoringJsonTags {
     public static final String START_YCOORD = "startYCoord";
     public static final String END_XCOORD = "endXCoord";
     public static final String END_YCOORD = "endYCoord";
-
+    public static final String COLOR = "color";
+    
     /** Branch Mapping and Tool Condition Tags */
     public static final String BRANCH_ACTIVITY_ENTRY_ID = "entryID";
     public static final String BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";

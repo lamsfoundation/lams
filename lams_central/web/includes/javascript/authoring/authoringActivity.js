@@ -150,7 +150,7 @@ var ActivityLib = {
 	
 	
 	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivities){
-		DecorationLib.Container.call(this, title);
+		DecorationLib.Container.call(this, id, uiid, title);
 		
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
@@ -173,7 +173,7 @@ var ActivityLib = {
 	 * Constructor for an Optional Activity.
 	 */
 	OptionalActivity : function(id, uiid, x, y, title, minActivities, maxActivities) {
-		DecorationLib.Container.call(this, title || 'Optional Activity');
+		DecorationLib.Container.call(this, id, uiid, title || 'Optional Activity');
 		
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
@@ -195,11 +195,8 @@ var ActivityLib = {
 	 * Constructor for a Floating Activity.
 	 */
 	FloatingActivity : function(id, uiid, x, y) {
-		DecorationLib.Container.call(this, 'Support Activity');
+		DecorationLib.Container.call(this, id, uiid, 'Support Activity');
 		
-		this.id = +id;
-		this.uiid = +uiid || ++layout.ld.maxUIID;
-
 		this.draw = ActivityLib.draw.floatingActivity;
 		this.draw(x, y);
 		

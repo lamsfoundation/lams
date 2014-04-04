@@ -66,7 +66,10 @@ var paper = null,
 		'transition'   		  : 'rgb(119,126,157)',
 		'binActive'    		  : 'red',
 		'selectEffect'        : 'blue',
-		'annotation'		  : 'yellow',
+		'annotation'		  : '#FFFF00',
+		'annotationPalette'	  : ['FFFF00', '00FFFF', '8A2BE2', '7FFF00', '6495ED',
+		                   	     'FFF8DC', 'FF8C00', '00BFFF', 'DCDCDC', 'ADD8E6', '20B2AA',
+		                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
 		'optionalActivity'    : 'rgb(194,213,254)'
 	},
 };
@@ -799,6 +802,16 @@ function openLearningDesign(learningDesignID) {
 				});
 			});
 			
+			$.each(ld.annotations, function(){
+				var isRegion = this.endXcoord;
+				if (isRegion) {
+					DecorationLib.addRegion(this.xcoord, this.ycoord, this.endXcoord, this.endYcoord,
+											this. title, this.color);
+				} else {
+					DecorationLib.addLabel(this.xcoord, this.ycoord, this.title);
+				}
+			});
+			
 			
 			if (arrangeNeeded) {
 				MenuLib.arrangeActivities();
@@ -822,6 +835,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		transitions = [],
 		groupings = [],
 		branchMappings = [],
+		annotations = [],
 		layoutActivities = [],
 		// trim the 
 		title = title.trim(),
@@ -967,7 +981,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		} else if (activity instanceof ActivityLib.BranchActivity){
 			activityTypeID = 8;
 		} else if (activity instanceof ActivityLib.FloatingActivity){
-			activityTypeID = 15;			
+			activityTypeID = 15;
 		}
 
 		
@@ -1029,6 +1043,24 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		}
 	});
 	
+	// iterate over labels and regions
+	$.each(layout.labels.concat(layout.regions), function(){
+		var box = this.items.shape.getBBox(),
+			isRegion = this instanceof DecorationLib.Region;
+		
+		annotations.push({
+			'id'		: this.id,
+			'annotationUIID' : this.uiid,
+			'title' 	: this.title,
+			'xCoord'    : box.x,
+			'yCoord'    : box.y,
+			'endXCoord' : isRegion ? box.x2 : null,
+			'endYCoord' : isRegion ? box.y2 : null,
+			'color'	    : isRegion ? this.items.shape.attr('fill') : null
+		});
+	});
+
+	
 	// serialise the sequence
 	var ld = {
 		// it is null if it is a new sequence
@@ -1051,6 +1083,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'transitions'		 : transitions,
 		'groupings'			 : groupings,
 		'branchMappings'     : branchMappings,
+		'annotations'		 : annotations,
 		
 		'helpText'           : null,
 		'duration'			 : null,
@@ -1071,13 +1104,13 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		},
 		success : function(response) {
 			// if save was successful
-			if (response.learningDesignID) {
+			if (response.ld) {
 				// assing the database-generated values
-				layout.ld.learningDesignID = response.learningDesignID;
+				layout.ld.learningDesignID = response.ld.learningDesignID;
 				layout.ld.folderID = folderID;
 				layout.ld.title = title;
 				if (!layout.ld.contentFolderID) {
-					layout.ld.contentFolderID = response.contentFolderID;
+					layout.ld.contentFolderID = response.ld.contentFolderID;
 				}
 				$('#ldDescriptionFieldTitle').text(title);
 				$('#ldDescriptionFieldDescription').text(description);
@@ -1102,29 +1135,61 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				}
 				
 				// assign database-generated properties to activities
-				$.each(response.activities, function() {
+				$.each(response.ld.activities, function() {
 					var updatedActivity = this;
 					$.each(layout.activities, function(){
-						if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
+						var isBranching = this instanceof ActivityLib.BranchingEdgeActivity,
+							found = false;
+						if (isBranching && !isStart) {
+							return true;
+						}
+						
+						if (isBranching) {
 							if (updatedActivity.activityUIID == this.branchingActivity.uiid){
 								this.branchingActivity.id = updatedActivity.activityID;
+								found = true;
 							} else {
 								$.each(this.branchingActivity.branches, function(){
 									if (updatedActivity.activityUIID == this.branchingActivity.uiid){
 										this.id = updatedActivity.activityID;
-									} 
+									}
 								});
 							}
 						} else if (updatedActivity.activityUIID == this.uiid) {
 							this.id = updatedActivity.activityID;
 							this.toolContentID = updatedActivity.toolContentID;
+							found = true;
 						}
+						
+						// update transition IDs
+						$.each(this.transitions.from, function(){
+							var existingTransition = this;
+							$.each(response.ld.transitions, function(){
+								if (existingTransition.uiid == +this.transitionUIID) {
+									existingTransition.id = +this.transitionID;
+									return false;
+								}
+							});
+						});
+						
+						return !found;
 					});
 				});
 				
 				if (layout.floatingActivity) {
 					layout.floatingActivity.id = response.floatingActivityID;
 				}
+				
+				// update annotation IDs
+				$.each(response.ld.annotations, function(){
+					var updatedAnnotation = this;
+					$.each(layout.labels.concat(layout.regions), function(){
+						if (this.uiid == updatedAnnotation.annotationUIID) {
+							this.id = updatedAnnotation.uid;
+							return false;
+						}
+					});
+				});
 				
 				alert('Congratulations! Your design is valid and has been saved.');
 				result = true;

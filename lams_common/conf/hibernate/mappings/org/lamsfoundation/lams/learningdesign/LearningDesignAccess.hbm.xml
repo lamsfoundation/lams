@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+	<class name="org.lamsfoundation.lams.learningdesign.LearningDesignAccess"
+		table="lams_learning_design_access">
+
+		<composite-id>
+			<key-many-to-one name="learningDesignId" class="org.lamsfoundation.lams.learningdesign.LearningDesign" column="learning_design_id"/>
+			<key-many-to-one name="userId" class="org.lamsfoundation.lams.usermanagement.User" column="user_id"/>
+		</composite-id>
+		
+		<property name="accessDate" type="java.util.Date" not-null="false" update="true" insert="true"
+			      column="access_date" />
+		
+	</class>
+</hibernate-mapping>

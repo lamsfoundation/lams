@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -598,6 +599,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	parseActivitiesToMatchUpParentandInputActivities((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
 	parseTransitions((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.TRANSITIONS));
 	parseBranchMappings((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.BRANCH_MAPPINGS));
+	parseAnnotations((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ANNOTATIONS));
 
 	progressDefaultChildActivities();
 
@@ -1474,6 +1476,51 @@ public class ObjectExtractor implements IObjectExtractor {
 		learningDesign.getCompetences().removeAll(removeCompetences);
 	    }
 	}
+    }
+
+    private void parseAnnotations(JSONArray annotationList) throws ObjectExtractorException, JSONException {
+
+	Set<LearningDesignAnnotation> existingAnnotations = learningDesign.getAnnotations();
+	Set<LearningDesignAnnotation> updatedAnnotations = new HashSet<LearningDesignAnnotation>();
+
+	for (int annotationIndex = 0; annotationIndex < annotationList.length(); annotationIndex++) {
+	    JSONObject annotationJSON = annotationList.getJSONObject(annotationIndex);
+	    boolean found = false;
+	    LearningDesignAnnotation annotation = null;
+
+	    if (existingAnnotations != null) {
+		for (LearningDesignAnnotation existingAnnotation : existingAnnotations) {
+		    if (existingAnnotation.getAnnotationUIID().equals(
+			    annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID))) {
+			annotation = existingAnnotation;
+			found = true;
+			break;
+		    }
+		}
+	    }
+
+	    if (annotation == null) {
+		annotation = new LearningDesignAnnotation();
+	    }
+	    annotation.setLearningDesignId(learningDesign.getLearningDesignId());
+	    annotation.setAnnotationUIID(annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID));
+	    annotation.setTitle((String) JsonUtil.opt(annotationJSON, AuthoringJsonTags.TITLE));
+	    annotation.setXcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.XCOORD));
+	    annotation.setYcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.YCOORD));
+	    annotation.setEndXcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.END_XCOORD));
+	    annotation.setEndYcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.END_YCOORD));
+	    annotation.setColor((String) JsonUtil.opt(annotationJSON, AuthoringJsonTags.COLOR));
+
+	    if (found) {
+		baseDAO.update(annotation);
+	    } else {
+		baseDAO.insert(annotation);
+	    }
+
+	    updatedAnnotations.add(annotation);
+	}
+
+	learningDesign.setAnnotations(updatedAnnotations);
     }
 
     private Competence getComptenceFromSet(Set<Competence> competences, String title) {

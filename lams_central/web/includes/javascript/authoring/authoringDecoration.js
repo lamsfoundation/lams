@@ -7,7 +7,9 @@ var DecorationLib = {
 		/**
 		 * Abstract class for Region, Optional and Floating Activities.
 		 */
-		Container : function(title) {
+		Container : function(id, uiid, title) {
+			this.id = +id;
+			this.uiid = +uiid || (layout.ld ? ++layout.ld.maxUIID : null);
 			this.title = title;
 			this.childActivities = [];
 			
@@ -18,8 +20,8 @@ var DecorationLib = {
 		/**
 		 * Constructor for region annotation.
 		 */
-		Region : function(x, y, x2, y2, color, title) {
-			DecorationLib.Container.call(this, title);
+		Region : function(id, uiid, x, y, x2, y2, title, color) {
+			DecorationLib.Container.call(this, id, uiid, title);
 			// we don't use it for region
 			this.childActivities = null;
 			
@@ -33,7 +35,9 @@ var DecorationLib = {
 		/**
 		 * Constructor for label annotation.
 		 */
-		Label : function(x, y, title){
+		Label : function(id, uiid, x, y, title){
+			this.id = +id;
+			this.uiid = +uiid || ++layout.ld.maxUIID;
 			// set a default title, if none provided
 			this.title = title || 'Label';
 			
@@ -183,8 +187,9 @@ var DecorationLib = {
 		},
 		
 		
-		addRegion : function(x, y, x2, y2) {
-			var region = new DecorationLib.Region(x, y, x2, y2, layout.colors.annotation);
+		addRegion : function(x, y, x2, y2, title, color) {
+			var region = new DecorationLib.Region(null, null,
+							 x, y, x2, y2, title, color ? color : layout.colors.annotation);
 			layout.regions.push(region);
 			return region;
 		},
@@ -221,7 +226,7 @@ var DecorationLib = {
 		
 		
 		addLabel : function(x, y, title) {
-			var label = new DecorationLib.Label(x, y, title);
+			var label = new DecorationLib.Label(null, null, x, y, title);
 			layout.labels.push(label);
 			return label;
 		},

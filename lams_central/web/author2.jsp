@@ -16,6 +16,8 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.simple-color.js"></script>
+	
 	<!-- Fix for iPad
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.ui.touch-punch.js"></script>
 	-->
@@ -467,6 +469,14 @@
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Color:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldColor" type="text"></input>
 				</td>
 			</tr>
 		</table>

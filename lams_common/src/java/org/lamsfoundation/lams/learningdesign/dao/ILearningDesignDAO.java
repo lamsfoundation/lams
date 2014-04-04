@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 ;
 /**
  * @author Manpreet Minhas
@@ -93,4 +94,5 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	 */
 	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID);
 	
+	public List<LearningDesignAccess> getAccessByUser(Long userId);
 }

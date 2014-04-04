@@ -230,18 +230,19 @@ public class LearningDesignService implements ILearningDesignService {
 		toolDTO.setActivityCategoryID(isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO
 			.getActivityCategoryID());
 
-		if (libraryActivityDTO.getToolID() != null) {
+		if (libraryActivityDTO.getToolID() == null) {
+		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
+		    // to be uncommented as soon as SVG images are delivered
+		    // iconPath = iconPath.replace(".swf", ".svg");
+		    toolDTO.setIconPath(iconPath);
+		} else {
 		    Tool tool = (Tool) learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
-		    if (tool != null) {
-			String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
-			iconPath = iconPath.substring(0, iconPath.lastIndexOf('/') + 1);
-			iconPath += "icon_" + tool.getToolIdentifier() + ".svg";
-			toolDTO.setIconPath(iconPath);
-
-			toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
-		    }
+		    String iconPath = "tool/" + tool.getToolSignature() + "/images/icon_" + tool.getToolIdentifier()
+			    + ".svg";
+		    toolDTO.setIconPath(iconPath);
+		    toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
 		}
-		
+
 		tools.add(toolDTO);
 	    }
 	}

@@ -170,6 +170,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					transition.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			});
 		}
@@ -214,6 +215,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			});
 		}
@@ -270,6 +272,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			};
 			
@@ -338,6 +341,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			});
 		}
@@ -402,6 +406,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					branchingActivity.start.draw();
 					branchingActivity.end.draw();
+					ActivityLib.addSelectEffect(layout.items.selectedObject, true);
 				}
 			}
 			
@@ -446,6 +451,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			});
 		}
@@ -478,6 +484,7 @@ var PropertyLib = {
 				if (newTitle != activity.title) {
 					activity.title = newTitle;
 					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
 				}
 			});
 				
@@ -525,24 +532,41 @@ var PropertyLib = {
 			// first run, create the content
 			content = region.propertiesContent = $('#propertiesContentRegion').clone().attr('id', null)
 													.show().data('parentObject', region);
+			
 			$('.propertiesContentFieldTitle', content).val(region.title);
+			var color = region.items.shape.attr('fill');
+			$('.propertiesContentFieldColor', content).val(color)
+													  .simpleColor({
+														'colors' : layout.colors.annotationPalette,
+														'chooserCSS' : {
+															'left'	   : 0,
+															'top'      : '30px',
+															'margin'   : '0'
+														}
+													  });
 			
 			$('input', content).change(function(){
 				// extract changed properties and redraw the transition
 				var content = $(this).closest('.dialogContainer'),
 					region = content.data('parentObject'),
 					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
+					newTitle = $('.propertiesContentFieldTitle', content).val(),
+					color = region.items.shape.attr('fill'),
+					newColor = $('.propertiesContentFieldColor', content).val();
 				if (newTitle != region.title) {
 					region.title = newTitle;
 					redrawNeeded = true;
 				}
+				redrawNeeded |= newColor != color;
 				
 				if (redrawNeeded) {
-					region.draw();
+					region.draw(null, null, null, null, newColor);
+					ActivityLib.addSelectEffect(region, true);
 				}
 			});
 		}
+		
+		
 	},
 	
 	
@@ -571,6 +595,7 @@ var PropertyLib = {
 				
 				if (redrawNeeded) {
 					label.draw();
+					ActivityLib.addSelectEffect(label, true);
 				}
 			});
 		}

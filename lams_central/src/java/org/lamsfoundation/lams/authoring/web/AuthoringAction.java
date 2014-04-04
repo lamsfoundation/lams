@@ -460,17 +460,16 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (learningDesign != null) {
 	    Long learningDesignID = learningDesign.getLearningDesignId();
 	    if (learningDesignID != null) {
-		responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignID);
-		responseJSON.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, learningDesign.getContentFolderID());
-
-		Vector<AuthoringActivityDTO> activityDTOs = getAuthoringService().getToolActivities(learningDesignID,
-			getUserLanguage());
-		Vector<ValidationErrorDTO> validationDTOs =getAuthoringService().validateLearningDesign(learningDesignID);
 		Gson gson = new GsonBuilder().create();
-		String activitiesJSON = gson.toJson(activityDTOs);
+		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService().validateLearningDesign(
+			learningDesignID);
 		String validationJSON = gson.toJson(validationDTOs);
-		responseJSON.put("activities", new JSONArray(activitiesJSON));
 		responseJSON.put("validation", new JSONArray(validationJSON));
+
+		// get DTO with updated IDs
+		LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
+			getUserLanguage());
+		responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
 	    }
 	}
 

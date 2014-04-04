@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
@@ -83,6 +84,7 @@ public class LearningDesignDTO extends BaseDTO {
     private ArrayList transitions;
     private ArrayList branchMappings;
     private ArrayList<CompetenceDTO> competences;
+    private Set<LearningDesignAnnotation> annotations;
 
     public LearningDesignDTO() {
     }
@@ -140,6 +142,7 @@ public class LearningDesignDTO extends BaseDTO {
 	this.activities = populateActivities(learningDesign, languageCode);
 	this.transitions = populateTransitions(learningDesign);
 	this.competences = populateCompetences(learningDesign);
+	this.annotations = learningDesign.getAnnotations();
 
     }
 
@@ -737,4 +740,11 @@ public class LearningDesignDTO extends BaseDTO {
 	this.competences = competences;
     }
 
+    public Set<LearningDesignAnnotation> getAnnotations() {
+	return annotations;
+    }
+
+    public void setAnnotations(Set<LearningDesignAnnotation> annotations) {
+	this.annotations = annotations;
+    }
 }

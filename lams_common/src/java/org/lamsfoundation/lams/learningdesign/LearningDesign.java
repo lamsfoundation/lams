@@ -137,6 +137,9 @@ public class LearningDesign implements Serializable {
 	private Set<Competence> competences;
 
 	/** persistent field */
+	private Set<LearningDesignAnnotation> annotations;
+	
+	/** persistent field */
 	private WorkspaceFolder workspaceFolder;
 	
 	/** persistent field */
@@ -573,6 +576,14 @@ public class LearningDesign implements Serializable {
 	
 	public void setCompetences(Set<Competence> competences) {
 		this.competences = competences;
+	}
+	
+	public Set<LearningDesignAnnotation> getAnnotations() {
+	    return annotations;
+	}
+
+	public void setAnnotations(Set<LearningDesignAnnotation> annotations) {
+	    this.annotations = annotations;
 	}
    
 	public void setFloatingActivity(FloatingActivity activity) {
