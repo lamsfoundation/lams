@@ -25,8 +25,7 @@
 	<div>
 	<table cellspacing="0" class="forum">
 		<tr>
-			<th><c:out value='${originalMessage.message.subject}'
-				escapeXml='true' /></th>
+			<th><c:out value='${originalMessage.message.subject}' escapeXml='true' /></th>
 		</tr>
 		<tr>
 			<td class="posted-by"><fmt:message key="lable.topic.subject.by" />

@@ -75,7 +75,7 @@
 											<fmt:message key="label.default.user.name"/>
 										</c:set>
 									</c:if>
-									${author}						
+									<c:out value="${author}" escapeXml="true"/>						
 											-
 									<lams:Date value="${msgDto.message.updated}"/>
 								</c:if>

@@ -38,10 +38,10 @@
 					<a href="${viewtopic}" data-ajax="false">
 						<c:choose>
 							<c:when test="${fn:length(topic.message.subject) > 14}">
-								${fn:substring(topic.message.subject, 0, 13)}...
+								<c:out value="${fn:substring(topic.message.subject, 0, 13)}..." escapeXml="true"/>
 							</c:when>
 							<c:otherwise>
-								${topic.message.subject}
+								<c:out value="${topic.message.subject}" escapeXml="true"/>
 							</c:otherwise>
 						</c:choose>
 					</a>

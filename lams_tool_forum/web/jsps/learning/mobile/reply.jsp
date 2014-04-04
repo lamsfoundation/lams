@@ -25,7 +25,7 @@
 			<table cellspacing="0" class="forum">
 				<tr>
 					<th class="ui-bar-c ui-corner-top">
-						<c:out value='${originalMessage.message.subject}' escapeXml='false' />
+						<c:out value='${originalMessage.message.subject}' escapeXml='true' />
 					</th>
 				</tr>
 				<tr class="ui-btn-up-d">
