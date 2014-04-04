@@ -16,7 +16,7 @@
 	</h1>
 	
 		<h2>
-			<fmt:message key="title.original.message.reply" />	
+			<fmt:message key="title.original.message.reply" />
 			
 	    </h2>
 
@@ -26,7 +26,7 @@
 	<table cellspacing="0" class="forum">
 		<tr>
 			<th><c:out value='${originalMessage.message.subject}'
-				escapeXml='false' /></th>
+				escapeXml='true' /></th>
 		</tr>
 		<tr>
 			<td class="posted-by"><fmt:message key="lable.topic.subject.by" />
