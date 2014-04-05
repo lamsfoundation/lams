@@ -61,7 +61,7 @@
 		<tr>
 			<td colspan="2">
 				<h2>
-					${userDTO.firstName} ${userDTO.lastName}
+					<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
 				</h2>
 			</td>
 		</tr>

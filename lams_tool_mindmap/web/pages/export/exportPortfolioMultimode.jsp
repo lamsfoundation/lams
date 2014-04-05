@@ -69,10 +69,10 @@
 					<c:if test="${!empty user.entryDTO.entry}">
 						<tr>
 							<td class="field-name" width="20%">
-								${user.firstName} ${user.lastName}
+								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 							</td>
 							<td>
-								${user.entryDTO.entry}
+								<lams:out value="${user.entryDTO.entry}" escapeHtml="true"/>
 							</td>
 						</tr>
 					</c:if>

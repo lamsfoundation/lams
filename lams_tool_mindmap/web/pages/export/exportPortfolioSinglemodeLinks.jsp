@@ -32,7 +32,7 @@
 					<table>
 						<tr>
 							<th colspan="2">
-								${user.firstName} ${user.lastName}
+								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 							</th>
 						</tr>
 								

@@ -49,7 +49,8 @@
 				<table>
 					<tr>
 						<th colspan="2">
-							${user.firstName} ${user.lastName}
+							<c:out value="${user.firstName} ${user.lastName}" />
+
 						</th>
 					</tr>
 								
@@ -72,7 +73,7 @@
 								<fmt:message key="label.notebookEntry" />
 							</td>
 							<td>
-								${user.entryDTO.entry}
+								<lams:out escapeHtml="true" value="${user.entryDTO.entry}" />
 							</td>
 						</tr>
 					</c:if>
