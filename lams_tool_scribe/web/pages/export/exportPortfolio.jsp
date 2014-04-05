@@ -50,7 +50,7 @@
 						</div>
 
 						<p>
-							${session.appointedScribe}
+							<c:out value="${session.appointedScribe}" escapeXml="true"/>
 						</p>
 
 						<c:set var="scribeSessionDTO" value="${session}" scope="request"> </c:set>
@@ -79,10 +79,10 @@
 							<c:if test="${user.finishedReflection}">
 
 								<p>
-									<span style="font-weight: bold">${user.firstName}
-										${user.lastName} </span>
+									<span style="font-weight: bold"><c:out value="${user.firstName}
+										${user.lastName}" escapeXml="true"/> </span>
 									<br />
-									${user.notebookEntry}
+									<lams:out value="${user.notebookEntry}" escapeHtml="true"/>
 								</p>
 							</c:if>
 						</c:forEach>
