@@ -88,7 +88,7 @@
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowName',index:'rowName', sortable:true, editable:false},
+			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
@@ -461,7 +461,7 @@
 			<h1 class="no-tabs-below">
 				<fmt:message key="gradebook.title.lessonGradebook">
 					<fmt:param>
-						${lessonDetails.lessonName}
+						<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
 					</fmt:param>
 				</fmt:message>
 			</h1> 

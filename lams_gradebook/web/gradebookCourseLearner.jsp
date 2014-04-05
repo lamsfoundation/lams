@@ -156,7 +156,7 @@
 			<h1 class="no-tabs-below">
 				<fmt:message key="gradebook.title.myGradebook">
 					<fmt:param>
-						${fullName}
+						<c:out value="${fullName}" escapeXml="true"/>
 					</fmt:param>
 				</fmt:message>
 			</h1>

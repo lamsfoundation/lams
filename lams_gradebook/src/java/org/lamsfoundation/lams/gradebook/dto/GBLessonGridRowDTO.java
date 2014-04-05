@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 
@@ -51,6 +53,8 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	ArrayList<String> ret = new ArrayList<String>();
 	
 	ret.add(id.toString());
+	
+	rowName = StringEscapeUtils.escapeHtml(rowName);
 	
 	if (view == GBGridView.MON_COURSE) {
 	    if (gradebookMonitorURL != null && gradebookMonitorURL.length() != 0) {

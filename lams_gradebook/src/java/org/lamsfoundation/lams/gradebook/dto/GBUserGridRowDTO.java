@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -47,7 +49,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     
     public GBUserGridRowDTO(User user) {
 	this.id = user.getUserId().toString();
-	this.rowName = user.getLastName() + " " + user.getFirstName();
+	this.rowName = StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
     }

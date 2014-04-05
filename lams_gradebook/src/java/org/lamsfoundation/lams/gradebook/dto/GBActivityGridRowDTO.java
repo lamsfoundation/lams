@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
@@ -64,11 +65,11 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    
 	    this.groupId = groupId;
 	    // If grouped acitivty, append group name
-	    this.rowName = activity.getTitle() + " (" + groupName + ")";
+	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")";
 	} else {
 	    this.id = activity.getActivityId().toString();
 
-	    this.rowName = activity.getTitle();
+	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle());
 	}
 	
 	//Constructs the competences for this activity.

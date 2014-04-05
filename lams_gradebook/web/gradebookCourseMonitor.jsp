@@ -430,7 +430,7 @@
 			<h1 class="no-tabs-below">
 				<fmt:message key="gradebook.title.courseMonitor">
 					<fmt:param>
-						${organisationName}
+						<c:out value="${organisationName}" escapeXml="true"/>
 					</fmt:param>
 				</fmt:message>
 			</h1>
