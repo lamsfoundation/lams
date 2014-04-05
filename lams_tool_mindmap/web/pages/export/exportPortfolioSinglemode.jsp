@@ -8,7 +8,11 @@
 
 <script type="text/javascript">
 <!--
-	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
+	<c:set var="MindmapUser">
+		<c:out value="${currentMindmapUser}" escapeXml="true"/>
+	</c:set>
+
+	flashvars = { xml: "${mindmapContentPath}", user: "${MindmapUser}", dictionary: "${localizationPath}" }
 	
 	$(window).resize(makeNice);
 

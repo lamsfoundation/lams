@@ -35,7 +35,11 @@
 		disableFinishButton();
 	}
 	
-	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", 
+	<c:set var="MindmapUser">
+		<c:out value="${currentMindmapUser}" escapeXml="true"/>
+	</c:set>
+	
+	flashvars = { xml: "${mindmapContentPath}", user: "${MindmapUser}", 
 				  pollServer: "${pollServerParam}", notifyServer: "${notifyServerParam}",
 				  dictionary: "${localizationPath}" }
 	
