@@ -33,14 +33,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 
 <div data-role="content">
+	<c:set var="displayName">
+		<lams:user property="firstName"/> <lams:user property="lastName"/>
+	</c:set>
+		
 	<h2>
 		<fmt:message key="message.lesson.finished">
 			<fmt:param>
-				<lams:user property="firstName"/> <lams:user property="lastName"/>
+				<c:out value="${displayName}" escapeXml="true"/>
 			</fmt:param>
 		</fmt:message>
 	</h2>
-	
 	<p>
 		<fmt:message key="message.lesson.finishedCont">
 			<fmt:param>
@@ -56,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p>
 			<fmt:message key="message.released.lessons">
 				<fmt:param>
-					${releasedLessons}
+					<c:out value="${releasedLessons}" escapeXml="true"/>
 				</fmt:param>		
 			</fmt:message>
 		</p>

@@ -15,7 +15,10 @@
 	var presenceEnabled = ${param.presenceEnabledPatch eq 'true'};
 	var presenceShown = ${param.presenceShown eq 'true'};
 	var presenceImEnabled = ${param.presenceImEnabled eq 'true'};
-	var nickname = "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>";
+	<c:set var="displayName">
+		<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>
+	</c:set>
+	var nickname = "<c:out value='${displayName}'/>";
 	
 	// labels used in JS file
 	var labelSend = '<fmt:message key="learner.im.send"/>';
