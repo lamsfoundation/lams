@@ -82,12 +82,12 @@
 		</fmt:message></h1>
 
 		<c:forEach var="user" items="${userLessonsMap}">
-			<div><strong>${user.key.firstName}
-			${user.key.lastName}</strong> <c:choose>
+			<div><strong><c:out value="${user.key.firstName}
+			${user.key.lastName}"/></strong> <c:choose>
 				<c:when test="${user.value ne null and not empty user.value}">
 					<ul>
 						<c:forEach var="lessonDto" items="${user.value}">
-							<li>${lessonDto.lessonName} 
+							<li><c:out value="${lessonDto.lessonName}" escapeXml="true"/>
 								<c:if test="${lessonDto.displayMonitor}">
 								<a href="javascript:openMonitorLesson(${lessonDto.lessonID})">
 								<fmt:message key="index.monitor" /></a>
