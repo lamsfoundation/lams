@@ -34,7 +34,7 @@
 						${status.index + 1}
 					</td>				
 					<td>
-						${assessmentResult.user.firstName} ${assessmentResult.user.lastName}
+						<c:out value="${assessmentResult.user.firstName} ${assessmentResult.user.lastName}" />
 					</td>
 					<td>
 						<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='3'/>

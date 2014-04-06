@@ -46,7 +46,7 @@
 							<table>
 								<tr>
 									<th colspan="2">
-										${user.firstName} ${user.lastName }
+										<c:out value="${user.firstName} ${user.lastName}"/>
 									</th>
 								</tr>
 								<c:if test="${not empty user.entryDTO}">
