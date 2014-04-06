@@ -4,7 +4,7 @@
 	<tr>
 		<td colspan="2">
 			<h2>
-				${userDTO.firstName} ${userDTO.lastName }
+				<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
 			</h2>
 		</td>
 	</tr>
@@ -31,7 +31,7 @@
 			<fmt:message key="label.notebookEntry" />
 		</td>
 		<td>
-			<c:out value="${userDTO.entryDTO.entry}" escapeXml="false"></c:out>
+			<lams:out value="${userDTO.entryDTO.entry}" escapeHtml="true"/>
 		</td>
 	</tr>
 </table>

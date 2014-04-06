@@ -106,7 +106,7 @@
 					<tr>
 						<td><a
 							href="javascript:openPopup('${pixlrImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})">
-						${user.firstName} ${user.lastName} </a></td>
+						<c:out value="${user.firstName} ${user.lastName}"/></a></td>
 						<td align="center"><c:choose>
 							<c:when
 								test="${user.imageFileName != null && user.imageFileName != pixlrDTO.imageFileName}">
