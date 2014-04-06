@@ -96,14 +96,27 @@ public class ProfileSaveAction extends Action {
 	// (dyna)form validation
 	if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.required"));
+	} else {
+	    Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
+	    Matcher m = p.matcher(userForm.getString("firstName"));
+	    if (!m.matches()) {
+		errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
+	    }
 	}
 	if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.required"));
+	} else {
+            Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
+            Matcher m = p.matcher(userForm.getString("lastName"));
+            if (!m.matches()) {
+                errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
+            }	
 	}
 	if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
 	    errors.add("email", new ActionMessage("error.email.required"));
 	} else {
-	    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+	    Pattern p = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
 	    Matcher m = p.matcher(userForm.getString("email"));
 	    if (!m.matches()) {
 		errors.add("email", new ActionMessage("error.valid.email.required"));
