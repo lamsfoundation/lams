@@ -75,9 +75,9 @@
 	<body class="stripes" >
 		<div id="content" >
 		
-			<h1>${assessment.title} </h1>
+			<h1><c:out value="${assessment.title}" escapeXml="true"/> </h1>
 			
-			<h2>${assessment.instructions} </h2>
+			<h2><c:out value="${assessment.instructions}" escapeXml="false"/></h2>
 			
 			<br><br>		
 			
@@ -87,7 +87,7 @@
 						<fmt:message key="label.monitoring.user.summary.user.name" />
 					</th>
 					<td >
-						${userSummary.user.lastName}, ${userSummary.user.firstName}
+						<c:out value="${userSummary.user.lastName}, ${userSummary.user.firstName}" escapeXml="true"/>
 					</td>
 				</tr>
 				
@@ -129,7 +129,7 @@
 								<fmt:message key="label.monitoring.user.summary.title" />
 							</td>
 							<td>
-								 ${userSummaryItem.question.title}
+								 <c:out value="${userSummaryItem.question.title}" />
 							</td>
 						</tr>					
 						<tr>
@@ -137,7 +137,7 @@
 								<fmt:message key="label.monitoring.user.summary.question" />
 							</td>
 							<td>
-								${userSummaryItem.question.question}
+								<c:out value="${userSummaryItem.question.question}" escapeXml="false"/>
 							</td>
 						</tr>
 					</table>

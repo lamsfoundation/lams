@@ -69,7 +69,7 @@
 						</c:if>
 						>
 							<c:forEach var="learner" items="${GateForm.map.forbiddenLearnerList}">
-								<option value="${learner.userId}">${learner.lastName} ${learner.firstName}</option>
+								<option value="${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></option>
 							</c:forEach>
 						</select>
 					</td >
@@ -80,14 +80,14 @@
 						</c:if>
 						>
 							<c:forEach var="learner" items="${GateForm.map.waitingLearnerList}">
-								<option value="${learner.userId}">${learner.lastName} ${learner.firstName}</option>
+								<option value="${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></option>
 							</c:forEach>
 						</select>
 					</td>
 					<td width="33%">
 						<select style="width: 160px" id="allowed" name="allowed" size="10" disabled="disabled">
 							<c:forEach var="learner" items="${GateForm.map.allowedToPassLearnerList}">
-								<option>${learner.lastName} ${learner.firstName}</option>
+								<option><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></option>
 							</c:forEach>
 						</select>
 					</td>

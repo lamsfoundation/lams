@@ -142,7 +142,7 @@
 						<fmt:message key="label.monitoring.user.summary.user.name" />
 					</th>
 					<td >
-						${userSummary.user.lastName}, ${userSummary.user.firstName}
+						<c:out value="${userSummary.user.lastName}, ${userSummary.user.firstName}" />
 					</td>
 				</tr>
 				
