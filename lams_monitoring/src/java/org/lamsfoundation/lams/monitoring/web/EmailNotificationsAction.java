@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -306,10 +308,10 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	responcedata.put("total", "" + users.size());
 	responcedata.put("page", "" + 1);
 	responcedata.put("records", "" + users.size());
-
+	
 	for (User user : users) {
 	    JSONArray cell=new JSONArray();
-	    cell.put(user.getFirstName() + " " + user.getLastName() + " [" + user.getLogin() + "]");
+	    cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
 	    
 	    JSONObject cellobj = new JSONObject();
 	    cellobj.put("id", "" + user.getUserId());

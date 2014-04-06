@@ -138,7 +138,7 @@
 					<fmt:message key="lesson.description"/>
 				</td>
 				<td>
-					${lesson.lessonDescription}
+					<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
 				</td>
 			</tr>
 			<tr>
@@ -173,7 +173,7 @@
 					<fmt:message key="lesson.class"/>
 				</td>
 				<td>
-					${lesson.organisationName}
+					<c:out value="${lesson.organisationName}" escapeXml="true"/>
 				</td>
 			</tr>
 			<tr>
