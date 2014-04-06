@@ -12,7 +12,7 @@
 <lams:head>
 	<html:base/>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<title><fmt:message key="${title}"/></title>
+	<title><fmt:message key="${fn:escapeXml(title)}"/></title>
 	
 	<lams:css style="learner"/>
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet">

@@ -111,7 +111,7 @@
 			jQuery("#lessonsTable").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
 			
 			<c:forEach var="lesson" items="${lessons}" varStatus="i">
-				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${lesson.lessonName}'});
+				jQuery("#lessonsTable").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${fn:escapeXml(lesson.lessonName)}'});
 			</c:forEach>
 			
 			$("#lessonsTable").parents('div.ui-jqgrid-bdiv').css("max-height","10000px");
@@ -253,7 +253,7 @@
 				</h3>
 				<select id="lessonId" onchange="getUsers();">
 					<c:forEach var="lesson" items="${lessons}">
-						<option <c:if test="${lesson.lessonId==firstLesson.lessonId}">selected="selected"</c:if> value="${lesson.lessonId}">${lesson.lessonName}</option>
+						<option <c:if test="${lesson.lessonId==firstLesson.lessonId}">selected="selected"</c:if> value="${lesson.lessonId}">${fn:escapeXml(lesson.lessonName)}</option>
 					</c:forEach>
 				</select>				
 			</div>
