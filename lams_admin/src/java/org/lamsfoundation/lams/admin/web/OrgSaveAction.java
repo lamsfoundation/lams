@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,7 +113,14 @@ public class OrgSaveAction extends Action {
 		ActionMessages errors = new ActionMessages();
 		if((orgForm.get("name")==null)||(((String)orgForm.getString("name").trim()).length()==0)){
 			errors.add("name",new ActionMessage("error.name.required"));
+		} else {
+            		Pattern p = Pattern.compile("^[^<>^*@%$]*$");
+            		Matcher m = p.matcher(orgForm.get("name").toString());
+            		if (!m.matches()) {
+                	errors.add("name", new ActionMessage("error.name.invalid.characters"));
+            	}
 		}
+
 		if(errors.isEmpty()){
 			HttpSession ss = SessionManager.getSession();
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
