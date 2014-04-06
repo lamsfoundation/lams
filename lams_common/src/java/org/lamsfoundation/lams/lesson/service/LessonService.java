@@ -665,7 +665,8 @@ public class LessonService implements ILessonService {
 	Lesson lesson = getLesson(completedLessonId);
 	if (lesson != null) {
 	    for (Lesson succeedingLesson : lesson.getSucceedingLessons()) {
-		if (checkLessonReleaseConditions(succeedingLesson.getLessonId(), learnerId)) {
+		if (succeedingLesson.isLessonAccessibleForLearner()
+			&& checkLessonReleaseConditions(succeedingLesson.getLessonId(), learnerId)) {
 		    releasedSucceedingLessons.add(succeedingLesson);
 		}
 	    }
