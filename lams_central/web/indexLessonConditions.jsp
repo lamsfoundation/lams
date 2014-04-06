@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-function" prefix="fn"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
@@ -65,7 +66,7 @@
 		<td colspan="2">
 			<h4>
 				<fmt:message key="label.conditions.box.title">
-					<fmt:param>${title}</fmt:param>
+					<fmt:param>${fn:escapeXml(title)}</fmt:param>
 				</fmt:message>
 			</h4>
 		</td>
@@ -121,7 +122,7 @@
 					<td class="lessonList" style="width: 70%">
 						<select name="precedingLessonId">
 							<c:forEach var="availableLesson" items="${availableLessons}">
-								<option value="${availableLesson.id}">${availableLesson.name}</option>
+								<option value="${availableLesson.id}">${fn:escapeXml(availableLesson.name)}</option>
 							</c:forEach>
 						</select>
 					</td>

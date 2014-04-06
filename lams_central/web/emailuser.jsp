@@ -83,7 +83,7 @@
 					<tr>
 						<td><fmt:message key="email.to" /></td>
 						 <c:if test="${not empty user}">
-							<td><c:out value="${user.firstName} ${user.lastName} &lt;${user.email}&gt;"/></td>
+							<td><c:out value="${user.firstName} ${user.lastName}"/> &lt;<c:out value="${user.email}"/>&gt;</td>
 						 </c:if>
 					</tr>
 

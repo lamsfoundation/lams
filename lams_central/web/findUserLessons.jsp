@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 		"http://www.w3.org/TR/html4/loose.dtd">
@@ -78,7 +79,7 @@
 
 	<c:otherwise>
 		<h1><fmt:message key="lessonsearch.results">
-			<fmt:param value="${originalQuery}" />
+			<fmt:param value="${fn:escapeXml(originalQuery)}" />
 		</fmt:message></h1>
 
 		<c:forEach var="user" items="${userLessonsMap}">

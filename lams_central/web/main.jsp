@@ -155,7 +155,10 @@
 				</c:if>
 				<td>
 					<fmt:message key="index.welcome" />
-					<lams:user property="firstName" />
+					<c:set var="firstName">
+						<lams:user property="firstName" />
+					</c:set>
+					<c:out value="${firstName}" escapeXml="true"/>
 				</td>
 				
 				<td id="messageCell">

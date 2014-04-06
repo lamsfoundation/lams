@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-function" prefix="fn"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 <c:set var="pngImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.png" />
 <c:set var="svgImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.svg" />
@@ -44,9 +45,9 @@
 			</div>
 		</c:if>
 	
-		<h1>${lesson.lessonName}</h1>
+		<h1><c:out value="${lesson.lessonName}" escapeXml="true"/></h1>
 	
-		<p>${lesson.lessonDescription}</p>	
+		<p><c:out value="${lesson.lessonDescription}" escapeXml="false"/></p>	
 	
 		<c:if test="${displayDesignImage}">
 			<div id="sequence-preview">
@@ -60,11 +61,11 @@
 		</c:if>
 			
 		<div class="space-bottom-top align-right">
-			<html:link href="${learnerURL}" styleClass="button">
+			<html:link href="${fn:escapeXml(learnerURL)}" styleClass="button">
 				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
 			</html:link>
 		</div>
-			
+
 	</div>
 	   
 	<div id="footer"></div>
