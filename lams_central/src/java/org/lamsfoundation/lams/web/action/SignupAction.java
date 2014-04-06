@@ -163,13 +163,41 @@ public class SignupAction extends Action {
 	    errors.add("username", new ActionMessage("error.username.blank"));
 	} else if (signupService.usernameExists(signupForm.getString("username"))) {
 	    errors.add("username", new ActionMessage("error.username.exists"));
+	} else {
+		// weed out all special characters and spaces
+		Pattern p = Pattern.compile("^[^<>^!#&()/\\|'\"?,.:{}= ~`*@%$]*$");
+		Matcher m = p.matcher(signupForm.getString("username"));
+		log.info("matches? " + m.matches());
+		if (!m.matches()) {
+			errors.add("username", new ActionMessage("error.username.invalid.characters"));
+			log.info("username has invalid characters: "+ signupForm.getString("username"));
+		}
 	}
+
+
 	if (StringUtils.isBlank(signupForm.getString("firstName"))) {
 	    errors.add("firstName", new ActionMessage("error.first.name.blank"));
-	}
+	} else {
+	    // first name validation
+	    Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
+	    Matcher m = p.matcher(signupForm.getString("firstName"));
+	    if (!m.matches()) {
+		errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
+		log.info("firstname has invalid characters: "+ signupForm.getString("firstName"));
+	    }
+	} 
 	if (StringUtils.isBlank(signupForm.getString("lastName"))) {
 	    errors.add("lastName", new ActionMessage("error.last.name.blank"));
-	}
+	} else {
+            // last name validation
+            Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
+            Matcher m = p.matcher(signupForm.getString("lastName"));
+            if (!m.matches()) {
+                errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
+		log.info("lastName has invalid characters: "+ signupForm.getString("lastName"));
+            }
+        }
+
 	if (StringUtils.isBlank(signupForm.getString("password"))) {
 	    errors.add("password", new ActionMessage("error.password.blank"));
 	} else if (!StringUtils.equals(signupForm.getString("password"), signupForm.getString("confirmPassword"))) {
@@ -181,7 +209,8 @@ public class SignupAction extends Action {
 	    if (!StringUtils.equals(signupForm.getString("email"), signupForm.getString("confirmEmail"))) {
 		errors.add("email", new ActionMessage("error.emails.unequal"));
 	    }
-	    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+	    Pattern p = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
 	    Matcher m = p.matcher(signupForm.getString("email"));
 	    if (!m.matches()) {
 		errors.add("email", new ActionMessage("error.email.invalid.format"));
