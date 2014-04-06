@@ -79,7 +79,7 @@
    	     		jQuery("#group${sessionMarkDto.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:"${i.index + 1}",
    	   	     		userUid:"${mcUserMarkDTO.queUsrId}",
-   	   	     		userName:"${mcUserMarkDTO.fullName} <c:if test='${mcUserMarkDTO.userGroupLeader}'>( <fmt:message key='label.monitoring.group.leader' />)</c:if>",
+   	   	     		userName:"${fn:escapeXml(mcUserMarkDTO.fullName)} <c:if test='${mcUserMarkDTO.userGroupLeader}'>( <fmt:message key='label.monitoring.group.leader' />)</c:if>",
    	   	     		total:"${mcUserMarkDTO.totalMark}"
    	   	   	    });
 	        </c:forEach>

@@ -17,7 +17,7 @@
 					  	 		<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 								<tr>			
 									<td valign=top class="align-left">
-										 <c:out value="${userName}" escapeXml="false"/> 
+										 <c:out value="${userName}" escapeXml="true"/> 
 									 </td>
 	
 									<td valign=top class="align-right">
@@ -25,7 +25,7 @@
 											<c:param name="dispatch" value="openNotebook" />
 											<c:param name="uid" value="${reflectionUid}" />
 											<c:param name="userId" value="${userId}" />
-											<c:param name="userName" value="${userName}" />
+											<c:param name="userName" value="${fn:escapeXml(userName)}" />
 											<c:param name="sessionId" value="${sessionId}" />													
 											<c:param name="contentFolderID" value="${McMonitoringForm.contentFolderID}" />																								
 										</c:url>
