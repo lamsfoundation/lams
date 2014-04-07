@@ -58,9 +58,10 @@
 
 		<c:if test="${sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h3>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</h3>
+				<h3><fmt:message key="monitor.summary.td.notebookInstructions" />:</h3>
+				<p>
+					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
+				</p>
 
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">

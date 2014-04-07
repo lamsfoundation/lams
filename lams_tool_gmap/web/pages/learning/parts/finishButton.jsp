@@ -16,9 +16,10 @@
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 	<html:hidden property="markersXML" value="" />
 		<div class="space-top">
-			<h2>
-				<lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/>
-			</h2>
+			<h3><fmt:message key="heading.reflection" /></h3>
+			<p>
+				<strong><lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/></strong>
+			</p>
 
 			<p>
 				<c:choose>

@@ -265,10 +265,10 @@
 		<%-- Reflection entry --%>
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
 			<div class="small-space-top">
-				<h2>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</h2>
-
+			 	<h3><fmt:message key="label.export.reflection" /></h3>
+			 	<p>
+					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
+				</p>
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>

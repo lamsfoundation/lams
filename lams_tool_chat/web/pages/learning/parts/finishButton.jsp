@@ -7,9 +7,10 @@
 	<c:if
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 		<div class="space-top">
-			<h2>
-				<lams:out value="${chatDTO.reflectInstructions}" escapeHtml="true"/>
-			</h2>
+			<h3><fmt:message key="button.reflect" /> </h3>
+			<p>
+				<strong><lams:out value="${chatDTO.reflectInstructions}" escapeHtml="true"/></strong>
+			</p>
 
 			<p>
 				<c:choose>
