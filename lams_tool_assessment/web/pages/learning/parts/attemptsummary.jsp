@@ -44,7 +44,7 @@
 					<fmt:message key="label.learning.summary.feedback" />
 				</th>
 				<td>
-					${result.overallFeedback}
+					<c:out value="${result.overallFeedback}" escapeXml="true"/>
 				</td>
 			</tr>			
 		</c:if>				
