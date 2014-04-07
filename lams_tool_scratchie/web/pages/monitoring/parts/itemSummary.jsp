@@ -78,7 +78,7 @@
 				</fmt:message>
 			</h1>
 			<h3>
-				${item.description}
+				<c:out value="${item.description}" escapeXml="false"/>
 			</h3>	
 			<%@ include file="/common/messages.jsp"%>
 			<br/>

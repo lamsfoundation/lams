@@ -13,7 +13,7 @@
 
 <div id="content">
 	<h1>
-		${mindmapDTO.title}
+		<c:out value="${mindmapDTO.title}"/>
 	</h1>
 
 	<div class="warning">

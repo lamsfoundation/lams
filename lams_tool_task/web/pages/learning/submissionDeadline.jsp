@@ -25,7 +25,7 @@
 <body class="stripes">
 	<div id="content">
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}"/>
 		</h1>
 
 		<div class="warning">

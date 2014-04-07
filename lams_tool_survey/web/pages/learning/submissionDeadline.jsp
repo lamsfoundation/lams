@@ -26,7 +26,7 @@
 	<div id="content">
 
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}"/>
 		</h1>
 		
 		<div class="warning">
@@ -38,7 +38,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h2>
 
 				<c:choose>

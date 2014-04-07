@@ -67,11 +67,11 @@
 
 <div id="content">
 	<h1>
-		${videoRecorderDTO.title}
+		<c:out value="${videoRecorderDTO.title}"/>
 	</h1>
 
 	<p>
-		${videoRecorderDTO.instructions}
+		<c:out value="${videoRecorderDTO.instructions}" escapeXml="false"/>
 	</p>
 
 	<c:if test="${videoRecorderDTO.lockOnFinish and mode == 'learner'}">

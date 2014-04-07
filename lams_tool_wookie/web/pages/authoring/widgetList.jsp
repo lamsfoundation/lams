@@ -44,7 +44,7 @@
 					</tr>
 					<tr align="center">
 						<td class="wookie-title" align="center" valign="top">
-							<a href="javascript:selectWookieWidget('${widget.identifier}')">${widget.title}</a>
+							<a href="javascript:selectWookieWidget('${widget.identifier}')"><c:out value="${widget.title}"/></a>
 						</td>
 					</tr>
 					

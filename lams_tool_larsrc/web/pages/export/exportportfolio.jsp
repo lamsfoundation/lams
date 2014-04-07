@@ -129,7 +129,7 @@
 							</td>
 
 							<td>
-								${item.itemTitle}
+								<c:out value="${item.itemTitle}"/>
 							</td>
 							
 							<td>

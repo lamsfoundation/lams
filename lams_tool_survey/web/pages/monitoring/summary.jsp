@@ -90,7 +90,7 @@
 			<tr>
 				<th class="first" colspan="2">
 					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/listAnswers.do?"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
-						${question.shortTitle} 
+						<c:out value="${question.shortTitle}"/> 
 					</a>
 					<div style="float:right">
 					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
@@ -180,10 +180,10 @@
 						</c:if>
 						<tr>
 							<td colspan="2">
-								${user.fullName}
+								<c:out value="${user.fullName}" escapeXml="true"/>
 							</td>
 							<td colspan="2">
-								${user.loginName}
+								<c:out value="${user.loginName}" escapeXml="true"/>
 							</td>
 							<td >
 								<c:set var="viewReflection">

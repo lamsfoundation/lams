@@ -65,11 +65,11 @@
 	<div id="content">
 
 		<h1>
-			${sessionMap.scratchie.title}
+			<c:out value="${sessionMap.scratchie.title}"/>
 		</h1>
 		
 		<div>
-			${sessionMap.scratchie.instructions}
+			<c:out value="${sessionMap.scratchie.instructions}" escapeXml="false"/>
 		</div>
 
 		<c:choose>

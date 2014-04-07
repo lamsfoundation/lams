@@ -80,7 +80,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.file" /> : </span>
-						${resource.title}
+						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"
@@ -136,7 +136,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.website" /> : </span>
-						${resource.title}
+						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"
@@ -191,7 +191,7 @@
 					<td>
 						<span class="field-name"> <fmt:message
 								key="label.authoring.basic.resource.learning.object" /> : </span>
-						${resource.title}
+						<c:out value="${resource.title}" escapeXml="true"/>
 					</td>
 					<td>
 						<a href="#"

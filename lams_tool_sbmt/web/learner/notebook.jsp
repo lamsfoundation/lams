@@ -27,7 +27,7 @@
 		<html:hidden property="sessionMapID" />
 		<div id="content">
 			<h1>
-				${sessionMap.title}
+				<c:out value="${sessionMap.title}"/>
 			</h1>
 
 			<%@ include file="/common/messages.jsp"%>

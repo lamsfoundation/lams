@@ -34,7 +34,7 @@
 		
 			<div data-role="header" data-theme="b" data-nobackbtn="true">
 				<h1>
-					${content.title}
+					<c:out value="${content.title}"/>
 				</h1>
 			</div>
 	
@@ -52,7 +52,7 @@
 				<div style="text-align: right;">
 					<c:forEach var="user" items="${groupUsers}" varStatus="status">
 						<div>
-							${user.firstName} ${user.lastName}
+							<c:out value="${user.firstName} ${user.lastName}"/>
 						</div>
 					</c:forEach>
 				</div>

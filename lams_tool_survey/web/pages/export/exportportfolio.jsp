@@ -14,7 +14,7 @@
 <body class="stripes">
 		<div id="content">
 		<h1>
-			${sessionMap.title}
+			<c:out value="${sessionMap.title}"/>
 		</h1>
 
 			<c:forEach var="sessionEntry" items="${sessionMap.summaryList}" varStatus="sessionStatus">
@@ -36,7 +36,7 @@
 											<%= SurveyConstants.OPTION_SHORT_HEADER %>${optTitleStatus.count}
 										</td>
 										<td>
-											${optionTitle.description}
+											<c:out value="${optionTitle.description}" escapeXml="false"/>
 										</td>
 									</tr>
 								</c:forEach>
@@ -75,7 +75,7 @@
 					<c:forEach var="answer" items="${answers}">
 						<%--  User answer list --%>
 						<tr>
-							<td>${answer.replier.loginName}</td>
+							<td><c:out value="${answer.replier.loginName}"/></td>
 							<c:forEach var="option" items="${question.options}">
 								<td>
 									<c:if test="${not empty answer.answer}">
@@ -112,7 +112,7 @@
 						<h3><fmt:message key="label.export.reflection" /></h3>
 						<c:set var="reflectDTOSet" value="${sessionMap.reflectList[toolSession.sessionId]}" />
 						<c:forEach var="reflectDTO" items="${reflectDTOSet}">
-							<h4>${reflectDTO.fullName}</h4>
+							<h4><c:out value="${reflectDTO.fullName}"/></h4>
 							<p>
 								<lams:out value="${reflectDTO.reflect}" escapeHtml="true" /> 
 							</p>						

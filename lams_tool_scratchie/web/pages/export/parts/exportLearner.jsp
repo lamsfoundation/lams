@@ -22,20 +22,20 @@
 	<div id="content">
 
 		<h1>
-			${sessionMap.scratchie.title}
+			<c:out value="${sessionMap.scratchie.title}"/>
 		</h1>
 		
 		<div>
-			${sessionMap.scratchie.instructions}
+			<c:out value="${sessionMap.scratchie.instructions}" escapeXml="false"/>
 		</div>
 
 		<table id="scratches" class="alternative-color">
 			<c:forEach var="item" items="${sessionMap.itemList}">
 				<tr id="tr${item.uid}">
 					<td>
-						${item.title}
+						<c:out value="${item.title}"/>
 						<br/>
-						${item.description} 
+						<c:out value="${item.description}" escapeXml="false"/>
 					</td>
 					<td align="right">
 						<c:choose>

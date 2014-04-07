@@ -33,7 +33,7 @@
 
 	<div id="content">
 		<h1>
-			${scratchie.title}
+			<c:out value="${scratchie.title}"/>
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -59,7 +59,7 @@
 		<c:if test="${sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h3>
-					${sessionMap.reflectInstructions}
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 				</h3>
 
 				<c:choose>
@@ -92,7 +92,7 @@
 					
 				    <c:forEach var="reflectDTO" items="${reflections}">
 				    	<div>
-				    		${reflectDTO.groupName}: <c:out value="${reflectDTO.reflection}" escapeXml="true"></c:out> 
+				    		<c:out value="${reflectDTO.groupName}"/>: <lams:out value="${reflectDTO.reflection}" escapeHtml="true"></c:out> 
 				    	</div>
 			        </c:forEach>
 		        </c:if>

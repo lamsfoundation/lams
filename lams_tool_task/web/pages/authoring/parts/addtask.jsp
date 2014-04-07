@@ -136,15 +136,15 @@
 					<c:forEach var="taskListItem" items="${sessionMap.taskListList}">
 						<c:choose>
 							<c:when	test="${formBean.parentTaskName == taskListItem.title}">
-								<option value="${taskListItem.title}" selected="true">
-									${taskListItem.title}
+								<option value="${fn:escapeXml(taskListItem.title)}" selected="true">
+									<c:out value="${taskListItem.title}"/>
 								</option>
 							</c:when>
 							<c:when	test="${formBean.title == taskListItem.title}">
 							</c:when>
 							<c:otherwise>
-								<option value="${taskListItem.title}">
-									${taskListItem.title}
+								<option value="${fn:escapeXml(taskListItem.title)}">
+									<c:out value="${taskListItem.title}"/>
 								</option>
 							</c:otherwise>
 						</c:choose>

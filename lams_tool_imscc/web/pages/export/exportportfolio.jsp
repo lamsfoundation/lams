@@ -41,7 +41,7 @@
 	<div id="content">
 
 		<h1>
-			${title}
+			<c:out value="${title}"/>
 		</h1>
 		
 		<div>
