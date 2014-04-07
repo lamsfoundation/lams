@@ -36,7 +36,7 @@
 				<fmt:message key="label.learner.notAvailable" />
 			</c:when>
 			<c:otherwise>
-				<c:out value="${fileInfo.fileDescription}" escapeXml="false" />
+				<lams:out value="${fileInfo.fileDescription}" escapeHtml="true" />
 			</c:otherwise>
 		</c:choose>
 	</td>

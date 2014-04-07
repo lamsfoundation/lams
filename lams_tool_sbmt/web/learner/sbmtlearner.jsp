@@ -56,7 +56,7 @@
 
 	<div id="content">
 		<h1>
-			<c:out value="${sessionMap.title}" escapeXml="false" />
+			<c:out value="${sessionMap.title}" escapeXml="true" />
 		</h1>
 
 		<p>
@@ -135,7 +135,7 @@
 									<fmt:message key="label.learner.fileDescription" />
 								</td>
 								<td>
-									<lams:out value="${file.fileDescription}" />
+									<lams:out value="${file.fileDescription}" escapeHtml="true"/>
 								</td>
 							</tr>
 
@@ -177,7 +177,7 @@
 											<fmt:message key="label.learner.notAvailable" />
 										</c:when>
 										<c:otherwise>
-											<c:out value="${file.marks}" escapeXml="false" />
+											<c:out value="${file.marks}" escapeXml="true" />
 										</c:otherwise>
 									</c:choose>
 								</td>

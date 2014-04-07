@@ -24,7 +24,7 @@
 			<fmt:message key="label.monitoring.heading.marking"/>
 		</h1>
 
-			<table cellpadding="0">
+			<table cellpadding="0" class="alternative-color">
 				<c:forEach var="user" items="${reports}">
 					<c:forEach items="${user.value}" var="fileInfo" varStatus="status">
 						<%@include file="filelist.jsp"%>

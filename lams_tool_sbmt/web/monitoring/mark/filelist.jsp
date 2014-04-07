@@ -10,7 +10,7 @@
 				<fmt:message key="label.learner.notAvailable" />
 			</c:when>
 			<c:otherwise>
-				<c:out value="${fileInfo.marks}" escapeXml="false" />
+				<c:out value="${fileInfo.marks}" escapeXml="true" />
 			</c:otherwise>
 		</c:choose>
 		<html:link href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 

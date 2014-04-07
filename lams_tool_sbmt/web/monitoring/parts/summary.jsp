@@ -81,6 +81,106 @@
 </script>
 
 
+
+<table cellpadding="0">
+<tr><td>
+	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+	<span id="messageArea"></span>
+</td></tr>
+</table>
+<c:forEach var="element" items="${sessionUserMap}">
+	<c:set var="sessionDto" value="${element.key}" />
+	<c:set var="userlist" value="${element.value}" />
+
+		<c:if test="${isGroupedActivity}">
+			<h1>
+				<fmt:message key="label.session.name" />: 
+				<c:out value="${sessionDto.sessionName}" />
+			</h1>
+		</c:if>
+		<br/>
+		
+		<c:forEach var="user" items="${userlist}" varStatus="status">
+			<table cellpadding="0" class="alternative-color">
+			<c:if test="${status.first}">
+				<tr>
+					<th>
+						<fmt:message key="monitoring.user.fullname"/>
+					</th>
+					<th align="center">
+						<fmt:message key="monitoring.user.submittedFiles"/>
+					</th>
+					<c:if test="${user.hasRefection}">
+						<th align="center">
+							<fmt:message key="monitoring.user.reflection"/>
+						</th>
+					</c:if>
+					<th align="center">
+						<fmt:message key="monitoring.marked.question"/>
+					</th>
+				</tr>
+			</c:if>		
+			<tr>
+				<td><c:out value="${user.firstName}" /> 
+					<c:out value="${user.lastName}" />
+				</td>
+				<!-- LDEV-2194 -->
+				<td align="center"><c:out value="${fn:length(user.filesUploaded)}" /></td>
+				
+				<c:if test="${user.hasRefection}">
+				<td align="center">
+						<c:set var="viewReflection">
+							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userUid}"/>
+						</c:set>
+						<html:link href="javascript:launchPopup('${viewReflection}')">
+							<fmt:message key="label.view" />
+						</html:link>
+				</td>
+				</c:if>				
+				<td align="center">
+					<c:choose>
+					<c:when test="${user.anyFilesMarked}">
+						<fmt:message key="label.yes"/>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.no"/>
+					</c:otherwise>
+					</c:choose>
+				[<html:link
+					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"
+					property="Mark" >
+					<fmt:message key="label.monitoring.Mark.button" />
+				</html:link>]</td>
+			</tr>
+		</c:forEach>
+		<c:if test="${empty userlist}">
+			<tr>
+				<td colspan="3"><fmt:message key="label.no.user.available" />
+				</td>
+			</tr>
+		</c:if>
+		</table>
+		<table>
+		  <tr>
+			<td align="center"><html:link href="javascript:viewAllMarks(${sessionDto.sessionID});"
+				property="viewAllMarks" styleClass="button">
+				<fmt:message key="label.monitoring.viewAllMarks.button" />
+			</html:link></td>
+			<td align="center"><html:link href="javascript:releaseMarks(${sessionDto.sessionID});"
+				property="releaseMarks" styleClass="button">
+				<fmt:message key="label.monitoring.releaseMarks.button" />
+			</html:link></td>
+			<td align="center" style="border-bottom: 12px;border-bottom-color: gray;"><html:link href="javascript:downloadMarks(${sessionDto.sessionID});"
+				property="downloadMarks" styleClass="button">
+				<fmt:message key="label.monitoring.downloadMarks.button" />
+			</html:link></td>
+		</tr>
+	</table>
+	<br/>
+</c:forEach>
+
+<br/>
+
 <h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
@@ -182,7 +282,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${authoring.reflectInstructions}	
+					<lams:out value="${authoring.reflectInstructions}" escapeHtml="true"/>	
 				</td>
 			</tr>
 		</c:when>
@@ -191,101 +291,3 @@
 </div>
 
 <%@include file="daterestriction.jsp"%>
-
-<table cellpadding="0">
-<tr><td>
-	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-	<span id="messageArea"></span>
-</td></tr>
-</table>
-<c:forEach var="element" items="${sessionUserMap}">
-	<c:set var="sessionDto" value="${element.key}" />
-	<c:set var="userlist" value="${element.value}" />
-	<table cellpadding="0">
-		<c:if test="${isGroupedActivity}">
-			<tr>
-				<th colspan="3">
-					<h2>
-						<fmt:message key="label.session.name" /> : 
-						<c:out value="${sessionDto.sessionName}" />
-					</h2>
-				</th>
-			</tr>
-		</c:if>
-		
-		<c:forEach var="user" items="${userlist}" varStatus="status">
-			<c:if test="${status.first}">
-				<tr>
-					<th>
-						<fmt:message key="monitoring.user.fullname"/>
-					</th>
-					<th>
-						<fmt:message key="monitoring.user.submittedFiles"/>
-					</th>
-					<c:if test="${user.hasRefection}">
-						<th>
-							<fmt:message key="monitoring.user.reflection"/>
-						</th>
-					</c:if>
-					<th>
-						<fmt:message key="monitoring.marked.question"/>
-					</th>
-					<th>&nbsp;</th>
-				</tr>
-			</c:if>		
-			<tr>
-				<td><c:out value="${user.firstName}" /> 
-					<c:out value="${user.lastName}" />
-				</td>
-				<!-- LDEV-2194 -->
-				<td align="center"><c:out value="${fn:length(user.filesUploaded)}" /></td>
-				
-				<c:if test="${user.hasRefection}">
-				<td>
-						<c:set var="viewReflection">
-							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userUid}"/>
-						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link>
-				</td>
-				</c:if>				
-				<td>
-					<c:choose>
-					<c:when test="${user.anyFilesMarked}">
-						<fmt:message key="label.yes"/>
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.no"/>
-					</c:otherwise>
-					</c:choose>
-				</td>
-				<td><html:link
-					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"
-					property="Mark" styleClass="button">
-					<fmt:message key="label.monitoring.Mark.button" />
-				</html:link></td>
-			</tr>
-		</c:forEach>
-		<c:if test="${empty userlist}">
-			<tr>
-				<td colspan="3"><fmt:message key="label.no.user.available" />
-				</td>
-			</tr>
-		</c:if>
-		<tr>
-			<td><html:link href="javascript:viewAllMarks(${sessionDto.sessionID});"
-				property="viewAllMarks" styleClass="button">
-				<fmt:message key="label.monitoring.viewAllMarks.button" />
-			</html:link></td>
-			<td><html:link href="javascript:releaseMarks(${sessionDto.sessionID});"
-				property="releaseMarks" styleClass="button">
-				<fmt:message key="label.monitoring.releaseMarks.button" />
-			</html:link></td>
-			<td><html:link href="javascript:downloadMarks(${sessionDto.sessionID});"
-				property="downloadMarks" styleClass="button">
-				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</html:link></td>
-		</tr>
-	</table>
-</c:forEach>

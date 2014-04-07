@@ -10,17 +10,17 @@
 
 <table cellpadding="0">
 	<tr>
-		<td class="field-name" width="30%">
+		<td class="field-name" width="10%" nowrap>
 			<fmt:message key="label.authoring.basic.title" />
 			:
 		</td>
 		<td>
-			<c:out value="${authoring.title}" escapeXml="false" />
+			<c:out value="${authoring.title}" escapeXml="true" />
 		</td>
 	</tr>
 	<!-- Instructions Row -->
 	<tr>
-		<td class="field-name" width="30%">
+		<td class="field-name" width="10%" nowrap valign="top">
 			<fmt:message key="label.authoring.basic.instruction" />
 			:
 		</td>
