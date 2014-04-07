@@ -78,8 +78,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</tr>
 				<c:forEach var="competence" items="${portfolio.competencesDefined}">
 					<tr>
-						<td>${competence.title}</td>
-						<td>${competence.description}</td>
+						<td><c:out value="${competence.title}"/></td>
+						<td><c:out value="${competence.description}"/></td>
 					</tr>
 				</c:forEach>
 			</table>
