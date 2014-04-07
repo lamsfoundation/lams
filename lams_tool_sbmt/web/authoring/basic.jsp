@@ -9,7 +9,7 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.title"></fmt:message>
 			</div>
-			<html:text property="title" style="width: 99%;"></html:text>
+			<html:text property="title" style="width: 99%;" maxlength="255"></html:text>
 		</td>
 	</tr>
 	<tr>

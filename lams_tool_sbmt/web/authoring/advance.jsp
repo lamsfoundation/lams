@@ -57,7 +57,7 @@
 
 <p>
 	<html:textarea property="reflectInstructions"
-		styleId="reflectInstructions" cols="30" rows="3" />
+		styleId="reflectInstructions" cols="50" rows="4" />
 
 </p>
 <script type="text/javascript">
