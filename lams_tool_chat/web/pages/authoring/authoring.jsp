@@ -47,7 +47,7 @@
 		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
 		<c:if test="${sessionMap.mode == 'author'}">
 			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="4" titleKey="button.conditions" page="conditions.jsp" />
+			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
 		</c:if>
 
 		<lams:AuthoringButton formID="authoringForm"
