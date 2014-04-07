@@ -35,10 +35,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
 	<div>
-		<c:out value="${entry}" escapeXml="false" />
+		<c:out value="${entry}" escapeHtml="false" />
 	</div>
 </c:forEach>
 
 <div>
-	<c:out value="${VoteLearningForm.userEntry}" />
+	<lams:out value="${VoteLearningForm.userEntry}" escapeHtml="true" />
 </div>
