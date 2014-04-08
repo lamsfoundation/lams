@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
 	<div>
-		<c:out value="${entry}" escapeHtml="true" />
+		<c:out value="${entry}" escapeXml="true" />
 	</div>
 </c:forEach>
 
