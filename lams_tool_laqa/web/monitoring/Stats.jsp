@@ -2,18 +2,18 @@
 
 <table class="alternative-color">
 	<tr> 
-		<th>
+		<td class="field-name">
 			<b> <fmt:message key="count.total.user" /> </b>
-		</th>
+		</td>
 		<td align="right">
 			<c:out value="${qaStatsDTO.countAllUsers}"/>
 		</td> 
 	</tr>
 						
 	<tr> 
-		<th>
+		<td class="field-name">
 			<b>  <fmt:message key="count.finished.session" /> </b>
-		</th>
+		</td>
 		<td align="right">
 			<c:out value="${qaStatsDTO.countSessionComplete}"/>
 		</td> 
