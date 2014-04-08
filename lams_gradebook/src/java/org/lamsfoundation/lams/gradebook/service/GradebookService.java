@@ -41,6 +41,7 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -1285,7 +1286,7 @@ public class GradebookService implements IGradebookService {
 	    } else if (learnerProgress.getAttemptedActivities() != null
 		    && learnerProgress.getAttemptedActivities().size() > 0) {
 		status = "<img src='" + IMAGES_DIR + "/cog.png' title='"
-			+ learnerProgress.getCurrentActivity().getTitle() + "' />";
+			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "' />";
 	    }
 	}
 	return status;
@@ -1305,7 +1306,7 @@ public class GradebookService implements IGradebookService {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
 		return "<img src='" + IMAGES_DIR + "/cog.png' title='"
-			+ learnerProgress.getCurrentActivity().getTitle() + "' />";
+			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<img src='" + IMAGES_DIR + "/tick.png' />";
 	    }
