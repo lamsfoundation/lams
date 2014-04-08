@@ -30,9 +30,9 @@
 		<table cellpadding="0" class="alternative-color">
 			<tr>
 				<th><fmt:message key="label.monitoring.fullname" /></th>
-				<th><fmt:message key="label.monitoring.recordcount" /></th>
+				<th align="center"><fmt:message key="label.monitoring.recordcount" /></th>
 				<c:if test="${daco.reflectOnActivity}">
-					<th><fmt:message key="label.monitoring.notebook" /></th>
+					<th align="center"><fmt:message key="label.monitoring.notebook" /></th>
 				</c:if>
 			</tr>
 			<c:forEach var="sessionSummary" items="${monitoringSummary}">
@@ -48,7 +48,7 @@
 						<td>
 							<c:out value="${user.fullName}" escapeXml="true"/>
 						</td>
-						<td  style="text-align: center; font-weight: bold;">
+						<td  style="text-align: center; font-weight: bold; text-align: center;">
 							<c:choose>
 								<c:when test="${user.recordCount > 0}">
 									<c:set var="anyRecordsAvailable" value="true" />
