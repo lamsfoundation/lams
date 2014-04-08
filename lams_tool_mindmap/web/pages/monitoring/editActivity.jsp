@@ -11,7 +11,7 @@
 <table cellspacing="0">
 	<tbody>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" width="10%" nowrap>
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
@@ -19,7 +19,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="field-name" width="30%">
+			<td class="field-name" width="10%" nowrap valign="top">
 				<fmt:message key="label.authoring.basic.instructions" />
 			</td>
 			<td>

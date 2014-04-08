@@ -73,10 +73,10 @@
 			<th>
 				<fmt:message key="heading.learner" />
 			</th>
-			<th>
+			<th align="center">
 				<fmt:message key="heading.mindmapEntry" />
 			</th>
-			<th>
+			<th align="center">
 				<fmt:message key="label.notebookEntry" />
 			</th>
 		</tr>
@@ -92,13 +92,13 @@
 									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 								</td>
 						
-								<td width="40%">
+								<td width="40%" align="center">
 									<a href="./learning.do?mode=learner&amp;toolSessionID=${session.sessionID}&amp;monitor=true">
 										<fmt:message key="label.view" />
 									</a>
 								</td>
 						
-								<td width="30%">
+								<td width="30%" align="center">
 									<a href="./monitoring.do?dispatch=reflect&amp;userUID=${user.uid}&amp;toolContentID=${dto.toolContentId}">
 										<fmt:message key="label.view" />
 									</a>
@@ -113,13 +113,13 @@
 								<fmt:message key="label.multimode" />
 							</td>
 					
-							<td width="40%">
+							<td width="40%" align="center">
 								<a href="./learning.do?mode=learner&amp;toolSessionID=${session.sessionID}&amp;monitor=true">
 									<fmt:message key="label.view" />
 								</a>
 							</td>
 					
-							<td width="30%">
+							<td width="30%" align="center">
 								<fmt:message key="label.notAvailable" />
 							</td>
 						</tr>
@@ -136,7 +136,7 @@
 							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 						</td>
 						
-						<td width="40%">
+						<td width="40%" align="center">
 							<c:choose>
 								<c:when test="${user.finishedActivity != true}">
 									<fmt:message key="label.notAvailable" />
@@ -149,7 +149,7 @@
 							</c:choose>
 						</td>
 						
-						<td width="30%">
+						<td width="30%" align="center">
 							<c:choose>
 								<c:when test="${dto.reflectOnActivity != true}">
 									<fmt:message key="label.notAvailable" />
