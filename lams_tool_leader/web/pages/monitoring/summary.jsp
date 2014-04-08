@@ -16,13 +16,13 @@
 		</h2>
 	</c:if>
 
-	<table cellpadding="0">
+	<table cellpadding="0" class="alternative-color">
 
 		<tr>
 			<th>
 				<fmt:message key="heading.learner" />
 			</th>
-			<th>
+			<th align="center">
 				<fmt:message key="heading.leader" />
 			</th>
 		</tr>
@@ -32,7 +32,7 @@
 				<td width="30%" style="padding: 5px 0;">
 					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</td>
-				<td width="70%">
+				<td width="70%" align="center">
 					<c:choose>
 						<c:when test="${session.groupLeader != null && session.groupLeader.uid == user.uid}">
 							<img src="<lams:LAMSURL />images/tick.png">
