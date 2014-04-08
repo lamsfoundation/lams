@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -733,6 +734,9 @@ public class LessonManagerServlet extends HttpServlet {
 	    } catch (UserInfoFetchException e) {
 		LessonManagerServlet.log.error(e, e);
 		return false;
+	    } catch (UserInfoValidationException e) {
+		LessonManagerServlet.log.error(e, e);
+		return false;
 	    } catch (AuthenticationException e) {
 		LessonManagerServlet.log.error(e, e);
 		return false;
@@ -741,7 +745,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	private void addUserToLesson(HttpServletRequest request, ExtServerOrgMap serverMap, String method,
 		String lsIdStr, String username, String firstName, String lastName, String email, String courseId,
-		String countryIsoCode, String langIsoCode) throws UserInfoFetchException {
+		String countryIsoCode, String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
 
 	    if (LessonManagerServlet.log.isDebugEnabled()) {
 		LessonManagerServlet.log.debug("Adding user '" + username + "' as " + method + " to lesson with id '"

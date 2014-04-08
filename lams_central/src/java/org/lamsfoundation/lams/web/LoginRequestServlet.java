@@ -25,9 +25,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -42,20 +39,15 @@ import javax.sql.DataSource;
 
 import org.apache.catalina.authenticator.Constants;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -129,7 +121,7 @@ public class LoginRequestServlet extends HttpServlet {
 	}
 
 	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
-	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
@@ -174,6 +166,9 @@ public class LoginRequestServlet extends HttpServlet {
 	    LoginRequestServlet.log.error("User fetch info error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
 		    "Login Failed - failed to fetch user info from the third party server");
+	} catch (UserInfoValidationException e) {
+	    LoginRequestServlet.log.error("User validation error: ", e);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 	} catch (FailedLoginException e) {
 	    LoginRequestServlet.log.error("Login error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - user was not found");

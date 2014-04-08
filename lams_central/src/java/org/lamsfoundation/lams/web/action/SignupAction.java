@@ -1,8 +1,5 @@
 package org.lamsfoundation.lams.web.action;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +20,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -159,63 +157,54 @@ public class SignupAction extends Action {
 
     private ActionMessages validateSignup(DynaActionForm signupForm) {
 	ActionMessages errors = new ActionMessages();
-	if (StringUtils.isBlank(signupForm.getString("username"))) {
+	
+	// user name validation
+	String userName = (signupForm.get("username") == null) ? null : (String) signupForm.get("username");
+	if (StringUtils.isBlank(userName)) {
 	    errors.add("username", new ActionMessage("error.username.blank"));
-	} else if (signupService.usernameExists(signupForm.getString("username"))) {
+	} else if (!ValidationUtil.isUserNameValid(userName)) {
+	    errors.add("username", new ActionMessage("error.username.invalid.characters"));
+	    log.info("username has invalid characters: "+ userName);
+	} else if (signupService.usernameExists(userName)) {
 	    errors.add("username", new ActionMessage("error.username.exists"));
-	} else {
-		// weed out all special characters and spaces
-		Pattern p = Pattern.compile("^[^<>^!#&()/\\|'\"?,.:{}= ~`*@%$]*$");
-		Matcher m = p.matcher(signupForm.getString("username"));
-		log.info("matches? " + m.matches());
-		if (!m.matches()) {
-			errors.add("username", new ActionMessage("error.username.invalid.characters"));
-			log.info("username has invalid characters: "+ signupForm.getString("username"));
-		}
 	}
 
-
-	if (StringUtils.isBlank(signupForm.getString("firstName"))) {
+	// first name validation
+	String firstName = (signupForm.get("firstName") == null) ? null : (String) signupForm.get("firstName");
+	if (StringUtils.isBlank(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.first.name.blank"));
-	} else {
-	    // first name validation
-	    Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
-	    Matcher m = p.matcher(signupForm.getString("firstName"));
-	    if (!m.matches()) {
-		errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
-		log.info("firstname has invalid characters: "+ signupForm.getString("firstName"));
-	    }
-	} 
-	if (StringUtils.isBlank(signupForm.getString("lastName"))) {
+	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
+	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
+	    log.info("firstname has invalid characters: "+ firstName);
+	}
+	
+	//last name validation
+	String lastName = (signupForm.get("lastName") == null) ? null : (String) signupForm.get("lastName");
+	if (StringUtils.isBlank(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.last.name.blank"));
-	} else {
-            // last name validation
-            Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
-            Matcher m = p.matcher(signupForm.getString("lastName"));
-            if (!m.matches()) {
-                errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
-		log.info("lastName has invalid characters: "+ signupForm.getString("lastName"));
-            }
-        }
+	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
+	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
+	    log.info("lastName has invalid characters: "+ lastName);
+	}
 
+	//password validation
 	if (StringUtils.isBlank(signupForm.getString("password"))) {
 	    errors.add("password", new ActionMessage("error.password.blank"));
 	} else if (!StringUtils.equals(signupForm.getString("password"), signupForm.getString("confirmPassword"))) {
 	    errors.add("password", new ActionMessage("error.passwords.unequal"));
 	}
-	if (StringUtils.isBlank(signupForm.getString("email"))) {
+	
+	//user email validation
+	String userEmail = (signupForm.get("email") == null) ? null : (String) signupForm.get("email");
+	if (StringUtils.isBlank(userEmail)) {
 	    errors.add("email", new ActionMessage("error.email.blank"));
-	} else {
-	    if (!StringUtils.equals(signupForm.getString("email"), signupForm.getString("confirmEmail"))) {
-		errors.add("email", new ActionMessage("error.emails.unequal"));
-	    }
-	    Pattern p = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-	    Matcher m = p.matcher(signupForm.getString("email"));
-	    if (!m.matches()) {
-		errors.add("email", new ActionMessage("error.email.invalid.format"));
-	    }
+	} else if (!ValidationUtil.isEmailValid(userEmail)) {
+	    errors.add("email", new ActionMessage("error.email.invalid.format"));
+	} else if (!StringUtils.equals(userEmail, signupForm.getString("confirmEmail"))) {
+	    errors.add("email", new ActionMessage("error.emails.unequal"));
 	}
+	
+	// courseKey validation
 	if (!signupService.courseKeyIsValid(signupForm.getString("context"),
 		signupForm.getString("courseKey"))) {
 	    errors.add("courseKey", new ActionMessage("error.course.key.invalid"));

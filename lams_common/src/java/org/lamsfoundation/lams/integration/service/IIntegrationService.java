@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -38,71 +39,63 @@ import org.lamsfoundation.lams.usermanagement.User;
  * <p>
  * <a href="IntegrationService.java.html"><i>View Source</i><a>
  * </p>
- *
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IIntegrationService {
-    
-    	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix);
 
-	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
-			String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method);
-	
-	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
-			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode,
-			String parentOrgId, Boolean isTeacher, Boolean prefix);
-	
-	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix) throws UserInfoFetchException;
-	    
-	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
-	
-	ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
-	
-	ExtServerOrgMap getExtServerOrgMap(Integer sid);
+    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
+	    throws UserInfoValidationException;
 
-	ExtServerOrgMap getExtServerOrgMap(String serverId);
-	
-	ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, 
-			String extUsername,
-			String firstName, 
-			String lastName,
-			String language,
-			String country,
-			String email,
-			boolean prefix) 
-			throws UserInfoFetchException; 
-	
-	ExtUserUseridMap getImplicitExtUserUseridMap(
-			ExtServerOrgMap serverMap, 
-			String extUsername,
-			String password,
-			String firstName, 
-			String lastName,
-			String email) 
-			throws UserInfoFetchException;
-	
-	List getAllExtServerOrgMaps();
-	
-	void saveExtServerOrgMap(ExtServerOrgMap map);
-	
-	String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
-	
-	List<ExtServerToolAdapterMap> getMappedServers(String toolSig);
-	
-	ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig);
-	
-	void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map); 
-	
-	void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map);
-	
-	/**
-	 * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
-	 * 
-	 * @param user
-	 * @param lesson
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method) throws UserInfoValidationException;
+
+    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
+	    Boolean prefix) throws UserInfoValidationException;
+
+    ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
+	    throws UserInfoFetchException, UserInfoValidationException;
+
+    ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+	    throws UserInfoFetchException, UserInfoValidationException;
+
+    ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+	    throws UserInfoFetchException;
+
+    ExtServerOrgMap getExtServerOrgMap(Integer sid);
+
+    ExtServerOrgMap getExtServerOrgMap(String serverId);
+
+    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
+	    String lastName, String language, String country, String email, boolean prefix)
+	    throws UserInfoValidationException;
+
+    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
+	    String firstName, String lastName, String email) throws UserInfoValidationException;
+
+    List getAllExtServerOrgMaps();
+
+    void saveExtServerOrgMap(ExtServerOrgMap map);
+
+    String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
+
+    List<ExtServerToolAdapterMap> getMappedServers(String toolSig);
+
+    ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig);
+
+    void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map);
+
+    void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map);
+
+    /**
+     * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
+     * 
+     * @param user
+     * @param lesson
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
 }

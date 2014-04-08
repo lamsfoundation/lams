@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -111,14 +112,13 @@ public class OrgSaveAction extends Action {
 		}
 		
 		ActionMessages errors = new ActionMessages();
-		if((orgForm.get("name")==null)||(((String)orgForm.getString("name").trim()).length()==0)){
-			errors.add("name",new ActionMessage("error.name.required"));
-		} else {
-            		Pattern p = Pattern.compile("^[^<>^*@%$]*$");
-            		Matcher m = p.matcher(orgForm.get("name").toString());
-            		if (!m.matches()) {
-                	errors.add("name", new ActionMessage("error.name.invalid.characters"));
-            	}
+		
+		//organisation name validation
+		String orgName = (orgForm.get("name") == null) ? null : (String) orgForm.get("name");
+		if (StringUtils.isBlank(orgName)) {
+		    errors.add("name",new ActionMessage("error.name.required"));
+		} else if (!ValidationUtil.isOrgNameValid(orgName)) {
+		    errors.add("name", new ActionMessage("error.name.invalid.characters"));
 		}
 
 		if(errors.isEmpty()){

@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -119,6 +120,8 @@ public class LoginRequestDispatcher {
 		addUserToLessonClass(request, lessonId, method);
 	    } catch (UserInfoFetchException e) {
 		throw new ServletException(e);
+	    } catch (UserInfoValidationException e) {
+		throw new ServletException(e);
 	    }
 	}
 	
@@ -169,7 +172,7 @@ public class LoginRequestDispatcher {
     }
 
     private static void addUserToLessonClass(HttpServletRequest request, String lessonId, String method)
-	    throws UserInfoFetchException {
+	    throws UserInfoFetchException, UserInfoValidationException {
 	if (integrationService == null) {
 	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 		    request.getSession().getServletContext()).getBean("integrationService");

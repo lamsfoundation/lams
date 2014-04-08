@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -46,6 +47,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -94,33 +96,28 @@ public class ProfileSaveAction extends Action {
 	}
 
 	// (dyna)form validation
-	if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
+	//first name validation
+	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
+	if (StringUtils.isBlank(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.required"));
-	} else {
-	    Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
-	    Matcher m = p.matcher(userForm.getString("firstName"));
-	    if (!m.matches()) {
-		errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
-	    }
+	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
+	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
+	
+	//last name validation
+	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
+	if (StringUtils.isBlank(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.required"));
-	} else {
-            Pattern p = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
-            Matcher m = p.matcher(userForm.getString("lastName"));
-            if (!m.matches()) {
-                errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
-            }	
+	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
+	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
 	}
-	if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
+
+	//user email validation
+	String userEmail = (userForm.get("email") == null) ? null : (String) userForm.get("email");
+	if (StringUtils.isBlank(userEmail)) {
 	    errors.add("email", new ActionMessage("error.email.required"));
-	} else {
-	    Pattern p = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-	    Matcher m = p.matcher(userForm.getString("email"));
-	    if (!m.matches()) {
-		errors.add("email", new ActionMessage("error.valid.email.required"));
-	    }
+	} else if (!ValidationUtil.isEmailValid(userEmail)) {
+	    errors.add("email", new ActionMessage("error.valid.email.required"));
 	}
 
 	if (!errors.isEmpty()) {

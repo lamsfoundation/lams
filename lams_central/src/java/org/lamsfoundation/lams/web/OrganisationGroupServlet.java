@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -119,6 +120,10 @@ public class OrganisationGroupServlet extends HttpServlet {
 	} catch (UserInfoFetchException e) {
 	    OrganisationGroupServlet.log.error(e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Course group action failed - user does not exist");
+	    return;
+	} catch (UserInfoValidationException e) {
+	    OrganisationGroupServlet.log.error(e);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Course group action failed." + e.getMessage());
 	    return;
 	}
 
@@ -308,6 +313,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {
 		throw new ServletException("Learner with ID \"" + learnerLogin + "\" does not exist");
+	    } catch (UserInfoValidationException e) {
+		throw new ServletException(e.getMessage());
 	    }
 
 	    boolean learnerAdded = group.getUsers().add(learner);
@@ -363,6 +370,9 @@ public class OrganisationGroupServlet extends HttpServlet {
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {
 		// if user does not exist, ignore
+		continue;
+	    } catch (UserInfoValidationException e) {
+		// if user can't be created, ignore
 		continue;
 	    }
 

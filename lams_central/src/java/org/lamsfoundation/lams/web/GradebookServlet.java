@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -134,6 +135,9 @@ public class GradebookServlet extends HttpServlet {
 		GradebookServlet.log.error(e);
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 			"Gradebook request failed - user info fetch exception");
+	    } catch (UserInfoValidationException e) {
+		GradebookServlet.log.error(e);
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Gradebook request failed. " + e.getMessage());
 	    }
 	}
     }

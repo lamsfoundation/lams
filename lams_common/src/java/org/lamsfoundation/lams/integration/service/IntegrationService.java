@@ -41,12 +41,14 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -64,6 +66,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
  * <p>
@@ -98,7 +101,7 @@ public class IntegrationService implements IIntegrationService {
     // wrapper method for compatibility with original integration modules
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method,
-	    Boolean prefix) {
+	    Boolean prefix) throws UserInfoValidationException {
 
 	// Set the pretty course name if available, otherwise maintain the extCourseId
 	String courseName = "";
@@ -119,7 +122,7 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) {
+	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) throws UserInfoValidationException {
 	return getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
 		method, true);
     }
@@ -128,7 +131,7 @@ public class IntegrationService implements IIntegrationService {
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
-	    Boolean isTeacher, Boolean prefix) {
+	    Boolean isTeacher, Boolean prefix) throws UserInfoValidationException {
 	ExtCourseClassMap map;
 	Organisation org;
 	User user = userMap.getUser();
@@ -193,7 +196,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
-	    throws UserInfoFetchException {
+	    throws UserInfoFetchException, UserInfoValidationException {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
@@ -206,7 +209,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
-	    throws UserInfoFetchException {
+	    throws UserInfoFetchException, UserInfoValidationException {
 	return getExtUserUseridMap(serverMap, extUsername, true);
     }
 
@@ -224,7 +227,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
-	    String firstName, String lastName, String email) throws UserInfoFetchException {
+	    String firstName, String lastName, String email) throws UserInfoValidationException {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
@@ -241,7 +244,7 @@ public class IntegrationService implements IIntegrationService {
 
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername,
 	    String firstName, String lastName, String language, String country, String email, boolean prefix)
-	    throws UserInfoFetchException {
+	    throws UserInfoValidationException {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
@@ -254,9 +257,19 @@ public class IntegrationService implements IIntegrationService {
     }
 
     private Organisation createOrganisation(ExtServerOrgMap serverMap, User user, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix) {
+	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix) throws UserInfoValidationException {
+	
 	Organisation org = new Organisation();
-	org.setName(prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName);
+	
+	// org name validation
+	String orgName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
+	if (StringUtils.isNotBlank(orgName) && !ValidationUtil.isFirstLastNameValid(orgName)) {
+	    throw new UserInfoValidationException("Can't create organisation due to validation error: "
+		    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
+		    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + orgName);
+	}
+	org.setName(orgName);
+	
 	org.setDescription(extCourseId);
 	org.setOrganisationState((OrganisationState) service
 		.findById(OrganisationState.class, OrganisationState.ACTIVE));
@@ -284,9 +297,47 @@ public class IntegrationService implements IIntegrationService {
 
     // flexible method to specify username and password
     private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
-	    String[] userData, boolean prefix) throws UserInfoFetchException {
+	    String[] userData, boolean prefix) throws UserInfoValidationException {
+	
+	String login = prefix ? buildName(serverMap.getPrefix(), extUsername) : extUsername;
+	String firstName = userData[1];
+	String lastName = userData[2];
+	String email = userData[11];
+	
+	// login validation
+	if (StringUtils.isBlank(login)) {
+	    throw new UserInfoValidationException("Can't create user due to validation error: "
+		    + "Username cannot be blank. External server:" + serverMap.getServerid() + ", firstName:"
+		    + firstName + ", lastName:" + lastName);
+	} else if (!ValidationUtil.isUserNameValid(login)) {
+	    throw new UserInfoValidationException("Can't create user due to validation error: "
+		    + "Username can only contain alphanumeric characters and no spaces. External server:"
+		    + serverMap.getServerid() + ", Username:" + login);
+	}
+
+	// first name validation
+	if (StringUtils.isNotBlank(firstName) && !ValidationUtil.isFirstLastNameValid(firstName)) {
+	    throw new UserInfoValidationException("Can't create user due to validation error: "
+		    + "First name contains invalid characters. External server:" + serverMap.getServerid()
+		    + ", Username:" + login + ", firstName:" + firstName + ", lastName:" + lastName);
+	}
+
+	// last name validation
+	if (StringUtils.isNotBlank(lastName) && !ValidationUtil.isFirstLastNameValid(lastName)) {
+	    throw new UserInfoValidationException("Can't create user due to validation error: "
+		    + "Last name contains invalid characters. External server:" + serverMap.getServerid()
+		    + ", Username:" + login + ", firstName:" + firstName + ", lastName:" + lastName);
+	}
+
+	// user email validation
+	if (StringUtils.isNotBlank(email) && !ValidationUtil.isEmailValid(email)) {
+	    throw new UserInfoValidationException("Can't create user due to validation error: "
+		    + "Email format is invalid. External server:" + serverMap.getServerid() + ", Username:" + login
+		    + ", firstName:" + firstName + ", lastName:" + lastName);
+	}
+	
 	User user = new User();
-	user.setLogin(prefix ? buildName(serverMap.getPrefix(), extUsername) : extUsername);
+	user.setLogin(login);
 	user.setPassword(password);
 	user.setTitle(userData[0]);
 	user.setFirstName(userData[1]);
@@ -318,16 +369,16 @@ public class IntegrationService implements IIntegrationService {
 
     // compatibility method to support integrations
     private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
-	    throws UserInfoFetchException {
+	    throws UserInfoFetchException, UserInfoValidationException {
 	String[] userData = getUserDataFromExtServer(serverMap, extUsername);
 	String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
 	return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
     }
 
     // compatibility method
-    public ExtUserUseridMap createImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername,
+    private ExtUserUseridMap createImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername,
 	    String firstName, String lastName, String language, String country, String email, boolean prefix)
-	    throws UserInfoFetchException {
+	    throws UserInfoValidationException {
 	String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, country, language };
 	String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
 	return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
