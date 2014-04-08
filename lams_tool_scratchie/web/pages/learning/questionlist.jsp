@@ -101,9 +101,10 @@
 		<%-- show reflection (only for teacher) --%>
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
 			<div class="small-space-top">
-				<h2>
-					${sessionMap.reflectInstructions}
-				</h2>
+				<h3><fmt:message key="monitor.summary.td.notebookInstructions"/></h3>
+				<p>
+					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
+				</p>
 
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">

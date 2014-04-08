@@ -74,7 +74,7 @@
 		
 			<h1>
 				<fmt:message key="label.monitoring.summary.report.for" >
-					<fmt:param>${item.title}</fmt:param>
+					<fmt:param>${fn:escapeXml(item.title)}</fmt:param>
 				</fmt:message>
 			</h1>
 			<h3>
