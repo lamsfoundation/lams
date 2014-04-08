@@ -300,8 +300,12 @@ public class GateAction extends LamsDispatchAction {
      */
     private ActionForward viewScheduleGate(ActionMapping mapping, DynaActionForm gateForm,
 	    ScheduleGateActivity scheduleGate) {
-	gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
-	gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+	if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+	    gateForm.set("activityCompletionBased", true);
+	} else {
+	    gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
+	    gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+	}
 	return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
     }
 

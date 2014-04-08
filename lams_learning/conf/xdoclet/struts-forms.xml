@@ -15,6 +15,9 @@
 	<form-property name="totalLearners" type="java.lang.Integer" />
 	<form-property name="startingTime" type="java.util.Date" />
 	<form-property name="endingTime" type="java.util.Date" />
+	<form-property name="reachDate" type="java.util.Date" />
+	<form-property name="remainTime" type="java.lang.Long" />
+	<form-property name="startOffset" type="java.lang.Long" />
 	<form-property name="previewLesson" type="java.lang.Boolean" />
 	<!--  used for updating the the progress bar -->
 	<form-property name="version" type="java.lang.Integer" />

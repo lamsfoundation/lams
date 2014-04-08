@@ -23,54 +23,92 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * Activity strategy that deals with the calculation specific to schedule gate 
- * activity. The major part of this strategy will be overiding the methods that 
- * defined in the abstract level.
+ * Activity strategy that deals with the calculation specific to schedule gate activity. The major part of this strategy
+ * will be overiding the methods that defined in the abstract level.
  * 
  * @author Jacky Fang
- * @since  2005-4-6
+ * @since 2005-4-6
  * @version 1.1
  * 
  */
-public class ScheduleGateActivityStrategy extends GateActivityStrategy
-{
-	public ScheduleGateActivityStrategy(GateActivity gateActivity) {
-		super(gateActivity);
-	}
+public class ScheduleGateActivityStrategy extends GateActivityStrategy {
+    public ScheduleGateActivityStrategy(GateActivity gateActivity) {
+	super(gateActivity);
+    }
 
-
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Overriden methods
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
     /**
-     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity,
+     *      java.util.ArrayList)
      */
-    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
-    {
-        contributionTypes.add(ContributionTypes.SCHEDULE_GATE);        
+    @Override
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
+	contributionTypes.add(ContributionTypes.SCHEDULE_GATE);
     }
 
     /**
-     * Regarding schedule gate, we don't validate the open condition for the 
-     * learner because the decision of opening the gate or not comes from the 
-     * system scheduler. Lams opens the gate when the start time is reached and 
-     * closes the gate when the end time is reached.
+     * Regarding schedule gate, we don't validate the open condition for the learner because the decision of opening the
+     * gate or not comes from the system scheduler. Lams opens the gate when the start time is reached and closes the
+     * gate when the end time is reached.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
-    protected boolean isOpenConditionMet(List lessonLearners)
-    {
-    	if ( gateActivity != null ) {
-    		return gateActivity.getGateOpen().booleanValue();
-    	}
-    	return true;
+    @Override
+    protected boolean isOpenConditionMet(List lessonLearners) {
+	if (gateActivity != null) {
+	    return gateActivity.getGateOpen().booleanValue();
+	}
+	return true;
+    }
+
+    @SuppressWarnings({ "rawtypes" })
+    @Override
+    public boolean shouldOpenGateFor(User learner, List lessonLearners) {
+	ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gateActivity;
+	if (Boolean.TRUE.equals((scheduleGate.getGateActivityCompletionBased()))) {
+	    Date previousActivityCompletionTime = getPreviousActivityCompletionDate(scheduleGate, learner);
+	    if (previousActivityCompletionTime != null) {
+		Date openTime = scheduleGate.getGateOpenTime(previousActivityCompletionTime);
+		if (openTime.compareTo(new Date()) <= 0) {
+		    gateActivity.addLeaner(learner, true);
+		    return true;
+		}
+	    }
+	    return false;
+	}
+	return super.shouldOpenGateFor(learner, lessonLearners);
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public static Date getPreviousActivityCompletionDate(ScheduleGateActivity scheduleGate, User learner) {
+	Activity previousActivity = scheduleGate.getTransitionTo().getFromActivity();
+	if (previousActivity != null) {
+	    for (LearnerProgress progress : (Set<LearnerProgress>) learner.getLearnerProgresses()) {
+		CompletedActivityProgress completion = progress.getCompletedActivities().get(previousActivity);
+		if (completion != null) {
+		    return completion.getFinishDate();
+		}
+	    }
+	}
+	return null;
     }
 }

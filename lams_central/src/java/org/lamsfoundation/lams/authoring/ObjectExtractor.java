@@ -1481,6 +1481,10 @@ public class ObjectExtractor implements IObjectExtractor {
     private void parseAnnotations(JSONArray annotationList) throws ObjectExtractorException, JSONException {
 
 	Set<LearningDesignAnnotation> existingAnnotations = learningDesign.getAnnotations();
+	if (existingAnnotations == null) {
+	    existingAnnotations = new HashSet<LearningDesignAnnotation>();
+	    learningDesign.setAnnotations(existingAnnotations);
+	}
 	Set<LearningDesignAnnotation> updatedAnnotations = new HashSet<LearningDesignAnnotation>();
 
 	for (int annotationIndex = 0; annotationIndex < annotationList.length(); annotationIndex++) {
@@ -1488,14 +1492,12 @@ public class ObjectExtractor implements IObjectExtractor {
 	    boolean found = false;
 	    LearningDesignAnnotation annotation = null;
 
-	    if (existingAnnotations != null) {
-		for (LearningDesignAnnotation existingAnnotation : existingAnnotations) {
-		    if (existingAnnotation.getAnnotationUIID().equals(
-			    annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID))) {
-			annotation = existingAnnotation;
-			found = true;
-			break;
-		    }
+	    for (LearningDesignAnnotation existingAnnotation : existingAnnotations) {
+		if (existingAnnotation.getAnnotationUIID().equals(
+			annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID))) {
+		    annotation = existingAnnotation;
+		    found = true;
+		    break;
 		}
 	    }
 
@@ -1520,7 +1522,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    updatedAnnotations.add(annotation);
 	}
 
-	learningDesign.setAnnotations(updatedAnnotations);
+	learningDesign.getAnnotations().clear();
+	learningDesign.getAnnotations().addAll(updatedAnnotations);
     }
 
     private Competence getComptenceFromSet(Set<Competence> competences, String title) {
@@ -2244,6 +2247,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throws JSONException {
 	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
 	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
+	activity.setGateActivityCompletionBased((Boolean) JsonUtil.opt(activityDetails,
+		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED));
 	SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
 	activity.setSystemTool(systemTool);
     }

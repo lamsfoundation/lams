@@ -25,6 +25,10 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +46,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -185,8 +190,30 @@ public class GateAction extends LamsDispatchAction {
 	    return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
 	} else if (gate.isScheduleGate()) {
 	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate.getGateActivity();
-	    gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
-	    gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+	    if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+		// so it is in seconds
+		gateForm.set("startOffset", scheduleGate.getGateStartTimeOffset() * 60);
+		
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet()
+			.getServletContext());
+		User learner = LearningWebUtil.getUser(learnerService);
+		Date reachTime = ScheduleGateActivityStrategy.getPreviousActivityCompletionDate(scheduleGate, learner);
+		gateForm.set("reachDate", reachTime);
+		
+		Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
+		startingTime.setTime(reachTime);
+		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		long diff = startingTime.getTimeInMillis() - new Date().getTime();
+		long remainTime = diff / 1000;
+		gateForm.set("remainTime", remainTime);
+	    } else {
+		gateForm.set("reachDate", null);
+		long diff = scheduleGate.getGateStartDateTime().getTime() - new Date().getTime();
+		long remainTime = diff / 1000;
+		gateForm.set("remainTime", remainTime);
+		gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
+		gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+	    }
 	    return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
 	} else if (gate.isConditionGate()) {
 	    gateForm.set("monitorCanOpenGate", false);

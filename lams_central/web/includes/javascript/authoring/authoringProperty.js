@@ -326,8 +326,9 @@ var PropertyLib = {
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
 			$('.propertiesContentFieldGateType', content).val(activity.gateType);
-
-			$('input, select', content).change(function(){
+			
+			// make onChange function a local variable, because it's used several times
+			var changeFunction = function(){
 				// extract changed properties and redraw the activity
 				var content = $(this).closest('.dialogContainer'),
 					activity = content.data('parentObject'),
@@ -338,12 +339,55 @@ var PropertyLib = {
 					redrawNeeded = true;
 				}
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
+				if (activity.gateType == 'schedule') {
+					$(".propertiesContentRowGateSchedule").show();
+					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
+					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
+					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
+					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased').is(':checked');
+				} else {
+					$(".propertiesContentRowGateSchedule").hide();
+				}
 				
 				if (redrawNeeded) {
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 				}
-			});
+			};
+			
+			// create groups/learners spinners
+			$('.propertiesContentFieldOffsetDay', content).spinner({
+				'min' : 0,
+				'max' : 364
+			}).spinner('value', activity.offsetDay || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldOffsetHour', content).spinner({
+				'min' : 0,
+				'max' : 23
+			}).spinner('value', activity.offsetHour || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldOffsetMinute', content).spinner({
+				'min' : 0,
+				'max' : 59
+			}).spinner('value', activity.offsetMinute || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
+			
+			$('input, select', content).change(changeFunction);
+			changeFunction.call(content);
+		}
+		
+		if (activity.transitions.to.length == 0){
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('checked', null)
+				.attr('disabled', 'disabled');
+		} else {
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('disabled', null);
 		}
 	},
 	

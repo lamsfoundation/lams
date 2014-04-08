@@ -918,7 +918,6 @@ public class LearnerService implements ICoreLearnerService {
 	// the database.
 	activityDAO.update(gate);
 	return new GateActivityDTO(gate, lessonLearners, gateOpen);
-
     }
 
     /**

@@ -48,43 +48,39 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy {
 	//---------------------------------------------------------------------
 	// Template methods
 	//---------------------------------------------------------------------
-	/**
-	 * Returns wether we should open the gate or close the gate. It's 
-	 * implementation depends on the type of the gate we are dealing with. 
-	 * Generally, it needs the check up the current gate status. If the gate
-	 * is already opened, we will keep it open for current learner. Otherwise,
-	 * we need to validate the open condition for this learner.
-	 * 
-	 * @param learner the learner who just arrived at the gate.
-	 * @param activity the gate activity.
-	 * @param lessonLearners all learners who have started the lesson
-	 * @return whether we should open it or not.
-	 */
-	public boolean shouldOpenGateFor(User learner, List lessonLearners) {
-		gateActivity.addLeaner(learner, false);
+	        /**
+     * Returns wether we should open the gate or close the gate. It's implementation depends on the type of the gate we
+     * are dealing with. Generally, it needs the check up the current gate status. If the gate is already opened, we
+     * will keep it open for current learner. Otherwise, we need to validate the open condition for this learner.
+     * 
+     * @param learner
+     *            the learner who just arrived at the gate.
+     * @param activity
+     *            the gate activity.
+     * @param lessonLearners
+     *            all learners who have started the lesson
+     * @return whether we should open it or not.
+     */
+    public boolean shouldOpenGateFor(User learner, List lessonLearners) {
+	gateActivity.addLeaner(learner, false);
 
-		if (!gateActivity.getGateOpen().booleanValue()) {
-			if (isOpenConditionMet(lessonLearners)) {
-				gateActivity.setGateOpen(new Boolean(true));
-				//always clear all lists if the gate is opened
-				gateActivity.getAllGateUsers().clear();
-				gateActivity.getWaitingLearners().clear();
-				gateActivity.getAllowedToPassLearners().clear();
-			}
-			else {
-				return gateActivity.getAllowedToPassLearners().contains(learner);
-			}
-		}
-		//always clear all lists if the gate is already opened.
-		else {
-			gateActivity.getAllGateUsers().clear();
-			gateActivity.getWaitingLearners().clear();
-			gateActivity.getAllowedToPassLearners().clear();
-		}
-		return gateActivity.getGateOpen().booleanValue();
+	boolean isOpen = gateActivity.getGateOpen().booleanValue();
+
+	if (!isOpen) {
+	    if (isOpenConditionMet(lessonLearners)) {
+		gateActivity.setGateOpen(new Boolean(true));
+	    } else {
+		return gateActivity.getAllowedToPassLearners().contains(learner);
+	    }
 	}
 
-	//---------------------------------------------------------------------
+	gateActivity.getAllGateUsers().clear();
+	gateActivity.getWaitingLearners().clear();
+	gateActivity.getAllowedToPassLearners().clear();
+	return isOpen;
+    }
+
+    // ---------------------------------------------------------------------
 	// Abstract methods
 	//---------------------------------------------------------------------
 	/**

@@ -98,6 +98,7 @@ public class LibraryActivityDTO extends BaseDTO {
 	private Long gateEndTimeOffset;
 	private Date gateStartDateTime;
 	private Date gateEndDateTime;
+	private Boolean gateActivityCompletionBased;
 
 	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
 	private String languageCode;
@@ -249,6 +250,7 @@ public class LibraryActivityDTO extends BaseDTO {
 		gateStartTimeOffset = activity.getGateStartTimeOffset();
 		gateEndDateTime = activity.getGateEndDateTime();
 		gateEndTimeOffset = activity.getGateEndTimeOffset();
+		gateActivityCompletionBased = activity.getGateActivityCompletionBased();
 	}
 
 	private void addConditionGateActivityAttributes(ConditionGateActivity activity) {
@@ -506,6 +508,10 @@ public class LibraryActivityDTO extends BaseDTO {
 	 */
 	public Long getGateStartTimeOffset() {
 		return gateStartTimeOffset;
+	}
+
+	public Boolean getGateActivityCompletionBased() {
+	    return gateActivityCompletionBased;
 	}
 
 	/**

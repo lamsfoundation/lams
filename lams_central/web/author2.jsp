@@ -341,7 +341,7 @@
 				<td>
 					Title:
 				</td>
-				<td>
+				<td colspan="3">
 					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
@@ -349,13 +349,35 @@
 				<td>
 					Type:
 				</td>
-				<td>
+				<td colspan="3">
 					 <select class="propertiesContentFieldGateType">
 					 	<option value="condition">Condition</option>
 					 	<option value="sync">Synchronise</option>
 					 	<option value="schedule">Schedule</option>
 					 	<option value="permission">Permission</option>
 					 </select>
+				</td>
+			</tr>
+			<tr class="propertiesContentRowGateSchedule">
+				<td>
+					Delay:
+				</td>
+				<td>
+					<input class="propertiesContentFieldOffsetDay spinner" type="text"></input> days
+				</td>
+				<td>
+					<input class="propertiesContentFieldOffsetHour spinner" type="text"></input> hours
+				</td>
+				<td>
+					<input class="propertiesContentFieldOffsetMinute spinner" type="text"></input> minutes
+				</td>
+			</tr>
+			<tr class="propertiesContentRowGateSchedule">
+				<td colspan="3">
+					Since learner finished previous activity?
+				</td>
+				<td>
+					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox"></input>
 				</td>
 			</tr>
 		</table>

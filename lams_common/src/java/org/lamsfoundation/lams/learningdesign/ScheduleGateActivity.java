@@ -92,6 +92,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * </p>
      */
     private Date gateEndDateTime;
+    
+    private Boolean gateActivityCompletionBased;
 
     /** full constructor */
     public ScheduleGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
@@ -154,6 +156,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
 	newScheduleGateActivity.setGateEndDateTime(this.getGateEndDateTime());
 	newScheduleGateActivity.setGateStartDateTime(this.getGateStartDateTime());
+	newScheduleGateActivity.setGateActivityCompletionBased(this.getGateActivityCompletionBased());
 	return newScheduleGateActivity;
     }
 
@@ -195,6 +198,14 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	this.gateEndTimeOffset = gateEndTimeOffset;
     }
 
+    public Boolean getGateActivityCompletionBased() {
+	return gateActivityCompletionBased;
+    }
+
+    public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
+	this.gateActivityCompletionBased = gateActivityCompletionBased;
+    }
+    
     /**
      * <p>
      * Returns the gate open time for a particular lesson according to the s ettings done by the author.
@@ -208,31 +219,30 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * 
      * <b>Note:</b> the time will also be translated against server timezone.
      * 
-     * @param lessonStartTime
+     * @param referenceTime
      *            the start time of the lesson. this should be the server local time. the UTC time is only used for
      *            persistent.
      * 
      * @return the server local date time that the gate will be opened.
      */
-    public Date getLessonGateOpenTime(Date lessonStartTime) {
+    public Date getGateOpenTime(Date referenceTime) {
 	Calendar openTime = new GregorianCalendar(TimeZone.getDefault());
-	openTime.setTime(lessonStartTime);
+	openTime.setTime(referenceTime);
 	// compute the real opening time based on the lesson start time.
 	if (isScheduledByStartTimeOffset()) {
 	    openTime.add(Calendar.MINUTE, getGateStartTimeOffset().intValue());
-	    this.setGateStartDateTime(openTime.getTime());
-	}
-
-	else if (isScheduledByStartDateTime())
+	    if (!Boolean.TRUE.equals(gateActivityCompletionBased)) {
+		this.setGateStartDateTime(openTime.getTime());
+	    }
+	} else if (isScheduledByStartDateTime()) {
 	    openTime.setTime(getGateStartDateTime());
-
+	}
 	/**
 	 * else throw new ActivityBehaviorException("No way of scheduling has " +
 	 * "been setup - this usually should be done at authoring " +
 	 * "interface. Fail to calculate gate open time for lesson.");
 	 */
 	return openTime.getTime();
-
     }
 
     /**
@@ -247,17 +257,16 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * 
      * <b>Note:</b> the time will also be translated against proper timezone.
      * 
-     * @param lessonStartTime
+     * @param referenceTime
      * 
      * @return the date time that the gate will be closed.
      */
-    public Date getLessonGateCloseTime(Date lessonStartTime) {
+    public Date getGateCloseTime(Date referenceTime) {
 	Calendar closeTime = new GregorianCalendar(TimeZone.getDefault());
-	closeTime.setTime(lessonStartTime);
+	closeTime.setTime(referenceTime);
 	// compute the real opening time based on the
 	if (isScheduledByEndTimeOffset()) {
 	    closeTime.add(Calendar.MINUTE, getGateEndTimeOffset().intValue());
-	    this.setGateEndDateTime(closeTime.getTime());
 	} else if (isScheduledByEndDateTime())
 	    closeTime.setTime(getGateEndDateTime());
 	/**
@@ -361,5 +370,4 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     public boolean isScheduled() {
 	return isScheduledByTimeOffset() || isScheduledByDateTime();
     }
-
 }

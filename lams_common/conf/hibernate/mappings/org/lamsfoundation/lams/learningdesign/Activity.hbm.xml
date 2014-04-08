@@ -263,6 +263,7 @@
 		    		<meta attribute="use-in-toString">true</meta>
 			    </property>
 			    
+			    <property name="gateActivityCompletionBased" type="java.lang.Boolean" column="gate_activity_completion_based" length="4" />
 			</subclass>
 			<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="3">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>

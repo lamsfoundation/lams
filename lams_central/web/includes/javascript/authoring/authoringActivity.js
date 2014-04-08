@@ -79,10 +79,19 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, uiid, x, y, gateType) {
+	GateActivity : function(id, uiid, x, y, gateType, startTimeOffset, gateActivityCompletionBased) {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.gateType = gateType || 'permission';
+		if (gateType == 'schedule') {
+			var day = 24*60;
+			this.offsetDay = Math.floor(startTimeOffset/day);
+			startTimeOffset -= this.offsetDay * day;
+			this.offsetHour = Math.floor(startTimeOffset/60);
+			this.offsetMinute = startTimeOffset - this.offsetHour * 60;
+			
+			this.gateActivityCompletionBased = gateActivityCompletionBased;
+		};
 		this.transitions = {
 			'from' : [],
 			'to'   : []

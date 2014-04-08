@@ -517,7 +517,9 @@ function openLearningDesign(learningDesignID) {
 							activityData.activityUIID,
 							activityData.xCoord,
 							activityData.yCoord,
-							gateType);
+							gateType,
+							activityData.gateStartTimeOffset,
+							activityData.gateActivityCompletionBased);
 						break;
 
 					// Parallel Activity
@@ -1009,6 +1011,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'activityTypeID'     	 : activityTypeID,
 			'orderID'				 : activity.orderID,
 			'defaultActivityUIID'    : activity.defaultActivityUIID,
+			'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
+										activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
+			'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,

@@ -43,6 +43,10 @@ input.propertiesContentFieldLearnerCount, input.propertiesContentFieldGroupCount
 	width: 40px;
 }
 
+tr.propertiesContentRowGateSchedule input.spinner {
+	width: 30px;
+}
+
 input.propertiesContentFieldTitle {
 	width: 98%;	
 }

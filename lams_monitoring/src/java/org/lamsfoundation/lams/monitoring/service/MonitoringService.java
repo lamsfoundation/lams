@@ -888,7 +888,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	if (activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
 	    ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity
 		    .getActivityId());
-	    activity = runGateScheduler(gateActivity, lessonStartTime, lessonName);
+	    // do not run the scheduler if the gate is basen on user completing previous activity
+	    if (!Boolean.TRUE.equals(gateActivity.getGateActivityCompletionBased())) {
+		activity = runGateScheduler(gateActivity, lessonStartTime, lessonName);
+	    }
 	    activity.setInitialised(true);
 	}
 	if (activity.isBranchingActivity() && (activity.getGrouping() == null)) {
@@ -949,10 +952,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	// create customized triggers
 	Trigger openGateTrigger = new SimpleTrigger("openGateTrigger:" + scheduleGate.getActivityId(),
-		Scheduler.DEFAULT_GROUP, scheduleGate.getLessonGateOpenTime(schedulingStartTime));
+		Scheduler.DEFAULT_GROUP, scheduleGate.getGateOpenTime(schedulingStartTime));
 
 	Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger:" + scheduleGate.getActivityId(),
-		Scheduler.DEFAULT_GROUP, scheduleGate.getLessonGateCloseTime(schedulingStartTime));
+		Scheduler.DEFAULT_GROUP, scheduleGate.getGateCloseTime(schedulingStartTime));
 
 	// start the scheduling job
 	try {

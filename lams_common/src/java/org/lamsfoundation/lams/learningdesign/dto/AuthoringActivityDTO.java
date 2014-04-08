@@ -179,6 +179,8 @@ public class AuthoringActivityDTO extends BaseDTO {
     private Date gateStartDateTime;
 
     private Date gateEndDateTime;
+    
+    private Boolean gateActivityCompletionBased;
 
     private Boolean applyGrouping;
 
@@ -463,6 +465,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	gateStartTimeOffset = activity.getGateStartTimeOffset();
 	gateEndDateTime = activity.getGateEndDateTime();
 	gateEndTimeOffset = activity.getGateEndTimeOffset();
+	gateActivityCompletionBased = activity.getGateActivityCompletionBased();
     }
 
     /*******************************************************************************************************************
@@ -565,6 +568,14 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     public Long getGateStartTimeOffset() {
 	return gateStartTimeOffset;
+    }
+
+    public Boolean getGateActivityCompletionBased() {
+        return gateActivityCompletionBased;
+    }
+
+    public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
+        this.gateActivityCompletionBased = gateActivityCompletionBased;
     }
 
     /**

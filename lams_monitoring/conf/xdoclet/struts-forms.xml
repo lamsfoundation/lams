@@ -5,6 +5,7 @@
 	<form-property name="totalLearners" type="java.lang.Integer" />
 	<form-property name="startingTime" type="java.util.Date" />
 	<form-property name="endingTime" type="java.util.Date" />
+	<form-property name="activityCompletionBased" type="java.lang.Boolean" />
 	<form-property name="readOnly" type="java.lang.Boolean" />
 	<form-property name="localFiles" type="java.lang.Boolean" />
 	<form-property name="waitingLearnerList" type="java.util.Collection" />
