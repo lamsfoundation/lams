@@ -222,7 +222,7 @@
 				</h3>
 				<select id="activityId" onchange="getUsers();">
 					<c:forEach var="activity" items="${activities}" varStatus="i">
-						<option <c:if test="${i.index==0}">selected="selected"</c:if> value="${activity.activityId}">${activity.title}</option>
+						<option <c:if test="${i.index==0}">selected="selected"</c:if> value="${activity.activityId}"><c:out value="${activity.title}"/></option>
 					</c:forEach>
 				</select>				
 			</div>
