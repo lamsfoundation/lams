@@ -74,11 +74,11 @@
 						<fmt:message key="monitoring.user.fullname"/>
 					</th>
 					<c:if test="${user.hasRefection}">
-						<th>
+						<th align="center">
 							<fmt:message key="monitoring.user.reflection"/>
 						</th>
 					</c:if>
-					<th>
+					<th align="center">
 						<fmt:message key="monitoring.marked.question"/>
 					</th>
 				</tr>
@@ -88,7 +88,7 @@
 					<c:out value="${user.fullName}" escapeXml="true" />
 				</td>
 				<c:if test="${user.hasRefection}">
-				<td>
+				<td align="center">
 						<c:set var="viewReflection">
 							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
 						</c:set>
@@ -97,7 +97,7 @@
 						</html:link>
 				</td>
 				</c:if>
-				<td>
+				<td align="center">
 					<c:choose>
 					<c:when test="${user.anyPostsMarked}">
 						<fmt:message key="label.yes"/>
