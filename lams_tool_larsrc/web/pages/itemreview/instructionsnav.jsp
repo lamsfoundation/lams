@@ -140,7 +140,7 @@
 					</c:when>
 					
 					<c:otherwise>
-						<c:out value="${instructions.instruction.description}" escapeXml="true"/>
+						<c:out value="${instructions.instruction.description}" escapeXml="false"/>
 					</c:otherwise>
 				</c:choose>
 				
