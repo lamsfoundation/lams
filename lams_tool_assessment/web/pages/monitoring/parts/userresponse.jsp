@@ -35,7 +35,7 @@
 
 						</c:when>
 						<c:when test="${question.type == 3}">
-							responseStr +="${questionResult.answerStringEscaped}";
+							responseStr +="${fn:escapeXml(questionResult.answerStringEscaped)}";
 						</c:when>
 						<c:when test="${question.type == 4}">
 							responseStr +="${questionResult.answerStringEscaped}";
