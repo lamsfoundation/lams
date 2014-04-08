@@ -117,11 +117,11 @@
 				<th>
 					<fmt:message>heading.learner</fmt:message>
 				</th>
-				<th>
+				<th align="center">
 					<fmt:message>heading.numPosts</fmt:message>
 				</th>
 
-				<th>
+				<th align="center">
 					<c:choose>
 						<c:when test="${dto.reflectOnActivity}">
 							<fmt:message key="heading.reflection" />
@@ -138,11 +138,11 @@
 					<td>
 						<c:out value="${user.nickname}" escapeXml="true"/>
 					</td>
-					<td>
+					<td align="center">
 						${user.postCount}
 					</td>
 					<c:if test="${dto.reflectOnActivity}">
-						<td>
+						<<td align="center">
 							<c:if test="${user.finishedReflection}">
 								<c:url value="monitoring.do" var="openNotebook">
 									<c:param name="dispatch" value="openNotebook" />
