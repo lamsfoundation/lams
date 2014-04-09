@@ -263,7 +263,7 @@ public class IntegrationService implements IIntegrationService {
 	
 	// org name validation
 	String orgName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
-	if (StringUtils.isNotBlank(orgName) && !ValidationUtil.isFirstLastNameValid(orgName)) {
+	if (StringUtils.isNotBlank(orgName) && !ValidationUtil.isOrgNameValid(orgName)) {
 	    throw new UserInfoValidationException("Can't create organisation due to validation error: "
 		    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
 		    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + orgName);
