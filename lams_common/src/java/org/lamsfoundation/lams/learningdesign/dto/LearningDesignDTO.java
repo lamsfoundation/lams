@@ -84,7 +84,7 @@ public class LearningDesignDTO extends BaseDTO {
     private ArrayList transitions;
     private ArrayList branchMappings;
     private ArrayList<CompetenceDTO> competences;
-    private Set<LearningDesignAnnotation> annotations;
+    private ArrayList<LearningDesignAnnotation> annotations;
 
     public LearningDesignDTO() {
     }
@@ -142,8 +142,8 @@ public class LearningDesignDTO extends BaseDTO {
 	this.activities = populateActivities(learningDesign, languageCode);
 	this.transitions = populateTransitions(learningDesign);
 	this.competences = populateCompetences(learningDesign);
-	this.annotations = learningDesign.getAnnotations();
-
+	this.annotations = new ArrayList<LearningDesignAnnotation>();
+	this.annotations.addAll(learningDesign.getAnnotations());
     }
 
     /**
@@ -740,11 +740,11 @@ public class LearningDesignDTO extends BaseDTO {
 	this.competences = competences;
     }
 
-    public Set<LearningDesignAnnotation> getAnnotations() {
+    public ArrayList<LearningDesignAnnotation> getAnnotations() {
 	return annotations;
     }
 
-    public void setAnnotations(Set<LearningDesignAnnotation> annotations) {
+    public void setAnnotations(ArrayList<LearningDesignAnnotation> annotations) {
 	this.annotations = annotations;
     }
 }

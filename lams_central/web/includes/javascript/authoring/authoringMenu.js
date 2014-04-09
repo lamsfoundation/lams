@@ -687,6 +687,8 @@ var MenuLib = {
 			
 			resizePaper();
 		} else {
+			// do not prompt again
+			window.onbeforeunload = null;
 			// full window reload so new content ID gets generated
 			document.location.href = LAMS_URL + 'authoring/author.do?method=openAuthoring';
 		}

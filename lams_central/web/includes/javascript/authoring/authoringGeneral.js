@@ -87,6 +87,15 @@ $(document).ready(function() {
 	initTemplates();
 	PropertyLib.init();
 	MenuLib.init();
+	
+	window.onbeforeunload = function(){
+		if (layout.activities.length > 0
+			|| layout.regions.length > 0
+			|| layout.labels.length > 0
+			|| layout.floatingActivity) {
+			return 'Your design is not saved.\nAny changes you made since you last saved will be lost.';
+		}
+	};
 });
 
 
@@ -424,11 +433,7 @@ function openLearningDesign(learningDesignID) {
 			$('#ldDescriptionFieldTitle').text(ld.title);
 			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
 			
-			var resizeNeeded = false,
-				arrangeNeeded = false,
-				// current paper dimensions 
-				paperWidth = paper.width,
-				paperHeight = paper.height,
+			var arrangeNeeded = false,
 				branchToBranching = {},
 				// helper for finding last activity in a branch
 				branchToActivities = {};
@@ -450,8 +455,8 @@ function openLearningDesign(learningDesignID) {
 										activityData.activityUIID,
 										activityData.toolContentID,
 										activityData.toolID,
-										activityData.xCoord,
-										activityData.yCoord,
+										activityData.xCoord ? activityData.xCoord : 1,
+										activityData.yCoord ? activityData.yCoord : 1,
 										activityData.activityTitle,
 										activityData.supportsOutputs);
 						// for later reference
@@ -614,22 +619,6 @@ function openLearningDesign(learningDesignID) {
 					if (activityData.orderID == 1) {
 						// is it the first activity in the branch
 						branchData.firstActivity = activity;
-					}
-				}
-				
-				// if we do arranging afterwards, paper will be resized anyway
-				if (!arrangeNeeded) {
-					// find new dimensions of paper
-					var activityBox = activity.items.shape.getBBox(),
-						maxX = activityBox.x + activityBox.width,
-						maxY = activityBox.y + activityBox.height;
-					if (maxX > paperWidth) {
-						resizeNeeded = true;
-						paperWidth = maxX;
-					}
-					if (maxY > paperHeight) {
-						resizeNeeded = true;
-						paperHeight = maxY;
 					}
 				}
 			});
@@ -818,7 +807,23 @@ function openLearningDesign(learningDesignID) {
 			if (arrangeNeeded) {
 				MenuLib.arrangeActivities();
 			} else {
-				if (resizeNeeded) {
+				// if we do arranging afterwards, paper will be resized anyway
+				var paperWidth = paper.width,
+					paperHeight = paper.height;
+				$.each(layout.activities, function(){
+					// find new dimensions of paper
+					var activityBox = this.items.shape.getBBox(),
+						maxX = activityBox.x + activityBox.width,
+						maxY = activityBox.y + activityBox.height;
+					if (maxX > paperWidth) {
+						paperWidth = maxX;
+					}
+					if (maxY > paperHeight) {
+						paperHeight = maxY;
+					}
+				});
+				
+				if (paperWidth > paper.width || paperHeight > paper.height) {
 					resizePaper(paperWidth, paperHeight);
 				} else {
 					HandlerLib.resetCanvasMode(true);
@@ -894,6 +899,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 	$.each(layoutActivities, function(){
 		var activity = this,
 			activityBox = activity.items ? activity.items.shape.getBBox() : null,
+			x = activityBox ? parseInt(activityBox.x) : null,
+			y = activityBox ? parseInt(activityBox.y) : null,
 			activityTypeID = null,
 			toolID = activity.toolID,
 			learningLibraryID = toolID ? toolID : activity.learningLibraryID,
@@ -985,7 +992,13 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		} else if (activity instanceof ActivityLib.FloatingActivity){
 			activityTypeID = 15;
 		}
-
+		
+		if (activity.parentActivity && activity.parentActivity instanceof DecorationLib.Container){
+			// positions are relative to parent container
+			var activityBox = activity.parentActivity.items.getBBox();
+			x -= activityBox.x;
+			y -= activityBox.y;
+		}
 		
 		// add activity
 		activities.push({
@@ -1002,8 +1015,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'parentActivityID' 		 : activity.parentActivity ? activity.parentActivity.id : null,
 			'parentUIID' 			 : activity.parentActivity ? activity.parentActivity.uiid : null,
 			'libraryActivityUIImage' : iconPath,
-			'xCoord' 				 : activityBox ? parseInt(activityBox.x) : null,
-			'yCoord' 				 : activityBox ? parseInt(activityBox.y) : null,
+			'xCoord' 				 : x,
+			'yCoord' 				 : y,
 			'activityTitle' 		 : activity.title,
 			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity
 									   || activity instanceof ActivityLib.ParallelActivity ?
