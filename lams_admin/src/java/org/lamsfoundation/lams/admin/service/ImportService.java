@@ -41,6 +41,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.struts.action.ActionMessage;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.themes.Theme;
@@ -58,6 +59,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -243,11 +245,19 @@ public class ImportService implements IImportService {
 		String[] args = new String[1];
 		
 		String name = parseStringCell(row.getCell(NAME));
-		if (name==null || name=="") {
-			rowResult.add(messageService.getMessage("error.name.required"));
-			hasError = true;
-			return null;
+		
+		//validate organisation name
+		if (StringUtils.isBlank(name)) {
+		    rowResult.add(messageService.getMessage("error.name.required"));
+		    hasError = true;
+		    return null;
+		    
+		} else if (!ValidationUtil.isOrgNameValid(name)) {
+		    rowResult.add(messageService.getMessage("error.orgname.invalid.characters"));
+		    hasError = true;
+		    return null;
 		}
+		
 		org.setName(name);
 		org.setCode(parseStringCell(row.getCell(CODE)));
 		org.setDescription(parseStringCell(row.getCell(DESCRIPTION)));
@@ -469,122 +479,148 @@ public class ImportService implements IImportService {
 		}
 	}
 	
-	/*
-	 * gathers error messages for each cell as required, unless it's the login field in which case,
-	 * flags whole row as empty.
-	 */
-	private User parseUser(HSSFRow row, int rowIndex) {
-		User user = new User();
-		String[] args = new String[1];
-		
-		String login = parseStringCell(row.getCell(LOGIN));
-		if (login==null || login=="") {
-			rowResult.add(messageService.getMessage("error.login.required"));
-			hasError = true;
-			return null;
-		} else if (service.getUserByLogin(login)!=null) {
-			args[0] = "("+login+")";
-			rowResult.add(messageService.getMessage("error.login.unique", args));
-			hasError = true;
-			return null;
-		}
+    /*
+     * gathers error messages for each cell as required, unless it's the login field in which case, flags whole row as
+     * empty.
+     */
+    private User parseUser(HSSFRow row, int rowIndex) {
+	User user = new User();
+	String[] args = new String[1];
 
-		user.setLogin(login);
-		
-		String password = HashUtil.sha1(parseStringCell(row.getCell(PASSWORD)));
-		user.setPassword(password);
-		
-		user.setTitle(parseStringCell(row.getCell(TITLE)));
-		
-		String fname = parseStringCell(row.getCell(FIRST_NAME));
-		if (fname==null || fname=="") {
-			rowResult.add(messageService.getMessage("error.firstname.required"));
-			hasError = true;
-		} else {
-			user.setFirstName(fname);
-		}
-		
-		String lname = parseStringCell(row.getCell(LAST_NAME));
-		if (lname==null || lname=="") {
-			rowResult.add(messageService.getMessage("error.lastname.required"));
-			hasError = true;
-		} else {
-			user.setLastName(lname);
-		}
-		
-		String authMethodName = parseStringCell(row.getCell(AUTH_METHOD));
-		AuthenticationMethod authMethod = getAuthMethod(authMethodName);
-		if (authMethod==null) {
-			args[0] = "("+authMethodName+")";
-			rowResult.add(messageService.getMessage("error.authmethod.invalid", args));
-			hasError = true;
-		} else {
-			user.setAuthenticationMethod(authMethod);
-		}
-		
-		String email = parseStringCell(row.getCell(EMAIL));
-		if (email==null || email=="") {
-			rowResult.add(messageService.getMessage("error.email.required"));
-			hasError = true;
-		} else {
-			Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
-			Matcher m = p.matcher(email);
-			if (!m.matches()) {
-				rowResult.add(messageService.getMessage("error.valid.email.required"));
-				hasError = true;
-			}
-			user.setEmail(email);
-		}
-		
-		String flashId = parseStringCell(row.getCell(FLASH_THEME));
-		Theme flashTheme = getFlashTheme(flashId);
-		if (flashTheme==null) {
-			args[0] = "("+flashId+")";
-			rowResult.add(messageService.getMessage("error.flash.theme.invalid", args));
-			hasError = true;
-		} else {
-			user.setFlashTheme(flashTheme);
-		}
-
-		String htmlId = parseStringCell(row.getCell(HTML_THEME));
-		Theme htmlTheme = getHtmlTheme(htmlId);
-		if (htmlTheme==null) {
-			args[0] = "("+htmlId+")";
-			rowResult.add(messageService.getMessage("error.html.theme.invalid", args));
-			hasError = true;
-		} else {
-			user.setHtmlTheme(htmlTheme);
-		}
-		
-		String localeId = parseStringCell(row.getCell(LOCALE));
-		SupportedLocale locale = getLocale(localeId);
-		if (locale==null) {
-			args[0] = "("+localeId+")";
-			rowResult.add(messageService.getMessage("error.locale.invalid", args));
-			hasError = true;
-		} else {
-			user.setLocale(locale);
-		}
-		
-		user.setAddressLine1(parseStringCell(row.getCell(ADDRESS1)));
-		user.setAddressLine2(parseStringCell(row.getCell(ADDRESS2)));
-		user.setAddressLine3(parseStringCell(row.getCell(ADDRESS3)));
-		user.setCity(parseStringCell(row.getCell(CITY)));
-		user.setState(parseStringCell(row.getCell(STATE)));
-		user.setPostcode(parseStringCell(row.getCell(POSTCODE)));
-		user.setCountry(parseStringCell(row.getCell(COUNTRY)));
-		user.setDayPhone(parseStringCell(row.getCell(DAY_PHONE)));
-		user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE)));
-		user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE)));
-		user.setFax(parseStringCell(row.getCell(FAX)));
-		user.setDisabledFlag(false);
-		user.setCreateDate(new Date());
-		user.setTimeZone(user.getTimeZone());
-		user.setTutorialsDisabled(false);
-		user.setFirstLogin(true);
-		
-		return (hasError ? null : user);
+	String login = parseStringCell(row.getCell(LOGIN));
+	// login validation
+	if (StringUtils.isBlank(login)) {
+	    rowResult.add(messageService.getMessage("error.login.required"));
+	    hasError = true;
+	    return null;
+	    
+	} else if (!ValidationUtil.isUserNameValid(login)) {
+	    rowResult.add(messageService.getMessage("error.login.invalid.characters"));
+	    hasError = true;
+	    return null;
+	    
+	} else if (service.getUserByLogin(login) != null) {
+	    args[0] = "(" + login + ")";
+	    rowResult.add(messageService.getMessage("error.login.unique", args));
+	    hasError = true;
+	    return null;
 	}
+	user.setLogin(login);
+
+	String password = HashUtil.sha1(parseStringCell(row.getCell(PASSWORD)));
+	// password validation
+	if (StringUtils.isBlank(password)) {
+	    rowResult.add(messageService.getMessage("error.password.required"));
+	    hasError = true;
+	    return null;
+	}
+	user.setPassword(password);
+
+	user.setTitle(parseStringCell(row.getCell(TITLE)));
+
+	String firstName = parseStringCell(row.getCell(FIRST_NAME));
+	// first name validation
+	if (StringUtils.isBlank(firstName)) {
+	    rowResult.add(messageService.getMessage("error.firstname.required"));
+	    hasError = true;
+	
+	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
+	    rowResult.add(messageService.getMessage("error.firstname.invalid.characters"));
+	    hasError = true;	    
+	    
+	} else {
+	    user.setFirstName(firstName);
+	}
+
+	String lastName = parseStringCell(row.getCell(LAST_NAME));
+	//last name validation
+	if (StringUtils.isBlank(lastName)) {
+	    rowResult.add(messageService.getMessage("error.lastname.required"));
+	    hasError = true;
+	    
+	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
+	    rowResult.add(messageService.getMessage("error.lastname.invalid.characters"));
+	    hasError = true;
+	    
+	} else {
+	    user.setLastName(lastName);
+	}
+
+	String authMethodName = parseStringCell(row.getCell(AUTH_METHOD));
+	AuthenticationMethod authMethod = getAuthMethod(authMethodName);
+	//auth method validation
+	if (authMethod == null) {
+	    args[0] = "(" + authMethodName + ")";
+	    rowResult.add(messageService.getMessage("error.authmethod.invalid", args));
+	    hasError = true;
+	    
+	} else {
+	    user.setAuthenticationMethod(authMethod);
+	}
+
+	String email = parseStringCell(row.getCell(EMAIL));
+	//user email validation
+	if (StringUtils.isBlank(email)) {
+	    rowResult.add(messageService.getMessage("error.email.required"));
+	    hasError = true;
+	    
+	} else if (!ValidationUtil.isEmailValid(email)) {
+	    rowResult.add(messageService.getMessage("error.valid.email.required"));
+	    hasError = true;
+	    
+	} else {
+	    user.setEmail(email);
+	}
+
+	String flashId = parseStringCell(row.getCell(FLASH_THEME));
+	Theme flashTheme = getFlashTheme(flashId);
+	if (flashTheme == null) {
+	    args[0] = "(" + flashId + ")";
+	    rowResult.add(messageService.getMessage("error.flash.theme.invalid", args));
+	    hasError = true;
+	} else {
+	    user.setFlashTheme(flashTheme);
+	}
+
+	String htmlId = parseStringCell(row.getCell(HTML_THEME));
+	Theme htmlTheme = getHtmlTheme(htmlId);
+	if (htmlTheme == null) {
+	    args[0] = "(" + htmlId + ")";
+	    rowResult.add(messageService.getMessage("error.html.theme.invalid", args));
+	    hasError = true;
+	} else {
+	    user.setHtmlTheme(htmlTheme);
+	}
+
+	String localeId = parseStringCell(row.getCell(LOCALE));
+	SupportedLocale locale = getLocale(localeId);
+	if (locale == null) {
+	    args[0] = "(" + localeId + ")";
+	    rowResult.add(messageService.getMessage("error.locale.invalid", args));
+	    hasError = true;
+	} else {
+	    user.setLocale(locale);
+	}
+
+	user.setAddressLine1(parseStringCell(row.getCell(ADDRESS1)));
+	user.setAddressLine2(parseStringCell(row.getCell(ADDRESS2)));
+	user.setAddressLine3(parseStringCell(row.getCell(ADDRESS3)));
+	user.setCity(parseStringCell(row.getCell(CITY)));
+	user.setState(parseStringCell(row.getCell(STATE)));
+	user.setPostcode(parseStringCell(row.getCell(POSTCODE)));
+	user.setCountry(parseStringCell(row.getCell(COUNTRY)));
+	user.setDayPhone(parseStringCell(row.getCell(DAY_PHONE)));
+	user.setEveningPhone(parseStringCell(row.getCell(EVE_PHONE)));
+	user.setMobilePhone(parseStringCell(row.getCell(MOB_PHONE)));
+	user.setFax(parseStringCell(row.getCell(FAX)));
+	user.setDisabledFlag(false);
+	user.setCreateDate(new Date());
+	user.setTimeZone(user.getTimeZone());
+	user.setTutorialsDisabled(false);
+	user.setFirstLogin(true);
+
+	return (hasError ? null : user);
+    }
 	
 	/*
 	 * the methods below return legible data from individual cells

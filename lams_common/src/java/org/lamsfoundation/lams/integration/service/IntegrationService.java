@@ -158,6 +158,16 @@ public class IntegrationService implements IIntegrationService {
 	    // update external course name if if has changed
 	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
 	    if (extCourseName != null && !org.getName().equals(requestedCourseName)) {
+		
+		//validate org name
+		if (!ValidationUtil.isOrgNameValid(requestedCourseName)) {
+		    throw new UserInfoValidationException(
+			    "Can't create organisation due to validation error: "
+				    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
+				    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:"
+				    + requestedCourseName);
+		}
+		
 		org.setName(requestedCourseName);
 		service.updateOrganisationandWorkspaceNames(org);
 	    }

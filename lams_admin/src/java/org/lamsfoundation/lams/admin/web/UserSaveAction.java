@@ -43,12 +43,14 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
  * @author Jun-Dir Liew
@@ -107,13 +109,12 @@ public class UserSaveAction extends Action {
 	    user = (User) UserSaveAction.service.findById(User.class, userId);
 	}
 
-	// (dyna)form validation
-	String login = userForm.getString("login");
-	if (login != null) {
-	    login = login.trim();
-	}
-	if ((login == null) || (login.length() == 0)) {
+	// login validation
+	String login = (userForm.get("login") == null) ? null : userForm.getString("login").trim();
+	if (StringUtils.isBlank(login)) {
 	    errors.add("login", new ActionMessage("error.login.required"));
+	} else if (!ValidationUtil.isUserNameValid(login)) {
+	    errors.add("login", new ActionMessage("error.login.invalid.characters"));
 	} else {
 	    userForm.set("login", login);
 	    User existingUser = UserSaveAction.service.getUserByLogin(login);
@@ -128,29 +129,40 @@ public class UserSaveAction extends Action {
 	    }
 	}
 
-	if (!StringUtils.equals((String) userForm.get("password"), ((String) userForm.get("password2")))) {
+	//password validation
+	String password = (userForm.get("password") == null) ? null : (String) userForm.get("password");
+	if (!StringUtils.equals(password, ((String) userForm.get("password2")))) {
 	    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 	}
-	if ((userForm.get("password") == null) || (userForm.getString("password").trim().length() == 0)) {
+	if (StringUtils.isBlank(password)) {
 	    passwordChanged = false;
 	    if (!edit) {
 		errors.add("password", new ActionMessage("error.password.required"));
 	    }
 	}
-	if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
+	
+	//first name validation
+	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
+	if (StringUtils.isBlank(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.required"));
+	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
+	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
+	
+	//last name validation
+	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
+	if (StringUtils.isBlank(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.required"));
+	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
+	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
 	}
-	if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
+	
+	//user email validation
+	String userEmail = (userForm.get("email") == null) ? null : (String) userForm.get("email");
+	if (StringUtils.isBlank(userEmail)) {
 	    errors.add("email", new ActionMessage("error.email.required"));
-	} else {
-	    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
-	    Matcher m = p.matcher(userForm.getString("email"));
-	    if (!m.matches()) {
-		errors.add("email", new ActionMessage("error.valid.email.required"));
-	    }
+	} else if (!ValidationUtil.isEmailValid(userEmail)) {
+	    errors.add("email", new ActionMessage("error.valid.email.required"));
 	}
 
 	if (errors.isEmpty()) {

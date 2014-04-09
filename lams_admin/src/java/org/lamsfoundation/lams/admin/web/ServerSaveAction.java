@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -97,11 +98,17 @@ public class ServerSaveAction extends Action {
 	Organisation org = null;
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	if ((Boolean) serverOrgMapForm.get("newOrg")) {
+	    
 	    String orgName = serverOrgMapForm.getString("orgName");
 	    if (StringUtils.trimToNull(orgName) == null) {
-		errors.add("orgId", new ActionMessage("error.required", messageService
-			.getMessage("sysadmin.organisation")));
+		errors.add("orgId",
+			new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
+		
+	    } else if (!ValidationUtil.isOrgNameValid(orgName)) {
+		errors.add("orgId", new ActionMessage("error.orgname.invalid.characters"));
+		
 	    } else {
+		
 		org = new Organisation();
 		org.setName(orgName);
 		org.setParentOrganisation(userService.getRootOrganisation());
@@ -116,6 +123,7 @@ public class ServerSaveAction extends Action {
 		serverOrgMapForm.set("newOrg", false);
 		serverOrgMapForm.set("orgName", null);
 	    }
+	    
 	} else {
 	    Integer orgId = (Integer) serverOrgMapForm.get("orgId");
 	    if (orgId.equals(-1)) {

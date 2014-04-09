@@ -105,34 +105,6 @@ public class Organisation implements Serializable, Comparable {
 
     private String orderedLessonIds;
 
-    /** full constructor */
-    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate,
-	    User createdBy, Workspace workspace, OrganisationType organisationType, Set userOrganisations,
-	    Set childOrganisations, Set lessons, Boolean courseAdminCanAddNewUsers,
-	    Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse,
-	    Boolean courseAdminCanCreateGuestAccounts, Boolean enableCourseNotifications, String orderedLessonIds,
-	    Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors, Boolean enableSingleActivityLessons) {
-	this.name = name;
-	this.description = description;
-	this.parentOrganisation = parentOrganisation;
-	this.createDate = createDate;
-	this.createdBy = createdBy;
-	this.workspace = workspace;
-	this.organisationType = organisationType;
-	this.userOrganisations = userOrganisations;
-	this.childOrganisations = childOrganisations;
-	this.lessons = lessons;
-	this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
-	this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
-	this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
-	this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
-	this.enableCourseNotifications = enableCourseNotifications;
-	this.orderedLessonIds = orderedLessonIds;
-	this.enableGradebookForLearners = enableGradebookForLearners;
-	this.enableGradebookForMonitors = enableGradebookForMonitors;
-	this.enableSingleActivityLessons = enableSingleActivityLessons;
-    }
-
     /** default constructor */
     public Organisation() {
 	this.courseAdminCanAddNewUsers = Boolean.FALSE;
@@ -143,37 +115,6 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableGradebookForMonitors = Boolean.FALSE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
-    }
-
-    /** minimal constructor */
-    public Organisation(Date createDate, User createdBy, Workspace workspace, OrganisationType organisationType,
-	    Set userOrganisations, Set lessons) {
-	this.createDate = createDate;
-	this.createdBy = createdBy;
-	this.workspace = workspace;
-	this.organisationType = organisationType;
-	this.userOrganisations = userOrganisations;
-	this.lessons = lessons;
-
-	// mandatory fields in the db
-	this.courseAdminCanAddNewUsers = Boolean.FALSE;
-	this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
-	this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
-	this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
-	this.enableCourseNotifications = Boolean.FALSE;
-	this.enableGradebookForLearners = Boolean.FALSE;
-	this.enableGradebookForMonitors = Boolean.FALSE;
-	this.enableSingleActivityLessons = Boolean.FALSE;
-    }
-
-    public Organisation(String name, String description, Date createDate, User createdBy,
-	    OrganisationType organisationType) {
-	super();
-	this.name = name;
-	this.description = description;
-	this.createDate = createDate;
-	this.createdBy = createdBy;
-	this.organisationType = organisationType;
     }
 
     public Integer getOrganisationId() {

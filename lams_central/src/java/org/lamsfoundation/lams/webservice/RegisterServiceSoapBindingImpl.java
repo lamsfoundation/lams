@@ -13,10 +13,12 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -31,6 +33,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -111,6 +114,13 @@ public class RegisterServiceSoapBindingImpl implements Register {
     public int createOrganisation(String name, String code, String description, String owner, String serverId,
 	    String datetime, String hash) throws java.rmi.RemoteException {
 	try {
+	    // validate organisation name
+	    if (StringUtils.isNotBlank(name) && !ValidationUtil.isOrgNameValid(name)) {
+		throw new UserInfoValidationException("Can't create organisation due to validation error: "
+			+ "organisation name cannot contain any of these characters < > ^ * @ % $. External serverId:"
+			+ serverId + ", orgName:" + name);
+	    }
+	    
 	    Organisation org = new Organisation();
 	    org.setName(name);
 	    org.setCode(code);
