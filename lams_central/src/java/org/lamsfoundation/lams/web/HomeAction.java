@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -61,7 +60,6 @@ import org.lamsfoundation.lams.lesson.util.LessonDTOComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -69,15 +67,11 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
-import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -203,7 +197,7 @@ public class HomeAction extends DispatchAction {
 		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_IM_ENABLED,
 			String.valueOf(lesson.getLearnerImAvailable()));
 		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_TITLE,
-			lesson.getLessonName());
+			URLEncoder.encode(lesson.getLessonName(), "UTF8"));
 
 		/* Date Format for Chat room append */
 		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -234,6 +228,7 @@ public class HomeAction extends DispatchAction {
 		    }
 		    return mapping.findForward("lessonIntro");
 		} else {
+		    res.setCharacterEncoding("UTF-8");
 		    res.sendRedirect(learnerURL);
 		    return null;
 		}
