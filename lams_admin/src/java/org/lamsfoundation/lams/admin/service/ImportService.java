@@ -253,7 +253,7 @@ public class ImportService implements IImportService {
 		    return null;
 		    
 		} else if (!ValidationUtil.isOrgNameValid(name)) {
-		    rowResult.add(messageService.getMessage("error.orgname.invalid.characters"));
+		    rowResult.add(messageService.getMessage("error.name.invalid.characters"));
 		    hasError = true;
 		    return null;
 		}
@@ -495,7 +495,7 @@ public class ImportService implements IImportService {
 	    return null;
 	    
 	} else if (!ValidationUtil.isUserNameValid(login)) {
-	    rowResult.add(messageService.getMessage("error.login.invalid.characters"));
+	    rowResult.add(messageService.getMessage("error.username.invalid.characters"));
 	    hasError = true;
 	    return null;
 	    

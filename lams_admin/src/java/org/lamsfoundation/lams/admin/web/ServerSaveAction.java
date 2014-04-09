@@ -105,7 +105,7 @@ public class ServerSaveAction extends Action {
 			new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
 		
 	    } else if (!ValidationUtil.isOrgNameValid(orgName)) {
-		errors.add("orgId", new ActionMessage("error.orgname.invalid.characters"));
+		errors.add("orgId", new ActionMessage("error.name.invalid.characters"));
 		
 	    } else {
 		

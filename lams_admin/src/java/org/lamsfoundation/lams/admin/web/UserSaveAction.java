@@ -114,7 +114,7 @@ public class UserSaveAction extends Action {
 	if (StringUtils.isBlank(login)) {
 	    errors.add("login", new ActionMessage("error.login.required"));
 	} else if (!ValidationUtil.isUserNameValid(login)) {
-	    errors.add("login", new ActionMessage("error.login.invalid.characters"));
+	    errors.add("login", new ActionMessage("error.username.invalid.characters"));
 	} else {
 	    userForm.set("login", login);
 	    User existingUser = UserSaveAction.service.getUserByLogin(login);
