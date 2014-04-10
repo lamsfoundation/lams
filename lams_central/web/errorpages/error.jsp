@@ -51,8 +51,8 @@
 			<div class="warning space-bottom">
 				<c:if test="${not empty param.errorName}">
 
-					<c:out value="${param.errorName}" escapeXml="false" />:
-						<c:out value="${param.errorMessage}" escapeXml="false" />
+					<c:out value="${param.errorName}" escapeXml="true" />:
+						<c:out value="${param.errorMessage}" escapeXml="true" />
 					
 					<a href="#" onclick="showHide()"><span id="showButt"><fmt:message
 								key='msg.show.detail' />
@@ -63,7 +63,7 @@
 					
 					<span id="messageDetail" style="display:none"> <c:if
 							test="${not empty param.errorStack}">
-							<c:out value="${param.errorStack}" escapeXml="false" />
+							<c:out value="${param.errorStack}" escapeXml="true" />
 						</c:if> <c:if test="${empty param.errorStack}">
 							<fmt:message key="msg.no.more.detail" />
 						</c:if> </span>
