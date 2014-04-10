@@ -235,7 +235,7 @@ public interface IAssessmentService {
     
     void updateEntry(NotebookEntry notebookEntry);
     
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
+    List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * If success return next activity's url, otherwise return null.

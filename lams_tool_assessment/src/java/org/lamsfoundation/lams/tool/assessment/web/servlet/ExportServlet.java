@@ -197,7 +197,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	// Create reflectList if reflection is enabled.
 	if (content.isReflectOnActivity()) {
-	    Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId());
+	    List<ReflectDTO> reflectList = service.getReflectList(content.getContentId());
 	    // Add reflectList to sessionMap
 	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}

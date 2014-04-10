@@ -268,6 +268,10 @@
 
 <br/>
 
+<c:if test="${assessment.reflectOnActivity && not empty sessionMap.reflectList}">
+	<%@ include file="parts/reflections.jsp"%>
+</c:if>
+
 <%@ include file="parts/advanceoptions.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>

@@ -604,31 +604,30 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
     
     @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+    public List<ReflectDTO> getReflectList(Long contentId) {
+	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getAssessment().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
 	    // get all users in this session
 	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
 	    for (AssessmentUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
 
 		NotebookEntry entry = getEntry(sessionId, user.getUserId().intValue());
 		if (entry != null) {
+		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
+			    .getCreateDate();
+		    ref.setDate(postedDate);
+		    reflectList.add(ref);
 		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
+		
 	    }
-	    map.put(sessionId, list);
 	}
 
-	return map;
+	return reflectList;
     }
 
 

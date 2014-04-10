@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -46,9 +45,9 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -132,6 +131,13 @@ public class MonitoringAction extends Action {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
+	
+	// Create reflectList if reflection is enabled.
+	if (assessment.isReflectOnActivity()) {
+	    List<ReflectDTO> reflectList = service.getReflectList(assessment.getContentId());
+	    // Add reflectList to sessionMap
+	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
 	// cache into sessionMap

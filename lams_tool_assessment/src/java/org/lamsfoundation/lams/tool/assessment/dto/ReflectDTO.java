@@ -23,29 +23,21 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.dto;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 
 public class ReflectDTO {
     private Long userUid;
     private String fullName;
     private String loginName;
-    private boolean hasRefection;
-    private String reflectInstrctions;
-    private boolean finishReflection;
     private String reflect;
+    private Date date;
 
     public ReflectDTO(AssessmentUser user) {
 	this.setLoginName(user.getLoginName());
 	this.setFullName(user.getFirstName() + " " + user.getLastName());
 	this.setUserUid(user.getUid());
-    }
-
-    public boolean isFinishReflection() {
-	return finishReflection;
-    }
-
-    public void setFinishReflection(boolean finishReflection) {
-	this.finishReflection = finishReflection;
     }
 
     public String getFullName() {
@@ -54,14 +46,6 @@ public class ReflectDTO {
 
     public void setFullName(String fullName) {
 	this.fullName = fullName;
-    }
-
-    public boolean isHasRefection() {
-	return hasRefection;
-    }
-
-    public void setHasRefection(boolean hasRefection) {
-	this.hasRefection = hasRefection;
     }
 
     public String getLoginName() {
@@ -80,19 +64,19 @@ public class ReflectDTO {
 	this.reflect = reflect;
     }
 
-    public String getReflectInstrctions() {
-	return reflectInstrctions;
-    }
-
-    public void setReflectInstrctions(String reflectInstrctions) {
-	this.reflectInstrctions = reflectInstrctions;
-    }
-
     public Long getUserUid() {
 	return userUid;
     }
 
     public void setUserUid(Long userUid) {
 	this.userUid = userUid;
+    }
+    
+    public Date getDate() {
+	return date;
+    }
+
+    public void setDate(Date date) {
+	this.date = date;
     }
 }

@@ -227,20 +227,16 @@
 				<fmt:message key="label.export.reflection" />
 			</h3>
 			
-			<c:forEach var="summary" items="${summaryList}">
-				<div style="padding-bottom: 5px; font-size: small;">
-					<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
-				</div>			
+			<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
 			
-				<c:set var="reflectDTOSet" value="${sessionMap.reflectList[summary.sessionId]}" />
-				<c:forEach var="reflectDTO" items="${reflectDTOSet}">
-					<h4>
-						<c:out value="${reflectDTO.fullName}" escapeXml="true" />
-					</h4>
-					<p>
-						<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
-					</p>
-				</c:forEach>
+				<h4>
+					<c:out value="${reflectDTO.fullName}" escapeXml="true" />
+				</h4>
+				
+				<p>
+					<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
+				</p>
+				
 			</c:forEach>
 		</c:if>
 	
