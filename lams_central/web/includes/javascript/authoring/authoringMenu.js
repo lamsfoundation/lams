@@ -67,6 +67,8 @@ var MenuLib = {
 				
 				dialog.text('');
 				dialog.dialog('close');
+				
+				setModified(true);
 			} else {
 				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
@@ -92,6 +94,7 @@ var MenuLib = {
 
 			layout.activities.push(new ActivityLib.GroupingActivity(null, null, x, y));
 			
+			setModified(true);
 			HandlerLib.resetCanvasMode(true);
 		});
 	},
@@ -165,6 +168,7 @@ var MenuLib = {
 				x = translatedEvent[0],
 				y = translatedEvent[1];
 			
+			setModified(true);
 			HandlerLib.resetCanvasMode(true);
 
 			layout.activities.push(new ActivityLib.OptionalActivity(null, null, x, y));
@@ -194,6 +198,7 @@ var MenuLib = {
 				x = translatedEvent[0],
 				y = translatedEvent[1];
 			
+			setModified(true);
 			HandlerLib.resetCanvasMode(true);
 
 			// do not add it to layout.activities as it behaves differently
@@ -247,6 +252,7 @@ var MenuLib = {
 			
 			layout.activities.push(new ActivityLib.GateActivity(null, null, x, y));
 			
+			setModified(true);
 			HandlerLib.resetCanvasMode(true);
 		});
 	},
@@ -650,6 +656,8 @@ var MenuLib = {
 				ActivityLib.addTransition(this.fromActivity, this.toActivity, true);
 			});
 		});
+		
+		setModified(true);
 	},
 	
 	
@@ -660,14 +668,17 @@ var MenuLib = {
 		// force means that user should not be asked for confirmation.
 		if (!force && (layout.activities.length > 0
 					  || layout.regions.length > 0
-					  || layout.labels.length > 0)
+					  || layout.labels.length > 0
+					  || layout.floatingActivity)
 				&& !confirm('Are you sure you want to remove all existing elements?')){
 			return;
 		}
 		
+		$('#ldDescriptionDetails').slideUp();
+		
 		// soft means that data is manually reset, instead of simply reloading the page.
 		if (soft) {
-			$('#ldDescriptionFieldTitle').text('');
+			$('#ldDescriptionFieldTitle').text('Untitled');
 			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(null);
 			
 			layout.ld = {
@@ -677,6 +688,7 @@ var MenuLib = {
 			layout.regions = [];
 			layout.labels = [];
 			layout.floatingActivity = null;
+			setModified(true);
 			
 			if (paper) {
 				paper.clear();
@@ -753,6 +765,59 @@ var MenuLib = {
 			newActivity.grouping = activity.grouping;
 			newActivity.draw();
 		}
+		
+		setModified(true);
+	},
+	
+	
+	openPreview : function(){
+		if (layout.modified) {
+			// disabling the button does not do the trick, so we have to check it here
+			return;
+		}
+		
+		// initialize, create and enter the preview lesson
+		$.ajax({
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			data : {
+				'method' : 'initializeLesson',
+				'learningDesignID' : layout.ld.learningDesignID,
+				'copyType' : 3,
+				'lessonName' : 'Preview'
+			},
+			cache : false,
+			dataType : 'text',
+			success : function(lessonID) {
+				if (!lessonID) {
+					alert('Error while initialising lesson for preview');
+					return;
+				}
+				
+				$.ajax({
+					url : LAMS_URL + 'monitoring/monitoring.do',
+					data : {
+						'method' : 'startPreviewLesson',
+						'lessonID' : lessonID
+					},
+					cache : false,
+					dataType : 'text',
+					success : function() {
+						// open preview pop up window
+						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
+									'width=920,height=700,resizable,status=yes');
+					}
+				});
+
+			}
+		});
+	},
+	
+	
+	toggleDescriptionDiv: function() {
+		$('#ldDescriptionDetails').slideToggle(function(){
+			ldDescriptionHideTip
+		});
+		$('#ldDescriptionHideTip').toggle();
 	}
 	
 	/*

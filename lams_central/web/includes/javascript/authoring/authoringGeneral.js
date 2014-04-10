@@ -9,6 +9,7 @@ var paper = null,
 // configuration and storage of various elements
 	layout = {
 	'drawMode'   : false,
+	'modified'   : false,
 	 // 'isZoomed'   : false,
 	'activities' : null,
 	'floatingActivity' : null,
@@ -80,19 +81,21 @@ var paper = null,
  */
 $(document).ready(function() {
 	canvas = $('#canvas');
-	MenuLib.newLearningDesign(true, true);
-	layout.ld.contentFolderID = initContentFolderID;
 	
 	initLayout();
 	initTemplates();
 	PropertyLib.init();
 	MenuLib.init();
 	
+	MenuLib.newLearningDesign(true, true);
+	layout.ld.contentFolderID = initContentFolderID;
+	
 	window.onbeforeunload = function(){
-		if (layout.activities.length > 0
+		if (layout.modified &&
+			(layout.activities.length > 0
 			|| layout.regions.length > 0
 			|| layout.labels.length > 0
-			|| layout.floatingActivity) {
+			|| layout.floatingActivity)) {
 			return 'Your design is not saved.\nAny changes you made since you last saved will be lost.';
 		}
 	};
@@ -205,7 +208,7 @@ function initTemplates(){
 			    	activity = new ActivityLib.ToolActivity(null, null, null, learningLibraryID, x, y, label);
 			    }
 			    
-				layout.activities.push(activity); 
+				layout.activities.push(activity);
 				ActivityLib.dropActivity(activity, eventX, eventY);
 		   }
 	});
@@ -829,6 +832,8 @@ function openLearningDesign(learningDesignID) {
 					HandlerLib.resetCanvasMode(true);
 				}
 			}
+			
+			setModified(false);
 		}
 	});
 }
@@ -1209,6 +1214,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					});
 				});
 				
+				setModified(false);
 				alert('Congratulations! Your design is valid and has been saved.');
 				result = true;
 			} else {
@@ -1251,4 +1257,17 @@ function resizePaper(width, height) {
 	layout.items.bin = paper.path(binPath);
 	
 	HandlerLib.resetCanvasMode(true);
+}
+
+function setModified(modified) {
+	layout.modified = modified;
+	if (modified) {
+		$('#previewButton').attr('disabled', 'disabled')
+						   .button('option', 'disabled', true);
+		$('#ldDescriptionFieldModified').text('*');
+	} else {
+		$('#previewButton').attr('disabled', null)
+						   .button('option', 'disabled', false);
+		$('#ldDescriptionFieldModified').text('');
+	}
 }

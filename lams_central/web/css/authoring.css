@@ -168,43 +168,8 @@ div#gtbDialog td.gtbListCell div {
 
 /**** Main authoring styles ****/
 
-#tabs {
-	padding: 0;
-	border: none;
-	font-size: 12px;
-}
-
-#tabs .ui-tabs-panel {
-	padding: 0;
-	height: 718px;
-}
-
-#tabs .tabs-spacer {
-	float: left;
-	height: 200px;
-}
-
-#tabs .ui-tabs-nav {
-	clear: left;
-	padding: 0 .2em .2em .2em;
-	background: none;
-	border: none;
-}
-
-#tabs .ui-tabs-nav li {
-	top: auto;
-	bottom: 0;
-	border: 1px solid #C5DBEC;
-	border-top: 0;
-}
-
-#tabs .ui-tabs-nav li.ui-tabs-active {
-	margin-top: 0;
-	padding-top: 0;
-}
-
-
 div#toolbar {
+	width: 1003px;
 	padding: 3px;
 	height: 27px;
 }
@@ -233,7 +198,7 @@ div#toolbar .split-ui-button + ul li {
 }
 
 table#authoringTable {
-	table-layout: fixed;
+	table-layout: fixedf;
 	width: 100%;
 }
 
@@ -250,7 +215,7 @@ td#templateContainerCell {
 }
 
 div#templateContainer {
-	height: 711px;
+	height: 720px;
 	overflow: auto;
 }
 
@@ -272,23 +237,42 @@ div.template div {
 	font-family: serif;
 }
 
+#ldDescriptionDiv {
+	background-color: rgb(219, 230, 252);
+	text-align: center;
+	z-index: 1099;
+}
+
+#ldDescriptionDiv #ldDescriptionTitleContainer {
+	font-size: 10pt;
+	font-family: serif;
+	cursor: pointer;
+}
+
+#ldDescriptionDiv #ldDescriptionHideTip {
+	display: none;
+	float: right;
+	margin-right: 10px;
+	cursor: pointer;
+}
+
+#ldDescriptionDiv #ldDescriptionDetails {
+	display: none;
+}
+
+#ldDescriptionDiv #ldDescriptionLabelDescription {
+	text-align: left;
+	font-size: 10pt;
+	font-family: serif;
+}
+
+#ldDescriptionDiv #ldDescriptionEditorContainer {
+	margin-top: -15px;
+}
+
 #canvas {
 	overflow: auto;
 	width: 844px;
-	height: 711px;
+	height: 720px;
 	vertical-align: top;
-}
-
-
-#tabDescription > table {
-	margin: auto;
-	padding-top: 180px;
-}
-
-.ldDescriptionCell {
-	padding: 0 0 30px 20px;
-}
-
-td.ldDescriptionLabel {
-	font-weight: bold;
 }

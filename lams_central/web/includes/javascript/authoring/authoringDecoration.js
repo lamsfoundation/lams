@@ -191,6 +191,7 @@ var DecorationLib = {
 			var region = new DecorationLib.Region(null, null,
 							 x, y, x2, y2, title, color ? color : layout.colors.annotation);
 			layout.regions.push(region);
+			setModified(true);
 			return region;
 		},
 		
@@ -198,6 +199,7 @@ var DecorationLib = {
 		removeRegion : function(region) {
 			layout.regions.splice(layout.regions.indexOf(region), 1);
 			region.items.remove();
+			setModified(true);
 		},
 		
 		
@@ -228,6 +230,7 @@ var DecorationLib = {
 		addLabel : function(x, y, title) {
 			var label = new DecorationLib.Label(null, null, x, y, title);
 			layout.labels.push(label);
+			setModified(true);
 			return label;
 		},
 		
@@ -235,6 +238,7 @@ var DecorationLib = {
 		removeLabel : function(label) {
 			layout.labels.splice(layout.labels.indexOf(label), 1);
 			label.items.remove();
+			setModified(true);
 		}
 };
 

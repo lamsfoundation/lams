@@ -17,7 +17,7 @@ var HandlerLib = {
 		      .off('click')
 		      .off('mousedown')
 		      .off('mouseup')
-		      .off('mousemove')
+		      .off('mousemove');
 
 		if (init) {
 			 // if clicked anywhere, activity selection is gone
@@ -134,6 +134,8 @@ var HandlerLib = {
 			// for canvas, not the dragged elements
 			canvas.mouseup(mouseup);
 			items.mouseup(mouseup);
+			
+			setModified(true);
 		}, layout.conf.dragStartThreshold);
 	},
 	
@@ -331,6 +333,8 @@ var HandlerLib = {
 			HandlerLib.resetCanvasMode(true);
 			ActivityLib.addSelectEffect(region, true);
 		});
+		
+		setModified(true);
 	},
 	
 	

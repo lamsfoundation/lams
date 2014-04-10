@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -177,7 +178,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Initializes a lesson for specific learning design with the given lesson title and lesson description. If
      * initialization is successful, this method will the ID of new lesson.
      * 
-     * Currently used only in TestHarness.
+     * Currently used only in TestHarness and Flashless Authoring Preview.
      */
     public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -195,14 +196,23 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 	Integer organisationId = WebUtil.readIntParam(request, "organisationID", true);
 	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	Integer copyType = WebUtil.readIntParam(request, "copyType", true);
+	String customCSV = request.getParameter("customCSV");
 	Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
 	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
 	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
-	Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
-		false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		false, learnerRestart, null, null);
+
+	Lesson newLesson = null;
+	if (copyType != null && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
+	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
+		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
+	} else {
+	    newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), customCSV,
+		    false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+		    liveEditEnabled, false, learnerRestart, null, null);
+	}
 
 	PrintWriter writer = response.getWriter();
 	writer.println(newLesson.getLessonId());

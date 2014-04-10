@@ -114,6 +114,8 @@ var PropertyLib = {
 			            		});
 			            		
 			            		dialog.dialog('close');
+			            		
+			            		setModified(true);
 							}
 			             },
 			             {
@@ -171,6 +173,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					transition.draw();
 					ActivityLib.addSelectEffect(activity, true);
+					setModified(true);
 				}
 			});
 		}
@@ -216,6 +219,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
+					setModified(true);
 				}
 			});
 		}
@@ -274,6 +278,8 @@ var PropertyLib = {
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 				}
+				
+				setModified(true);
 			};
 			
 			// first run, create the content
@@ -353,6 +359,8 @@ var PropertyLib = {
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 				}
+				
+				setModified(true);
 			};
 			
 			// create groups/learners spinners
@@ -452,6 +460,8 @@ var PropertyLib = {
 					branchingActivity.end.draw();
 					ActivityLib.addSelectEffect(layout.items.selectedObject, true);
 				}
+				
+				setModified(true);
 			}
 			
 			$('input, select', content).change(changeFunction);
@@ -496,6 +506,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
+					setModified(true);
 				}
 			});
 		}
@@ -529,6 +540,7 @@ var PropertyLib = {
 					activity.title = newTitle;
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
+					setModified(true);
 				}
 			});
 				
@@ -606,6 +618,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					region.draw(null, null, null, null, newColor);
 					ActivityLib.addSelectEffect(region, true);
+					setModified(true);
 				}
 			});
 		}
@@ -640,6 +653,7 @@ var PropertyLib = {
 				if (redrawNeeded) {
 					label.draw();
 					ActivityLib.addSelectEffect(label, true);
+					setModified(true);
 				}
 			});
 		}

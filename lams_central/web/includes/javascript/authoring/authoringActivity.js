@@ -673,6 +673,7 @@ var ActivityLib = {
 			fromActivity.branchingActivity.branches.push(branch);
 		}
 		
+		setModified(true);
 		return transition;
 	},
 	
@@ -694,6 +695,7 @@ var ActivityLib = {
 		}
 		
 		transition.items.remove();
+		setModified(true);
 	},
 	
 	
@@ -748,6 +750,7 @@ var ActivityLib = {
 
 		ActivityLib.addTransition(branchingEdgeStart, toActivity1);
 		ActivityLib.addTransition(convergeActivity1, branchingEdgeEnd);
+		setModified(true);
 	},
 	
 	
@@ -935,6 +938,8 @@ var ActivityLib = {
 			// redraw all annotation regions so they are pushed to back
 			this.draw();
 		});
+		
+		setModified(true);
 	},
 	
 	
@@ -982,6 +987,7 @@ var ActivityLib = {
 			window.open(activity.authorURL, 'activityAuthoring' + activity.id,
 					"HEIGHT=800,WIDTH=1024,resizable=yes,scrollbars=yes,status=false," +
 					"menubar=no,toolbar=no");
+			setModified(true);
 		}
 	},
 	

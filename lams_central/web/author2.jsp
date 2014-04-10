@@ -108,6 +108,9 @@
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
 		</div>
+		<div id="previewButton" class="ui-button" onClick="javascript:MenuLib.openPreview()">
+			Preview
+		</div>
 		<!-- 
 		<div id="zoomButton" class="ui-button" onClick="javascript:MenuLib.zoom()">
 			Zoom out
@@ -115,57 +118,45 @@
  		-->
 	</div>
 	
-	<div id="tabs" class="tabs-bottom">
-		<ul>
-			<li><a href="#tabCanvas">Canvas</a></li>
-			<li><a href="#tabDescription">Description</a></li>
-		</ul>
-		<div class="tabs-spacer"></div>
-		
-		<div id="tabCanvas">
-			<table id="authoringTable">
-				<tr>
-					<td id="templateContainerCell">
-						<div id="templateContainer">
-							<c:forEach var="tool" items="${tools}">
-								<div learningLibraryId="${tool.learningLibraryId}"
-									 supportsOutputs="${tool.supportsOutputs}"
-									 activityCategoryId="${tool.activityCategoryID}"
-									 class="template">
-									<c:if test="${not empty tool.iconPath}">
-										<img src="<lams:LAMSURL/>${tool.iconPath}" />
-									</c:if>
-									<div><c:out value="${tool.toolDisplayName}" /></div>
-								</div>
-							</c:forEach>
+	<table id="authoringTable">
+		<tr>
+			<td id="templateContainerCell">
+				<div id="templateContainer">
+					<c:forEach var="tool" items="${tools}">
+						<div learningLibraryId="${tool.learningLibraryId}"
+							 supportsOutputs="${tool.supportsOutputs}"
+							 activityCategoryId="${tool.activityCategoryID}"
+							 class="template">
+							<c:if test="${not empty tool.iconPath}">
+								<img src="<lams:LAMSURL/>${tool.iconPath}" />
+							</c:if>
+							<div><c:out value="${tool.toolDisplayName}" /></div>
 						</div>
-					</td>
-					<td>
-						<div id="canvas"></div>
-					</td>
-				</tr>
-			</table>
-		</div>
-		
-		<div id="tabDescription">
-			<table>
-				<tr>
-					<td class="ldDescriptionLabel ldDescriptionCell">Title</td>
-					<td id="ldDescriptionFieldTitle" class="ldDescriptionCell"></td>
-				</tr>
-				<tr>
-					<td class="ldDescriptionLabel ldDescriptionCell">Description</td>
-					<td class="ldDescriptionCell">
-						<lams:CKEditor id="ldDescriptionFieldDescription" value=""
-									   height="300px"
-									   contentFolderID="${contentFolderID}"/>
-					</td>
-				</tr>
-			</table>
-		</div>
-		
-	</div>
-
+					</c:forEach>
+				</div>
+			</td>
+			<td>
+				<div id="ldDescriptionDiv"
+					 title="Click to show the sequence description">
+					<div id="ldDescriptionTitleContainer" onClick="javascript:MenuLib.toggleDescriptionDiv()">
+						<span id="ldDescriptionFieldTitle">Untitled</span>
+						<span id="ldDescriptionFieldModified"></span>
+					</div>
+					<div id="ldDescriptionDetails">
+						<div id="ldDescriptionLabelDescription">Description:
+						<span id="ldDescriptionHideTip" onClick="javascript:MenuLib.toggleDescriptionDiv()">(click to hide)</span>
+						</div>
+						<div id="ldDescriptionEditorContainer">
+							<lams:CKEditor id="ldDescriptionFieldDescription" value=""
+								   height="300px"
+								   contentFolderID="${contentFolderID}"/>
+						</div>
+					</div>
+				</div>
+				<div id="canvas"></div>
+			</td>
+		</tr>
+	</table>
 	
 	<!-- DIALOGS CONTENTS -->
 	
