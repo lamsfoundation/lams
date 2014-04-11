@@ -396,16 +396,13 @@ var MenuLib = {
 					                 / layout.conf.arrangeHorizontalSpace),
 			// the initial max length of subsequences is limited by paper space
 			subsequenceMaxLength = maxColumns,
-			// check how many rows current paper can hold
-			maxRows = Math.floor((paper.height - layout.conf.arrangeVerticalPadding)
-	                 			  / layout.conf.arrangeVerticalSpace),
 	        // a shallow copy of activities array without inner activities
 			activitiesCopy = [],
 			// just to speed up processing when there are only activities with no transitions left
 			onlyDetachedLeft = false;
 	
 		$.each(layout.activities, function(){
-			if (!this.parentActivity){
+			if (!this.parentActivity || !(this.parentActivity instanceof DecorationLib.Container)){
 				activitiesCopy.push(this);
 			}
 		});
@@ -439,13 +436,6 @@ var MenuLib = {
 		
 		// main loop; iterate over whatever is left in the array
 		while (activitiesCopy.length > 0) {
-			// resize paper vertically, if needed
-			if (row > maxRows) {
-				maxRows++;
-				resizePaper(paper.width, layout.conf.arrangeVerticalPadding
-		                   				   + maxRows * layout.conf.arrangeVerticalSpace);
-			}
-			
 			// look for activities with transitions first; detached ones go to the very end
 			var activity = null;
 			if (!onlyDetachedLeft) {
@@ -562,7 +552,7 @@ var MenuLib = {
 					
 					// learn where a tall Optional Activity has its end
 					// and later start drawing activities lower than in the next row
-					if (activity instanceof ActivityLib.OptionalActivity && activity.childActivities.length > 1) {
+					if (activity instanceof DecorationLib.Container && activity.childActivities.length > 1) {
 						var activityEndY = activity.items.shape.getBBox().y2;
 						if (!forceRowY || activityEndY > forceRowY) {
 							forceRowY = activityEndY;
@@ -637,17 +627,23 @@ var MenuLib = {
 		};
 		
 		if (layout.floatingActivity) {
-			row++;
-			if (row >= maxRows) {
-				resizePaper(paper.width, layout.conf.arrangeVerticalPadding
-					   + layout.floatingActivity.items.shape.getBBox().height
-    				   + row * layout.conf.arrangeVerticalSpace);
+			if (column > 0) {
+				// if the last activity was in the last column, there is no need for another row
+				row++;
+				column = 0;
 			}
-			column = 0;
 			var x = layout.conf.arrangeHorizontalPadding,
 				y = layout.conf.arrangeVerticalPadding - 30 + row * layout.conf.arrangeVerticalSpace;
 			
 			layout.floatingActivity.draw(x, y);
+		}
+		
+		// are there more rows that current paper can hold?
+		if (row >= Math.floor((paper.height - layout.conf.arrangeVerticalPadding)
+   			  					/ layout.conf.arrangeVerticalSpace)) {
+			// some extra height for rubbish bin
+			resizePaper(paper.width, layout.conf.arrangeVerticalPadding + 70
+				   + row * layout.conf.arrangeVerticalSpace);
 		}
 		
 		// redraw transitions one by one
@@ -818,6 +814,40 @@ var MenuLib = {
 			ldDescriptionHideTip
 		});
 		$('#ldDescriptionHideTip').toggle();
+	},
+	
+	
+	importLearningDesign : function(){
+		var importWindow = window.open(LAMS_URL + 'authoring/importToolContent.do?method=import','Import',
+					'width=800,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no'),
+			currentLearningDesignID = null,
+			regEx = /learningDesignID=(\d+)/g,
+			// since window.onload does not really work after submitting a form inside the window,
+			// this trick checks periodically for changes
+			loadCheckInterval = setInterval(function(){
+				if (!importWindow){
+					// window was closed
+					clearInterval(loadCheckInterval);
+					return;
+				}
+				var body = $('body', importWindow.document).html(),
+					match = regEx.exec(body);
+				// check if ID was found and it's not the same as previously
+				if (match && match[1] != currentLearningDesignID) {
+					currentLearningDesignID = match[1];
+					openLearningDesign(currentLearningDesignID);
+				}
+			}, 1000);
+	},
+	
+	
+	exportLearningDesign : function(){
+		if (layout.modified || layout.activities.length == 0) {
+			return;
+		}
+		
+		 window.open(LAMS_URL + 'authoring/exportToolContent.do?learningDesignID=46','Export',
+				 'width=712,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no');
 	}
 	
 	/*

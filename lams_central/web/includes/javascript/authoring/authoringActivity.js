@@ -576,7 +576,7 @@ var ActivityLib = {
 		}
 		
 		// remove the activity from parent activity
-		if (activity.parentActivity) {
+		if (activity.parentActivity && activity.parentActivity instanceof DecorationLib.Container) {
 			activity.parentActivity.childActivities.splice(layout.parentActivity.childActivities.indexOf(activity), 1);
 		}
 		
@@ -597,10 +597,10 @@ var ActivityLib = {
 	 * Draws a transition between two activities.
 	 */
 	addTransition : function(fromActivity, toActivity, redraw, id, uiid, branchData) {
-		if (toActivity.parentActivity){
+		if (toActivity.parentActivity && toActivity.parentActivity instanceof DecorationLib.Container){
 			toActivity = toActivity.parentActivity;
 		}
-		if (fromActivity.parentActivity){
+		if (fromActivity.parentActivity && fromActivity.parentActivity instanceof DecorationLib.Container){
 			fromActivity = fromActivity.parentActivity;
 		}
 		if (toActivity instanceof ActivityLib.FloatingActivity
@@ -776,7 +776,7 @@ var ActivityLib = {
 					object.items.fitButton.show();
 					
 					$.each(childActivities, function(){
-						if (!this.parentActivity) {
+						if (!this.parentActivity || !(this.parentActivity instanceof DecorationLib.Container)) {
 							ActivityLib.addSelectEffect(this, false);
 						}
 					});
@@ -893,7 +893,7 @@ var ActivityLib = {
 	dropActivity : function(activity, x, y) {
 		if (!(activity instanceof DecorationLib.Container)) {
 			// check if it was removed from an Optional or Floating Activity
-			if (activity.parentActivity) {
+			if (activity.parentActivity && activity.parentActivity instanceof DecorationLib.Container) {
 				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
 				if ($.inArray(activity, childActivities) == -1) {
 					activity.parentActivity.draw();

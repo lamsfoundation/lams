@@ -169,7 +169,7 @@ div#gtbDialog td.gtbListCell div {
 /**** Main authoring styles ****/
 
 div#toolbar {
-	width: 1003px;
+	width: 1035px;
 	padding: 3px;
 	height: 27px;
 }
@@ -272,7 +272,7 @@ div.template div {
 
 #canvas {
 	overflow: auto;
-	width: 844px;
+	width: 900px;
 	height: 720px;
 	vertical-align: top;
 }

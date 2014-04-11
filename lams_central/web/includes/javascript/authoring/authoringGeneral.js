@@ -827,7 +827,8 @@ function openLearningDesign(learningDesignID) {
 				});
 				
 				if (paperWidth > paper.width || paperHeight > paper.height) {
-					resizePaper(paperWidth, paperHeight);
+					// add some height for rubbish bin
+					resizePaper(paperWidth, paperHeight + 70);
 				} else {
 					HandlerLib.resetCanvasMode(true);
 				}
@@ -853,7 +854,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		title = title.trim(),
 		description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData(),
 		// final success/failure of the save
-		result = false;
+		result = false,
+		error = null;
 	
 	$.each(layout.activities, function(){
 		if (this.parentActivity	&& (this.parentActivity instanceof ActivityLib.BranchingActivity
@@ -888,6 +890,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 						}
 						orderID++;
 						
+						if (childActivity.transitions.from.length == 0) {
+							// we need to carry on to assign parent to all remaining child activities
+							error = 'One of branches does not have a transition to the end point';
+							break;
+						}
 						childActivity = childActivity.transitions.from[0].toActivity;
 					}
 				});
@@ -896,6 +903,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			layoutActivities.push(this);
 		}
 	});
+	
+	if (error) {
+		alert(error);
+		return false;
+	}
 	
 	if (layout.floatingActivity){
 		layoutActivities.push(layout.floatingActivity);
@@ -1065,6 +1077,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			});
 		}
 	});
+	
+	if (error) {
+		alert(error);
+		return false;
+	}
 	
 	// iterate over labels and regions
 	$.each(layout.labels.concat(layout.regions), function(){
@@ -1253,12 +1270,16 @@ function resizePaper(width, height) {
 	
 	// draw rubbish bin on canvas
 	var binPath = Raphael.parsePathString(layout.defs.bin);
-	binPath = Raphael.transformPath(binPath, Raphael.format('t {0} {1}', width, height - 50));
+	binPath = Raphael.transformPath(binPath, Raphael.format('t {0} {1}', width - 5, height - 50));
 	layout.items.bin = paper.path(binPath);
 	
 	HandlerLib.resetCanvasMode(true);
 }
 
+
+/**
+ * Tells that current sequence was modified and not saved.
+ */
 function setModified(modified) {
 	layout.modified = modified;
 	if (modified) {
@@ -1268,6 +1289,15 @@ function setModified(modified) {
 	} else {
 		$('#previewButton').attr('disabled', null)
 						   .button('option', 'disabled', false);
+
 		$('#ldDescriptionFieldModified').text('');
+	}
+	
+	if (modified || layout.activities.length == 0) {
+		$('#exportButton').attr('disabled', 'disabled')
+		  				  .css('opacity', 0.2);
+	} else {
+		$('#exportButton').attr('disabled', null)
+		  				  .css('opacity', 1);
 	}
 }

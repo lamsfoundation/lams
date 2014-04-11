@@ -43,8 +43,16 @@
 		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign(false, false)">
 			New
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
-			Open
+		<div>
+			<div class="split-ui-button">
+				<div onClick="javascript:MenuLib.openLearningDesign()">
+					<span>Open</span>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+			<ul>
+				<li onClick="javascript:MenuLib.importLearningDesign()">Import</li>
+			</ul>
 		</div>
 		<div>
 			<div class="split-ui-button">
@@ -54,7 +62,8 @@
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as...</li>
+				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
+				<li id="exportButton" onClick="javascript:MenuLib.exportLearningDesign()">Export</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">

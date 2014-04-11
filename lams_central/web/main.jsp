@@ -246,7 +246,7 @@
 	<div id="footer">
 		<p>
 			<a style="color: #999999; text-decoration: none; border: none;" href="#"
-			 onClick="javascript:window.open('authoring/author.do?method=openAuthoring', 'FlashlessAuthoring','resizable=yes,left=10,top=10,width=1030,height=800');">
+			 onClick="javascript:window.open('authoring/author.do?method=openAuthoring', 'FlashlessAuthoring','resizable=yes,left=10,top=10,width=1065,height=800');">
 				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
 			</a>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
