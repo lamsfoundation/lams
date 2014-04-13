@@ -11,7 +11,7 @@
 	<c:forEach var="reflectDTO" items="${reflectionsContainerDTO}">
 		<tr>			
 			<td valign=top class="align-left">
-				<c:out value="${reflectDTO.userName}" escapeXml="true"/> <lams:Date value="${reflectDTO.date}"/>
+				<b><c:out value="${reflectDTO.userName}" escapeXml="true"/> - <lams:Date value="${reflectDTO.date}"/></b>
 				<br>
 				<lams:out value="${reflectDTO.entry}" escapeHtml="true"/>
 
