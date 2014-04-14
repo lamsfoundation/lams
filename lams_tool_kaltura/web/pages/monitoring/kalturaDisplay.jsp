@@ -54,7 +54,7 @@
 							<fmt:message key="label.notebookEntry" />
 						</td>
 						<td>
-							<lams:out value="${userDTO.entryDTO.entry}" escapeHtml="true"></c:out>
+							<lams:out value="${userDTO.entryDTO.entry}" escapeHtml="true"/>
 						</td>
 					</tr>
 				</table>
