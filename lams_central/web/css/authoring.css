@@ -169,8 +169,8 @@ div#gtbDialog td.gtbListCell div {
 /**** Main authoring styles ****/
 
 div#toolbar {
-	width: 1035px;
 	padding: 3px;
+	width: 1235px;
 	height: 27px;
 }
 
@@ -198,7 +198,7 @@ div#toolbar .split-ui-button + ul li {
 }
 
 table#authoringTable {
-	table-layout: fixedf;
+	table-layout: fixed;
 	width: 100%;
 }
 
@@ -209,14 +209,14 @@ table#authoringTable {
 
 td#templateContainerCell {
 	width: 150px;
-	border: black thin solid;
 	vertical-align: top;
-	background-color: rgb(219, 230, 252);
 }
 
 div#templateContainer {
-	height: 720px;
+	height: 740px;
 	overflow: auto;
+	border: black thin solid;
+	background-color: rgb(219, 230, 252);
 }
 
 div.template {
@@ -232,9 +232,9 @@ div.template img {
 div.template div {
 	float: right;
 	width: 89px;
-	padding-top: 11px;
-	font-size: 10pt;
-	font-family: serif;
+	padding-top: 14px;
+	font-size: 12px;
+	font-family: "Lucida Console", Monaco, monospace;
 }
 
 #ldDescriptionDiv {
@@ -244,16 +244,15 @@ div.template div {
 }
 
 #ldDescriptionDiv #ldDescriptionTitleContainer {
-	font-size: 10pt;
-	font-family: serif;
+	padding: 2px 0 0 0;
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: 12px;
 	cursor: pointer;
 }
 
 #ldDescriptionDiv #ldDescriptionHideTip {
-	display: none;
 	float: right;
 	margin-right: 10px;
-	cursor: pointer;
 }
 
 #ldDescriptionDiv #ldDescriptionDetails {
@@ -261,9 +260,9 @@ div.template div {
 }
 
 #ldDescriptionDiv #ldDescriptionLabelDescription {
+	font-family: "Lucida Console", Monaco, monospace;
 	text-align: left;
-	font-size: 10pt;
-	font-family: serif;
+	font-size: 12px;
 }
 
 #ldDescriptionDiv #ldDescriptionEditorContainer {
@@ -272,7 +271,6 @@ div.template div {
 
 #canvas {
 	overflow: auto;
-	width: 900px;
-	height: 720px;
+	height: 725px;
 	vertical-align: top;
 }

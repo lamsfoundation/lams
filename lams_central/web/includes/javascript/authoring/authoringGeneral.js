@@ -143,8 +143,8 @@ function initTemplates(){
 		// if a tool's name is too long and gets broken into two lines
 		// make some adjustments to layout
 		var toolName = $('div', this);
-		if (toolName.text().length > 15){
-			toolName.css('padding-top', '4px');
+		if (toolName.text().length > 12){
+			toolName.css('padding-top', '8px');
 		}
 		
 		// allow dragging a template to canvas
@@ -197,7 +197,7 @@ function initTemplates(){
 			    		var toolActivityLibraryID = +$(this).attr('learningLibraryId'),
 			    			toolLabel = $('div', this).text(),
 			    			childActivity = new ActivityLib.ToolActivity(null, null, null,
-				    				toolActivityLibraryID, x, y, toolLabel);
+				    				toolActivityLibraryID, null, x, y, toolLabel);
 			    		
 			    		layout.activities.push(childActivity);
 			    		childActivities.push(childActivity);
@@ -205,10 +205,11 @@ function initTemplates(){
 			    	
 			    	activity = new ActivityLib.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivities);
 			    } else {
-			    	activity = new ActivityLib.ToolActivity(null, null, null, learningLibraryID, x, y, label);
+			    	activity = new ActivityLib.ToolActivity(null, null, null, learningLibraryID, null, x, y, label);
 			    }
 			    
 				layout.activities.push(activity);
+				HandlerLib.dropObject(activity);
 				ActivityLib.dropActivity(activity, eventX, eventY);
 		   }
 	});
@@ -249,7 +250,7 @@ function initLayout() {
 			'of' :  'body'
 		},
 		'resizable'     : false,
-		'width'			: 1000,
+		'width'			: 1240,
 		'height'		: 785,
 		'draggable'     : false,
 		'buttonsLoad' : [
@@ -458,6 +459,9 @@ function openLearningDesign(learningDesignID) {
 										activityData.activityUIID,
 										activityData.toolContentID,
 										activityData.toolID,
+										LAMS_URL + activityData.authoringURL
+												 + '?toolContentID='   + activityData.toolContentID
+												 + '&contentFolderID=' + layout.ld.contentFolderID,
 										activityData.xCoord ? activityData.xCoord : 1,
 										activityData.yCoord ? activityData.yCoord : 1,
 										activityData.activityTitle,
@@ -1255,13 +1259,24 @@ function resizePaper(width, height) {
 		return;
 	}
 
-	if (!width) {
-		width = canvas.width() - 5;
+	if (!width || !height) {
+		var width = 0,
+			height = 0;
+		$.each(layout.activities, function(){
+			// find new dimensions of paper
+			var activityBox = this.items.shape.getBBox();
+			if (activityBox.x2 + 30 > width) {
+				width = activityBox.x2 + 30;
+			}
+			if (activityBox.y2 + 30 > height) {
+				height = activityBox.y2 + 30;
+			}
+		});
 	}
-	if (!height || (height == canvas.height() - 5)) {
-		// take into account the horizontal scrollbar
-		height = canvas.height() - 5 - (width > canvas.width() - 5 ? 20 : 0);
-	}
+	
+	width = Math.max(width, canvas.width()) - 20;
+	height = Math.max(height, canvas.height()) - 20;
+	
 	paper.setSize(width, height);
 	
 	if (layout.items.bin) {

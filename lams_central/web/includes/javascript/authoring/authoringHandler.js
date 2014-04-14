@@ -536,6 +536,9 @@ var HandlerLib = {
 			object.draw(x + transformation[0][1],
 						y + transformation[0][2]);
 		}
+		
+		// add space if dropped object is next to border
+		resizePaper();
 	},
 	
 	

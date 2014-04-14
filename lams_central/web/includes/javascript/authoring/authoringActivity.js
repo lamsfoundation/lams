@@ -30,11 +30,13 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity : function(id, uiid, toolContentID, toolID, x, y, title, supportsOutputs) {
+	ToolActivity : function(id, uiid, toolContentID, toolID, authorURL,
+						    x, y, title, supportsOutputs) {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
 		this.toolID = +toolID;
+		this.authorURL = authorURL;
 		this.title = title;
 		this.supportsOutputs = supportsOutputs;
 		this.transitions = {

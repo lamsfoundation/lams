@@ -753,7 +753,8 @@ var MenuLib = {
 		// draw the new activity next to the existing one
 		var x = activity.items.shape.getBBox().x + 10,
 			y = activity.items.shape.getBBox().y + 10,
-			newActivity = new ActivityLib.ToolActivity(null, null, null, activity.toolID, x, y, title);
+			newActivity = new ActivityLib.ToolActivity(null, null, null, activity.toolID,
+													   null, x, y, title);
 		layout.activities.push(newActivity);
 		
 		if (activity.grouping) {
@@ -811,9 +812,8 @@ var MenuLib = {
 	
 	toggleDescriptionDiv: function() {
 		$('#ldDescriptionDetails').slideToggle(function(){
-			ldDescriptionHideTip
+			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
 		});
-		$('#ldDescriptionHideTip').toggle();
 	},
 	
 	

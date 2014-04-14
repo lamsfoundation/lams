@@ -38,7 +38,7 @@
 			initContentFolderID = '${contentFolderID}';
 	</script>
 </lams:head>
-<body>
+<body onresize="javascript:resizePaper()">
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
 		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign(false, false)">
 			New
@@ -150,10 +150,11 @@
 					<div id="ldDescriptionTitleContainer" onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle">Untitled</span>
 						<span id="ldDescriptionFieldModified"></span>
+						<span id="ldDescriptionHideTip">▼</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div id="ldDescriptionLabelDescription">Description:
-						<span id="ldDescriptionHideTip" onClick="javascript:MenuLib.toggleDescriptionDiv()">(click to hide)</span>
+						
 						</div>
 						<div id="ldDescriptionEditorContainer">
 							<lams:CKEditor id="ldDescriptionFieldDescription" value=""
