@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 /**
@@ -142,6 +143,14 @@ public class ExcelUtil {
 
     public static void createSheet(Workbook workbook, String sheetName, String sheetTitle, int sheetIndex,
 	    String dateHeader, ExcelCell[][] data) throws IOException {
+	
+	// Modify sheet name if required. It should contain only allowed letters and sheets are not allowed with
+	// the same names (case insensitive)
+	sheetName = WorkbookUtil.createSafeSheetName(sheetName);
+	while (workbook.getSheet(sheetName) != null) {
+	    sheetName += " ";
+	}
+	
 	Sheet sheet = workbook.createSheet(sheetName);
 
 	// Print title in bold, if needed
