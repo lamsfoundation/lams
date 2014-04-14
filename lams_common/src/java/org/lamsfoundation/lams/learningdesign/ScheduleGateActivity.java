@@ -71,31 +71,10 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      */
     private Long gateEndTimeOffset;
 
-    /**
-     * </p>The absolute start time of the gate activity. If this is set, we are expecting
-     * <code>gateStartTimeOffset</code> is set to null.</p>
-     * 
-     * <p>
-     * All time value that used for persistent should be UTC time
-     * </p>
-     */
-    private Date gateStartDateTime;
-
-    /**
-     * <p>
-     * The absolute end time of the gate activity. If this is set, we are expecting <code>gateEndTimeOffset</code> is
-     * set to null.
-     * </p>
-     * 
-     * <p>
-     * All time value that used for persistent should be UTC time
-     * </p>
-     */
-    private Date gateEndDateTime;
-    
     private Boolean gateActivityCompletionBased;
 
     /** full constructor */
+    @SuppressWarnings("rawtypes")
     public ScheduleGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
 	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
@@ -108,9 +87,10 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, waitingLearners,
 		sysTool, branchActivityEntries);
 	// validate pre-condition.
-	if (gateStartTimeOffset != null && gateEndTimeOffset != null
-		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue()))
+	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
+		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
 	    throw new IllegalStateException("End time offset must be larger" + " than start time offset");
+	}
 
 	this.gateStartTimeOffset = gateStartTimeOffset;
 	this.gateEndTimeOffset = gateEndTimeOffset;
@@ -123,6 +103,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /** minimal constructor */
+    @SuppressWarnings("rawtypes")
     public ScheduleGateActivity(Long activityId, java.util.Date createDateTime,
 	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
@@ -132,9 +113,10 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	    Set waitingLearners) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, gateActivityLevelId, waitingLearners);
-	if (gateStartTimeOffset != null && gateEndTimeOffset != null
-		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue()))
+	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
+		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
 	    throw new IllegalStateException("End time offset must be larger" + " than start time offset");
+	}
 
 	this.gateStartTimeOffset = gateStartTimeOffset;
 	this.gateEndTimeOffset = gateEndTimeOffset;
@@ -146,6 +128,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * 
      * @return ScheduleGateActivity Returns a deep-copy of the originalActivity
      */
+    @Override
     public Activity createCopy(int uiidOffset) {
 	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
 	copyToNewActivity(newScheduleGateActivity, uiidOffset);
@@ -154,26 +137,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
 	newScheduleGateActivity.setGateEndTimeOffset(this.getGateEndTimeOffset());
 	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
-	newScheduleGateActivity.setGateEndDateTime(this.getGateEndDateTime());
-	newScheduleGateActivity.setGateStartDateTime(this.getGateStartDateTime());
 	newScheduleGateActivity.setGateActivityCompletionBased(this.getGateActivityCompletionBased());
 	return newScheduleGateActivity;
-    }
-
-    public Date getGateEndDateTime() {
-	return gateEndDateTime;
-    }
-
-    public void setGateEndDateTime(Date gateEndDateTime) {
-	this.gateEndDateTime = gateEndDateTime;
-    }
-
-    public Date getGateStartDateTime() {
-	return gateStartDateTime;
-    }
-
-    public void setGateStartDateTime(Date gateStartDateTime) {
-	this.gateStartDateTime = gateStartDateTime;
     }
 
     /**
@@ -205,7 +170,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
 	this.gateActivityCompletionBased = gateActivityCompletionBased;
     }
-    
+
     /**
      * <p>
      * Returns the gate open time for a particular lesson according to the s ettings done by the author.
@@ -231,17 +196,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	// compute the real opening time based on the lesson start time.
 	if (isScheduledByStartTimeOffset()) {
 	    openTime.add(Calendar.MINUTE, getGateStartTimeOffset().intValue());
-	    if (!Boolean.TRUE.equals(gateActivityCompletionBased)) {
-		this.setGateStartDateTime(openTime.getTime());
-	    }
-	} else if (isScheduledByStartDateTime()) {
-	    openTime.setTime(getGateStartDateTime());
 	}
-	/**
-	 * else throw new ActivityBehaviorException("No way of scheduling has " +
-	 * "been setup - this usually should be done at authoring " +
-	 * "interface. Fail to calculate gate open time for lesson.");
-	 */
+
 	return openTime.getTime();
     }
 
@@ -267,15 +223,12 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	// compute the real opening time based on the
 	if (isScheduledByEndTimeOffset()) {
 	    closeTime.add(Calendar.MINUTE, getGateEndTimeOffset().intValue());
-	} else if (isScheduledByEndDateTime())
-	    closeTime.setTime(getGateEndDateTime());
-	/**
-	 * else throw new ActivityBehaviorException("No way of scheduling has " +
-	 * "been setup - this usually should be done at authoring " + "interface. Fail to calculate gate close time.");
-	 */
+	}
+
 	return closeTime.getTime();
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
@@ -283,6 +236,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }
@@ -292,17 +246,20 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * 
      * @return error message key
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public Vector validateActivity(MessageService messageService) {
 	Vector listOfValidationErrors = new Vector();
 	if (isScheduledByTimeOffset()) {
-	    if (getGateStartTimeOffset().equals(getGateEndTimeOffset()))
+	    if (getGateStartTimeOffset().equals(getGateEndTimeOffset())) {
 		listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE,
 			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY), this
 				.getActivityUIID()));
-	    else if (getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0)
+	    } else if (getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0) {
 		listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE,
 			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY), this
 				.getActivityUIID()));
+	    }
 
 	}
 	return listOfValidationErrors;
@@ -314,16 +271,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * @return is the gate scheduled by time offset
      */
     private boolean isScheduledByTimeOffset() {
-	return getGateStartTimeOffset() != null && getGateEndTimeOffset() != null;
-    }
-
-    /**
-     * Helper method that determines the way of sheduling gate.
-     * 
-     * @return is the gate scheduled by the exact date time.
-     */
-    private boolean isScheduledByDateTime() {
-	return getGateStartDateTime() != null && getGateEndDateTime() != null;
+	return (getGateStartTimeOffset() != null) && (getGateEndTimeOffset() != null);
     }
 
     /**
@@ -342,32 +290,5 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      */
     private boolean isScheduledByEndTimeOffset() {
 	return getGateEndTimeOffset() != null;
-    }
-
-    /**
-     * Helper method that determines way of scheduling a gate.
-     * 
-     * @return is the gate scheduled by start exact date time.
-     */
-    private boolean isScheduledByStartDateTime() {
-	return getGateStartDateTime() != null;
-    }
-
-    /**
-     * Helper method that determines way of scheduling a gate.
-     * 
-     * @return is the gate scheduled by start exact date time.
-     */
-    private boolean isScheduledByEndDateTime() {
-	return getGateEndDateTime() != null;
-    }
-
-    /**
-     * Helper method that determines if a gate is not scheduled.
-     * 
-     * @return is the gate scheduled by any time offset.
-     */
-    public boolean isScheduled() {
-	return isScheduledByTimeOffset() || isScheduledByDateTime();
     }
 }

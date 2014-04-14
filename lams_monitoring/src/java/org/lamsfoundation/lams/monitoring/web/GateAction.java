@@ -25,8 +25,12 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +43,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
@@ -289,12 +294,12 @@ public class GateAction extends LamsDispatchAction {
      * Set up the form attributes specific to the schedule gate and navigate to the schedule gate view.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param gateForm
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param permissionGate
-     *                the gate acitivty object
+     *            the gate acitivty object
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      */
@@ -303,10 +308,14 @@ public class GateAction extends LamsDispatchAction {
 	if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
 	    gateForm.set("activityCompletionBased", true);
 	} else {
-	    gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
-	    gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+	    learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
+	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
+	    startingTime.setTime(lesson.getStartDateTime());
+	    startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+	    gateForm.set("startingTime", startingTime.getTime());
 	}
+	
 	return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
     }
-
 }

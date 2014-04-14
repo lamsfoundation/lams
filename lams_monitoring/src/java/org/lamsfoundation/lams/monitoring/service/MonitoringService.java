@@ -2125,30 +2125,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#checkGateStatus(java.lang.Long,
-     *      java.lang.Long)
-     */
-    @Override
-    public String checkGateStatus(Long activityID, Long lessonID) throws IOException {
-	FlashMessage flashMessage;
-	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
-	Lesson lesson = lessonDAO.getLesson(lessonID); // used to calculate the
-	// total learners.
-
-	if ((gate == null) || (lesson == null)) {
-	    flashMessage = new FlashMessage("checkGateStatus", messageService.getMessage("INVALID.ACTIVITYID.LESSONID",
-		    new Object[] { activityID, lessonID }), FlashMessage.ERROR);
-	} else {
-	    Hashtable table = new Hashtable();
-	    table = createGateStatusInfo(activityID, gate);
-	    flashMessage = new FlashMessage("checkGateStatus", table);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    /**
      * (non-javadoc)
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#releaseGate(java.lang.Long)
@@ -2396,28 +2372,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      */
     private JobDetail getCloseScheduleGateJob() {
 	return (JobDetail) applicationContext.getBean("closeScheduleGateJob");
-    }
-
-    private Hashtable createGateStatusInfo(Long activityID, GateActivity gate) {
-	Hashtable<String, Object> table = new Hashtable<String, Object>();
-	table.put("activityID", activityID);
-	table.put("activityTypeID", gate.getActivityTypeId());
-	table.put("gateOpen", gate.getGateOpen());
-	table.put("activityLevelID", gate.getGateActivityLevelId());
-	table.put("learnersWaiting", new Integer(gate.getWaitingLearners().size()));
-
-	/*
-	 * if the gate is a schedule gate, include the information about gate
-	 * opening and gate closing times
-	 */
-	if (gate.isScheduleGate()) {
-	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
-	    table.put("gateStartTime", scheduleGate.getGateStartDateTime());
-	    table.put("gateEndTime", scheduleGate.getGateEndDateTime());
-	} else if (gate.isPermissionGate() || gate.isConditionGate()) {
-	    table.put("allowedToPassLearnerList", gate.getAllowedToPassLearners());
-	}
-	return table;
     }
 
     // ---------------------------------------------------------------------

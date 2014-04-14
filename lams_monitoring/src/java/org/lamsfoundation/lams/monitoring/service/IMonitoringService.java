@@ -525,17 +525,6 @@ public interface IMonitoringService {
     public GroupingActivity getGroupingActivityById(Long activityID);
 
     /**
-     * Returns the status of the gate in WDDX format.
-     * 
-     * @param activityID
-     *            The activity_id of the Activity whose gate must be checked
-     * @param lessonID
-     *            The lesson_id of the Lesson
-     * @return
-     */
-    public String checkGateStatus(Long activityID, Long lessonID) throws IOException;
-
-    /**
      * Returns an acknowledgement that the gate has been released. Returns true if the gate has been released and false
      * otherwise. This information is packaged in WDDX format
      * 

@@ -2510,10 +2510,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // always set false
 	    ((ScheduleGateActivity) act).setGateOpen(false);
 
-	    ((ScheduleGateActivity) act).setGateEndDateTime(actDto.getGateEndDateTime());
-	    ((ScheduleGateActivity) act).setGateStartDateTime(actDto.getGateStartDateTime());
 	    ((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
 	    ((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
+	    ((ScheduleGateActivity) act).setGateActivityCompletionBased(actDto.getGateActivityCompletionBased());
 	    ((ScheduleGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
 	    break;
 	case Activity.PERMISSION_GATE_ACTIVITY_TYPE:

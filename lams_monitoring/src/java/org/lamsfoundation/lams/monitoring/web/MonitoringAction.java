@@ -1071,26 +1071,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward checkGateStatus(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	String wddxPacket = null;
-	try {
-	    Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
-	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "checkGateStatus", monitoringService);
-	    wddxPacket = flashMessage.serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-
-    }
-
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()

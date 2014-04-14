@@ -208,11 +208,14 @@ public class GateAction extends LamsDispatchAction {
 		gateForm.set("remainTime", remainTime);
 	    } else {
 		gateForm.set("reachDate", null);
-		long diff = scheduleGate.getGateStartDateTime().getTime() - new Date().getTime();
+		Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
+		startingTime.setTime(lesson.getStartDateTime());
+		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		gateForm.set("startingTime", startingTime.getTime());
+		long diff = startingTime.getTimeInMillis() - new Date().getTime();
 		long remainTime = diff / 1000;
 		gateForm.set("remainTime", remainTime);
-		gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
-		gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+		gateForm.set("endingTime", null);
 	    }
 	    return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
 	} else if (gate.isConditionGate()) {

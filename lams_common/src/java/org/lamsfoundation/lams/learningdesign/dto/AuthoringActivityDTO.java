@@ -461,9 +461,7 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     private void addScheduleGateActivityAttributes(ScheduleGateActivity activity) {
-	gateStartDateTime = activity.getGateStartDateTime();
 	gateStartTimeOffset = activity.getGateStartTimeOffset();
-	gateEndDateTime = activity.getGateEndDateTime();
 	gateEndTimeOffset = activity.getGateEndTimeOffset();
 	gateActivityCompletionBased = activity.getGateActivityCompletionBased();
     }

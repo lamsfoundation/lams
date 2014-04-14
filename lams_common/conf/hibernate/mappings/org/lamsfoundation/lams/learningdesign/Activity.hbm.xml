@@ -253,16 +253,6 @@
 		    		<meta attribute="use-in-toString">true</meta>
 			    </property>
 			    
-			    <property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
-       				<meta attribute="field-description">@hibernate.property column="gate_start_date_time" length="19"</meta>    
-        			<meta attribute="use-in-toString">true</meta>
-			    </property>
-			    
-			    <property name="gateEndDateTime" type="java.sql.Timestamp" column="gate_end_date_time" length="19" >
-			    	<meta attribute="field-description">@hibernate.property column="gate_end_date_time" length="19" </meta>    
-		    		<meta attribute="use-in-toString">true</meta>
-			    </property>
-			    
 			    <property name="gateActivityCompletionBased" type="java.lang.Boolean" column="gate_activity_completion_based" length="4" />
 			</subclass>
 			<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="3">
