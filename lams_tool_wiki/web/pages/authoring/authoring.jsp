@@ -2,6 +2,10 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<link href="includes/css/wiki_style.css" rel="stylesheet" type="text/css">
+	
 <html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />

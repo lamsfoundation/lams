@@ -20,7 +20,7 @@
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 		<div class="space-top">
 			<h2>
-				${wikiDTO.reflectInstructions}
+				<lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true"/>
 			</h2>
 
 			<p>

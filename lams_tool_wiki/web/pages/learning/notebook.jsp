@@ -12,7 +12,7 @@
 
 <div id="content">
 	<h1>
-		${wikiDTO.title}
+		<c:out value="${wikiDTO.title}" escapeXml="true"/>
 	</h1>
 
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
@@ -20,7 +20,7 @@
 		<html:hidden property="mode" value="${mode}" />
 		
 		<p class="small-space-top">
-			<lams:out value="${wikiDTO.reflectInstructions}" />
+			<lams:out value="${wikiDTO.reflectInstructions}"  escapeHtml="true"/>
 		</p>
 
 		<html:textarea cols="60" rows="8" property="entryText"

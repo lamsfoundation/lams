@@ -30,6 +30,45 @@
 <c:set var="dto" value="${wikiDTO}" />
 
 <h1>
+	<c:out value="${dto.title}" escapeXml="true" />
+</h1>
+
+<div class="instructions space-top">
+	<c:out value="${dto.instructions}" escapeXml="false" />
+</div>
+<br/>
+
+<c:choose>
+	<c:when test="${not empty dto.sessionDTOs}">
+		<table class="alternative-color">
+			<tr>
+				<th>
+					<fmt:message key="monitor.th.sessions"></fmt:message>
+				</th>	
+				<th>
+					<fmt:message key="monitor.th.numlearners"></fmt:message>
+				</th>
+			</tr>
+			<c:forEach var="session" items="${dto.sessionDTOs}">
+			<tr>
+				<td>
+					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
+				</td>	
+				<td>
+					${session.numberOfLearners}
+				</td>	
+			</tr>
+			</c:forEach>
+		</table>
+
+	</c:when>
+	<c:otherwise>
+		<fmt:message key="monitor.nosessions"></fmt:message> 
+	</c:otherwise>
+</c:choose>
+
+
+<h1>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
@@ -150,7 +189,7 @@
 					<fmt:message key="monitor.summary.td.notebookInstructions" />
 				</td>
 				<td>
-					${dto.reflectInstructions}	
+					<lams:out value="${dto.reflectInstructions}" escapeHtml="true"/>	
 				</td>
 			</tr>
 		</c:when>
@@ -188,32 +227,3 @@
 	
 </table>
 </div>
-
-<c:choose>
-	<c:when test="${not empty dto.sessionDTOs}">
-		<table class="alternative-color">
-			<tr>
-				<th>
-					<fmt:message key="monitor.th.sessions"></fmt:message>
-				</th>	
-				<th>
-					<fmt:message key="monitor.th.numlearners"></fmt:message>
-				</th>
-			</tr>
-			<c:forEach var="session" items="${dto.sessionDTOs}">
-			<tr>
-				<td>
-					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
-				</td>	
-				<td>
-					${session.numberOfLearners}
-				</td>	
-			</tr>
-			</c:forEach>
-		</table>
-
-	</c:when>
-	<c:otherwise>
-		<fmt:message key="monitor.nosessions"></fmt:message> 
-	</c:otherwise>
-</c:choose>

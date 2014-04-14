@@ -1,5 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
+<link href="includes/css/wiki_style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
 <script type="text/javascript">
 <!--
 	var mode = "${mode}";
@@ -13,7 +17,7 @@
 	
 		// Validates that there's input from the user. 
 		
-		// disables the Finish button to avoid double submittion 
+		// disables the Finish button to avoid double submission 
 		disableFinishButton();
 
  		if (mode == "learner") {
@@ -124,9 +128,9 @@
 		<div id="wikimenu">
 			<div id="breadcrumb" style="float: left; width: 50%;">
 				<c:if test="${currentWikiPage.title != mainWikiPage.title}">
-					<a href="javascript:changeWikiPage('${mainWikiPage.javaScriptTitle}')">${mainWikiPage.title}</a> :
+					<a href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')">${fn:escapeXml(mainWikiPage.title)}</a> :
 				</c:if> 
-				<a href="javascript:changeWikiPage('${currentWikiPage.javaScriptTitle}')">${currentWikiPage.title}</a>
+				<a href="javascript:changeWikiPage('${fn:escapeXml(currentWikiPage.javaScriptTitle)}')">${fn:escapeXml(currentWikiPage.title)}</a>
 			</div>
 	
 			<div id="buttons" style="float: right; width: 50%; text-align:right;">
@@ -191,7 +195,7 @@
 		<br />
 	
 		<div id="view">
-			<h1>${currentWikiPage.title}</h1>
+			<h1>${fn:escapeXml(currentWikiPage.title)}</h1>
 			<i> 
 				<fmt:message key="label.wiki.last.edit">
 					<fmt:param>
@@ -200,7 +204,7 @@
 								<fmt:message key="label.wiki.history.editor.author"></fmt:message>
 							</c:when>
 							<c:otherwise>
-								${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}
+								<c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/>
 							</c:otherwise>
 						</c:choose>
 					</fmt:param>
@@ -230,13 +234,13 @@
 			<br />
 			<br />
 			<div id="viewBody">
-				${currentWikiPage.currentWikiContentDTO.body}
+				<c:out value="${currentWikiPage.currentWikiContentDTO.body}" escapeXml="false"/>
 			</div>
 		</div>
 	
 		<div id="history" style="display: none;">
 			<h1>
-				<fmt:message key="label.wiki.history" /> - ${currentWikiPage.title}
+				<fmt:message key="label.wiki.history" /> - ${fn:escapeXml(currentWikiPage.title)}
 			</h1>
 			<br />
 			<c:choose>
@@ -268,7 +272,7 @@
 									<td>
 										<c:choose>
 											<c:when test="${wikiContentPageVersion.editorDTO != null}">
-												${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}
+												<c:out value="${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}" escapeXml="true"/>
 											</c:when>
 											<c:otherwise>
 												<fmt:message key="label.wiki.history.editor.author"></fmt:message>
@@ -305,7 +309,7 @@
 	
 		<div id="edit" style="display: none;">
 			<h1>
-				<fmt:message key="label.wiki.edit"></fmt:message> - ${currentWikiPage.title}
+				<fmt:message key="label.wiki.edit"></fmt:message> - ${fn:escapeXml(currentWikiPage.title)}
 			</h1>
 			
 			<table cellpadding="0">
@@ -315,7 +319,7 @@
 							<fmt:message key="label.authoring.basic.title"></fmt:message>
 						</div>
 						
-						<html:text property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}"></html:text>
+						<html:text property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}"></html:text><span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
 					</td>
 				</tr>
 				<tr>
@@ -351,7 +355,7 @@
 						<div class="field-name">
 							<fmt:message key="label.authoring.basic.title"></fmt:message>
 						</div>
-						<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value=""></html:text>
+						<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value=""></html:text><span style="display: none;'" class="newPageTitle error"><fmt:message key="error.title.invalid.characters"/>
 					</td>
 				</tr>
 				<tr>
@@ -387,12 +391,12 @@
 		<img src="<lams:WebAppURL />/images/tree_closed.gif" id="wikiListImage" 
 			onclick="javascript:toggleWikiList('<lams:WebAppURL />')" />
 		&nbsp;
-		<a href="javascript:changeWikiPage('${mainWikiPage.javaScriptTitle}')">${mainWikiPage.title}</a>
+		<a href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')">${fn:escapeXml(mainWikiPage.title)}</a>
 		<div id="wikiList" style="display:none;">
 			<c:forEach var="wikiPage" items="${wikiPages}">
 				<c:if test="${wikiPage.title != mainWikiPage.title}">
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<a href="javascript:changeWikiPage('${wikiPage.javaScriptTitle}')">${wikiPage.title}</a>
+					<a href="javascript:changeWikiPage('${fn:escapeXml(wikiPage.javaScriptTitle)}')">${fn:escapeXml(wikiPage.title)}</a>
 					<br />
 				</c:if> 
 			</c:forEach>
@@ -414,7 +418,7 @@
 	function populateWikiLinkArray()
 	{
 		<c:forEach var="wikiPage" items="${wikiPages}">
-			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.javaScriptTitle}';
+			wikiLinkArray[wikiLinkArray.length] = '${fn:escapeXml(wikiPage.javaScriptTitle)}';
 		</c:forEach>
 		document.getElementById("wikiLinks").value = wikiLinkArray.toString();
 	}
@@ -453,7 +457,7 @@
 		
 		for (i=0; i<wikiLinkArray.length; i++)
 		{
-			if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}')
+			if(dispatch == "editPage" && wikiLinkArray[i] == '${fn:escapeXml(currentWikiPage.javaScriptTitle)}')
 			{
 				continue;
 			}
