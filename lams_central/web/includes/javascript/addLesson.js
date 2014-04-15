@@ -263,7 +263,15 @@ function addLesson(){
 	}
 	$('#ldIdField').val(ldNode.data.learningDesignId);
 	
-	if (!lessonName){
+	if (lessonName){
+		var nameValidator = /^[^<>^*@%$]*$/igm;	
+		if (!nameValidator.test(lessonName)) {
+			$('#lessonNameInput').addClass('errorField');
+			$('#tabs').tabs('option', 'selected', 0);
+			alert(LABEL_NAME_INVALID_CHARACTERS);
+			return;
+		}
+	} else {
 		$('#lessonNameInput').addClass('errorField');
 		$('#tabs').tabs('option', 'selected', 0);
 		return;

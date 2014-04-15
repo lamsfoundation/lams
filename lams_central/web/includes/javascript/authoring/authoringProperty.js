@@ -44,9 +44,23 @@ var PropertyLib = {
 			            	'text'   : 'OK',
 			            	'click'  : function() {
 			            		var dialog = $(this),
-			            			activity = dialog.dialog('option', 'parentObject');
+			            			activity = dialog.dialog('option', 'parentObject'),
+			            			error = false;
 			            		
 			            		// extract group names from text fields
+			            		$('input', dialog).each(function(){
+			            			var groupName = $(this).val().trim();
+				            		if (!nameValidator.test(groupName)) {
+				            			alert('Group name can not contain any of these characters < > ^ * @ % $');
+				            			error = true;
+				            			return false;
+				            		}
+			            		});
+			            		
+			            		if (error) {
+			            			return;
+			            		}
+			            		
 			            		$('input', dialog).each(function(index){
 		            				activity.groups[index].groupName = $(this).val().trim();
 			            		});
@@ -163,11 +177,15 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != transition.title) {
-					transition.title = newTitle;
-					if (transition.branch) {
-						transition.branch.title = newTitle;
-					}
-					redrawNeeded = true;
+            		if (!nameValidator.test(newTitle)) {
+            			alert('Transition title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						transition.title = newTitle;
+						if (transition.branch) {
+							transition.branch.title = newTitle;
+						}
+						redrawNeeded = true;
+            		}
 				}
 				
 				if (redrawNeeded) {
@@ -202,8 +220,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					activity.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('Activity title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				
 				var selectedGrouping = $('.propertiesContentFieldGrouping option:selected', content);
@@ -246,8 +268,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					activity.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('Grouping title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				
 				activity.groupingType = $('.propertiesContentFieldGroupingType', content).val();
@@ -341,8 +367,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					activity.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
 				if (activity.gateType == 'schedule') {
@@ -430,8 +460,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != branchingActivity.title) {
-					branchingActivity.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						branchingActivity.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
 				
@@ -493,8 +527,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					activity.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
 									.data('grouping');
@@ -537,10 +575,14 @@ var PropertyLib = {
 					activity = content.data('parentObject'),
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					activity.title = newTitle;
-					activity.draw();
-					ActivityLib.addSelectEffect(activity, true);
-					setModified(true);
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						activity.title = newTitle;
+						activity.draw();
+						ActivityLib.addSelectEffect(activity, true);
+						setModified(true);
+            		}
 				}
 			});
 				
@@ -610,8 +652,12 @@ var PropertyLib = {
 					color = region.items.shape.attr('fill'),
 					newColor = $('.propertiesContentFieldColor', content).val();
 				if (newTitle != region.title) {
-					region.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						region.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				redrawNeeded |= newColor != color;
 				
@@ -646,8 +692,12 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != label.title) {
-					label.title = newTitle;
-					redrawNeeded = true;
+					if (!nameValidator.test(newTitle)) {
+            			alert('The title can not contain any of these characters < > ^ * @ % $');
+            		} else {
+						label.title = newTitle;
+						redrawNeeded = true;
+            		}
 				}
 				
 				if (redrawNeeded) {

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
  * Validates a learning design. Encapsulates all the validation rules that are "cross activity" for a learning design as
@@ -66,6 +67,11 @@ public class LearningDesignValidator {
     public Vector<ValidationErrorDTO> validate() {
 	errors = new Vector<ValidationErrorDTO>(); // initialises the list of validation messages.
 
+	if (!ValidationUtil.isOrgNameValid(learningDesign.getTitle())) {
+	    errors.add(new ValidationErrorDTO(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_CODE, messageService
+		    .getMessage(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_KEY)));
+	}
+
 	// check the design has a starting or first activity
 	if (learningDesign.getFirstActivity() == null) {
 	    errors.add(new ValidationErrorDTO(ValidationErrorDTO.FIRST_ACTIVITY_ERROR_CODE, messageService
@@ -78,6 +84,11 @@ public class LearningDesignValidator {
 	validateActivityTransitionRules(topLevelActivities, learningDesign.getTransitions());
 
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	    if (!ValidationUtil.isOrgNameValid(activity.getTitle())) {
+		errors.add(new ValidationErrorDTO(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_CODE, messageService
+			.getMessage(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_KEY), activity.getActivityUIID()));
+	    }
+
 	    checkIfGroupingRequired(activity);
 	    validateGroupingIfGroupingIsApplied(activity);
 	    validateOptionalActivity(activity);

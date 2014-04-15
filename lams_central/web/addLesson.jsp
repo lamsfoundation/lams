@@ -23,24 +23,25 @@
 	<script type="text/javascript" src="includes/javascript/yui/treeview-min.js" ></script>
 	<script type="text/javascript" src="includes/javascript/addLesson.js"></script>
 	<script type="text/javascript">
-		var userId = '<lams:user property="userID"/>';
-		var folderContents = ${folderContents};
-		var users = ${users};
-		
-		var LAMS_URL = '<lams:LAMSURL/>';
-		var LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=';
+		var userId = '<lams:user property="userID"/>',
+			folderContents = ${folderContents},
+			users = ${users},
+			
+			LAMS_URL = '<lams:LAMSURL/>',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
+			
+			CANVAS_RESIZE_OPTION_NONE = 0,
+			CANVAS_RESIZE_OPTION_FIT = 1,
+			CANVAS_RESIZE_OPTION_FULL = 2,
+			CANVAS_RESIZE_LABEL_FULL = '<fmt:message key="label.tab.lesson.size.full" />',
+			CANVAS_RESIZE_LABEL_FIT = '<fmt:message key="label.tab.lesson.size.fit" />',
 
-		var CANVAS_RESIZE_OPTION_NONE = 0;
-		var CANVAS_RESIZE_OPTION_FIT = 1;
-		var CANVAS_RESIZE_OPTION_FULL = 2;
-		var CANVAS_RESIZE_LABEL_FULL = '<fmt:message key="label.tab.lesson.size.full" />';
-		var CANVAS_RESIZE_LABEL_FIT = '<fmt:message key="label.tab.lesson.size.fit" />';
-
-		var SPLIT_LEARNERS_DESCRIPTION = '<fmt:message key="label.tab.advanced.split.desc" />';
-		var LABEL_MISSING_LEARNERS = '<fmt:message key="error.tab.class.learners" />';
-		var LABEL_MISSING_MONITORS = '<fmt:message key="error.tab.class.monitors" />';
-		var LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />';
-		
+			SPLIT_LEARNERS_DESCRIPTION = '<fmt:message key="label.tab.advanced.split.desc" />',
+			LABEL_MISSING_LEARNERS = '<fmt:message key="error.tab.class.learners" />',
+			LABEL_MISSING_MONITORS = '<fmt:message key="error.tab.class.monitors" />',
+			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
+			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />';
+				
 		$(document).ready(function(){
 			$('#tabs').tabs();
 			

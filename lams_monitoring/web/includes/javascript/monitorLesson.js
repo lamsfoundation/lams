@@ -1026,7 +1026,7 @@ function addLearnerIconsHandlers(activity) {
 			},
 			'stop' : function(event, ui) {
 				// jQuery droppable does not work for SVG, so this is a workaround
-				forceComplete(activity.id, learner.id, getLearnerDisplayName(learner),
+				forceComplete(activity.id, learner.id, getLearnerDisplayName(learner, true),
 						      ui.offset.left, ui.offset.top);
 			}
 		});
@@ -1095,7 +1095,7 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 					},
 					'stop' : function(event, ui) {
 						// jQuery droppable does not work for SVG, so this is a workaround
-						forceComplete(null, learner.id, getLearnerDisplayName(learner),
+						forceComplete(null, learner.id, getLearnerDisplayName(learner, true),
 								      ui.offset.left, ui.offset.top);
 					}
 				})
@@ -1210,7 +1210,7 @@ function fillClassDialogList(listId, users, disableCreator) {
 			'userId'  : user.id
 			})
           .addClass('dialogListItem')
-	      .text(getLearnerDisplayName(user))
+	      .html(getLearnerDisplayName(user))
 	      .prepend(checkbox)
 	      .appendTo(list);
 		
@@ -1550,7 +1550,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 									'viewUrl'    : viewUrl
 									})
 			                      .addClass('dialogListItem')
-							      .text(getLearnerDisplayName(learner))
+							      .html(getLearnerDisplayName(learner))
 							      .appendTo(learnerGroupList);
 			
 			if (allowForceComplete || allowView || allowEmail) {
@@ -1594,8 +1594,22 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 /**
  * Formats learner name.
  */
-function getLearnerDisplayName(learner) {
-	return learner.firstName + ' ' + learner.lastName + ' (' + learner.login + ')';
+function getLearnerDisplayName(learner, raw) {
+	return raw ? learner.firstName + ' ' + learner.lastName + ' (' + learner.login + ')'
+			   : escapeHtml(learner.firstName) + ' ' + escapeHtml(learner.lastName) + ' (' + escapeHtml(learner.login) + ')';
+}
+
+
+/**
+ * Escapes HTML tags to prevent XSS injection.
+ */
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 

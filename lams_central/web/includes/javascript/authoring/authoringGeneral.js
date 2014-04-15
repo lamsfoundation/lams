@@ -5,6 +5,7 @@
 // few publicly visible variables 
 var paper = null,
 	canvas = null,
+	nameValidator = /^[^<>^*@%$]*$/igm,
 	
 // configuration and storage of various elements
 	layout = {
@@ -279,9 +280,14 @@ function initLayout() {
 			            	'click'  : function() {	
 			            		var dialog = $(this),
 			            			container = dialog.closest('.ui-dialog'),
-			            			title = $('#ldStoreDialogNameField', container).val();
+			            			title = $('#ldStoreDialogNameField', container).val().trim();
 			            		if (!title) {
 			            			alert('Please enter a title for the sequence');
+			            			return;
+			            		}
+			            		
+			            		if (!nameValidator.test(title)) {
+			            			alert('Sequence title can not contain any of these characters < > ^ * @ % $');
 			            			return;
 			            		}
 			            		
@@ -434,7 +440,7 @@ function openLearningDesign(learningDesignID) {
 				'maxUIID'		   : 0
 			};
 			
-			$('#ldDescriptionFieldTitle').text(ld.title);
+			$('#ldDescriptionFieldTitle').html(escapeHtml(ld.title));
 			CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
 			
 			var arrangeNeeded = false,
@@ -1147,36 +1153,38 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'ld'			  : JSON.stringify(ld)
 		},
 		success : function(response) {
-			// if save was successful
-			if (response.ld) {
-				// assing the database-generated values
-				layout.ld.learningDesignID = response.ld.learningDesignID;
-				layout.ld.folderID = folderID;
-				layout.ld.title = title;
-				if (!layout.ld.contentFolderID) {
-					layout.ld.contentFolderID = response.ld.contentFolderID;
-				}
-				$('#ldDescriptionFieldTitle').text(title);
-				$('#ldDescriptionFieldDescription').text(description);
-				
-				// check if there were any validation errors
-				if (response.validation.length > 0) {
-					var message = 'While saving the sequence there were following validation issues:\n';
-					$.each(response.validation, function() {
-						var uiid = this.UIID,
-							title = '';
+			layout.ld.folderID = folderID;
+			layout.ld.title = title;
+			
+			// check if there were any validation errors
+			if (response.validation.length > 0) {
+				var message = 'While saving the sequence there were following validation issues:\n';
+				$.each(response.validation, function() {
+					var uiid = this.UIID,
+						title = '';
+					if (uiid) {
 						// find which activity is the error about
 						$.each(layout.activities, function(){
 							if (uiid == this.uiid) {
 								title = this.title + ': ';
 							}
 						});
-						message += title + this.message + '\n';
-					});
-					
-					alert(message);
-					return;
+					}
+					message += title + this.message + '\n';
+				});
+				
+				alert(message);
+			}
+			
+			// if save (even partially) was successful
+			if (response.ld) {
+				// assing the database-generated values
+				layout.ld.learningDesignID = response.ld.learningDesignID;
+				if (!layout.ld.contentFolderID) {
+					layout.ld.contentFolderID = response.ld.contentFolderID;
 				}
+				$('#ldDescriptionFieldTitle').text(title);
+				$('#ldDescriptionFieldDescription').text(description);
 				
 				// assign database-generated properties to activities
 				$.each(response.ld.activities, function() {
@@ -1235,11 +1243,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					});
 				});
 				
-				setModified(false);
-				alert('Congratulations! Your design is valid and has been saved.');
-				result = true;
-			} else {
-				alert('Error while saving the sequence');
+				if (response.validation.length == 0) {
+					setModified(false);
+					alert('Congratulations! Your design is valid and has been saved.');
+					result = true;
+				}
 			}
 		},
 		error : function(){
@@ -1315,4 +1323,17 @@ function setModified(modified) {
 		$('#exportButton').attr('disabled', null)
 		  				  .css('opacity', 1);
 	}
+}
+
+
+/**
+ * Escapes HTML tags to prevent XSS injection.
+ */
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

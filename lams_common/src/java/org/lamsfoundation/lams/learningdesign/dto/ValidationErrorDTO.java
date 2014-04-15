@@ -51,6 +51,7 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing"; // GM
 	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch"; // GC
 	public static final String FIRST_ACTIVITY_ERROR_KEY = "validation.error.first.activity"; // FIA
+	public static final String TITLE_CHARACTERS_ERROR_KEY = "validation.error.title.characters";
 	
 	public static final String BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH = "validation.error.branching.must.have.a.branch"; // BB
 	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH = "validation.error.toolBranchingMustHaveDefaultBranch"; // BDB
@@ -87,6 +88,7 @@ public class ValidationErrorDTO {
 	public static final String BRANCHING_ACTVITY_TOOLINPUT_ERROR_CODE = "BTI";
 	public static final String BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE = "BTC";
 	public static final String FIRST_ACTIVITY_ERROR_CODE = "FIA";
+	public static final String TITLE_CHARACTERS_ERROR_CODE = "TCH";
 	
 	private static MessageResources resources = MessageResources.getMessageResources(ValidationErrorDTO.CONFIG_PARAM);
 	/**
