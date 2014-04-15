@@ -455,7 +455,7 @@ public class LearningAction extends Action {
 	// Create reflectList if reflection is enabled.
 	if (isReflectOnActivity) {
 	    List<ReflectDTO> reflections = LearningAction.service.getReflectionList(toolSession.getScratchie()
-		    .getContentId(), false);
+		    .getContentId());
 
 	    // remove current session leader reflection
 	    Iterator<ReflectDTO> refIterator = reflections.iterator();

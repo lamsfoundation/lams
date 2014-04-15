@@ -632,7 +632,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List<ReflectDTO> getReflectionList(Long contentId, boolean isEscapeText) {
+    public List<ReflectDTO> getReflectionList(Long contentId) {
 	ArrayList<ReflectDTO> reflections = new ArrayList<ReflectDTO>();
 
 	// get all available leaders associated with this content as only leaders have reflections
@@ -650,9 +650,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    ReflectDTO reflectDTO = new ReflectDTO(user);
 		    reflectDTO.setGroupName(session.getSessionName());
 		    String reflection = notebookEntry.getEntry();
-		    if (isEscapeText) {
-			reflection = StringEscapeUtils.escapeJavaScript(reflection);
-		    }
+		    reflection = StringEscapeUtils.escapeJavaScript(reflection);
 		    reflectDTO.setReflection(reflection);
 		    reflectDTO.setIsGroupLeader(session.isUserGroupLeader(leader.getUid()));
 

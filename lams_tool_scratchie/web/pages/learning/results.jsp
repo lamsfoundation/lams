@@ -1,23 +1,75 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="scratchie" value="${sessionMap.scratchie}" />
-	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="scratchie" value="${sessionMap.scratchie}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	
+	<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+	<style media="screen,projection" type="text/css">
+		#reflections-div {
+			width:96%;
+			padding: 80px 0 20px;
+		}
+	</style>
 
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			<!-- Display reflection entries -->
+			jQuery("#reflections").jqGrid({
+				datatype: "local",
+				height: 'auto',
+				autowidth: true,
+				shrinkToFit: false,
+			   	colNames:['#',
+						"<fmt:message key='label.monitoring.summary.user.name' />",
+					    "<fmt:message key='label.learners.feedback' />"
+				],
+			   	colModel:[
+			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+			   		{name:'groupName', index:'groupName', width:140},
+			   		{name:'feedback', index:'feedback', width:553}
+			   	],
+			   	caption: "<fmt:message key='label.other.groups' />"
+			});
+		    <c:forEach var="reflectDTO" items="${reflections}" varStatus="i">
+		    	jQuery("#reflections").addRowData(${i.index + 1}, {
+		   			id:"${i.index + 1}",
+		   	     	groupName:"${reflectDTO.groupName}",
+			   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
+		   	   	});
+		    </c:forEach>
+		    
+			//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+			$(window).bind('resize', function() {
+				var grid;
+			    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+			    	grid.each(function(index) {
+			        	var gridId = $(this).attr('id');
+			        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+			        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+			    	});
+			    }
+			});
+		    
+		})
+	
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
@@ -87,15 +139,9 @@
 				</c:if>
 				
 				<c:if test="${fn:length(reflections) > 0}">
-					<h2>
-						<fmt:message key="label.other.groups" />
-					</h2>
-					
-				    <c:forEach var="reflectDTO" items="${reflections}">
-				    	<div>
-				    		<c:out value="${reflectDTO.groupName}"/>: <lams:out value="${reflectDTO.reflection}" escapeHtml="true"/> 
-				    	</div>
-			        </c:forEach>
+					<div id="reflections-div">
+						<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
+					</div>
 		        </c:if>
 			</div>
 		</c:if>
