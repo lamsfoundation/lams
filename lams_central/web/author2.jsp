@@ -144,7 +144,7 @@
 					</c:forEach>
 				</div>
 			</td>
-			<td>
+			<td id="canvasContainerCell">
 				<div id="ldDescriptionDiv"
 					 title="Click to show the sequence description">
 					<div id="ldDescriptionTitleContainer" onClick="javascript:MenuLib.toggleDescriptionDiv()">

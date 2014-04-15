@@ -170,7 +170,7 @@ div#gtbDialog td.gtbListCell div {
 
 div#toolbar {
 	padding: 3px;
-	width: 1235px;
+	width: 1220px;
 	height: 27px;
 }
 
@@ -237,7 +237,12 @@ div.template div {
 	font-family: "Lucida Console", Monaco, monospace;
 }
 
+td#canvasContainerCell {
+	vertical-align: top;
+}
+
 #ldDescriptionDiv {
+	margin-right: 15px;
 	background-color: rgb(219, 230, 252);
 	text-align: center;
 	z-index: 1099;

@@ -810,13 +810,20 @@ var MenuLib = {
 	},
 	
 	
+	/**
+	 * Expands/collapses description field.
+	 */
 	toggleDescriptionDiv: function() {
 		$('#ldDescriptionDetails').slideToggle(function(){
 			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
+			$('#templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
 	},
 	
 	
+	/**
+	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
+	 */
 	importLearningDesign : function(){
 		var importWindow = window.open(LAMS_URL + 'authoring/importToolContent.do?method=import','Import',
 					'width=800,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no'),
@@ -835,12 +842,16 @@ var MenuLib = {
 				// check if ID was found and it's not the same as previously
 				if (match && match[1] != currentLearningDesignID) {
 					currentLearningDesignID = match[1];
+					// load the imported LD
 					openLearningDesign(currentLearningDesignID);
 				}
 			}, 1000);
 	},
 	
 	
+	/**
+	 * Opens a pop up for exporting LD.
+	 */
 	exportLearningDesign : function(){
 		if (layout.modified || layout.activities.length == 0) {
 			return;

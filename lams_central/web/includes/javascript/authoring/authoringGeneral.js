@@ -1286,6 +1286,8 @@ function resizePaper(width, height) {
 	height = Math.max(height, canvas.height()) - 20;
 	
 	paper.setSize(width, height);
+	$('#templateContainer').height($('#ldDescriptionDiv').height() 
+								 + $('#canvas').height() - 10);
 	
 	if (layout.items.bin) {
 		layout.items.bin.remove();
