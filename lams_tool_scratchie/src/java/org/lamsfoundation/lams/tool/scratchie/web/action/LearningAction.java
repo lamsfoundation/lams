@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -464,7 +465,8 @@ public class LearningAction extends Action {
 		if (toolSession.getSessionName().equals(reflection.getGroupName())) {
 		    
 		    //store for displaying purposes
-		    sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, reflection.getReflection());
+		    String reflectEntry = StringEscapeUtils.unescapeJavaScript(reflection.getReflection());
+		    sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, reflectEntry);
 		    
 		    //remove from list to display other groups' notebooks
 		    refIterator.remove();
