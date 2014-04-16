@@ -1113,7 +1113,6 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'version'        	 : null,
 		'contentFolderID'    : layout.ld.contentFolderID,
 		'saveMode'			 : layout.ld.learningDesignID
-							   && learningDesignID
 							   && layout.ld.learningDesignID != learningDesignID
 							   ? 1 : 0,
 		'originalLearningDesignID' : null,
