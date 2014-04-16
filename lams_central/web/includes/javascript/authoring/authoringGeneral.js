@@ -5,7 +5,7 @@
 // few publicly visible variables 
 var paper = null,
 	canvas = null,
-	nameValidator = /^[^<>^*@%$]*$/igm,
+	nameValidator = /^[^<>^*@%$]*$/i,
 	
 // configuration and storage of various elements
 	layout = {
