@@ -36,7 +36,7 @@ public class ValidationUtil {
     private final static Pattern REGEX_FIRST_LAST_NAME = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
 
     private final static Pattern REGEX_EMAIL = Pattern
-	    .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+	    .compile("^[_A-Za-z0-9-\\+']+(\\.[_A-Za-z0-9-']+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
 
     private final static Pattern REGEX_ORGANISATION_NAME = Pattern.compile("^[^<>^*@%$]*$");
 
