@@ -132,7 +132,9 @@
 			<td id="templateContainerCell">
 				<div id="templateContainer">
 					<c:forEach var="tool" items="${tools}">
-						<div learningLibraryId="${tool.learningLibraryId}"
+						<div
+							 toolId="${tool.toolId}"
+							 learningLibraryId="${tool.learningLibraryId}"
 							 supportsOutputs="${tool.supportsOutputs}"
 							 activityCategoryId="${tool.activityCategoryID}"
 							 class="template">

@@ -30,12 +30,13 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity : function(id, uiid, toolContentID, toolID, authorURL,
+	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL,
 						    x, y, title, supportsOutputs) {
 		this.id = +id;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
 		this.toolID = +toolID;
+		this.learningLibraryID = +learningLibraryID;
 		this.authorURL = authorURL;
 		this.title = title;
 		this.supportsOutputs = supportsOutputs;
@@ -282,10 +283,10 @@ var ActivityLib = {
 			paper.setStart();
 			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
 							 .attr({
-								'fill' : layout.colors.activity[layout.toolMetadata[this.toolID].activityCategoryID]
+								'fill' : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 							 });
 			// check for icon in the library
-			paper.image(layout.toolMetadata[this.toolID].iconPath, x + 47, y + 2, 30, 30);
+			paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 2, 30, 30);
 			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
 				 .attr({
 					 'fill' : layout.colors.activityText
@@ -815,12 +816,7 @@ var ActivityLib = {
 				layout.items.selectedObject = object;
 				// show the properties dialog for the selected object
 				if (object.loadPropertiesDialogContent) {
-					object.loadPropertiesDialogContent();
-					var dialog = layout.items.propertiesDialog;
-					dialog.children().detach();
-					dialog.append(object.propertiesContent);
-					dialog.dialog('open');
-					dialog.find('input').blur();
+					PropertyLib.openPropertiesDialog(object);
 				}
 			}
 		}

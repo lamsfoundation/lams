@@ -157,6 +157,25 @@ var PropertyLib = {
 		layout.dialogs.push(gtbDialog);
 	},
 	
+	openPropertiesDialog : function(object) {
+		object.loadPropertiesDialogContent();
+		var dialog = layout.items.propertiesDialog;
+		dialog.children().detach();
+		dialog.append(object.propertiesContent);
+		dialog.dialog('open');
+		dialog.find('input').blur();
+		var box = object.items.getBBox(),
+			x = box.x2 + canvas.offset().left + 5,
+			y = box.y + canvas.offset().top;
+		dialog.dialog('option', 'position',	[x, y]);
+		if (dialog.offset().left < box.x2 + canvas.offset().left) {
+			// if dialog covers the activity (too close to right border),
+			// move it to the other side
+			x = box.x + canvas.offset().left - dialog.width() - 35;
+			dialog.dialog('option', 'position',	[x, y]);
+		}
+	},
+	
 	
 	/**
 	 * Properties dialog content for transitions.
@@ -743,7 +762,8 @@ var PropertyLib = {
 		var emptyOption = $('<option />'),
 			inputDropdown = $('.propertiesContentFieldInput', content).empty().append(emptyOption);
 		$.each(layout.activities, function(){
-			if (this instanceof ActivityLib.ToolActivity && layout.toolMetadata[this.toolID].supportsOutputs) {
+			if (this instanceof ActivityLib.ToolActivity
+				&& layout.toolMetadata[this.learningLibraryID].supportsOutputs) {
 				var option = $('<option />').text(this.title)
 											.appendTo(inputDropdown)
 											// store reference to grouping object

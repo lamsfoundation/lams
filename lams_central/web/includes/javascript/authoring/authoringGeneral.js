@@ -182,6 +182,7 @@ function initTemplates(){
 				
 				// calculate the position and create an instance of the tool activity
 			    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
+			    	toolID = +draggable.draggable.attr('toolId'),
 					activityCategoryID = +draggable.draggable.attr('activityCategoryId'),
 			    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 			    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
@@ -195,10 +196,11 @@ function initTemplates(){
 			    	// construct child activities out of previously referenced HTML templates
 			    	var childActivities = [];
 			    	layout.toolMetadata[learningLibraryID].parallelChildActivities.each(function(){
-			    		var toolActivityLibraryID = +$(this).attr('learningLibraryId'),
+			    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
+			    			childToolID = +$(this).attr('toolId'),
 			    			toolLabel = $('div', this).text(),
 			    			childActivity = new ActivityLib.ToolActivity(null, null, null,
-				    				toolActivityLibraryID, null, x, y, toolLabel);
+			    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
 			    		
 			    		layout.activities.push(childActivity);
 			    		childActivities.push(childActivity);
@@ -206,7 +208,7 @@ function initTemplates(){
 			    	
 			    	activity = new ActivityLib.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivities);
 			    } else {
-			    	activity = new ActivityLib.ToolActivity(null, null, null, learningLibraryID, null, x, y, label);
+			    	activity = new ActivityLib.ToolActivity(null, null, null, toolID, learningLibraryID, null, x, y, label);
 			    }
 			    
 				layout.activities.push(activity);
@@ -466,6 +468,7 @@ function openLearningDesign(learningDesignID) {
 										activityData.activityUIID,
 										activityData.toolContentID,
 										activityData.toolID,
+										activityData.learningLibraryID,
 										LAMS_URL + activityData.authoringURL
 												 + '?toolContentID='   + activityData.toolContentID
 												 + '&contentFolderID=' + layout.ld.contentFolderID,
@@ -914,21 +917,19 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			x = activityBox ? parseInt(activityBox.x) : null,
 			y = activityBox ? parseInt(activityBox.y) : null,
 			activityTypeID = null,
-			toolID = activity.toolID,
-			learningLibraryID = toolID ? toolID : activity.learningLibraryID,
 			activityCategoryID = activity instanceof ActivityLib.ToolActivity ?
-					   			 layout.toolMetadata[learningLibraryID].activityCategoryID : 
+					   			 layout.toolMetadata[activity.learningLibraryID].activityCategoryID : 
 					             activity instanceof ActivityLib.ParallelActivity ? 5 : 1,
 			iconPath = null,
 			isGrouped = activity.grouping ? true : false,
 			parentActivityID = activity.parentActivity ? activity.parentActivity.id : null;
 		
-		if (toolID) {
+		if (activity.toolID) {
 			activityTypeID = 1;
 			// find out what is the icon for tool acitivty
-			var templateIcon = $('.template[learningLibraryId=' + learningLibraryID +'] img');
+			var templateIcon = $('.template[learningLibraryId=' + activity.learningLibraryID +'] img');
 			if (templateIcon.width() > 0) {
-				 iconPath = layout.toolMetadata[learningLibraryID].iconPath;
+				 iconPath = layout.toolMetadata[activity.learningLibraryID].iconPath;
 			}
 		}
 		// translate activity type to back-end understandable
@@ -1019,8 +1020,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		activities.push({
 			'activityID' 			 : activity.id,
 			'activityUIID' 			 : activity.uiid,
-			'toolID' 				 : toolID,
-			'learningLibraryID' 	 : learningLibraryID,
+			'toolID' 				 : activity.toolID,
+			'learningLibraryID' 	 : activity.learningLibraryID,
 			'toolContentID' 	 	 : activity.toolContentID,
 			'stopAfterActivity' 	 : false,
 			'groupingSupportType' 	 : 2,
