@@ -12,8 +12,8 @@ var PropertyLib = {
 					'autoOpen'      : false,
 					'closeOnEscape' : false,
 					'position'      : {
-						'my' : 'left top',
-						'at' : 'left top',
+						'my' : 'right top',
+						'at' : 'right top',
 						'of' :  '#canvas'
 					},
 					'resizable'     : true,
