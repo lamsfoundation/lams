@@ -638,14 +638,6 @@ var MenuLib = {
 			layout.floatingActivity.draw(x, y);
 		}
 		
-		// are there more rows that current paper can hold?
-		if (row >= Math.floor((paper.height - layout.conf.arrangeVerticalPadding)
-   			  					/ layout.conf.arrangeVerticalSpace)) {
-			// some extra height for rubbish bin
-			resizePaper(paper.width, layout.conf.arrangeVerticalPadding + 70
-				   + row * layout.conf.arrangeVerticalSpace);
-		}
-		
 		// redraw transitions one by one
 		$.each(layout.activities, function(){
 			$.each(this.transitions.from.slice(), function(){
@@ -653,6 +645,7 @@ var MenuLib = {
 			});
 		});
 		
+		resizePaper();
 		setModified(true);
 	},
 	

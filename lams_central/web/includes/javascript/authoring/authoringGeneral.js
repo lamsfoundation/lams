@@ -461,7 +461,8 @@ function openLearningDesign(learningDesignID) {
 				switch(activityData.activityTypeID) {
 					// Tool Activity
 					case 1 :
-						activity = new ActivityLib.ToolActivity(activityData.activityID,
+						activity = new ActivityLib.ToolActivity(
+										activityData.activityID,
 										activityData.activityUIID,
 										activityData.toolContentID,
 										activityData.toolID,
@@ -506,7 +507,8 @@ function openLearningDesign(learningDesignID) {
 										});
 								});
 								
-								activity = new ActivityLib.GroupingActivity(activityData.activityID,
+								activity = new ActivityLib.GroupingActivity(
+										activityData.activityID,
 										activityData.activityUIID,
 										activityData.xCoord,
 										activityData.yCoord,
@@ -531,7 +533,8 @@ function openLearningDesign(learningDesignID) {
 					case 5: var gateType = gateType || 'permision';
 					case 14:
 						var gateType = gateType || 'condition';
-						activity = new ActivityLib.GateActivity(activityData.activityID,
+						activity = new ActivityLib.GateActivity(
+							activityData.activityID,
 							activityData.activityUIID,
 							activityData.xCoord,
 							activityData.yCoord,
@@ -542,7 +545,8 @@ function openLearningDesign(learningDesignID) {
 
 					// Parallel Activity
 					case 6:
-						activity = new ActivityLib.ParallelActivity(activityData.activityID,
+						activity = new ActivityLib.ParallelActivity(
+								activityData.activityID,
 								activityData.activityUIID,
 								activityData.learningLibraryID,
 								activityData.xCoord,
@@ -552,7 +556,8 @@ function openLearningDesign(learningDesignID) {
 						
 					// Optional Activity
 					case 7:
-						activity = new ActivityLib.OptionalActivity(activityData.activityID,
+						activity = new ActivityLib.OptionalActivity(
+								activityData.activityID,
 								activityData.activityUIID,
 								activityData.xCoord,
 								activityData.yCoord,
@@ -596,7 +601,8 @@ function openLearningDesign(learningDesignID) {
 						
 					// Support (Floating) activity
 					case 15:
-						activity = new ActivityLib.FloatingActivity(activityData.activityID,
+						activity = new ActivityLib.FloatingActivity(
+								activityData.activityID,
 								activityData.activityUIID,
 								activityData.xCoord,
 								activityData.yCoord);
@@ -820,28 +826,7 @@ function openLearningDesign(learningDesignID) {
 			if (arrangeNeeded) {
 				MenuLib.arrangeActivities();
 			} else {
-				// if we do arranging afterwards, paper will be resized anyway
-				var paperWidth = paper.width,
-					paperHeight = paper.height;
-				$.each(layout.activities, function(){
-					// find new dimensions of paper
-					var activityBox = this.items.shape.getBBox(),
-						maxX = activityBox.x + activityBox.width,
-						maxY = activityBox.y + activityBox.height;
-					if (maxX > paperWidth) {
-						paperWidth = maxX;
-					}
-					if (maxY > paperHeight) {
-						paperHeight = maxY;
-					}
-				});
-				
-				if (paperWidth > paper.width || paperHeight > paper.height) {
-					// add some height for rubbish bin
-					resizePaper(paperWidth, paperHeight + 70);
-				} else {
-					HandlerLib.resetCanvasMode(true);
-				}
+				resizePaper();
 			}
 			
 			setModified(false);
@@ -931,6 +916,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			activityTypeID = null,
 			toolID = activity.toolID,
 			learningLibraryID = toolID ? toolID : activity.learningLibraryID,
+			activityCategoryID = activity instanceof ActivityLib.ToolActivity ?
+					   			 layout.toolMetadata[learningLibraryID].activityCategoryID : 
+					             activity instanceof ActivityLib.ParallelActivity ? 5 : 1,
 			iconPath = null,
 			isGrouped = activity.grouping ? true : false,
 			parentActivityID = activity.parentActivity ? activity.parentActivity.id : null;
@@ -1045,9 +1033,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'xCoord' 				 : x,
 			'yCoord' 				 : y,
 			'activityTitle' 		 : activity.title,
-			'activityCategoryID' 	 : activity instanceof ActivityLib.ToolActivity
-									   || activity instanceof ActivityLib.ParallelActivity ?
-									   layout.toolMetadata[learningLibraryID].activityCategoryID : 1,
+			'activityCategoryID' 	 : activityCategoryID,
 			'activityTypeID'     	 : activityTypeID,
 			'orderID'				 : activity.orderID,
 			'defaultActivityUIID'    : activity.defaultActivityUIID,
@@ -1282,8 +1268,10 @@ function resizePaper(width, height) {
 		});
 	}
 	
+	// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
+	// +50 so there is space for rubbish bin
 	width = Math.max(width, canvas.width()) - 20;
-	height = Math.max(height, canvas.height()) - 20;
+	height = Math.max(height + 50, canvas.height()) - 20;
 	
 	paper.setSize(width, height);
 	$('#templateContainer').height($('#ldDescriptionDiv').height() 

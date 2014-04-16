@@ -1360,8 +1360,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    for (AuthoringActivityDTO activity : activities) {
+		ExportToolContentService.fillLearningLibraryID(activity);
 		// skip non-tool activities
-		if (activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE) {
+		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;
 		}
 
@@ -2490,6 +2491,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		plannerMetadata.setActivity(((ToolActivity) act));
 		((ToolActivity) act).setPlannerMetadata(plannerMetadata);
 	    }
+
+	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
 	    break;
 	case Activity.GROUPING_ACTIVITY_TYPE:
 	    newGrouping = groupingList.get(actDto.getCreateGroupingID());
@@ -2528,6 +2531,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    ((ConditionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 	    break;
 	case Activity.PARALLEL_ACTIVITY_TYPE:
+	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
 	    break;
 	case Activity.OPTIONS_ACTIVITY_TYPE:
 	case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
@@ -2571,17 +2575,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    act.setStopAfterActivity(actDto.getStopAfterActivity());
 	}
 
-	// do not need set so far
-	// act.setLearningDesign();
-
-	// the id will be decide in LearningObject
-	// actDto.getLearningDesignID()
-	// act.setLearningLibrary();
-
-	// be to decided by Fiona: 08/06/2006: It is ok to left it as null
-	// actDto.getLibraryActivityID()
-	// act.setLibraryActivity();
-
 	act.setLibraryActivityUiImage(actDto.getLibraryActivityUIImage());
 	act.setOrderId(actDto.getOrderID());
 
@@ -2615,6 +2608,27 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setEndXcoord(actDto.getEndXCoord());
 	act.setStartYcoord(actDto.getStartYCoord());
 	act.setEndYcoord(actDto.getEndYCoord());
+    }
+    
+    /**
+     * Guess missing Learning Library ID based on activity tool ID or description. Old exported LDs may not contain this
+     * value.
+     */
+    private static void fillLearningLibraryID(AuthoringActivityDTO activity) {
+	if (activity.getLearningLibraryID() == null) {
+	    if (activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
+		activity.setLearningLibraryID(activity.getToolID());
+	    } else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
+		String description = activity.getDescription();
+		if (description.contains("Share") && description.contains("Forum")) {
+		    activity.setLearningLibraryID(28L);
+		} else if (description.contains("Chat") && description.contains("Scribe")) {
+		    activity.setLearningLibraryID(29L);
+		} else if (description.contains("Forum") && description.contains("Scribe")) {
+		    activity.setLearningLibraryID(30L);
+		}
+	    }
+	}
     }
 
     // ******************************************************************
