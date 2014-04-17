@@ -8,7 +8,7 @@ var DecorationLib = {
 		 * Abstract class for Region, Optional and Floating Activities.
 		 */
 		Container : function(id, uiid, title) {
-			this.id = +id;
+			this.id = +id || null;
 			this.uiid = +uiid || (layout.ld ? ++layout.ld.maxUIID : null);
 			this.title = title;
 			this.childActivities = [];
@@ -36,7 +36,7 @@ var DecorationLib = {
 		 * Constructor for label annotation.
 		 */
 		Label : function(id, uiid, x, y, title){
-			this.id = +id;
+			this.id = +id || null;
 			this.uiid = +uiid || ++layout.ld.maxUIID;
 			// set a default title, if none provided
 			this.title = title || 'Label';
@@ -210,10 +210,11 @@ var DecorationLib = {
 			var result = [];
 			$.each(layout.activities, function(){
 				if (shape != this.items.shape) {
-					var activityBox = this.items.shape.getBBox();
+					var activityBox = this.items.shape.getBBox(),
+						shapeBox = shape.getBBox();
 					
-					if (shape.isPointInside(activityBox.x, activityBox.y)
-							&& shape.isPointInside(activityBox.x2, activityBox.y2)) {
+					if (Raphael.isPointInsideBBox(shapeBox,activityBox.x, activityBox.y)
+						&& Raphael.isPointInsideBBox(shapeBox, activityBox.x2, activityBox.y2)) {
 						result.push(this);
 					}
 				}

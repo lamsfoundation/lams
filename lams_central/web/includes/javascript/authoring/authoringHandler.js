@@ -84,6 +84,8 @@ var HandlerLib = {
 		if (items.dragStarter) {
 			// prevent confusion when double clicking
 			clearTimeout(items.dragStarter);
+			items.dragStarter = null;
+			return;
 		}
 		
 		if (layout.drawMode || (event.originalEvent ?
@@ -109,9 +111,16 @@ var HandlerLib = {
 				sticky = parentObject && (parentObject instanceof ActivityLib.ParallelActivity
 										  || parentObject instanceof ActivityLib.OptionalActivity
 										  || parentObject instanceof ActivityLib.FloatingActivity);
+				
+			// hide child activities while moving the parent around
 			if (sticky) {
 				$.each(parentObject.childActivities, function(){
 					this.items.hide();
+					if (this.childActivities) {
+						$.each(this.childActivities, function() {
+							this.items.hide();
+						});
+					}
 				});
 			}
 			
@@ -167,7 +176,6 @@ var HandlerLib = {
 	drawTransitionStartHandler : function(activity, event, x, y) {
 		if (activity.fromTransition && !(activity instanceof ActivityLib.BranchingEdgeActivity)) {
 			alert('Transition from this activity already exists');
-			return;
 		}
 		
 		HandlerLib.resetCanvasMode();

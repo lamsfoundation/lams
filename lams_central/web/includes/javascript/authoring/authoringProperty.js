@@ -454,14 +454,24 @@ var PropertyLib = {
 	 */
 	branchingProperties : function() {
 		var activity = this,
-			content = activity.propertiesContent;
-		
-		var fillWidgetsFunction = function(){
-			$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
-			$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
-			PropertyLib.fillGroupingDropdown(content, activity.branchingActivity.grouping);
-			PropertyLib.fillToolInputDropdown(content, activity.branchingActivity.input);
-		}
+			content = activity.propertiesContent,
+			fillWidgetsFunction = function(){
+				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
+				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
+				PropertyLib.fillGroupingDropdown(content, activity.branchingActivity.grouping);
+				PropertyLib.fillToolInputDropdown(content, activity.branchingActivity.input);
+				
+				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
+																				 activity.branchingActivity.minOptions)
+																		.spinner('option', 'max',
+																				 activity.branchingActivity.branches.length);
+				$('.propertiesContentFieldOptionalSequenceMax', content).spinner('value',
+																				 activity.branchingActivity.maxOptions)
+																		.spinner('option', {
+																			'min' : activity.branchingActivity.minOptions,
+																			'max' : activity.branchingActivity.branches.length
+																		});
+			}
 		
 		if (!content) {
 			// first run, create the content
@@ -507,6 +517,13 @@ var PropertyLib = {
 					inputRow.hide();
 					branchingActivity.input = null;
 				}
+				
+				var optionalSequenceRows = $('.spinner', content).closest('tr');
+				if (branchingActivity.branchingType == 'optional') {
+					optionalSequenceRows.show();
+				} else {
+					optionalSequenceRows.hide();
+				}
 
 				if (redrawNeeded) {
 					branchingActivity.start.draw();
@@ -517,10 +534,34 @@ var PropertyLib = {
 				setModified(true);
 			}
 			
+			$('.propertiesContentFieldOptionalSequenceMin', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
+				  if (value != activity.branchingActivity.minOptions) {
+					  $(this, content).spinner('value', activity.branchingActivity.minOptions);
+				  }
+				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
+					  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('value', value);
+				  }
+				  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('option', 'min', value);
+			  });
+			
+			
+			$('.propertiesContentFieldOptionalSequenceMax', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.branchingActivity.maxOptions = Math.min(value, activity.branchingActivity.branches.length);
+				  if (value != activity.branchingActivity.maxOptions) {
+					  $(this, content).spinner('value', activity.branchingActivity.maxOptions);
+				  }
+			  });
+			
 			$('input, select', content).change(changeFunction);
 			fillWidgetsFunction();
 			changeFunction.call(content);
 		}
+		
 		
 		fillWidgetsFunction();
 	},
@@ -579,8 +620,8 @@ var PropertyLib = {
 		var activity = this,
 			content = activity.propertiesContent;
 
-		activity.minActivities = Math.min(activity.minActivities, activity.childActivities.length);
-		activity.maxActivities = Math.min(activity.maxActivities, activity.childActivities.length);
+		activity.minOptions = Math.min(activity.minOptions, activity.childActivities.length);
+		activity.maxOptions = Math.min(activity.maxOptions, activity.childActivities.length);
 		
 		if (!content) {
 			// first run, create the content
@@ -608,11 +649,11 @@ var PropertyLib = {
 			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
 			  .on('spinchange', function(){
 				  var value = +$(this).val();
-				  activity.minActivities = Math.min(value, activity.childActivities.length);
-				  if (value != activity.minActivities) {
-					  $(this, content).spinner('value', activity.minActivities);
+				  activity.minOptions = Math.min(value, activity.childActivities.length);
+				  if (value != activity.minOptions) {
+					  $(this, content).spinner('value', activity.minOptions);
 				  }
-				  if (activity.minActivities > activity.maxActivities) {
+				  if (activity.minOptions > activity.maxOptions) {
 					  $('.propertiesContentFieldOptionalActivityMax', content).spinner('value', value);
 				  }
 				  $('.propertiesContentFieldOptionalActivityMax', content).spinner('option', 'min', value);
@@ -622,18 +663,18 @@ var PropertyLib = {
 			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
 			  .on('spinchange', function(){
 				  var value = +$(this).val();
-				  activity.maxActivities = Math.min(value, activity.childActivities.length);
-				  if (value != activity.maxActivities) {
-					  $(this, content).spinner('value', activity.maxActivities);
+				  activity.maxOptions = Math.min(value, activity.childActivities.length);
+				  if (value != activity.maxOptions) {
+					  $(this, content).spinner('value', activity.maxOptions);
 				  }
 			  });
 		}
 		
-		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minActivities)
+		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minOptions)
 																.spinner('option', 'max', activity.childActivities.length);
-		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxActivities)
+		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxOptions)
 																.spinner('option', {
-																	'min' : activity.minActivities,
+																	'min' : activity.minOptions,
 																	'max' : activity.childActivities.length
 																});
 	},

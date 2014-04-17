@@ -8,7 +8,7 @@ var ActivityLib = {
 	 * Constructor for a Transition
 	 */
 	Transition : function(id, uiid, fromActivity, toActivity, title) {
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.fromActivity = fromActivity;
 		this.toActivity = toActivity;
@@ -32,7 +32,7 @@ var ActivityLib = {
 	 */
 	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL,
 						    x, y, title, supportsOutputs) {
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
 		this.toolID = +toolID;
@@ -56,8 +56,8 @@ var ActivityLib = {
 	 */
 	GroupingActivity : function(id, uiid, x, y, title, groupingID, groupingUIID, groupingType, groupDivide,
 								groupCount, learnerCount, equalSizes, viewLearners, groups) {
-		this.id = +id;
-		this.groupingID = +groupingID;
+		this.id = +id || null;
+		this.groupingID = +groupingID || null;
 		this.groupingUIID = +groupingUIID  || ++layout.ld.maxUIID;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title || 'Grouping';
@@ -83,7 +83,7 @@ var ActivityLib = {
 	 * Constructor for a Gate Activity.
 	 */
 	GateActivity : function(id, uiid, x, y, gateType, startTimeOffset, gateActivityCompletionBased) {
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.gateType = gateType || 'permission';
 		if (gateType == 'schedule') {
@@ -140,12 +140,15 @@ var ActivityLib = {
 	 * Represents a set of branches. It is not displayed on canvas.
 	 */
 	BranchingActivity : function(id, uiid, branchingEdgeStart) {
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.start = branchingEdgeStart;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
 		this.groupsToBranches = [];
+		
+		this.minOptions = 0;
+		this.maxOptions = 0;
 	},
 	
 	
@@ -153,7 +156,7 @@ var ActivityLib = {
 	 * Represents a subsequence of activities. It is not displayed on canvas.
 	 */
 	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title || ('Branch ' + (branchingActivity.branches.length + 1));
 		this.branchingActivity = branchingActivity;
@@ -164,7 +167,7 @@ var ActivityLib = {
 	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivities){
 		DecorationLib.Container.call(this, id, uiid, title);
 		
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.learningLibraryID = +learningLibraryID;
 		this.transitions = {
@@ -184,13 +187,13 @@ var ActivityLib = {
 	/**
 	 * Constructor for an Optional Activity.
 	 */
-	OptionalActivity : function(id, uiid, x, y, title, minActivities, maxActivities) {
+	OptionalActivity : function(id, uiid, x, y, title, minOptions, maxOptions) {
 		DecorationLib.Container.call(this, id, uiid, title || 'Optional Activity');
 		
-		this.id = +id;
+		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.minActivities = minActivities || 0;
-		this.maxActivities = maxActivities || 0;
+		this.minOptions = minOptions || 0;
+		this.maxOptions = maxOptions || 0;
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -448,16 +451,19 @@ var ActivityLib = {
 				// draw one by one, vertically
 				var activityY = y + 30,
 					allElements = paper.set(),
-					optionalActivity = this;
+					optionalActivity = this,
+					box = this.items.shape.getBBox();
 				$.each(this.childActivities, function(orderID){
 					this.parentActivity = optionalActivity;
 					this.orderID = orderID + 1;
-					this.draw(x + 20, activityY);
-					activityY = this.items.shape.getBBox().y2 + 10;
+					var childBox = this.items.shape.getBBox();
+					this.draw(x + Math.max(20, (box.width - childBox.width)/2), activityY);
+					childBox = this.items.shape.getBBox();
+					activityY = childBox.y2 + 10;
 					allElements.push(this.items.shape);
 				});
 				// area containing all drawn child activities
-				var box = allElements.getBBox();
+				box = allElements.getBBox();
 				
 				this.drawContainer(x, y, box.x2 + 20, box.y2 + 20, layout.colors.optionalActivity);
 			} else {
@@ -487,16 +493,19 @@ var ActivityLib = {
 				// draw one by one, horizontally
 				var activityX = x + 20,
 					allElements = paper.set(),
-					floatingActivity = this;
+					floatingActivity = this,
+					box = this.items.shape.getBBox();
 				$.each(this.childActivities, function(orderID){
 					this.parentActivity = floatingActivity;
 					this.orderID = orderID;
-					this.draw(activityX, y + 30);
-					activityX = this.items.shape.getBBox().x2 + 10;
+					var childBox = this.items.shape.getBBox();
+					this.draw(activityX, y + Math.max(30, (box.height - childBox.height)/2));
+					childBox = this.items.shape.getBBox();
+					activityX = childBox.x2 + 10;
 					allElements.push(this.items.shape);
 				});
 				// area containing all drawn child activities
-				var box = allElements.getBBox();
+				box = allElements.getBBox();
 				
 				this.drawContainer(x, y, box.x2 + 20, box.y2 + 20, layout.colors.optionalActivity);
 			} else {
@@ -580,12 +589,11 @@ var ActivityLib = {
 		
 		// remove the activity from parent activity
 		if (activity.parentActivity && activity.parentActivity instanceof DecorationLib.Container) {
-			activity.parentActivity.childActivities.splice(layout.parentActivity.childActivities.indexOf(activity), 1);
+			activity.parentActivity.childActivities.splice(activity.parentActivity.childActivities.indexOf(activity), 1);
 		}
 		
 		// remove child activities
-		if (activity instanceof ActivityLib.OptionalActivity
-			|| activity instanceof ActivityLib.FloatingActivity) {
+		if (activity instanceof DecorationLib.Container) {
 			$.each(activity.childActivities, function(){
 				ActivityLib.removeActivity(this);
 			});
@@ -889,7 +897,7 @@ var ActivityLib = {
 	 * Drop the dragged activity on the canvas.
 	 */
 	dropActivity : function(activity, x, y) {
-		if (!(activity instanceof DecorationLib.Container)) {
+		if (!(activity instanceof ActivityLib.OptionalActivity || activity instanceof ActivityLib.FloatingActivity)) {
 			// check if it was removed from an Optional or Floating Activity
 			if (activity.parentActivity && activity.parentActivity instanceof DecorationLib.Container) {
 				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
@@ -901,11 +909,13 @@ var ActivityLib = {
 			}
 			
 			// check if it was added to an Optional or Floating Activity
-			var container = layout.floatingActivity && layout.floatingActivity.items.shape.isPointInside(x, y)
+			var container = layout.floatingActivity
+							&& Raphael.isPointInsideBBox(layout.floatingActivity.items.getBBox(),x,y)
 							? layout.floatingActivity : null;
 			if (!container) {
 				$.each(layout.activities, function(){
-					if (this instanceof ActivityLib.OptionalActivity && this.items.shape.isPointInside(x, y)) {
+					if (this instanceof ActivityLib.OptionalActivity
+						&& Raphael.isPointInsideBBox(this.items.getBBox(),x,y)) {
 						container = this;
 						return false;
 					}

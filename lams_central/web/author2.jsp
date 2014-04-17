@@ -406,6 +406,7 @@
 					 	<option value="chosen">Instructor's choice</option>
 					 	<option value="group">Group-based</option>
 					 	<option value="tool">Learner's output</option>
+					 	<option value="optional">Learner's choice</option>
 					 </select>
 				</td>
 			</tr>
@@ -428,6 +429,22 @@
 			<tr>
 				<td colspan="2">
 					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Min sequences:
+				</td>
+				<td>
+					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Max sequences:
+				</td>
+				<td>
+					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="text"></input>
 				</td>
 			</tr>
 		</table>

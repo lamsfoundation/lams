@@ -378,10 +378,12 @@ public class AuthoringActivityDTO extends BaseDTO {
 	Activity parentActivity = activity.getParentActivity();
 	Integer toolActivityUIID = parentActivity == null ? null : parentActivity.getToolInputActivityUIID();
 
-	Iterator iter = activity.getBranchEntries().iterator();
-	while (iter.hasNext()) {
-	    BranchActivityEntry ba = (BranchActivityEntry) iter.next();
-	    branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
+	if (activity.getBranchEntries() != null) {
+	    Iterator iter = activity.getBranchEntries().iterator();
+	    while (iter.hasNext()) {
+		BranchActivityEntry ba = (BranchActivityEntry) iter.next();
+		branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
+	    }
 	}
     }
 

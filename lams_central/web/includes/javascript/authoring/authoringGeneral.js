@@ -572,10 +572,11 @@ function openLearningDesign(learningDesignID) {
 					// Branching Activity
 					case 10: var branchingType = 'chosen';
 					case 11: var branchingType = branchingType || 'group';
-					case 12:
+					case 12: var branchingType = branchingType || 'tool';
+					case 13:
 						// draw both edge points straight away and mark the whole canvas for auto reaarange
 						arrangeNeeded = true;
-						var branchingType = branchingType || 'tool',
+						var branchingType = branchingType || 'optional',
 							branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID,
 									activityData.activityUIID,
 									0, 0, 
@@ -588,6 +589,11 @@ function openLearningDesign(learningDesignID) {
 						branchingEdge = new ActivityLib.BranchingEdgeActivity(
 								null, null, 0, 0, null, null, branchingEdge.branchingActivity);
 						layout.activities.push(branchingEdge);
+						
+						if (branchingType == 'optional'){
+							branchingEdge.branchingActivity.minOptions = activityData.minOptions;
+							branchingEdge.branchingActivity.maxOptions = activityData.maxOptions;
+						}
 
 						break;
 					
@@ -1002,6 +1008,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					
 					break;
 				case 'tool'   : activityTypeID = 12; break;
+				case 'optional'   : activityTypeID = 13; break;
 			}
 		} else if (activity instanceof ActivityLib.BranchActivity){
 			activityTypeID = 8;
@@ -1041,6 +1048,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 										activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 			'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
+			'minOptions'			 : activity.minOptions,
+			'maxOptions'			 : activity.maxOptions,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,
@@ -1181,7 +1190,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					$.each(layout.activities, function(){
 						var isBranching = this instanceof ActivityLib.BranchingEdgeActivity,
 							found = false;
-						if (isBranching && !isStart) {
+						if (isBranching && !this.isStart) {
 							return true;
 						}
 						
@@ -1207,7 +1216,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 							var existingTransition = this;
 							$.each(response.ld.transitions, function(){
 								if (existingTransition.uiid == +this.transitionUIID) {
-									existingTransition.id = +this.transitionID;
+									existingTransition.id = +this.transitionID || null;
 									return false;
 								}
 							});
