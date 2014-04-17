@@ -95,7 +95,7 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&requestSrc="
 		    + URLEncoder.encode(reqSrc, "UTF8") + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
 		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
-		    + "&email=" + email;
+		    + "&email=" + URLEncoder.encode(email, "UTF-8");
 		    
 	} catch (UnsupportedEncodingException e) {
 	    throw new RuntimeException(e);
@@ -199,7 +199,7 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
 		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + MODE
 		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
-		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + email;
+		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
 	    if (folderId != null) {
 		serviceURL += "&folderID=" + folderId;
 	    }
