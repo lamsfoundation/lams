@@ -24,11 +24,12 @@
 
 package org.lamsfoundation.lams.tool.kaltura.service;
 
+import java.util.List;
 import java.util.Set;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.kaltura.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
@@ -129,6 +130,8 @@ public interface IKalturaService {
     NotebookEntry getEntry(Long sessionId, Integer userId);
     
     void updateEntry(NotebookEntry notebookEntry);
+    
+    List<NotebookEntryDTO> getReflectList(Kaltura kaltura);
     
     String finishToolSession(Long toolSessionId, Long userId) throws KalturaException;
 

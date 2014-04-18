@@ -48,6 +48,7 @@ public interface KalturaConstants {
     public static final String ATTR_IS_ALLOW_UPLOADS = "isAllowUpload";
     public static final String ATTR_IS_USER_ITEM_AUTHOR = "isUserItemAuthor";
     public static final String ATTR_IS_GROUP_MONITORING = "isGroupMonitoring";
+    public static final String ATTR_REFLECT_LIST = "reflectList";
     
     // Parameter names
     public static final String PARAM_ITEM_INDEX = "itemIndex";

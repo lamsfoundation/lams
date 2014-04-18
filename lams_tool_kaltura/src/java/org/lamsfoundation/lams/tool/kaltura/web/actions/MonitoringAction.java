@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.tool.kaltura.web.actions;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +41,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.tool.kaltura.dto.KalturaSessionDTO;
 import org.lamsfoundation.lams.tool.kaltura.dto.KalturaUserDTO;
+import org.lamsfoundation.lams.tool.kaltura.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @author Andrey Balan
@@ -93,6 +92,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    sessionDTOs.add(sessionDTO);
 	}
 	request.setAttribute("sessionDTOs", sessionDTOs);
+	
+	// Create reflectList if reflection is enabled.
+	if (kaltura.isReflectOnActivity()) {
+	    List<NotebookEntryDTO> reflectList = kalturaService.getReflectList(kaltura);
+	    request.setAttribute(KalturaConstants.ATTR_REFLECT_LIST, reflectList);
+	}
 
 	Date submissionDeadline = kaltura.getSubmissionDeadline();
 	if (submissionDeadline != null) {

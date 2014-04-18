@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.kaltura.service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -58,6 +59,7 @@ import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaRatingDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaSessionDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaUserDAO;
 import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.kaltura.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaComment;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
@@ -85,7 +87,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 public class KalturaService implements ToolSessionManager, ToolContentManager, IKalturaService,
 	ToolContentImport102Manager {
 
-    static Logger logger = Logger.getLogger(KalturaService.class.getName());
+    private static Logger logger = Logger.getLogger(KalturaService.class.getName());
 
     private IKalturaDAO kalturaDao = null;
     
@@ -312,6 +314,33 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
+    }
+    
+    @Override
+    public List<NotebookEntryDTO> getReflectList(Kaltura kaltura) {
+	List<NotebookEntryDTO> reflectList = new LinkedList<NotebookEntryDTO>();
+
+	Set<KalturaSession> sessions = kaltura.getKalturaSessions();
+	for (KalturaSession session : sessions) {
+	    Long sessionId = session.getSessionId();
+	    // get all users in this session
+	    Set<KalturaUser> users = session.getKalturaUsers();
+	    for (KalturaUser user : users) {
+
+		NotebookEntry entry = getEntry(sessionId, user.getUserId().intValue());
+		if (entry != null) {
+		    NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(entry);
+		    notebookEntryDTO.setFullName(user.getFirstName() + " " + user.getLastName());
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
+			    .getCreateDate();
+		    notebookEntryDTO.setLastModified(postedDate);
+		    reflectList.add(notebookEntryDTO);
+		}
+		
+	    }
+	}
+
+	return reflectList;
     }
     
     @Override
