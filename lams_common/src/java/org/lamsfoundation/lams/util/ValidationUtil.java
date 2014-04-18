@@ -44,8 +44,12 @@ public class ValidationUtil {
      * Checks whether supplied username is valid. Username can only contain alphanumeric characters and no spaces.
      */
     public static boolean isUserNameValid(String userName) {
-	boolean isUserNameValid = ValidationUtil.isRegexMatches(ValidationUtil.REGEX_USER_NAME, userName);
-	return isUserNameValid;
+	
+	boolean isValidationRequired = Configuration.getAsBoolean(ConfigurationKeys.USER_VALIDATION_REQUIRED_USERNAME);
+	if (isValidationRequired) {
+	    return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_USER_NAME, userName);
+	}
+	return true;
     }
 
     /**
@@ -55,17 +59,24 @@ public class ValidationUtil {
      * @return
      */
     public static boolean isFirstLastNameValid(String name) {
-
-	boolean isNameValid = ValidationUtil.isRegexMatches(ValidationUtil.REGEX_FIRST_LAST_NAME, name);
-	return isNameValid;
+	
+	boolean isValidationRequired = Configuration.getAsBoolean(ConfigurationKeys.USER_VALIDATION_REQUIRED_FIRST_LAST_NAME);
+	if (isValidationRequired) {
+	    return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_FIRST_LAST_NAME, name);
+	}
+	return true;
     }
 
     /**
      * Checks whether supplied email address is valid.
      */
     public static boolean isEmailValid(String email) {
-	boolean isEmailValid = ValidationUtil.isRegexMatches(ValidationUtil.REGEX_EMAIL, email);
-	return isEmailValid;
+	
+	boolean isValidationRequired = Configuration.getAsBoolean(ConfigurationKeys.USER_VALIDATION_REQUIRED_EMAIL);
+	if (isValidationRequired) {
+	    return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_EMAIL, email);
+	}
+	return true;
     }
 
     /**

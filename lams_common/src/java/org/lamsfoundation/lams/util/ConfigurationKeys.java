@@ -269,6 +269,12 @@ public class ConfigurationKeys {
     public static String KALTURA_KCW_UI_CONF_ID = "KalturaKCWUiConfId";
     
     public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
+    
+    public static String USER_VALIDATION_REQUIRED_USERNAME = "UserValidationUsername";
+    
+    public static String USER_VALIDATION_REQUIRED_FIRST_LAST_NAME = "UserValidationFirstLastName";
+    
+    public static String USER_VALIDATION_REQUIRED_EMAIL = "UserValidationEmail";
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";

@@ -291,3 +291,12 @@ values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.h
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationUsername','true', 'config.user.validation.username', 'config.header.user.validation', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationFirstLastName','true', 'config.user.validation.first.last.name', 'config.header.user.validation', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationEmail','true', 'config.user.validation.emails', 'config.header.user.validation', 'BOOLEAN', 0);
