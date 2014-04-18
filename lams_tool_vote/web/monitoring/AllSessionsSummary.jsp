@@ -141,10 +141,10 @@
 	<p style="font-size: 12px;" class="indent">
 		<fmt:message key="label.total.number.students.voted">
 			<fmt:param>
-				<c:out value="${sessionDto.sessionUserCount}"/>
+				<c:out value="${sessionDto.completedSessionUserCount}"/>
 			</fmt:param>
 			<fmt:param>
-				<c:out value="${sessionDto.completedSessionUserCount}"/>
+				<c:out value="${sessionDto.sessionUserCount}"/>
 			</fmt:param>		
 		</fmt:message>
 	</p>
