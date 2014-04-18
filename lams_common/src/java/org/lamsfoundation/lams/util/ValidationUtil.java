@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  */
 public class ValidationUtil {
 
-    private final static Pattern REGEX_USER_NAME = Pattern.compile("^[^<>^!#&()/\\|'\"?,.:{}= ~`*@%$]*$");
+    private final static Pattern REGEX_USER_NAME = Pattern.compile("^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$");
 
     private final static Pattern REGEX_FIRST_LAST_NAME = Pattern.compile("^[\\p{L}]++(?:[' -][\\p{L}]++)*+\\.?$");
 
