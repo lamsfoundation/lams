@@ -4,7 +4,7 @@
 			
 			$('form input[name="username"]').blur(function () {
 			    var username = $(this).val();
-				var re = /^[^<>^!#&()/\\|'\"?,.:{}= ~`*@%$]*$/;
+				var re = /^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$/;
 				if (re.test(username)) {
 				    $('.msg').hide();
 				} else {
