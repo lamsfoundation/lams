@@ -52,11 +52,11 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			APP_URL = LAMS_URL + 'learning/',
 			
 			LABELS = {
-				CURRENT_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.current.tooltip"/>',
-				COMPLETED_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>',
-				ATTEMPTED_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>',
-				TOSTART_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
-				SUPPORT_ACTIVITY_LABEL : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>'
+				CURRENT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.current.tooltip"/>',
+				COMPLETED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>',
+				ATTEMPTED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>',
+				TOSTART_ACTIVITY : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
+				SUPPORT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>'
 			},
 		
 			supportSeparatorRow = null,
