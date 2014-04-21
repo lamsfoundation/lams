@@ -695,7 +695,9 @@ function openLearningDesign(learningDesignID) {
 								return false;
 							}
 						});
-					} else if (layout.floatingActivity && layout.floatingActivity.id == activityData.parentActivityID) {
+					}
+					
+					if (layout.floatingActivity && layout.floatingActivity.id == activityData.parentActivityID) {
 						// add a Tool Activity as a Floating Activity element
 						if (!layout.floatingActivity.childActivities) {
 							layout.floatingActivity.childActivities = [];
@@ -1035,7 +1037,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'activityUIID' 			 : activity.uiid,
 			'toolID' 				 : activity.toolID,
 			'learningLibraryID' 	 : activity.learningLibraryID,
-			'toolContentID' 	 	 : activity.toolContentID,
+			'toolContentID' 	 	 : activity.toolContentID || activity.toolID,
 			'stopAfterActivity' 	 : false,
 			'groupingSupportType' 	 : 2,
 			'applyGrouping' 		 : isGrouped,

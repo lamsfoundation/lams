@@ -850,8 +850,8 @@ var MenuLib = {
 			return;
 		}
 		
-		 window.open(LAMS_URL + 'authoring/exportToolContent.do?learningDesignID=46','Export',
-				 'width=712,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no');
+		 window.open(LAMS_URL + 'authoring/exportToolContent.do?learningDesignID=' + layout.ld.learningDesignID,
+				 'Export','width=712,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no');
 	}
 	
 	/*
