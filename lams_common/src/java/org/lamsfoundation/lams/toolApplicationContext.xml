@@ -68,6 +68,7 @@
 					<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 					<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>									
 			   		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
+			   		<property name="lessonService"><ref bean="lessonService"/></property>
 				</bean>
 			</property>
 		<property name="transactionAttributes">

@@ -24,16 +24,22 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -65,6 +71,7 @@ public class LamsToolService implements ILamsToolService {
     public IToolSessionDAO toolSessionDAO;
     public IToolContentDAO toolContentDAO;
     private ILamsCoreToolService lamsCoreToolService;
+    private ILessonService lessonService;
 
     @Override
     public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException {
@@ -150,7 +157,7 @@ public class LamsToolService implements ILamsToolService {
 	
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity);
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId, toolSession.getLesson().getLessonId());
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -173,7 +180,7 @@ public class LamsToolService implements ILamsToolService {
      * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
      * activities set first, and then inside the parent set.
      */
-    private static Activity getNearestLeaderSelectionActivity(Activity activity) {
+    private Activity getNearestLeaderSelectionActivity(Activity activity, Integer userId, Long lessonId) {
 
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
@@ -193,19 +200,47 @@ public class LamsToolService implements ILamsToolService {
 	    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
 		return activity;
 	    }
+	    
+	//in case of floating activity
+	} else if (activityClass.equals(FloatingActivity.class)) {
+	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
+	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
+	    
+	    //find the earliest finished Leader Select Activity
+	    Date leaderSelectActivityFinishDate = null;
+	    Activity leaderSelectionActivity = null;
+	    for (Activity completedActivity : completedActivities.keySet()) {
+		
+		if (completedActivity instanceof ToolActivity) {
+		    ToolActivity completedToolActivity = (ToolActivity) completedActivity;
+		    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(completedToolActivity.getTool().getToolSignature())) {
+			Date finishDate = completedActivities.get(completedActivity).getFinishDate();
+			
+			if ((leaderSelectActivityFinishDate == null)
+				|| (finishDate.compareTo(leaderSelectActivityFinishDate) < 0)) {
+			    leaderSelectionActivity = completedToolActivity;
+			    leaderSelectActivityFinishDate = completedActivities.get(completedActivity).getFinishDate();
+			}
+
+		    }
+		}
+		
+	    }
+	    
+	    return leaderSelectionActivity;
 	}
 
 	// check previous activity
 	Transition transitionTo = activity.getTransitionTo();
 	if (transitionTo != null) {
 	    Activity fromActivity = transitionTo.getFromActivity();
-	    return getNearestLeaderSelectionActivity(fromActivity);
+	    return getNearestLeaderSelectionActivity(fromActivity, userId, lessonId);
 	}
 
 	// check parent activity
 	Activity parent = activity.getParentActivity();
 	if (parent != null) {
-	    return getNearestLeaderSelectionActivity(parent);
+	    return getNearestLeaderSelectionActivity(parent, userId, lessonId);
 	}
 
 	return null;
@@ -256,5 +291,9 @@ public class LamsToolService implements ILamsToolService {
      */
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
+    }
+    
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
     }
 }
