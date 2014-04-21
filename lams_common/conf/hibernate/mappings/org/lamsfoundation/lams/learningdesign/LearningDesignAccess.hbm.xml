@@ -9,8 +9,8 @@
 		table="lams_learning_design_access">
 
 		<composite-id>
-			<key-many-to-one name="learningDesignId" class="org.lamsfoundation.lams.learningdesign.LearningDesign" column="learning_design_id"/>
-			<key-many-to-one name="userId" class="org.lamsfoundation.lams.usermanagement.User" column="user_id"/>
+			<key-property name="learningDesignId" column="learning_design_id"/>
+			<key-property name="userId" 		  column="user_id"/>
 		</composite-id>
 		
 		<property name="accessDate" type="java.util.Date" not-null="false" update="true" insert="true"

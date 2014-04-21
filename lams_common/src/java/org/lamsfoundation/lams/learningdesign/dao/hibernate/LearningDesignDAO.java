@@ -50,8 +50,9 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	private static final String FIND_LD_NAMES_IN_FOLDER = "select title from " + LearningDesign.class.getName()+
 												" where workspace_folder_id=?";
 	
-	private static final String ACCESS_BY_USER ="from " + LearningDesignAccess.class + " as a where.userId = ?";
-	
+	private static final String ACCESS_BY_USER = "from " + LearningDesignAccess.class.getName()
+	    + " as a where a.userId = ? order by a.accessDate desc";
+
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.ILearningDesignDAO#getLearningDesignById(java.lang.Long)
 	 */
@@ -115,11 +116,11 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	 */
 	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID){
 		return this.getHibernateTemplate().find(FIND_LD_NAMES_IN_FOLDER,workspaceFolderID);
-	}
-
+        }
+    
         @SuppressWarnings("unchecked")
         @Override
-        public List<LearningDesignAccess> getAccessByUser(Long userId) {
-    	return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
+        public List<LearningDesignAccess> getAccessByUser(Integer userId) {
+    		return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
         }
-}
+    }

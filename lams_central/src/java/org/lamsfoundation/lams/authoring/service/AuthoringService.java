@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -2021,5 +2022,22 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		    .appendParameterToURL(authorUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	}
 	return authorUrl;
+    }
+
+    public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId) {
+	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
+	for (LearningDesignAccess access : accessList) {
+	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
+	    access.setTitle(learningDesign.getTitle());
+	}
+	return accessList;
+    }
+
+    public void storeLearningDesignAccess(Long learningDesignId, Integer userId) {
+	LearningDesignAccess access = new LearningDesignAccess();
+	access.setLearningDesignId(learningDesignId);
+	access.setUserId(userId);
+	access.setAccessDate(new Date());
+	learningDesignDAO.insertOrUpdate(access);
     }
 }

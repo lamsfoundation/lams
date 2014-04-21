@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
@@ -387,4 +388,8 @@ public interface IAuthoringService {
 
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    String contentFolderID, Integer organisationID);
+
+    public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId);
+
+    public void storeLearningDesignAccess(Long learningDesignId, Integer userId);
 }

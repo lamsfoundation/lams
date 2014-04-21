@@ -283,24 +283,25 @@ var ActivityLib = {
 			}
 			
 			// create activity SVG elements
-			paper.setStart();
+			this.items = paper.set();
 			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
 							 .attr({
 								'fill' : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 							 });
-			// check for icon in the library
-			paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 2, 30, 30);
-			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
-				 .attr({
-					 'fill' : layout.colors.activityText
-				 });
-			
-			this.items = paper.setFinish();
+
 			this.items.shape = shape;
+			this.items.push(shape);
 			
 			if (this.grouping) {
 				ActivityLib.addGroupingEffect(this);
 			}
+			
+			// check for icon in the library
+			this.items.push(paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 2, 30, 30));
+			this.items.push(paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
+				 .attr({
+					 'fill' : layout.colors.activityText
+				 }));
 			
 			ActivityLib.activityHandlersInit(this);
 		},
@@ -883,8 +884,9 @@ var ActivityLib = {
 					activityBox.height)
 				.attr({
 					'fill' : shape.attr('fill')
-				})
-				.toBack();
+				});
+			
+			shape.toFront();
 			activity.items.push(activity.items.groupingEffect);
 			
 			// this is needed, for some reason, otherwise the activity can not be selected

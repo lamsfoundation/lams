@@ -74,6 +74,7 @@ var paper = null,
 		                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
 		'optionalActivity'    : 'rgb(194,213,254)'
 	},
+	maxAccessEntries : 7
 };
 
 
@@ -257,6 +258,7 @@ function initLayout() {
 		'height'		: 785,
 		'draggable'     : false,
 		'buttonsLoad' : [
+		             closeLdStoreDialogButton,
 		             {
 		            	'text'   : 'Open',
 		            	'click'  : function() {
@@ -272,11 +274,11 @@ function initLayout() {
 		            		dialog.dialog('close');
 		            		openLearningDesign(ldNode.data.learningDesignId);
 						}
-		             },
-		             closeLdStoreDialogButton
+		             }
 		],
 		
 		'buttonsSave' : [
+			             closeLdStoreDialogButton,
 			             {
 			            	'text'   : 'Save',
 			            	'click'  : function() {	
@@ -321,8 +323,7 @@ function initLayout() {
 			            			dialog.dialog('close');
 			            		}
 							}
-			             },
-			             closeLdStoreDialogButton
+			             }
 		],
 		'open' : function(){
 			var nameContainer = $('#ldStoreDialogNameContainer');
@@ -391,6 +392,8 @@ function initLayout() {
 		}
 	});
 	tree.subscribe('clickEvent', tree.onEventToggleHighlight);
+	
+	updateAccess(initAccess);
 
 	// initialise a small info dialog
 	layout.items.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
@@ -423,14 +426,16 @@ function openLearningDesign(learningDesignID) {
 		url : LAMS_URL + "authoring/author.do",
 		dataType : 'json',
 		data : {
-			'method'          : 'getLearningDesignJSON',
+			'method'          : 'openLearningDesign',
 			'learningDesignID': learningDesignID
 		},
-		success : function(ld) {
-			if (!ld) {
+		success : function(response) {
+			if (!response) {
 				alert('Error while loading sequence');
 				return;
 			}
+			
+			var ld = response.ld;
 			
 			// remove existing activities
 			MenuLib.newLearningDesign(true, true);
@@ -839,6 +844,7 @@ function openLearningDesign(learningDesignID) {
 			}
 			
 			setModified(false);
+			updateAccess(response.access);
 		}
 	});
 }
@@ -1247,6 +1253,8 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					result = true;
 				}
 			}
+
+			updateAccess(response.access);
 		},
 		error : function(){
 			alert('Error while saving the sequence');
@@ -1338,4 +1346,19 @@ function escapeHtml(unsafe) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+
+function updateAccess(access){
+	var accessCell = $('#ldStoreDialogAccessCell');
+	accessCell.children('div.access').remove();
+	$.each(access, function(index){
+		if (index >= layout.maxAccessEntries) {
+			return false;
+		}
+		$('<div />').addClass('access')
+					.attr('learningDesignId', this.learningDesignId)
+					.text(this.title)
+					.appendTo(accessCell);
+	});
 }

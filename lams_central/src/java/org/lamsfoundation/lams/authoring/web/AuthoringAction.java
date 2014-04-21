@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +46,6 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -113,6 +111,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
+	
+	Gson gson = new GsonBuilder().create();
+	String access = gson.toJson(getAuthoringService().getLearningDesignAccessByUser(getUserId()));
+	request.setAttribute("access", access);
 	return mapping.findForward("openAutoring");
     }
 
@@ -171,18 +173,21 @@ public class AuthoringAction extends LamsDispatchAction {
 	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
 
-    public ActionForward getLearningDesignJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
-	JSONObject responseJSON = new JSONObject();
-
+    public ActionForward openLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException, JSONException {
 	long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
 		getUserLanguage());
 
+	Integer userId = getUserId();
+	getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
+
 	response.setContentType("application/json;charset=utf-8");
-	Writer responseWriter = response.getWriter();
+	JSONObject responseJSON = new JSONObject();
 	Gson gson = new GsonBuilder().create();
-	gson.toJson(learningDesignDTO, responseWriter);
+	responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
+	responseJSON.put("access", new JSONArray(gson.toJson(getAuthoringService().getLearningDesignAccessByUser(userId))));
+	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 
@@ -470,6 +475,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
 			getUserLanguage());
 		responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
+
+		Integer userId = getUserId();
+		getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
+		responseJSON.put("access", new JSONArray(gson.toJson(getAuthoringService().getLearningDesignAccessByUser(userId))));
 	    }
 	}
 

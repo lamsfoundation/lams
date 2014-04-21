@@ -79,16 +79,25 @@ div#ldStoreDialog div#ldStoreDialogTree {
 	overflow: auto;
 }
 
-div#ldStoreDialog #ldStoreDialogRecentlyUsedCell {
+div#ldStoreDialog #ldStoreDialogAccessCell {
 	height: 200px;
 	vertical-align: top;
 	border-top: thin dotted #2E6E9E;
 	border-right: thin dotted #2E6E9E;
 	padding: 5px 0px 5px 0px;
+}
+
+div#ldStoreDialog #ldStoreDialogAccessCell > div#ldStoreDialogAccessTitle {
 	font-size: 11px;
 	font-weight: bold;
 	text-align: center;
 }
+
+div#ldStoreDialog #ldStoreDialogAccessCell > div.access {
+	padding-top: 5px;
+	cursor: pointer;
+}
+
 
 div#ldStoreDialog td#ldStoreDialogCanvasCell {
 	text-align: center;

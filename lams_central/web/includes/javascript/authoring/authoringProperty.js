@@ -230,7 +230,9 @@ var PropertyLib = {
 			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
-			$('.propertiesContentFieldGrouping', content).closest('tr').remove();
+			if (!allowsGrouping) {
+				$('.propertiesContentFieldGrouping', content).closest('tr').remove();
+			}
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
@@ -266,7 +268,7 @@ var PropertyLib = {
 		}
 		
 		if (allowsGrouping){
-			PropertyLib.fillGroupingDropdown(content, activity.grouping);
+			PropertyLib.fillGroupingDropdown(activity, activity.grouping);
 		}
 	},
 	
@@ -458,7 +460,7 @@ var PropertyLib = {
 			fillWidgetsFunction = function(){
 				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
 				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
-				PropertyLib.fillGroupingDropdown(content, activity.branchingActivity.grouping);
+				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
 				PropertyLib.fillToolInputDropdown(content, activity.branchingActivity.input);
 				
 				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
@@ -609,7 +611,7 @@ var PropertyLib = {
 			});
 		}
 		
-		PropertyLib.fillGroupingDropdown(content, activity.grouping);
+		PropertyLib.fillGroupingDropdown(activity, activity.grouping);
 	},
 	
 	
@@ -773,25 +775,48 @@ var PropertyLib = {
 	/**
 	 * 	Find all groupings on canvas and fill dropdown menu with their titles
 	 */
-	fillGroupingDropdown : function(content, grouping) {
+	fillGroupingDropdown : function(activity, grouping) {
 		// find all groupings on canvas and fill dropdown menu with their titles
-		var emptyOption = $('<option />'),
-			groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
-		$.each(layout.activities, function(){
-			if (this instanceof ActivityLib.GroupingActivity) {
-				var option = $('<option />').text(this.title)
-											.appendTo(groupingDropdown)
-											// store reference to grouping object
-											.data('grouping', this);
-				if (this == grouping) {
-					option.attr('selected', 'selected');
+		var emptyOption = $('<option />').attr('selected', 'selected'),
+			groupingDropdown = $('.propertiesContentFieldGrouping', activity.propertiesContent).empty().append(emptyOption),
+			groupings = [];
+		
+		if (activity.parentActivity && activity.parentActivity instanceof ActivityLib.FloatingActivity) {
+			// Support activities can use any grouping on canvas
+			$.each(layout.activities, function(){
+				if (this instanceof ActivityLib.GroupingActivity) {
+					groupings.push(this);
 				}
+			});
+		} else {
+			// normal activities can use only preceeding groupings
+			var candidate = activity;
+			do {
+				if (candidate.transitions.to.length > 0) {
+					candidate = candidate.transitions.to[0].fromActivity;
+				} else if (candidate.parentActivity) {
+					candidate = candidate.parentActivity;
+				} else {
+					candidate = null;
+				}
+				
+				if (candidate instanceof ActivityLib.GroupingActivity) {
+					groupings.push(candidate);
+				}
+			} while (candidate != null);
+		}
+
+		// fill dropdown menu
+		$.each(groupings, function(){
+			var option = $('<option />').text(this.title)
+						.appendTo(groupingDropdown)
+						// store reference to grouping object
+						.data('grouping', this);
+			if (this == grouping) {
+				emptyOption.removeAttr('selected');
+				option.attr('selected', 'selected');
 			}
 		});
-		if (!grouping) {
-			// no grouping selected
-			emptyOption.attr('selected', 'selected');
-		}
 	},
 	
 	

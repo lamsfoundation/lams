@@ -40,6 +40,9 @@ public class LearningDesignAccess implements Serializable {
     Integer userId;
     Date accessDate;
 
+    // non-persistent field
+    String title;
+
     public Long getLearningDesignId() {
 	return learningDesignId;
     }
@@ -62,6 +65,14 @@ public class LearningDesignAccess implements Serializable {
 
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
+    }
+
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
     }
 
     @Override

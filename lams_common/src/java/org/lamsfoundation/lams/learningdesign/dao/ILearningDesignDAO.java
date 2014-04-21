@@ -94,5 +94,5 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	 */
 	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID);
 	
-	public List<LearningDesignAccess> getAccessByUser(Long userId);
+	public List<LearningDesignAccess> getAccessByUser(Integer userId);
 }

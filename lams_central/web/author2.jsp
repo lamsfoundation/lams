@@ -35,7 +35,9 @@
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
-			initContentFolderID = '${contentFolderID}';
+					
+			initContentFolderID = '${contentFolderID}',
+			initAccess = ${access};
 	</script>
 </lams:head>
 <body onresize="javascript:resizePaper()">
@@ -188,8 +190,8 @@
 				</td>
 			</tr>
 			<tr>
-				<td id="ldStoreDialogRecentlyUsedCell" >
-					Recently used sequences
+				<td id="ldStoreDialogAccessCell" >
+					<div id="ldStoreDialogAccessTitle">Recently used sequences</div>
 				</td>
 			</tr>
 		</table>
