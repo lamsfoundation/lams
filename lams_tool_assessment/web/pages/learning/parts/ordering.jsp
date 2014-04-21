@@ -12,7 +12,7 @@
 	</div>
 	
 	<table cellspacing="0" style="padding-bottom: 10px;">
-		<c:forEach var="option" items="${question.questionOptions}" varStatus="ordStatus">
+		<c:forEach var="option" items="${question.options}" varStatus="ordStatus">
 			<tr>
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; ">
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />

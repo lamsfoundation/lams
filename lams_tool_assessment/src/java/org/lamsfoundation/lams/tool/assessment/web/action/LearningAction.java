@@ -322,12 +322,12 @@ public class LearningAction extends Action {
 	}
 	for (AssessmentQuestion question : questionList) {
 	    if (question.isShuffle() || (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
-		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getQuestionOptions());
+		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getOptions());
 		Collections.shuffle(shuffledList);
-		question.setQuestionOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
+		question.setOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
 	    }
 	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getQuestionOptions());
+		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getOptions());
 		Collections.shuffle(shuffledList);
 		question.setMatchingPairOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
 	    }	    
@@ -541,7 +541,7 @@ public class LearningAction extends Action {
 	    }
 	}
 	
-	Set<AssessmentQuestionOption> optionList = question.getQuestionOptions();
+	Set<AssessmentQuestionOption> optionList = question.getOptions();
 	
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
@@ -557,7 +557,7 @@ public class LearningAction extends Action {
 		
 	    // put back list
 	    optionList = new LinkedHashSet<AssessmentQuestionOption>(rList);
-	    question.setQuestionOptions(optionList);
+	    question.setOptions(optionList);
 	}
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, question);
@@ -657,9 +657,8 @@ public class LearningAction extends Action {
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
-	int count = questionsForOnePage.size(); 
 	
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < questionsForOnePage.size(); i++) {
 	    Long assessmentQuestionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID + i);
 	    AssessmentQuestion question = null;
 	    for (AssessmentQuestion sessionQuestion : questionsForOnePage) {
@@ -677,7 +676,7 @@ public class LearningAction extends Action {
 	    
 	    int questionType = question.getType();
 	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		for (AssessmentQuestionOption option : question.getOptions()) {
 		    boolean answerBoolean = false;
 		    if (question.isMultipleAnswersAllowed()) {
 			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
@@ -693,7 +692,7 @@ public class LearningAction extends Action {
 		    option.setAnswerBoolean(answerBoolean);
 		}
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		for (AssessmentQuestionOption option : question.getOptions()) {
 		    int answerInt = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId()); 
 		    option.setAnswerInt(answerInt);
 		}
@@ -737,9 +736,9 @@ public class LearningAction extends Action {
 			question.setPenalty(questionResult.getPenalty());
 
 			question.setQuestionFeedback(null);
-			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
-			    if (questionOption.getUid().equals(questionResult.getSubmittedOptionUid())) {
-				question.setQuestionFeedback(questionOption.getFeedback());
+			for (AssessmentQuestionOption option : question.getOptions()) {
+			    if (option.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				question.setQuestionFeedback(option.getFeedback());
 				break;
 			    }
 			}
@@ -800,15 +799,15 @@ public class LearningAction extends Action {
 			question.setMark(questionResult.getMark());
 			question.setPenalty(questionResult.getPenalty());
 			
-			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+			for (AssessmentQuestionOption option : question.getOptions()) {
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-				if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
+				if (option.getUid().equals(optionAnswer.getOptionUid())) {
 				    
-				    questionOption.setAnswerBoolean(optionAnswer.getAnswerBoolean());
+				    option.setAnswerBoolean(optionAnswer.getAnswerBoolean());
 				    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-					questionOption.setSequenceId(optionAnswer.getAnswerInt());
+					option.setSequenceId(optionAnswer.getAnswerInt());
 				    } else {
-					questionOption.setAnswerInt(optionAnswer.getAnswerInt());
+					option.setAnswerInt(optionAnswer.getAnswerInt());
 				    }
 				    
 				    break;
@@ -822,8 +821,8 @@ public class LearningAction extends Action {
 		//sort ordering type of question
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
-		    orderedSet.addAll(question.getQuestionOptions());
-		    question.setQuestionOptions(orderedSet);
+		    orderedSet.addAll(question.getOptions());
+		    question.setOptions(orderedSet);
 		}
 	    }
 	}

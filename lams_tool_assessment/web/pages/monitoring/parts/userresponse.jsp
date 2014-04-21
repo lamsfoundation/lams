@@ -2,25 +2,25 @@
 					
 					<c:choose>
 						<c:when test="${question.type == 1}">
-							<c:forEach var="questionOption" items="${question.questionOptions}">
+							<c:forEach var="option" items="${question.options}">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.questionOptionUid == questionOption.uid)}">
-										responseStr += "${questionOption.optionStringEscaped}";
+									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
+										responseStr += "${option.optionStringEscaped}";
 									</c:if>
 								</c:forEach>					
 							</c:forEach>						
 						</c:when>
 						<c:when test="${question.type == 2}">
-							<c:forEach var="questionOption" items="${question.questionOptions}">
+							<c:forEach var="option" items="${question.options}">
 								responseStr +='<div>';
 									responseStr +='<div style="float: left;">';
-										responseStr +="${questionOption.questionEscaped}";
+										responseStr +="${option.questionEscaped}";
 									responseStr +='</div>';
 									responseStr +='<div style=" float: right; width: 50%;">';
 										responseStr +=' - '; 
 										<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-											<c:if test="${questionOption.uid == optionAnswer.questionOptionUid}">
-												<c:forEach var="questionOption2" items="${question.questionOptions}">
+											<c:if test="${option.uid == optionAnswer.optionUid}">
+												<c:forEach var="questionOption2" items="${question.options}">
 													<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
 														responseStr +="${questionOption2.optionStringEscaped}";
 													</c:if>
@@ -52,9 +52,9 @@
 							<c:forEach var="j" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 									<c:if test="${optionAnswer.answerInt == j}">		
-										<c:forEach var="questionOption" items="${question.questionOptions}">
-											<c:if test="${optionAnswer.questionOptionUid == questionOption.uid}">
-												responseStr +="${questionOption.optionStringEscaped}";
+										<c:forEach var="option" items="${question.options}">
+											<c:if test="${optionAnswer.optionUid == option.uid}">
+												responseStr +="${option.optionStringEscaped}";
 											</c:if>
 										</c:forEach>
 									</c:if>								

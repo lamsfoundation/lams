@@ -40,26 +40,26 @@
 						<c:if test='${status.last}'>border-bottom: none;</c:if>	" >
 					<c:choose>
 						<c:when test="${question.type == 1}">
-							<c:forEach var="questionOption" items="${question.questionOptions}">
+							<c:forEach var="option" items="${question.options}">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.questionOptionUid == questionOption.uid)}">
-										${questionOption.optionString}
+									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
+										${option.optionString}
 									</c:if>
 								</c:forEach>					
 							</c:forEach>						
 						</c:when>
 						<c:when test="${question.type == 2}">
 							<table style="padding: 0px; margin: 0px; border: none; " cellspacing="0" cellpadding="0">
-								<c:forEach var="questionOption" items="${question.questionOptions}">
+								<c:forEach var="option" items="${question.options}">
 									<tr>
 										<td style="width:40%; background: none; padding: 0px; margin: 0px; border: none;">
-											${questionOption.question}
+											${option.question}
 										</td>
 										<td style="background: none; padding: 0px; margin: 0px; border: none; vertical-align: middle;">
 											- 
 											<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-												<c:if test="${questionOption.uid == optionAnswer.questionOptionUid}">
-													<c:forEach var="questionOption2" items="${question.questionOptions}">
+												<c:if test="${option.uid == optionAnswer.optionUid}">
+													<c:forEach var="questionOption2" items="${question.options}">
 														<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
 															${questionOption2.optionString}
 														</c:if>
@@ -89,9 +89,9 @@
 							<c:forEach var="i" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 									<c:if test="${optionAnswer.answerInt == i}">		
-										<c:forEach var="questionOption" items="${question.questionOptions}">
-											<c:if test="${optionAnswer.questionOptionUid == questionOption.uid}">
-												${questionOption.optionString}
+										<c:forEach var="option" items="${question.options}">
+											<c:if test="${optionAnswer.optionUid == option.uid}">
+												${option.optionString}
 											</c:if>
 										</c:forEach>
 									</c:if>								

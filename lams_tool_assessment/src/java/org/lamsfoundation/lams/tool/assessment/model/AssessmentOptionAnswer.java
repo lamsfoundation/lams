@@ -37,7 +37,7 @@ public class AssessmentOptionAnswer implements Cloneable {
 
     private Long uid;
     
-    private Long questionOptionUid;
+    private Long optionUid;
     
     private int answerInt;
     
@@ -66,18 +66,18 @@ public class AssessmentOptionAnswer implements Cloneable {
      * 
      * @hibernate.property column="question_option_uid"
      */
-    public Long getQuestionOptionUid() {
-	return questionOptionUid;
+    public Long getOptionUid() {
+	return optionUid;
     }
 
     /**
      * Sets question Option's Uid.
      * 
-     * @param questionOptionUid
+     * @param optionUid
      *                question Option's Uid
      */
-    public void setQuestionOptionUid(Long questionOptionUid) {
-	this.questionOptionUid = questionOptionUid;
+    public void setOptionUid(Long optionUid) {
+	this.optionUid = optionUid;
     }
     
     /**

@@ -733,10 +733,10 @@ public class MonitoringAction extends Action {
 	    if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 		    if (optionAnswer.getAnswerBoolean() == true) {
-			for (AssessmentQuestionOption questionOption : assessmentQuestionResult.getAssessmentQuestion()
-				.getQuestionOptions()) {
-			    if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
-				sb.append(questionOption.getOptionString() + ", ");
+			for (AssessmentQuestionOption option : assessmentQuestionResult.getAssessmentQuestion()
+				.getOptions()) {
+			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
+				sb.append(option.getOptionString() + ", ");
 				trimComma = true;
 			    }
 			}
@@ -746,10 +746,10 @@ public class MonitoringAction extends Action {
 		for (int i = 0; i < optionAnswers.size(); i++) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (optionAnswer.getAnswerInt() == i) {
-			    for (AssessmentQuestionOption questionOption : assessmentQuestionResult
-				    .getAssessmentQuestion().getQuestionOptions()) {
-				if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
-				    sb.append(questionOption.getOptionString() + ", ");
+			    for (AssessmentQuestionOption option : assessmentQuestionResult
+				    .getAssessmentQuestion().getOptions()) {
+				if (option.getUid().equals(optionAnswer.getOptionUid())) {
+				    sb.append(option.getOptionString() + ", ");
 				    trimComma = true;
 				}
 			    }
@@ -759,15 +759,15 @@ public class MonitoringAction extends Action {
 
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 
-		for (AssessmentQuestionOption questionOption : assessmentQuestionResult.getAssessmentQuestion()
-			.getQuestionOptions()) {
-		    sb.append("[" + questionOption.getOptionString() + ", ");
+		for (AssessmentQuestionOption option : assessmentQuestionResult.getAssessmentQuestion()
+			.getOptions()) {
+		    sb.append("[" + option.getOptionString() + ", ");
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-			if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
-			    for (AssessmentQuestionOption questionOption2 : assessmentQuestionResult
-				    .getAssessmentQuestion().getQuestionOptions()) {
-				if (questionOption2.getUid() == optionAnswer.getAnswerInt()) {
-				    sb.append(questionOption2.getOptionString() + "] ");
+			if (option.getUid().equals(optionAnswer.getOptionUid())) {
+			    for (AssessmentQuestionOption option2 : assessmentQuestionResult
+				    .getAssessmentQuestion().getOptions()) {
+				if (option2.getUid() == optionAnswer.getAnswerInt()) {
+				    sb.append(option2.getOptionString() + "] ");
 				}
 			    }
 			}

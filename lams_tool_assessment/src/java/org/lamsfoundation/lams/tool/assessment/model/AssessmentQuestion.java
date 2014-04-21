@@ -89,7 +89,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     // ***********************************************
     // Non persistant fields:
     
-    private Set<AssessmentQuestionOption> questionOptions;
+    private Set<AssessmentQuestionOption> options;
     
     private Set<AssessmentUnit> units;
     
@@ -118,7 +118,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private List<Object[]> questionResults;
     
     public AssessmentQuestion() {
-	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+	options = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
     }
 
@@ -128,16 +128,16 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	    obj = (AssessmentQuestion) super.clone();
 	    ((AssessmentQuestion) obj).setUid(null);
 	    
-	    // clone questionOptions
-	    if (questionOptions != null) {
-		Iterator<AssessmentQuestionOption> iter = questionOptions.iterator();
+	    // clone options
+	    if (options != null) {
+		Iterator<AssessmentQuestionOption> iter = options.iterator();
 		Set<AssessmentQuestionOption> set = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentQuestionOption answerOption = (AssessmentQuestionOption) iter.next();
 		    AssessmentQuestionOption newAnswerOption = (AssessmentQuestionOption) answerOption.clone();
 		    set.add(newAnswerOption);
 		}
-		obj.questionOptions = set;
+		obj.options = set;
 	    }
 	    
 	    // clone units
@@ -448,17 +448,17 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
      * @hibernate.collection-key column="question_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption"
      * 
-     * @return a set of questionOptions to this AssessmentQuestion.
+     * @return a set of options to this AssessmentQuestion.
      */
-    public Set<AssessmentQuestionOption> getQuestionOptions() {
-	return questionOptions;
+    public Set<AssessmentQuestionOption> getOptions() {
+	return options;
     }
 
     /**
-     * @param questionOptions questionOptions to set.
+     * @param options options to set.
      */
-    public void setQuestionOptions(Set<AssessmentQuestionOption> questionOptions) {
-	this.questionOptions = questionOptions;
+    public void setOptions(Set<AssessmentQuestionOption> options) {
+	this.options = options;
     }
     
     /**
@@ -474,7 +474,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @param questionOptions units to set.
+     * @param options units to set.
      */
     public void setUnits(Set<AssessmentUnit> units) {
 	this.units = units;

@@ -638,7 +638,7 @@ public class AuthoringAction extends Action {
 			optionList.add(assessmentAnswer);
 		    }
 
-		    assessmentQuestion.setQuestionOptions(optionList);
+		    assessmentQuestion.setOptions(optionList);
 		}
 
 		if (correctAnswer == null) {
@@ -681,7 +681,7 @@ public class AuthoringAction extends Action {
 			optionList.add(assessmentAnswer);
 		    }
 
-		    assessmentQuestion.setQuestionOptions(optionList);
+		    assessmentQuestion.setOptions(optionList);
 		}
 
 	    } else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
@@ -742,7 +742,7 @@ public class AuthoringAction extends Action {
 			}
 		    }
 
-		    assessmentQuestion.setQuestionOptions(optionList);
+		    assessmentQuestion.setOptions(optionList);
 		}
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_ESSAY);
@@ -790,7 +790,7 @@ public class AuthoringAction extends Action {
 		    question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
 		    int correctAnswerCount = 0;
 
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 			if (assessmentAnswer.getGrade() > 0) {
 			    correctAnswerCount++;
 			}
@@ -798,11 +798,11 @@ public class AuthoringAction extends Action {
 
 		    Float correctAnswerScore = correctAnswerCount > 0 ? new Integer(100 / correctAnswerCount)
 			    .floatValue() : null;
-		    int incorrectAnswerCount = assessmentQuestion.getQuestionOptions().size() - correctAnswerCount;
+		    int incorrectAnswerCount = assessmentQuestion.getOptions().size() - correctAnswerCount;
 		    Float incorrectAnswerScore = incorrectAnswerCount > 0 ? new Integer(-100 / incorrectAnswerCount)
 			    .floatValue() : null;
 
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 			Answer answer = new Answer();
 			boolean isCorrectAnswer = assessmentAnswer.getGrade() > 0;
 
@@ -817,7 +817,7 @@ public class AuthoringAction extends Action {
 		} else {
 		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 			Answer answer = new Answer();
 			boolean isCorrectAnswer = assessmentAnswer.getGrade() == 1F;
 
@@ -835,7 +835,7 @@ public class AuthoringAction extends Action {
 	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
 		question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
 
-		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 		    // only answer which has more than 0% is considered a correct one
 		    if (assessmentAnswer.getGrade() > 0) {
 			Answer answer = new Answer();
@@ -872,10 +872,10 @@ public class AuthoringAction extends Action {
 		question.setType(Question.QUESTION_TYPE_MATCHING);
 
 		int answerIndex = 0;
-		float score = assessmentQuestion.getDefaultGrade() / assessmentQuestion.getQuestionOptions().size();
-		question.setMatchAnswers(new ArrayList<Answer>(assessmentQuestion.getQuestionOptions().size()));
+		float score = assessmentQuestion.getDefaultGrade() / assessmentQuestion.getOptions().size();
+		question.setMatchAnswers(new ArrayList<Answer>(assessmentQuestion.getOptions().size()));
 		question.setMatchMap(new TreeMap<Integer, Integer>());
-		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getQuestionOptions()) {
+		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
 		    Answer answer = new Answer();
 
 		    answer.setText(assessmentAnswer.getQuestion());
@@ -1669,7 +1669,7 @@ public class AuthoringAction extends Action {
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
-	    Set<AssessmentQuestionOption> optionList = question.getQuestionOptions();
+	    Set<AssessmentQuestionOption> optionList = question.getOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
 	if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
@@ -1762,7 +1762,7 @@ public class AuthoringAction extends Action {
 		option.setSequenceId(seqId++);
 		options.add(option);
 	    }
-	    question.setQuestionOptions(options);
+	    question.setOptions(options);
 	}
 	// set units
 	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
@@ -2039,7 +2039,7 @@ public class AuthoringAction extends Action {
      * @param question
      */
     private void removeNewLineCharacters(AssessmentQuestion question) {
-	Set<AssessmentQuestionOption> options = question.getQuestionOptions();
+	Set<AssessmentQuestionOption> options = question.getOptions();
 	if (options != null) {
 	    for (AssessmentQuestionOption option : options) {
 		String optionString = option.getOptionString();

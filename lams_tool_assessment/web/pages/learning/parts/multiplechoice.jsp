@@ -12,7 +12,7 @@
 </div>
 
 <table cellspacing="0" style="padding-bottom: 10px;">
-	<c:forEach var="option" items="${question.questionOptions}">
+	<c:forEach var="option" items="${question.options}">
 		<tr>
 			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
