@@ -49,8 +49,10 @@ import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.BeansException;
@@ -76,6 +78,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     private ISystemToolDAO systemToolDAO;
     private ToolContentIDGenerator contentIDGenerator;
     protected IToolContentDAO toolContentDAO;
+    private MessageService messageService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -112,6 +115,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
     }
+    
+    /**
+     * Set i18n MessageService
+     */
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -119,7 +129,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     @Override
     public synchronized ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
-	    throws LamsToolServiceException, DataIntegrityViolationException {
+	    throws RequiredGroupMissingException, DataIntegrityViolationException {
 	// look for an existing applicable tool session
 	// could be either a grouped (class group or standard group) or an individual.
 	// more likely to be grouped (more tools work that way!)
@@ -134,7 +144,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 			+ lesson.getLessonId() + "," + lesson.getLessonName() + "].");
 	    }
 
-	    toolSession = activity.createToolSessionForActivity(learner, lesson);
+	    toolSession = activity.createToolSessionForActivity(messageService, learner, lesson);
 	    toolSessionDAO.saveToolSession(toolSession);
 
 	    return toolSession;

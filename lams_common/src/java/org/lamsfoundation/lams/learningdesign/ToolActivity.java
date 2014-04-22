@@ -42,7 +42,9 @@ import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Manpreet Minhas
@@ -186,7 +188,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      * @return the new tool session.
      */
     @SuppressWarnings("unchecked")
-    public ToolSession createToolSessionForActivity(User learner, Lesson lesson) {
+    public ToolSession createToolSessionForActivity(MessageService messageService, User learner, Lesson lesson)
+	    throws RequiredGroupMissingException {
 	Date now = new Date(System.currentTimeMillis());
 	Integer supportType = getGroupingSupportType();
 	ToolSession session = null;
@@ -198,10 +201,12 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Group group = null;
 	    if (getApplyGrouping().booleanValue()) {
 		group = this.getGroupFor(learner);
+		
+		//check if activity requires existing grouping but no group for user exists yet
 		if (group == null || group.isNull()) {
-		    throw new LamsToolServiceException("Activity " + getActivityId()
-			    + " requires existing grouping but no group for user " + learner.getUserId()
-			    + " exists yet.");
+		    String errorMessage = messageService.getMessage("error.requires.existing.grouping", new Object[] {
+			    getActivityId(), learner.getUserId() });
+		    throw new RequiredGroupMissingException(errorMessage);
 		}
 
 		for (ToolSession toolSession : (Set<ToolSession>) group.getToolSessions()) {

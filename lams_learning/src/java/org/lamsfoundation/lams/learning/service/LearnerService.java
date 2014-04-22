@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -380,9 +381,9 @@ public class LearnerService implements ICoreLearnerService {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		createToolSessionFor(toolActivity, learnerProgress.getUser(), learnerProgress.getLesson());
 	    }
-	} catch (LamsToolServiceException e) {
-	    LearnerService.log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
-	    throw new LearnerServiceException(e.getMessage());
+	} catch (RequiredGroupMissingException e) {
+	    LearnerService.log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
+	    throw e;
 	} catch (ToolException e) {
 	    LearnerService.log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
 	    throw new LearnerServiceException(e.getMessage());
@@ -1035,7 +1036,7 @@ public class LearnerService implements ICoreLearnerService {
      * @throws LamsToolServiceException
      */
     private void createToolSessionFor(ToolActivity toolActivity, User learner, Lesson lesson)
-	    throws LamsToolServiceException, ToolException {
+	    throws RequiredGroupMissingException, ToolException {
 	// if the tool session already exists, createToolSession() will return null
 	ToolSession toolSession = null;
 	try {

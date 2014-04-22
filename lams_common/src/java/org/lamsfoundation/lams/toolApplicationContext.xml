@@ -44,6 +44,7 @@
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>	
 	
 	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

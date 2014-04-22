@@ -36,9 +36,11 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * <p>
@@ -72,8 +74,8 @@ public interface ILamsCoreToolService {
      *                the requested activity.
      * @return toolSession if a new one created, null otherwise.
      */
-    public ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
-	    throws LamsToolServiceException;
+    ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
+	    throws DataIntegrityViolationException, RequiredGroupMissingException;
 
     /**
      * Creates LAMS ToolSessions for a set of learners and activity. Checks to see if an appropriate tool session exists
@@ -89,7 +91,7 @@ public interface ILamsCoreToolService {
      *                the requested activity.
      * @return toolSessions set of newly created ToolSessions
      */
-    public Set createToolSessions(Set learners, ToolActivity activity, Lesson lesson) throws LamsToolServiceException;
+    Set createToolSessions(Set learners, ToolActivity activity, Lesson lesson) throws LamsToolServiceException;
 
     /**
      * Returns the previously created ToolSession for a learner and activity. It is queried base on learner.
@@ -102,7 +104,7 @@ public interface ILamsCoreToolService {
      * @throws LamsToolServiceException
      *                 the known error condition when we are getting the tool session
      */
-    public ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException;
+    ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException;
 
     /**
      * Returns the tool session according to tool session id.
@@ -111,7 +113,7 @@ public interface ILamsCoreToolService {
      *                the requested tool session id.
      * @return the tool session object
      */
-    public ToolSession getToolSessionById(Long toolSessionId);
+    ToolSession getToolSessionById(Long toolSessionId);
 
     /**
      * Get the lams tool session based on activity. It search through all the tool sessions that linked to the requested
@@ -125,7 +127,7 @@ public interface ILamsCoreToolService {
      * @throws LamsToolServiceException
      *                 the known error condition when we are getting the tool session
      */
-    public ToolSession getToolSessionByActivity(User learner, ToolActivity toolActivity)
+    ToolSession getToolSessionByActivity(User learner, ToolActivity toolActivity)
 	    throws LamsToolServiceException;
 
     /**
@@ -136,7 +138,7 @@ public interface ILamsCoreToolService {
      * @param activity
      *                the activity correspondent to that tool session.
      */
-    public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException;
+    void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException;
 
     /**
      * Calls the tool to copy the content for an activity. Used when copying a learning design.
@@ -149,7 +151,7 @@ public interface ILamsCoreToolService {
      *                 ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV) throws DataMissingException,
+    Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV) throws DataMissingException,
 	    ToolException;
 
     /**
@@ -165,7 +167,7 @@ public interface ILamsCoreToolService {
      *                 ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(Long toolContentId, String customCSV) throws DataMissingException,
+    Long notifyToolToCopyContent(Long toolContentId, String customCSV) throws DataMissingException,
 	    ToolException;
 
     /**
@@ -175,12 +177,12 @@ public interface ILamsCoreToolService {
      *                the tool activity defined in the design.
      * @throws ToolException
      */
-    public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException;
+    void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException;
     
     /**
      * Ask a tool to delete content entered by the given user, if exists.
      */
-    public void notifyToolToDeleteLearnerContent(ToolActivity toolActivity, Integer userId) throws ToolException;
+    void notifyToolToDeleteLearnerContent(ToolActivity toolActivity, Integer userId) throws ToolException;
     
     /**
      * Ask a tool for its OutputDefinitions, based on the given toolContentId. If the tool doesn't have any content
@@ -193,7 +195,7 @@ public interface ILamsCoreToolService {
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
+    SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
 	    throws ToolException;
 
     /**
@@ -206,7 +208,7 @@ public interface ILamsCoreToolService {
      * @return
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromToolFiltered(Long outputToolContentId,
+    SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromToolFiltered(Long outputToolContentId,
 	    int definitionType, Long inputToolContentId) throws ToolException;
 
     /**
@@ -217,7 +219,7 @@ public interface ILamsCoreToolService {
      * 
      * @throws ToolException
      */
-    public ToolOutput getOutputFromTool(String conditionName, Long toolSessionId, Integer learnerId)
+    ToolOutput getOutputFromTool(String conditionName, Long toolSessionId, Integer learnerId)
 	    throws ToolException;
 
     /**
@@ -228,7 +230,7 @@ public interface ILamsCoreToolService {
      * 
      * @throws ToolException
      */
-    public ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId)
+    ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId)
 	    throws ToolException;
 
     /**
@@ -247,7 +249,7 @@ public interface ILamsCoreToolService {
      * 
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId)
+    SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId)
 	    throws ToolException;
 
     /**
@@ -266,7 +268,7 @@ public interface ILamsCoreToolService {
      * 
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession,
+    SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession,
 	    Integer learnerId) throws ToolException;
 
     /**
@@ -275,7 +277,7 @@ public interface ILamsCoreToolService {
      * @param toolSession
      *                the new tool session object.
      */
-    public void updateToolSession(ToolSession toolSession);
+    void updateToolSession(ToolSession toolSession);
 
     /**
      * Return tool activity url for a learner. See also getToolPreviewURL, getToolLearnerProgressURL
@@ -288,7 +290,7 @@ public interface ILamsCoreToolService {
      *                the current learner.
      * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException;
+    String getToolLearnerURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException;
 
     /**
      * Return tool activity url for running a tool in preview mode. See also getToolLearnerURL,
@@ -302,7 +304,7 @@ public interface ILamsCoreToolService {
      *                the current learner.
      * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerPreviewURL(Long lessonID, Activity activity, User learner)
+    String getToolLearnerPreviewURL(Long lessonID, Activity activity, User learner)
 	    throws LamsToolServiceException;
 
     /**
@@ -316,7 +318,7 @@ public interface ILamsCoreToolService {
      *                the current learner.
      * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerProgressURL(Long lessonID, Activity activity, User learner)
+    String getToolLearnerProgressURL(Long lessonID, Activity activity, User learner)
 	    throws LamsToolServiceException;
 
     /**
@@ -328,7 +330,7 @@ public interface ILamsCoreToolService {
      *                the requested activity - should be either a ToolActivity or a SystemToolActivity
      * @return the tool access url with tool session id or activity id
      */
-    public String getToolMonitoringURL(Long lessonID, Activity activity) throws LamsToolServiceException;
+    String getToolMonitoringURL(Long lessonID, Activity activity) throws LamsToolServiceException;
 
     /**
      * Return the contribution url for monitoring.
@@ -339,7 +341,7 @@ public interface ILamsCoreToolService {
      *                the requested activity - should be either a ToolActivity or a SystemToolActivity
      * @return the tool access url with tool session id or activity id
      */
-    public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException;
+    String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException;
 
     /**
      * Return the moderate url for monitoring.
@@ -348,20 +350,20 @@ public interface ILamsCoreToolService {
      *                the requested activity - must be a a ToolActivity. System Activities don't support moderation.
      * @return the tool access url with tool content id
      */
-    public String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException;
+    String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException;
 
     /**
      * Get all the tool sessions for a lesson. The resulting list is not sorted.
      * 
      * @return list of ToolSession objects
      */
-    public List getToolSessionsByLesson(Lesson lesson);
+    List getToolSessionsByLesson(Lesson lesson);
 
     /**
      * Delete a tool session. Calls the tool to delete its session details and then deletes the main tool session
      * record. If the tool throws an exception, the main tool session record is still deleted.
      */
-    public void deleteToolSession(ToolSession toolSession);
+    void deleteToolSession(ToolSession toolSession);
 
     /**
      * <p>
@@ -377,7 +379,7 @@ public interface ILamsCoreToolService {
      * @throws LamsToolServiceException
      * @return the url with tool session id.
      */
-    public String setupToolURLWithToolSession(ToolActivity activity, User learner, String toolURL)
+    String setupToolURLWithToolSession(ToolActivity activity, User learner, String toolURL)
 	    throws LamsToolServiceException;
 
     /**
@@ -391,7 +393,7 @@ public interface ILamsCoreToolService {
      *                the target url
      * @return the url with tool content id.
      */
-    public String setupToolURLWithToolContent(ToolActivity activity, String toolURL);
+    String setupToolURLWithToolContent(ToolActivity activity, String toolURL);
 
-    public Object findToolService(Tool tool) throws NoSuchBeanDefinitionException;
+    Object findToolService(Tool tool) throws NoSuchBeanDefinitionException;
 }

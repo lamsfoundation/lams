@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
@@ -53,6 +54,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
  * @struts:action path="/LoadToolActivity" name="activityForm" validate="false" scope="request"
  * 
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
+ * @struts:action-forward name="message" path=".message"
  * 
  */
 public class LoadToolActivityAction extends ActivityAction {
@@ -98,8 +100,16 @@ public class LoadToolActivityAction extends ActivityAction {
 	synchronized (toolSessionCreationLock) {
 	    try {
 		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
+		
 	    } catch (UnexpectedRollbackException e) {
 		log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+		
+	    } catch (RequiredGroupMissingException e) {
+		
+		//got here when activity requires existing grouping but no group for user exists yet
+		log.warn(e.getMessage());
+		request.setAttribute("messageKey", e.getMessage());
+		return mapping.findForward("message");
 	    }
 	}
 

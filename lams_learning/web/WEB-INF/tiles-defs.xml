@@ -55,6 +55,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/error.jsp" />	
 	</definition>
 	
+	<definition name=".message" extends=".layout" >
+		<put name="pageTitleKey" value="error.title"/>
+		<put name="body" value="/msgContent.jsp" />
+	</definition>
+	
 	<!--  Activity definitions -->
 	
 	<definition name=".loadToolActivity" extends=".layout">
