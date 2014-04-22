@@ -80,7 +80,12 @@
 	}
 </script>
 
-
+<h1>
+	<c:out value="${authoring.title}" escapeXml="true" />
+</h1>
+<div class="instructions space-top">
+	<c:out value="${authoring.instruction}" escapeXml="false" />
+</div>
 
 <table cellpadding="0">
 <tr><td>
@@ -100,8 +105,9 @@
 		</c:if>
 		<br/>
 		
+		<table cellpadding="0" class="alternative-color">
 		<c:forEach var="user" items="${userlist}" varStatus="status">
-			<table cellpadding="0" class="alternative-color">
+			
 			<c:if test="${status.first}">
 				<tr>
 					<th>
