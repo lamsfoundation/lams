@@ -87,7 +87,8 @@
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../${tool_wiki_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
-        <ant antfile="../${tool_wookie_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+        	<ant antfile="../${tool_wookie_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="_clean-dirs" inheritAll="false"/>
 	</target>
 	
 	
@@ -127,7 +128,8 @@
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_wiki_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
-        <ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+        	<ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="copy-tags" inheritAll="false"/>
 		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS:
 			  Kaltura and other public and private tools</echo>
 	</target>
@@ -317,6 +319,7 @@
 		<ant antfile="../${tool_vote_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_wiki_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_wookie_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="deploy-tool" inheritAll="false" />
 	</target>
 	
 
