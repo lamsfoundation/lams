@@ -789,7 +789,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    report.setDateMarksReleased(new Date());
 	    if (notifyLearnersOnMarkRelease) {
 		SubmitUser user = details.getLearner();
-		StringBuilder notificationMessage = notificationMessages.get(user.getUserID().longValue());
+		StringBuilder notificationMessage = notificationMessages.get(user.getUserID());
 		if (notificationMessage == null) {
 		    notificationMessage = new StringBuilder();
 		}
