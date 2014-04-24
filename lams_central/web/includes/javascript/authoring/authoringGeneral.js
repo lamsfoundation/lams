@@ -73,8 +73,7 @@ var paper = null,
 		                   	     'FFF8DC', 'FF8C00', '00BFFF', 'DCDCDC', 'ADD8E6', '20B2AA',
 		                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
 		'optionalActivity'    : 'rgb(194,213,254)'
-	},
-	maxAccessEntries : 7
+	}
 };
 
 
@@ -114,24 +113,18 @@ function initTemplates(){
 			parallelChildActivities = null;
 		
 		if (activityCategoryID == 5) {
-				// mark which HTML templates construct this parallel activity
-				switch(learningLibraryID){
-		    	case 28:
-		    		// share resources and forum
-		    		parallelChildActivities = $('.template[learningLibraryId=12]')
-		    								  .add($('.template[learningLibraryId=6]'));
-		    		break;
-		    	case 29:
-		    		// chat and scribe
-		    		parallelChildActivities = $('.template[learningLibraryId=3]')
-		    								  .add($('.template[learningLibraryId=20]'));
-		    		break;
-		    	case 30:
-		    		// forum and scribe
-		    		parallelChildActivities = $('.template[learningLibraryId=6]')
-		    								  .add($('.template[learningLibraryId=20]'));
-		    		break;
-		    	}
+			var childToolIds = $(this).attr('childToolIds').split(',');
+			$.each(childToolIds, function(){
+				var childToolId = this.trim();
+				if (childToolId) {
+					parallelChildActivity = $('.template[toolId=' + childToolId + ']');
+					if (parallelChildActivities) {
+						parallelChildActivities = parallelChildActivities.add(parallelChildActivity);
+					} else {
+						parallelChildActivities = parallelChildActivity;
+					}
+				}
+			});
 		}
 		
 		// register tool properties so they are later easily accessible
@@ -264,15 +257,21 @@ function initLayout() {
 		            	'click'  : function() {
 		            		var dialog = $(this),
 		            			tree = dialog.dialog('option', 'ldTree'),
-		            			ldNode = tree.getHighlightedNode();
+		            			ldNode = tree.getHighlightedNode(),
+		            			learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
+		            		
+		            		if (!learningDesignID) {
+		            			learningDesignID = +$('#ldStoreDialogAccessCell > div.selected').attr('learningDesignId');
+		            		}
+		            		
 		            		// no LD was chosen
-		            		if (!ldNode || !ldNode.data.learningDesignId) {
+		            		if (!learningDesignID) {
 		            			alert("Please choose a sequence");
 		            			return;
 		            		}
 		            		
 		            		dialog.dialog('close');
-		            		openLearningDesign(ldNode.data.learningDesignId);
+		            		openLearningDesign(learningDesignID);
 						}
 		             }
 		],
@@ -295,30 +294,61 @@ function initLayout() {
 			            			return;
 			            		}
 			            		
-			            		var tree = dialog.dialog('option', 'ldTree'),
+			            		var learningDesignID = null,
+			            			folderNode = null,
+			            			folderID = null,
+			            			tree = dialog.dialog('option', 'ldTree'),
 			            			node = tree.getHighlightedNode();
-			            		if (!node) {
+			            		if (node) {
+				            		// get folder from LD tree
+			            			folderNode = node.data.learningDesignId ? node.parent : node;
+			            			folderID = folderNode.data.folderID;
+			            		} else {
+			            			// get data from "recently used sequences" list
+			            			var selectedAccess = $('#ldStoreDialogAccessCell > div.selected');
+			            			// if title was altered, do not consider this an overwrite
+			            			if (selectedAccess.length > 0 && title == selectedAccess.text()) {
+			            				learningDesignID = +selectedAccess.attr('learningDesignId');
+			            				folderID = +selectedAccess.attr('folderID');
+			            				
+			            				var folders = tree.getRoot().children;
+			            				if (folders) {
+			            					$.each(folders, function(){
+			            						if (folderID == this.data.folderID) {
+			            							this.highlight();
+			            							folderNode = this;
+			            							return false;
+			            						}
+			            					});
+			            				}
+			            			}
+			            		}
+			            		
+			            		if (!folderID) {
 			            			// although an existing sequence can be highlighted 
 			            			alert('Please choose a folder');
 			            			return;
 			            		}
 			            		
-			            		var nodeTitle = $(node.getContentHtml()).text(),
-			            			// if a node is highlighted but user modified the title,
-			            			// it is considered a new sequence
-			            			learningDesingID = node.data.learningDesignId && nodeTitle == title ?
-			            					node.data.learningDesignId : null;
-			            		if (learningDesingID
+		            			// if a node is highlighted but user modified the title,
+		            			// it is considered a new sequence
+		            			// otherwise check if there is no other sequence with the same name
+			            		if (folderNode && folderNode.children) {
+			            			$.each(folderNode.children, function(){
+			            				var nodeTitle = $(this.getContentHtml()).text();
+			            				if (nodeTitle == title) {
+			            					this.highlight();
+			            					learningDesignID = this.data.learningDesignId;
+			            					return false;
+			            				}
+			            			});
+			            		}
+			            		if (learningDesignID
 			            				&& !confirm('Are you sure you want to overwrite the existing sequence?')) {
 			            			return;
 			            		}
-			            		
-			            		var folderID = node.data.folderID;
-			            		if (!folderID) {
-			            			folderID = node.parent.data.folderID;
-			            		}
 
-			            		var result = saveLearningDesign(folderID, learningDesingID, title);
+			            		var result = saveLearningDesign(folderID, learningDesignID, title);
 			            		if (result) {
 			            			dialog.dialog('close');
 			            		}
@@ -326,9 +356,12 @@ function initLayout() {
 			             }
 		],
 		'open' : function(){
+			showLearningDesignThumbnail();
+			
 			var nameContainer = $('#ldStoreDialogNameContainer');
 			$('input', nameContainer).val(null);
 			$(this).siblings('.ui-dialog-buttonpane').append(nameContainer);
+			$('#ldStoreDialogNameField', nameContainer).focus();
 		}
 	});
 	
@@ -348,10 +381,8 @@ function initLayout() {
 	ldStoreDialog.dialog('option', 'ldTree', tree);
 	// make folder contents load dynamically on open
 	tree.setDynamicLoad(function(node, callback){
-		var dialog = $(this.getEl()).closest('.ui-dialog'),
-					 isSaveDialog = dialog.hasClass('ldStoreDialogSave');
 		// load subfolder contents
-		var childNodeData = MenuLib.getFolderContents(node.data.folderID, isSaveDialog);
+		var childNodeData = MenuLib.getFolderContents(node.data.folderID);
 		if (childNodeData) {
 		$.each(childNodeData, function(){
 				// create and add a leaf
@@ -366,30 +397,16 @@ function initLayout() {
 	tree.subscribe('clickEvent', function(event){
 		var dialog = $(this.getEl()).closest('.ui-dialog'),
 			isSaveDialog = dialog.hasClass('ldStoreDialogSave');
-		
+	
 		if (!isSaveDialog && !event.node.data.learningDesignId){
 			// it is a folder in load sequence dialog, do not highlight
 			return false;
 		}
-		// display "loading" animation and finally LD thumbnail
-		$('.ldChoiceDependentCanvasElement', dialog).css('display', 'none');
-		if (event.node.highlightState == 0) {
-			if (event.node.data.learningDesignId) {
-				$('#ldStoreDialog #ldScreenshotLoading', dialog).css('display', 'inline');
-				// get the image of the chosen LD and prevent caching
-				$('#ldStoreDialog #ldScreenshotAuthor', dialog)
-					.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId + '&_=' + new Date().getTime());
-				$('#ldStoreDialog #ldScreenshotAuthor', dialog).css({
-					'width'  : 'auto',
-					'height' : 'auto'
-				});
-				if (isSaveDialog) {
-					// copy title of the highligthed sequence to title field
-					var title = $(event.node.getContentHtml()).text();
-					$('#ldStoreDialogNameField', dialog).val(title);
-				}
-			}
-		}
+		
+		var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId      : null,
+			title            = isSaveDialog && learningDesignID ? $(event.node.getContentHtml()).text() : null;
+		
+		showLearningDesignThumbnail(learningDesignID, title);
 	});
 	tree.subscribe('clickEvent', tree.onEventToggleHighlight);
 	
@@ -399,8 +416,7 @@ function initLayout() {
 	layout.items.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
 		'autoOpen'   : false,
 		'width'      : 290,
-		'height'     : 35,
-		'resizable'  : false,
+		'minHeight'  : 'auto',
 		'show'       : 'fold',
 		'hide'       : 'fold',
 		'draggable'  : false,
@@ -515,6 +531,11 @@ function openLearningDesign(learningDesignID) {
 										});
 								});
 								
+								// sort groups by asceding UIID
+								groups.sort(function(a,b) {
+									return a.uiid - b.uiid;
+								});
+								
 								activity = new ActivityLib.GroupingActivity(
 										activityData.activityID,
 										activityData.activityUIID,
@@ -606,11 +627,18 @@ function openLearningDesign(learningDesignID) {
 					case 8:
 						var branches = branchToBranching[activityData.parentActivityID];
 						if (!branches) {
-							branches =  branchToBranching[activityData.parentActivityID] = [];
+							branches = branchToBranching[activityData.parentActivityID] = [];
 						}
 						branches.push(new ActivityLib.BranchActivity(activityData.activityID,
 																	 activityData.activityUIID,
 																	 activityData.activityTitle));
+						
+						var branchData = branchToActivities[activityData.activityID];
+						if (!branchData) {
+							branchData = branchToActivities[activityData.activityID] = {};
+						}
+						branchData.stopAfterActivity = activityData.stopAfterActivity;
+						
 						break;
 						
 					// Support (Floating) activity
@@ -637,7 +665,7 @@ function openLearningDesign(learningDesignID) {
 				if (activityData.parentActivityID) {
 					var branchData = branchToActivities[activityData.parentActivityID];
 					if (branchData) {
-						if (activityData.orderID > branchData.lastActivityOrderID) {
+						if (!branchData.lastActivityOrderID || activityData.orderID > branchData.lastActivityOrderID) {
 							// is it the last activity in the branch?
 							branchData.lastActivityOrderID = activityData.orderID;
 							branchData.lastActivity = activity;
@@ -791,7 +819,7 @@ function openLearningDesign(learningDesignID) {
 						ActivityLib.addTransition(branchingActivity.start,
 								branchData ? branchData.firstActivity : branchingActivity.end,
 								true, null, null, branch);
-						if (branchData) {
+						if (branchData && !branchData.stopAfterActivity) {
 							ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);
 						}
 					});
@@ -847,6 +875,15 @@ function openLearningDesign(learningDesignID) {
 			
 			setModified(false);
 			updateAccess(response.access);
+			
+			if (!ld.validDesign) {
+				var dialog = layout.items.infoDialog.html('The sequence is not valid.<br />It needs to be corrected before it can be used in lessons.');
+				dialog.dialog('open');
+				
+				setTimeout(function(){
+					dialog.text('').dialog('close');
+				}, 5000);
+			}
 		}
 	});
 }
@@ -889,6 +926,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					this.defaultActivityUIID = null;
 					this.orderID = branchOrderID + 1;
 					this.parentActivity = branchingActivity;
+					this.stopAfterActivity = false;
 					layoutActivities.push(this);
 					
 					var childActivity = this.transitionFrom.toActivity,
@@ -903,8 +941,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 						orderID++;
 						
 						if (childActivity.transitions.from.length == 0) {
-							// we need to carry on to assign parent to all remaining child activities
-							error = 'One of branches does not have a transition to the end point';
+							this.stopAfterActivity = true;
 							break;
 						}
 						childActivity = childActivity.transitions.from[0].toActivity;
@@ -915,11 +952,6 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			layoutActivities.push(this);
 		}
 	});
-	
-	if (error) {
-		alert(error);
-		return false;
-	}
 	
 	if (layout.floatingActivity){
 		layoutActivities.push(layout.floatingActivity);
@@ -989,7 +1021,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			switch(activity.gateType) {
 				case 'sync'      : activityTypeID = 3; break;
 				case 'schedule'  : activityTypeID = 4; break;
-				case 'permision' : activityTypeID = 5; break;
+				case 'permission' : activityTypeID = 5; break;
 				case 'condition' : activityTypeID = 14; break;
 			}
 		} else if (activity instanceof ActivityLib.ParallelActivity) {
@@ -1058,6 +1090,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
 			'minOptions'			 : activity.minOptions,
 			'maxOptions'			 : activity.maxOptions,
+			'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,
@@ -1250,12 +1283,13 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				});
 				
 				if (response.validation.length == 0) {
-					setModified(false);
 					alert('Congratulations! Your design is valid and has been saved.');
-					result = true;
 				}
+				
+				result = true;
+				setModified(false);
 			}
-
+			
 			updateAccess(response.access);
 		},
 		error : function(){
@@ -1354,13 +1388,63 @@ function escapeHtml(unsafe) {
 function updateAccess(access){
 	var accessCell = $('#ldStoreDialogAccessCell');
 	accessCell.children('div.access').remove();
-	$.each(access, function(index){
-		if (index >= layout.maxAccessEntries) {
-			return false;
-		}
+	$.each(access, function(){
 		$('<div />').addClass('access')
-					.attr('learningDesignId', this.learningDesignId)
+					.attr({
+						'learningDesignId' : this.learningDesignId,
+						'folderID'         : this.workspaceFolderId
+					})
 					.text(this.title)
-					.appendTo(accessCell);
+					.appendTo(accessCell)
+					.click(function(){
+						var accessEntry = $(this);
+						if (accessEntry.hasClass('selected')) {
+							return;
+						}
+						
+						var	dialog = accessEntry.closest('.ui-dialog'),
+							isSaveDialog = dialog.hasClass('ldStoreDialogSave'),
+							learningDesignID = +accessEntry.attr('learningDesignId'),
+							title = isSaveDialog ? accessEntry.text() : null;
+							
+						showLearningDesignThumbnail(learningDesignID, title);
+					});
+	});
+}
+
+
+function showLearningDesignThumbnail(learningDesignID, title) {
+	// display "loading" animation and finally LD thumbnail
+	$('.ldChoiceDependentCanvasElement').css('display', 'none');
+	if (learningDesignID) {
+		var dialogContent = $('#ldStoreDialog');
+		$('#ldScreenshotLoading', dialogContent).css('display', 'inline');
+		// get the image of the chosen LD and prevent caching
+		$('#ldScreenshotAuthor', dialogContent)
+			.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_=' + new Date().getTime())
+			.css({
+			'width'  : 'auto',
+			'height' : 'auto'
+		});
+		if (title) {
+			// copy title of the highligthed sequence to title field
+			$('#ldStoreDialogNameField').val(title).focus();
+		}
+		
+		var tree =  $('#ldStoreDialog').dialog('option', 'ldTree'),
+			ldNode = tree.getHighlightedNode();
+			// no LD was chosen
+		if (ldNode && learningDesignID != ldNode.data.learningDesignId) {
+			ldNode.unhighlight(true);
+		}
+	}
+	
+	$('#ldStoreDialogAccessCell > div.access', dialogContent).each(function(){
+		var access = $(this);
+		if (+access.attr('learningDesignId') == learningDesignID){
+			access.addClass('selected');
+		} else {
+			access.removeClass('selected');
+		}
 	});
 }

@@ -94,8 +94,12 @@ div#ldStoreDialog #ldStoreDialogAccessCell > div#ldStoreDialogAccessTitle {
 }
 
 div#ldStoreDialog #ldStoreDialogAccessCell > div.access {
-	padding-top: 5px;
+	padding: 3px 0 3px 3px;
 	cursor: pointer;
+}
+
+div#ldStoreDialog #ldStoreDialogAccessCell > div.selected {
+	background-color: #dfeffc;
 }
 
 
@@ -195,15 +199,18 @@ div#toolbar .ui-button, div#toolbar .split-ui-button {
 }
 
 div#toolbar .split-ui-button + ul {
-	padding: 0 5px 5px 5px;
 	font-size: 11px;
 	color: #2E6E9E;
 	z-index: 1100;
 }
 
 div#toolbar .split-ui-button + ul li {
-	padding-top: 5px;
+	padding: 3px 5px;
 	cursor: pointer;
+}
+
+div#toolbar .split-ui-button + ul li:hover {
+	background-color: #dfeffc;
 }
 
 table#authoringTable {

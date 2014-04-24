@@ -30,6 +30,7 @@ public class ToolDTO {
     private String iconPath;
     private Boolean supportsOutputs;
     private Integer activityCategoryID;
+    private Long[] childToolIds;
 
     public ToolDTO() {
     }
@@ -75,10 +76,19 @@ public class ToolDTO {
     }
 
     public Long getLearningLibraryId() {
-        return learningLibraryId;
+	return learningLibraryId;
     }
 
     public void setLearningLibraryId(Long learningLibraryId) {
-        this.learningLibraryId = learningLibraryId;
+	this.learningLibraryId = learningLibraryId;
     }
+
+    public Long[] getChildToolIds() {
+	return childToolIds;
+    }
+
+    public void setChildToolIds(Long[] childLearningLibraryIds) {
+	this.childToolIds = childLearningLibraryIds;
+    }
+
 }

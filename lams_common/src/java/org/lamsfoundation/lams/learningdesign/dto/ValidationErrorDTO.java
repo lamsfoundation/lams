@@ -40,6 +40,7 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_REQUIRED_ERROR_KEY = "validation.error.GroupingRequired"; // GR
 	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "validation.error.GroupingNotRequired"; // GNR
 	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected"; // GS
+	public static final String GROUPING_NOT_USED_ERROR_KEY = "validation.error.GroupingNotUsed"; // GNU
 	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity"; // OA
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId"; // OAOI
 	public static final String FLOATING_ACTIVITY_ERROR_KEY = "validation.error.FloatingActivity"; // FLA
@@ -70,6 +71,7 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_REQUIRED_ERROR_CODE = "GR";
 	public static final String GROUPING_NOT_REQUIRED_ERROR_CODE = "GNR";
 	public static final String GROUPING_SELECTED_ERROR_CODE = "GS";
+	public static final String GROUPING_NOT_USED_ERROR_CODE = "GNU";
 	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
 	public static final String FLOATING_ACTIVITY_ERROR_CODE = "FLA";

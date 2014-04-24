@@ -139,6 +139,11 @@
 							 learningLibraryId="${tool.learningLibraryId}"
 							 supportsOutputs="${tool.supportsOutputs}"
 							 activityCategoryId="${tool.activityCategoryID}"
+							 childToolIds="
+							 <c:forEach var='childId' items='${tool.childToolIds}'>
+							 	${childId},
+							 </c:forEach>
+							 "
 							 class="template">
 							<c:if test="${not empty tool.iconPath}">
 								<img src="<lams:LAMSURL/>${tool.iconPath}" />
@@ -197,7 +202,7 @@
 		</table>
 		<%-- This will be moved to dialog's button pane --%>
 		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-			<span>Title:</span><input id="ldStoreDialogNameField" type="text" />
+			<span>Title:</span><input id="ldStoreDialogNameField" type="text"/>
 		</div>
 	</div>
 	

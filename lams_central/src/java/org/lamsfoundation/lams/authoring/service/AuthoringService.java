@@ -2029,6 +2029,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	for (LearningDesignAccess access : accessList) {
 	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
 	    access.setTitle(learningDesign.getTitle());
+	    access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
 	}
 	return accessList;
     }

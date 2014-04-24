@@ -40,8 +40,9 @@ public class LearningDesignAccess implements Serializable {
     Integer userId;
     Date accessDate;
 
-    // non-persistent field
+    // non-persistent fields
     String title;
+    Integer workspaceFolderId;
 
     public Long getLearningDesignId() {
 	return learningDesignId;
@@ -73,6 +74,14 @@ public class LearningDesignAccess implements Serializable {
 
     public void setTitle(String title) {
 	this.title = title;
+    }
+
+    public Integer getWorkspaceFolderId() {
+	return workspaceFolderId;
+    }
+
+    public void setWorkspaceFolderId(Integer workspaceFolderId) {
+	this.workspaceFolderId = workspaceFolderId;
     }
 
     @Override

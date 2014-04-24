@@ -64,6 +64,7 @@ public class LearningDesignValidator {
     }
 
     /** Run the validation */
+    @SuppressWarnings("unchecked")
     public Vector<ValidationErrorDTO> validate() {
 	errors = new Vector<ValidationErrorDTO>(); // initialises the list of validation messages.
 
@@ -83,7 +84,8 @@ public class LearningDesignValidator {
 	Set<Activity> topLevelActivities = extractFloatingActivities(learningDesign.getParentActivities());
 	validateActivityTransitionRules(topLevelActivities, learningDesign.getTransitions());
 
-	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	Set<Activity> activities = (Set<Activity>) learningDesign.getActivities();
+	for (Activity activity : activities) {
 	    if (!ValidationUtil.isOrgNameValid(activity.getTitle())) {
 		errors.add(new ValidationErrorDTO(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_CODE, messageService
 			.getMessage(ValidationErrorDTO.TITLE_CHARACTERS_ERROR_KEY), activity.getActivityUIID()));
@@ -94,7 +96,7 @@ public class LearningDesignValidator {
 	    validateOptionalActivity(activity);
 	    validateOptionsActivityOrderId(activity);
 	    validateFloatingActivity(activity);
-	    validateGroupingActivity(activity);
+	    validateGroupingActivity(activity, activities);
 	    Vector<ValidationErrorDTO> activityErrors = activity.validateActivity(messageService);
 	    if (activityErrors != null && !activityErrors.isEmpty()) {
 		errors.addAll(activityErrors);
@@ -458,7 +460,7 @@ public class LearningDesignValidator {
      * 
      * @param parentActivity
      */
-    private void validateGroupingActivity(Activity activity) {
+    private void validateGroupingActivity(Activity activity, Set<Activity> activities) {
 
 	if (activity.isGroupingActivity()) {
 	    // get the child activities and check how many there are.
@@ -482,8 +484,21 @@ public class LearningDesignValidator {
 			messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY),
 			activity.getActivityUIID()));
 	    }
-	}
 
+	    boolean used = false;
+	    for (Activity groupedActivity : activities) {
+		if (groupedActivity.getApplyGrouping()
+			&& groupingActivity.getCreateGroupingUIID().equals(groupedActivity.getGroupingUIID())) {
+		    used = true;
+		    break;
+		}
+	    }
+
+	    if (!used) {
+		errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_USED_ERROR_CODE, messageService
+			.getMessage(ValidationErrorDTO.GROUPING_NOT_USED_ERROR_KEY), activity.getActivityUIID()));
+	    }
+	}
     }
 
     /**

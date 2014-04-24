@@ -45,24 +45,24 @@ var PropertyLib = {
 			            	'click'  : function() {
 			            		var dialog = $(this),
 			            			activity = dialog.dialog('option', 'parentObject'),
-			            			error = false;
+			            			error = null;
 			            		
 			            		// extract group names from text fields
 			            		$('input', dialog).each(function(){
 			            			var groupName = $(this).val().trim();
 				            		if (!nameValidator.test(groupName)) {
-				            			alert('Group name can not contain any of these characters < > ^ * @ % $');
-				            			error = true;
+				            			error = 'Group name can not contain any of these characters < > ^ * @ % $';
 				            			return false;
 				            		}
 			            		});
 			            		
 			            		if (error) {
+			            			alert(error);
 			            			return;
 			            		}
 			            		
 			            		$('input', dialog).each(function(index){
-		            				activity.groups[index].groupName = $(this).val().trim();
+		            				activity.groups[index].name = $(this).val().trim();
 			            		});
 			            		
 			            		dialog.dialog('close');
@@ -792,7 +792,7 @@ var PropertyLib = {
 			// normal activities can use only preceeding groupings
 			var candidate = activity;
 			do {
-				if (candidate.transitions.to.length > 0) {
+				if (candidate.transitions && candidate.transitions.to.length > 0) {
 					candidate = candidate.transitions.to[0].fromActivity;
 				} else if (candidate.parentActivity) {
 					candidate = candidate.parentActivity;
@@ -857,7 +857,7 @@ var PropertyLib = {
 		activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount,
 				activity.groups, 'name', 'Group ');
 		$.each(activity.groups, function(){
-			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.groupName);
+			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.name);
 			dialog.append('<br />');
 		});
 		
@@ -950,8 +950,7 @@ var PropertyLib = {
 				item[nameAttr] = prefix + itemIndex;
 			}
 			if (!item.uiid) {
-				// new unique UIID; TODO: change
-				item.uiid = new Date().getTime() + '_' + itemIndex;
+				item.uiid = ++layout.ld.maxUIID;
 			}
 			list.push(item);
 		}

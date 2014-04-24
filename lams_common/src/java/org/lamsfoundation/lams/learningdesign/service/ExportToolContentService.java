@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
@@ -318,6 +319,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     // Other fields
     private Logger log = Logger.getLogger(ExportToolContentService.class);
+
+    // words found both in current complex learning library descriptions and in old exported LD XML files
+    private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
+	    { "Forum", "Scribe" } };
 
     private static MessageService messageService;
 
@@ -1360,7 +1365,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    for (AuthoringActivityDTO activity : activities) {
-		ExportToolContentService.fillLearningLibraryID(activity);
+		fillLearningLibraryID(activity);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;
@@ -2614,18 +2619,28 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Guess missing Learning Library ID based on activity tool ID or description. Old exported LDs may not contain this
      * value.
      */
-    private static void fillLearningLibraryID(AuthoringActivityDTO activity) {
+    @SuppressWarnings("unchecked")
+    private void fillLearningLibraryID(AuthoringActivityDTO activity) {
 	if (activity.getLearningLibraryID() == null) {
 	    if (activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		activity.setLearningLibraryID(activity.getToolID());
 	    } else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
 		String description = activity.getDescription();
-		if (description.contains("Share") && description.contains("Forum")) {
-		    activity.setLearningLibraryID(28L);
-		} else if (description.contains("Chat") && description.contains("Scribe")) {
-		    activity.setLearningLibraryID(29L);
-		} else if (description.contains("Forum") && description.contains("Scribe")) {
-		    activity.setLearningLibraryID(30L);
+		// recognise learning libraries by their word description
+		for (LearningLibrary library : (List<LearningLibrary>) learningLibraryDAO.getAllLearningLibraries()) {
+		    for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
+			boolean found = false;
+			for (String keyWord : keyWords) {
+			    found = description.contains(keyWord) && library.getDescription().contains(keyWord);
+			    if (!found) {
+				break;
+			    }
+			}
+			if (found) {
+			    activity.setLibraryActivityID(library.getLearningLibraryId());
+			    return;
+			}
+		    }
 		}
 	    }
 	}

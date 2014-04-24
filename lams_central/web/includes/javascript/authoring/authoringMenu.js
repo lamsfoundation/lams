@@ -65,8 +65,7 @@ var MenuLib = {
 				// converge point was just place, end of function
 				HandlerLib.resetCanvasMode(true);
 				
-				dialog.text('');
-				dialog.dialog('close');
+				dialog.text('').dialog('close');
 				
 				setModified(true);
 			} else {
@@ -325,7 +324,7 @@ var MenuLib = {
 	/**
 	 * Loads subfolders and LDs from the server.
 	 */
-	getFolderContents : function(folderID, allowInvalidDesigns) {
+	getFolderContents : function(folderID) {
 		var result = null;
 			
 		$.ajax({
@@ -333,7 +332,7 @@ var MenuLib = {
 			data : {
 				'method' : 'getFolderContents',
 				'folderID' : folderID,
-				'allowInvalidDesigns' : allowInvalidDesigns
+				'allowInvalidDesigns' : true
 			},
 			cache : false,
 			async: false,

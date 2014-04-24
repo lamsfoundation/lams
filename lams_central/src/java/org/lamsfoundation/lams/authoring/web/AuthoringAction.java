@@ -46,6 +46,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -95,6 +96,8 @@ public class AuthoringAction extends LamsDispatchAction {
     private static IAuthoringService authoringService;
     private static ILearningDesignService learningDesignService;
 
+    private static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -112,9 +115,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
 	
+	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(getUserId());
+	accessList = accessList.subList(0,
+		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
-	String access = gson.toJson(getAuthoringService().getLearningDesignAccessByUser(getUserId()));
-	request.setAttribute("access", access);
+	request.setAttribute("access",  gson.toJson(accessList));
 	return mapping.findForward("openAutoring");
     }
 
@@ -186,7 +191,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	JSONObject responseJSON = new JSONObject();
 	Gson gson = new GsonBuilder().create();
 	responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
-	responseJSON.put("access", new JSONArray(gson.toJson(getAuthoringService().getLearningDesignAccessByUser(userId))));
+
+	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+	accessList = accessList.subList(0,
+		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+	responseJSON.put("access", new JSONArray(gson.toJson(accessList)));
+	
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
@@ -385,7 +395,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	return null;
     }
-    
+
     /**
      * Creates a LD with the given activity and starts a lesson with default class and settings.
      */
@@ -478,7 +488,11 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		Integer userId = getUserId();
 		getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
-		responseJSON.put("access", new JSONArray(gson.toJson(getAuthoringService().getLearningDesignAccessByUser(userId))));
+		
+		List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+		accessList = accessList.subList(0,
+			Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+		responseJSON.put("access", new JSONArray(gson.toJson(accessList)));
 	    }
 	}
 

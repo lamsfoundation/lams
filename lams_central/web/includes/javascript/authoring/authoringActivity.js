@@ -578,6 +578,7 @@ var ActivityLib = {
 			if (layout.items.copiedActivity = activity) {
 				layout.items.copiedActivity = null;
 			}
+
 			if (activity instanceof ActivityLib.GroupingActivity) {
 				$.each(layout.activities, function(){
 					if (activity == this.grouping) {
@@ -705,6 +706,33 @@ var ActivityLib = {
 			var branches = transition.branch.branchingActivity.branches;
 			branches.splice(branches.indexOf(transition.branch), 1);
 		}
+		
+		// remove grouping references if chain was broken by the removed transition
+		$.each(layout.activities, function(){
+			if (this.grouping) {
+				var candidate = this,
+					groupingFound = false;
+				do {
+					if (candidate.transitions && candidate.transitions.to.length > 0) {
+						candidate = candidate.transitions.to[0].fromActivity;
+					} else if (candidate.parentActivity) {
+						candidate = candidate.parentActivity;
+					} else {
+						candidate = null;
+					}
+					
+					if (this.grouping == candidate) {
+						groupingFound = true;
+						candidate = null;
+					}
+				} while (candidate != null);
+			}
+			
+			if (!groupingFound) {
+				this.grouping = null;
+				this.draw();
+			}
+		});
 		
 		transition.items.remove();
 		setModified(true);
