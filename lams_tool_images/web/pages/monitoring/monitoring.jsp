@@ -3,6 +3,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <lams:html>
 	<lams:head>
@@ -11,9 +12,19 @@
 		</title>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
-		<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
- 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>	
+		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet" >
+		<style media="screen,projection" type="text/css">
+			.tablesorter {
+				margin: 15px 10px 5px;
+				width: 97%;
+			}
+		</style>
+		
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>	
  			
 		<script>
 			var initialTabId = "${initialTabId}";
@@ -29,12 +40,50 @@
 		   	function doSelectTab(tabId) {
 				// end optional tab controller stuff
 			    selectTab(tabId);
-		    } 
+		    }
+		   	
+		   	function onSelectTab(id) {
+		   		return;
+		   	}
 		        
 			function viewItem(imageUid,sessionMapID){
 				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&imageUid=" + imageUid + "&sessionMapID="+sessionMapID;
 				launchPopup(myUrl,"MonitoringReview");
 			}
+			
+			$(document).ready(function(){
+
+				$(".tablesorter").tablesorter({
+					theme: 'blue',
+				    widthFixed: true,
+				    widgets: ['zebra'],
+			        headers: {
+			            0: { sorter: false }
+			            <c:if test="${sessionMap.imageGallery.allowRank || sessionMap.imageGallery.allowVote}"> 
+			            	, 3: { sorter: false }
+			            </c:if>
+			        } 
+				});
+
+				function resizeIframe() {
+					if (document.getElementById('TB_iframeContent') != null) {
+					    var height = top.window.innerHeight;
+					    if ( height == undefined || height == 0 ) {
+					    	// IE doesn't use window.innerHeight.
+					    	height = document.documentElement.clientHeight;
+					    	// alert("using clientHeight");
+					    }
+						// alert("doc height "+height);
+					    height -= document.getElementById('TB_iframeContent').offsetTop + 100;
+					    document.getElementById('TB_iframeContent').style.height = height +"px";
+				
+						TB_HEIGHT = height + 28;
+						tb_position();
+					}
+				};
+				window.onresize = resizeIframe;
+				
+			});
 		</script>		 
 	</lams:head>
 	
@@ -51,11 +100,11 @@
 				</lams:Tabs>
 			</div>
 			<div id="content">
-					<lams:help toolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+				<lams:help toolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" module="monitoring"/>
 			
-					<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
-					<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
-					<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
+				<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
+				<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
+				<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
 			</div>
 			<div id="footer"></div>
 		

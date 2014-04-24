@@ -1,0 +1,149 @@
+<%@ include file="/common/taglibs.jsp"%>
+
+<br />
+
+<h1 class="space-top">
+	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+
+	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
+		<fmt:message key="monitor.summary.th.advancedSettings" />
+	</a>
+</h1>
+
+<br />
+
+<div class="monitoring-advanced space-top" id="advancedDiv" style="display:none">
+	<table class="alternative-color">
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.lock.on.finished" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.lockWhenFinished == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.allow.learner.share.images" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.allowShareImages == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.notify.monitoring.teachers" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.notifyTeachersOnImageSumbit == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.allow.learner.comment.images" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.allowCommentImages == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.allow.learner.vote" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.allowVote == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.allow.learner.rank" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.allowRank == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="monitor.summary.td.addNotebook" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.reflectOnActivity == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<c:choose>
+			<c:when test="${sessionMap.imageGallery.reflectOnActivity == true}">
+				<tr>
+					<td>
+						<fmt:message key="monitor.summary.td.notebookInstructions" />
+					</td>
+					<td>
+						<lams:out value="${sessionMap.imageGallery.reflectInstructions}" escapeHtml="true"/>
+					</td>
+				</tr>
+			</c:when>
+		</c:choose>
+	</table>
+</div>
