@@ -1,5 +1,6 @@
 <%@ page language="java"  pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@page import="org.apache.struts.action.ActionMessages" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@page import="org.lamsfoundation.lams.web.ForgotPasswordServlet" %>
 <%@page import="org.lamsfoundation.lams.util.MessageService" %>
 <%@page import="org.springframework.web.context.WebApplicationContext" %>
@@ -13,7 +14,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <%
-String languageKey = request.getParameter("languageKey");
+String languageKey = StringEscapeUtils.escapeHtml(request.getParameter("languageKey"));
 String stateStr = request.getParameter("state");
 String emailStr = request.getParameter("emailSent");
 %>
@@ -62,8 +63,8 @@ String emailStr = request.getParameter("emailSent");
 	    <% 
 	    	}
 	    %>
-	   	<fmt:message key="<%=languageKey %>"/>
-	   	
+		<fmt:message key="<%=languageKey%>"/>
+
 	   	<%
 	   		if (emailStr!=null && !emailStr.equals(""))
 		    {
