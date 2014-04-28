@@ -1037,6 +1037,10 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	return getEadventureByContentId(toolContentId).getTitle();
     }
 
+    public boolean isContentEdited(Long toolContentId) {
+	return getEadventureByContentId(toolContentId).isDefineLater();
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);

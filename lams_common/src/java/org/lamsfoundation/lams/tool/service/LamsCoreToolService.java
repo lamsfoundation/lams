@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -613,6 +614,20 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
+    @Override
+    public String getToolAuthorURL(Long lessonID, ToolActivity activity, ToolAccessMode mode) {
+	String url = activity.getTool().getAuthorUrl();
+	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_CONTENT_ID, activity.getToolContentId()
+		.toString());
+	// should have used LessonService, but reusing existing tools is just easier
+	Lesson lesson = (Lesson) toolContentDAO.find(Lesson.class, lessonID);
+	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_CONTENT_FOLDER_ID, lesson.getLearningDesign()
+		.getContentFolderID());
+	
+	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_MODE, mode.toString());
+	return url;
+    }
+
     /**
      * Add the user id to the url
      */
@@ -668,4 +683,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return context.getBean(tool.getServiceName());
     }
 
+    @Override
+    public boolean isContentEdited(Activity activity) {
+	if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+	    ToolContentManager toolService = (ToolContentManager) findToolService(toolActivity.getTool());
+	    return toolService.isContentEdited(toolActivity.getToolContentId());
+	}
+	return false;
+    }
 }

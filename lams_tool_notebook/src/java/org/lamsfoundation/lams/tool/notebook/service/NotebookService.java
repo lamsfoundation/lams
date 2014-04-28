@@ -291,6 +291,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public String getToolContentTitle(Long toolContentId) {
 	return getNotebookByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getNotebookByContentId(toolContentId).isDefineLater();
+    }
    
     /* ********** INotebookService Methods ********************************* */
 

@@ -723,6 +723,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public String getToolContentTitle(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getSurveyByContentId(toolContentId).isDefineLater();
+    }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {

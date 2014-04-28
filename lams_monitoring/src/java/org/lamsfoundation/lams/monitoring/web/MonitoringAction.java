@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -91,6 +92,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * <p>
@@ -704,7 +708,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    @SuppressWarnings("unchecked")
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -825,24 +828,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getServletContext());
 	monitoringService.checkOwnerOrStaffMember(user.getUserID(), lessonId, "monitor lesson");
 
-	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
-
-	if (contributeActivities != null) {
-	    List<ContributeActivityDTO> requiredContributeActivities = new ArrayList<ContributeActivityDTO>();
-	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
-		if (contributeActivity.getContributeEntries() != null) {
-		    for (ContributeActivityDTO.ContributeEntry contributeEntry : contributeActivity
-			    .getContributeEntries()) {
-			if (contributeEntry.getIsRequired()) {
-			    requiredContributeActivities.add(contributeActivity);
-			}
-		    }
-		}
-	    }
-	    if (!requiredContributeActivities.isEmpty()) {
-		request.setAttribute("contributeActivities", requiredContributeActivities);
-	    }
-	}
 
 	// should info box on Sequence tab be displayed?
 	Short sequenceTabInfoShowCount = (Short) ss.getAttribute("sequenceTabInfoShowCount");
@@ -862,6 +847,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
 	request.setAttribute("lesson", lessonDTO);
+
 	return mapping.findForward("monitorLesson");
     }
 
@@ -998,6 +984,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId);
+	if (contributeActivities != null) {
+	    Gson gson = new GsonBuilder().create();
+	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
+	}
+	
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
@@ -1070,6 +1062,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId);
+	if (contributeActivities != null) {
+	    Gson gson = new GsonBuilder().create();
+	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
+	}
+	
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 
@@ -1341,5 +1339,33 @@ public class MonitoringAction extends LamsDispatchAction {
 	Activity parentActivity = activity.getParentActivity();
 	return (parentActivity != null) && (parentActivity.getParentActivity() != null)
 		&& parentActivity.getParentActivity().getActivityId().equals(branchingActivityId);
+    }
+
+    private List<ContributeActivityDTO> getContributeActivities(Long lessonId) {
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+
+	if (contributeActivities != null) {
+	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<ContributeActivityDTO>();
+	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
+		if (contributeActivity.getContributeEntries() != null) {
+		    Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity
+			    .getContributeEntries().iterator();
+		    while (entryIterator.hasNext()) {
+			ContributeActivityDTO.ContributeEntry contributeEntry = entryIterator.next();
+			if (!contributeEntry.getIsRequired() || contributeEntry.getIsComplete()) {
+			    entryIterator.remove();
+			}
+		    }
+
+		    if (!contributeActivity.getContributeEntries().isEmpty()) {
+			resultContributeActivities.add(contributeActivity);
+		    }
+		}
+	    }
+	    return resultContributeActivities;
+	}
+	return null;
     }
 }

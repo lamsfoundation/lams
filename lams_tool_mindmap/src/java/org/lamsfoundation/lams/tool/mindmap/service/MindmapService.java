@@ -564,6 +564,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public String getToolContentTitle(Long toolContentId) {
 	return getMindmapByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getMindmapByContentId(toolContentId).isDefineLater();
+    }
 
     /* IMindmapService Methods */
 

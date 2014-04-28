@@ -40,4 +40,6 @@ public class ContributionTypes {
 	public static final Integer SYSTEM_GATE = new Integer(8);
 	public static final Integer CHOSEN_BRANCHING = new Integer(9);
 	public static final Integer CONDITION_GATE = new Integer(10);
+	// Tool activity was opened for editing but not closed properly
+	public static final Integer CONTENT_EDITED = new Integer(11);
 }

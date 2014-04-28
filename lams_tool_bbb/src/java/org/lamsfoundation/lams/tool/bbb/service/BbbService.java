@@ -25,35 +25,20 @@
 package org.lamsfoundation.lams.tool.bbb.service;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -74,7 +59,6 @@ import org.lamsfoundation.lams.tool.bbb.model.BbbConfig;
 import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.model.BbbUser;
 import org.lamsfoundation.lams.tool.bbb.util.BbbException;
-import org.lamsfoundation.lams.tool.bbb.util.BbbToolContentHandler;
 import org.lamsfoundation.lams.tool.bbb.util.BbbUtil;
 import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -82,7 +66,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the IBbbService interface.
@@ -309,6 +292,10 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 
     public String getToolContentTitle(Long toolContentId) {
 	return getBbbByContentId(toolContentId).getTitle();
+    }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getBbbByContentId(toolContentId).isDefineLater();
     }
     
     /* IBbbService Methods */

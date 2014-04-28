@@ -109,15 +109,18 @@ public class ContributeActivityDTO {
 	return parentActivityID;
     }
 
-    public void addContribution(Integer contributionType, String url) {
+    public ContributeEntry addContribution(Integer contributionType, String url) {
 	ContributeEntry entry = new ContributeEntry();
 	entry.setContributionType(contributionType);
 	entry.setURL(url);
 	contributeEntries.add(entry);
+	return entry;
     }
 
     public class ContributeEntry {
 	private Boolean isRequired;
+	private Boolean isComplete = false;
+
 	private Integer contributionType;
 	private String url;
 
@@ -130,10 +133,11 @@ public class ContributeActivityDTO {
 
 	public void setContributionType(Integer contributionType) {
 	    this.contributionType = contributionType;
-	    boolean isReq = contributionType != null
+	    boolean isReq = (contributionType != null)
 		    && (contributionType.equals(ContributionTypes.PERMISSION_GATE)
-			    || contributionType.equals(ContributionTypes.CHOSEN_GROUPING) || contributionType
-				.equals(ContributionTypes.CHOSEN_BRANCHING));
+			    || contributionType.equals(ContributionTypes.CHOSEN_GROUPING)
+			    || contributionType.equals(ContributionTypes.CHOSEN_BRANCHING)
+			    || contributionType.equals(ContributionTypes.CONTENT_EDITED));
 
 	    this.isRequired = new Boolean(isReq);
 	}
@@ -152,6 +156,13 @@ public class ContributeActivityDTO {
 	public void setURL(String url) {
 	    this.url = url;
 	}
-    }
 
+	public Boolean getIsComplete() {
+	    return isComplete;
+	}
+
+	public void setIsComplete(Boolean isComplete) {
+	    this.isComplete = isComplete;
+	}
+    }
 }

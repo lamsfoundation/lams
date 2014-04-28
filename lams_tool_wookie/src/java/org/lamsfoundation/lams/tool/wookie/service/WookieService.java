@@ -483,6 +483,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
         public String getToolContentTitle(Long toolContentId) {
     		return getWookieByContentId(toolContentId).getTitle();
         }
+        
+        public boolean isContentEdited(Long toolContentId) {
+            return getWookieByContentId(toolContentId).isDefineLater();
+        }
 
 	@SuppressWarnings("unchecked")
 	public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

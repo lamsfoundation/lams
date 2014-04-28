@@ -942,6 +942,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return getResourceByContentId(toolContentId).getTitle();
     }
 
+    public boolean isContentEdited(Long toolContentId) {
+	return getResourceByContentId(toolContentId).isDefineLater();
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);

@@ -580,6 +580,10 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return getSpreadsheetByContentId(toolContentId).getTitle();
     }
 
+    public boolean isContentEdited(Long toolContentId) {
+	return getSpreadsheetByContentId(toolContentId).isDefineLater();
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);

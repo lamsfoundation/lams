@@ -413,6 +413,10 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public String getToolContentTitle(Long toolContentId) {
 	return getPixlrByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getPixlrByContentId(toolContentId).isDefineLater();
+    }
 
     /* ********** IPixlrService Methods ********************************* */
 

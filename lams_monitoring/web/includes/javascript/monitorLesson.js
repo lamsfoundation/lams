@@ -1,40 +1,40 @@
 ﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson/branching SVG so it does no need to be fetched every time
 // HTML with SVG of the lesson
-var originalSequenceCanvas = null;
+var originalSequenceCanvas = null,
 // DIV container for lesson/branching SVG
 // it gets accessed so many times it's worth to cache it here
-var sequenceCanvas = null;
+	sequenceCanvas = null,
 // ID of currently shown branching activity; if NULL, the whole lesson is shown
-var sequenceBranchingId = null;
+	sequenceBranchingId = null,
 // info box show timeout
-var sequenceInfoTimeout = 10000;
+	sequenceInfoTimeout = 10000,
 // how learners in pop up lists are currently sorted
-var sortOrderAsc = {
-	learnerGroup : false,
-	classLearner : false,
-	classMonitor : false
-};
+	sortOrderAsc = {
+		learnerGroup : false,
+		classLearner : false,
+		classMonitor : false
+	},
 // container for learners' progress bars metadata
-var bars = null;
+	bars = null,
 // placeholder for single learner's progress bar and title
-var learnerProgressCellsTemplate = null;
+	learnerProgressCellsTemplate = null,
 // for synchronisation purposes
-var learnersRefreshInProgress = false;
-var sequenceRefreshInProgress = false;
+	learnersRefreshInProgress = false,
+	sequenceRefreshInProgress = false,
 
 // total number of learners with ongoing progress
-var numberActiveLearners = 0;
+	numberActiveLearners = 0,
 // page in Learners tab
-var learnerProgressCurrentPageNumber = 1;
+	learnerProgressCurrentPageNumber = 1,
 // search phrase in Learners tab
-var learnersSearchPhrase = null;
+	learnersSearchPhrase = null,
 
 //auto refresh all tabs every 30 seconds
-var autoRefreshInterval = 30 * 1000;
-var autoRefreshIntervalObject = null;
+	autoRefreshInterval = 30 * 1000,
+	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
-var autoRefreshBlocked = false;
+	autoRefreshBlocked = false;
 
 // ********* GENERAL TABS FUNCTIONS *********
 
@@ -400,6 +400,8 @@ function updateLessonTab(){
 				 	startDateField.text(response.startDate).css('display','inline');
 				 	break;
 			}
+			
+			updateContributeActivities(response.contributeActivities);
 		}
 	});
 	
@@ -511,6 +513,38 @@ function selectLearnerURL(){
 		$('#copyLearnerURL').hide();
 	});
 	$('#copyLearnerURL').show();
+}
+
+function updateContributeActivities(contributeActivities) {
+	$('.contributeRow').remove();
+	var header = $('#contributeHeader');
+	if (contributeActivities) {
+		var row = header;
+		$.each(contributeActivities, function(){
+			var cell = $('<td colspan="2" />').addClass('contributeActivityCell').text(this.title);
+			row = $('<tr />').addClass('contributeRow').insertAfter(row).append(cell);
+			
+			$.each(this.contributeEntries, function(){
+				var entryContent = '';
+				switch(this.contributionType) {
+					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
+					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
+					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
+					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
+				}
+				entryContent += '<a href="#" class="button" onClick="javascript:openPopUp(\''
+							 + this.url + '\',\'ContributeActivity\', 600, 800, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
+							 + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
+				cell = $('<td colspan="2" />').addClass('contributeEntryCell').html(entryContent);
+				row = $('<tr />').addClass('contributeRow').insertAfter(row).append(cell);
+			});
+		});
+	}
+	if ($('.contributeRow').length == 0) {
+		header.hide();
+	} else {
+		header.show();
+	}
 }
 
 //********** SEQUENCE TAB FUNCTIONS **********
@@ -707,11 +741,11 @@ function updateSequenceTab() {
 					// if it was faded out by showBranchingSequence()
 					.fadeIn();
 				
-				var canvasHeight = sequenceCanvas.height();
-				var canvasWidth = sequenceCanvas.width();
-				var svg = $('svg', sequenceCanvas);
-				var canvasPaddingTop = canvasHeight/2 - svg.attr('height')/2;
-				var canvasPaddingLeft = canvasWidth/2 - svg.attr('width')/2;
+				var canvasHeight = sequenceCanvas.height(),
+					canvasWidth = sequenceCanvas.width(),
+					svg = $('svg', sequenceCanvas),
+					canvasPaddingTop = canvasHeight/2 - svg.attr('height')/2,
+					canvasPaddingLeft = canvasWidth/2 - svg.attr('width')/2;
 
 				if (canvasPaddingTop > 0) {
 					sequenceCanvas.css({
@@ -752,28 +786,37 @@ function updateSequenceTab() {
 			// remove the loading animation
 			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
 
-			var learnerCount = 0;
-			$.each(response.activities, function(){
-				if (this.learners) {
-					// are there any learners in this or any activity?
-					learnerCount += this.learners.length;
-					// put learner icons on each activity shape
-					addLearnerIcons(this);
+			var learnerCount = 0,
+				reloadSVG = false;
+			$.each(response.activities, function(index, activity){
+				// are there any learners in this or any activity?
+				learnerCount += activity.learners ? activity.learners.length : 0;
+				if (response.contributeActivities) {
+					$.each(response.contributeActivities, function(){
+						if (activity.id == this.activityID) {
+							 activity.requiresAttention = true;
+							 reloadSVG = true;
+							 return false;
+						}
+					});
 				}
+				// put learner and attention icons on each activity shape
+				addActivityIcons(activity);
 			});
 			
-			if (learnerCount > 0) {
+			reloadSVG |= learnerCount > 0;
+			if (reloadSVG) {
 				// IMPORTANT! Reload SVG, otherwise added icons will not get displayed
 				sequenceCanvas.html(sequenceCanvas.html());
 			}
 			
-			var completedLearners = response.completedLearners;
-			var learnerTotalCount = learnerCount + (completedLearners ? completedLearners.length : 0 );
+			var completedLearners = response.completedLearners,
+				learnerTotalCount = learnerCount + (completedLearners ? completedLearners.length : 0 );
 			$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
 			addCompletedLearnerIcons(completedLearners, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){
-				addLearnerIconsHandlers(activity);
+				addActivityIconsHandlers(activity);
 				
 				if (activity.url || activity.isBranching) {
 					// find activity group, if it is not hidden
@@ -808,11 +851,11 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	// check all activities and "users who finished lesson" bar
 	$('rect[id^="act"], g polygon', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
-		var act = $(this);
-		var actX = act.offset().left;
-		var actY = act.offset().top;
-		var actWidth = act.width();
-		var actHeight = act.height();
+		var act = $(this),
+			actX = act.offset().left,
+			actY = act.offset().top,
+			actWidth = act.width(),
+			actHeight = act.height();
 		if (!actWidth) {
 			actWidth = +act.attr('width');
 			actHeight = +act.attr('height');
@@ -823,8 +866,8 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			actWidth = +polygonPoints[5].split(',')[0] - +polygonPoints[2].split(',')[0];
 			actHeight = +polygonPoints[0].split(',')[1] - +polygonPoints[3].split(',')[1];
 		}
-		var actEndX = actX + actWidth;
-		var actEndY = actY + actHeight;
+		var actEndX = actX + actWidth,
+			actEndY = actY + actHeight;
 		
 		if (x >= actX && x<= actEndX && y>= actY && y<=actEndY) {
 			var targetActivityId = null;
@@ -914,9 +957,12 @@ function forceCompleteExecute(learnerId, activityId, removeContent) {
 
 
 /**
- * Draw user icons on top of activities.
+ * Draw user and attention icons on top of activities.
  */
-function addLearnerIcons(activity) {
+function addActivityIcons(activity) {
+	if (!activity.learners && !activity.requiresAttention) {
+		return;
+	}
 	var isGate = false,
 		actX = null,
 		actY = null,
@@ -942,59 +988,73 @@ function addLearnerIcons(activity) {
 	
 	// add group of users icon
 	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width')),
-		groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT
-		+ ' ' + LABELS.LEARNER_GROUP_SHOW,
-	// if icons do not fit in shape anymore, show a group icon
-		element = appendXMLElement('image', {
-		'id'         : 'act' + activity.id + 'learnerGroup',
-		'x'          : actRightBorder - 19,
-		'y'          : actY + 1,
-		'height'     : 16,
-		'width'      : 16,
-		'xlink:href' : LAMS_URL + 'images/icons/group.png'
-	}, null, activityGroup[0]);
-	appendXMLElement('title', null, groupTitle, element);
-	// add a small number telling how many learners are in the group
-	element = appendXMLElement('text', {
-		'id'         : 'act' + activity.id + 'learnerGroupText',
-		'x'          : actRightBorder - 10,
-		'y'          : actY + 24,
-		'text-anchor': 'middle',
-		'font-family': 'Verdana',
-		'font-size'  : 8
-	}, activity.learners.length, activityGroup[0]);
-	appendXMLElement('title', null, groupTitle, element);
-
-	var actTooltip = LABELS.LEARNER_GROUP_LIST_TITLE;
-	// draw single user icons for the first few
-	if (!isGate) {
-		$.each(activity.learners, function(learnerIndex, learner){
-			var learnerDisplayName = getLearnerDisplayName(learner);
-			actTooltip += '\n' + learnerDisplayName;
-			
-			if (learnerIndex < 7) {
-				element = appendXMLElement('image', {
-					'id'         : 'act' + activity.id + 'learner' + learner.id,
-					'x'          :  actX + learnerIndex*15,
-					'y'          :  actY,
-					'height'     : 16,
-					'width'      : 16,
-					'xlink:href' : LAMS_URL + 'images/icons/user.png'
-				}, null, activityGroup[0]);
-				appendXMLElement('title', null, learnerDisplayName, element);
-			}
-		});
-	}
+		actBottomBorder = actY + (isGate? 50 : +activityShape.attr('height'));
+	if (activity.learners){
+		var	groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
+		// if icons do not fit in shape anymore, show a group icon
+			element = appendXMLElement('image', {
+			'id'         : 'act' + activity.id + 'learnerGroup',
+			'x'          : actRightBorder - 19,
+			'y'          : actY + 1,
+			'height'     : 16,
+			'width'      : 16,
+			'xlink:href' : LAMS_URL + 'images/icons/group.png'
+		}, null, activityGroup[0]);
+		appendXMLElement('title', null, groupTitle, element);
+		// add a small number telling how many learners are in the group
+		element = appendXMLElement('text', {
+			'id'         : 'act' + activity.id + 'learnerGroupText',
+			'x'          : actRightBorder - 10,
+			'y'          : actY + 24,
+			'text-anchor': 'middle',
+			'font-family': 'Verdana',
+			'font-size'  : 8
+		}, activity.learners.length, activityGroup[0]);
+		appendXMLElement('title', null, groupTitle, element);
 	
-	appendXMLElement('title', null, actTooltip, activityGroup[0]);
+		var actTooltip = LABELS.LEARNER_GROUP_LIST_TITLE;
+		// draw single user icons for the first few
+		if (!isGate) {
+			$.each(activity.learners, function(learnerIndex, learner){
+				var learnerDisplayName = getLearnerDisplayName(learner);
+				actTooltip += '\n' + learnerDisplayName;
+				
+				if (learnerIndex < 7) {
+					element = appendXMLElement('image', {
+						'id'         : 'act' + activity.id + 'learner' + learner.id,
+						'x'          :  actX + learnerIndex*15,
+						'y'          :  actY,
+						'height'     : 16,
+						'width'      : 16,
+						'xlink:href' : LAMS_URL + 'images/icons/user.png'
+					}, null, activityGroup[0]);
+					appendXMLElement('title', null, learnerDisplayName, element);
+				}
+			});
+		}
+		
+		appendXMLElement('title', null, actTooltip, activityGroup[0]);
+	} 
+
+	if (activity.requiresAttention) {
+		var element = appendXMLElement('image', {
+			'id'         : 'act' + activity.id + 'attention',
+			'x'          : actRightBorder - 19,
+			'y'          : actBottomBorder - 19,
+			'height'     : 16,
+			'width'      : 16,
+			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png'
+		}, null, activityGroup[0]);
+		appendXMLElement('title', null, LABELS.CONTRIBUTE_ATTENTION, element);
+	}
 }
 
 
 /**
- * After SVG refresh, add click/dblclick/drag handlers to user icons.
+ * After SVG refresh, add click/dblclick/drag handlers to icons.
  */
-function addLearnerIconsHandlers(activity) {
-	if (!activity.learners) {
+function addActivityIconsHandlers(activity) {
+	if (!activity.learners && !activity.requiresAttention) {
 		return;
 	}
 	
@@ -1006,52 +1066,62 @@ function addLearnerIconsHandlers(activity) {
 	// gate activity does not allows users' view
 	var usersViewable = $('polygon', activityGroup).length == 0;
 	
-	$.each(activity.learners, function(learnerIndex, learner){
-		var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]'
-				,activityGroup);
-		learnerIcon .css('cursor', 'pointer')
-		  // drag learners to force complete activities
-		  .draggable({
-			'appendTo'    : '#tabSequence',
-			'containment' : '#tabSequence',
-		    'distance'    : 20,
-		    'scroll'      : false,
-		    'cursorAt'	  : {'left' : 10, 'top' : 15},
-			'helper'      : function(event){
-				// copy of the icon for dragging
-				return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
-			},
-			'start' : function(){
-				autoRefreshBlocked = true;
-			},
-			'stop' : function(event, ui) {
-				// jQuery droppable does not work for SVG, so this is a workaround
-				forceComplete(activity.id, learner.id, getLearnerDisplayName(learner, true),
-						      ui.offset.left, ui.offset.top);
+	if (activity.learners){
+		$.each(activity.learners, function(learnerIndex, learner){
+			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]', activityGroup)
+							  .css('cursor', 'pointer')
+							  // drag learners to force complete activities
+							  .draggable({
+								'appendTo'    : '#tabSequence',
+								'containment' : '#tabSequence',
+							    'distance'    : 20,
+							    'scroll'      : false,
+							    'cursorAt'	  : {'left' : 10, 'top' : 15},
+								'helper'      : function(event){
+									// copy of the icon for dragging
+									return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+								},
+								'start' : function(){
+									autoRefreshBlocked = true;
+								},
+								'stop' : function(event, ui) {
+									// jQuery droppable does not work for SVG, so this is a workaround
+									forceComplete(activity.id, learner.id, getLearnerDisplayName(learner, true),
+											      ui.offset.left, ui.offset.top);
+								}
+							});
+			
+			if (usersViewable) {
+				learnerIcon.dblclick(function(event){
+					 // double click on learner icon to see activity from his perspective
+					event.stopPropagation();
+					var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
+					openPopUp(url, "LearnActivity", 600, 800, true);
+				});
 			}
 		});
 		
-		if (usersViewable) {
-			learnerIcon.dblclick(function(event){
+		
+		var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
+		// 0 is for no group icon, 2 is for icon + digits
+		if (learnerGroupIcon.length == 2) {
+			var activityName = $('text[id^="TextElement"]', activityGroup).text();
+			learnerGroupIcon.dblclick(function(event){
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
-				var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
-					               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
-				openPopUp(url, "LearnActivity", 600, 800, true);
+				showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
 			});
 		}
-	});
+	}
 	
-	
-	var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
-	// 0 is for no group icon, 2 is for icon + digits
-	if (learnerGroupIcon.length == 2) {
-		var activityName = $('text[id^="TextElement"]', activityGroup).text();
-		learnerGroupIcon.dblclick(function(event){
-			 // double click on learner icon to see activity from his perspective
+	if (activity.requiresAttention){
+		var attentionIcon = $('*[id^="act' + activity.id + 'attention"]', activityGroup);
+		attentionIcon.click(function(event){
 			event.stopPropagation();
-			showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
-		})
+			// switch to first tab where attention prompts are listed
+			$('#tabs').tabs('select', 0);     
+		});
 	}
 }
 

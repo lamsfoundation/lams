@@ -336,6 +336,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return getSubmitFilesContent(toolContentId).getTitle();
     }
    
+    public boolean isContentEdited(Long toolContentId) {
+	return getSubmitFilesContent(toolContentId).isDefineLater();
+    }
+    
     /*
      * (non-Javadoc)
      * 

@@ -346,6 +346,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public String getToolContentTitle(Long toolContentId) {
 	return getChatByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getChatByContentId(toolContentId).isDefineLater();
+    }
 
     /* IChatService Methods */
     public Long getDefaultContentIdBySignature(String toolSignature) {

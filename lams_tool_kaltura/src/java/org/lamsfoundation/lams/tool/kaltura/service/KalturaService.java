@@ -292,6 +292,10 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	return getKalturaByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return getKalturaByContentId(toolContentId).isDefineLater();
+    }
+    
     /* ********** IKalturaService Methods ********************************* */
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,

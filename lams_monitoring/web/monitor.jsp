@@ -82,9 +82,15 @@
 				EXPORT_PORTFOLIO_LEARNER_TOOLTIP : '<fmt:message key="button.export.learner.tooltip"/>',
 			    TIME_CHART : '<fmt:message key="button.timechart"/>',
 			    TIME_CHART_TOOLTIP : '<fmt:message key="button.timechart.tooltip"/>',
-				LIVE_EDIT_CONFIRM : '<fmt:message key="button.live.edit.confirm"/>'
+				LIVE_EDIT_CONFIRM : '<fmt:message key="button.live.edit.confirm"/>',
+				CONTRIBUTE_GATE : '<fmt:message key="lesson.task.gate"/>',
+				CONTRIBUTE_GROUPING : '<fmt:message key="lesson.task.grouping"/>',
+				CONTRIBUTE_BRANCHING : '<fmt:message key="lesson.task.branching"/>',
+				CONTRIBUTE_CONTENT_EDITED : '<fmt:message key="lesson.task.content.edited"/>',
+				CONTRIBUTE_TOOLTIP : '<fmt:message key="button.task.go.tooltip"/>',
+				CONTRIBUTE_BUTTON : '<fmt:message key="button.task.go"/>',
+				CONTRIBUTE_ATTENTION : '<fmt:message key="lesson.task.attention"/>'
 			}
-	    
 	    
 		$(document).ready(function(){
 			initTabs();
@@ -275,44 +281,42 @@
 					/><fmt:message key="lesson.enable.im"/>
 				</td>
 			</tr>
-			<c:if test="${not empty contributeActivities}">
-				<tr>
-					<td colspan="2" class="sectionHeader">
-						<fmt:message key="lesson.required.tasks"/>
+			<tr id="contributeHeader">
+				<td colspan="2" class="sectionHeader">
+					<fmt:message key="lesson.required.tasks"/>
+				</td>
+			</tr>
+			<c:forEach var="activity" items="${contributeActivities}">
+				<tr class="contributeRow">
+					<td colspan="2" class="contributeActivityCell">
+						<c:out value="${activity.title}" />
 					</td>
 				</tr>
-				<c:forEach var="activity" items="${contributeActivities}">
-					<tr>
-						<td colspan="2" class="contributeActivityCell">
-							<c:out value="${activity.title}" />
-						</td>
-					</tr>
-					<c:forEach var="entry" items="${activity.contributeEntries}">
-						<c:if test="${entry.isRequired}">
-							<tr>
-								<td colspan="2" class="contributeEntryCell">
-									<c:choose>
-										<c:when test="${entry.contributionType eq 3}">
-											<fmt:message key="lesson.task.gate"/>
-										</c:when>
-										<c:when test="${entry.contributionType eq 6}">
-											<fmt:message key="lesson.task.grouping"/>
-										</c:when>
-										<c:when test="${entry.contributionType eq 9}">
-											<fmt:message key="lesson.task.branching"/>
-										</c:when>
-									</c:choose>
-									<a href="#" class="button"
-									   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 600, 800, true)"
-									   title='<fmt:message key="button.task.go.tooltip"/>'>
-									   <fmt:message key="button.task.go"/>
-									</a>
-								</td>
-							</tr>
-						</c:if>
-					</c:forEach>
+				<c:forEach var="entry" items="${activity.contributeEntries}">
+					<c:if test="${entry.isRequired}">
+						<tr class="contributeRow">
+							<td colspan="2" class="contributeEntryCell">
+								<c:choose>
+									<c:when test="${entry.contributionType eq 3}">
+										<fmt:message key="lesson.task.gate"/>
+									</c:when>
+									<c:when test="${entry.contributionType eq 6}">
+										<fmt:message key="lesson.task.grouping"/>
+									</c:when>
+									<c:when test="${entry.contributionType eq 9}">
+										<fmt:message key="lesson.task.branching"/>
+									</c:when>
+								</c:choose>
+								<a href="#" class="button"
+								   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 600, 800, true)"
+								   title='<fmt:message key="button.task.go.tooltip"/>'>
+								   <fmt:message key="button.task.go"/>
+								</a>
+							</td>
+						</tr>
+					</c:if>
 				</c:forEach>
-			</c:if>
+			</c:forEach>
 		</table>
 	</div>
 	

@@ -885,7 +885,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public String getToolContentTitle(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).getTitle();
     }
-
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getCommonCartridgeByContentId(toolContentId).isDefineLater();
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);

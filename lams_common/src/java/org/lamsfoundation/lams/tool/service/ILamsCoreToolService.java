@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -343,6 +344,8 @@ public interface ILamsCoreToolService {
      */
     String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException;
 
+    boolean isContentEdited(Activity activity);
+    
     /**
      * Return the moderate url for monitoring.
      * 
@@ -351,7 +354,9 @@ public interface ILamsCoreToolService {
      * @return the tool access url with tool content id
      */
     String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException;
-
+    
+    String getToolAuthorURL(Long lessonID, ToolActivity activity, ToolAccessMode mode);
+    
     /**
      * Get all the tool sessions for a lesson. The resulting list is not sorted.
      * 

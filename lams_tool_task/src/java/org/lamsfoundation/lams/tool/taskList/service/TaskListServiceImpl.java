@@ -831,7 +831,11 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public String getToolContentTitle(Long toolContentId) {
 	return getTaskListByContentId(toolContentId).getTitle();
     }
-   
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getTaskListByContentId(toolContentId).isDefineLater();
+    }
+    
     /**
      * {@inheritDoc}
      */

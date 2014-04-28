@@ -354,6 +354,10 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return getGmapByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return getGmapByContentId(toolContentId).isDefineLater();
+    }
+    
     /* ********** IGmapService Methods ********************************* */
 
     public Long getDefaultContentIdBySignature(String toolSignature) {

@@ -140,6 +140,10 @@ td.sectionHeader {
 	display: none;
 }
 
+table#tabLessonTable #contributeHeader {
+	display: none;
+}
+
 table#tabLessonTable td.contributeActivityCell {
 	padding: 0 0 0 5px;
 	font-weight: bold;

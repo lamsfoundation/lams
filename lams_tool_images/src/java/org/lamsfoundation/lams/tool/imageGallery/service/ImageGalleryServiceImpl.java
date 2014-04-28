@@ -880,6 +880,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return getImageGalleryByContentId(toolContentId).getTitle();
     }
 
+    public boolean isContentEdited(Long toolContentId) {
+	return getImageGalleryByContentId(toolContentId).isDefineLater();
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);

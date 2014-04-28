@@ -120,4 +120,9 @@ public interface ToolContentManager {
      * Finds title entered in the tool content.
      */
     public String getToolContentTitle(Long toolContentId);
+    
+    /**
+     * Is an activity being edited by Monitor?
+     */
+    public boolean isContentEdited(Long toolContentId);
 }

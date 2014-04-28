@@ -24,17 +24,22 @@
 /* $Id$ */
 package org.lamsfoundation.lams.monitoring;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.IContributionTypeStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO.ContributeEntry;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -52,7 +57,7 @@ public class ContributeDTOFactory {
 	ContributeActivityDTO dto = null;
 	SimpleActivityStrategy strategy = activity.getSimpleActivityStrategy();
 	if (strategy != null) {
-	    dto = addContributionURLS(lessonID, activity, strategy, toolService);
+	    dto = ContributeDTOFactory.addContributionURLS(lessonID, activity, strategy, toolService);
 	}
 	return dto;
     }
@@ -60,15 +65,28 @@ public class ContributeDTOFactory {
     private static ContributeActivityDTO addContributionURLS(Long lessonID, Activity activity,
 	    IContributionTypeStrategy strategy, ILamsCoreToolService toolService) {
 	ContributeActivityDTO dto = null;
-	Integer[] contributionType = strategy.getContributionType();
-	if (contributionType.length > 0) {
+	LinkedList<Integer> contributionType = new LinkedList<Integer>();
+	Collections.addAll(contributionType, strategy.getContributionType());
+
+	// check for activities being edited by Monitor
+	if (toolService.isContentEdited(activity)) {
+	    contributionType.add(ContributionTypes.CONTENT_EDITED);
+	}
+
+	if (!contributionType.isEmpty()) {
 	    dto = new ContributeActivityDTO(activity);
-	    for (int i = 0; i < contributionType.length; i++) {
-		Integer contributionTypeEntry = contributionType[i];
-		String url = getURL(lessonID, activity, contributionTypeEntry, toolService);
-		dto.addContribution(contributionTypeEntry, url);
+	    for (Integer contributionTypeEntry : contributionType) {
+		String url = ContributeDTOFactory.getURL(lessonID, activity, contributionTypeEntry, toolService);
+		ContributeEntry entry = dto.addContribution(contributionTypeEntry, url);
+
+		// once a gate was opened, it does not require attention
+		if (ContributionTypes.PERMISSION_GATE.equals(contributionTypeEntry)
+			&& ((GateActivity) activity).getGateOpen()) {
+		    entry.setIsComplete(true);
+		}
 	    }
 	}
+
 	return dto;
     }
 
@@ -80,6 +98,8 @@ public class ContributeDTOFactory {
 	    ToolActivity toolActivity = (ToolActivity) activity;
 	    if (contributionTypeEntry.equals(ContributionTypes.MODERATION)) {
 		url = toolService.getToolModerateURL(toolActivity);
+	    } else if (contributionTypeEntry.equals(ContributionTypes.CONTENT_EDITED)) {
+		url = toolService.getToolAuthorURL(lessonID, toolActivity, ToolAccessMode.TEACHER);
 	    }
 	}
 
@@ -102,8 +122,8 @@ public class ContributeDTOFactory {
 	ContributeActivityDTO dto = null;
 	ComplexActivityStrategy strategy = activity.getComplexActivityStrategy();
 	if (strategy != null) {
-	    dto = addContributionURLS(lessonID, activity, strategy, toolService);
-	    if (childActivities != null && childActivities.size() > 0) {
+	    dto = ContributeDTOFactory.addContributionURLS(lessonID, activity, strategy, toolService);
+	    if ((childActivities != null) && (childActivities.size() > 0)) {
 		if (dto == null) {
 		    dto = new ContributeActivityDTO(activity);
 		}

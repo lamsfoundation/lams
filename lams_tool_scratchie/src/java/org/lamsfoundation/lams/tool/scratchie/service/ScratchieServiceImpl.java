@@ -1537,6 +1537,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return getScratchieByContentId(toolContentId).getTitle();
     }
 
+    public boolean isContentEdited(Long toolContentId) {
+	return getScratchieByContentId(toolContentId).isDefineLater();
+    }
+    
     @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {

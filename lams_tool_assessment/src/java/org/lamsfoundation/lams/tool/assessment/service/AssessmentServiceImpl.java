@@ -1413,6 +1413,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+
+    public boolean isContentEdited(Long toolContentId) {
+	return getAssessmentByContentId(toolContentId).isDefineLater();
+    }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 

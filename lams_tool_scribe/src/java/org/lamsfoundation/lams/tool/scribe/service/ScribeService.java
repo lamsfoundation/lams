@@ -333,6 +333,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public String getToolContentTitle(Long toolContentId) {
 	return getScribeByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getScribeByContentId(toolContentId).isDefineLater();
+    }
    
     
     /* ********** IScribeService Methods ************************************** */

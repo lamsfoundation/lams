@@ -624,6 +624,10 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return getDacoByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return getDacoByContentId(toolContentId).isDefineLater();
+    }
+    
     public DacoUser getUser(Long uid) {
 	return (DacoUser) dacoUserDao.getObject(DacoUser.class, uid);
     }

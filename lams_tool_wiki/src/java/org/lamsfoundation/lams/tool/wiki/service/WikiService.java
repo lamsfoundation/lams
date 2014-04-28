@@ -240,6 +240,10 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public String getToolContentTitle(Long toolContentId) {
 	return getWikiByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getWikiByContentId(toolContentId).isDefineLater();
+    }
    
     /* ************ Methods from ToolContentManager ************************* */
 

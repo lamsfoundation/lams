@@ -270,6 +270,10 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 	return getContentByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return getContentByContentId(toolContentId).isDefineLater();
+    }
+    
     /* ********** ILeaderselectionService Methods ********************************* */
 
     @Override

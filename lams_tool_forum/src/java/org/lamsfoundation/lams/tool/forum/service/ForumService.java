@@ -962,6 +962,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getForumByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return getForumByContentId(toolContentId).isDefineLater();
+    }
+    
     /**
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
      *      java.lang.Long)

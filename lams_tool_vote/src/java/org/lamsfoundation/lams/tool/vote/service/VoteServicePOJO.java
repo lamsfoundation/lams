@@ -1717,6 +1717,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public String getToolContentTitle(Long toolContentId) {
 	return retrieveVote(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return retrieveVote(toolContentId).isDefineLater();
+    }
    
     /**
      * Get the tool output for the given tool output names.

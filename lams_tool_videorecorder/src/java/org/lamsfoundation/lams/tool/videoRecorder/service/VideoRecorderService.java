@@ -377,6 +377,10 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public String getToolContentTitle(Long toolContentId) {
 	return getVideoRecorderByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return getVideoRecorderByContentId(toolContentId).isDefineLater();
+    }
    
     /* ********** IVideoRecorderService Methods ********************************* */
 

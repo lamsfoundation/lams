@@ -909,6 +909,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaDAO.getQaByContentId(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return qaDAO.getQaByContentId(toolContentId).isContentLocked();
+    }
+    
     /**
      * it is possible that the tool session id already exists in the tool sessions table as the users from the same
      * session are involved. existsSession(long toolSessionId)

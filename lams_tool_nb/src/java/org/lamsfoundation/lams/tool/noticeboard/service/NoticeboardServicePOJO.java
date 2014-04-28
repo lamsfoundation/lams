@@ -770,6 +770,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	return retrieveNoticeboard(toolContentId).getTitle();
     }
     
+    public boolean isContentEdited(Long toolContentId) {
+	return retrieveNoticeboard(toolContentId).isDefineLater();
+    }
+    
     /* ===============Methods implemented from ToolSessionManager =============== */
 
     /**
