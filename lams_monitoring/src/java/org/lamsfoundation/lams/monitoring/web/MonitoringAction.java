@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,7 +57,12 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -66,6 +72,7 @@ import org.lamsfoundation.lams.lesson.util.LearnerProgressComparator;
 import org.lamsfoundation.lams.lesson.util.LearnerProgressNameComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO.ContributeEntry;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
@@ -984,7 +991,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
@@ -1062,12 +1069,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
 	if (contributeActivities != null) {
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 
@@ -1341,10 +1348,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		&& parentActivity.getParentActivity().getActivityId().equals(branchingActivityId);
     }
 
-    private List<ContributeActivityDTO> getContributeActivities(Long lessonId) {
+    @SuppressWarnings("unchecked")
+    private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+	Lesson lesson = getLessonService().getLesson(lessonId);
 
 	if (contributeActivities != null) {
 	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<ContributeActivityDTO>();
@@ -1354,6 +1363,22 @@ public class MonitoringAction extends LamsDispatchAction {
 			    .getContributeEntries().iterator();
 		    while (entryIterator.hasNext()) {
 			ContributeActivityDTO.ContributeEntry contributeEntry = entryIterator.next();
+
+			// extra filtering for chosen branching: do not show in Sequence tab if all users were assigned
+			if (skipCompletedBranching
+				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
+			    Set<User> learners = new HashSet<User>(lesson.getLessonClass().getLearners());
+			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
+				    .getActivityById(contributeActivity.getActivityID());
+			    for (SequenceActivity branch : (Set<SequenceActivity>) branching.getActivities()) {
+				Group group = branch.getSoleGroupForBranch();
+				if (group != null) {
+				    learners.removeAll(group.getUsers());
+				}
+			    }
+			    contributeEntry.setIsComplete(learners.isEmpty());
+			}
+
 			if (!contributeEntry.getIsRequired() || contributeEntry.getIsComplete()) {
 			    entryIterator.remove();
 			}

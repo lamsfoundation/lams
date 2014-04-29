@@ -854,8 +854,6 @@ var PropertyLib = {
 		// remove existing entries and add reference to the initiating activity
 		dialog.empty().dialog('option', 'parentObject', activity);
 		
-		activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount,
-				activity.groups, 'name', 'Group ');
 		$.each(activity.groups, function(){
 			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.name);
 			dialog.append('<br />');

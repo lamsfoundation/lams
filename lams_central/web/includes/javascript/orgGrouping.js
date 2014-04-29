@@ -12,6 +12,9 @@ function removeGrouping(groupingId) {
 function showGroups(groupingId) {
 	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID='
 		+ organisationId;
+	if (lessonId) {
+		url += '&lessonID=' + lessonId;
+	}
 	// no grouping ID means we open a brand new grouping
 	if (groupingId) {
 		url += '&groupingId=' + groupingId;

@@ -226,11 +226,12 @@ public class OrganisationGroupAction extends DispatchAction {
 	    HttpServletResponse response) throws JSONException {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	Long lessonId =  WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	Lesson lesson = null;
 	if (organisationId == null) {
 	    // read organisation ID from lesson
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    organisationId = ((Lesson) getUserManagementService().findById(Lesson.class, lessonId)).getOrganisation()
-		    .getOrganisationId();
+	    lesson = (Lesson) getUserManagementService().findById(Lesson.class, lessonId);
+	    organisationId = lesson.getOrganisation().getOrganisationId();
 	}
 
 	// check if user is allowed to view and edit groups
@@ -283,13 +284,19 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
 
 	JSONArray orgGroupsJSON = null;
-	Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId, Role.LEARNER,
-		false, true);
+	Collection<User> learners = null;
+
 	// select source for groups (course or lesson)
 	if ((lessonGroups == null) || lessonGroups.isEmpty()) {
+	    learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId, Role.LEARNER, false,
+		    true);
 	    Set<OrganisationGroup> orgGroups = orgGrouping == null ? null : orgGrouping.getGroups();
 	    orgGroupsJSON = getOrgGroupsDetails(orgGroups, learners);
 	} else {
+	    if (lesson == null) {
+		lesson = (Lesson) getUserManagementService().findById(Lesson.class, lessonId);
+	    }
+	    learners = lesson.getLessonClass().getLearners();
 	    orgGroupsJSON = getLessonGroupsDetails(lessonGroups, learners);
 	    request.setAttribute("skipInitialAssigning", true);
 	}

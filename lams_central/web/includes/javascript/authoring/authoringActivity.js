@@ -67,7 +67,7 @@ var ActivityLib = {
 		this.learnerCount = +learnerCount || 1;
 		this.equalSizes = equalSizes || false;
 		this.viewLearners = viewLearners || false;
-		this.groups = groups || [];
+		this.groups = groups || PropertyLib.fillNameAndUIIDList(this.groupCount, [], 'name', 'Group ');
 		this.transitions = {
 			'from' : [],
 			'to'   : []

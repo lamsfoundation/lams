@@ -16,16 +16,17 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/orgGrouping.js"></script>
 	<script type="text/javascript">
-		var groupingActivityId = '${param.activityID}';
-		var lessonMode = ${lessonMode};
+		var groupingActivityId = '${param.activityID}',
+			lessonMode = ${lessonMode},
 		// parameter can be null and the ID available only as a JSP attribute
-		var organisationId = ${empty organisationID ? param.organisationID : organisationID};
+			organisationId = ${empty organisationID ? param.organisationID : organisationID},
+			lessonId = '${param.lessonID}',
 		
-		var LAMS_URL = '<lams:LAMSURL/>';
-		var LABELS = {
-			REMOVE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.remove.confirm" />',
-			USE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.use.confirm" />'
-		};
+			LAMS_URL = '<lams:LAMSURL/>',
+			LABELS = {
+				REMOVE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.remove.confirm" />',
+				USE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.use.confirm" />'
+			};
 	</script>
 </lams:head>
 <body>
