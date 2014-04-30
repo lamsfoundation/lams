@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -318,6 +319,20 @@ public interface IAssessmentService {
     String getLearnerContentFolder(Long toolSessionId, Long userId);
     
     /**
+     * Recalculate marks after editing content from monitoring.
+     * 
+     * @param assessment
+     * @param oldQuestions
+     * @param newQuestions
+     * @param oldReferences
+     * @param newReferences
+     * @param deletedReferences
+     */
+    void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions,
+	    Set<AssessmentQuestion> newQuestions, Set<QuestionReference> oldReferences,
+	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences);
+    
+    /**
      * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either lesson stuff or group manager.
      * 
      * @param requestUserDTO
@@ -325,6 +340,7 @@ public interface IAssessmentService {
      */
     void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
 
+    void releaseQuestionsAndReferencesFromCache(Assessment assessment);
 }
 
 

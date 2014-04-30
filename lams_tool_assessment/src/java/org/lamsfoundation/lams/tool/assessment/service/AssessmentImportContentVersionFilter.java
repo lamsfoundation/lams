@@ -40,4 +40,11 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	this.removeField(Assessment.class, "offlineInstructions");
 	this.removeField(Assessment.class, "attachments");
     }
+    
+    /**
+     * Import 20140102 version content to 20140428 version tool server.
+     */
+    public void up20140102To20140428() {
+	this.removeField(Assessment.class, "contentInUse");
+    }
 }

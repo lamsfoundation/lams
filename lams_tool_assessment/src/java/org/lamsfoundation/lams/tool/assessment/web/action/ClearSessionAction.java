@@ -40,9 +40,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
-	if (mode.isAuthor()) {
 	    session.removeAttribute(customiseSessionID);
-	}
     }
 
 }

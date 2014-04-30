@@ -26,7 +26,7 @@
 			   		{name:'userId',index:'userId', width:0},
 			   		{name:'sessionId',index:'sessionId', width:0},
 			   		{name:'userName',index:'userName', width:350},
-			   		{name:'total',index:'total', width:120,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
+			   		{name:'total',index:'total', width:120,align:"right",sorttype:"float"}		
 			   	],
 			   	
 			   	multiselect: false,
@@ -64,7 +64,7 @@
    	   	     		userId:"${assessmentResult.user.userId}",
    	   	     		sessionId:"${assessmentResult.user.session.sessionId}",
    	   	     		userName:"${assessmentResult.user.lastName}, ${assessmentResult.user.firstName}",
-   	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='3'/>"
+   	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='2'/>"
    	   	   	    });
 	        </c:forEach>
 	        
@@ -132,7 +132,7 @@
 			        }
 		        });
 		    }
-		});
+		}).trigger('resize');
 
 		$("#questionUid").change(function() {
 			var questionUid = $("#questionUid").val();

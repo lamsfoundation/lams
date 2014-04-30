@@ -230,8 +230,6 @@ public class AssessmentConstants {
     public static final String ERROR_MSG_DEFAULT_GRADE_WRONG_FORMAT = "error.default.grade.wrong.format";
     
     public static final String ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT = "error.penalty.factor.wrong.format";
-    
-    public static final String PAGE_EDITABLE = "isPageEditable";
 
     public static final String ATTR_USER_UID = "userUid";
 

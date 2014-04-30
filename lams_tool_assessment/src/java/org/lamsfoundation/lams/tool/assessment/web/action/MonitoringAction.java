@@ -144,7 +144,6 @@ public class MonitoringAction extends Action {
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
-	sessionMap.put(AssessmentConstants.PAGE_EDITABLE, assessment.isContentInUse());
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,

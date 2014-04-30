@@ -58,6 +58,7 @@
 	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return serializeOverallFeedbackForm();">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="assessment.contentId" />
+		<html:hidden property="mode" value="${mode}"/>
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="contentFolderID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
@@ -79,9 +80,9 @@
 				cancelConfirmMsgKey="authoring.msg.cancel.save"
 				accessMode="author"
 			--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.assessment.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>" 
+				toolContentID="${formBean.assessment.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+				customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}" />
 	</html:form>
 
 </div>

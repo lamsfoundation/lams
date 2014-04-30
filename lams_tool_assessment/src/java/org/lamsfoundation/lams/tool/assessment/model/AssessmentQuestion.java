@@ -84,10 +84,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private boolean allowRichEditor;
 
     private Date createDate;
-    private AssessmentUser createBy;
     
-    // ***********************************************
-    // Non persistant fields:
+    private AssessmentUser createBy;
     
     private Set<AssessmentQuestionOption> options;
     

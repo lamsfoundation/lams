@@ -41,5 +41,9 @@ public class AssessmentQuestionDAOHibernate extends BaseDAOHibernate implements 
     public AssessmentQuestion getByUid(Long assessmentQuestionUid) {
 	return (AssessmentQuestion) this.getObject(AssessmentQuestion.class, assessmentQuestionUid);
     }
+    
+    public void evict(Object o) {
+	getHibernateTemplate().evict(o);
+    }
 
 }

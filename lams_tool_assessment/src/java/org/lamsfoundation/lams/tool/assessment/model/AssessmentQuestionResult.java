@@ -28,6 +28,10 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * Assessment Question Result
  * 
@@ -57,6 +61,24 @@ public class AssessmentQuestionResult {
     
     public AssessmentQuestionResult() {
 	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(getUid()).toHashCode();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (!(obj instanceof AssessmentQuestionResult)) {
+	    return false;
+	}
+
+	final AssessmentQuestionResult genericEntity = (AssessmentQuestionResult) obj;
+	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).isEquals();
     }
 
     /**

@@ -16,7 +16,6 @@
 			scope="request" 
 			parameter="definelater" 
 			validate="false">
-			<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
 			<forward name="success" path="/pages/authoring/start.jsp" />
 		</action>
 		<action path="/authoring/init"
@@ -26,7 +25,6 @@
 			parameter="initPage" 
 			validate="false">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
-			<forward name="definelater" path="/pages/authoring/definelater.jsp" />
 		</action>
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
@@ -35,7 +33,6 @@
 			parameter="updateContent" 
 			validate="false">
 			<forward name="author" path="/pages/authoring/authoring.jsp" />
-			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
 		</action>
 		
 		<!-- ==========  Authroing Definitions: Assessment Question methods ========== -->

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -39,7 +40,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -87,7 +90,6 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
-import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -328,6 +330,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
 	assessmentDao.saveObject(assessment);
+    }
+    
+    @Override
+    public void releaseQuestionsAndReferencesFromCache(Assessment assessment) {
+	for (AssessmentQuestion question : (Set<AssessmentQuestion>)assessment.getQuestions()) {
+	    assessmentQuestionDao.evict(question);
+	}
+	for (QuestionReference reference : (Set<QuestionReference>)assessment.getQuestionReferences()) {
+	    assessmentQuestionDao.evict(reference);
+	}
     }
 
     @Override
@@ -934,6 +946,256 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
 		    "" + totalMark);
 	}
+
+    }
+    
+    @Override
+    public void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
+	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences) {
+
+	//create list of modified questions
+	List<AssessmentQuestion> modifiedQuestions = new ArrayList<AssessmentQuestion>();
+	for (AssessmentQuestion oldQuestion : oldQuestions) {
+	    for (AssessmentQuestion newQuestion : newQuestions) {
+		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
+		    
+		    boolean isQuestionModified = false;
+
+		    //title or question is different
+		    if (!oldQuestion.getTitle().equals(newQuestion.getTitle())
+			    || !oldQuestion.getQuestion().equals(newQuestion.getQuestion())
+			    || (oldQuestion.getCorrectAnswer() != newQuestion.getCorrectAnswer())) {
+			isQuestionModified = true;
+		    }
+		    
+		    //options is different
+		    Set<AssessmentQuestionOption> oldOptions = oldQuestion.getOptions();
+		    Set<AssessmentQuestionOption> newOptions = newQuestion.getOptions();
+		    for (AssessmentQuestionOption oldOption : oldOptions) {
+			for (AssessmentQuestionOption newOption : newOptions) {
+			    if (oldOption.getUid().equals(newOption.getUid())) {
+				
+				if (((oldQuestion.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) && (oldOption
+					.getSequenceId() != newOption.getSequenceId()))
+					|| !StringUtils.equals(oldOption.getQuestion(), newOption.getQuestion())
+					|| !StringUtils.equals(oldOption.getOptionString(), newOption.getOptionString())
+					|| (oldOption.getOptionFloat() != newOption.getOptionFloat())
+					|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
+					|| (oldOption.getGrade() != newOption.getGrade())) {
+				    isQuestionModified = true;
+				}			
+			    }
+			}
+		    }
+		    
+		    if (isQuestionModified) {
+			modifiedQuestions.add(newQuestion);
+		    }
+		}
+	    }    
+	}
+
+	//create list of modified references
+	//modifiedReferences holds pairs newReference -> oldReference.getDefaultGrade()
+	Map<QuestionReference, Integer> modifiedReferences= new HashMap<QuestionReference, Integer>();
+	for (QuestionReference oldReference : oldReferences) {
+	    for (QuestionReference newReference : newReferences) {
+		if (oldReference.getUid().equals(newReference.getUid())
+			&& (oldReference.getDefaultGrade() != newReference.getDefaultGrade())) {
+		    modifiedReferences.put(newReference, oldReference.getDefaultGrade());
+		}
+	    }
+	}
+	
+	//create list of added references
+	List<QuestionReference> addedReferences= new ArrayList<QuestionReference>();
+	for (QuestionReference newReference : newReferences) {
+	    boolean isNewReferenceMetInOldReferences = false;
+	    
+	    for (QuestionReference oldReference : oldReferences) {
+		if (oldReference.getUid().equals(newReference.getUid())) {
+		    isNewReferenceMetInOldReferences = true;
+		}
+	    }
+	    
+	    //if the new reference was not met in old references then it's the newly added reference
+	    if (!isNewReferenceMetInOldReferences) {
+		addedReferences.add(newReference);
+	    }
+	}
+	
+	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(assessment.getContentId());
+	for (AssessmentSession session : sessionList) {
+	    Long toolSessionId = session.getSessionId();
+	    Set<AssessmentUser> sessionUsers = session.getAssessmentUsers();
+	    
+	    for (AssessmentUser user : sessionUsers) {
+		
+		//get all finished user results
+		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(
+			assessment.getUid(), user.getUserId());
+		AssessmentResult lastAssessmentResult = (assessmentResults.isEmpty()) ? null : assessmentResults
+			.get(assessmentResults.size() - 1);
+		
+		for (AssessmentResult assessmentResult : assessmentResults) {
+
+		    float assessmentMark = assessmentResult.getGrade();
+		    int assessmentMaxMark = assessmentResult.getMaximumGrade();
+
+		    Set<AssessmentQuestionResult> questionAnswers = assessmentResult.getQuestionResults();
+		    Iterator<AssessmentQuestionResult> iter = questionAnswers.iterator();
+		    while (iter.hasNext()) {
+			AssessmentQuestionResult questionAnswer = iter.next();
+			AssessmentQuestion question = questionAnswer.getAssessmentQuestion();
+
+			//[+] if the question reference was removed
+			for (QuestionReference deletedReference : deletedReferences) {
+			    if (!deletedReference.isRandomQuestion()
+				    && question.getUid().equals(deletedReference.getQuestion().getUid())) {
+				assessmentMark -= questionAnswer.getMark();
+				assessmentMaxMark -= deletedReference.getDefaultGrade();
+				iter.remove();
+				assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
+					questionAnswer.getUid());
+				break;
+			    }
+			}
+    		    
+			//[+] if the question reference mark is modified
+			for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
+			    if (!modifiedReference.isRandomQuestion()
+				    && question.getUid().equals(modifiedReference.getQuestion().getUid())) {
+				int newReferenceGrade = modifiedReference.getDefaultGrade();
+				int oldReferenceGrade = modifiedReferences.get(modifiedReference);
+
+				// update question answer's mark
+				Float oldQuestionAnswerMark = questionAnswer.getMark();
+				float newQuestionAnswerMark = oldQuestionAnswerMark * newReferenceGrade
+					/ oldReferenceGrade;
+				questionAnswer.setMark(newQuestionAnswerMark);
+				questionAnswer.setMaxMark((float) newReferenceGrade);
+				assessmentQuestionResultDao.saveObject(questionAnswer);
+
+				assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
+				assessmentMaxMark += newReferenceGrade - oldReferenceGrade;
+				break;
+			    }
+
+			}
+
+			//[+] if the question is modified
+			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
+			    if (question.getUid().equals(modifiedQuestion.getUid())) {
+				assessmentMark -= questionAnswer.getMark();
+				iter.remove();
+				assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
+					questionAnswer.getUid());
+				break;
+			    }
+			}
+			
+			//[+] doing nothing if the question was removed - as it will be in the list of removed references
+			//[+] doing nothing if the new question was added
+
+		    }
+		    
+		    //find all question answers from random question reference
+		    ArrayList<AssessmentQuestionResult> nonRandomQuestionAnswers = new ArrayList<AssessmentQuestionResult>();
+		    for (AssessmentQuestionResult questionAnswer : questionAnswers) {
+			for (QuestionReference reference : newReferences) {
+			    if (!reference.isRandomQuestion()
+				    && questionAnswer.getAssessmentQuestion().getUid().equals(reference.getQuestion().getUid())) {
+				nonRandomQuestionAnswers.add(questionAnswer);
+			    }
+			}
+		    }
+		    Collection<AssessmentQuestionResult> randomQuestionAnswers = CollectionUtils.subtract(
+			    questionAnswers, nonRandomQuestionAnswers);
+		    
+		    // [+] if the question reference was removed (in case of random question references)
+		    for (QuestionReference deletedReference : deletedReferences) {
+			
+			//in case of random question reference - search for the answer with the same maxmark
+			if (deletedReference.isRandomQuestion()) {
+			    
+			    Iterator<AssessmentQuestionResult> iter2 = randomQuestionAnswers.iterator();
+			    while (iter2.hasNext()) {
+				AssessmentQuestionResult randomQuestionAnswer = iter2.next();
+				if (randomQuestionAnswer.getMaxMark().intValue() == deletedReference.getDefaultGrade()) {
+
+				    assessmentMark -= randomQuestionAnswer.getMark();
+				    assessmentMaxMark -= deletedReference.getDefaultGrade();
+				    iter2.remove();
+				    questionAnswers.remove(randomQuestionAnswer);
+				    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
+					    randomQuestionAnswer.getUid());
+				    break;
+				}
+			    }
+			}
+		    }
+
+		    // [+] if the question reference mark is modified (in case of random question references)
+		    for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
+			
+			//in case of random question reference - search for the answer with the same maxmark
+			if (modifiedReference.isRandomQuestion()) {
+			    
+			    for (AssessmentQuestionResult randomQuestionAnswer : randomQuestionAnswers) {
+				int newReferenceGrade = modifiedReference.getDefaultGrade();
+				int oldReferenceGrade = modifiedReferences.get(modifiedReference);
+				    
+				if (randomQuestionAnswer.getMaxMark().intValue() == oldReferenceGrade) {
+
+				    // update question answer's mark
+				    Float oldQuestionAnswerMark = randomQuestionAnswer.getMark();
+				    float newQuestionAnswerMark = oldQuestionAnswerMark * newReferenceGrade
+					    / oldReferenceGrade;
+				    randomQuestionAnswer.setMark(newQuestionAnswerMark);
+				    randomQuestionAnswer.setMaxMark((float) newReferenceGrade);
+				    assessmentQuestionResultDao.saveObject(randomQuestionAnswer);
+
+				    nonRandomQuestionAnswers.add(randomQuestionAnswer);
+
+				    assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
+				    assessmentMaxMark += newReferenceGrade - oldReferenceGrade;
+				    break;
+				}
+			    }
+			}
+
+		    }
+		    
+    		    
+		    // [+] if the new question reference was added
+		    for (QuestionReference addedReference : addedReferences) {
+			assessmentMaxMark += addedReference.getDefaultGrade();
+		    }
+    
+		    // store new mark and maxMark if they were changed
+		    if ((assessmentResult.getGrade() != assessmentMark)
+			    || (assessmentResult.getMaximumGrade() != assessmentMaxMark)) {
+
+			// marks can't be below zero
+			assessmentMark = (assessmentMark < 0) ? 0 : assessmentMark;
+			assessmentMaxMark = (assessmentMaxMark < 0) ? 0 : assessmentMaxMark;
+
+			assessmentResult.setGrade(assessmentMark);
+			assessmentResult.setMaximumGrade(assessmentMaxMark);
+			assessmentResultDao.saveObject(assessmentResult);
+
+			// if this is the last assessment result - propagade total mark to Gradebook
+			if (lastAssessmentResult.getUid().equals(assessmentResult.getUid())) {
+			    gradebookService.updateActivityMark(new Double(assessmentMark), null, user.getUserId()
+				    .intValue(), toolSessionId, true);
+			}
+		    }
+
+		}
+
+	    }
+	}
+	
 
     }
     

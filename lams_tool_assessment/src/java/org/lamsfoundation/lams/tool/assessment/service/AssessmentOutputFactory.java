@@ -195,10 +195,13 @@ public class AssessmentOutputFactory extends OutputFactory {
 	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
 
 	float questionScore = 0;
-	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-	    if (questionResult.getAssessmentQuestion().getSequenceId() == questionSequenceId) {
-		questionScore = questionResult.getMark();
-		break;
+	
+	if (assessmentResult != null) {
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		if (questionResult.getAssessmentQuestion().getSequenceId() == questionSequenceId) {
+		    questionScore = questionResult.getMark();
+		    break;
+		}
 	    }
 	}
 

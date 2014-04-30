@@ -224,7 +224,7 @@ public class AuthoringAction extends Action {
 	AssessmentForm assessmentForm = (AssessmentForm) form;
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	assessmentForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -303,7 +303,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	AssessmentForm existForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 
 	AssessmentForm assessmentForm = (AssessmentForm) form;
@@ -314,11 +314,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(AssessmentConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(AssessmentConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
+	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
     /**
@@ -337,7 +335,8 @@ public class AuthoringAction extends Action {
 	AssessmentForm assessmentForm = (AssessmentForm) (form);
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(assessmentForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		assessmentForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
 
@@ -346,23 +345,28 @@ public class AuthoringAction extends Action {
 
 	// **********************************Get Assessment PO*********************
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
+	
+	service.releaseQuestionsAndReferencesFromCache(assessmentPO);
+	
+	Set<AssessmentQuestion> oldQuestions = assessmentPO.getQuestions();
+	Set<QuestionReference> oldReferences = assessmentPO.getQuestionReferences();
 	if (assessmentPO == null) {
 	    // new Assessment, create it.
 	    assessmentPO = assessment;
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
 	    assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = assessmentPO.getUid();
-		PropertyUtils.copyProperties(assessmentPO, assessment);
-		// get back UID
-		assessmentPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content (definelater)
-		assessmentPO.setInstructions(assessment.getInstructions());
-		assessmentPO.setTitle(assessment.getTitle());
-		// change define later status
+	    Long uid = assessmentPO.getUid();
+	    PropertyUtils.copyProperties(assessmentPO, assessment);
+	    // set back UID
+	    assessmentPO.setUid(uid);
+	    
+	    // if it is Teacher (from monitor) - change define later status
+	    if (mode.isTeacher()) {
 		assessmentPO.setDefineLater(false);
 	    }
+	    
 	    assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -376,39 +380,41 @@ public class AuthoringAction extends Action {
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser(user, assessmentPO);
 	}
-
 	assessmentPO.setCreatedBy(assessmentUser);
 
 	// ************************* Handle assessment questions *******************
-	// Handle assessment questions
-	Set questions = new LinkedHashSet();
-	SortedSet topics = getQuestionList(sessionMap);
-	Iterator iter = topics.iterator();
-	while (iter.hasNext()) {
-	    AssessmentQuestion question = (AssessmentQuestion) iter.next();
-	    if (question != null) {
-		// This flushs user UID info to message if this user is a new user.
-		question.setCreateBy(assessmentUser);
-		removeNewLineCharacters(question);
-		questions.add(question);
-	    }
+	// Handle assessment questions	
+	Set<AssessmentQuestion> questions = new LinkedHashSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
+	for (AssessmentQuestion question : newQuestions) {
+	    // This flushes user UID info to message if this user is a new user.
+	    question.setCreateBy(assessmentUser);
+	    removeNewLineCharacters(question);
+	    questions.add(question);
 	}
 	assessmentPO.setQuestions(questions);
 
-	// delete References from database.
+	//Define Later - recalculate results
+	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
+	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
-	iter = deletedReferences.iterator();
-	while (iter.hasNext()) {
-	    QuestionReference reference = (QuestionReference) iter.next();
-	    iter.remove();
+	if (mode.isTeacher()) {
+	    service.recalculateUserAnswers(assessmentPO, oldQuestions, newQuestions, oldReferences, newReferences,
+		    deletedReferences);
+	}
+
+	// delete References from database.
+	Iterator<QuestionReference> iterRef = deletedReferences.iterator();
+	while (iterRef.hasNext()) {
+	    QuestionReference reference = (QuestionReference) iterRef.next();
+	    iterRef.remove();
 	    if (reference.getUid() != null) {
 		service.deleteQuestionReference(reference.getUid());
 	    }
 	}
 
 	// delete Questions from database.
-	List deletedQuestionList = getDeletedQuestionList(sessionMap);
-	iter = deletedQuestionList.iterator();
+	Iterator<AssessmentQuestion> iter = deletedQuestions.iterator();
 	while (iter.hasNext()) {
 	    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 	    iter.remove();
@@ -418,14 +424,11 @@ public class AuthoringAction extends Action {
 	}
 
 	// Handle question references
-	Set<QuestionReference> questionReferences = updateQuestionReferencesGrades(request, sessionMap, true);
-	assessmentPO.setQuestionReferences(questionReferences);
+	assessmentPO.setQuestionReferences(newReferences);
 
 	// ************************* Handle assessment overall feedbacks *******************
-	if (mode.isAuthor()) {
-	    TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
-	    assessmentPO.setOverallFeedbacks(overallFeedbackList);
-	}
+	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
+	assessmentPO.setOverallFeedbacks(overallFeedbackList);
 
 	// **********************************************
 	// finally persist assessmentPO again
@@ -434,11 +437,8 @@ public class AuthoringAction extends Action {
 	assessmentForm.setAssessment(assessmentPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return mapping.findForward("author");
     }
 
     /**
@@ -453,7 +453,7 @@ public class AuthoringAction extends Action {
     private ActionForward newQuestionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
@@ -484,7 +484,7 @@ public class AuthoringAction extends Action {
 	}
 	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 
-	short type = (short) NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
+	short type = (short) NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return findForward(type, mapping);
@@ -504,11 +504,12 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
+	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	AssessmentQuestion question = null;
 	if (questionIdx != -1) {
 	    SortedSet<AssessmentQuestion> assessmentList = getQuestionList(sessionMap);
@@ -544,7 +545,8 @@ public class AuthoringAction extends Action {
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 	extractFormToAssessmentQuestion(request, questionForm);
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		questionForm.getSessionMapID());
 	reinitializeAvailableQuestions(sessionMap);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
@@ -561,7 +563,8 @@ public class AuthoringAction extends Action {
     private ActionForward saveQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	String sessionMapId = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 
@@ -774,7 +777,8 @@ public class AuthoringAction extends Action {
     private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	List<Question> questions = new LinkedList<Question>();
@@ -932,10 +936,11 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
+	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	if (questionIdx != -1) {
 	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(questionList);
@@ -943,7 +948,7 @@ public class AuthoringAction extends Action {
 	    questionList.clear();
 	    questionList.addAll(rList);
 	    // add to delList
-	    List delList = getDeletedQuestionList(sessionMap);
+	    List<AssessmentQuestion> delList = getDeletedQuestionList(sessionMap);
 	    delList.add(question);
 
 	    // remove according questionReference, if exists
@@ -994,11 +999,12 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
+	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 
 	// set SequenceId
 	QuestionReference reference = new QuestionReference();
@@ -1051,10 +1057,11 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionReferenceIdx = NumberUtils.stringToInt(
+	int questionReferenceIdx = NumberUtils.toInt(
 		request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
@@ -1063,7 +1070,7 @@ public class AuthoringAction extends Action {
 	    questionReferences.clear();
 	    questionReferences.addAll(rList);
 	    // add to delList
-	    List delList = getDeletedQuestionReferences(sessionMap);
+	    List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
 	    delList.add(questionReference);
 	}
 
@@ -1104,10 +1111,11 @@ public class AuthoringAction extends Action {
     private ActionForward switchQuestionReferences(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionReferenceIdx = NumberUtils.stringToInt(
+	int questionReferenceIdx = NumberUtils.toInt(
 		request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
@@ -1150,12 +1158,11 @@ public class AuthoringAction extends Action {
     private ActionForward importQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);
 
-	List<String> ldErrorMsgs = new ArrayList<String>();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 	try {
 	    File designFile = null;
@@ -1230,7 +1237,8 @@ public class AuthoringAction extends Action {
     private ActionForward exportQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
@@ -1335,7 +1343,7 @@ public class AuthoringAction extends Action {
     private ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
+	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
 	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
 	    AssessmentQuestionOption question = rList.remove(optionIndex);
@@ -1382,7 +1390,7 @@ public class AuthoringAction extends Action {
     private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 
-	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
+	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
 	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
 
@@ -1449,7 +1457,8 @@ public class AuthoringAction extends Action {
     private ActionForward initOverallFeedback(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
 
@@ -1506,7 +1515,7 @@ public class AuthoringAction extends Action {
      * 
      * @param sessionMap
      */
-    private void reinitializeAvailableQuestions(SessionMap sessionMap) {
+    private void reinitializeAvailableQuestions(SessionMap<String, Object> sessionMap) {
 	SortedSet<AssessmentQuestion> bankQuestions = getQuestionList(sessionMap);
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	Set<AssessmentQuestion> questionsFromList = new LinkedHashSet<AssessmentQuestion>();
@@ -1535,7 +1544,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<AssessmentQuestion> getQuestionList(SessionMap sessionMap) {
+    private SortedSet<AssessmentQuestion> getQuestionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
@@ -1551,7 +1560,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<QuestionReference> getQuestionReferences(SessionMap sessionMap) {
+    private SortedSet<QuestionReference> getQuestionReferences(SessionMap<String, Object> sessionMap) {
 	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_REFERENCES);
 	if (list == null) {
@@ -1567,7 +1576,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedQuestionList(SessionMap sessionMap) {
+    private List<AssessmentQuestion> getDeletedQuestionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
     }
 
@@ -1577,7 +1586,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedQuestionReferences(SessionMap sessionMap) {
+    private List<QuestionReference> getDeletedQuestionReferences(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
     }
 
@@ -1588,7 +1597,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -1692,10 +1701,10 @@ public class AuthoringAction extends Action {
 	 * gets all info EXCEPT AssessmentQuestion.createDate and AssessmentQuestion.createBy, which need be set when persisting
 	 * this assessment Question.
 	 */
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(questionForm.getSessionMapID());
 	// check whether it is "edit(old Question)" or "add(new Question)"
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	int questionIdx = NumberUtils.stringToInt(questionForm.getQuestionIndex(), -1);
+	int questionIdx = NumberUtils.toInt(questionForm.getQuestionIndex(), -1);
 	AssessmentQuestion question = null;
 
 	if (questionIdx == -1) { // add
@@ -1756,7 +1765,7 @@ public class AuthoringAction extends Action {
 		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
 	    Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, true);
-	    Set options = new LinkedHashSet();
+	    Set<AssessmentQuestionOption> options = new LinkedHashSet<AssessmentQuestionOption>();
 	    int seqId = 0;
 	    for (AssessmentQuestionOption option : optionList) {
 		option.setSequenceId(seqId++);
@@ -1767,7 +1776,7 @@ public class AuthoringAction extends Action {
 	// set units
 	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    Set<AssessmentUnit> unitList = getUnitsFromRequest(request, true);
-	    Set units = new LinkedHashSet();
+	    Set<AssessmentUnit> units = new LinkedHashSet<AssessmentUnit>();
 	    int seqId = 0;
 	    for (AssessmentUnit unit : unitList) {
 		unit.setSequenceId(seqId++);
@@ -1795,8 +1804,8 @@ public class AuthoringAction extends Action {
 	return mode;
     }
 
-    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request, SessionMap sessionMap,
-	    boolean isFormSubmit) {
+    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request,
+	    SessionMap<String, Object> sessionMap, boolean isFormSubmit) {
 	Map<String, String> paramMap = splitRequestParameter(request,
 		AssessmentConstants.ATTR_QUESTION_REFERENCES_GRADES);
 
@@ -1827,12 +1836,11 @@ public class AuthoringAction extends Action {
      * @param request
      * @param isForSaving
      *            whether the blank options will be preserved or not
-     * 
      */
     private TreeSet<AssessmentQuestionOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
-	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
+	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
 	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
 		new SequencableComparator());
@@ -1846,7 +1854,7 @@ public class AuthoringAction extends Action {
 
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);
@@ -1860,7 +1868,7 @@ public class AuthoringAction extends Action {
 
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
 		option.setQuestion(question);
 		optionList.add(option);
@@ -1875,7 +1883,7 @@ public class AuthoringAction extends Action {
 
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		try {
 		    float optionFloat = Float.valueOf(optionFloatStr);
 		    option.setOptionFloat(optionFloat);
@@ -1900,7 +1908,7 @@ public class AuthoringAction extends Action {
 
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		option.setAnswerInt(i);
 		optionList.add(option);
@@ -1917,7 +1925,7 @@ public class AuthoringAction extends Action {
     private TreeSet<AssessmentUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
 
-	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
+	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
 	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
@@ -1927,7 +1935,7 @@ public class AuthoringAction extends Action {
 
 	    AssessmentUnit unit = new AssessmentUnit();
 	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);
-	    unit.setSequenceId(NumberUtils.stringToInt(sequenceId));
+	    unit.setSequenceId(NumberUtils.toInt(sequenceId));
 	    unit.setUnit(unitStr);
 	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
 	    unit.setMultiplier(multiplier);
@@ -1944,7 +1952,7 @@ public class AuthoringAction extends Action {
      */
     private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromRequest(HttpServletRequest request,
 	    boolean skipBlankOverallFeedbacks) {
-	int count = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
+	int count = NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
 		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
@@ -1957,9 +1965,9 @@ public class AuthoringAction extends Action {
 		continue;
 	    }
 	    AssessmentOverallFeedback overallFeedback = new AssessmentOverallFeedback();
-	    overallFeedback.setSequenceId(NumberUtils.stringToInt(sequenceId));
+	    overallFeedback.setSequenceId(NumberUtils.toInt(sequenceId));
 	    if (!StringUtils.isBlank(gradeBoundaryStr)) {
-		int gradeBoundary = NumberUtils.stringToInt(request
+		int gradeBoundary = NumberUtils.toInt(request
 			.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
 		overallFeedback.setGradeBoundary(gradeBoundary);
 	    }
@@ -1978,7 +1986,7 @@ public class AuthoringAction extends Action {
 	    boolean skipBlankOverallFeedbacks) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST);
 
-	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
+	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
 		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
@@ -1990,9 +1998,9 @@ public class AuthoringAction extends Action {
 		continue;
 	    }
 	    AssessmentOverallFeedback overallFeedback = new AssessmentOverallFeedback();
-	    overallFeedback.setSequenceId(NumberUtils.stringToInt(sequenceId));
+	    overallFeedback.setSequenceId(NumberUtils.toInt(sequenceId));
 	    if (!StringUtils.isBlank(gradeBoundaryStr)) {
-		int gradeBoundary = NumberUtils.stringToInt(paramMap
+		int gradeBoundary = NumberUtils.toInt(paramMap
 			.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
 		overallFeedback.setGradeBoundary(gradeBoundary);
 	    }

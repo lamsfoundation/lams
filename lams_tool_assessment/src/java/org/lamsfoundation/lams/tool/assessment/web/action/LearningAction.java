@@ -172,7 +172,7 @@ public class LearningAction extends Action {
 	
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 	
-	//*LKC* added the next chunk
+	//support for leader select feature
 	AssessmentUser groupLeader = null;
 	if (assessment.isUseSelectLeaderToolOuput()) {
 	    groupLeader = service.checkLeaderSelectToolForSessionLeader(assessmentUser, new Long(toolSessionId).longValue());
@@ -193,12 +193,6 @@ public class LearningAction extends Action {
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
 		service.copyAnswersFromLeader(assessmentUser, groupLeader);
-
-		//service.finishToolSession(toolSessionId, assessmentUser.getUserId());
-//		user.setSessionFinished(true);
-//		assessmentUserDao.saveObject(user);
-//		assessmentUser.setSessionFinished(true);
-//		service.saupdateAssessmentUser(assessmentUser);
 	    }
 	}
 	
@@ -277,11 +271,6 @@ public class LearningAction extends Action {
 	if (assessment.isDefineLater()) {
 	    return mapping.findForward("defineLater");
 	}
-
-	// set contentInUse flag to true!
-	assessment.setContentInUse(true);
-	assessment.setDefineLater(false);
-	service.saveOrUpdateAssessment(assessment);
 
 	//check if there is submission deadline
 	Date submissionDeadline = assessment.getSubmissionDeadline();

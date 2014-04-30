@@ -86,8 +86,6 @@ public class Assessment implements Cloneable {
     
     private boolean defineLater;
 
-    private boolean contentInUse;
-
     private boolean notifyTeachersOnAttemptCompletion;
     
     private boolean reflectOnActivity;
@@ -444,18 +442,6 @@ public class Assessment implements Cloneable {
 
     public void setOverallFeedbacks(Set assessmentOverallFeedbacks) {
 	this.overallFeedbacks = assessmentOverallFeedbacks;
-    }
-
-    /**
-     * @hibernate.property column="content_in_use"
-     * @return
-     */
-    public boolean isContentInUse() {
-	return contentInUse;
-    }
-
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
     }
 
     /**
