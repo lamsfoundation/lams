@@ -77,7 +77,7 @@
 	
 	// refresh the parent window if the parent window is a tool monitoring window
 	function refreshParentMonitoringWindow() {
-		if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorLearnerActivity") >= 0 ) {
+		if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorActivity") >= 0 ) {
 			var monitoringURL = String(window.opener.location);
 			var currentTab = window.opener.selectedTabID;
 			if ( currentTab ) {
