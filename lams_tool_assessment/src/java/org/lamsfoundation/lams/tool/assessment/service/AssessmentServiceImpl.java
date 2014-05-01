@@ -413,10 +413,38 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float grade = 0;
 
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
+	Assessment assessment = result.getAssessment();
 	
 	//store all answers (in all pages)
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
+		
+		// In case if assessment was updated after result has been started check question still exists in DB as
+		// it could be deleted if modified in monitor.
+		if ((assessment.getUpdated() != null) && assessment.getUpdated().after(result.getStartDate())) {
+
+		    Set<QuestionReference> references = assessment.getQuestionReferences();
+		    Set<AssessmentQuestion> questions = assessment.getQuestions();
+		    
+		    boolean isQuestionExists = false;
+		    for (QuestionReference reference : references) {
+			if (!reference.isRandomQuestion() && reference.getQuestion().getUid().equals(question.getUid())) {
+			    isQuestionExists = true;
+			    break;
+			}
+			if (reference.isRandomQuestion()) {
+			    for (AssessmentQuestion questionDb : questions) {
+				if (questionDb.getUid().equals(question.getUid())) {
+				    isQuestionExists = true;
+				    break;
+				}
+			    }
+			}
+		    }
+		    if (!isQuestionExists) {
+			continue;
+		    }
+		}
 		
 		float userQeustionGrade = storeUserAnswer(result, question, isAutosave);
 		grade += userQeustionGrade;
@@ -440,15 +468,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * @param isAutosave in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
      */
-    private float storeUserAnswer(AssessmentResult assessmentAnswer, AssessmentQuestion question, boolean isAutosave) {
+    private float storeUserAnswer(AssessmentResult assessmentResult, AssessmentQuestion question, boolean isAutosave) {
 	
 	AssessmentQuestionResult questionAnswer = null;
+	// get questionResult from DB instance of AssessmentResult
+	for (AssessmentQuestionResult dbQuestionAnswer : assessmentResult.getQuestionResults()) {
+	    if (question.equals(dbQuestionAnswer.getAssessmentQuestion())) {
+		questionAnswer = dbQuestionAnswer;
+	    }
+	}
 	
-	//create new questionAnswer if this is a new assessmentAnswer (i.e. doesn't have any answers yet)
-	if (assessmentAnswer.getQuestionResults().isEmpty()) {
+	//create new questionAnswer if it's nonexistent
+	if (questionAnswer == null) {
 	    questionAnswer = new AssessmentQuestionResult();
 	    questionAnswer.setAssessmentQuestion(question);
-	    questionAnswer.setAssessmentResult(assessmentAnswer);
+	    questionAnswer.setAssessmentResult(assessmentResult);
 	    
 	    Set<AssessmentOptionAnswer> optionAnswers = questionAnswer.getOptionAnswers();
 	    for (AssessmentQuestionOption option : question.getOptions()) {
@@ -458,14 +492,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	    
 	    assessmentQuestionResultDao.saveObject(questionAnswer);
-	    
-	} else {
-	    // get questionResult from DB instance of AssessmentResult
-	    for (AssessmentQuestionResult dbQuestionAnswer : assessmentAnswer.getQuestionResults()) {
-		if (question.equals(dbQuestionAnswer.getAssessmentQuestion())) {
-		    questionAnswer = dbQuestionAnswer;
-		}
-	    }
 	}
 	
 	//store question answer values
@@ -597,8 +623,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    // calculate penalty
 	    if (mark > 0) {
 		// calculate number of wrong answers
-		Long assessmentUid = assessmentAnswer.getAssessment().getUid();
-		Long userId = assessmentAnswer.getUser().getUserId();
+		Long assessmentUid = assessmentResult.getAssessment().getUid();
+		Long userId = assessmentResult.getUser().getUserId();
 		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
 			userId, question.getUid());
 
@@ -897,15 +923,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     @Override
     public void changeQuestionResultMark(Long questionResultUid, float newMark) {
-	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
+	AssessmentQuestionResult questionAnswer = assessmentQuestionResultDao
 		.getAssessmentQuestionResultByUid(questionResultUid);
-	float oldMark = questionResult.getMark();
-	AssessmentResult assessmentResult = questionResult.getAssessmentResult();
+	float oldMark = questionAnswer.getMark();
+	AssessmentResult assessmentResult = questionAnswer.getAssessmentResult();
 	float totalMark = assessmentResult.getGrade() - oldMark + newMark;
 	
-	Long toolSessionId = questionResult.getAssessmentResult().getSessionId();
-	Assessment assessment = questionResult.getAssessmentResult().getAssessment();
-	Long questionUid = questionResult.getAssessmentQuestion().getUid();
+	Long toolSessionId = assessmentResult.getSessionId();
+	Assessment assessment = assessmentResult.getAssessment();
+	Long questionUid = questionAnswer.getAssessmentQuestion().getUid();
 	
 	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
 	// students within the group
@@ -914,8 +940,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    users = getUsersBySession(toolSessionId);
 	} else {
 	    users = new ArrayList<AssessmentUser>();
-	    AssessmentUser leader = questionResult.getUser();
-	    users.add(leader);
+	    AssessmentUser user = assessmentResult.getUser();
+	    users.add(user);
 	}
 	
 	for (AssessmentUser user : users) {
@@ -948,10 +974,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 
     }
-    
+
     @Override
-    public void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
-	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences) {
+    public void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions,
+	    Set<AssessmentQuestion> newQuestions, List<AssessmentQuestion> deletedQuestions,
+	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
+	    List<QuestionReference> deletedReferences) {
 
 	//create list of modified questions
 	List<AssessmentQuestion> modifiedQuestions = new ArrayList<AssessmentQuestion>();
@@ -1047,16 +1075,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    while (iter.hasNext()) {
 			AssessmentQuestionResult questionAnswer = iter.next();
 			AssessmentQuestion question = questionAnswer.getAssessmentQuestion();
+			
+			boolean isRemoveQuestionResult = false;
 
 			//[+] if the question reference was removed
 			for (QuestionReference deletedReference : deletedReferences) {
 			    if (!deletedReference.isRandomQuestion()
 				    && question.getUid().equals(deletedReference.getQuestion().getUid())) {
-				assessmentMark -= questionAnswer.getMark();
+				isRemoveQuestionResult = true;
 				assessmentMaxMark -= deletedReference.getDefaultGrade();
-				iter.remove();
-				assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
-					questionAnswer.getUid());
 				break;
 			    }
 			}
@@ -1086,15 +1113,27 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			//[+] if the question is modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
 			    if (question.getUid().equals(modifiedQuestion.getUid())) {
-				assessmentMark -= questionAnswer.getMark();
-				iter.remove();
-				assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
-					questionAnswer.getUid());
+				isRemoveQuestionResult = true;
 				break;
 			    }
 			}
 			
-			//[+] doing nothing if the question was removed - as it will be in the list of removed references
+			//[+] if the question was removed 
+			for (AssessmentQuestion deletedQuestion : deletedQuestions) {
+			    if (question.getUid().equals(deletedQuestion.getUid())) {
+				isRemoveQuestionResult = true;
+				break;
+			    }
+			}
+			
+			if (isRemoveQuestionResult) {
+
+			    assessmentMark -= questionAnswer.getMark();
+			    iter.remove();
+			    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
+				    questionAnswer.getUid());
+			}
+			
 			//[+] doing nothing if the new question was added
 
 		    }

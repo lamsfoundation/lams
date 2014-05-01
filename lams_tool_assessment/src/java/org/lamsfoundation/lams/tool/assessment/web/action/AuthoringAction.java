@@ -359,7 +359,6 @@ public class AuthoringAction extends Action {
 	    // new Assessment, create it.
 	    assessmentPO = assessment;
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
-	    assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
 	    
 	} else {
 	    Long uid = assessmentPO.getUid();
@@ -370,9 +369,9 @@ public class AuthoringAction extends Action {
 	    // if it is Teacher (from monitor) - change define later status
 	    if (mode.isTeacher()) {
 		assessmentPO.setDefineLater(false);
+		assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
 	    }
 	    
-	    assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
 	// *******************************Handle user*******************
@@ -404,8 +403,8 @@ public class AuthoringAction extends Action {
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
 	//recalculate results in case content is edited from monitoring
 	if (mode.isTeacher()) {
-	    service.recalculateUserAnswers(assessmentPO, oldQuestions, newQuestions, oldReferences, newReferences,
-		    deletedReferences);
+	    service.recalculateUserAnswers(assessmentPO, oldQuestions, newQuestions, deletedQuestions, oldReferences,
+		    newReferences, deletedReferences);
 	}
 
 	// delete References from database.

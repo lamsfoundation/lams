@@ -324,13 +324,15 @@ public interface IAssessmentService {
      * @param assessment
      * @param oldQuestions
      * @param newQuestions
+     * @param deletedQuestions
      * @param oldReferences
      * @param newReferences
      * @param deletedReferences
      */
     void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions,
-	    Set<AssessmentQuestion> newQuestions, Set<QuestionReference> oldReferences,
-	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences);
+	    Set<AssessmentQuestion> newQuestions, List<AssessmentQuestion> deletedQuestions,
+	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
+	    List<QuestionReference> deletedReferences);
     
     /**
      * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either lesson stuff or group manager.
