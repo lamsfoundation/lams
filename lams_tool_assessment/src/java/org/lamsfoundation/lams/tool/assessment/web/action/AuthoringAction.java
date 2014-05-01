@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -346,10 +347,14 @@ public class AuthoringAction extends Action {
 	// **********************************Get Assessment PO*********************
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 	
-	service.releaseQuestionsAndReferencesFromCache(assessmentPO);
+	//allow using old and modified questions and references altogether
+	if (mode.isTeacher()) {
+	    service.releaseQuestionsAndReferencesFromCache(assessmentPO);
+	}
 	
-	Set<AssessmentQuestion> oldQuestions = assessmentPO.getQuestions();
-	Set<QuestionReference> oldReferences = assessmentPO.getQuestionReferences();
+	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<AssessmentQuestion>() : assessmentPO.getQuestions();
+	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<QuestionReference>() : assessmentPO.getQuestionReferences();
+	
 	if (assessmentPO == null) {
 	    // new Assessment, create it.
 	    assessmentPO = assessment;
@@ -394,10 +399,10 @@ public class AuthoringAction extends Action {
 	}
 	assessmentPO.setQuestions(questions);
 
-	//Define Later - recalculate results
 	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
 	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
+	//recalculate results in case content is edited from monitoring
 	if (mode.isTeacher()) {
 	    service.recalculateUserAnswers(assessmentPO, oldQuestions, newQuestions, oldReferences, newReferences,
 		    deletedReferences);
