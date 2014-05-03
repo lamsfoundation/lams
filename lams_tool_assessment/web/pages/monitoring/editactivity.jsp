@@ -4,9 +4,8 @@
 
 <table cellpadding="0">
 	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.title" />
-			:
+		<td width="10%">
+			<fmt:message key="label.authoring.basic.title" />:
 		</td>
 		<td>
 			<c:out value="${assessment.title}" escapeXml="true" />
@@ -14,9 +13,8 @@
 	</tr>
 
 	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.instruction" />
-			:
+		<td width="10%" valign="top">
+			<fmt:message key="label.authoring.basic.instruction" />:
 		</td>
 		<td>
 			<c:out value="${assessment.instructions}" escapeXml="false" />
