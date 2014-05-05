@@ -31,10 +31,6 @@ public interface IToolVO {
 
     public abstract void setAuthorUrl(String authorUrl);
 
-    public abstract String getContributeUrl();
-
-    public abstract void setContributeUrl(String contributeUrl);
-
     public abstract String getHelpUrl();
 
     public abstract void setHelpUrl(String helpUrl);
@@ -62,8 +58,6 @@ public interface IToolVO {
     public abstract String getLearnerProgressUrl();
 
     public abstract String getLearnerUrl();
-
-    public abstract String getModerationUrl();
 
     public abstract String getMonitorUrl();
 

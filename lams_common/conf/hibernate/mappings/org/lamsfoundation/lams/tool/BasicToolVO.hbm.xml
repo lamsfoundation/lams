@@ -78,39 +78,6 @@
         </meta>    
     </property>
     
-<!-- 
-    <property
-        name="supportsModeration"
-        type="java.lang.Boolean"
-        column="supports_moderation_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_moderation_flag"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property>
--->   
-<!-- 
-    <property
-        name="supportsContribute"
-        type="java.lang.Boolean"
-        column="supports_contribute_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_contribute_flag"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property> 
--->    
-    
     <property
         name="valid"
         type="java.lang.Boolean"
@@ -229,36 +196,6 @@
         <meta attribute="field-description">
            @hibernate.property
             column="monitor_url"
-            length="65535"
-            not-null="true"
-        </meta>    
-    </property>
-    
-    <property
-        name="moderationUrl"
-        type="java.lang.String"
-        column="moderation_url"
-        not-null="true"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="moderation_url"
-            length="65535"
-            not-null="true"
-        </meta>    
-    </property> 
-    
-    <property
-        name="contributeUrl"
-        type="java.lang.String"
-        column="contribute_url"
-        not-null="true"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="contribute_url"
             length="65535"
             not-null="true"
         </meta>    

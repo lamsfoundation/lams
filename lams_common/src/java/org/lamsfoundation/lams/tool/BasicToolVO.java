@@ -64,12 +64,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 
     /** persistent field */
     private String monitorUrl;
-    
-    /** persistent field */
-    private String contributeUrl;
-    
-    /** persistent field */
-    private String moderationUrl;
 
     /** persistent field */
     private String helpUrl;
@@ -124,8 +118,6 @@ public class BasicToolVO implements Serializable, IToolVO {
                 String exportPortfolioLearnerUrl, 
                 String exportPortfolioClassUrl, 
                 String monitorUrl,
-                String contributeUrl,
-                String moderationUrl,
                 String helpUrl,
                 long defaultToolContentId, 
                 String toolSignature, 
@@ -148,8 +140,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 		this.exportPortfolioLearnerUrl=exportPortfolioLearnerUrl;
 		this.exportPortfolioClassUrl=exportPortfolioClassUrl;
 		this.monitorUrl=monitorUrl;
-		this.contributeUrl=contributeUrl;
-		this.moderationUrl=moderationUrl;
 		this.helpUrl = helpUrl;
 		this.defaultToolContentId=defaultToolContentId;
 		this.toolSignature=toolSignature;
@@ -208,20 +198,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 	 */
 	public void setAuthorUrl(String authorUrl) {
 		this.authorUrl = authorUrl;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#getContributeUrl()
-	 */
-	public String getContributeUrl() {
-		return contributeUrl;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#setContributeUrl(java.lang.String)
-	 */
-	public void setContributeUrl(String contributeUrl) {
-		this.contributeUrl = contributeUrl;
 	}
 
 	/* (non-Javadoc)
@@ -353,17 +329,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 
 	public void setLearnerUrl(String learnerUrl) {
 		this.learnerUrl = learnerUrl;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.IToolVO#getModerationUrl()
-	 */
-	public String getModerationUrl() {
-		return moderationUrl;
-	}
-
-	public void setModerationUrl(String moderationUrl) {
-		this.moderationUrl = moderationUrl;
 	}
 
 	/* (non-Javadoc)

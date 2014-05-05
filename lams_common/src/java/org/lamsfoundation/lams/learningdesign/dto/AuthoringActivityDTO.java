@@ -393,8 +393,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 	toolSignature = toolActivity.getTool().getToolSignature();
 	authoringURL = toolActivity.getTool().getAuthorUrl();
 	monitoringURL = toolActivity.getTool().getMonitorUrl();
-	contributeURL = toolActivity.getTool().getContributeUrl();
-	moderationURL = toolActivity.getTool().getModerationUrl();
 	adminURL = toolActivity.getTool().getAdminUrl();
 	toolDisplayName = toolActivity.getTool().getToolDisplayName();
 	toolVersion = toolActivity.getTool().getToolVersion();

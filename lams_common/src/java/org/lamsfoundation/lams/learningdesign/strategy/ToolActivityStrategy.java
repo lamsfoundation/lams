@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.learningdesign.strategy;
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 /**
@@ -46,12 +45,6 @@ public class ToolActivityStrategy extends SimpleActivityStrategy {
 
     @Override
     protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
-	if (toolActivity != null) {
-	    if (toolActivity.getTool().getSupportsModeration())
-		contributionTypes.add(ContributionTypes.MODERATION);
-	    if (toolActivity.getTool().getSupportsContribute())
-		contributionTypes.add(ContributionTypes.CONTRIBUTION);
-	}
     }
 
     @Override

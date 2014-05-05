@@ -133,9 +133,7 @@ public class ContributeDTOFactory {
 	String url = null;
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
-	    if (contributionTypeEntry.equals(ContributionTypes.MODERATION)) {
-		url = toolService.getToolModerateURL(toolActivity);
-	    } else if (contributionTypeEntry.equals(ContributionTypes.CONTENT_EDITED)) {
+	    if (contributionTypeEntry.equals(ContributionTypes.CONTENT_EDITED)) {
 		url = toolService.getToolAuthorURL(lessonID, toolActivity, ToolAccessMode.TEACHER);
 	    }
 	}

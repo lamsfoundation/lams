@@ -62,8 +62,6 @@ public class AuthoringToolDTO {
 	this.toolContentID = new Long(tool.getDefaultToolContentId());
 	this.description = tool.getDescription();
 	this.toolDisplayName = tool.getToolDisplayName();
-	this.supportsModeration = new Boolean(tool.getSupportsModeration());
-	this.supportsContribute = new Boolean(tool.getSupportsContribute());
 	this.authoringURL = tool.getAuthorUrl();
 	this.helpURL = tool.getHelpUrl();
     }

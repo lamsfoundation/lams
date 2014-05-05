@@ -346,15 +346,6 @@ public interface ILamsCoreToolService {
 
     boolean isContentEdited(Activity activity);
     
-    /**
-     * Return the moderate url for monitoring.
-     * 
-     * @param activity
-     *                the requested activity - must be a a ToolActivity. System Activities don't support moderation.
-     * @return the tool access url with tool content id
-     */
-    String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException;
-    
     String getToolAuthorURL(Long lessonID, ToolActivity activity, ToolAccessMode mode);
     
     /**

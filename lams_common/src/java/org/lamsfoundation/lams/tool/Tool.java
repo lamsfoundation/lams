@@ -64,12 +64,6 @@ public class Tool implements Serializable {
     private String monitorUrl;
 
     /** persistent field */
-    private String contributeUrl;
-
-    /** persistent field */
-    private String moderationUrl;
-
-    /** persistent field */
     private String pedagogicalPlannerUrl;
 
     /** persistent field */
@@ -148,8 +142,6 @@ public class Tool implements Serializable {
 	this.learnerProgressUrl = learnerProgressUrl;
 	this.authorUrl = authorUrl;
 	this.monitorUrl = monitorUrl;
-	this.contributeUrl = contributeUrl;
-	this.moderationUrl = moderationUrl;
 	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
 	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
 
@@ -226,28 +218,12 @@ public class Tool implements Serializable {
 	this.learnerProgressUrl = learnerProgressUrl;
     }
 
-    /**
-     * Does this tool support contribute? Will be true if the contributeURL is not null/empty string.
-     */
-    public boolean getSupportsContribute() {
-	String contributeURL = getContributeUrl();
-	return contributeURL != null && contributeURL.trim().length() > 0;
-    }
-
     public String getAuthorUrl() {
 	return authorUrl;
     }
 
     public void setAuthorUrl(String authorUrl) {
 	this.authorUrl = authorUrl;
-    }
-
-    /**
-     * Does this tool support moderation? Will be true if the moderateURL is not null/empty string.
-     */
-    public boolean getSupportsModeration() {
-	String url = getModerationUrl();
-	return url != null && url.trim().length() > 0;
     }
 
     public long getDefaultToolContentId() {
@@ -357,36 +333,6 @@ public class Tool implements Serializable {
      */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
-    }
-
-    /**
-     * @return Returns the contributeUrl.
-     */
-    public String getContributeUrl() {
-	return contributeUrl;
-    }
-
-    /**
-     * @param contributeUrl
-     *                The contributUrl to set.
-     */
-    public void setContributeUrl(String contributeUrl) {
-	this.contributeUrl = contributeUrl;
-    }
-
-    /**
-     * @return Returns the moderationUrl.
-     */
-    public String getModerationUrl() {
-	return moderationUrl;
-    }
-
-    /**
-     * @param moderationUrl
-     *                The moderationUrl to set.
-     */
-    public void setModerationUrl(String moderationUrl) {
-	this.moderationUrl = moderationUrl;
     }
 
     /**
@@ -509,10 +455,9 @@ public class Tool implements Serializable {
 
     public IToolVO createBasicToolVO() {
 	IToolVO vo = new BasicToolVO(toolId, supportsGrouping, learnerUrl, learnerPreviewUrl, learnerProgressUrl,
-		authorUrl, exportPortfolioLearnerUrl, exportPortfolioClassUrl, monitorUrl, contributeUrl,
-		moderationUrl, helpUrl, defaultToolContentId, toolSignature, toolDisplayName, description, serviceName,
-		createDateTime, groupingSupportTypeId, toolIdentifier, toolVersion, languageFile, supportsOutputs,
-		extLmsId);
+		authorUrl, exportPortfolioLearnerUrl, exportPortfolioClassUrl, monitorUrl, helpUrl,
+		defaultToolContentId, toolSignature, toolDisplayName, description, serviceName, createDateTime,
+		groupingSupportTypeId, toolIdentifier, toolVersion, languageFile, supportsOutputs, extLmsId);
 	return vo;
     }
 

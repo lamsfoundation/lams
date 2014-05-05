@@ -198,8 +198,6 @@ public class LibraryActivityDTO extends BaseDTO {
 			toolDisplayName = tool.getToolDisplayName();
 			toolLanguageFile = tool.getLanguageFile();
 			toolSignature = tool.getToolSignature();
-			supportsModeration = new Boolean(tool.getSupportsModeration());
-			supportsContribute = new Boolean(tool.getSupportsContribute());
 			authoringURL = tool.getAuthorUrl();
 			adminURL = tool.getAdminUrl();
 			supportsOutputs = tool.getSupportsOutputs();

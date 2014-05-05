@@ -585,30 +585,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     @Override
     public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException {
-
-	if (activity.isToolActivity()) {
-	    ToolActivity toolActivity = (ToolActivity) activity;
-	    String url = toolActivity.getTool().getContributeUrl();
-	    if (url != null) {
-		return setupToolURLWithToolContent(toolActivity, url);
-	    }
-	} else if (activity.isSystemToolActivity()) {
+	if (activity.isSystemToolActivity()) {
 	    SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
 	    if (sysTool != null) {
 		return setupURLWithActivityLessonID(activity, lessonID, sysTool.getContributeUrl());
-	    }
-	}
-	return null;
-    }
-
-    @Override
-    public String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException {
-
-	if (activity.isToolActivity()) {
-	    ToolActivity toolActivity = activity;
-	    String url = toolActivity.getTool().getModerationUrl();
-	    if (url != null) {
-		return setupToolURLWithToolContent(toolActivity, url);
 	    }
 	}
 	return null;
