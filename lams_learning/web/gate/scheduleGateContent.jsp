@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			offsetDay = Math.floor(offset/day);
 		offset -= offsetDay * day;
 		var offsetHour = Math.floor(offset/(60*60));
-		offset -= offsetHour * 60;
+		offset -= offsetHour * 60 * 60;
 		var offsetMinute =  Math.floor(offset/60);
 		
 		if (offsetDay > 0) {
