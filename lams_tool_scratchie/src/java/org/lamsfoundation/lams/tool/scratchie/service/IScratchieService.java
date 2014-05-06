@@ -281,4 +281,16 @@ public interface IScratchieService {
     Set<ScratchieUser> getAllLeaders(Long contentId);
     
     void changeUserMark(Long userId, Long userUid, Integer newMark);
+    
+    /**
+     * Recalculate marks after editing content from monitoring.
+     * 
+     * @param scratchie
+     * @param oldItems
+     * @param newItems
+     */
+    void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
+	    List<ScratchieItem> deletedItems);
+    
+    void releaseItemsFromCache(Scratchie scratchie);
 }

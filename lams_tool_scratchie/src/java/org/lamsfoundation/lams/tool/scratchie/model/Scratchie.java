@@ -58,8 +58,6 @@ public class Scratchie implements Cloneable {
 
     private boolean defineLater;
 
-    private boolean contentInUse;
-
     // general infomation
     private Date created;
 
@@ -270,18 +268,6 @@ public class Scratchie implements Cloneable {
 
     public void setScratchieItems(Set scratchieItems) {
 	this.scratchieItems = scratchieItems;
-    }
-
-    /**
-     * @hibernate.property column="content_in_use"
-     * @return
-     */
-    public boolean isContentInUse() {
-	return contentInUse;
-    }
-
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
     }
 
     /**

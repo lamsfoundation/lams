@@ -166,7 +166,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	boolean isGroupedActivity = service.isGroupedActivity(toolContentID);
 	sessionMap.put(ScratchieConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
-	sessionMap.put(ScratchieConstants.PAGE_EDITABLE, content.isContentInUse());
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, content);
 	sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, toolContentID);
     }

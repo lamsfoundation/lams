@@ -214,17 +214,6 @@ public class LearningAction extends Action {
 	    return mapping.findForward("defineLater");
 	}
 
-	// set contentInUse flag to true!
-	scratchie.setContentInUse(true);
-	scratchie.setDefineLater(false);
-	tryExecute(new Callable<Object>() {
-	    @Override
-	    public Object call() throws ScratchieApplicationException {
-		LearningAction.service.saveOrUpdateScratchie(scratchie);
-		return null;
-	    }
-	});
-
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
 		toolSessionId, request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
@@ -370,7 +359,7 @@ public class LearningAction extends Action {
 	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
 	ScratchieAnswer answer = LearningAction.service.getScratchieAnswerByUid(answerUid);
 	if (answer == null) {
-	    return mapping.findForward(ScratchieConstants.ERROR);
+	    return null;
 	}
 
 	JSONObject JSONObject = new JSONObject();
@@ -396,7 +385,7 @@ public class LearningAction extends Action {
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
 
 	ScratchieUser leader = this.getCurrentUser(toolSessionId);
-	// only leaders are allowed to scratch answers
+	// only leader is allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}

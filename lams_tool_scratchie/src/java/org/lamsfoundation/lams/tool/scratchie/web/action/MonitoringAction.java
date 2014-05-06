@@ -124,7 +124,6 @@ public class MonitoringAction extends Action {
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
-	sessionMap.put(ScratchieConstants.PAGE_EDITABLE, scratchie.isContentInUse());
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	sessionMap.put(ScratchieConstants.ATTR_LEARNERS, learners);
 	sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, contentId);

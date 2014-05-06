@@ -11,6 +11,7 @@
 						<tr>
 							<td style="padding-left:10px; border-bottom:0px; vertical-align:middle; background:none;">
 								<input type="hidden" name="answerOrderId${status.index}" id="answerOrderId${status.index}" value="${answer.orderId}">
+								<input type="hidden" name="answerUid${status.index}" id="answerUid${status.index}" value="${answer.uid}">
 								<span class="field-name">
 									&#${status.index + 65};)
 								</span>

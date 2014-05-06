@@ -35,8 +35,10 @@ public interface ScratchieItemDAO extends DAO {
      * @param scratchieUid
      * @return
      */
-    List getAuthoringItems(Long scratchieUid);
+    List<ScratchieItem> getAuthoringItems(Long scratchieUid);
 
     ScratchieItem getByUid(Long scratchieItemUid);
+    
+    void releaseItemFromCache(ScratchieItem item);
 
 }

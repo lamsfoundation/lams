@@ -86,6 +86,8 @@ public class ScratchieConstants {
     public static final String ATTR_ANSWER_DESCRIPTION_PREFIX = "answerDescription";
     
     public static final String ATTR_ANSWER_ORDER_ID_PREFIX = "answerOrderId";
+    
+    public static final String ATTR_ANSWER_UID_PREFIX = "answerUid";
 
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
     
@@ -128,8 +130,6 @@ public class ScratchieConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
-
-    public static final String PAGE_EDITABLE = "isPageEditable";
 
     public static final String ATTR_REFLECTION_ON = "reflectOn";
 

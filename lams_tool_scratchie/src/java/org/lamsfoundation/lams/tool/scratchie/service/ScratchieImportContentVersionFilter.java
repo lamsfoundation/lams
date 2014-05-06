@@ -60,4 +60,11 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 	this.removeField(Scratchie.class, "offlineInstructions");
 	this.removeField(Scratchie.class, "attachments");
     }
+    
+    /**
+     * Import 20131212 version content to 20140102 version tool server.
+     */
+    public void up20140102To20140505() {
+	this.removeField(Scratchie.class, "contentInUse");
+    }
 }

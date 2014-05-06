@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.scratchie.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,26 +40,14 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -72,7 +58,6 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -95,7 +80,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -105,7 +89,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
  * @author Andrey Balan
  */
 public class ScratchieServiceImpl implements IScratchieService, ToolContentManager, ToolSessionManager,
@@ -178,8 +161,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List getAuthoredItems(Long scratchieUid) {
-	List res = scratchieItemDao.getAuthoringItems(scratchieUid);
+    public List<ScratchieItem> getAuthoredItems(Long scratchieUid) {
+	List<ScratchieItem> res = scratchieItemDao.getAuthoringItems(scratchieUid);
 	return res;
     }
 
@@ -197,6 +180,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public void saveOrUpdateScratchie(Scratchie scratchie) {
 	scratchieDao.saveObject(scratchie);
+    }
+    
+    @Override
+    public void releaseItemsFromCache(Scratchie scratchie) {
+	for (ScratchieItem item : (Set<ScratchieItem>)scratchie.getScratchieItems()) {
+	    scratchieItemDao.releaseItemFromCache(item);
+	}
     }
 
     @Override
@@ -330,6 +320,87 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 			.getSession().getSessionId(), false);
 	    }
 	}
+    }
+    
+    @Override
+    public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
+	    List<ScratchieItem> deletedItems) {
+
+	//create list of modified questions
+	List<ScratchieItem> modifiedItems = new ArrayList<ScratchieItem>();
+	for (ScratchieItem oldItem : oldItems) {
+	    for (ScratchieItem newItem : newItems) {
+		if (oldItem.getUid().equals(newItem.getUid())) {
+		    
+		    boolean isItemModified = false;
+
+		    //title or description is different
+		    if (!oldItem.getTitle().equals(newItem.getTitle())
+			    || !oldItem.getDescription().equals(newItem.getDescription())) {
+			isItemModified = true;
+		    }
+		    
+		    //options are different
+		    Set<ScratchieAnswer> oldAnswers = oldItem.getAnswers();
+		    Set<ScratchieAnswer> newAnswers = newItem.getAnswers();
+		    for (ScratchieAnswer oldAnswer : oldAnswers) {
+			for (ScratchieAnswer newAnswer : newAnswers) {
+			    if (oldAnswer.getUid().equals(newAnswer.getUid())) {
+				
+				if (!StringUtils.equals(oldAnswer.getDescription(), newAnswer.getDescription())
+					|| (oldAnswer.isCorrect() != newAnswer.isCorrect())) {
+				    isItemModified = true;
+				}			
+			    }
+			}
+		    }
+		    
+		    if (isItemModified) {
+			modifiedItems.add(newItem);
+		    }
+		}
+	    }    
+	}
+	
+	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
+	for (ScratchieSession session : sessionList) {
+	    Long toolSessionId = session.getSessionId();
+	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<ScratchieAnswerVisitLog>();
+	    boolean isRecalculateMarks = false;
+
+	    // remove all scratches for modified and removed items
+
+	    // [+] if the item was removed
+	    for (ScratchieItem deletedItem : deletedItems) {
+		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(
+			toolSessionId, deletedItem.getUid());
+		visitLogsToDelete.addAll(visitLogs);
+	    }
+
+	    // [+] if the question is modified
+	    for (ScratchieItem modifiedItem : modifiedItems) {
+		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(
+			toolSessionId, modifiedItem.getUid());
+		visitLogsToDelete.addAll(visitLogs);
+	    }
+	    
+	    //remove all visit logs marked for deletion
+	    Iterator<ScratchieAnswerVisitLog> iter = visitLogsToDelete.iterator();
+	    while (iter.hasNext()) {
+		ScratchieAnswerVisitLog visitLogToDelete = iter.next();
+		iter.remove();
+		scratchieAnswerVisitDao.removeObject(ScratchieAnswerVisitLog.class, visitLogToDelete.getUid());
+		isRecalculateMarks = true;
+	    }
+
+	    // [+] doing nothing if the new question was added
+
+	    // recalculate marks if it's required
+	    if (isRecalculateMarks) {
+		recalculateMarkForSession(toolSessionId, true);
+	    }
+	}
+
     }
 
     @Override
