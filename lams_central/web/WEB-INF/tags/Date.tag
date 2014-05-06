@@ -46,7 +46,10 @@
 	<c:when test="${style=='short'}">
 		<fmt:formatDate value="${value}" type="${type}" dateStyle="short" timeStyle="short" />
 	</c:when>
-	<c:otherwise>
+	<c:when test="${style=='full'}">
 		<fmt:formatDate value="${value}" type="${type}" dateStyle="long" timeStyle="full" />
+	</c:when>
+	<c:otherwise>
+		<fmt:formatDate value="${value}" type="${type}" dateStyle="long" timeStyle="medium" />
 	</c:otherwise>
 </c:choose>
