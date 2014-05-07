@@ -122,6 +122,11 @@ div#ldStoreDialog img#ldScreenshotLoading  {
 	display: none;
 }
 
+div#leftDialogButtonContainer {
+	float: left;
+	margin-left: 10px;
+}
+
 div#ldStoreDialogNameContainer {
 	float: left;
 	padding: 8px 0 0 215px;

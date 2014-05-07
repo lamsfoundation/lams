@@ -6,6 +6,7 @@
 var paper = null,
 	canvas = null,
 	nameValidator = /^[^<>^*@%$]*$/i,
+	numberValidator = /^[\d\.]+$/,
 	
 // configuration and storage of various elements
 	layout = {
@@ -230,13 +231,273 @@ function initLayout() {
 		.addClass( "ui-corner-bottom" );
 	$('#tabs .ui-tabs-nav').appendTo('#tabs');
 	
-	// the close button is shared by both load and save dialogs
-	var closeLdStoreDialogButton ={
-    	'text'   : 'Cancel',
-    	'click'  : function() {
+	// buttons shared by both load and save dialogs
+	var sharedButtons = [
+	{
+    	'text'     : 'Cancel',
+    	'tabIndex' : -1,
+    	'click'    : function() {
 			$(this).dialog('close');
 		}
     },
+    	
+	// creates a new folder
+    {
+		'class'    : 'leftDialogButton',
+		'text'     : 'New',
+		'tabIndex' : -1,
+		'click'    : function(){
+    		var dialog = $(this),
+				tree = dialog.dialog('option', 'ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode();
+    		if (!ldNode) {
+    			return;
+    		}
+    		
+			var	title = prompt('Please enter the name for a new folder');
+			// skip if no name was provided
+			if (!title) {
+				return;
+			}
+			if (!nameValidator.test(title)) {
+    			alert('The title can not contain any of these characters < > ^ * @ % $');
+    			return;
+    		}
+			
+			var parentFolder = ldNode.data.learningDesignId ? ldNode.parent : ldNode;
+			$.each(parentFolder.children, function(){
+				if (this.label == title) {
+					alert('A folder with this name already exists.');
+					title = null;
+					return false;
+				}
+			});
+			if (!title) {
+				return;
+			}
+			
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'         : 'createFolderForFlash',
+					'name' 		     : title,
+					'parentFolderID' : parentFolder.data.folderID
+				},
+				success : function(response) {
+					// still process WDDX packed, to be changed when we get rid of Flash Authoring
+					var messageIndex = response.indexOf("folderID'><number>") + 18,
+						folderID = response.substring(messageIndex, response.indexOf('<', messageIndex));
+					
+					if (!numberValidator.test(folderID)) {
+						// error
+						var messageIndex = response.indexOf("messageValue'><string>") + 22,
+							message = response.substring(messageIndex, response.indexOf('<', messageIndex));
+						alert(message);
+						return;
+					}
+					
+					tree.removeChildren(parentFolder);
+					parentFolder.expand();
+				}
+			});
+		}
+	},
+	
+	// copy sequence or folder
+    {
+		'class'    : 'leftDialogButton',
+		'text'     : 'Copy',
+		'tabIndex' : -1,
+		'click'    : function(){
+    		var dialog = $(this),
+				tree = dialog.dialog('option', 'ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				isFolder = ldNode && !ldNode.data.learningDesignId;
+    		if (!ldNode) {
+    			return;
+    		}
+    		
+    		dialog.dialog('option', 'copiedResource', {
+    			'isFolder'   : isFolder,
+    			'resourceID' : isFolder ?  ldNode.data.folderID : ldNode.data.learningDesignId
+    		});
+		}
+	},
+	
+	// pastes sequence or folder
+    {
+		'class'    : 'leftDialogButton',
+		'text'     : 'Paste',
+		'tabIndex' : -1,
+		'click'    : function(){
+    		var dialog = $(this),
+				tree = dialog.dialog('option', 'ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				folderNode = ldNode ? (ldNode.data.learningDesignId ? ldNode.parent : ldNode) : null,
+				copiedResource = dialog.dialog('option','copiedResource');
+				
+			if (!folderNode || !copiedResource) {
+    			return;
+    		}
+
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'         : 'copyResource',
+					'targetFolderID' : folderNode.data.folderID,
+					'resourceID'     : copiedResource.resourceID,
+					'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function(response) {
+					// still process WDDX packed, to be changed when we get rid of Flash Authoring
+					var messageIndex = response.indexOf("messageValue'><number>") + 22,
+						message = response.substring(messageIndex, response.indexOf('<', messageIndex));
+					if (!numberValidator.test(message)) {
+						// error
+						alert(message);
+						return;
+					}
+					
+					tree.removeChildren(folderNode);
+					folderNode.expand();
+				}
+			});
+		}
+	},
+	
+	// removes sequence or folder
+    {
+		'class'    : 'leftDialogButton',
+		'text'     : 'Delete',
+		'tabIndex' : -1,
+		'click'    : function(){
+    		var dialog = $(this),
+				tree = dialog.dialog('option', 'ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				isFolder = ldNode && !ldNode.data.learningDesignId;
+    		if (!ldNode || !confirm('Are you sure you want to delete this ' + (isFolder ? 'folder' : 'sequence') + '?')) {
+    			return;
+    		}
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'       : 'deleteResource',
+					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function(response) {
+					// still process WDDX packed, to be changed when we get rid of Flash Authoring
+					var messageIndex = response.indexOf("messageValue'><string>") + 22,
+						message = response.substring(messageIndex, response.indexOf('<', messageIndex));
+					if (!/^.*:\d+$/.test(message)) {
+						// error
+						alert(message);
+						return;
+					}
+					
+					var parentFolder = ldNode.parent;
+					tree.removeChildren(parentFolder);
+					parentFolder.expand();
+				}
+			});
+		}
+	},
+	
+	
+	// renames sequence or folder
+    {
+		'class'    : 'leftDialogButton',
+		'text'     : 'Rename',
+		'tabIndex' : -1,
+		'click'    : function(){
+    		var dialog = $(this),
+				tree = dialog.dialog('option', 'ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				isFolder = ldNode && !ldNode.data.learningDesignId;
+    		if (!ldNode) {
+    			return;
+    		}
+			var title = prompt('Please enter the new name for ' + (isFolder ? 'folder' : 'sequence') + ' "' + ldNode.label + '"');
+			
+			// skip if no name or the same name was provided
+			if (!title || ldNode.label == title) {
+				return;
+			}
+			if (!nameValidator.test(title)) {
+    			alert('The title can not contain any of these characters < > ^ * @ % $');
+    			return;
+    		}
+			
+			$.each(ldNode.parent.children, function(){
+				if (this.label == title && (isFolder == (this.data.folderID != null))) {
+					alert('A ' + (isFolder ? 'folder' : 'sequence') + ' with this name already exists.');
+					title = null;
+					return false;
+				}
+			});
+			if (!title) {
+				return;
+			}
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'       : 'renameResourceJSON',
+					'name' 		   : title,
+					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function(response) {
+					// still process WDDX packed, to be changed when we get rid of Flash Authoring
+					var messageIndex = response.indexOf("messageValue'><string>") + 22,
+						message = response.substring(messageIndex, response.indexOf('<', messageIndex));
+					if (message != title) {
+						// error
+						alert(message);
+						return;
+					}
+					if (isFolder) {
+						ldNode.label = title;
+						ldNode.getLabelEl().innerHTML = title;
+					} else {
+						// refresh all opened folders in the tree
+	    				var folders = tree.getRoot().children;
+	    				if (folders) {
+	    					$.each(folders, function(){
+	    						var expanded = this.expanded;
+								tree.removeChildren(this);
+	    						if (expanded) {
+	    							this.expand();
+	    						}
+	    					});
+	    				}
+	    				
+	    				// fetch access list again
+						updateAccess(null, true);
+					}
+				}
+			});
+		}
+	}],
     
 	// initalise Learning Design load/save dialog
 	ldStoreDialog = $('#ldStoreDialog').dialog({
@@ -250,9 +511,10 @@ function initLayout() {
 		'width'			: 1240,
 		'height'		: 785,
 		'draggable'     : false,
-		'buttonsLoad' : [
-		             closeLdStoreDialogButton,
+		'buttonsLoad' : sharedButtons.concat([
 		             {
+		            	'id'	 : 'openLdStoreButton',
+		            	'class'  : 'defaultFocus',
 		            	'text'   : 'Open',
 		            	'click'  : function() {
 		            		var dialog = $(this),
@@ -274,11 +536,11 @@ function initLayout() {
 		            		openLearningDesign(learningDesignID);
 						}
 		             }
-		],
+		]),
 		
-		'buttonsSave' : [
-			             closeLdStoreDialogButton,
+		'buttonsSave' : sharedButtons.concat([
 			             {
+			            	'class'  : 'defaultFocus',
 			            	'text'   : 'Save',
 			            	'click'  : function() {	
 			            		var dialog = $(this),
@@ -335,8 +597,7 @@ function initLayout() {
 		            			// otherwise check if there is no other sequence with the same name
 			            		if (folderNode && folderNode.children) {
 			            			$.each(folderNode.children, function(){
-			            				var nodeTitle = $(this.getContentHtml()).text();
-			            				if (nodeTitle == title) {
+			            				if (this.label == title) {
 			            					this.highlight();
 			            					learningDesignID = this.data.learningDesignId;
 			            					return false;
@@ -354,14 +615,24 @@ function initLayout() {
 			            		}
 							}
 			             }
-		],
+		]),
 		'open' : function(){
 			showLearningDesignThumbnail();
 			
-			var nameContainer = $('#ldStoreDialogNameContainer');
+			$('#leftDialogButtonContainer').remove();
+			var nameContainer = $('#ldStoreDialogNameContainer'),
+				leftButtonContainer = $('<div />').attr('id','leftDialogButtonContainer');
 			$('input', nameContainer).val(null);
-			$(this).siblings('.ui-dialog-buttonpane').append(nameContainer);
+			$(this).siblings('.ui-dialog-buttonpane').append(leftButtonContainer).append(nameContainer);
 			$('#ldStoreDialogNameField', nameContainer).focus();
+
+			$('.leftDialogButton')
+			   .attr('disabled', 'disabled')
+			   .button('option', 'disabled', true)
+			   .appendTo(leftButtonContainer);
+			$('.defaultFocus').focus();
+			
+			$(this).dialog('option', 'copiedResource', null);
 		}
 	});
 	
@@ -398,13 +669,17 @@ function initLayout() {
 		var dialog = $(this.getEl()).closest('.ui-dialog'),
 			isSaveDialog = dialog.hasClass('ldStoreDialogSave');
 	
+		$('.leftDialogButton')
+		   .attr('disabled', event.node.highlightState > 0 ? 'disabled' : null)
+		   .button('option', 'disabled', event.node.highlightState > 0);
+
 		if (!isSaveDialog && !event.node.data.learningDesignId){
-			// it is a folder in load sequence dialog, do not highlight
-			return false;
+			// it is a folder in load sequence dialog, hightlight but stop processing
+			return true;
 		}
 		
-		var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId      : null,
-			title            = isSaveDialog && learningDesignID ? $(event.node.getContentHtml()).text() : null;
+		var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId : null,
+			title            = isSaveDialog && learningDesignID ? event.node.label : null;
 		
 		showLearningDesignThumbnail(learningDesignID, title);
 	});
@@ -1385,31 +1660,48 @@ function escapeHtml(unsafe) {
 }
 
 
-function updateAccess(access){
-	var accessCell = $('#ldStoreDialogAccessCell');
-	accessCell.children('div.access').remove();
-	$.each(access, function(){
-		$('<div />').addClass('access')
-					.attr({
-						'learningDesignId' : this.learningDesignId,
-						'folderID'         : this.workspaceFolderId
-					})
-					.text(this.title)
-					.appendTo(accessCell)
-					.click(function(){
-						var accessEntry = $(this);
-						if (accessEntry.hasClass('selected')) {
-							return;
-						}
-						
-						var	dialog = accessEntry.closest('.ui-dialog'),
-							isSaveDialog = dialog.hasClass('ldStoreDialogSave'),
-							learningDesignID = +accessEntry.attr('learningDesignId'),
-							title = isSaveDialog ? accessEntry.text() : null;
+function updateAccess(access, fetchIfEmpty){
+	if (fetchIfEmpty && !access) {
+		$.ajax({
+			cache : false,
+			async : false,
+			url : LAMS_URL + "authoring/author.do",
+			dataType : 'json',
+			data : {
+				'method' : 'getLearningDesignAccess'
+			},
+			success : function(response) {
+				access = response;
+			}
+		});
+	}
+	
+	if (access) {
+		var accessCell = $('#ldStoreDialogAccessCell');
+		accessCell.children('div.access').remove();
+		$.each(access, function(){
+			$('<div />').addClass('access')
+						.attr({
+							'learningDesignId' : this.learningDesignId,
+							'folderID'         : this.workspaceFolderId
+						})
+						.text(this.title)
+						.appendTo(accessCell)
+						.click(function(){
+							var accessEntry = $(this);
+							if (accessEntry.hasClass('selected')) {
+								return;
+							}
 							
-						showLearningDesignThumbnail(learningDesignID, title);
-					});
-	});
+							var	dialog = accessEntry.closest('.ui-dialog'),
+								isSaveDialog = dialog.hasClass('ldStoreDialogSave'),
+								learningDesignID = +accessEntry.attr('learningDesignId'),
+								title = isSaveDialog ? accessEntry.text() : null;
+								
+							showLearningDesignThumbnail(learningDesignID, title);
+						});
+		});
+	}
 }
 
 

@@ -501,6 +501,21 @@ public class AuthoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    public ActionForward getLearningDesignAccess(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	Integer userId = getUserId();
+
+	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+	accessList = accessList.subList(0,
+		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+	Gson gson = new GsonBuilder().create();
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(gson.toJson(accessList));
+	return null;
+    }
+    
+
     /**
      * Get AuditService bean.
      * 
