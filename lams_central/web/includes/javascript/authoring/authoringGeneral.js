@@ -128,13 +128,25 @@ function initTemplates(){
 			});
 		}
 		
+		var iconPath = $('img', this).attr('src');
 		// register tool properties so they are later easily accessible
 		layout.toolMetadata[learningLibraryID] = {
-			'iconPath' 			 	  : $('img', this).attr('src'),
+			'iconPath' 			 	  : iconPath,
 			'supportsOutputs' 	 	  : $(this).attr('supportsOutputs'),
 			'activityCategoryID' 	  : activityCategoryID,
 			'parallelChildActivities' : parallelChildActivities
 		};
+		
+		
+		if (/\.svg$/i.test(iconPath)){
+			$.ajax({
+				url : iconPath,
+				dataType : 'text',
+				success : function(response) {
+					layout.toolMetadata[learningLibraryID].iconCode = response.substring(response.indexOf('<svg'));
+				}
+			});
+		}
 		
 		// if a tool's name is too long and gets broken into two lines
 		// make some adjustments to layout
@@ -1616,6 +1628,7 @@ function resizePaper(width, height) {
 	var binPath = Raphael.parsePathString(layout.defs.bin);
 	binPath = Raphael.transformPath(binPath, Raphael.format('t {0} {1}', width - 5, height - 50));
 	layout.items.bin = paper.path(binPath);
+	$(layout.items.bin.node).attr('id', 'rubbishBin');
 	
 	HandlerLib.resetCanvasMode(true);
 }

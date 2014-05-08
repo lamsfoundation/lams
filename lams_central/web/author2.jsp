@@ -32,6 +32,9 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringProperty.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/rgbcolor.js"></script> 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/StackBlur.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/canvg.js"></script> 
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
@@ -66,6 +69,8 @@
 			<ul>
 				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
 				<li id="exportButton" onClick="javascript:MenuLib.exportLearningDesign()">Export</li>
+				<li onClick="javascript:MenuLib.convertToPNG()">Image</li>
+				
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
