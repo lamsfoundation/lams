@@ -129,7 +129,7 @@ div#leftDialogButtonContainer {
 
 div#ldStoreDialogNameContainer {
 	float: left;
-	padding: 8px 0 0 100px;
+	padding: 8px 0 0 215px;
 }
 
 div#ldStoreDialogNameContainer span {
@@ -180,6 +180,14 @@ div#gtbDialog #gtbAddButton, div#gtbDialog #gtbRemoveButton {
 div#gtbDialog td.gtbListCell div {
 	text-align: left;
 	cursor: pointer;
+}
+
+
+div#exportImageDialog div#exportCanvas {
+	margin: 5px;
+	padding: 5px;
+	text-align: center;
+	border: thin dashed black;
 }
 
 

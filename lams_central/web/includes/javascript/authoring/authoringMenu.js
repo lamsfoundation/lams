@@ -853,66 +853,153 @@ var MenuLib = {
 				 'Export','width=712,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no');
 	},
 	
+	
 	/**
 	 * Creates a PNG image out of current SVG contents.
 	 */
 	convertToPNG : function(){
-		// Raphael does not add this and it's needed by Firefox
-		$('svg', canvas).attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+		var crop = MenuLib.getCanvasCrop();
+		if (crop.x >= crop.x2) {
+			return;
+		}
+		
+		var ctx = crop.workspace.getContext('2d'),
+		w = crop.x2 - crop.x,
+		h = crop.y2 - crop.y,
+		cut = ctx.getImageData(crop.x, crop.y, w, h);
+
+		crop.workspace.width = w;
+		crop.workspace.height = h;
+		ctx.putImageData(cut, 0, 0);
+		
+		// open a dialog with the result
+		var dialog = $('#exportImageDialog');
+		$('<img />').attr('src', crop.workspace.toDataURL("image/png"))
+					.appendTo($('#exportCanvas', dialog).empty());
+		dialog.dialog({
+					'minWidth' : w + 50,
+					'show'     : 'fold',
+					'hide'     : 'fold',
+					'resizable': false,
+					'title'	   : 'Image export'
+			   });
+	},
+	
+	
+	/**
+	 * Creates a SVG image out of current SVG contents.
+	 */
+	convertToSVG : function(){
+		var crop = MenuLib.getCanvasCrop();
+		if (crop.x >= crop.x2) {
+			return;
+		}
+		
+		// replace image links with PNG code
+		var iconLibrary = {};
+		crop.canvasClone.find('image').each(function(){
+			var attributeName = 'xlink:href',
+				iconLink = $(this).attr(attributeName);
+			if (!iconLink) {
+				attributeName = 'href',
+				iconLink = $(this).attr(attributeName);
+			}
+			
+			var iconCode = iconLibrary[iconLink];
+			if (!iconCode) {
+				$.ajax({
+					url : iconLink,
+					async: false,
+					dataType : 'text',
+					success : function(response) {
+						iconCode = iconLibrary[iconLink] = response;
+					}
+				});
+			}
+			if (!iconCode) {
+				return true;
+			}
+			
+			canvg(crop.workspace, iconCode);
+			$(this).attr(attributeName, crop.workspace.toDataURL("image/png"));
+		});
+		
+		
+		// set viewBox so content is nicely aligned
+		var width = crop.x2 - crop.x + 2,
+			height = crop.y2 - crop.y + 2;
+		
+		$('svg', crop.canvasClone).attr({
+			'viewBox'             : crop.x + ' ' + crop.y + ' ' + width + ' ' + height,
+			'width'               : width,
+			'height'              : height,
+			'preserveAspectRatio' : 'xMinYMin slice'
+		});
+		
+		var dialog = $('#exportImageDialog');
+		$('#exportCanvas', dialog).html(crop.canvasClone.html());
+		dialog.dialog({
+					'minWidth' : width + 50,
+					'show'     : 'fold',
+					'hide'     : 'fold',
+					'resizable': false,
+					'title'	   : 'Image export'
+			   });
+	},
+	
+	
+	/**
+	 * Finds coordinates of canvas content, minus surrounding whitespace.
+	 */
+	getCanvasCrop : function(){
 		var canvasClone = canvas.clone();
+		// Raphael does not add this and it's needed by Firefox
+		$('svg', canvasClone).attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+		// remove the rubbish bin icon
 		canvasClone.find('#rubbishBin').remove();
-		var svgCode = canvasClone.html(),
-			workspace = $('<canvas />')[0];
-//		svgCode = svgCode.replace(/xmlns:NS1=\"\"/, '');
-//		svgCode = svgCode.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, 'xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"');
-//		svgCode = svgCode.replace(/xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\" xlink:href/g, 'xlink:href');
-//		svgCode = svgCode.replace(/<svg\s+[a-zA-Z0-9.=\/:"\-;\s]+>/, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">');
-		canvg(workspace, svgCode);
+		// create HTML5 canvas element and fill it with SVG code using canvg library
+		var workspace = $('<canvas />')[0];
+		canvg(workspace, canvasClone.html());
 
 		// trim the image from white space
 		var ctx = workspace.getContext('2d'),
 		w = workspace.width,
 		h = workspace.height,
-		pix = {
-			x : [],
-			y : []
-		},
-		imageData = ctx.getImageData(0, 0, w, h);
+		imageData = ctx.getImageData(0, 0, w, h),
+		result = {
+			x : w,
+			y : h,
+			x2 : 0,
+			y2 : 0,
+			workspace : workspace,
+			canvasClone : canvasClone
+		};
 
-		for (var y = 0; y < h; y++) {
-			for (var x = 0; x < w; x++) {
-				var index = (y * w + x) * 4;
-				if (imageData.data[index + 3] > 0) {
-					pix.x.push(x);
-					pix.y.push(y);
+		for (y = 0; y < h; y++) {
+		    for (x = 0; x < w; x++) {
+		        var index = (y * w + x) * 4,
+		        	a = imageData.data[index + 3];
 
-				}
-			}
+		        if (a > 0) {
+		            if (x < result.x) {
+		            	result.x = x;
+		            }
+		            if (y < result.y) {
+		            	result.y = y;
+		            }
+		            if (x > result.x2) {
+		            	result.x2 = x;
+		            }
+		            if (y > result.y2) {
+		            	result.y2 = y;
+		            }
+		        }
+		    }
 		}
 		
-		// see if the image was not empty
-		if (pix.x.length > 0 && pix.y.length > 0) {
-			pix.x.sort(function(a, b) {
-				return a - b
-			});
-			pix.y.sort(function(a, b) {
-				return a - b
-			});
-			var n = pix.x.length - 1;
-	
-			w = pix.x[n] - pix.x[0];
-			h = pix.y[n] - pix.y[0];
-			var cut = ctx.getImageData(pix.x[0], pix.y[0], w, h);
-	
-			workspace.width = w;
-			workspace.height = h;
-			ctx.putImageData(cut, 0, 0);
-			
-			// open a new window with the result
-			window.open(workspace.toDataURL("image/png"), '_blank', 'width=' + (w + 10) + ',height=' + (h + 10));
-		}
-		$(workspace).remove();
+		return result;
 	}
+	
 	
 	/*
 	,zoom : function(){

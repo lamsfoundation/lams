@@ -132,6 +132,12 @@
 			if (window.DOMParser)
 			{
 				var parser = new DOMParser();
+				
+				// Modified by LAMS to address issue 189: syntax errors in IE 11
+				xml = xml.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
+				xml = xml.replace(/xmlns:NS1=\"\"/, '');
+				xml = xml.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, 'xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"');
+				xml= xml.replace(/xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\" xlink:href/g, 'xlink:href');
 				return parser.parseFromString(xml, 'text/xml');
 			}
 			else 

@@ -69,8 +69,8 @@
 			<ul>
 				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
 				<li id="exportButton" onClick="javascript:MenuLib.exportLearningDesign()">Export</li>
-				<li onClick="javascript:MenuLib.convertToPNG()">Image</li>
-				
+				<li onClick="javascript:MenuLib.convertToPNG()">Image PNG</li>
+				<li onClick="javascript:MenuLib.convertToSVG()">Image SVG</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
@@ -548,6 +548,13 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	
+	
+	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
+	<div id="exportImageDialog" class="dialogContainer">
+		<div class="dialogTitle">Right-click on the image and save it</div>
+		<div id="exportCanvas"></div>
 	</div>
 </body>
 </lams:html>
