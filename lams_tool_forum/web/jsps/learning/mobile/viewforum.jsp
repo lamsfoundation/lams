@@ -5,14 +5,14 @@
 <c:set var="continue"><html:rewrite page="/learning/newReflection.do?sessionMapID=${sessionMapID}" /></c:set>
 <c:set var="finish"><html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" /></c:set>
 
-<script type="text/javascript">
-	function finishForum() {
-		document.getElementById("finishButton").disabled = true;
-		location.href = '${finish}';
-	};
-</script>
-
 <div data-role="page" data-dom-cache="false">
+
+	<script type="text/javascript">
+		function finishForum() {
+			document.getElementById("finishButton").disabled = true;
+			location.href = '${finish}';
+		};
+	</script>
 
 	<div data-role="header" data-theme="b">
 		<h1>
