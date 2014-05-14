@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:forEach var="msgDto" items="${topicThread}">
-	<c:set var="indentSize" value="${msgDto.level*3}" />
+	<c:set var="indentSize" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 	<c:set var="edittopic">
 		<html:rewrite page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}" />

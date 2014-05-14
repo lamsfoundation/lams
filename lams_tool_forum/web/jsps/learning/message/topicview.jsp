@@ -3,7 +3,7 @@
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
 
 <c:forEach var="msgDto" items="${topicThread}">
-	<c:set var="indentSize" value="${msgDto.level*3}" />
+	<c:set var="indentSize" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
 		<table cellspacing="0" class="forum">
