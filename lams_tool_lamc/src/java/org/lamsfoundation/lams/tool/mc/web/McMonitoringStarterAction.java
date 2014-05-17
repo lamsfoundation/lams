@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +38,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
+import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -57,9 +55,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * <p>
  * Starts up the monitoring module
- * </p>
  * 
  * @author Ozgur Demirtas
  */
@@ -88,27 +84,23 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    throw (e);
 	}
 
-	McContent mcContent = service.retrieveMc(new Long(toolContentID));
+	McContent mcContent = service.getMcContent(new Long(toolContentID));
 	mcGeneralMonitoringDTO.setToolContentID(toolContentID.toString());
 	mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 	mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
 	mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
-	mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
-	mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 	mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 
 	/*
 	 * get the questions section is needed for the Edit tab's View Only mode
 	 */
-	List<McQuestionContentDTO> listQuestionContentDTO = new LinkedList<McQuestionContentDTO>();
-	Map<String, String> mapOptionsContent = new TreeMap<String, String>(new McComparator());
+	List<McQuestionDTO> listQuestionContentDTO = new LinkedList<McQuestionDTO>();
 	Long mapIndex = new Long(1);
 	for (McQueContent question : (Set<McQueContent>)mcContent.getMcQueContents()) {
-	    McQuestionContentDTO mcContentDTO = new McQuestionContentDTO();
+	    McQuestionDTO mcContentDTO = new McQuestionDTO();
 
 	    if (question != null) {
-		mapOptionsContent.put(mapIndex.toString(), question.getQuestion());
 
 		mcContentDTO.setQuestion(question.getQuestion());
 		mcContentDTO.setDisplayOrder(question.getDisplayOrder().toString());
@@ -117,9 +109,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
 	}
-	mcGeneralMonitoringDTO.setMapOptionsContent(mapOptionsContent);
 
-	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	request.setAttribute(LIST_QUESTION_DTOS, listQuestionContentDTO);
 	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
@@ -137,32 +128,20 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	mcMonitoringForm.setCurrentTab("1");
 	mcGeneralMonitoringDTO.setCurrentTab("1");
 
-	mcMonitoringForm.setActiveModule(MONITORING);
-	mcGeneralMonitoringDTO.setActiveModule(MONITORING);
 	mcGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
 
 	/* this section is needed for Edit Activity screen, from here... */
 	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
 	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
-	mcGeneralAuthoringDTO.setActiveModule(MONITORING);
 	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-
 	
 	McMonitoringAction monitoringAction = new McMonitoringAction();
 	monitoringAction.repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
 
 	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 
-	mcGeneralMonitoringDTO.setSummaryToolSessions(monitoringAction.populateToolSessions(mcContent));
+	mcGeneralMonitoringDTO.setSummaryToolSessions(MonitoringUtil.populateToolSessions(mcContent));
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
-
-	boolean isContentInUse = McUtils.isContentInUse(mcContent);
-	mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
-	if (isContentInUse == true) {
-	    // monitoring url does not allow editActivity since the content is in use
-	    mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
-	}
 
 	List<ReflectionDTO> reflectionsContainerDTO = service.getReflectionList(mcContent, null);
 	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
@@ -176,12 +155,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	}
 
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
 
 	// find out if there are any reflection entries
 	if (!reflectionsContainerDTO.isEmpty()) {

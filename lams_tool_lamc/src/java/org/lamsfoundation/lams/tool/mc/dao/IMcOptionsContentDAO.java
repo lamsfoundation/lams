@@ -24,15 +24,13 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
- * @author Ozgur Demirtas
- *         <p>
- *         Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content
- *         </p>
+ * Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content
  * 
+ * @author Ozgur Demirtas
  */
 public interface IMcOptionsContentDAO {
     /**
@@ -45,7 +43,7 @@ public interface IMcOptionsContentDAO {
      * @param uid
      * @return McOptsContent
      */
-    public McOptsContent getMcOptionsContentByUID(Long uid);
+    McOptsContent getMcOptionsContentByUID(Long uid);
 
     /**
      * <p>
@@ -56,7 +54,7 @@ public interface IMcOptionsContentDAO {
      * @param mcQueContentId
      * @return List
      */
-    public List findMcOptionsContentByQueId(Long mcQueContentId);
+    List findMcOptionsContentByQueId(Long mcQueContentId);
 
     /**
      * <p>
@@ -68,11 +66,11 @@ public interface IMcOptionsContentDAO {
      * @param mcQueContentUid
      * @return McOptsContent
      */
-    public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
+    McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
-    public List<String> findMcOptionCorrectByQueId(Long mcQueContentId);
+    List<String> findMcOptionCorrectByQueId(Long mcQueContentId);
 
-    public List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId);
+    List<McOptionDTO> getOptionDtos(Long mcQueContentId);
 
     /**
      * <p>
@@ -81,7 +79,7 @@ public interface IMcOptionsContentDAO {
      * 
      * @param mcOptionsContent
      */
-    public void saveMcOptionsContent(McOptsContent mcOptionsContent);
+    void saveMcOptionsContent(McOptsContent mcOptionsContent);
 
     /**
      * <p>
@@ -90,7 +88,7 @@ public interface IMcOptionsContentDAO {
      * 
      * @param mcOptionsContent
      */
-    public void updateMcOptionsContent(McOptsContent mcOptionsContent);
+    void updateMcOptionsContent(McOptsContent mcOptionsContent);
 
     /**
      * <p>
@@ -99,7 +97,7 @@ public interface IMcOptionsContentDAO {
      * 
      * @param mcOptionsContent
      */
-    public void removeMcOptionsContentByUID(Long uid);
+    void removeMcOptionsContentByUID(Long uid);
 
     /**
      * <p>
@@ -108,14 +106,5 @@ public interface IMcOptionsContentDAO {
      * 
      * @param mcOptionsContent
      */
-    public void removeMcOptionsContentByQueId(Long mcQueContentId);
-
-    /**
-     * <p>
-     * removes McOptsContent
-     * </p>
-     * 
-     * @param mcOptionsContent
-     */
-    public void removeMcOptionsContent(McOptsContent mcOptsContent);
+    void removeMcOptionsContent(McOptsContent mcOptsContent);
 }

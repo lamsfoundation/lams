@@ -15,14 +15,16 @@
 		pageContext.setAttribute("tabs", tabs);
 	%>
 
-	<lams:html>
-	<lams:head>
+<lams:html>
+<lams:head>
 
-	<title> <fmt:message key="label.monitoring"/> </title>
+	<title><fmt:message key="label.monitoring"/></title>
+	
+	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
 	
         function init(){
@@ -31,7 +33,6 @@
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-
         }     
         
         function doSelectTab(tabId) {
@@ -47,63 +48,23 @@
         	document.McMonitoringForm.submit();
         }
 
-		function submitMonitoringMethod(actionMethod) 
-		{
+		function submitMonitoringMethod(actionMethod) {
 			document.McMonitoringForm.dispatch.value=actionMethod; 
 			document.McMonitoringForm.submit();
 		}
 		
-		function submitAuthoringMethod(actionMethod) {
-			document.McAuthoringForm.dispatch.value=actionMethod; 
-			document.McAuthoringForm.submit();
+		function submitMethod(actionMethod) {
+			submitMonitoringMethod(actionMethod);
 		}
 		
-		function submitModifyQuestion(questionIndexValue, actionMethod) 
-		{
-			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
+		function submitMonitoringMethod(actionMethod) {
+			document.McMonitoringForm.dispatch.value=actionMethod; 
+			document.McMonitoringForm.submit();
 		}
 		
-		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) 
-		{
-			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
-		}
-
 		function submitChangeDisplayAnswers(displayAnswers, actionMethod) {
 			document.McMonitoringForm.displayAnswers.value=displayAnswers; 
 			submitMonitoringMethod(actionMethod);
-		}		
-		
-		function submitEditResponse(responseId, actionMethod) 
-		{
-			document.McMonitoringForm.responseId.value=responseId; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitMethod(actionMethod) 
-		{
-			submitMonitoringMethod(actionMethod);
-		}
-		
-		function deleteOption(optIndex, actionMethod) {
-			document.McMonitoringForm.optIndex.value=optIndex; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitModifyOption(optionIndexValue, actionMethod) {
-			document.McMonitoringForm.optIndex.value=optionIndexValue; 
-			submitMethod(actionMethod);
-		}
-
-		function submitModifyQuestion(optionIndexValue, actionMethod) {
-			document.McMonitoringForm.optIndex.value=optionIndexValue; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitOpenMc(currentUid, actionMethod)	{
-			document.McMonitoringForm.currentUid.value=currentUid;
-	        submitMethod(actionMethod);
 		}
 	
 	</script>
@@ -119,16 +80,13 @@
 		</div>	
 	
 		<div id="content">						
-		    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="monitoringForm">		
 				<html:hidden property="dispatch"/>
 				<html:hidden property="toolContentID"/>
 				<html:hidden property="httpSessionID"/>
 				<html:hidden property="currentTab" styleId="currentTab" />
 				<html:hidden property="contentFolderID"/>
-				<html:hidden property="activeModule"/>
-				<html:hidden property="defineLaterInEditMode"/>
 				<html:hidden property="responseId"/>
-				<html:hidden property="currentUid"/>
 			
 				<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
 			

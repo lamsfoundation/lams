@@ -39,15 +39,9 @@
     >
 
 	    <forward
-			name="load"
-			path="/AuthoringMaincontent.jsp"
+			name="authoringTabsHolder"
+			path="/authoring/AuthoringTabsHolder.jsp"
 			redirect="false"
-	    />
-	
-	    <forward
-			name="loadViewOnly"
-	      	path="/authoring/AuthoringTabsHolder.jsp"
-	      	redirect="false"
 	    />
 
 	  	<forward
@@ -68,7 +62,7 @@
       path="/authoring"
       type="org.lamsfoundation.lams.tool.mc.web.McAction"
       name="McAuthoringForm"
-      input="/AuthoringMaincontent.jsp"
+      input="/authoring/AuthoringTabsHolder.jsp"
       parameter="dispatch"
       scope="request"
       unknown="false"
@@ -76,8 +70,8 @@
     >
     
 	  	<forward
-	        name="load"
-	        path="/AuthoringMaincontent.jsp"
+	        name="authoringTabsHolder"
+	        path="/authoring/AuthoringTabsHolder.jsp"
 	        redirect="false"
 		/>
 	
@@ -92,12 +86,6 @@
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="false"
 	  	/>
-	  
-	    <forward
-			name="loadViewOnly"
-			path="/authoring/AuthoringTabsHolder.jsp"
-			redirect="false"
-	    />
 	    
 	    <forward
 			name="newQuestionBox"
@@ -108,12 +96,6 @@
 	    <forward
 			name="editQuestionBox"
 			path="/authoring/editQuestionBox.jsp"
-			redirect="false"
-	    />
-	    
-	   <forward
-			name="itemList"
-			path="/authoring/itemlist.jsp"
 			redirect="false"
 	    />
 	    
@@ -141,35 +123,6 @@
 	        redirect="false"
 	  	/>
   </action>
-    
-   <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action 
-   	path="/defineLaterStarter" 
-   	type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
-   	name="McAuthoringForm" 
-	scope="request"
-   	input="/index.jsp"> 
-
-	  	<forward
-		    name="load"
-          	path="/AuthoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-	        name="starter"
-	        path="/index.jsp"
-	        redirect="false"
-	     />
-	  
-        <forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-	  	
-	</action>  
-    
 
    <!--Learning Starter Action: initializes the Learning module -->
    <action 	path="/learningStarter" 
@@ -232,8 +185,7 @@
 		    name="notebook"
 		    path="/learning/Notebook.jsp"
 		    redirect="false"
-	  	/>   
-	  	
+	  	/>
 
 		<forward
 		    name="simpleLearningError"
@@ -265,7 +217,6 @@
 	        redirect="false"
 	      />
 	    </action>
-	
 	
 	
    <!--Learning Main Action: interacts with the Learning module user -->
@@ -354,8 +305,7 @@
 			name="refreshMonitoring"
 			path="/monitoring/MonitoringMaincontent.jsp"
 			redirect="false"
-	  	/>
-	         			
+	  	/>			
    			
 	  	<forward
 		    name="errorList"
@@ -393,32 +343,17 @@
 			redirect="false"
 	  	/>
 
-
         <forward
           name="learnerNotebook"
           path="/monitoring/LearnerNotebook.jsp"
           redirect="false"
         />
-
-
-	    <forward
-			name="newQuestionBox"
-			path="/monitoring/newQuestionBox.jsp"
-			redirect="false"
-	    />
-
-	    <forward
-			name="editQuestionBox"
-			path="/monitoring/editQuestionBox.jsp"
-			redirect="false"
-	    />
 	    
 	   <forward
           name="userMasterDetail"
           path="/monitoring/masterDetailLoadUp.jsp"
           redirect="false"
         />
-
 
 	  	<forward
 		    name="errorList"
@@ -429,8 +364,7 @@
 	
    <action 	path="/clearsession" 
    			type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction"> 
-	</action>     			
-
+	</action>
 
 	<action path="/clearsession"
 		type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction">

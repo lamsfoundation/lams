@@ -120,11 +120,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	mcLearningForm.setToolContentID(toolContentId);
 	
-	//setContentInUse
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
-	mcContent.setContentInUse(true);
-	mcService.saveMcContent(mcContent);
-	
 	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
 
 	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
@@ -303,7 +298,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	/* process the answers */
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
+	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
@@ -383,7 +378,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
+	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 	
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -454,21 +449,72 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
+	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+	
+	Map mapQuestionsUidContent = new TreeMap(new McComparator());
+	if (mcContent != null) {
+	    List list = mcService.refreshQuestionContent(mcContent.getUid());
 
-	Map mapQuestionsUidContent = AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId),
-		mcService);
-
-	Map mapStartupGeneralOptionsContent = AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request,
-		mapQuestionsUidContent, mcService);
+	    Iterator listIterator = list.iterator();
+	    Long mapIndex = new Long(1);
+	    while (listIterator.hasNext()) {
+		McQueContent mcQueContent = (McQueContent) listIterator.next();
+		mapQuestionsUidContent.put(mapIndex.toString(), mcQueContent.getUid());
+		mapIndex = new Long(mapIndex.longValue() + 1);
+	    }
+	}
+	
+	//builds a map to hold all the candidate answers for all the questions by accessing the db
+	Map mapStartupGeneralOptionsContent = new TreeMap(new McComparator());
+	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
+	Long mapIndex = new Long(1);
+	while (itMap.hasNext()) {
+	    Map.Entry pairs = (Map.Entry) itMap.next();
+	    String currentQuestionUid = pairs.getValue().toString();
+	    List listQuestionOptions = mcService.findOptionsByQuestionUid(new Long(currentQuestionUid));
+	    
+	    //builds a questions map from questions list
+	    Map<String, String> mapOptsContent = new TreeMap<String, String>(new McComparator());
+	    Iterator<McOptsContent> iter = listQuestionOptions.iterator();
+	    Long mapIndex2 = new Long(1);
+	    while (iter.hasNext()) {
+		McOptsContent option = iter.next();
+		mapOptsContent.put(mapIndex2.toString(), option.getMcQueOptionText());
+		mapIndex2 = new Long(mapIndex2.longValue() + 1);
+	    }
+	    
+	    mapStartupGeneralOptionsContent.put(mapIndex.toString(), mapOptsContent);
+	    mapIndex = new Long(mapIndex.longValue() + 1);
+	}
 	mcGeneralLearnerFlowDTO.setMapGeneralOptionsContent(mapStartupGeneralOptionsContent);
 
-	Map mapQuestionsContent = AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId), mcService);
+	//builds a map to hold question texts 
+	Map mapQuestionsContent = new TreeMap(new McComparator());
+	List list = mcService.refreshQuestionContent(mcContent.getUid());
+	Iterator iter = list.iterator();
+	Long mapIndex3 = new Long(1);
+	while (iter.hasNext()) {
+	    McQueContent question = (McQueContent) iter.next();
+	    mapQuestionsContent.put(mapIndex3.toString(), question.getQuestion());
+	    mapIndex3 = new Long(mapIndex3.longValue() + 1);
+	}
 	mcGeneralLearnerFlowDTO.setMapQuestionsContent(mapQuestionsContent);
 
-	Map mapFeedbackContent = AuthoringUtil.rebuildFeedbackMapfromDB(request, new Long(toolContentId), mcService);
+	//rebuildFeedbackMapfromDB
+	Map mapFeedbackContent = new TreeMap(new McComparator());
+	List list2 = mcService.refreshQuestionContent(mcContent.getUid());
+	Iterator iter2 = list2.iterator();
+	Long mapIndex4 = new Long(1);
+	while (iter2.hasNext()) {
+	    McQueContent question = (McQueContent) iter2.next();
+
+	    String feedback = question.getFeedback();
+
+	    mapFeedbackContent.put(mapIndex4.toString(), feedback);
+	    mapIndex4 = new Long(mapIndex4.longValue() + 1);
+	}
 	mcGeneralLearnerFlowDTO.setMapFeedbackContent(mapFeedbackContent);
 
 	// Set up the user details. If this is the learner progress screen then we that id,
@@ -562,7 +608,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
+	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 	McQueUsr mcQueUsr = getCurrentUser(toolSessionID);
 	
 	//clear sessionMap

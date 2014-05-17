@@ -28,27 +28,19 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * <p>
  * DTO that holds users attempt history data for jsp purposes
- * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McQuestionContentDTO implements Comparable {
+public class McQuestionDTO implements Comparable {
+    private Long uid;
     private String question;
     private String displayOrder;
     private String feedback;
     private String weight;
     private String mark;
 
-    private String caCount;
-    private List listCandidateAnswersDTO;
-
-    public String toString() {
-	return new ToStringBuilder(this).append("question:", question).append("feedback:", feedback)
-		.append("weight:", weight).append("caCount:", caCount).append("displayOrder:", displayOrder)
-		.append("mark:", mark).append("listCandidateAnswersDTO:", listCandidateAnswersDTO).toString();
-    }
+    private List<McOptionDTO> listCandidateAnswersDTO;
 
     public int compareTo(Object o) {
 	McMonitoredUserDTO mcMonitoredUserDTO = (McMonitoredUserDTO) o;
@@ -57,6 +49,21 @@ public class McQuestionContentDTO implements Comparable {
 	    return 1;
 	else
 	    return 0;
+    }
+    
+    /**
+     * @return Returns the uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(Long uid) {
+	this.uid = uid;
     }
 
     /**
@@ -137,7 +144,7 @@ public class McQuestionContentDTO implements Comparable {
     /**
      * @return Returns the listCandidateAnswersDTO.
      */
-    public List getListCandidateAnswersDTO() {
+    public List<McOptionDTO> getListCandidateAnswersDTO() {
 	return listCandidateAnswersDTO;
     }
 
@@ -145,22 +152,7 @@ public class McQuestionContentDTO implements Comparable {
      * @param listCandidateAnswersDTO
      *            The listCandidateAnswersDTO to set.
      */
-    public void setListCandidateAnswersDTO(List listCandidateAnswersDTO) {
+    public void setListCandidateAnswersDTO(List<McOptionDTO> listCandidateAnswersDTO) {
 	this.listCandidateAnswersDTO = listCandidateAnswersDTO;
-    }
-
-    /**
-     * @return Returns the caCount.
-     */
-    public String getCaCount() {
-	return caCount;
-    }
-
-    /**
-     * @param caCount
-     *            The caCount to set.
-     */
-    public void setCaCount(String caCount) {
-	this.caCount = caCount;
     }
 }

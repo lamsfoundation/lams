@@ -35,17 +35,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.mc.McAllGroupsDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -90,142 +86,6 @@ public class MonitoringUtil implements McAppConstants {
     }
 
     /**
-     * 
-     * ends up populating the attempt history for all the users of all the tool sessions for a content
-     * 
-     * @param request
-     * @param mcContent
-     * @return List
-     */
-    public static List<McMonitoredAnswersDTO> buildGroupsQuestionData(McContent mcContent, IMcService mcService) {
-	// will be building groups question data for content
-
-	List<McQueContent> questions = mcService.getAllQuestionEntries(mcContent.getUid());
-
-	List<McMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<McMonitoredAnswersDTO>();
-
-	for (McQueContent question : questions) {
-
-	    if (question != null) {
-		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
-		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
-		monitoredAnswersDTO.setQuestion(question.getQuestion());
-		monitoredAnswersDTO.setMark(question.getMark().toString());
-
-		List<McCandidateAnswersDTO> listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(question
-			.getUid());
-		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
-
-		Map<String, List<McMonitoredUserDTO>> questionAttemptData = new TreeMap<String, List<McMonitoredUserDTO>>(
-			new McStringComparator());
-
-		for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
-		    Set<McQueUsr> users = session.getMcQueUsers();
-		    List<McMonitoredUserDTO> monitoredUserDTOs = new LinkedList<McMonitoredUserDTO>();
-		    for (McQueUsr user : users) {
-			McMonitoredUserDTO monitoredUserDTO = getUserAttempt(mcService, user, session,
-				question.getUid());
-			monitoredUserDTOs.add(monitoredUserDTO);
-		    }
-
-		    questionAttemptData.put(session.getSession_name(), monitoredUserDTOs);
-		}
-
-		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		monitoredAnswersDTOs.add(monitoredAnswersDTO);
-
-	    }
-	}
-	return monitoredAnswersDTOs;
-    }
-
-    /**
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @param mcSession
-     * @param mcQueUsr
-     * @return
-     */
-    public static List buildGroupsQuestionDataForExportLearner(McContent mcContent, IMcService mcService,
-	    McSession mcSession, McQueUsr mcQueUsr) {
-
-	List<McQueContent> questions = mcService.getAllQuestionEntries(mcContent.getUid());
-
-	List listMonitoredAnswersContainerDTO = new LinkedList();
-
-	Iterator<McQueContent> itListQuestions = questions.iterator();
-	while (itListQuestions.hasNext()) {
-	    McQueContent question = itListQuestions.next();
-
-	    if (question != null) {
-		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
-		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
-		monitoredAnswersDTO.setQuestion(question.getQuestion());
-		monitoredAnswersDTO.setMark(question.getMark().toString());
-
-		List<McCandidateAnswersDTO> listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(question.getUid());
-		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
-
-		// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp
-		// won't work.
-		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(mcService, mcQueUsr, mcSession,
-			question.getUid());
-		List<McMonitoredUserDTO> listMonitoredUserContainerDTO = new LinkedList();
-		listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-		Map questionAttemptData = new TreeMap(new McStringComparator());
-		questionAttemptData.put(mcSession.getSession_name(), listMonitoredUserContainerDTO);
-
-		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		listMonitoredAnswersContainerDTO.add(monitoredAnswersDTO);
-	    }
-	}
-	return listMonitoredAnswersContainerDTO;
-    }
-
-    /**
-     * 
-     */
-    public static McMonitoredUserDTO getUserAttempt(IMcService mcService, McQueUsr mcQueUsr,
-	    McSession mcSession, Long questionUid) {
-
-	McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	if (mcQueUsr != null) {
-	    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-	    mcMonitoredUserDTO.setSessionId(mcSession.getMcSessionId().toString());
-	    mcMonitoredUserDTO.setQuestionUid(questionUid.toString());
-	    mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
-
-	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(mcQueUsr.getUid(), questionUid);
-
-	    if (!mcQueUsr.isResponseFinalised() || (userAttempt == null)) {
-
-		mcMonitoredUserDTO.setMark(new Integer(0));
-
-	    } else {
-
-		// At present, we expect there to be only one answer to a question but there
-		// could be more in the future - if that happens then we need to change
-		// String to a list of Strings.
-
-		// We get the mark for the attempt if the answer is correct and we don't allow
-		// retries, or if the answer is correct and the learner has met the passmark if
-		// we do allow retries.
-
-		String userAnswer = userAttempt.getMcOptionsContent().getMcQueOptionText();
-		boolean isRetries = mcSession.getMcContent().isRetries();
-		mcMonitoredUserDTO.setMark(userAttempt.getMarkForShow(isRetries));
-		mcMonitoredUserDTO.setIsCorrect(new Boolean(userAttempt.isAttemptCorrect()).toString());
-		mcMonitoredUserDTO.setUserAnswer(userAnswer);
-	    }
-
-	}
-
-	return mcMonitoredUserDTO;
-    }
-
-    /**
      * @param request
      * @param mcService
      * @param mcContent
@@ -251,89 +111,6 @@ public class MonitoringUtil implements McAppConstants {
 
 	if (countSessionComplete > 0)
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(Boolean.FALSE.toString());
-    }
-
-    /**
-     * 
-     * @param mcService
-     * @param mcContent
-     * @return
-     */
-    public static boolean notebookEntriesExist(IMcService mcService, McContent mcContent) {
-	Iterator iteratorSession = mcContent.getMcSessions().iterator();
-	while (iteratorSession.hasNext()) {
-	    McSession mcSession = (McSession) iteratorSession.next();
-
-	    if (mcSession != null) {
-
-		Iterator iteratorUser = mcSession.getMcQueUsers().iterator();
-		while (iteratorUser.hasNext()) {
-		    McQueUsr mcQueUsr = (McQueUsr) iteratorUser.next();
-
-		    if (mcQueUsr != null) {
-			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(mcQueUsr.getQueUsrId()
-					.intValue()));
-			if (notebookEntry != null) {
-			    return true;
-			}
-
-		    }
-		}
-	    }
-	}
-	return false;
-    }
-
-    /**
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @return
-     */
-    public static List buildGroupBasedSessionData(McContent mcContent, IMcService mcService) {
-	List listQuestions = mcService.getAllQuestionEntries(mcContent.getUid());
-
-	List listAllGroupsContainerDTO = new LinkedList();
-
-	Iterator iteratorSession = mcContent.getMcSessions().iterator();
-	while (iteratorSession.hasNext()) {
-	    McSession mcSession = (McSession) iteratorSession.next();
-	    String currentSessionId = mcSession.getMcSessionId().toString();
-
-	    String currentSessionName = mcSession.getSession_name();
-
-	    McAllGroupsDTO mcAllGroupsDTO = new McAllGroupsDTO();
-	    List listMonitoredAnswersContainerDTO = new LinkedList();
-
-	    if (mcSession != null) {
-		Iterator itListQuestions = listQuestions.iterator();
-		while (itListQuestions.hasNext()) {
-		    McQueContent mcQueContent = (McQueContent) itListQuestions.next();
-
-		    if (mcQueContent != null) {
-			McMonitoredAnswersDTO mcMonitoredAnswersDTO = new McMonitoredAnswersDTO();
-			mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
-			mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
-			mcMonitoredAnswersDTO.setSessionId(currentSessionId);
-			mcMonitoredAnswersDTO.setSessionName(currentSessionName);
-
-			Map questionAttemptData = new TreeMap();
-
-			mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-
-			listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
-		    }
-		}
-	    }
-	    mcAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
-	    mcAllGroupsDTO.setSessionName(currentSessionName);
-	    mcAllGroupsDTO.setSessionId(currentSessionId);
-
-	    listAllGroupsContainerDTO.add(mcAllGroupsDTO);
-
-	}
-	return listAllGroupsContainerDTO;
     }
 
     /**
@@ -388,5 +165,28 @@ public class MonitoringUtil implements McAppConstants {
 
 	boolean isGroupedActivity = mcService.isGroupedActivity(new Long(content.getMcContentId()));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
+    }
+
+    /**
+     * Populates a sorted map of the tool session where the key is the mcSessionId and the value is name of the session.
+     * If no sessions exists, there will be a single entry "None", otherwise on the end of the list will be the entry
+     * "All"
+     */
+    public static Map<String, String> populateToolSessions(McContent mcContent) {
+	Map<String, String> sessionsMap = new TreeMap<String, String>();
+	Iterator iter = mcContent.getMcSessions().iterator();
+	while (iter.hasNext()) {
+	    McSession elem = (McSession) iter.next();
+	    sessionsMap.put(elem.getMcSessionId().toString(), elem.getSession_name());
+	}
+
+	if (sessionsMap.isEmpty()) {
+	    sessionsMap.put("None", "None");
+	} else {
+	    sessionsMap.put("All", "All");
+	}
+
+	return sessionsMap;
+
     }
 }

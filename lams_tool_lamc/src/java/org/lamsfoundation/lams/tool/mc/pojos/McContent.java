@@ -77,9 +77,6 @@ public class McContent implements Serializable {
     private long createdBy;
 
     /** nullable persistent field */
-    private boolean contentInUse;
-
-    /** nullable persistent field */
     private boolean retries;
 
     private boolean showReport;
@@ -110,8 +107,8 @@ public class McContent implements Serializable {
 
     /** full constructor */
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater,
-	    Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy, boolean contentInUse,
-	    Integer passMark, boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
+	    Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
+	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
 	    boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries, boolean reflect,
 	    String reflectionSubject, Set mcQueContents, Set mcSessions) {
 	
@@ -124,7 +121,6 @@ public class McContent implements Serializable {
 	this.updateDate = updateDate;
 	this.questionsSequenced = questionsSequenced;
 	this.createdBy = createdBy;
-	this.contentInUse = contentInUse;
 	this.retries = retries;
 	this.reflectionSubject = reflectionSubject;
 	this.reflect = reflect;
@@ -162,14 +158,12 @@ public class McContent implements Serializable {
      *            the new mc content id.
      * @return the new mc content object.
      */
-    public static McContent newInstance(IToolContentHandler toolContentHandler, McContent mc, Long newContentId)
-	    throws ItemNotFoundException, RepositoryCheckedException {
+    public static McContent newInstance(McContent mc, Long newContentId) {
 	McContent newContent = new McContent(newContentId, mc.getContent(), mc.getTitle(), mc.getInstructions(),
-		mc.isDefineLater(), mc.getCreationDate(), mc.getUpdateDate(),
-		mc.isQuestionsSequenced(), mc.getCreatedBy(), mc.isContentInUse(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(),
-		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
-		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
-		new TreeSet(), new TreeSet());
+		mc.isDefineLater(), mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(),
+		mc.getCreatedBy(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(), mc.isDisplayAnswers(),
+		mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(), mc.isPrefixAnswersWithLetters(), mc.isRetries(),
+		mc.isReflect(), mc.getReflectionSubject(), new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 
 	return newContent;
@@ -256,14 +250,6 @@ public class McContent implements Serializable {
 
     public void setCreatedBy(long createdBy) {
 	this.createdBy = createdBy;
-    }
-
-    public boolean isContentInUse() {
-	return this.contentInUse;
-    }
-
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
     }
 
     public Integer getPassMark() {

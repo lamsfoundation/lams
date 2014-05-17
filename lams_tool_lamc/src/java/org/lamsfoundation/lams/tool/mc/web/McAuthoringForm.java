@@ -22,7 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
 /**
@@ -43,7 +42,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String editDefaultQuestion;
     protected String removeOptionContent;
 
-    protected String activeModule;
     protected String editOptionsMode;
 
     protected String showMarks;
@@ -51,8 +49,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String prefixAnswersWithLetters;
     protected String randomize;
     protected String displayAnswers;
-
-    protected String defaultContentIdStr;
 
     protected String addContent;
     protected String removeContent;
@@ -107,7 +103,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String edit;
     private String contentFolderID;
     private String editableQuestionIndex;
-    private String defineLaterInEditMode;
     private String feedback;
     private String candidateIndex;
     private String totalMarks;
@@ -776,21 +771,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *            The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
      * @return Returns the editOptionsMode.
      */
     public String getEditOptionsMode() {
@@ -851,21 +831,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *            The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
-    }
-
-    /**
      * @return Returns the editableQuestionIndex.
      */
     public String getEditableQuestionIndex() {
@@ -878,21 +843,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setEditableQuestionIndex(String editableQuestionIndex) {
 	this.editableQuestionIndex = editableQuestionIndex;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *            The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
     }
 
     /**

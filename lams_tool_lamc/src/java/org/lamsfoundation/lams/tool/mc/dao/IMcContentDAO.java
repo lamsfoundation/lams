@@ -61,17 +61,6 @@ public interface IMcContentDAO {
 
     /**
      * <p>
-     * Returns the persistent instance of McContent with the given tool session id <code>mcSessionId</code>, returns
-     * null if not found.
-     * 
-     * @param mcSessionId
-     *            The tool session id
-     * @return a persistent instance of McContent or null if not found.
-     */
-    public McContent getMcContentBySession(Long mcSessionId);
-
-    /**
-     * <p>
      * Persist the given persistent instance of McContent.
      * </p>
      * 

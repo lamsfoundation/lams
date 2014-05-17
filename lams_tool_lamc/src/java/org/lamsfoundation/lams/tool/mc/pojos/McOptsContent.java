@@ -27,10 +27,8 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * <p>
  * Persistent object/bean that defines the content for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_options_content
- * </p>
  * 
  * @author Ozgur Demirtas
  */
@@ -38,8 +36,6 @@ public class McOptsContent implements Serializable, Comparable {
 
     /** identifier field */
     private Long uid;
-
-    private Long mcQueOptionId;
 
     /** nullable persistent field */
     private boolean correctOption;
@@ -53,24 +49,21 @@ public class McOptsContent implements Serializable, Comparable {
     private Long mcQueContentId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent;
-    
-    //DTO fields
+    private McQueContent mcQueContent;
+
+    // DTO fields
     private boolean selected;
-    
+
     private String escapedOptionText;
 
-    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
+    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText, McQueContent mcQueContent) {
 	this.displayOrder = displayOrder;
 	this.correctOption = correctOption;
 	this.mcQueOptionText = mcQueOptionText;
 	this.mcQueContent = mcQueContent;
     }
 
-    public static McOptsContent newInstance(McOptsContent mcOptsContent, McQueContent newMcQueContent)
-
-    {
+    public static McOptsContent newInstance(McOptsContent mcOptsContent, McQueContent newMcQueContent) {
 	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(),
 		mcOptsContent.isCorrectOption(), mcOptsContent.getMcQueOptionText(), newMcQueContent);
 	return newMcOptsContent;
@@ -104,31 +97,16 @@ public class McOptsContent implements Serializable, Comparable {
 	this.mcQueOptionText = mcQueOptionText;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McQueContent getMcQueContent() {
+    public McQueContent getMcQueContent() {
 	return this.mcQueContent;
     }
 
-    public void setMcQueContent(org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
+    public void setMcQueContent(McQueContent mcQueContent) {
 	this.mcQueContent = mcQueContent;
     }
 
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
-    }
-
-    /**
-     * @return Returns the mcQueOptionId.
-     */
-    public Long getMcQueOptionId() {
-	return mcQueOptionId;
-    }
-
-    /**
-     * @param mcQueOptionId
-     *            The mcQueOptionId to set.
-     */
-    public void setMcQueOptionId(Long mcQueOptionId) {
-	this.mcQueOptionId = mcQueOptionId;
     }
 
     /**
@@ -149,10 +127,10 @@ public class McOptsContent implements Serializable, Comparable {
     public int compareTo(Object o) {
 	McOptsContent optContent = (McOptsContent) o;
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (mcQueOptionId == null)
+	if (uid == null)
 	    return 1;
 	else
-	    return (int) (mcQueOptionId.longValue() - optContent.mcQueOptionId.longValue());
+	    return (int) (uid.longValue() - optContent.uid.longValue());
     }
 
     /**
@@ -169,7 +147,7 @@ public class McOptsContent implements Serializable, Comparable {
     public void setDisplayOrder(Integer displayOrder) {
 	this.displayOrder = displayOrder;
     }
-    
+
     public boolean isSelected() {
 	return this.selected;
     }
@@ -177,7 +155,7 @@ public class McOptsContent implements Serializable, Comparable {
     public void setSelected(boolean selected) {
 	this.selected = selected;
     }
-    
+
     public String getEscapedOptionText() {
 	return this.escapedOptionText;
     }

@@ -41,7 +41,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -65,7 +65,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McContent mcContent = getMcService().retrieveMc(toolContentID);
+	McContent mcContent = getMcService().getMcContent(toolContentID);
 	plannerForm.fillForm(mcContent, getMcService());
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
@@ -80,18 +80,18 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	ActionMessages errors = plannerForm.validate(request);
 
 	if (errors.isEmpty()) {
-	    McContent mcContent = getMcService().retrieveMc(plannerForm.getToolContentID());
+	    McContent mcContent = getMcService().getMcContent(plannerForm.getToolContentID());
 	    int questionIndex = 1;
 	    String question = null;
 
 	    do {
 		question = plannerForm.getQuestion(questionIndex - 1);
-		List<McCandidateAnswersDTO> candidateAnswerDTOList = plannerForm.extractCandidateAnswers(request,
+		List<McOptionDTO> candidateAnswerDTOList = plannerForm.extractCandidateAnswers(request,
 			questionIndex);
 		boolean removeQuestion = true;
 		if (!StringUtils.isEmpty(question)) {
 		    if (candidateAnswerDTOList != null) {
-			for (McCandidateAnswersDTO answer : candidateAnswerDTOList) {
+			for (McOptionDTO answer : candidateAnswerDTOList) {
 			    if (answer != null && !StringUtils.isEmpty(answer.getCandidateAnswer())) {
 				removeQuestion = false;
 				break;
@@ -114,7 +114,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			    if (candidateAnswerDTOIndex >= candidateAnswerDTOList.size()) {
 				candidateAnswerIter.remove();
 			    } else {
-				McCandidateAnswersDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
+				McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 				candidateAnswer.setCorrectOption(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
 				candidateAnswer.setMcQueOptionText(answerDTO.getCandidateAnswer());
 				getMcService().updateMcOptionsContent(candidateAnswer);
@@ -131,7 +131,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			mcQueContent.setMark(McAppConstants.QUESTION_DEFAULT_MARK);
 			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
 			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList.size(); candidateAnswerDTOIndex++) {
-			    McCandidateAnswersDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
+			    McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1,
 				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()),
 				    answerDTO.getCandidateAnswer(), mcQueContent);

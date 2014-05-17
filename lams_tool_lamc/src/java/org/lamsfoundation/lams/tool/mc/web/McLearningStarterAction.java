@@ -207,9 +207,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 
 	/* find out if the content is being modified at the moment. */
-	boolean isDefineLater = McUtils.isDefineLater(mcContent);
+	boolean isDefineLater = mcContent.isDefineLater();
 	if (isDefineLater == true) {
-	    return (mapping.findForward(McAppConstants.DEFINE_LATER));
+	    return (mapping.findForward("defineLater"));
 	}
 	
 	McQueUsr groupLeader = null;

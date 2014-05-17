@@ -44,8 +44,8 @@
 	    		    });
 				}
 			}
-
-			function submitModifyAddedAuthoringCandidate(candidateIndexValue, actionMethod) {
+			
+			function submitModifyAddedCandidate(candidateIndexValue, actionMethod) {
 				document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
 				submitMethod(actionMethod);
 			}
@@ -153,10 +153,7 @@
 			<html:hidden property="currentField" />			
 			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="activeModule" />
 			<html:hidden property="httpSessionID" />
-			<html:hidden property="defaultContentIdStr" />
-			<html:hidden property="defineLaterInEditMode" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="editQuestionBoxRequest" value="false" />
 			<html:hidden property="totalMarks" />

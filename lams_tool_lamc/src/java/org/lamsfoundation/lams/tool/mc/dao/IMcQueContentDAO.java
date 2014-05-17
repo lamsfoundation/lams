@@ -27,16 +27,13 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 
 /**
+ * Interface for the McQueContent DAO, defines methods needed to access/modify mc question content
  * 
  * @author Ozgur Demirtas
- *         <p>
- *         Interface for the McQueContent DAO, defines methods needed to access/modify mc question content
- *         </p>
- * 
  */
 public interface IMcQueContentDAO {
+    
     /**
-     * *
      * <p>
      * Return the persistent instance of a McQueContent with the given identifier <code>uid</code>, returns null if not
      * found.
@@ -45,22 +42,9 @@ public interface IMcQueContentDAO {
      * @param uid
      * @return McQueContent
      */
-    public McQueContent getMcQueContentByUID(Long uid);
+    McQueContent getMcQueContentByUID(Long uid);
 
     /**
-     * *
-     * <p>
-     * Return the persistent instance of a McQueContent with the given identifier <code>mcContentId</code>, returns null
-     * if not found.
-     * </p>
-     * 
-     * @param mcContentId
-     * @return McQueContent
-     */
-    public McQueContent getToolDefaultQuestionContent(final long mcContentId);
-
-    /**
-     * *
      * <p>
      * Return the persistent instance of a McQueContent with the given identifier <code>question</code> and
      * <code>mcContentUid</code>, returns null if not found.
@@ -70,10 +54,9 @@ public interface IMcQueContentDAO {
      * @param mcContentUid
      * @return McQueContent
      */
-    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+    McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
 
     /**
-     * *
      * <p>
      * Return the persistent instance of a McQueContent with the given identifier <code>displayOrder</code> and
      * <code>mcContentUid</code>, returns null if not found.
@@ -83,10 +66,9 @@ public interface IMcQueContentDAO {
      * @param mcContentUid
      * @return McQueContent
      */
-    public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid);
+    McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid);
 
     /**
-     * *
      * <p>
      * Return a list of McQueContent with the given identifier <code>question</code> and <code>mcContentUid</code>,
      * returns null if not found.
@@ -95,10 +77,9 @@ public interface IMcQueContentDAO {
      * @param mcContentUid
      * @return List
      */
-    public List getAllQuestionEntries(final long mcContentId);
+    List<McQueContent> getQuestionsByContentUid(final long mcContentId);
 
     /**
-     * *
      * <p>
      * Return a list of McQueContent with the given identifier <code>question</code> and <code>mcContentUid</code>,
      * returns null if not found.
@@ -107,70 +88,63 @@ public interface IMcQueContentDAO {
      * @param mcContentUid
      * @return List
      */
-    public List refreshQuestionContent(final Long mcContentId);
+    List refreshQuestionContent(final Long mcContentId);
 
     /**
-     * *
      * <p>
      * resets McQueContent with the given identifier <code>mcContentUid</code>
      * </p>
      * 
      * @param mcContentUid
      */
-    public void resetAllQuestions(final Long mcContentUid);
+    void resetAllQuestions(final Long mcContentUid);
 
     /**
-     * *
      * <p>
      * removes McQueContent with the given identifier <code>mcContentUid</code>
      * </p>
      * 
      * @param mcContentUid
      */
-    public void removeQuestionContentByMcUid(final Long mcContentUid);
+    void removeQuestionContentByMcUid(final Long mcContentUid);
 
     /**
-     * *
      * <p>
      * saves McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      * 
      * @param mcQueContent
      */
-    public void saveMcQueContent(McQueContent mcQueContent);
+    void saveMcQueContent(McQueContent mcQueContent);
 
     /**
-     * *
      * <p>
      * updates McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      * 
      * @param mcQueContent
      */
-    public void updateMcQueContent(McQueContent mcQueContent);
+    void updateMcQueContent(McQueContent mcQueContent);
 
     /**
-     * *
      * <p>
      * saves McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      * 
      * @param mcQueContent
      */
-    public void saveOrUpdateMcQueContent(McQueContent mcQueContent);
+    void saveOrUpdateMcQueContent(McQueContent mcQueContent);
 
     /**
-     * *
      * <p>
      * removes McQueContent with the given identifier <code>uid</code>
      * </p>
      * 
      * @param uid
      */
-    public void removeMcQueContentByUID(Long uid);
+    void removeMcQueContentByUID(Long uid);
 
     /**
-     * *
      * <p>
      * removes McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
@@ -178,10 +152,9 @@ public interface IMcQueContentDAO {
      * @param mcQueContent
      * @return
      */
-    public void removeMcQueContent(McQueContent mcQueContent);
+    void removeMcQueContent(McQueContent mcQueContent);
 
     /**
-     * *
      * <p>
      * used to get the next available display order with the given identifier <code>mcContentId</code>
      * </p>
@@ -189,12 +162,12 @@ public interface IMcQueContentDAO {
      * @param mcQueContent
      * @return
      */
-    public List getNextAvailableDisplayOrder(final long mcContentId);
+    List getNextAvailableDisplayOrder(final long mcContentId);
 
-    public McQueContent findMcQuestionContentByUid(Long uid);
+    McQueContent findMcQuestionContentByUid(Long uid);
 
-    public List getAllQuestionEntriesSorted(final long qaContentId);
-
-    public List getMcQueContentsByContentId(long mcContentId);
+    List getAllQuestionEntriesSorted(final long qaContentId);
+    
+    void releaseQuestionFromCache(McQueContent question);
 
 }

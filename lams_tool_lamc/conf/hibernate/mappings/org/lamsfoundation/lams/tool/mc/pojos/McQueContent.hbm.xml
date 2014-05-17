@@ -82,12 +82,11 @@
         <column name="mc_content_id" />
     </many-to-one>
     
-    
     <set
         name="mcOptionsContents"
         lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
+        inverse="false"
+		cascade="all"
 		order-by="displayOrder"
     >
         <key>
@@ -95,22 +94,6 @@
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.tool.mc.pojos.McOptsContent"
-        />
-    </set>
-    
-    
-    <set
-        name="mcUsrAttempts"
-        lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
-	>
-
-        <key>
-            <column name="mc_que_content_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt"
         />
     </set>
     

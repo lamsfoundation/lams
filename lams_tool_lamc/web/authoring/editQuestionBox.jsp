@@ -157,10 +157,7 @@
 			<html:hidden property="currentField"/>
 			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="activeModule" />
 			<html:hidden property="httpSessionID" />
-			<html:hidden property="defaultContentIdStr" />
-			<html:hidden property="defineLaterInEditMode" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="editableQuestionIndex" />
 			<html:hidden property="editQuestionBoxRequest" value="true" />

@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
+import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
@@ -68,12 +68,12 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    for (String item : question) {
 		if (item != null || !StringUtils.isEmpty(item)) {
 		    try {
-			List<McCandidateAnswersDTO> candidateAnswerList = extractCandidateAnswers(request,
+			List<McOptionDTO> candidateAnswerList = extractCandidateAnswers(request,
 				questionIndex);
 			if (candidateAnswerList != null) {
 			    boolean answersEmpty = true;
 			    ActionMessage correctAnswerBlankError = null;
-			    for (McCandidateAnswersDTO answer : candidateAnswerList) {
+			    for (McOptionDTO answer : candidateAnswerList) {
 				if (answer != null && !StringUtils.isEmpty(answer.getCandidateAnswer())) {
 				    allEmpty = false;
 				    answersEmpty = false;
@@ -114,7 +114,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setCandidateAnswersString(candidateAnswersBuilder.toString());
 	    for (int questionIndex = 1; questionIndex <= getQuestionCount(); questionIndex++) {
 		Object param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
-		int count = NumberUtils.stringToInt(((String[]) param)[0]);
+		int count = NumberUtils.toInt(((String[]) param)[0]);
 		getCandidateAnswerCount().add(count);
 	    }
 	}
@@ -127,21 +127,20 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	if (mcContent != null) {
 	    setToolContentID(mcContent.getMcContentId());
 
-	    AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List<McQuestionContentDTO> questions = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+	    List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent, mcService);
 
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
-	    setCandidateAnswerCount(new ArrayList<Integer>(questions.size()));
-	    for (int questionIndex = 1; questionIndex <= questions.size(); questionIndex++) {
-		McQuestionContentDTO item = questions.get(questionIndex - 1);
+	    setCandidateAnswerCount(new ArrayList<Integer>(questionDtos.size()));
+	    for (int questionIndex = 1; questionIndex <= questionDtos.size(); questionIndex++) {
+		McQuestionDTO item = questionDtos.get(questionIndex - 1);
 		int questionDisplayOrder = Integer.parseInt(item.getDisplayOrder());
 		String questionText = item.getQuestion();
 		setQuestion(questionDisplayOrder - 1, questionText);
-		List<McCandidateAnswersDTO> candidateAnswers = item.getListCandidateAnswersDTO();
+		List<McOptionDTO> candidateAnswers = item.getListCandidateAnswersDTO();
 
 		for (int candidateAnswerIndex = 1; candidateAnswerIndex <= candidateAnswers.size(); candidateAnswerIndex++) {
 
-		    McCandidateAnswersDTO candidateAnswer = candidateAnswers.get(candidateAnswerIndex - 1);
+		    McOptionDTO candidateAnswer = candidateAnswers.get(candidateAnswerIndex - 1);
 
 		    candidateAnswersBuilder.append(McAppConstants.CANDIDATE_ANSWER_PREFIX).append(questionDisplayOrder)
 			    .append('-').append(candidateAnswerIndex).append('=')
@@ -193,19 +192,19 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	candidateAnswersString = candidateAnswers;
     }
 
-    public List<McCandidateAnswersDTO> extractCandidateAnswers(HttpServletRequest request, int questionIndex)
+    public List<McOptionDTO> extractCandidateAnswers(HttpServletRequest request, int questionIndex)
 	    throws UnsupportedEncodingException {
 	Map<String, String> paramMap = request.getParameterMap();
 	Object param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
 
-	int count = NumberUtils.stringToInt(((String[]) param)[0]);
+	int count = NumberUtils.toInt(((String[]) param)[0]);
 	int correct = Integer.parseInt(getCorrect(questionIndex - 1));
-	List<McCandidateAnswersDTO> candidateAnswerList = new ArrayList<McCandidateAnswersDTO>();
+	List<McOptionDTO> candidateAnswerList = new ArrayList<McOptionDTO>();
 	for (int index = 1; index <= count; index++) {
 	    param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_PREFIX + questionIndex + "-" + index);
 	    String answer = ((String[]) param)[0];
 	    if (answer != null) {
-		McCandidateAnswersDTO candidateAnswer = new McCandidateAnswersDTO();
+		McOptionDTO candidateAnswer = new McOptionDTO();
 		candidateAnswer.setCandidateAnswer(answer);
 		if (index == correct) {
 		    candidateAnswer.setCorrect(McAppConstants.CORRECT);

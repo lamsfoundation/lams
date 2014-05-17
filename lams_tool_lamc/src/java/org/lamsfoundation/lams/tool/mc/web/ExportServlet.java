@@ -28,7 +28,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -40,14 +45,18 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
@@ -66,8 +75,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 	    learner(request, response, directoryName, cookies);
@@ -118,14 +126,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
 
 	if (learner != null) {
-	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionDataForExportLearner(content,
-		    mcService, mcSession, learner);
+	    List listMonitoredAnswersContainerDTO = buildGroupsQuestionDataForExportLearner(content, mcService,
+		    mcSession, learner);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	    request.getSession().setAttribute(LEARNER_MARK, learner.getLastAttemptTotalMark());
 	    request.getSession().setAttribute(LEARNER_NAME, learner.getFullname());
 	    request.getSession().setAttribute(PASSMARK, content.getPassMark().toString());
-	    
+
 	    List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(content, userID);
 	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 	}
@@ -152,7 +160,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    throw new McApplicationException(error);
 	}
 
-	McContent content = mcService.retrieveMc(toolContentID);
+	McContent content = mcService.getMcContent(toolContentID);
 
 	if (content == null) {
 	    String error = "Data is missing from the database. Unable to Continue";
@@ -160,7 +168,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    throw new McApplicationException(error);
 	}
 
-	List<McMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(content, mcService);
+	List<McMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = buildGroupsQuestionData(content, mcService);
 	request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = mcService.buildGroupsMarkData(content, true);
@@ -208,5 +216,140 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    }
 	}
 
+    }
+
+    /**
+     * 
+     * ends up populating the attempt history for all the users of all the tool sessions for a content
+     * 
+     * @param request
+     * @param mcContent
+     * @return List
+     */
+    private static List<McMonitoredAnswersDTO> buildGroupsQuestionData(McContent mcContent, IMcService mcService) {
+	// will be building groups question data for content
+
+	List<McQueContent> questions = mcService.getQuestionsByContentUid(mcContent.getUid());
+
+	List<McMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<McMonitoredAnswersDTO>();
+
+	for (McQueContent question : questions) {
+
+	    if (question != null) {
+		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
+		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
+		monitoredAnswersDTO.setQuestion(question.getQuestion());
+		monitoredAnswersDTO.setMark(question.getMark().toString());
+
+		List<McOptionDTO> listCandidateAnswersDTO = mcService.getOptionDtos(question.getUid());
+		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
+
+		Map<String, List<McMonitoredUserDTO>> questionAttemptData = new TreeMap<String, List<McMonitoredUserDTO>>(
+			new McStringComparator());
+
+		for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+		    Set<McQueUsr> users = session.getMcQueUsers();
+		    List<McMonitoredUserDTO> monitoredUserDTOs = new LinkedList<McMonitoredUserDTO>();
+		    for (McQueUsr user : users) {
+			McMonitoredUserDTO monitoredUserDTO = getUserAttempt(mcService, user, session,
+				question.getUid());
+			monitoredUserDTOs.add(monitoredUserDTO);
+		    }
+
+		    questionAttemptData.put(session.getSession_name(), monitoredUserDTOs);
+		}
+
+		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+		monitoredAnswersDTOs.add(monitoredAnswersDTO);
+
+	    }
+	}
+	return monitoredAnswersDTOs;
+    }
+
+    /**
+     * 
+     * @param request
+     * @param mcContent
+     * @param mcService
+     * @param mcSession
+     * @param mcQueUsr
+     * @return
+     */
+    private static List buildGroupsQuestionDataForExportLearner(McContent mcContent, IMcService mcService,
+	    McSession mcSession, McQueUsr mcQueUsr) {
+
+	List<McQueContent> questions = mcService.getQuestionsByContentUid(mcContent.getUid());
+
+	List listMonitoredAnswersContainerDTO = new LinkedList();
+
+	Iterator<McQueContent> itListQuestions = questions.iterator();
+	while (itListQuestions.hasNext()) {
+	    McQueContent question = itListQuestions.next();
+
+	    if (question != null) {
+		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
+		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
+		monitoredAnswersDTO.setQuestion(question.getQuestion());
+		monitoredAnswersDTO.setMark(question.getMark().toString());
+
+		List<McOptionDTO> listCandidateAnswersDTO = mcService.getOptionDtos(question.getUid());
+		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
+
+		// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp
+		// won't work.
+		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(mcService, mcQueUsr, mcSession,
+			question.getUid());
+		List<McMonitoredUserDTO> listMonitoredUserContainerDTO = new LinkedList();
+		listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+		Map questionAttemptData = new TreeMap(new McStringComparator());
+		questionAttemptData.put(mcSession.getSession_name(), listMonitoredUserContainerDTO);
+
+		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+		listMonitoredAnswersContainerDTO.add(monitoredAnswersDTO);
+	    }
+	}
+	return listMonitoredAnswersContainerDTO;
+    }
+
+    /**
+     * 
+     */
+    private static McMonitoredUserDTO getUserAttempt(IMcService mcService, McQueUsr mcQueUsr, McSession mcSession,
+	    Long questionUid) {
+
+	McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	if (mcQueUsr != null) {
+	    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+	    mcMonitoredUserDTO.setSessionId(mcSession.getMcSessionId().toString());
+	    mcMonitoredUserDTO.setQuestionUid(questionUid.toString());
+	    mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
+
+	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(mcQueUsr.getUid(), questionUid);
+
+	    if (!mcQueUsr.isResponseFinalised() || (userAttempt == null)) {
+
+		mcMonitoredUserDTO.setMark(new Integer(0));
+
+	    } else {
+
+		// At present, we expect there to be only one answer to a question but there
+		// could be more in the future - if that happens then we need to change
+		// String to a list of Strings.
+
+		// We get the mark for the attempt if the answer is correct and we don't allow
+		// retries, or if the answer is correct and the learner has met the passmark if
+		// we do allow retries.
+
+		String userAnswer = userAttempt.getMcOptionsContent().getMcQueOptionText();
+		boolean isRetries = mcSession.getMcContent().isRetries();
+		mcMonitoredUserDTO.setMark(userAttempt.getMarkForShow(isRetries));
+		mcMonitoredUserDTO.setIsCorrect(new Boolean(userAttempt.isAttemptCorrect()).toString());
+		mcMonitoredUserDTO.setUserAnswer(userAnswer);
+	    }
+
+	}
+
+	return mcMonitoredUserDTO;
     }
 }

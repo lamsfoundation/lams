@@ -22,19 +22,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
 /**
- * @author Ozgur Demirtas
+ * ActionForm for the Monitoring environment
  * 
- *         ActionForm for the Monitoring environment
+ * @author Ozgur Demirtas
  */
-public class McMonitoringForm extends McAuthoringForm implements McAppConstants {
+public class McMonitoringForm extends McAuthoringForm {
     protected String method;
-
-    private String currentUid;
-
-    private String editResponse;
 
     /**
      * @return Returns the method.
@@ -49,35 +44,5 @@ public class McMonitoringForm extends McAuthoringForm implements McAppConstants 
      */
     public void setMethod(String method) {
 	this.method = method;
-    }
-
-    /**
-     * @return Returns the currentUid.
-     */
-    public String getCurrentUid() {
-	return currentUid;
-    }
-
-    /**
-     * @param currentUid
-     *            The currentUid to set.
-     */
-    public void setCurrentUid(String currentUid) {
-	this.currentUid = currentUid;
-    }
-
-    /**
-     * @return Returns the editResponse.
-     */
-    public String getEditResponse() {
-	return editResponse;
-    }
-
-    /**
-     * @param editResponse
-     *            The editResponse to set.
-     */
-    public void setEditResponse(String editResponse) {
-	this.editResponse = editResponse;
     }
 }

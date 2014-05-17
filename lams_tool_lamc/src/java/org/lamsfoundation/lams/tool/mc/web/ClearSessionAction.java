@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * 
  * @struts:action path="/clearsession" validate="false"
  * 
- * @version $Revision$
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
@@ -64,7 +63,6 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	    session.removeAttribute(McAction.CREATION_DATE);
 	    session.removeAttribute(McAction.QUESTIONS_WITHNO_OPTIONS);
 	    session.removeAttribute(McAction.RICHTEXT_CORRECT_FEEDBACK);
-	    // session.removeAttribute(McAction.RICHTEXT_END_LEARNING_MSG);
 	    session.removeAttribute(McAction.RICHTEXT_INSTRUCTIONS);
 	    session.removeAttribute(McAction.MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
 	    session.removeAttribute(McAction.MAP_STARTUP_GENERAL_OPTIONS_QUEID);
@@ -72,16 +70,13 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	    session.removeAttribute(McAction.SHOW_AUTHORING_TABS);
 	    session.removeAttribute(McAction.MAP_SELECTED_OPTIONS);
 	    session.removeAttribute(McAction.SELECTED_QUESTION);
-	    session.removeAttribute(McAction.DEFINE_LATER_IN_EDIT_MODE);
 	    session.removeAttribute(McAction.RICHTEXT_TITLE);
 	    session.removeAttribute(McAction.RICHTEXT_REPORT_TITLE);
 	    session.removeAttribute(McAction.DEFAULT_CONTENT_ID);
-	    session.removeAttribute(McAction.DEFINE_LATER);
 	    session.removeAttribute(McAction.MAP_DISABLED_QUESTIONS);
 	    session.removeAttribute(McAction.MAP_QUESTIONS_CONTENT);
 	    session.removeAttribute(McAction.IS_REVISITING_USER);
 	    session.removeAttribute(McAction.MAP_CHECKBOX_STATES);
-	    session.removeAttribute(McAction.ACTIVE_MODULE);
 	    session.removeAttribute("queIndex");
 	    session.removeAttribute(McAction.MAP_OPTIONS_CONTENT);
 	    session.removeAttribute(McAction.MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);

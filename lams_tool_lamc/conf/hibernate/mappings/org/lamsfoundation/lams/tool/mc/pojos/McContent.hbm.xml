@@ -110,14 +110,6 @@
         column="created_by"
         length="20"
     />
-
-    <property
-        name="contentInUse"
-        type="boolean"
-        access="property"        
-        column="content_in_use"
-        length="1"
-    />
     
     <property
         name="retries"
@@ -190,7 +182,7 @@
             order-by="display_order"
             lazy="true"
             inverse="true"
-            cascade="all-delete-orphan"
+            cascade="all"
             sort="unsorted"
         >
               <key

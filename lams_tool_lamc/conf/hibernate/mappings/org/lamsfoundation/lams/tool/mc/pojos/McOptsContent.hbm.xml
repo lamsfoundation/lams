@@ -53,7 +53,6 @@
         name="mcQueContentId"
         type="java.lang.Long"
         column="mc_que_content_id"
-        not-null="true"
    	    update="false"
 	    insert="false"
         length="20"
@@ -65,7 +64,6 @@
     <many-to-one
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
-        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"

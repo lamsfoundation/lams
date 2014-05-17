@@ -38,26 +38,26 @@
 	<c:set var="queIndex" scope="request" value="0" />
 	
 	<tr>
-			<td width="10px">
-			</td>
+		<td width="10px">
+		</td>
 
-			<td>
-			</td>
+		<td>
+		</td>
 
-			<td width="60px" class="align-center">
-				<fmt:message key="label.isCorrect" />
-			</td>
+		<td width="60px" class="align-center">
+			<fmt:message key="label.isCorrect" />
+		</td>
 
-			<td width="40px">
-			</td>
+		<td width="40px">
+		</td>
 
-			<td width="20px">
-			</td>
+		<td width="20px">
+		</td>
 	</tr>
 	
 	<c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
 		<c:set var="queIndex" scope="request" value="${queIndex +1}" />
-		<c:set var="caCount" scope="request" value="${currentDTO.caCount}" />
+		<c:set var="caCount" scope="request" value="${fn:length(currentDTO.listCandidateAnswersDTO)}" />
 
 		<c:if test="${currentEditableQuestionIndex == queIndex}">
 
@@ -70,6 +70,7 @@
 
 				<tr>
 					<td>
+						<input type="hidden" name="caUid${caIndex}" value="${currentCandidateDTO.uid}">
 						<c:out value="${caIndex}" />
 					</td>
 

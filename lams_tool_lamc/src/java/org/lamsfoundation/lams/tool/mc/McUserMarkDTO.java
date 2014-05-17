@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.mc;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 
 /**
  * <p>

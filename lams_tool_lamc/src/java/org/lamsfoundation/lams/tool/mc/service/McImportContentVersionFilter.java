@@ -10,7 +10,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
  * Import filter class for different version of MC content.
  * 
  * @author steven
- * 
  */
 public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
@@ -26,7 +25,6 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
     public void up20061015To20061113() {
 	// Change name to suit the version you give the tool.
-
 	this.addField(McContent.class, "showMarks", new Boolean(false));
 	this.addField(McContent.class, "randomize", new Boolean(false));
 	this.addField(McOptsContent.class, "displayOrder", new Integer(0));
@@ -34,7 +32,6 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
     public void up20061113To20070820() {
 	// Adds displayAnswers LDEV-1156
-
 	this.addField(McContent.class, "displayAnswers", new Boolean(true));
     }
     
@@ -46,5 +43,12 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(McContent.class, "onlineInstructions");
 	this.removeField(McContent.class, "offlineInstructions");
 	this.removeField(McContent.class, "mcAttachments");
+    }
+    
+    /**
+     * Import 20131212 version content to 20140512 version tool server.
+     */
+    public void up20140102To20140505() {
+	this.removeField(McContent.class, "contentInUse");
     }
 }

@@ -44,18 +44,6 @@ public interface IMcUserDAO {
      */
     public McQueUsr getMcUserByUID(Long uid);
 
-    /**
-     * <p>
-     * Return the persistent instance of a McQueUsr with the given user id <code>userId</code>, returns null if not
-     * found.
-     * </p>
-     * 
-     * @param userId
-     *            The id of a McQueUsr
-     * @return the persistent instance of a McQueUsr or null if not found.
-     */
-    public McQueUsr findMcUserById(Long userId);
-
     public McQueUsr getMcUserBySession(Long userId, Long sessionUid);
 
     public void saveMcUser(McQueUsr mcUser);

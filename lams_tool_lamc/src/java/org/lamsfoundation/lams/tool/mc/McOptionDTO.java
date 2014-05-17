@@ -23,19 +23,49 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
- * <p>
  * DTO that holds candiate answers data for summary page
- * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McCandidateAnswersDTO implements Comparable {
+public class McOptionDTO implements Comparable {
 
+    private Long uid;
     private String candidateAnswer;
-
     private String correct;
+    
+    public McOptionDTO() {
+	
+    }
+    
+    public McOptionDTO(McOptsContent option) {
+	this.uid = option.getUid();
+	this.candidateAnswer = option.getMcQueOptionText();
+	//this.correct = new Boolean(option.isCorrectOption()).toString();
+	
+	if (option.isCorrectOption()) {
+	    this.correct = "Correct";
+	} else {
+	    this.correct = "Incorrect";
+	}
+    }
+    
+    /**
+     * @return Returns the uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
     /**
      * @return Returns the candidateAnswer.
@@ -68,17 +98,12 @@ public class McCandidateAnswersDTO implements Comparable {
     }
 
     public int compareTo(Object o) {
-	McCandidateAnswersDTO mcCandidateAnswersDTO = (McCandidateAnswersDTO) o;
+	McOptionDTO mcOptionDTO = (McOptionDTO) o;
 
-	if (mcCandidateAnswersDTO == null)
+	if (mcOptionDTO == null)
 	    return 1;
 	else
 	    return 0;
-    }
-
-    public String toString() {
-	return new ToStringBuilder(this).append("candidateAnswer: ", candidateAnswer).append("correct: ", correct)
-		.toString();
     }
 
 }

@@ -44,9 +44,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 
     private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=?";
 
-    private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
-	    + "mc.mcSessions session where session.mcSessionId=:sessionId";
-
     public McContent getMcContentByUID(Long uid) {
 	return (McContent) this.getHibernateTemplate().get(McContent.class, uid);
     }
@@ -62,16 +59,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	    return mc;
 	}
 	return null;
-    }
-
-    public McContent getMcContentBySession(final Long mcSessionId) {
-	return (McContent) getHibernateTemplate().execute(new HibernateCallback() {
-
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_MC_BY_SESSION).setLong("sessionId", mcSessionId.longValue())
-			.uniqueResult();
-	    }
-	});
     }
 
     public void saveMcContent(McContent mcContent) {

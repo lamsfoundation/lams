@@ -63,9 +63,6 @@ public class McQueContent implements Serializable, Comparable {
     private org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent;
 
     /** persistent field */
-    private Set mcUsrAttempts;
-
-    /** persistent field */
     private Set mcOptionsContents;
 
     //DTO fields
@@ -79,7 +76,6 @@ public class McQueContent implements Serializable, Comparable {
 	this.mark = mark;
 	this.feedback = feedback;
 	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
 	this.mcOptionsContents = mcOptionsContents;
     }
 
@@ -96,9 +92,7 @@ public class McQueContent implements Serializable, Comparable {
      *            the original qa question content
      * @return the new qa question content object
      */
-    public static McQueContent newInstance(McQueContent queContent, McContent newMcContent)
-
-    {
+    public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
 	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
 		queContent.getMark(), queContent.getFeedback(), newMcContent, new TreeSet(), new TreeSet());
 
@@ -111,10 +105,7 @@ public class McQueContent implements Serializable, Comparable {
 	for (Iterator i = this.getMcOptionsContents().iterator(); i.hasNext();) {
 	    McOptsContent mcOptsContent = (McOptsContent) i.next();
 	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
-
-	    if (mcNewOptsContent.getMcQueContent() != null) {
-		newMcOptionsContent.add(mcNewOptsContent);
-	    }
+	    newMcOptionsContent.add(mcNewOptsContent);
 	}
 	return newMcOptionsContent;
     }
@@ -157,16 +148,6 @@ public class McQueContent implements Serializable, Comparable {
 
     public void setMcContent(org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent) {
 	this.mcContent = mcContent;
-    }
-
-    public Set getMcUsrAttempts() {
-	if (this.mcUsrAttempts == null)
-	    setMcUsrAttempts(new HashSet());
-	return this.mcUsrAttempts;
-    }
-
-    public void setMcUsrAttempts(Set mcUsrAttempts) {
-	this.mcUsrAttempts = mcUsrAttempts;
     }
 
     public Set getMcOptionsContents() {

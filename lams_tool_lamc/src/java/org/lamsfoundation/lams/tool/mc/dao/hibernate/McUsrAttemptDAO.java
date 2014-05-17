@@ -118,6 +118,11 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     }
     
     @Override
+    public void removeAttempt(McUsrAttempt userAttempt) {
+	this.getHibernateTemplate().delete(userAttempt);
+    }
+    
+    @Override
     public int getAttemptsCountPerOption(Long optionUid) {
 	List list = getHibernateTemplate().find(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
 	if (list == null || list.size() == 0)

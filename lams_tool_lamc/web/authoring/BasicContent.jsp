@@ -15,10 +15,19 @@
     	    }
 	    });
 	}
-
+	
 	function removeMonitoringQuestion(questionIndex) {
 		document.McMonitoringForm.questionIndex.value=questionIndex;
-        submitMonitoringMethod('removeQuestion');
+		document.McMonitoringForm.dispatch.value='removeQuestion'; 
+		
+		$('#monitoringForm').ajaxSubmit({ 
+    		target:  $('#resourceListArea'),
+    		iframe: true,
+    		success:    function() { 
+    			document.McMonitoringForm.dispatch.value="submitAllContent";
+    			refreshThickbox();
+    	    }
+	    });
 	}
 
 	function resizeIframe() {
@@ -51,7 +60,7 @@
     function saveQTI(formHTML, formName) {
     	document.body.innerHTML += formHTML;
     	var form = document.getElementById(formName);
-    	form.action = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}"/>';
+    	form.action = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}"/>';
     	form.submit();
     }
     
@@ -88,42 +97,22 @@
 </table>
 
 <div id="resourceListArea">
-	<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<%@ include file="/authoring/itemlist.jsp"%>
-	</c:if>
-	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<%@ include file="/monitoring/itemlist.jsp"%>
-	</c:if>
+	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
 
 <p>
-	<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
-			class="button-add-item thickbox"> 
-			<fmt:message key="label.save.question" /> 
-		</a>
-		<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px">
-			<fmt:message key="label.authoring.import.qti" />
-		</a>
-		<a href="#" onClick="javascript:exportQTI()" style="margin-left: 40px">
-			<fmt:message key="label.authoring.export.qti" />
-		</a>
-	</c:if>
+	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
+		class="button-add-item thickbox"> 
+		<fmt:message key="label.save.question" /> 
+	</a>
 	
-	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<a href="<html:rewrite page="/monitoring.do"/>?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
-			class="button-add-item thickbox"> 
-			<fmt:message key="label.save.question" /> 
-		</a>
-	</c:if>
+	<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px">
+		<fmt:message key="label.authoring.import.qti" />
+	</a>
+	<a href="#" onClick="javascript:exportQTI()" style="margin-left: 40px">
+		<fmt:message key="label.authoring.export.qti" />
+	</a>
 </p>
-
-<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring'}">
-	<p class="align-right">
-		<a href="javascript:submitMethod('submitAllContent')" class="button">
-			<fmt:message key="label.save" /> </a>
-	</p>
-</c:if>
 
 <!-- For exporting QTI packages -->
 <iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

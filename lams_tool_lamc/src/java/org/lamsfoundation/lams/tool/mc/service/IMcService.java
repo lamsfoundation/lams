@@ -23,12 +23,9 @@
 package org.lamsfoundation.lams.tool.mc.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -36,8 +33,9 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -48,9 +46,9 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 /**
- * @author Ozgur Demirtas
+ * Interface that defines the contract that all MCQ service provider must follow.
  * 
- *         Interface that defines the contract that all MCQ service provider must follow.
+ * @author Ozgur Demirtas
  */
 public interface IMcService {
     
@@ -73,13 +71,11 @@ public interface IMcService {
 
     void createMc(McContent mcContent) throws McApplicationException;
 
-    McContent retrieveMc(Long toolContentId) throws McApplicationException;
+    McContent getMcContent(Long toolContentId) throws McApplicationException;
 
-    void createMcQue(McQueContent mcQueContent) throws McApplicationException;
+    void createQuestion(McQueContent mcQueContent) throws McApplicationException;
 
-    void updateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
-
-    List retrieveMcQueContentsByToolContentId(long mcContentId) throws McApplicationException;
+    void updateQuestion(McQueContent mcQueContent) throws McApplicationException;
 
     McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
 	    throws McApplicationException;
@@ -90,19 +86,17 @@ public interface IMcService {
 
     McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
-    McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
-
     void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
-
-    McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
 
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
     McQueContent getMcQueContentByUID(Long uid) throws McApplicationException;
 
     void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    
+    void releaseQuestionsFromCache(McContent content);
 
     void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
 
@@ -114,23 +108,19 @@ public interface IMcService {
 
     List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException;
 
-    McQueContent getQuestionByUid(Long uid) throws McApplicationException;
-
-    void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    McQueContent getQuestionByUid(Long uid);
 
     void removeMcOptionsContent(McOptsContent mcOptsContent);
 
-    McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+    McQueContent getQuestionByQuestionText(final String question, final Long mcContentUid);
 
     void removeMcQueContentByUID(Long uid) throws McApplicationException;
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
 
-    List<McQueContent> getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
+    List<McQueContent> getQuestionsByContentUid(final Long mcContentId) throws McApplicationException;
 
     McSession getMcSessionById(Long mcSessionId) throws McApplicationException;
-
-    McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException;
 
     void updateMc(McContent mc) throws McApplicationException;
 
@@ -138,7 +128,7 @@ public interface IMcService {
 
     void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
-    List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
+    List<McOptionDTO> getOptionDtos(Long mcQueContentId) throws McApplicationException;
 
     McSession getMcSessionByUID(Long uid) throws McApplicationException;
 
@@ -150,9 +140,9 @@ public interface IMcService {
 
     void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
-    List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    List findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
 
-    void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
+    void saveOption(McOptsContent mcOptsContent) throws McApplicationException;
 
     McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
@@ -190,8 +180,6 @@ public interface IMcService {
     IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
 
     long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
-
-    McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException;
 
     List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
 
@@ -247,6 +235,9 @@ public interface IMcService {
     byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException;
     
     void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
+    
+    void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs,
+	    List<McQuestionDTO> deletedQuestions);
     
     /**
      * 

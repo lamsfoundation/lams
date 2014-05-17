@@ -68,6 +68,8 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     void removeAllUserAttempts(Long queUserUid);
+    
+    void removeAttempt(McUsrAttempt userAttempt);
 
     /**
      * Get the most recent attempts (for all questions) for one user in one tool session

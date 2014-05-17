@@ -24,50 +24,28 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 /**
- * <p>
  * DTO that holds authoring properties for authoring jsps
- * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class McGeneralAuthoringDTO implements Comparable {
     protected String toolContentID;
     protected String currentTab;
-    protected String activeModule;
-    protected String defineLaterInEditMode;
-    protected String showAuthoringTabs;
-    protected String monitoringOriginatedDefineLater;
-    protected String targetMode;
-    protected String defaultQuestionContent;
-    protected String defaultContentIdStr;
 
     protected String activityTitle;
     protected String activityInstructions;
     protected String usernameVisible;
     protected String reflect;
-    protected String synchInMonitor;
     protected String questionsSequenced;
     protected String randomize;
     protected String displayAnswers;
-    protected String editActivityEditMode;
     protected String reflectionSubject;
     protected String showMarks;
 
-    protected String monitoredContentInUse;
-
     protected String httpSessionID;
-    protected String requestedModule;
-    protected String isDefineLater;
-    protected Map mapQuestionContent;
-
-    protected String sbmtSuccess;
-    protected String userExceptionQuestionsDuplicate;
 
     protected String contentFolderID;
     protected String editableQuestionText;
@@ -83,42 +61,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     protected Map passMarksMap;
 
     protected String totalMarks;
-
-    public String toString() {
-	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
-		.append("contentFolderID: ", contentFolderID).append("httpSessionID: ", httpSessionID)
-		.append("editableQuestionText: ", editableQuestionText).append("passMarksMap: ", passMarksMap)
-		.append("totalMarks: ", totalMarks).append("marksMap: ", marksMap).append("currentTab: ", currentTab)
-		.append("markValue: ", markValue).append("activeModule: ", activeModule)
-		.append("defineLaterInEditMode: ", defineLaterInEditMode)
-		.append("showAuthoringTabs: ", showAuthoringTabs)
-		.append("monitoringOriginatedDefineLater: ", monitoringOriginatedDefineLater)
-		.append("targetMode: ", targetMode).append("defaultQuestionContent: ", defaultQuestionContent)
-		.append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ", activityTitle)
-		.append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
-		.append("usernameVisible: ", usernameVisible)
-		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
-		.append("editActivityEditMode: ", editActivityEditMode)
-		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule)
-		.append("isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("mapQuestionContent: ", mapQuestionContent).append("sbmtSuccess: ", sbmtSuccess)
-		.append("userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
-    }
-
-    /**
-     * @return Returns the userExceptionQuestionsDuplicate.
-     */
-    public String getUserExceptionQuestionsDuplicate() {
-	return userExceptionQuestionsDuplicate;
-    }
-
-    /**
-     * @param userExceptionQuestionsDuplicate
-     *            The userExceptionQuestionsDuplicate to set.
-     */
-    public void setUserExceptionQuestionsDuplicate(String userExceptionQuestionsDuplicate) {
-	this.userExceptionQuestionsDuplicate = userExceptionQuestionsDuplicate;
-    }
 
     /**
      * @return Returns the httpSessionID.
@@ -136,66 +78,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the monitoredContentInUse.
-     */
-    public String getMonitoredContentInUse() {
-	return monitoredContentInUse;
-    }
-
-    /**
-     * @param monitoredContentInUse
-     *            The monitoredContentInUse to set.
-     */
-    public void setMonitoredContentInUse(String monitoredContentInUse) {
-	this.monitoredContentInUse = monitoredContentInUse;
-    }
-
-    /**
-     * @return Returns the editActivityEditMode.
-     */
-    public String getEditActivityEditMode() {
-	return editActivityEditMode;
-    }
-
-    /**
-     * @param editActivityEditMode
-     *            The editActivityEditMode to set.
-     */
-    public void setEditActivityEditMode(String editActivityEditMode) {
-	this.editActivityEditMode = editActivityEditMode;
-    }
-
-    /**
-     * @return Returns the mapQuestionContent.
-     */
-    public Map getMapQuestionContent() {
-	return mapQuestionContent;
-    }
-
-    /**
-     * @param mapQuestionContent
-     *            The mapQuestionContent to set.
-     */
-    public void setMapQuestionContent(Map mapQuestionContent) {
-	this.mapQuestionContent = mapQuestionContent;
-    }
-
-    /**
-     * @return Returns the isDefineLater.
-     */
-    public String getIsDefineLater() {
-	return isDefineLater;
-    }
-
-    /**
-     * @param isDefineLater
-     *            The isDefineLater to set.
-     */
-    public void setIsDefineLater(String isDefineLater) {
-	this.isDefineLater = isDefineLater;
-    }
-
-    /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
@@ -210,81 +92,6 @@ public class McGeneralAuthoringDTO implements Comparable {
 	this.toolContentID = toolContentID;
     }
 
-    /**
-     * @return Returns the targetMode.
-     */
-    public String getTargetMode() {
-	return targetMode;
-    }
-
-    /**
-     * @param targetMode
-     *            The targetMode to set.
-     */
-    public void setTargetMode(String targetMode) {
-	this.targetMode = targetMode;
-    }
-
-    /**
-     * @return Returns the monitoringOriginatedDefineLater.
-     */
-    public String getMonitoringOriginatedDefineLater() {
-	return monitoringOriginatedDefineLater;
-    }
-
-    /**
-     * @param monitoringOriginatedDefineLater
-     *            The monitoringOriginatedDefineLater to set.
-     */
-    public void setMonitoringOriginatedDefineLater(String monitoringOriginatedDefineLater) {
-	this.monitoringOriginatedDefineLater = monitoringOriginatedDefineLater;
-    }
-
-    /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *            The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *            The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
-     * @return Returns the showAuthoringTabs.
-     */
-    public String getShowAuthoringTabs() {
-	return showAuthoringTabs;
-    }
-
-    /**
-     * @param showAuthoringTabs
-     *            The showAuthoringTabs to set.
-     */
-    public void setShowAuthoringTabs(String showAuthoringTabs) {
-	this.showAuthoringTabs = showAuthoringTabs;
-    }
-
     public int compareTo(Object o) {
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO) o;
 
@@ -292,51 +99,6 @@ public class McGeneralAuthoringDTO implements Comparable {
 	    return 1;
 	else
 	    return 0;
-    }
-
-    /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *            The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
-    }
-
-    /**
-     * @return Returns the defaultQuestionContent.
-     */
-    public String getDefaultQuestionContent() {
-	return defaultQuestionContent;
-    }
-
-    /**
-     * @param defaultQuestionContent
-     *            The defaultQuestionContent to set.
-     */
-    public void setDefaultQuestionContent(String defaultQuestionContent) {
-	this.defaultQuestionContent = defaultQuestionContent;
-    }
-
-    /**
-     * @return Returns the requestedModule.
-     */
-    public String getRequestedModule() {
-	return requestedModule;
-    }
-
-    /**
-     * @param requestedModule
-     *            The requestedModule to set.
-     */
-    public void setRequestedModule(String requestedModule) {
-	this.requestedModule = requestedModule;
     }
 
     /**
@@ -385,21 +147,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the synchInMonitor.
-     */
-    public String getSynchInMonitor() {
-	return synchInMonitor;
-    }
-
-    /**
-     * @param synchInMonitor
-     *            The synchInMonitor to set.
-     */
-    public void setSynchInMonitor(String synchInMonitor) {
-	this.synchInMonitor = synchInMonitor;
-    }
-
-    /**
      * @return Returns the usernameVisible.
      */
     public String getUsernameVisible() {
@@ -427,21 +174,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    /**
-     * @return Returns the sbmtSuccess.
-     */
-    public String getSbmtSuccess() {
-	return sbmtSuccess;
-    }
-
-    /**
-     * @param sbmtSuccess
-     *            The sbmtSuccess to set.
-     */
-    public void setSbmtSuccess(String sbmtSuccess) {
-	this.sbmtSuccess = sbmtSuccess;
     }
 
     /**
