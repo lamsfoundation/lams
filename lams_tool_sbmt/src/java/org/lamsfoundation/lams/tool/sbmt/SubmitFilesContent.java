@@ -26,15 +26,11 @@ package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * @hibernate.class table="tl_lasbmt11_content"
@@ -207,16 +203,21 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     @Override
     public Object clone() {
-	Object obj = null;
+	SubmitFilesContent content = null;
 	try {
-	    obj = super.clone();
+	    content = (SubmitFilesContent) super.clone();
 	    // never clone key!
-	    ((SubmitFilesContent) obj).setContentID(null);
+	    content.setContentID(null);
+	    
+	    // clone SubmitUser as well
+	    if (createdBy != null) {
+		content.setCreatedBy((SubmitUser) createdBy.clone());
+	    }
 	} catch (CloneNotSupportedException e) {
 	    SubmitFilesContent.log.error("When clone " + SubmitFilesContent.class + " failed");
 	}
 
-	return obj;
+	return content;
     }
 
     /**
