@@ -40,4 +40,11 @@ public class SubmitFilesImportContentVersionFilter extends ToolContentVersionFil
 	this.removeField(SubmitFilesContent.class, "offlineInstruction");
 	this.removeField(SubmitFilesContent.class, "instructionFiles");
     }
+    
+    /**
+     * Import 20140407 version content to 20140520 version tool server.
+     */
+    public void up20140407To20140520() {
+	this.removeField(SubmitFilesContent.class, "createdBy");
+    }
 }
