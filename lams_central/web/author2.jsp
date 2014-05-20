@@ -212,35 +212,33 @@
 	</div>
 	
 	
-	<!-- GROUP TO BRANCH MATCHING DIALOG -->
+	<!-- GROUP OR CONDITION TO BRANCH MATCHING DIALOG -->
 	
-	<div id="gtbDialog" class="dialogContainer">
+	<div id="branchMappingDialog" class="dialogContainer branchMappingDialog">
 		<table>
 			<tr>
 				<td></td>
 				<td></td>
 				<td rowspan="2"></td>
-				<td colspan="2" class="gtbLabelCell">
+				<td colspan="2" class="branchMappingLabelCell">
 					Mappings
 				</td>
 			</tr>
 			<tr>
-				<td class="gtbLabelCell">Groups</td>
-				<td class="gtbLabelCell">Branches</td>
-				<td class="gtbLabelCell">Group</td>
-				<td class="gtbLabelCell">Branch</td>
+				<td class="branchMappingLabelCell branchMappingFreeItemHeaderCell"></td>
+				<td class="branchMappingLabelCell">Branches</td>
+				<td class="branchMappingLabelCell branchMappingBoundItemHeaderCell"></td>
+				<td class="branchMappingLabelCell">Branch</td>
 			</tr>
 			<tr>
-				<td id="gtbGroupsCell" class="gtbListCell"></td>
-				<td id="gtbBranchesCell" class="gtbListCell"></td>
-				<td id="gtbButtonCell">
-					<div id="gtbAddButton"
-					     onClick="javascript:PropertyLib.addGroupToBranchMapping()"></div>
-					<div id="gtbRemoveButton"
-					     onClick="javascript:PropertyLib.removeGroupToBranchMapping()"></div>
+				<td class="branchMappingFreeItemCell branchMappingListCell"></td>
+				<td class="branchMappingFreeBranchCell branchMappingListCell"></td>
+				<td>
+					<div class="branchMappingAddButton branchMappingButton"></div>
+					<div class="branchMappingRemoveButton branchMappingButton"></div>
 				</td>
-				<td id="gtbMappingGroupCell" class="gtbListCell"></td>
-				<td id="gtbMappingBranchCell" class="gtbListCell"></td>
+				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
+				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
 			</tr>
 		</table>
 	</div>
@@ -440,6 +438,16 @@
 			</tr>
 			<tr>
 				<td colspan="2">
+					<div class="propertiesContentFieldCreateConditions">Create conditions</div>
+				</td>
+			</tr>
+			</tr>
+				<td colspan="2">
+					<div class="propertiesContentFieldMatchConditions">Match conditions to branches</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
 					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
 				</td>
 			</tr>
@@ -548,6 +556,37 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	
+	
+	<!-- TOOL OUTPUT CONDITIONS DIALOG -->
+	<div id="outputConditionsDialog" class="dialogContainer">
+		 <select id="outputSelect">
+		 	<option value="none">[ Choose Output ]</option>
+		 </select>
+		 <select id="rangeOptionSelect" class="outputSelectDependent">
+		 	<option value="none" selected="selected">[ Options ]</option>
+		 	<option value="greater">Greater than or equal to</option>
+		 	<option value="less">Less than or equal to</option>
+		 	<option value="range">Range</option>
+		 </select>
+		 <div id="rangeAddDiv" class="outputSelectDependent">
+			 <input id="singleRangeSpinner" class="outputSelectDependent spinner" />
+			 <div id="multiRangeDiv" class="outputSelectDependent">
+			 	From: <input id="multiRangeFromSpinner" class="spinner" /> To: <input id="multiRangeToSpinner" class="spinner" />
+			 </div>
+			 <span id="rangeAddButton">Add</span>
+		 </div>
+		 <div id="complexConditions" class="outputSelectDependent">
+		 	<div>Name:</div>
+		 	<ul></ul>
+		 </div>
+		 <table id="rangeConditions" class="outputSelectDependent">
+		 	<tr id="rangeConditionsHeaderRow">
+		 		<th>Name</th>
+		 		<th>Condition</th>
+		 	</tr>
+		 </table>
 	</div>
 	
 	

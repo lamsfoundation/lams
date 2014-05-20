@@ -146,6 +146,8 @@ var ActivityLib = {
 		this.branches = [];
 		// mapping between groups and branches, if applicable
 		this.groupsToBranches = [];
+		// mapping between tool output and branches, if applicable
+		this.conditionsToBranches = [];
 		
 		this.minOptions = 0;
 		this.maxOptions = 0;
@@ -547,11 +549,12 @@ var ActivityLib = {
 	 * Deletes the given activity.
 	 */
 	removeActivity : function(activity, forceRemove) {
+		var coreActivity =  activity.branchingActivity || this;
 		if (!forceRemove && activity instanceof ActivityLib.BranchingEdgeActivity){
 			// user removes one of the branching edges, so remove the whole activity
 			if (confirm('Are you sure you want to remove the whole branching activity?')){
-				var otherEdge = activity.isStart ? activity.branchingActivity.end
-						                         : activity.branchingActivity.start;
+				var otherEdge = activity.isStart ? coreActivity.end
+						                         : coreActivity.start;
 				ActivityLib.removeActivity(otherEdge, true);
 			} else {
 				return;
@@ -579,14 +582,15 @@ var ActivityLib = {
 				layout.items.copiedActivity = null;
 			}
 
-			if (activity instanceof ActivityLib.GroupingActivity) {
-				$.each(layout.activities, function(){
-					if (activity == this.grouping) {
-						this.grouping = null;
-						this.draw();
-					}
-				});
-			}
+			// find references of this activity as grouping or input
+			$.each(layout.activities, function(){
+				if (activity == coreActivity.grouping) {
+					coreActivity.grouping = null;
+					this.draw();
+				} else if (activity == coreActivity.input) {
+					coreActivity.input = null;
+				}
+			});
 		}
 		
 		// remove the activity from parent activity
@@ -673,7 +677,7 @@ var ActivityLib = {
 		
 		
 		if (transition) {
-			ActivityLib.removeTransition(transition);
+			ActivityLib.removeTransition(transition, redraw);
 		}
 		
 		transition = new ActivityLib.Transition(id, uiid, fromActivity, toActivity,
@@ -694,7 +698,7 @@ var ActivityLib = {
 	/**
 	 * Removes the given transition.
 	 */
-	removeTransition : function(transition) {
+	removeTransition : function(transition, redraw) {
 		// find the transition and remove it
 		var transitions = transition.fromActivity.transitions.from;
 		transitions.splice(transitions.indexOf(transition), 1);
@@ -707,32 +711,41 @@ var ActivityLib = {
 			branches.splice(branches.indexOf(transition.branch), 1);
 		}
 		
-		// remove grouping references if chain was broken by the removed transition
-		$.each(layout.activities, function(){
-			if (this.grouping) {
-				var candidate = this,
-					groupingFound = false;
-				do {
-					if (candidate.transitions && candidate.transitions.to.length > 0) {
-						candidate = candidate.transitions.to[0].fromActivity;
-					} else if (candidate.parentActivity) {
-						candidate = candidate.parentActivity;
-					} else {
-						candidate = null;
-					}
+		if (!redraw){
+			// remove grouping or input references if chain was broken by the removed transition
+			$.each(layout.activities, function(){
+				var coreActivity =  this.branchingActivity || this;
+				if (coreActivity.grouping || coreActivity.input) {
+					var candidate = this,
+						groupingFound = false,
+						inputFound = false;
+					do {
+						if (candidate.transitions && candidate.transitions.to.length > 0) {
+							candidate = candidate.transitions.to[0].fromActivity;
+						} else if (candidate.parentActivity) {
+							candidate = candidate.parentActivity;
+						} else {
+							candidate = null;
+						}
+						
+						if (coreActivity.grouping == candidate) {
+							groupingFound = true;
+						}
+						if (coreActivity.input == candidate) {
+							inputFound = true;
+						}
+					} while (candidate != null);
 					
-					if (this.grouping == candidate) {
-						groupingFound = true;
-						candidate = null;
+					if (!groupingFound) {
+						coreActivity.grouping = null;
+						this.draw();
 					}
-				} while (candidate != null);
-			}
-			
-			if (!groupingFound) {
-				this.grouping = null;
-				this.draw();
-			}
-		});
+					if (!inputFound) {
+						coreActivity.input = null;
+					}
+				}
+			});
+		}
 		
 		transition.items.remove();
 		setModified(true);

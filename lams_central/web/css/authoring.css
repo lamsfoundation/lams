@@ -142,34 +142,34 @@ div#ldStoreDialogNameContainer span {
 }
 
 
-div#gtbDialog > table {
+div.branchMappingDialog > table {
 	width: 100%;
 	height: 98%;
 	table-layout: fixed;
 	border-collapse: collapse;
 }
 
-div#gtbDialog td {
+div.branchMappingDialog td {
 	text-align: center;
 	vertical-align: top;
 }
 
-div#gtbDialog td.gtbLabelCell {
+div.branchMappingDialog td.branchMappingLabelCell {
 	height: 15px;
 	font-weight: bold;
 }
 
-div#gtbDialog td.gtbListCell {
+div.branchMappingDialog td.branchMappingListCell {
 	border: thin black solid;
 	padding: 3px;
 }
 
-div#gtbDialog td.gtbListCell .selected {
+div.branchMappingDialog td.branchMappingListCell .selected {
 	background-color: #5c9ccc;
 	color: white;
 }
 
-div#gtbDialog #gtbAddButton, div#gtbDialog #gtbRemoveButton {
+div.branchMappingDialog .branchMappingButton {
 	width: 40%;
 	height: 25px;
 	display: block;
@@ -177,9 +177,53 @@ div#gtbDialog #gtbAddButton, div#gtbDialog #gtbRemoveButton {
 	margin-bottom: 20px;
 }
 
-div#gtbDialog td.gtbListCell div {
+div.branchMappingDialog td.branchMappingListCell div {
 	text-align: left;
 	cursor: pointer;
+}
+
+
+div#outputConditionsDialog div#complexConditions > div {
+	font-weight: bold;
+	margin: 10px 0 0 2px;
+}
+
+div#outputConditionsDialog select {
+	margin-bottom: 10px;
+}
+
+div#outputConditionsDialog .spinner {
+	width: 40px;
+}
+
+div#outputConditionsDialog div#multiRangeDiv {
+	display: inline-block;	
+}
+
+div#outputConditionsDialog #rangeAddButton {
+	margin-left: 10px;
+}
+
+div#outputConditionsDialog table#rangeConditions {
+	width: 100%;
+	margin-top: 15px;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+div#outputConditionsDialog table#rangeConditions tr td,
+div#outputConditionsDialog table#rangeConditions tr th {
+	padding: 3px;
+	border: black thin solid;
+	cursor: pointer;
+}
+
+div#outputConditionsDialog table#rangeConditions input {
+	width: 95%;
+}
+
+div#outputConditionsDialog tr.selected {
+	background-color: #dfeffc;
 }
 
 

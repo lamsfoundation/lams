@@ -419,8 +419,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long, int)
      */
     @Override
-    public String getToolOutputDefinitions(Long toolContentID, int definitionType) throws IOException {
-
+    public List<ToolOutputDefinitionDTO> getToolOutputDefinitions(Long toolContentID, int definitionType) {
 	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID,
 		definitionType);
 
@@ -431,9 +430,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		defnDTOList.add(new ToolOutputDefinitionDTO(defn));
 	    }
 	}
-
-	FlashMessage flashMessage = new FlashMessage("getToolOutputDefinitions", defnDTOList);
-	return flashMessage.serializeMessage();
+	return defnDTOList;
     }
 
     /**

@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -114,12 +115,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
-	
+
 	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(getUserId());
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
-	request.setAttribute("access",  gson.toJson(accessList));
+	request.setAttribute("access", gson.toJson(accessList));
 	return mapping.findForward("openAutoring");
     }
 
@@ -156,12 +157,33 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Long toolContentID = WebUtil.readLongParam(request, "toolContentID", false);
 	    Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION; // WebUtil.readIntParam(request,
 												 // "toolOutputDefinitionType");
-	    wddxPacket = authoringService.getToolOutputDefinitions(toolContentID, definitionType);
+	    List<ToolOutputDefinitionDTO> defnDTOList = authoringService.getToolOutputDefinitions(toolContentID,
+		    definitionType);
+
+	    FlashMessage flashMessage = new FlashMessage("getToolOutputDefinitions", defnDTOList);
+	    wddxPacket = flashMessage.serializeMessage();
 
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getToolOutputDefinitions", authoringService, true).serializeMessage();
 	}
 	return outputPacket(mapping, request, response, wddxPacket, "definitions");
+    }
+
+    public ActionForward getToolOutputDefinitionsJSON(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
+	    JSONException {
+	String wddxPacket;
+	IAuthoringService authoringService = getAuthoringService();
+	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
+	Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION;
+
+	List<ToolOutputDefinitionDTO> defnDTOList = authoringService.getToolOutputDefinitions(toolContentID,
+		definitionType);
+
+	Gson gson = new GsonBuilder().create();
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(gson.toJson(defnDTOList));
+	return null;
     }
 
     public ActionForward getLearningDesignDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -196,7 +218,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	responseJSON.put("access", new JSONArray(gson.toJson(accessList)));
-	
+
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
@@ -488,7 +510,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		Integer userId = getUserId();
 		getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
-		
+
 		List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
 		accessList = accessList.subList(0,
 			Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
@@ -514,7 +536,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	response.getWriter().write(gson.toJson(accessList));
 	return null;
     }
-    
 
     /**
      * Get AuditService bean.

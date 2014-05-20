@@ -16,7 +16,7 @@ var PropertyLib = {
 						'at' : 'right top',
 						'of' :  '#canvas'
 					},
-					'resizable'     : true,
+					'resizable'     : false,
 					'title'         : 'Properties'
 				});
 		// for proximity detection throttling (see handlers)
@@ -80,7 +80,10 @@ var PropertyLib = {
 		
 		
 		// initialise dialog from matching groups to branches in branching activities
-		var gtbDialog = layout.items.groupsToBranchesMappingDialog = $('#gtbDialog').dialog({
+		var gtbDialog = layout.items.groupsToBranchesMappingDialog = $('#branchMappingDialog')
+			.clone()
+			.attr('id','gtbDialog')
+			.dialog({
 			'autoOpen' : false,
 			'modal'  : true,
 			'show'   : 'fold',
@@ -96,22 +99,30 @@ var PropertyLib = {
 			            	'text'   : 'OK',
 			            	'click'  : function() {
 			            		var dialog = $(this),
-			            			branchingActivity = dialog.dialog('option', 'branchingActivity');
-			            		
+			            			branchingActivity = dialog.dialog('option', 'branchingActivity'),
+			            			assignedToDefault = false;
+
 			            		// find references to groups and branches
 			            		branchingActivity.groupsToBranches = [];
-			            		$('#gtbMappingGroupCell div', dialog).each(function(){
+			            		$('.branchMappingBoundItemCell div, .branchMappingFreeItemCell div', dialog).each(function(){
 			            			var groupUIID = +$(this).attr('uiid'),
-			            				branchUIID = +$(this).data('boundItem').attr('uiid'),
+			            				boundItem = $(this).data('boundItem'),
+			            				branchUIID = boundItem ? +boundItem.attr('uiid') : null,
 			            				group = null,
 			            				branch = null;
 			            			
-			            			$.each(branchingActivity.branches, function(){
-			            				if (branchUIID == this.uiid) {
-			            					branch = this;
-			            					return false;
-			            				}
-			            			});
+			            			if (branchUIID) {
+				            			$.each(branchingActivity.branches, function(){
+				            				if (branchUIID == this.uiid) {
+				            					branch = this;
+				            					return false;
+				            				}
+				            			});
+			            			} else {
+			            				branch = branchingActivity.branches[0];
+			            				assignedToDefault = true;
+			            			}
+			            			
 			            			$.each(branchingActivity.grouping.groups, function(){
 			            				if (groupUIID == this.uiid) {
 			            					group = this;
@@ -127,34 +138,457 @@ var PropertyLib = {
 			            			});
 			            		});
 			            		
+		            			if (assignedToDefault){
+		            				alert('All remaining groups will be mapped to the default branch');
+		            			}
 			            		dialog.dialog('close');
-			            		
 			            		setModified(true);
-							}
-			             },
-			             {
-			            	'text'   : 'Cancel',
-			            	'click'  : function() {
-								$(this).dialog('close');
-							}
+			            	}
 			             }
 			]
 		});
 		
-		$('#gtbAddButton', gtbDialog).button({
+		$('.branchMappingAddButton', gtbDialog).button({
 			'icons' : {
 				'primary' :  'ui-icon-seek-next'
 			},
 			'text' : false
+		}).click(function(){
+			PropertyLib.addBranchMapping(gtbDialog);
 		});
-		$('#gtbRemoveButton', gtbDialog).button({
+		$('.branchMappingRemoveButton', gtbDialog).button({
 			'icons' : {
 				'primary' :  'ui-icon-seek-prev'
 			},
 			'text' : false
+		}).click(function(){
+			PropertyLib.removeBranchMapping(gtbDialog);
 		});
+		$('.branchMappingFreeItemHeaderCell', gtbDialog).text('Groups');
+		$('.branchMappingBoundItemHeaderCell', gtbDialog).text('Group');
 		
 		layout.dialogs.push(gtbDialog);
+		
+		
+		var outputConditionsDialog = layout.items.outputConditionsDialog = $('#outputConditionsDialog').dialog({
+			'autoOpen' : false,
+			'modal'  : true,
+			'show'   : 'fold',
+			'hide'   : 'fold',
+			'position' : {
+				'of' :  '#canvas'
+			},
+			'width'  : 400,
+			'height' : 400,
+			'title'  : 'Select Output Conditions for Input',
+			'buttons' : [
+				{
+					'class'  : 'outputSelectDependent rangeOutputButton',
+					'text'   : 'Clear all',
+					'click'  : function() {
+						var rows = $('#rangeConditions td', this).closest('tr');
+						rows.each(function(){
+							if ($(this).data('mappingEntry').branch) {
+								if (confirm('There are conditions linked to an existing branch.\nDo you wish to remove them?')) {
+									rows = null;
+								}
+								return false;
+							}
+						});
+						
+						if (rows) {
+							rows.remove();
+						}
+					}
+				},
+				{
+					'class'  : 'outputSelectDependent rangeOutputButton',
+					'text'   : 'Remove',
+					'click'  : function() {
+						var selected = $('#rangeConditions tr.selected', this);
+						if (!selected.data('mappingEntry').branch
+								|| confirm('This condition is linked to an existing branch.\nDo you wish to remove it?')) {
+							selected.remove();
+						}
+					}
+				},
+				{
+					'class'  : 'outputSelectDependent complexOutputButton',
+					'text'   : 'Refresh',
+					'click'  : function() {
+						$(this).dialog('option', 'refreshDefinitions')();
+						$(this).dialog('option', 'buildContent')();
+					}
+				},
+				{
+					'text'   : 'Cancel',
+					'click'  : function() {
+						var dialog = $(this);
+						dialog.dialog('close');
+					}
+				},
+				{
+					'text'   : 'OK',
+					'click'  : function() {
+						var dialog = $(this),
+							activity = dialog.dialog('option', 'parentObject');
+						
+						if (activity instanceof ActivityLib.BranchingActivity) {
+							activity.conditionsToBranches = [];
+							$('#rangeConditions tr, #complexConditions li', dialog).each(function(){
+								var mappingEntry = $(this).is(':visible') ? $(this).data('mappingEntry') : null;
+								if (!mappingEntry) {
+									return true;
+								}
+								
+								if (!mappingEntry.uiid) {
+									mappingEntry.uiid = ++layout.ld.maxUIID;
+								}
+								if (!mappingEntry.condition.conditionUIID) {
+									mappingEntry.condition.conditionUIID = ++layout.ld.maxUIID;
+								}
+								
+								var input = $('input', this);
+								if (input.length > 0) {
+									mappingEntry.condition.displayName = input.val();
+								}
+								activity.conditionsToBranches.push(mappingEntry);
+							});
+						}
+												
+						dialog.dialog('close');
+						PropertyLib.openConditionsToBranchesMappingDialog(activity);
+					}
+				}
+			 ],
+			 
+			 'open' : function(){
+				 $(this).dialog('option', 'buildContent')();
+			 }
+		});
+		
+		outputConditionsDialog.dialog('option', 
+			{
+			'refreshDefinitions' : function(){
+				var dialog = layout.items.outputConditionsDialog,
+					activity = dialog.dialog('option', 'parentObject');
+				
+				$.ajax({
+					url : LAMS_URL + 'authoring/author.do',
+					data : {
+						'method' : 'getToolOutputDefinitionsJSON',
+						'toolContentID' : activity.input.toolContentID || activity.input.toolID
+					},
+					cache : false,
+					async: false,
+					dataType : 'json',
+					success : function(response) {
+						activity.input.outputDefinitions = response;
+					}
+				});
+			},
+			
+			
+			'buildContent' : function() {
+				var dialog = layout.items.outputConditionsDialog,
+					activity = dialog.dialog('option', 'parentObject'),
+					outputSelect = $('#outputSelect', dialog),
+					emptyOption = $('option[value="none"]', outputSelect).attr('selected', 'selected'),
+					outputName = activity.conditionsToBranches && activity.conditionsToBranches.length > 0
+							 	 ? activity.conditionsToBranches[0].condition.name.split('#')[0] : null;
+				$('option[value!="none"]', outputSelect).remove();
+				
+				if (!activity.input.outputDefinitions) {
+					dialog.dialog('option', 'refreshDefinitions')();
+				}
+				
+				if (activity.input.outputDefinitions) {
+					$.each(activity.input.outputDefinitions,function(){
+						var suffix = '';
+						switch(this.type) {
+							case 'OUTPUT_COMPLEX' :
+								suffix = ' (user defined)';
+								break;
+													
+							case 'OUTPUT_LONG' :
+								suffix = ' (range)';
+								break;
+						};
+		
+						this.toolActivityUIID = activity.input.uiid;
+						var option = $('<option />')
+									   .text(this.description + suffix)
+									   .data('output', this)
+									   .appendTo(outputSelect);
+						if (this.name == outputName) {
+							option.attr('selected', 'selected');
+							emptyOption.attr('selected', null);
+						}
+					});
+				}
+				
+				dialog.dialog('option', 'outputChange')();
+			},
+			
+			
+			'outputChange' : function(){
+				var dialog = layout.items.outputConditionsDialog,
+					container = dialog.closest('.ui-dialog'),
+				 	activity = dialog.dialog('option', 'parentObject'),
+				    outputOption = $('#outputSelect option:selected', dialog),
+				    output = outputOption.data('output');
+				
+				$('.outputSelectDependent', container).hide();
+				if (!output) {
+					return;
+				}
+				
+				var complexConditionNames = $('#complexConditions', dialog),
+					rangeConditionNames = $('#rangeConditions', dialog),
+					complexOutputWidgets = $('.complexOutputButton', container).add(complexConditionNames),
+					rangeOutputWidgets = $('#rangeOptionSelect, .rangeOutputButton', container).add(rangeConditionNames);
+				if (output.showConditionNameOnly) {
+					complexOutputWidgets.show();
+					var list =  $('ul', complexConditionNames);
+					$('li', list).remove();
+					 
+					if (output.defaultConditions){
+						$.each(output.defaultConditions, function(){
+							$('<li />').text(this.displayName)
+									   .data('mappingEntry', {
+										   'condition' : {
+											   'name' 			  : this.name,
+											   'displayName' 	  : this.displayName,
+											   'type' 			  : 'OUTPUT_COMPLEX',
+											   'toolActivityUIID' : output.toolActivityUIID
+										   }
+									   })			   
+							  		   .appendTo(list);
+						});
+					}
+				} else {
+					rangeOutputWidgets.show();
+					outputConditionsDialog.dialog('option', 'rangeOptionChange')();
+					
+					$('td',rangeConditionNames).closest('tr').remove();
+					if (activity.conditionsToBranches) {
+						$.each(activity.conditionsToBranches, function(){
+							if (output.toolActivityUIID == this.condition.toolActivityUIID
+									&& output.name == this.condition.name) {
+								if (this.condition.exactMatchValue) {
+									this.condition.startValue = this.condition.endValue = this.condition.exactMatchValue;
+								}
+								outputConditionsDialog.dialog('option', 'addRangeConditionRow')(this);
+							}
+						});
+					}
+				}
+			},
+			
+			'rangeOptionChange' : function(){
+				var dialog = layout.items.outputConditionsDialog,
+					selectedOption = $('#rangeOptionSelect option:selected', dialog).attr('value');
+				
+				switch(selectedOption){
+					case 'greater':
+					case 'less':
+						$('#rangeAddDiv, #singleRangeSpinner', dialog).show();
+						$('#multiRangeDiv', dialog).hide();
+						break;
+					case 'range':
+						$('#rangeAddDiv, #multiRangeDiv', dialog).show();
+						$('#singleRangeSpinner', dialog).hide();
+						break;
+					default:
+						$('#rangeAddDiv', dialog).hide();
+				}
+			},
+			
+			
+			'addRangeConditionRow' : function(mappingEntry){
+				var condition = mappingEntry.condition;
+				if (condition.type != 'OUTPUT_LONG') {
+					return;
+				}
+				var rangeConditionNames = $('#outputConditionsDialog #rangeConditions'),
+					conditionText = null;
+				
+				if (condition.exactMatchValue) {
+					conditionText = 'Exact value of ' + +condition.exactMatchValue;
+				} else if (typeof condition.startValue == 'undefined') {
+					conditionText = 'Less than or eq ' + +condition.endValue;
+				} else if (typeof condition.endValue == 'undefined') {
+					conditionText = 'Greater than or eq ' + +condition.startValue;
+				} else {
+					conditionText = 'Range ' + +condition.startValue + ' to ' + +condition.endValue;
+				}
+				
+				var row = $('<tr />').appendTo(rangeConditionNames).data('mappingEntry', mappingEntry).click(function(){
+						$(this).addClass('selected').siblings('tr').removeClass('selected');
+					}),
+					nameCell = $('<td />').appendTo(row),
+					nameInput = $('<input />').val(condition.displayName).appendTo(nameCell),
+					conditionCell = $('<td />').text(conditionText).appendTo(row);
+			}
+		});
+		
+		
+		$('#outputSelect', outputConditionsDialog).change(outputConditionsDialog.dialog('option', 'outputChange'));
+		$('#rangeOptionSelect', outputConditionsDialog).change(outputConditionsDialog.dialog('option', 'rangeOptionChange'));
+		$('#rangeAddButton', outputConditionsDialog).button().click(function(){
+			var dialog = layout.items.outputConditionsDialog, 
+				rangeConditionNames = $('#rangeConditions', dialog),
+				selectedOption = $('#rangeOptionSelect option:selected', dialog).attr('value'),
+				output = $('#outputSelect option:selected', dialog).data('output'),
+				condition = {
+					'name' : output.name,
+					'type' : 'OUTPUT_LONG',
+ 				    'toolActivityUIID' : output.toolActivityUIID
+				};
+				
+				switch(selectedOption){
+					case 'greater':
+						condition.startValue = $('#singleRangeSpinner', dialog).val();
+						break;
+					case 'less':
+						condition.endValue = $('#singleRangeSpinner', dialog).val();
+						break;
+					case 'range':
+						condition.startValue = $('#multiRangeFromSpinner', dialog).val();
+						condition.endValue = $('#multiRangeToSpinner', dialog).val();
+						if (condition.startValue == condition.endValue) {
+							condition.exactMatchValue = condition.startValue;
+						}
+						break;
+				}
+				
+				$('td', rangeConditionNames).closest('tr').each(function(){
+					var existingCondition = $(this).data('mappingEntry').condition;
+					
+					if ((typeof condition.startValue == 'undefined' && existingCondition.startValue <= condition.endValue)
+						|| (typeof condition.endValue == 'undefined'
+							&& (typeof existingCondition.endValue == 'undefined' || existingCondition.endValue >= condition.startValue))
+						|| (!(condition.startValue > existingCondition.endValue) && !(condition.endValue < existingCondition.startValue))) {
+						alert('The start value can not be within the range of an existing condition');
+						condition = null;
+						return false;
+					}
+					
+					if ((typeof condition.endValue == 'undefined' && existingCondition.endValue >= condition.startValue)
+						|| (typeof condition.startValue == 'undefined'
+							&& (typeof existingCondition.startValue == 'undefined' || existingCondition.startValue <= condition.endValue))
+						|| (!(condition.endValue < existingCondition.startValue) && !(condition.startValue > existingCondition.endValue))) {
+						alert('The end value can not be within the range of an existing condition');
+						condition = null;
+						return false;
+					}
+				});
+				
+				if (!condition){
+					return;
+				}
+
+				var nameIndex = 1;
+				while (!condition.displayName) {
+					condition.displayName = 'Untitled ' + nameIndex;
+					$('input', rangeConditionNames).each(function(){
+						if (condition.displayName == $(this).val()) {
+							condition.displayName = null;
+							nameIndex++;
+							return false;
+						}
+					});
+				}
+				
+				dialog.dialog('option', 'addRangeConditionRow')({'condition' : condition});
+		});
+		$('#singleRangeSpinner, #multiRangeFromSpinner, #multiRangeToSpinner', outputConditionsDialog).spinner({
+			'min' : 0,
+		}).spinner('value', 0);
+		
+		layout.dialogs.push(outputConditionsDialog);
+		
+		
+		// initialise dialog for matching conditions to branches in branching activities
+		var ctbDialog = layout.items.conditionsToBranchesMappingDialog = $('#branchMappingDialog')
+			.clone()
+			.attr('id','ctbDialog')
+			.dialog({
+				'autoOpen' : false,
+				'modal'  : true,
+				'show'   : 'fold',
+				'hide'   : 'fold',
+				'position' : {
+					'of' :  '#canvas'
+				},
+				'width'  : 800,
+				'height' : 400,
+				'title'  : 'Match Conditions to Branches',
+				'buttons' : [
+				             {
+				            	'text'   : 'OK',
+				            	'click'  : function() {
+				            		var dialog = $(this),
+				            			branchingActivity = dialog.dialog('option', 'branchingActivity'),
+				            			assignedToDefault = false;
+				            		
+			            			$.each(branchingActivity.conditionsToBranches, function(){
+			            				var mappingEntry = this;
+			            				mappingEntry.branch = null;
+					            		// find references to conditions and branches
+					            		$('.branchMappingBoundItemCell div', dialog).each(function(){
+					            			var entryUIID = +$(this).attr('uiid'),
+					            				branchUIID = +$(this).data('boundItem').attr('uiid');
+
+					            			if (entryUIID == mappingEntry.uiid) {
+						            			$.each(branchingActivity.branches, function(){
+						            				if (branchUIID == this.uiid) {
+						            					mappingEntry.branch = this;
+						            					return false;
+						            				}
+						            			});
+						            			return false;
+					            			}
+					            		});
+					            		
+				            			if (!mappingEntry.branch) {
+				            				assignedToDefault = true;
+				            				mappingEntry.branch = branchingActivity.branches[0];
+				            			}
+			            			});
+			            			
+				            		
+			            			if (assignedToDefault){
+			            				alert('All remaining conditions will be mapped to the default branch');
+			            			}
+			            			
+				            		dialog.dialog('close');
+				            		setModified(true);
+				            	}
+				             }
+				]
+		});
+		
+		$('.branchMappingAddButton', ctbDialog).button({
+			'icons' : {
+				'primary' :  'ui-icon-seek-next'
+			},
+			'text' : false
+		}).click(function(){
+			PropertyLib.addBranchMapping(ctbDialog);
+		});
+		$('.branchMappingRemoveButton', ctbDialog).button({
+			'icons' : {
+				'primary' :  'ui-icon-seek-prev'
+			},
+			'text' : false
+		}).click(function(){
+			PropertyLib.removeBranchMapping(ctbDialog);
+		});
+		$('.branchMappingFreeItemHeaderCell', ctbDialog).text('Conditions');
+		$('.branchMappingBoundItemHeaderCell', ctbDialog).text('Condition');
+		
+		layout.dialogs.push(ctbDialog);
 	},
 	
 	openPropertiesDialog : function(object) {
@@ -461,7 +895,7 @@ var PropertyLib = {
 				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
 				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
 				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
-				PropertyLib.fillToolInputDropdown(content, activity.branchingActivity.input);
+				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
 				
 				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
 																				 activity.branchingActivity.minOptions)
@@ -473,6 +907,11 @@ var PropertyLib = {
 																			'min' : activity.branchingActivity.minOptions,
 																			'max' : activity.branchingActivity.branches.length
 																		});
+				if (activity.branchingActivity.branches.length == 0) {
+					$('.propertiesContentFieldCreateConditions, .propertiesContentFieldMatchConditions,'+
+					  '.propertiesContentFieldMatchGroups', content)
+						.closest('tr').hide();
+				}
 			}
 		
 		if (!content) {
@@ -480,7 +919,13 @@ var PropertyLib = {
 			content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldMatchGroups', content).button().click(function(){
-				PropertyLib.openGroupsToBranchesMappingDialog(activity);
+				PropertyLib.openGroupsToBranchesMappingDialog(activity.branchingActivity);
+			});
+			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
+				PropertyLib.openOutputConditionsDialog(activity.branchingActivity);
+			});
+			$('.propertiesContentFieldMatchConditions', content).button().click(function(){
+				PropertyLib.openConditionsToBranchesMappingDialog(activity.branchingActivity);
 			});
 			
 			var changeFunction = function(){
@@ -509,14 +954,22 @@ var PropertyLib = {
 					branchingActivity.grouping = null;
 				}
 				$('.propertiesContentFieldMatchGroups', content).closest('tr')
-					.css('display', branchingActivity.grouping ? '' : 'none');
+					.css('display', branchingActivity.grouping && branchingActivity.branches.length > 0 ? '' : 'none');
 				
-				var inputRow = $('.propertiesContentFieldInput', content).closest('tr');
+				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
+					inputDefinitionRows = $('.propertiesContentFieldCreateConditions, .propertiesContentFieldMatchConditions', content)
+										.closest('tr');
 				if (branchingActivity.branchingType == 'tool') {
 					branchingActivity.input = inputRow.show()
-						.find('option:selected').data('parentObject');
+						.find('option:selected').data('input');
+					if (branchingActivity.input && branchingActivity.branches.length > 0) {
+						inputDefinitionRows.show();
+					} else {
+						inputDefinitionRows.hide();
+					}
 				} else {
 					inputRow.hide();
+					inputDefinitionRows.hide();
 					branchingActivity.input = null;
 				}
 				
@@ -823,26 +1276,41 @@ var PropertyLib = {
 	/**
 	 * 	Find all activities that support outputs and fill dropdown menu with their titles
 	 */
-	fillToolInputDropdown : function(content, input) {
+	fillToolInputDropdown : function(activity, input) {
 		// find all tools that support input and fill dropdown menu with their titles
 		var emptyOption = $('<option />'),
-			inputDropdown = $('.propertiesContentFieldInput', content).empty().append(emptyOption);
-		$.each(layout.activities, function(){
-			if (this instanceof ActivityLib.ToolActivity
-				&& layout.toolMetadata[this.learningLibraryID].supportsOutputs) {
-				var option = $('<option />').text(this.title)
-											.appendTo(inputDropdown)
-											// store reference to grouping object
-											.data('parentObject', this);
-				if (this == input) {
-					option.attr('selected', 'selected');
-				}
+			inputDropdown = $('.propertiesContentFieldInput', activity.propertiesContent).empty().append(emptyOption),
+			inputActivities = [],
+			candidate = activity;
+
+		do {
+			if (candidate.transitions && candidate.transitions.to.length > 0) {
+				candidate = candidate.transitions.to[0].fromActivity;
+			} else if (candidate.parentActivity) {
+				candidate = candidate.parentActivity;
+			} else {
+				candidate = null;
+			}
+			
+			if (candidate instanceof ActivityLib.ToolActivity
+					&& layout.toolMetadata[candidate.learningLibraryID].supportsOutputs) {
+				inputActivities.push(candidate);
+			}
+		} while (candidate != null);
+		
+
+		// fill dropdown menu
+		$.each(inputActivities, function(){
+			var option = $('<option />').text(this.title)
+						.appendTo(inputDropdown)
+						// store reference to grouping object
+						.data('input', this);
+			if (this == input) {
+				emptyOption.removeAttr('selected');
+				option.attr('selected', 'selected');
 			}
 		});
-		if (!input) {
-			// no grouping selected
-			emptyOption.attr('selected', 'selected');
-		}
+
 	},
 	
 	
@@ -860,79 +1328,6 @@ var PropertyLib = {
 		});
 		
 		dialog.dialog('open');
-	},
-	
-	
-	/**
-	 * Opens dialog for assigned groups to branches in branching activity.
-	 */
-	openGroupsToBranchesMappingDialog : function(activity) {
-		var dialog = layout.items.groupsToBranchesMappingDialog,
-			branchingActivity = activity.branchingActivity,
-			grouping = branchingActivity.grouping,
-			groupsCell = $('#gtbGroupsCell', dialog),
-			branchesCell = $('#gtbBranchesCell', dialog),
-			groupCell = $('#gtbMappingGroupCell', dialog),
-			branchCell = $('#gtbMappingBranchCell', dialog),
-			branches = branchingActivity.branches;
-		
-		// remove existing entries and add reference to the initiating activity
-		dialog.dialog('option', 'branchingActivity', branchingActivity);
-		$('.gtbListCell', dialog).empty();
-		
-		// find group names and create DOM elements out of them
-		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
-				grouping.groups, 'name', 'Group ');
-		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
-				branches, 'title', 'Branch ');
-		
-		$.each(grouping.groups, function(){
-			var group = this,
-				groupElem = $('<div />').click(PropertyLib.selectGroupsToBranchesListItem)
-										.text(group.name).attr('uiid', group.uiid);
-			
-			// check if a group-branch mapping is already defined
-			$.each(branchingActivity.groupsToBranches, function() {
-				if (this.group == group) {
-					var branchElem = $('<div />').click(PropertyLib.selectGroupsToBranchesListItem)
-												 .appendTo(branchCell)
-												 .text(this.branch.title)
-												 .attr('uiid', this.branch.uiid)
-												 .data('boundItem', groupElem);
-					groupElem.appendTo(groupCell).data('boundItem', branchElem);
-					groupElem = null;
-					return false;
-				}
-			});
-			
-			if (groupElem) {
-				// no existing mapping was found, make the group available for mapping
-				groupElem.appendTo(groupsCell);
-			}
-		});
-		$.each(branches, function(){
-			$('<div />').click(PropertyLib.selectGroupsToBranchesListItem).appendTo(branchesCell)
-						.text(this.title).attr('uiid', this.uiid);
-		});
-		
-		dialog.dialog('open');
-	},
-	
-	
-	/**
-	 * Selects a list item and optionally the matched pair.
-	 */
-	selectGroupsToBranchesListItem : function(){
-		var item = $(this),
-			boundItem = item.data('boundItem');
-		
-		item.siblings().removeClass('selected');
-		item.addClass('selected');
-		
-		if (boundItem) {
-			boundItem.siblings().removeClass('selected');
-			boundItem.addClass('selected');
-		}
 	},
 	
 	
@@ -957,46 +1352,172 @@ var PropertyLib = {
 	
 	
 	/**
-	 * Make a pair out of selected group and branch.
+	 * Opens dialog for assigned groups to branches in branching activity.
 	 */
-	addGroupToBranchMapping : function(){
+	openGroupsToBranchesMappingDialog : function(branchingActivity ) {
 		var dialog = layout.items.groupsToBranchesMappingDialog,
-			selectedGroup = $('#gtbGroupsCell .selected', dialog),
-			selectedBranch =  $('#gtbBranchesCell .selected', dialog);
+			grouping = branchingActivity.grouping,
+			groupsCell = $('.branchMappingFreeItemCell', dialog),
+			branchesCell = $('.branchMappingFreeBranchCell', dialog),
+			groupCell = $('.branchMappingBoundItemCell', dialog),
+			branchCell = $('.branchMappingBoundBranchCell', dialog),
+			branches = branchingActivity.branches;
 		
-		if (selectedGroup.length != 1 || selectedBranch.length != 1) {
+		// remove existing entries and add reference to the initiating activity
+		dialog.dialog('option', 'branchingActivity', branchingActivity);
+		$('.branchMappingListCell', dialog).empty();
+		
+		// find group names and create DOM elements out of them
+		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
+				grouping.groups, 'name', 'Group ');
+		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
+				branches, 'title', 'Branch ');
+		
+		$.each(grouping.groups, function(){
+			var group = this,
+				groupElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+										.text(group.name).attr('uiid', group.uiid);
+			
+			// check if a group-branch mapping is already defined
+			$.each(branchingActivity.groupsToBranches, function() {
+				if (this.group == group && branches.indexOf(this.branch) != -1) {
+					var branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+												 .appendTo(branchCell)
+												 .text(this.branch.title)
+												 .attr('uiid', this.branch.uiid)
+												 .data('boundItem', groupElem);
+					groupElem.appendTo(groupCell).data('boundItem', branchElem);
+					groupElem = null;
+					return false;
+				}
+			});
+			
+			if (groupElem) {
+				// no existing mapping was found, make the group available for mapping
+				groupElem.appendTo(groupsCell);
+			}
+		});
+		$.each(branches, function(){
+			$('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell)
+						.text(this.title).attr('uiid', this.uiid);
+		});
+		
+		dialog.dialog('open');
+	},
+	
+	
+	/**
+	 * Selects a list item and optionally the matched pair.
+	 */
+	selectBranchMappingListItem : function(){
+		var item = $(this),
+			boundItem = item.data('boundItem');
+		
+		item.siblings().removeClass('selected');
+		item.addClass('selected');
+		
+		if (boundItem) {
+			boundItem.siblings().removeClass('selected');
+			boundItem.addClass('selected');
+		}
+	},
+	
+	
+	/**
+	 * Make a pair out of selected group/condition and branch.
+	 */
+	addBranchMapping : function(dialog){
+		var selectedItem = $('.branchMappingFreeItemCell .selected', dialog),
+			selectedBranch =  $('.branchMappingFreeBranchCell .selected', dialog);
+		
+		if (selectedItem.length != 1 || selectedBranch.length != 1) {
 			return;
 		}
 		
 		// original branch stays in its list
-		selectedBranch = selectedBranch.clone().click(PropertyLib.selectGroupsToBranchesListItem);
+		selectedBranch = selectedBranch.clone().click(PropertyLib.selectBranchMappingListItem);
 		// add info about the pair for later reference
-		selectedGroup.data('boundItem', selectedBranch);
-		selectedBranch.data('boundItem', selectedGroup);
-		var groupCell = $('#gtbMappingGroupCell', dialog),
-			branchCell = $('#gtbMappingBranchCell', dialog);
+		selectedItem.data('boundItem', selectedBranch);
+		selectedBranch.data('boundItem', selectedItem);
+		var itemCell = $('.branchMappingBoundItemCell', dialog),
+			branchCell = $('.branchMappingBoundBranchCell', dialog);
 		// clear existing selection
-		$('.selected', groupCell).removeClass('selected');
+		$('.selected', itemCell).removeClass('selected');
 		$('.selected', branchCell).removeClass('selected');
-		groupCell.append(selectedGroup);
+		itemCell.append(selectedItem);
 		branchCell.append(selectedBranch);
 	},
 	
 	
 	/**
-	 * Remove a mapping of group and branch.
+	 * Remove a mapping of group/condition and branch.
 	 */
-	removeGroupToBranchMapping : function() {
-		var dialog = layout.items.groupsToBranchesMappingDialog,
-			selectedGroup = $('#gtbMappingGroupCell .selected', dialog),
-			selectedBranch =  $('#gtbMappingBranchCell .selected', dialog);
+	removeBranchMapping : function(dialog) {
+		var selectedItem = $('.branchMappingBoundItemCell .selected', dialog),
+			selectedBranch =  $('.branchMappingBoundBranchCell .selected', dialog);
 	
-		if (selectedGroup.length != 1 || selectedBranch.length != 1) {
+		if (selectedItem.length != 1 || selectedBranch.length != 1) {
 			return;
 		}
 		
-		selectedGroup.removeData('boundItem');
+		selectedItem.removeData('boundItem');
 		selectedBranch.remove();
-		$('#gtbGroupsCell', dialog).append(selectedGroup);
+		$('.branchMappingFreeItemCell', dialog).append(selectedItem);
+	},
+
+	
+	openOutputConditionsDialog : function(activity){
+		if (!activity || !activity.input) {
+			return;
+		}
+
+		$('#outputConditionsDialog').dialog('option', 'parentObject', activity)
+			  						.dialog('open');
+	},
+	
+	
+	/**
+	 * Opens dialog for assigned conditions to branches in branching activity.
+	 */
+	openConditionsToBranchesMappingDialog : function(branchingActivity) {
+		var dialog = layout.items.conditionsToBranchesMappingDialog,
+			conditionsCell = $('.branchMappingFreeItemCell', dialog),
+			branchesCell = $('.branchMappingFreeBranchCell', dialog),
+			conditionCell = $('.branchMappingBoundItemCell', dialog),
+			branchCell = $('.branchMappingBoundBranchCell', dialog),
+			branches = branchingActivity.branches;
+		
+		// remove existing entries and add reference to the initiating activity
+		dialog.dialog('option', 'branchingActivity', branchingActivity);
+		$('.branchMappingListCell', dialog).empty();
+		
+		// find group names and create DOM elements out of them
+		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
+				branches, 'title', 'Branch ');
+		
+		$.each(branchingActivity.conditionsToBranches, function(){
+			var entry = this,
+				condition = entry.condition,
+				conditionElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+										.text(condition.displayName).attr('uiid', entry.uiid);
+			
+			if (entry.branch && branchingActivity.branches.indexOf(entry.branch) != -1) {
+				var branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+											 .appendTo(branchCell)
+											 .text(entry.branch.title)
+											 .attr('uiid', entry.branch.uiid)
+											 .data('boundItem', conditionElem);
+				conditionElem.appendTo(conditionCell).data('boundItem', branchElem);
+			} else {
+				conditionElem.appendTo(conditionsCell);
+			}
+		});
+		
+		$.each(branches, function(){
+			$('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell)
+						.text(this.title).attr('uiid', this.uiid);
+		});
+		
+		dialog.dialog('open');
 	}
 };

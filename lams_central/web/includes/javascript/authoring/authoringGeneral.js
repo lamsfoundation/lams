@@ -1054,6 +1054,7 @@ function openLearningDesign(learningDesignID) {
 			$.each(ld.branchMappings, function(){
 				var entry = this,
 					group = null,
+					input = null,
 					branch = null;
 				$.each(layout.activities, function(){
 					// is it the branch we're looking for?
@@ -1072,21 +1073,33 @@ function openLearningDesign(learningDesignID) {
 								return false;
 							}
 						});
+					} else if (entry.condition && entry.condition.toolActivityUIID == this.uiid) {
+						input = this;
 					}
 					
 					// found both, no need to continue iteration
-					if (group && branch) {
+					if (branch && (group || input)) {
 						return false;
 					}
 				});
 				
-				if (group && branch) {
-					branch.branchingActivity.groupsToBranches.push({
-						'id'	: entry.entryID,
-						'uiid' : entry.entryUIID,
-						'group'     : group,
-						'branch'    : branch
-					});
+				if (branch) {
+					if (group) {
+						branch.branchingActivity.groupsToBranches.push({
+							'id'	 : entry.entryID,
+							'uiid'   : entry.entryUIID,
+							'group'  : group,
+							'branch' : branch
+						});
+					} else if (input) {
+						branch.branchingActivity.input = input;
+						branch.branchingActivity.conditionsToBranches.push({
+							'id'	    : entry.entryID,
+							'uiid'      : entry.entryUIID,
+							'condition' : entry.condition,
+							'branch'    : branch
+						});
+					}
 				}
 			});
 			
@@ -1099,14 +1112,13 @@ function openLearningDesign(learningDesignID) {
 					
 					$.each(branches, function(){
 						var branch = this,
-							// if there is no branch data, the branch is empty
 							branchData = branchToActivities[branch.id];
 						
 						// add reference to the transition inside branch
 						ActivityLib.addTransition(branchingActivity.start,
-								branchData ? branchData.firstActivity : branchingActivity.end,
+								branchData.firstActivity || branchingActivity.end,
 								true, null, null, branch);
-						if (branchData && !branchData.stopAfterActivity) {
+						if (branchData.lastActivity && !branchData.stopAfterActivity) {
 							ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);
 						}
 					});
@@ -1210,6 +1222,9 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				layoutActivities.push(branchingActivity);
 				
 				$.each(branchingActivity.branches, function(branchOrderID){
+					if (!branchingActivity.defaultActivityUIID) {
+						branchingActivity.defaultActivityUIID = this.uiid;
+					}
 					this.defaultActivityUIID = null;
 					this.orderID = branchOrderID + 1;
 					this.parentActivity = branchingActivity;
@@ -1322,20 +1337,47 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				case 'chosen' : activityTypeID = 10; break;
 				case 'group'  :
 					activityTypeID = 11;
-					$.each(activity.groupsToBranches, function(){
-						branchMappings.push({
-							'entryID'			   : this.id,
-							'entryUIID'			   : this.uiid,
-							'groupUIID' 		   : this.group.uiid,
-							'branchingActivityUIID': this.branch.branchingActivity.uiid,
-							'sequenceActivityUIID' : this.branch.uiid,
-							'condition'			   : null
+					var branchMappingCopy = activity.groupsToBranches.slice(),
+						branchMapping = activity.groupsToBranches = [];
+					// no break, so fall to 'tool'
+				case 'tool' :
+					activityTypeID = activityTypeID  || 12;
+					var branchMappingCopy = branchMappingCopy || activity.conditionsToBranches.slice(),
+						// yes, yes, a lousy construction
+						branchMapping = branchMapping || (activity.conditionsToBranches = []);
+						
+					if (activity.defaultActivityUIID && (activityTypeID == 11 || activity.input)) {
+						$.each(branchMappingCopy, function(index){
+							if (activity.branches.indexOf(this.branch) == -1){
+								return true;
+							}
+							if (this.group && activity.grouping.groups.indexOf(this.group) == -1) {
+								return true;
+							}
+							
+							var condition = this.condition;
+							if (condition) {
+								condition.orderID = index + 1;
+								if (condition.exactMatchValue) {
+									condition.startValue = condition.endValue = null;
+								}
+							}
+							
+							branchMappings.push({
+								'entryID'			   : this.id,
+								'entryUIID'			   : this.uiid,
+								'branchingActivityUIID': this.branch.branchingActivity.uiid,
+								'sequenceActivityUIID' : this.branch.uiid,
+								'groupUIID' 		   : this.group ? this.group.uiid : null,
+								'condition'			   : condition
+							});
+							
+							branchMapping.push(this);
 						});
-					});
+					}
 					
 					break;
-				case 'tool'   : activityTypeID = 12; break;
-				case 'optional'   : activityTypeID = 13; break;
+				case 'optional' : activityTypeID = 13; break;
 			}
 		} else if (activity instanceof ActivityLib.BranchActivity){
 			activityTypeID = 8;
@@ -1378,6 +1420,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'minOptions'			 : activity.minOptions,
 			'maxOptions'			 : activity.maxOptions,
 			'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
+			'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,

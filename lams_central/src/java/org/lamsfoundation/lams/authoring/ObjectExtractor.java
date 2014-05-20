@@ -2733,7 +2733,7 @@ public class ObjectExtractor implements IObjectExtractor {
     private BranchActivityEntry extractBranchActivityEntry(JSONObject details) throws JSONException,
 	    ObjectExtractorException {
 
-	Long entryId = details.getLong(AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_ID);
+	Long entryId = JsonUtil.optLong(details, AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_ID);
 	Integer entryUIID = details.getInt(AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_UIID);
 
 	Integer sequenceActivityUIID = details.getInt(AuthoringJsonTags.BRANCH_SEQUENCE_ACTIVITY_UIID);
@@ -2816,7 +2816,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	BranchCondition condition = extractCondition(details.optJSONObject(AuthoringJsonTags.BRANCH_CONDITION), entry);
 
-	Integer groupUIID = details.getInt(AuthoringJsonTags.GROUP_UIID);
+	Integer groupUIID = (Integer) JsonUtil.opt(details, AuthoringJsonTags.GROUP_UIID);
 	Group group = null;
 	if (groupUIID != null) {
 	    group = groups.get(groupUIID);
@@ -2985,17 +2985,17 @@ public class ObjectExtractor implements IObjectExtractor {
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE),
-			conditionDetails.getString(AuthoringJsonTags.CONDITION_START_VALUE),
-			conditionDetails.getString(AuthoringJsonTags.CONDITION_END_VALUE),
-			conditionDetails.getString(AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE),
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE),
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 	    } else {
 		condition.setConditionUIID(conditionUIID);
 		condition.setDisplayName(conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME));
-		condition.setEndValue(conditionDetails.getString(AuthoringJsonTags.CONDITION_END_VALUE));
-		condition.setExactMatchValue(conditionDetails.getString(AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+		condition.setEndValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE));
+		condition.setExactMatchValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 		condition.setName(conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME));
 		condition.setOrderId(conditionDetails.getInt(AuthoringJsonTags.ORDER_ID));
-		condition.setStartValue(conditionDetails.getString(AuthoringJsonTags.CONDITION_START_VALUE));
+		condition.setStartValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE));
 		condition.setType(conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE));
 	    }
 	}

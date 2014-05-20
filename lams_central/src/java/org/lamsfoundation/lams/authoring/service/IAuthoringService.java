@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -39,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -202,12 +204,9 @@ public interface IAuthoringService {
     public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode);
 
     /**
-     * This method returns a output definitions of the Tool in WDDX format.
-     * 
-     * @return String The required definitions in WDDX format
-     * @throws IOException
+     * This method returns a output definitions of the Tool.
      */
-    public String getToolOutputDefinitions(Long toolContentID, int definitionType) throws IOException;
+    public List<ToolOutputDefinitionDTO> getToolOutputDefinitions(Long toolContentID, int definitionType);
 
     /**
      * This method returns a output definition of the Tool, filtered by the supported Tool Output classes, in WDDX
