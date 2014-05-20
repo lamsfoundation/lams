@@ -910,7 +910,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
     
     public boolean isContentEdited(Long toolContentId) {
-	return qaDAO.getQaByContentId(toolContentId).isContentLocked();
+	return qaDAO.getQaByContentId(toolContentId).isDefineLater();
     }
     
     /**
