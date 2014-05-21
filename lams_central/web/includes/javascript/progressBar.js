@@ -220,9 +220,13 @@ var ActivityUtils = {
 			// get exact Y where inner shape was drawn
 			// it is different than activity.y in OptionalActivity
 			// because of gray square around it
-			var y = act.shape.attr('path')[0][2];
-			var arc = paper.path('M ' + (act.middle - 8) + ' ' + y
-					+ PATH_QUARTER_CIRCLE);
+			var y = act.shape.attr('path')[0][2],
+				arc = paper.path('M ' + (act.middle - 8) + ' ' + y
+					+ PATH_QUARTER_CIRCLE),
+				transformation = act.shape.transform();
+			if (transformation.length > 0) {
+				arc.transform(transformation);
+			}
 			arc.attr({
 				'fill' : COLOR_CURRENT_ACTIVITY,
 				'opacity' : 0,
@@ -252,8 +256,7 @@ var ActivityUtils = {
 			act.decoration = paper.set();
 
 			// should be internationalised?
-			// and for some reason, in horizontal bars the text must be slightly shifted, why?
-			var text = paper.text(act.middle, act.y + (isHorizontalBar ? 16 : 13), 'STOP');
+			var text = paper.text(act.middle, act.y + 16, 'STOP');
 			
 			text.attr({
 				'opacity' : 0,
@@ -340,10 +343,10 @@ var ActivityUtils = {
 		var isLarger = activity.isComplex || activity.type == 'g';
 		
 		// label underneath the shape
-		var label = null;
+		var label = null,
+			content = activity.name;
 		if (isHorizontalBar) {
 			// cut lengthy activity names so they don't overlap
-			var content = activity.name;
 			if (content.length > 23) {
 				content = content.substring(0,20) + '...';
 			}
@@ -351,12 +354,13 @@ var ActivityUtils = {
 					40 + (activity.index % 2 == 0 ? 0 : 15),
 					content);
 		} else {
+			content = ActivityUtils.breakTitle(content, paper.width);
 			label = paper.text(activity.middle,
-				47 + 60 * activity.index + (isLarger ? 10 : 0),
-				activity.name);
+					47 + 60 * activity.index + (isLarger ? 10 : 0),
+					content);
 		}
 		// correct Raphael bug
-		$('tspan', label.node).attr('dy', 0);
+		$('tspan:first-child', label.node).attr('dy', 0);
 		activity.elements.push(label);
 		
 		if (!isLast) {
@@ -365,12 +369,16 @@ var ActivityUtils = {
 			if (isHorizontalBar) {
 				line = paper.path('M ' + (activity.middle + 15) + ' 18 h 30');
 			} else {
-				line = paper.path('M ' + activity.middle + ' '
-						+ (50 + 60 * activity.index  + (isLarger ? 10 : 0))
-						+ ' v ' + (isLarger ? 20 : 30));
+				var startY = activity.y + label.getBBox().height + (isLarger ? 28 : 18),
+					endY = 20 + 60 * (activity.index + 1);
+				if (startY < endY) {
+					line = paper.path('M ' + activity.middle + ' ' + startY + ' L ' + activity.middle + ' ' + endY);
+				}
 			}
 			
-			activity.elements.push(line);
+			if (line) {
+				activity.elements.push(line);
+			}
 		}
 
 		if (!quick) {
@@ -685,16 +693,30 @@ var ActivityUtils = {
 			ActivityUtils.addDecoration(childActivity, null,
 					true);
 			
-			var label = paper.text(35, childActivity.y + 11,
-			// add dash before name
-			(isNested ? '- ' : '') + childActivity.name)
-			// align to left
-			.attr('text-anchor', 'start');
+			var labelText = ActivityUtils.breakTitle((isNested ? '- ' : '') + childActivity.name, activity.bar.paper.width - 31),
+				label = paper.text(35, childActivity.y + 11, labelText)
+							 // align to left
+							 .attr('text-anchor', 'start');
 			// fix a bug in FF layout
-			$('tspan', label.node).attr('dy', 0);
+			$('tspan:first-child', label.node).attr('dy', 0);
+			// bbox for label is not available yet, so draw the same one on a temporary paper
+			var tempPaper = new Raphael(0, 0, 1000, 1000),
+				tempLabel = tempPaper.text(0, 0, labelText),
+				labelHeight = tempLabel.getBBox().height + 10,
+				paperHeight = Math.max(23, labelHeight),
+				shift = paperHeight - 23,
+				transformationString = 't 0 ' + (shift)/2;
+			tempLabel.remove();
+			tempPaper.remove();
+			paper.setSize(paper.width, paperHeight);
+			childActivity.shape.transform(transformationString);
+			if (childActivity.decoration) {
+				childActivity.decoration.transform(transformationString);
+			}
 
 			var click = null;
 			if (!isNested) {
+				container.height(container.height() + shift);
 				// only first tier inner activities
 				if (childActivityIndex == 0) {
 					click = function() {
@@ -714,7 +736,10 @@ var ActivityUtils = {
 							if (!forceCommand
 									|| (isOpen ? forceCommand == 'close'
 											: forceCommand == 'open')) {
-								var containerHeightDelta = 27 * childCells.length;
+								var containerHeightDelta = 3;
+								childCells.each(function(){
+									containerHeightDelta += $(this).height();
+								});
 								childCells.toggle();
 								// resize inner content box
 								container.height(container.height()
@@ -803,7 +828,7 @@ var ActivityUtils = {
 					};
 				}
 				elem.animate(targetProperties, 2000, "linear", function(){
-					$('tspan', elem.node).attr('dy', 0);
+					$('tspan:first-child', elem.node).attr('dy', 0);
 				});
 			});
 		}
@@ -840,6 +865,34 @@ var ActivityUtils = {
 						);
 					}
 				}, 2000);
+	},
+	
+	// break string into several lines if it is too long
+	breakTitle : function(title, width) {
+		var paper = Raphael(0,0, width, 100),
+			brokenTitle = title,
+			parts = 1,
+			elem = null;
+		do {
+			elem = paper.text(0, 0, brokenTitle);
+			if (elem.getBBox().width > width) {
+				elem.remove();
+				parts++;
+				var chunk = Math.ceil(title.length/parts);
+				brokenTitle = '';
+				for (var part = 1; part <= parts; part++) {
+					var startIndex = (part - 1) * chunk,
+						endIndex = part == parts ? null : part*chunk;
+					brokenTitle += endIndex ? title.substring(startIndex, endIndex) + '\n' : title.substring(startIndex);
+				}
+			} else {
+				elem.remove();
+				elem = null;
+			}
+		} while (elem);
+		
+		paper.remove();
+		return brokenTitle;
 	}
 }
 
@@ -987,7 +1040,7 @@ function fillProgressBar(barId) {
 					// create paper only the first time
 					paper = bar.paper = Raphael(bar.containerId,
 							isHorizontalBar ? 40 + 60 * result.activities.length : 140,
-							isHorizontalBar ? 60 : 60 * result.activities.length);
+							isHorizontalBar ? 60 : 60 * result.activities.length + 25);
 					// first line on the top
 					paper.path(isHorizontalBar ? PATH_START_LINE_HORIZONTAL : PATH_START_LINE_VERTICAL);
 				}
@@ -1055,7 +1108,7 @@ function fillProgressBar(barId) {
 										+ branchActivities.length - 1), 60);
 							} else {
 								paper.setSize(140, 60 * (activities.length
-										+ branchActivities.length - 1));
+										+ branchActivities.length - 1) + 25);
 							}
 
 							ActivityUtils.expandBranch(bar,
