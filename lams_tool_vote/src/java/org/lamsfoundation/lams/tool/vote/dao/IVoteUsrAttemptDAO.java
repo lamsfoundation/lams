@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
-import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * @author Ozgur Demirtas
@@ -53,7 +52,7 @@ public interface IVoteUsrAttemptDAO {
 
     int getSessionEntriesCount(final Long voteSessionId);
 
-    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long questionUid);
+    List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
 
     int getAttemptsForQuestionContent(final Long voteQueContentId);
 

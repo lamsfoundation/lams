@@ -23,85 +23,83 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.vote.dto;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-
 
 /**
- * <p> Votes dto
- * </p>
+ * Votes dto
  * 
  * @author Ozgur Demirtas
  */
-public class VoteNominationContentDTO implements Comparable
-{
+public class VoteQuestionDTO implements Comparable {
+    private Long uid;
     private String question;
     private String displayOrder;
-    private String feedback;
+
+    public int compareTo(Object o) {
+	VoteMonitoredUserDTO voteMonitoredUserDTO = (VoteMonitoredUserDTO) o;
+
+	if (voteMonitoredUserDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
     
-	public String toString() {
-       return new ToStringBuilder(this)
-            .append("question:", question)
-            .append("feedback:", feedback)
-            .append("displayOrder:", displayOrder)
-            .toString();
+    /**
+     * @return Returns the uid.
+     */
+    public Long getUid() {
+	return uid;
     }
-	
-	public int compareTo(Object o)
-    {
-		VoteMonitoredUserDTO voteMonitoredUserDTO = (VoteMonitoredUserDTO) o;
-     
-        if (voteMonitoredUserDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(Long uid) {
+	this.uid = uid;
     }
+
     /**
      * @return Returns the displayOrder.
      */
     public String getDisplayOrder() {
-        return displayOrder;
+	return displayOrder;
     }
+
     /**
-     * @param displayOrder The displayOrder to set.
+     * @param displayOrder
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(String displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
-    /**
-     * @return Returns the feedback.
-     */
-    public String getFeedback() {
-        return feedback;
-    }
-    /**
-     * @param feedback The feedback to set.
-     */
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
+
     /**
      * @return Returns the question.
      */
     public String getNomination() {
-        return question;
+	return question;
     }
+
     /**
-     * @param question The question to set.
+     * @param question
+     *            The question to set.
      */
     public void setNomination(String question) {
-        this.question = question;
+	this.question = question;
     }
+
     /**
      * @return Returns the question.
      */
     public String getQuestion() {
-        return question;
+	return question;
     }
+
     /**
-     * @param question The question to set.
+     * @param question
+     *            The question to set.
      */
     public void setQuestion(String question) {
-        this.question = question;
+	this.question = question;
     }
 }

@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -94,13 +92,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
 
-	VoteUtils.cleanUpSessionAbsolute(request);
+	VoteUtils.cleanUpUserExceptions(request);
 	
 	if (voteService == null) {
 	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	}
-
-	Map mapQuestionsContent = new TreeMap(new VoteComparator());
 
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
@@ -115,10 +111,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteGeneralLearnerFlowDTO.setCastVoteCount("0");
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 
-	/*
-	 * save time zone information to session scope.
-	 */
-	VoteUtils.saveTimeZone(request);
 	ActionForward validateParameters = validateParameters(request, mapping, voteLearningForm);
 	if (validateParameters != null) {
 	    return validateParameters;
@@ -131,10 +123,10 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	 * retrieve it and the relavent content
 	 */
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 
 	if (voteSession == null) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	    VoteUtils.cleanUpUserExceptions(request);
 	    VoteLearningStarterAction.logger.error("error: The tool expects voteSession.");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
@@ -145,7 +137,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	 */
 	VoteContent voteContent = voteSession.getVoteContent();
 	if (voteContent == null) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	    VoteUtils.cleanUpUserExceptions(request);
 	    VoteLearningStarterAction.logger.error("error: The tool expects voteContent.");
 	    persistInRequestError(request, "error.content.doesNotExist");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
@@ -218,9 +210,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		.getServletContext());
 
 	/* find out if the content is being modified at the moment. */
-	boolean isDefineLater = VoteUtils.isDefineLater(voteContent);
-	if (isDefineLater == true) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	if (voteContent.isDefineLater()) {
+	    VoteUtils.cleanUpUserExceptions(request);
 	    return mapping.findForward(VoteAppConstants.DEFINE_LATER);
 	}
 	
@@ -281,9 +272,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	/*
 	 * fetch question content from content
 	 */
-	mapQuestionsContent = LearningUtil.buildQuestionContentMap(request, voteService, voteContent, null);
-	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-	request.setAttribute(VoteAppConstants.MAP_OPTIONS_CONTENT, mapQuestionsContent);
+	Map<String, String> mapQuestions = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
+	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
 
 	/*
 	 * the user's session id AND user id exists in the tool tables goto this screen if the OverAll Results scren has
@@ -382,7 +372,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      */
     protected void commonContentSetup(HttpServletRequest request, IVoteService voteService, VoteContent voteContent,
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
-	Map mapQuestionsContent = LearningUtil.buildQuestionContentMap(request, voteService, voteContent, null);
+	Map<String, String> mapQuestionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
 
 	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 	voteGeneralLearnerFlowDTO.setTotalQuestionCount(new Long(mapQuestionsContent.size()).toString());
@@ -445,7 +435,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	String strToolSessionId = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	long toolSessionID = 0;
 	if (strToolSessionId == null || strToolSessionId.length() == 0) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	    VoteUtils.cleanUpUserExceptions(request);
 	    // persistInRequestError(request, "error.toolSessionId.required");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	} else {
@@ -453,7 +443,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		toolSessionID = new Long(strToolSessionId).longValue();
 		voteLearningForm.setToolSessionID(new Long(toolSessionID).toString());
 	    } catch (NumberFormatException e) {
-		VoteUtils.cleanUpSessionAbsolute(request);
+		VoteUtils.cleanUpUserExceptions(request);
 		// persistInRequestError(request, "error.sessionId.numberFormatException");
 		VoteLearningStarterAction.logger.error("add error.sessionId.numberFormatException to ActionMessages.");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
@@ -464,13 +454,13 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	String mode = request.getParameter(VoteAppConstants.MODE);
 
 	if (mode == null || mode.length() == 0) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	    VoteUtils.cleanUpUserExceptions(request);
 	    VoteLearningStarterAction.logger.error("mode missing: ");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 
 	if (!mode.equals("learner") && !mode.equals("teacher") && !mode.equals("author")) {
-	    VoteUtils.cleanUpSessionAbsolute(request);
+	    VoteUtils.cleanUpUserExceptions(request);
 	    VoteLearningStarterAction.logger.error("mode invalid: ");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
@@ -480,7 +470,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     }
 
     boolean isSessionCompleted(String userSessionId, IVoteService voteService) {
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(userSessionId));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(userSessionId));
 	if (voteSession.getSessionStatus() != null && voteSession.getSessionStatus().equals(VoteAppConstants.COMPLETED)) {
 	    return true;
 	}
@@ -506,7 +496,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
 
-	VoteSession session = voteService.retrieveVoteSession(new Long(toolSessionId));
+	VoteSession session = voteService.getSessionBySessionId(new Long(toolSessionId));
 	VoteQueUsr user = voteService.getVoteUserBySession(userId, session.getUid());
 	if (user == null) {
 	    String userName = toolUser.getLogin();
@@ -520,7 +510,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     }
 
     private VoteQueUsr getSpecifiedUser(String toolSessionId, Integer userId) {
-	VoteSession session = voteService.retrieveVoteSession(new Long(toolSessionId));
+	VoteSession session = voteService.getSessionBySessionId(new Long(toolSessionId));
 	VoteQueUsr user = voteService.getVoteUserBySession(new Long(userId.intValue()), session.getUid());
 	if (user == null) {
 	    logger.error("Unable to find specified user for Vote activity. Screens are likely to fail. SessionId="

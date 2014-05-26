@@ -25,45 +25,23 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 
-
 /**
- * @author Ozgur Demirtas
+ * Interface that defines the contract for VoteQueContent access
  * 
- * <p> Interface that defines the contract for VoteQueConten access </p>
+ * @author Ozgur Demirtas
  */
-public interface IVoteQueContentDAO
-{
- 	public VoteQueContent getVoteQueContentByUID(Long uid);
-
- 	public VoteQueContent getToolDefaultQuestionContent(final long voteContentId);
-
- 	public List getAllQuestionEntries(final long voteContentId);
- 	
- 	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
- 	
- 	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid);
- 	
- 	public List getVoteQueContentsByContentId(long qaContentId);
- 	
- 	public void removeQuestionContentByVoteUid(final Long voteContentUid);
- 	
- 	public void resetAllQuestions(final Long voteContentUid);
-
- 	public void cleanAllQuestions(final Long voteContentUid);
- 	
- 	public void cleanAllQuestionsSimple(final Long voteContentUid);
- 	
- 	public void saveVoteQueContent(VoteQueContent voteQueContent);
+public interface IVoteQueContentDAO {
+    VoteQueContent getQuestionByUid(Long uid);
     
-	public void updateVoteQueContent(VoteQueContent voteQueContent);
-	
-	public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent);
-	
-	public void removeVoteQueContentByUID(Long uid);
-	
-	public void removeVoteQueContent(VoteQueContent voteQueContent);
-	
-	public List getAllQuestionEntriesSorted(final long voteContentId);
-	
- 	public void flush();
+    VoteQueContent getDefaultVoteContentFirstQuestion();
+
+    VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid);
+
+    void saveQuestion(VoteQueContent voteQueContent);
+
+    void saveOrUpdateQuestion(VoteQueContent voteQueContent);
+
+    void removeQuestion(VoteQueContent voteQueContent);
+
+    List getAllQuestionsSorted(final long voteContentId);
 }

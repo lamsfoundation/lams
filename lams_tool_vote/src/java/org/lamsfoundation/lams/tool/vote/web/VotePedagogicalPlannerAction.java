@@ -58,7 +58,7 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	VoteContent voteContent = getVoteService().retrieveVote(toolContentID);
+	VoteContent voteContent = getVoteService().getVoteContent(toolContentID);
 	plannerForm.fillForm(voteContent);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
@@ -70,7 +70,7 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
-	    VoteContent voteContent = getVoteService().retrieveVote(plannerForm.getToolContentID());
+	    VoteContent voteContent = getVoteService().getVoteContent(plannerForm.getToolContentID());
 	    voteContent.setInstructions(plannerForm.getInstructions());
 
 	    int nominationIndex = 1;
@@ -82,7 +82,7 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeNomination(nominationIndex - 1);
 		} else {
 		    if (nominationIndex <= voteContent.getVoteQueContents().size()) {
-			VoteQueContent voteQueContent = getVoteService().getQuestionContentByDisplayOrder(
+			VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder(
 				(long) nominationIndex, voteContent.getUid());
 			voteQueContent.setQuestion(nomination);
 			getVoteService().saveOrUpdateVoteQueContent(voteQueContent);
@@ -99,9 +99,10 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 		}
 	    } while (nominationIndex <= plannerForm.getNominationCount());
 	    if (nominationIndex <= voteContent.getVoteQueContents().size()) {
-		getVoteService().removeNominationsFromCache(voteContent);
+		getVoteService().removeQuestionsFromCache(voteContent);
+		getVoteService().removeVoteContentFromCache(voteContent);
 		for (; nominationIndex <= voteContent.getVoteQueContents().size(); nominationIndex++) {
-		    VoteQueContent voteQueContent = getVoteService().getQuestionContentByDisplayOrder(
+		    VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder(
 			    (long) nominationIndex, voteContent.getUid());
 		    getVoteService().removeVoteQueContent(voteQueContent);
 		}

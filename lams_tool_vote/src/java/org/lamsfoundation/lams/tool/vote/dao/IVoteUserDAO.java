@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 public interface IVoteUserDAO {
     public VoteQueUsr getVoteUserByUID(Long uid);
 
-    public VoteQueUsr findVoteUserById(Long userId);
+    public VoteQueUsr getUserByUserId(Long userId);
 
     public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
 

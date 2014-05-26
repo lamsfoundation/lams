@@ -26,59 +26,59 @@ package org.lamsfoundation.lams.tool.vote.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds stats data
+ * <p>
+ * DTO that holds stats data
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class VoteStatsDTO implements Comparable
-{
-	private String countAllUsers;
-	
-	private String countSessionComplete;
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("question", countAllUsers)
-            .append("countSessionComplete", countSessionComplete)
-            .toString();
+public class VoteStatsDTO implements Comparable {
+    private String countAllUsers;
+
+    private String countSessionComplete;
+
+    public String toString() {
+	return new ToStringBuilder(this).append("question", countAllUsers)
+		.append("countSessionComplete", countSessionComplete).toString();
     }
-	
-	public int compareTo(Object o)
-    {
-	    VoteStatsDTO qaStatsDTO = (VoteStatsDTO) o;
-     
-        if (qaStatsDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	VoteStatsDTO qaStatsDTO = (VoteStatsDTO) o;
+
+	if (qaStatsDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-	
-	
+
     /**
      * @return Returns the countAllUsers.
      */
     public String getCountAllUsers() {
-        return countAllUsers;
+	return countAllUsers;
     }
+
     /**
-     * @param countAllUsers The countAllUsers to set.
+     * @param countAllUsers
+     *            The countAllUsers to set.
      */
     public void setCountAllUsers(String countAllUsers) {
-        this.countAllUsers = countAllUsers;
+	this.countAllUsers = countAllUsers;
     }
+
     /**
      * @return Returns the countSessionComplete.
      */
     public String getCountSessionComplete() {
-        return countSessionComplete;
+	return countSessionComplete;
     }
+
     /**
-     * @param countSessionComplete The countSessionComplete to set.
+     * @param countSessionComplete
+     *            The countSessionComplete to set.
      */
     public void setCountSessionComplete(String countSessionComplete) {
-        this.countSessionComplete = countSessionComplete;
+	this.countSessionComplete = countSessionComplete;
     }
 }

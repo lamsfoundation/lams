@@ -29,7 +29,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -41,6 +40,7 @@ import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -51,17 +51,17 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @author Ozgur Demirtas
  * 
- * Interface that defines the contract Voting service provider must follow.
+ *         Interface that defines the contract Voting service provider must follow.
  */
 public interface IVoteService {
-    
+
     /**
      * @param user
      * @param toolSessionId
      * @return
      */
     boolean isUserGroupLeader(VoteQueUsr user, Long toolSessionId);
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      * 
@@ -69,15 +69,15 @@ public interface IVoteService {
      * @param toolSessionID
      */
     VoteQueUsr checkLeaderSelectToolForSessionLeader(VoteQueUsr user, Long toolSessionID);
-    
+
     /**
-     * Check user has the same answers logs as group leader. If not - creates missing ones. 
+     * Check user has the same answers logs as group leader. If not - creates missing ones.
      * 
      * @param user
      * @param leader
      */
     void copyAnswersFromLeader(VoteQueUsr user, VoteQueUsr leader);
-    
+
     /**
      * Generates chart data for the learner module and monitoring module Summary tab (Individual Sessions mode)
      * 
@@ -88,7 +88,7 @@ public interface IVoteService {
      */
     VoteGeneralLearnerFlowDTO prepareChartData(HttpServletRequest request, Long toolContentID, Long toolSessionUid,
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO);
-    
+
     /**
      * Generates data for all sessions in the Monitoring Summary, including all sessions summary.
      * 
@@ -98,113 +98,87 @@ public interface IVoteService {
     LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
 
     List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId);
-    
+
     List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
 
-    void createVote(VoteContent voteContent) throws VoteApplicationException;
+    VoteContent getVoteContent(Long toolContentID);
 
-    VoteContent retrieveVote(Long toolContentID) throws VoteApplicationException;
+    VoteUsrAttempt getAttemptByUID(Long uid);
 
-    VoteUsrAttempt getAttemptByUID(Long uid) throws VoteApplicationException;
+    void createVoteQue(VoteQueContent voteQueContent);
 
-    void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException;
+    void createVoteSession(VoteSession voteSession);
 
-    void createVoteSession(VoteSession voteSession) throws VoteApplicationException;
+    void createVoteQueUsr(VoteQueUsr voteQueUsr);
 
-    void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException;
+    VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid);
 
-    VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid)
-	    throws VoteApplicationException;
+    VoteQueUsr getUserByUserId(Long userId);
 
-    VoteQueUsr retrieveVoteQueUsr(Long userId) throws VoteApplicationException;
+    List getVoteUserBySessionUid(final Long voteSessionUid);
 
-    List getVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException;
+    int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
 
-    int getCompletedVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException;
-
-    VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid)
-	    throws VoteApplicationException;
+    VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid);
 
     Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid);
 
-   Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException;
+    Set getSessionUserEntriesSet(final Long voteSessionUid);
 
-    void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
-    void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
-    List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
+    List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession);
 
-    void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    void hideOpenVote(VoteUsrAttempt voteUsrAttempt);
 
-    void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    void showOpenVote(VoteUsrAttempt voteUsrAttempt);
 
-    void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
+    int getAttemptsForQuestionContent(final Long questionUid);
 
-    int getAttemptsForQuestionContent(final Long questionUid) throws VoteApplicationException;
+    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
 
-    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException;
+    int getUserEnteredVotesCountForContent(final Long voteContentUid);
 
-    int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException;
+    List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 
-    List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
-	    final Long voteSessionUid);
+    int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionId);
 
-    int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionId)
-	    throws VoteApplicationException;
+    int getSessionEntriesCount(final Long voteSessionId);
 
-    int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
+    List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid);
 
-    List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
-	    throws VoteApplicationException;
+    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId, final Long questionUid,
+	    final Long toolSessionUid);
 
-    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long questionUid, final Long toolSessionUid) throws VoteApplicationException;
+    VoteQueContent getQuestionByUid(Long uid);
 
-    List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException;
+    void removeVoteQueContent(VoteQueContent voteQueContent);
 
-    VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException;
+    VoteQueContent getVoteQueContentByUID(Long uid);
 
-    void removeVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
+    void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent);
 
-    VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException;
+    List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
+    
+    VoteQueContent getDefaultVoteContentFirstQuestion();
 
-    void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
+    VoteQueUsr getVoteUserByUID(Long uid);
 
-    void removeQuestionContentByVoteUid(final Long voteContentUid) throws VoteApplicationException;
+    void updateVoteUser(VoteQueUsr voteUser);
 
-    void cleanAllQuestionsSimple(final Long voteContentUid) throws VoteApplicationException;
+    void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid);
 
-    void resetAllQuestions(final Long voteContentUid) throws VoteApplicationException;
+    VoteQueUsr getUserById(long voteQueUsrId);
 
-    void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException;
+    VoteSession getSessionBySessionId(Long voteSessionId);
 
-    List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long questionUid);
+    void updateVote(VoteContent vote);
 
-    VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
+    void updateVoteSession(VoteSession voteSession);
 
-    void removeVoteQueContentByUID(Long uid) throws VoteApplicationException;
-
-    VoteQueUsr getVoteUserByUID(Long uid) throws VoteApplicationException;
-
-    void updateVoteUser(VoteQueUsr voteUser) throws VoteApplicationException;
-
-    void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid)
-	    throws VoteApplicationException;
-
-    List getAllQuestionEntries(final Long voteContentId) throws VoteApplicationException;
-
-    VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException;
-
-    VoteSession retrieveVoteSession(Long voteSessionId) throws VoteApplicationException;
-
-    VoteContent retrieveVoteBySessionId(Long voteSessionId) throws VoteApplicationException;
-
-    void updateVote(VoteContent vote) throws VoteApplicationException;
-
-    void updateVoteSession(VoteSession voteSession) throws VoteApplicationException;
-
-    VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
+    VoteSession getVoteSessionByUID(Long uid);
 
     /**
      * Get the count of all the potential learners for the vote session. This will include the people that have never
@@ -212,29 +186,27 @@ public interface IVoteService {
      * the number of people already known to the tool.
      * 
      * @param voteSessionId
-     *                The tool session id
+     *            The tool session id
      */
-    int getVoteSessionPotentialLearnersCount(Long voteSessionId) throws VoteApplicationException;
+    int getVoteSessionPotentialLearnersCount(Long voteSessionId);
 
-    void deleteVote(VoteContent vote) throws VoteApplicationException;
+    void deleteVote(VoteContent vote);
 
-    void deleteVoteById(Long voteId) throws VoteApplicationException;
+    void deleteVoteById(Long voteId);
 
-    void deleteVoteSession(VoteSession voteSession) throws VoteApplicationException;
+    void deleteVoteSession(VoteSession voteSession);
 
-    List getSessionNamesFromContent(VoteContent voteContent) throws VoteApplicationException;
+    List getSessionNamesFromContent(VoteContent voteContent);
 
-    void removeAttempt(VoteUsrAttempt attempt) throws VoteApplicationException;
+    void removeAttempt(VoteUsrAttempt attempt);
 
-    void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException;
+    void deleteVoteQueUsr(VoteQueUsr voteQueUsr);
 
-    User getCurrentUserData(String username) throws VoteApplicationException;
+    User getCurrentUserData(String username);
 
-    int getTotalNumberOfUsers() throws VoteApplicationException;
+    int getTotalNumberOfUsers();
 
-    Lesson getCurrentLesson(long lessonId) throws VoteApplicationException;
-
-    void saveVoteContent(VoteContent vote) throws VoteApplicationException;
+    void saveVoteContent(VoteContent vote);
 
     /**
      * checks the parameter content in the user responses table
@@ -243,7 +215,10 @@ public interface IVoteService {
      * @return boolean
      * @throws VoteApplicationException
      */
-    boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException;
+    boolean studentActivityOccurredGlobal(VoteContent voteContent);
+    
+    void recalculateUserAnswers(VoteContent content, Set<VoteQueContent> oldQuestions,
+	    List<VoteQuestionDTO> questionDTOs, List<VoteQuestionDTO> deletedQuestions);
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
@@ -258,33 +233,31 @@ public interface IVoteService {
 
     ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException;
+    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
 
-    IToolVO getToolBySignature(String toolSignature) throws VoteApplicationException;
+    IToolVO getToolBySignature(String toolSignature);
 
-    long getToolDefaultContentIdBySignature(String toolSignature) throws VoteApplicationException;
-
-    VoteQueContent getToolDefaultQuestionContent(long contentId) throws VoteApplicationException;
+    long getToolDefaultContentIdBySignature(String toolSignature);
 
     List getToolSessionsForContent(VoteContent vote);
 
-    List getAttemptsForUser(final Long userUid) throws VoteApplicationException;
+    List getAttemptsForUser(final Long userUid);
 
-    int countSessionComplete() throws VoteApplicationException;
+    int countSessionComplete();
 
-    List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException;
+    List getAllQuestionsSorted(final long voteContentId);
 
-    List<Long> getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
+    List<Long> getSessionsFromContent(VoteContent mcContent);
 
-    Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid)
-	    throws VoteApplicationException;
+    Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid);
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
-    void removeNominationsFromCache(VoteContent voteContent);
+    void removeQuestionsFromCache(VoteContent voteContent);
+    
+    void removeVoteContentFromCache(VoteContent voteContent);
 
     ToolOutput getToolInput(Long requestingToolContentId, Integer learnerId);
 
@@ -293,10 +266,10 @@ public interface IVoteService {
     void saveDataFlowObjectAssigment(DataFlowObject assignedDataFlowObject);
 
     DataFlowObject getAssignedDataFlowObject(Long toolContentId);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *  
+     * 
      * @param toolContentID
      * @return
      */

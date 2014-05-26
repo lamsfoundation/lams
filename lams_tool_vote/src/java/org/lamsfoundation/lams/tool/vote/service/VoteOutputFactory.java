@@ -124,7 +124,7 @@ public class VoteOutputFactory extends OutputFactory {
 
     public ToolOutput getToolOutput(String name, IVoteService voteService, Long toolSessionId, Long learnerId) {
 	if (name != null && name.startsWith(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION)) {
-	    VoteSession session = voteService.retrieveVoteSession(toolSessionId);
+	    VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	    VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
 
 	    return new ToolOutput(name, getI18NText(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, true),
@@ -194,7 +194,7 @@ public class VoteOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutput> output = null;
 
-	VoteSession session = voteService.retrieveVoteSession(toolSessionId);
+	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	VoteContent content = session.getVoteContent();
 	VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
 	String i18nDescription = getI18NText(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, true);

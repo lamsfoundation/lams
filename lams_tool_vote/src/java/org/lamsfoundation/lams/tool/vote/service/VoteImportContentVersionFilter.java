@@ -59,4 +59,11 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(VoteContent.class, "offlineInstructions");
 	this.removeField(VoteContent.class, "voteAttachments");
     }
+    
+    /**
+     * Import 20140102 version content to 20140520 version tool server.
+     */
+    public void up20140102To20140520() {
+	this.removeField(VoteContent.class, "contentInUse");
+    }
 }

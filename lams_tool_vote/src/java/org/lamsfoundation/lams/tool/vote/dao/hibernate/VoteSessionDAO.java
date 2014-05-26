@@ -60,7 +60,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 	return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, sessionUid);
     }
 
-    public VoteSession findVoteSessionById(Long voteSessionId) {
+    public VoteSession getSessionBySessionId(Long voteSessionId) {
 	String query = "from VoteSession votes where votes.voteSessionId=?";
 
 	List list = getSession().createQuery(query).setLong(0, voteSessionId.longValue()).list();
@@ -132,7 +132,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     }
 
     public void addVoteUsers(Long voteSessionId, VoteQueUsr user) {
-	VoteSession session = findVoteSessionById(voteSessionId);
+	VoteSession session = getSessionBySessionId(voteSessionId);
 	user.setVoteSession(session);
 	session.getVoteQueUsers().add(user);
 	this.getHibernateTemplate().saveOrUpdate(user);

@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 public interface IVoteSessionDAO {
     VoteSession getVoteSessionByUID(Long uid);
 
-    VoteSession findVoteSessionById(Long voteSessionId);
+    VoteSession getSessionBySessionId(Long voteSessionId);
 
     int countSessionComplete();
 

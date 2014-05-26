@@ -22,8 +22,6 @@
 
 package org.lamsfoundation.lams.tool.vote.web.form;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
@@ -46,7 +44,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String selectedIndex;
     protected String deletableOptionIndex;
 
-    protected String editDefaultQuestion;
     protected String removeOptionContent;
 
     protected String lockOnFinish;
@@ -56,8 +53,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     protected String reflect;
     protected String reflectionSubject;
-
-    protected String activeModule;
 
     protected String maxNominationCount;
     protected String minNominationCount;
@@ -84,8 +79,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String toolContentID;
     protected String editableNominationIndex;
 
-    protected String defineLaterInEditMode;
-
     /* proxy controllers for Monitoring tabs */
     protected String summaryMonitoring;
     protected String instructionsMonitoring;
@@ -94,17 +87,12 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     protected String edit;
     protected String exceptionMaxNominationInvalid;
-    protected String defaultContentIdStr;
-    protected String defaultContentId;
-    protected String isDefineLater;
-    protected String defaultOptionContent;
     protected String httpSessionID;
     protected IVoteService voteService;
 
     private String contentFolderID;
     private String addSingleQuestion;
     private String editableQuestionIndex;
-    private String feedback;
     private String editQuestionBoxRequest;
 
     protected Integer assignedDataFlowObject;
@@ -119,7 +107,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     public void resetUserAction() {
-	editDefaultQuestion = null;
 	addOptionContent = null;
 	removeOptionContent = null;
 
@@ -138,7 +125,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     public void reset() {
-	editDefaultQuestion = null;
 	addOptionContent = null;
 	removeOptionContent = null;
 
@@ -187,36 +173,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	showResults = "0";
 	reflect = "0";
 	useSelectLeaderToolOuput = "0";
-    }
-
-    /**
-     * @return Returns the defaultContentId.
-     */
-    public String getDefaultContentId() {
-	return defaultContentId;
-    }
-
-    /**
-     * @param defaultContentId
-     *                The defaultContentId to set.
-     */
-    public void setDefaultContentId(String defaultContentId) {
-	this.defaultContentId = defaultContentId;
-    }
-
-    /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *                The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
     }
 
     /**
@@ -492,21 +448,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     /**
-     * @return Returns the editDefaultQuestion.
-     */
-    public String getEditDefaultQuestion() {
-	return editDefaultQuestion;
-    }
-
-    /**
-     * @param editDefaultQuestion
-     *                The editDefaultQuestion to set.
-     */
-    public void setEditDefaultQuestion(String editDefaultQuestion) {
-	this.editDefaultQuestion = editDefaultQuestion;
-    }
-
-    /**
      * @return Returns the addOptionContent.
      */
     public String getAddOptionContent() {
@@ -706,36 +647,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     }
 
     /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *                The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *                The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
      * @return Returns the toolContentID.
      */
     @Override
@@ -750,36 +661,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     @Override
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
-    }
-
-    /**
-     * @return Returns the isDefineLater.
-     */
-    public String getIsDefineLater() {
-	return isDefineLater;
-    }
-
-    /**
-     * @param isDefineLater
-     *                The isDefineLater to set.
-     */
-    public void setIsDefineLater(String isDefineLater) {
-	this.isDefineLater = isDefineLater;
-    }
-
-    /**
-     * @return Returns the defaultOptionContent.
-     */
-    public String getDefaultOptionContent() {
-	return defaultOptionContent;
-    }
-
-    /**
-     * @param defaultOptionContent
-     *                The defaultOptionContent to set.
-     */
-    public void setDefaultOptionContent(String defaultOptionContent) {
-	this.defaultOptionContent = defaultOptionContent;
     }
 
     /**
@@ -810,21 +691,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setHttpSessionID(String httpSessionID) {
 	this.httpSessionID = httpSessionID;
-    }
-
-    @Override
-    public String toString() {
-	return new ToStringBuilder(this).append("activeModule: ", activeModule).append("contentFolderID: ",
-		contentFolderID).append("addSingleQuestion: ", addSingleQuestion).append("editableQuestionIndex: ",
-		editableQuestionIndex).append("feedback: ", feedback).append("editQuestionBoxRequest: ",
-		editQuestionBoxRequest).append("defineLaterInEditMode: ", defineLaterInEditMode).append(
-		"exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid).append("isDefineLater: ",
-		isDefineLater).append("toolContentID: ", toolContentID).append("allowText: ", allowText).append(
-		"showResults: ", showResults).append("lockOnFinish: ", lockOnFinish).append("reflect: ", reflect)
-		.append("defaultContentId: ", defaultContentId).append("defaultContentIdStr: ", defaultContentIdStr)
-		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount).append("defaultOptionContent: ",
-			defaultOptionContent).append("activityTitle: ", activityTitle).append("activityInstructions: ",
-			activityInstructions).toString();
     }
     
     /**
@@ -930,21 +796,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
 	this.editQuestionBoxRequest = editQuestionBoxRequest;
-    }
-
-    /**
-     * @return Returns the feedback.
-     */
-    public String getFeedback() {
-	return feedback;
-    }
-
-    /**
-     * @param feedback
-     *                The feedback to set.
-     */
-    public void setFeedback(String feedback) {
-	this.feedback = feedback;
     }
 
     /**

@@ -1,45 +1,19 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
+<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <div id="itemList">
 	<h2 class="spacer-left">
 		<fmt:message key="label.vote.nominations" />
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none" id="resourceListArea_Busy" />
+		<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" />
 	</h2>
 
-	<c:set var="formBean"
-		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<table id="itemTable" class="alternative-color" cellspacing="0">
 		<c:set var="queIndex" scope="request" value="0" />
 
-		<c:forEach items="${listNominationContentDTO}" var="currentDTO"
-			varStatus="status">
+		<c:forEach items="${listQuestionDTO}" var="currentDTO" varStatus="status">
 			<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 			<c:set var="question" scope="request" value="${currentDTO.question}" />
-			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
-			<c:set var="displayOrder" scope="request"
-				value="${currentDTO.displayOrder}" />
+			<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}" />
 			<c:if test="${status.first}">
 				<input type="hidden" id="firstNomination" />
 			</c:if>
@@ -53,10 +27,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:out value="${question}" escapeXml="false" />
 				</td>
 
-
-
 				<td width="10%" class="align-right">
-					<c:if test="${totalNominationCount != 1}">
+					<c:if test="${fn:length(listQuestionDTO) != 1}">
 
 						<c:if test="${queIndex == 1}">
 							<img src="<c:out value="${tool}"/>images/down.gif" border="0"
@@ -66,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								border="0">
 						</c:if>
 
-						<c:if test="${queIndex == totalNominationCount}">
+						<c:if test="${queIndex == fn:length(listQuestionDTO)}">
 							<img src="<c:out value="${tool}"/>images/down_disabled.gif"
 								border="0">
 							<img src="<c:out value="${tool}"/>images/up.gif" border="0"
@@ -75,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if>
 
 						<c:if
-							test="${(queIndex != 1)  && (queIndex != totalNominationCount)}">
+							test="${(queIndex != 1)  && (queIndex != fn:length(listQuestionDTO))}">
 							<img src="<c:out value="${tool}"/>images/down.gif" border="0"
 								title="<fmt:message key='label.tip.moveNominationDown'/>"
 								onclick="javascript:submitModifyAuthoringNomination('<c:out value="${queIndex}"/>','moveNominationDown');">
@@ -90,7 +62,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<td width="10%" class="align-right">
 					<img src="<c:out value="${tool}"/>images/edit.gif" border="0"
 						title="<fmt:message key='label.tip.editNomination'/>"
-						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');">
+						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');">
 				</td>
 
 				<td width="10%" class="align-right">

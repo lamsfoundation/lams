@@ -110,14 +110,6 @@
         length="1"        
    />
 
-    <property
-        name="contentInUse"
-        type="boolean"
-        access="property"        
-        column="content_in_use"
-        length="1"
-    />
-
 
    <property
         name="lockOnFinish"

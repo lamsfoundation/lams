@@ -20,22 +20,15 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-
 package org.lamsfoundation.lams.tool.vote.pojos;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p>Persistent  object/bean that defines the question content for the Voting tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lavote11_nomination_content
- * </p>
+ * Persistent object/bean that defines the question content for the Voting tool. Provides accessors and mutators to
+ * get/set attributes It maps to database table: tl_lavote11_nomination_content
  * 
  * @author Ozgur Demirtas
  */
@@ -46,94 +39,72 @@ public class VoteQueContent implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String question;
-    
+
     private int displayOrder;
 
-    
     /** non persistent field */
     private Long voteContentId;
-    
+
     /** persistent field */
     private org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent;
-    
-    /** persistent field */
-    private Set voteUsrAttempts;
-    
-    public VoteQueContent(String question,  VoteContent voteContent, Set voteUsrAttempts) {
-        this.question = question;
-        this.voteContent=voteContent;
-        this.voteUsrAttempts = voteUsrAttempts;
+
+    public VoteQueContent(String question, VoteContent voteContent) {
+	this.question = question;
+	this.voteContent = voteContent;
     }
 
-    public VoteQueContent(String question,  int displayOrder, VoteContent voteContent, Set voteUsrAttempts) {
-        this.question = question;
-        this.displayOrder=displayOrder;
-        this.voteContent=voteContent;
-        this.voteUsrAttempts = voteUsrAttempts;
+    public VoteQueContent(String question, int displayOrder, VoteContent voteContent) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.voteContent = voteContent;
     }
 
     /** default constructor */
     public VoteQueContent() {
     }
-    
-    
+
     /**
-     *  gets called by copyToolContent
+     * gets called by copyToolContent
      * 
      * Copy constructor
-     * @param queContent the original qa question content
+     * 
+     * @param queContent
+     *            the original qa question content
      * @return the new qa question content object
      */
     public static VoteQueContent newInstance(VoteQueContent queContent, int displayOrder, VoteContent newMcContent) {
-	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(), displayOrder, newMcContent,
-		new TreeSet());
+	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(), displayOrder, newMcContent);
 
 	return newQueContent;
     }
-    
-    
+
     public Long getUid() {
-        return this.uid;
+	return this.uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     public String getQuestion() {
-        return this.question;
+	return this.question;
     }
 
     public void setQuestion(String question) {
-        this.question = question;
+	this.question = question;
     }
 
     public org.lamsfoundation.lams.tool.vote.pojos.VoteContent getMcContent() {
-        return this.voteContent;
+	return this.voteContent;
     }
 
     public void setMcContent(org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
-        this.voteContent = voteContent;
+	this.voteContent = voteContent;
     }
 
-    public Set getVoteUsrAttempts() {
-    	if (this.voteUsrAttempts == null)
-        	setVoteUsrAttempts(new HashSet());
-        return this.voteUsrAttempts;
-    }
-
-    
-    public void setMcUsrAttempts(Set voteUsrAttempts) {
-        this.voteUsrAttempts = voteUsrAttempts;
-    }
-
-    
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("uid", getUid())
-            .toString();
+	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
-	
 
     public int compareTo(Object o) {
 	VoteQueContent queContent = (VoteQueContent) o;
@@ -143,49 +114,49 @@ public class VoteQueContent implements Serializable, Comparable {
 	else
 	    return (int) (uid.longValue() - queContent.uid.longValue());
     }
-    
+
     /**
      * @return Returns the voteContentId.
      */
     public Long getVoteContentId() {
-        return voteContentId;
+	return voteContentId;
     }
+
     /**
-     * @param voteContentId The voteContentId to set.
+     * @param voteContentId
+     *            The voteContentId to set.
      */
     public void setVoteContentId(Long voteContentId) {
-        this.voteContentId = voteContentId;
+	this.voteContentId = voteContentId;
     }
+
     /**
      * @return Returns the voteContent.
      */
     public org.lamsfoundation.lams.tool.vote.pojos.VoteContent getVoteContent() {
-        return voteContent;
+	return voteContent;
     }
+
     /**
-     * @param voteContent The voteContent to set.
+     * @param voteContent
+     *            The voteContent to set.
      */
-    public void setVoteContent(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
-        this.voteContent = voteContent;
-    }
-    /**
-     * @param voteUsrAttempts The voteUsrAttempts to set.
-     */
-    public void setVoteUsrAttempts(Set voteUsrAttempts) {
-        this.voteUsrAttempts = voteUsrAttempts;
+    public void setVoteContent(org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
+	this.voteContent = voteContent;
     }
 
     /**
      * @return Returns the displayOrder.
      */
     public int getDisplayOrder() {
-        return displayOrder;
+	return displayOrder;
     }
+
     /**
-     * @param displayOrder The displayOrder to set.
+     * @param displayOrder
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(int displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
 }

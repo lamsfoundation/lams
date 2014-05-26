@@ -23,29 +23,17 @@
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * <p>
  * DTO that holds authoring properties for authoring jsps
- * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class VoteGeneralAuthoringDTO implements Comparable {
-    protected String activeModule;
-    protected String defineLaterInEditMode;
     protected String exceptionMaxNominationInvalid;
     protected String toolContentID;
-    protected String defaultContentId;
-    protected String defaultContentIdStr;
-    protected String isDefineLater;
     protected String activityTitle;
     protected String activityInstructions;
-    protected int maxOptionIndex;
-    protected String defaultOptionContent;
 
     protected String useSelectLeaderToolOuput;
     protected String allowText;
@@ -54,28 +42,22 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     protected String maxNominationCount;
     protected String minNominationCount;
 
-    protected String editActivityEditMode;
-    protected Map mapOptionsContent;
     protected String userExceptionMaxNominationInvalid;
     protected String userExceptionNoToolSessions;
     protected String userExceptionFilenameEmpty;
-    protected String isMonitoredContentInUse;
     protected String validationError;
     protected String userExceptionOptionsDuplicate;
     protected String httpSessionID;
 
     protected String contentFolderID;
     protected String editableQuestionText;
-    protected String editableQuestionFeedback;
 
     protected List attachmentList;
     protected List deletedAttachmentList;
     protected String reflect;
     protected String reflectionSubject;
 
-    protected Map mapNominationContent;
     protected String editableNominationText;
-    protected String editableNominationFeedback;
     protected String responseId;
     protected String currentUid;
     protected List<String> dataFlowObjectNames;
@@ -134,36 +116,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @return Returns the isMonitoredContentInUse.
-     */
-    public String getIsMonitoredContentInUse() {
-	return isMonitoredContentInUse;
-    }
-
-    /**
-     * @param isMonitoredContentInUse
-     *            The isMonitoredContentInUse to set.
-     */
-    public void setIsMonitoredContentInUse(String isMonitoredContentInUse) {
-	this.isMonitoredContentInUse = isMonitoredContentInUse;
-    }
-
-    /**
-     * @param activeModule
-     *            The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
@@ -194,66 +146,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the defaultContentId.
-     */
-    public String getDefaultContentId() {
-	return defaultContentId;
-    }
-
-    /**
-     * @param defaultContentId
-     *            The defaultContentId to set.
-     */
-    public void setDefaultContentId(String defaultContentId) {
-	this.defaultContentId = defaultContentId;
-    }
-
-    /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *            The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
-    }
-
-    /**
-     * @return Returns the defaultOptionContent.
-     */
-    public String getDefaultOptionContent() {
-	return defaultOptionContent;
-    }
-
-    /**
-     * @param defaultOptionContent
-     *            The defaultOptionContent to set.
-     */
-    public void setDefaultOptionContent(String defaultOptionContent) {
-	this.defaultOptionContent = defaultOptionContent;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *            The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
      * @return Returns the exceptionMaxNominationInvalid.
      */
     public String getExceptionMaxNominationInvalid() {
@@ -266,36 +158,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setExceptionMaxNominationInvalid(String exceptionMaxNominationInvalid) {
 	this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
-    }
-
-    /**
-     * @return Returns the isDefineLater.
-     */
-    public String getIsDefineLater() {
-	return isDefineLater;
-    }
-
-    /**
-     * @param isDefineLater
-     *            The isDefineLater to set.
-     */
-    public void setIsDefineLater(String isDefineLater) {
-	this.isDefineLater = isDefineLater;
-    }
-
-    /**
-     * @return Returns the maxOptionIndex.
-     */
-    public int getMaxOptionIndex() {
-	return maxOptionIndex;
-    }
-
-    /**
-     * @param maxOptionIndex
-     *            The maxOptionIndex to set.
-     */
-    public void setMaxOptionIndex(int maxOptionIndex) {
-	this.maxOptionIndex = maxOptionIndex;
     }
 
     /**
@@ -359,21 +221,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the mapOptionsContent.
-     */
-    public Map getMapOptionsContent() {
-	return mapOptionsContent;
-    }
-
-    /**
-     * @param mapOptionsContent
-     *            The mapOptionsContent to set.
-     */
-    public void setMapOptionsContent(Map mapOptionsContent) {
-	this.mapOptionsContent = mapOptionsContent;
-    }
-
-    /**
      * @return Returns the userExceptionMaxNominationInvalid.
      */
     public String getUserExceptionMaxNominationInvalid() {
@@ -419,21 +266,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the editActivityEditMode.
-     */
-    public String getEditActivityEditMode() {
-	return editActivityEditMode;
-    }
-
-    /**
-     * @param editActivityEditMode
-     *            The editActivityEditMode to set.
-     */
-    public void setEditActivityEditMode(String editActivityEditMode) {
-	this.editActivityEditMode = editActivityEditMode;
-    }
-
-    /**
      * @return Returns the userExceptionNoToolSessions.
      */
     public String getUserExceptionNoToolSessions() {
@@ -472,30 +304,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
 	    return 0;
     }
 
-    public String toString() {
-	return new ToStringBuilder(this).append("activeModule: ", activeModule)
-		.append("contentFolderID: ", contentFolderID).append("editableQuestionText: ", editableQuestionText)
-		.append("reflectionSubject: ", reflectionSubject)
-		.append("mapNominationContent: ", mapNominationContent)
-		.append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
-		.append("toolContentID: ", toolContentID).append("defaultContentId: ", defaultContentId)
-		.append("defaultContentIdStr: ", defaultContentIdStr).append("reflect: ", reflect)
-		.append("allowText: ", allowText)
-		.append("showResults: ", showResults).append("lockOnFinish: ", lockOnFinish)
-		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount)
-		.append("activityTitle: ", activityTitle).append("activityInstructions: ", activityInstructions)
-		.append("maxOptionIndex: ", maxOptionIndex).append("defaultOptionContent: ", defaultOptionContent)
-		.append("mapOptionsContent: ", mapOptionsContent)
-		.append("userExceptionMaxNominationInvalid: ", userExceptionMaxNominationInvalid)
-		.append("userExceptionFilenameEmpty: ", userExceptionFilenameEmpty)
-		.append("isMonitoredContentInUse: ", isMonitoredContentInUse)
-		.append("validationError: ", validationError)
-		.append("userExceptionOptionsDuplicate: ", userExceptionOptionsDuplicate)
-		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-		.append("httpSessionID: ", httpSessionID).append("editActivityEditMode: ", editActivityEditMode)
-		.toString();
-    }
-
     /**
      * @return Returns the contentFolderID.
      */
@@ -509,21 +317,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
-    }
-
-    /**
-     * @return Returns the editableQuestionFeedback.
-     */
-    public String getEditableQuestionFeedback() {
-	return editableQuestionFeedback;
-    }
-
-    /**
-     * @param editableQuestionFeedback
-     *            The editableQuestionFeedback to set.
-     */
-    public void setEditableQuestionFeedback(String editableQuestionFeedback) {
-	this.editableQuestionFeedback = editableQuestionFeedback;
     }
 
     /**
@@ -602,21 +395,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the editableNominationFeedback.
-     */
-    public String getEditableNominationFeedback() {
-	return editableNominationFeedback;
-    }
-
-    /**
-     * @param editableNominationFeedback
-     *            The editableNominationFeedback to set.
-     */
-    public void setEditableNominationFeedback(String editableNominationFeedback) {
-	this.editableNominationFeedback = editableNominationFeedback;
-    }
-
-    /**
      * @return Returns the editableNominationText.
      */
     public String getEditableNominationText() {
@@ -629,21 +407,6 @@ public class VoteGeneralAuthoringDTO implements Comparable {
      */
     public void setEditableNominationText(String editableNominationText) {
 	this.editableNominationText = editableNominationText;
-    }
-
-    /**
-     * @return Returns the mapNominationContent.
-     */
-    public Map getMapNominationContent() {
-	return mapNominationContent;
-    }
-
-    /**
-     * @param mapNominationContent
-     *            The mapNominationContent to set.
-     */
-    public void setMapNominationContent(Map mapNominationContent) {
-	this.mapNominationContent = mapNominationContent;
     }
 
     /**

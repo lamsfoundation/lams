@@ -29,9 +29,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * <p>
@@ -85,9 +82,6 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private boolean lockOnFinish;
 
-    /** nullable persistent field */
-    private boolean contentInUse;
-
     private boolean showResults;
 
     /** persistent field */
@@ -113,8 +107,8 @@ public class VoteContent implements Serializable {
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
 	    Date creationDate, Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
 	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
-	    boolean lockOnFinish, boolean contentInUse, boolean showResults, Short maxExternalInputs,
-	    Short externalInputsAdded, Set voteQueContents, Set voteSessions) {
+	    boolean lockOnFinish, boolean showResults, Short maxExternalInputs, Short externalInputsAdded,
+	    Set voteQueContents, Set voteSessions) {
 	this.voteContentId = voteContentId;
 	this.content = content;
 	this.title = title;
@@ -130,7 +124,6 @@ public class VoteContent implements Serializable {
 	this.reflectionSubject = reflectionSubject;
 	this.createdBy = createdBy;
 	this.lockOnFinish = lockOnFinish;
-	this.contentInUse = contentInUse;
 	this.showResults = showResults;
 	this.voteQueContents = voteQueContents;
 	this.voteSessions = voteSessions;
@@ -161,14 +154,13 @@ public class VoteContent implements Serializable {
      *            the new mc content id.
      * @return the new mc content object.
      */
-    public static VoteContent newInstance(IToolContentHandler toolContentHandler, VoteContent vote, Long newContentId)
-	    throws ItemNotFoundException, RepositoryCheckedException {
+    public static VoteContent newInstance(VoteContent vote, Long newContentId) {
 	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(),
 		vote.getInstructions(), vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(),
 		vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
 		vote.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
-		vote.isContentInUse(), vote.isShowResults(), vote.getMaxExternalInputs(),
-		vote.getExternalInputsAdded(), new TreeSet(), new TreeSet());
+		vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
+		new TreeSet());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
 
@@ -241,14 +233,6 @@ public class VoteContent implements Serializable {
 
     public void setCreatedBy(long createdBy) {
 	this.createdBy = createdBy;
-    }
-
-    public boolean isContentInUse() {
-	return contentInUse;
-    }
-
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
     }
 
     /**

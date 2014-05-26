@@ -1,25 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set scope="request" var="lams">
@@ -61,21 +39,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 	}
 
-	function removeNomination(questionIndex)
-	{
+	function removeNomination(questionIndex){
 		document.VoteAuthoringForm.questionIndex.value=questionIndex;
         submitMethod('removeNomination');
 	}
 
-	function removeMonitoringNomination(questionIndex)
-	{
+	function removeMonitoringNomination(questionIndex){
 		document.VoteMonitoringForm.questionIndex.value=questionIndex;
         submitMonitoringMethod('removeNomination');
 	}
 	
 	
 	function onSelectDataInput(){
-	if (document.getElementById("dataFlowNoneOption")!=null){
+		if (document.getElementById("dataFlowNoneOption")!=null){
 			if (noneDataFlowSelectedPreviously && !document.getElementById("dataFlowNoneOption").selected){
 					document.getElementById("maxInputs").disabled=false;		
 						
@@ -122,31 +98,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </table>
 
 <div id="resourceListArea">
-	<c:if
-		test="${voteGeneralAuthoringDTO.activeModule == 'authoring' || voteGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<%@ include file="/authoring/itemlist.jsp"%>
-	</c:if>
-	<c:if
-		test="${voteGeneralAuthoringDTO.activeModule != 'authoring' && voteGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<%@ include file="/monitoring/itemlist.jsp"%>
-	</c:if>
+	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
 
 <p>
-	<c:if
-		test="${voteGeneralAuthoringDTO.activeModule == 'authoring' || voteGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.add.new.nomination" /> </a>
-	</c:if>
-	<c:if
-		test="${voteGeneralAuthoringDTO.activeModule != 'authoring' && voteGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.add.new.nomination" /> </a>
-	</c:if>
+	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');"
+			class="button-add-item"> 
+		<fmt:message key="label.add.new.nomination" /> 
+	</a>
 	
 	<c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
 		<span style="margin-left: 20px;"><fmt:message key="label.data.flow.choose" /></span>
@@ -167,10 +126,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		scrolling="no">
 	</iframe>
 </p>
-
-<c:if test="${voteGeneralAuthoringDTO.activeModule != 'authoring'}">
-	<p class="align-right">
-		<a href="javascript:submitMethod('submitAllContent')" class="button">
-			<fmt:message key="label.save" /> </a>
-	</p>
-</c:if>

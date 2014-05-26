@@ -25,13 +25,10 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -41,13 +38,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.vote.dto.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -56,9 +50,6 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
-import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
@@ -99,7 +90,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	    throw new VoteApplicationException(error);
 	}
 
-	VoteSession voteSession = voteService.retrieveVoteSession(toolSessionID);
+	VoteSession voteSession = voteService.getSessionBySessionId(toolSessionID);
 
 	// If the learner hasn't voted yet, then they won't exist in the session.
 	// Yet we might be asked for their page, as the activity has been commenced.
@@ -148,7 +139,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	    throw new VoteApplicationException(error);
 	}
 
-	VoteContent content = voteService.retrieveVote(toolContentID);
+	VoteContent content = voteService.getVoteContent(toolContentID);
 	if (content == null) {
 	    String error = "Data is missing from the database. Unable to Continue";
 	    ExportServlet.logger.error(error);
@@ -179,7 +170,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	if (currentSessionId == null) {
 	    sessions = (Set<VoteSession>) voteContent.getVoteSessions();
 	} else {
-	    VoteSession voteSession = voteService.retrieveVoteSession(currentSessionId);
+	    VoteSession voteSession = voteService.getSessionBySessionId(currentSessionId);
 	    sessions.add(voteSession);
 	}
 	

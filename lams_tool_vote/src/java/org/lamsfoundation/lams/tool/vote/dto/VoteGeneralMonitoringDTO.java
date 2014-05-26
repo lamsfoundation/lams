@@ -25,39 +25,28 @@ package org.lamsfoundation.lams.tool.vote.dto;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 /**
- * <p>
  * DTO that holds monitoring flow properties
- * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class VoteGeneralMonitoringDTO implements Comparable {
-    protected String defineLaterInEditMode;
     protected String requestLearningReport;
     protected String userExceptionNoToolSessions;
     protected String userExceptionContentInUse;
     protected String userExceptionContentDoesNotExist;
     protected String userExceptionNoStudentActivity;
-    protected String isMonitoredContentInUse;
-    protected String monitoredContentInUse;
 
-    protected String activeModule;
     protected String currentTab;
     protected String activityTitle;
     protected String activityInstructions;
-    protected String defaultOptionContent;
     protected String countAllUsers;
     protected String countSessionComplete;
     protected String isPortfolioExport;
     protected String existsOpenVotes;
     protected String responseId;
-    protected String currentUid;
 
     protected String toolContentID;
-    protected Map mapOptionsContent;
     protected List listMonitoredAnswersContainerDto;
     protected List listUserEntries;
 
@@ -106,21 +95,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *            The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
      * @return Returns the currentTab.
      */
     public String getCurrentTab() {
@@ -133,21 +107,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    /**
-     * @return Returns the defaultOptionContent.
-     */
-    public String getDefaultOptionContent() {
-	return defaultOptionContent;
-    }
-
-    /**
-     * @param defaultOptionContent
-     *            The defaultOptionContent to set.
-     */
-    public void setDefaultOptionContent(String defaultOptionContent) {
-	this.defaultOptionContent = defaultOptionContent;
     }
 
     /**
@@ -196,21 +155,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *            The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
      * @return Returns the requestLearningReport.
      */
     public String getRequestLearningReport() {
@@ -238,36 +182,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
      */
     public void setUserExceptionNoToolSessions(String userExceptionNoToolSessions) {
 	this.userExceptionNoToolSessions = userExceptionNoToolSessions;
-    }
-
-    /**
-     * @return Returns the isMonitoredContentInUse.
-     */
-    public String getIsMonitoredContentInUse() {
-	return isMonitoredContentInUse;
-    }
-
-    /**
-     * @param isMonitoredContentInUse
-     *            The isMonitoredContentInUse to set.
-     */
-    public void setIsMonitoredContentInUse(String isMonitoredContentInUse) {
-	this.isMonitoredContentInUse = isMonitoredContentInUse;
-    }
-
-    /**
-     * @return Returns the mapOptionsContent.
-     */
-    public Map getMapOptionsContent() {
-	return mapOptionsContent;
-    }
-
-    /**
-     * @param mapOptionsContent
-     *            The mapOptionsContent to set.
-     */
-    public void setMapOptionsContent(Map mapOptionsContent) {
-	this.mapOptionsContent = mapOptionsContent;
     }
 
     /**
@@ -481,21 +395,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the currentUid.
-     */
-    public String getCurrentUid() {
-	return currentUid;
-    }
-
-    /**
-     * @param currentUid
-     *            The currentUid to set.
-     */
-    public void setCurrentUid(String currentUid) {
-	this.currentUid = currentUid;
-    }
-
-    /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
@@ -555,28 +454,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 	this.sessionUserCount = sessionUserCount;
     }
 
-    public String toString() {
-	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
-		.append("activeModule: ", activeModule).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("currentTab: ", currentTab)
-		.append("requestLearningReport: ", requestLearningReport)
-		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-		.append("userExceptionContentDoesNotExist: ", userExceptionContentDoesNotExist)
-		.append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
-		.append("isMonitoredContentInUse: ", isMonitoredContentInUse).append("activityTitle: ", activityTitle)
-		.append("activityInstructions: ", activityInstructions)
-		.append("userExceptionContentInUse: ", userExceptionContentInUse)
-		.append("defaultOptionContent: ", defaultOptionContent).append("countAllUsers: ", countAllUsers)
-		.append("countSessionComplete: ", countSessionComplete)
-		.append("isPortfolioExport: ", isPortfolioExport)
-		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
-		.append("listUserEntries: ", listUserEntries).append("existsOpenVotes: ", existsOpenVotes)
-		.append("sessionDtos: ", sessionDTOs).append("mapStudentsVoted: ", mapStudentsVoted)
-		.append("responseId: ", responseId).append("currentUid: ", currentUid)
-		.append("sessionUserCount: ", sessionUserCount)
-		.append("completedSessionUserCount: ", completedSessionUserCount).toString();
-    }
-
     public int compareTo(Object o) {
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = (VoteGeneralMonitoringDTO) o;
 
@@ -584,21 +461,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 	    return 1;
 	else
 	    return 0;
-    }
-
-    /**
-     * @return Returns the monitoredContentInUse.
-     */
-    public String getMonitoredContentInUse() {
-	return monitoredContentInUse;
-    }
-
-    /**
-     * @param monitoredContentInUse
-     *            The monitoredContentInUse to set.
-     */
-    public void setMonitoredContentInUse(String monitoredContentInUse) {
-	this.monitoredContentInUse = monitoredContentInUse;
     }
 
     /**

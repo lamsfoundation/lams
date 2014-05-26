@@ -1,24 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -33,10 +12,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		tabs.add("label.basic");
 		tabs.add("label.advanced");
 		pageContext.setAttribute("tabs", tabs);
-		
-		Set tabsBasic = new LinkedHashSet();
-		tabsBasic.add("label.basic");
-		pageContext.setAttribute("tabsBasic", tabsBasic);
 	%>
 
 	<lams:html>
@@ -50,23 +25,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var noneDataFlowSelectedPreviously = null;
 		
         function init(){
-			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
-			{
-	            var tag = document.getElementById("currentTab");
-		    	if(tag.value != "")
-		    		selectTab(tag.value);
-	            else
-	                selectTab(1); //select the default tab;
-	            
-			}
-			else
-			{
-	            var tag = document.getElementById("currentTab");
-		    	if(tag.value != "")
-		    		selectTab(tag.value);
-	            else
-	                selectTab(1); //select the default tab;
-			}
+	    	var tag = document.getElementById("currentTab");
+			if(tag.value != "")
+		    	selectTab(tag.value);
+	        else
+	        	selectTab(1); //select the default tab;
 			
 			//actually, we don't set the value right, but opposite, so onSelectDataInput() can work
 			noneDataFlowSelectedPreviously =  document.getElementById("dataFlowNoneOption")!=null 
@@ -124,20 +87,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.VoteAuthoringForm.submit();
         }
         
-		function submitModifyNomination(optionIndexValue, actionMethod) 
-		{
+		function submitModifyNomination(optionIndexValue, actionMethod) {
 			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
-		function submitModifyAuthoringNomination(questionIndexValue, actionMethod) 
-		{
+		function submitModifyAuthoringNomination(questionIndexValue, actionMethod) {
 			document.VoteAuthoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			document.VoteAuthoringForm.dispatch.value=actionMethod; 
 			document.VoteAuthoringForm.submit();
 		}
@@ -147,8 +107,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMethod(actionMethod);
 		}
 		
-		function submitDeleteFile(uuid, actionMethod) 
-		{
+		function submitDeleteFile(uuid, actionMethod) {
 			document.VoteAuthoringForm.uuid.value=uuid; 
 			submitMethod(actionMethod);
 		}
@@ -161,16 +120,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div id="page">
 	<h1> <fmt:message key="label.authoring.vote"/> </h1>
 	
-	<div id="header">
-		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
-			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-		</c:if> 					
-		<c:if test="${(voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 					
-			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
-		</c:if> 							
-		<c:if test="${(voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 					
-			<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
-		</c:if> 									
+	<div id="header">			
+		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>								
 	</div>
 	
 	<div id="content">	
@@ -179,40 +130,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="dispatch" value="submitAllContent"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="activeModule"/>
-		<html:hidden property="httpSessionID"/>								
-		<html:hidden property="defaultContentIdStr"/>								
-		<html:hidden property="defineLaterInEditMode"/>										
-		<html:hidden property="contentFolderID"/>												
+		<html:hidden property="httpSessionID"/>									
+		<html:hidden property="contentFolderID"/>
+		<input type="hidden" name="mode" value="${mode}">
 		
 		<%@ include file="/common/messages.jsp"%>
 		
 		<lams:help toolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" module="authoring"/>
-		
-		<c:if test="${voteGeneralAuthoringDTO.activeModule != 'defineLater' }"> 			
-			<!-- tab content 1 (Basic) -->
-			<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
-			<!-- end of content (Basic) -->
+					
+			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 			      
-			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-			<!-- end of content (Advanced) -->
 
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
-			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-			contentFolderID="${formBean.contentFolderID}" />
-		</c:if> 			
-		
-		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode != 'true') }"> 			
-			<lams:TabBody id="1" titleKey="label.basic" page="BasicContentViewOnly.jsp"/>
-			<!-- end of content (Basic) -->
-		</c:if> 			
-		
-		<c:if test="${ (voteGeneralAuthoringDTO.activeModule == 'defineLater') && (voteGeneralAuthoringDTO.defineLaterInEditMode == 'true') }"> 			
-			<!-- tab content 1 (Basic) -->
-			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			<!-- end of content (Basic) -->
-		</c:if> 			
+				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
+				contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
+			
 		</html:form>
 	</div>
 

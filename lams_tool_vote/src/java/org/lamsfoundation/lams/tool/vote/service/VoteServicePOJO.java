@@ -38,21 +38,13 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -61,11 +53,9 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -81,6 +71,7 @@ import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -100,17 +91,14 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 /**
+ * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
+ * translates the request from presentation layer and performs appropriate database operation.
  * 
  * @author Ozgur Demirtas
- * 
- * The POJO implementation of Voting service. All business logic of Voting tool
- * is implemented in this class. It translates the request from presentation
- * layer and performs appropriate database operation.
- * 
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager, VoteAppConstants {
-    static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
+    private static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 
     private IVoteContentDAO voteContentDAO;
     private IVoteQueContentDAO voteQueContentDAO;
@@ -134,108 +122,53 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     public VoteServicePOJO() {
     }
-    
+
     @Override
     public boolean isUserGroupLeader(VoteQueUsr user, Long toolSessionId) {
 
-	VoteSession session = retrieveVoteSession(toolSessionId);
+	VoteSession session = getSessionBySessionId(toolSessionId);
 	VoteQueUsr groupLeader = session.getGroupLeader();
-	
+
 	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
 	return isUserLeader;
     }
-    
+
     @Override
     public VoteQueUsr checkLeaderSelectToolForSessionLeader(VoteQueUsr user, Long toolSessionId) {
 	if (user == null || toolSessionId == null) {
 	    return null;
 	}
 
-	VoteSession session = retrieveVoteSession(toolSessionId);
+	VoteSession session = getSessionBySessionId(toolSessionId);
 	VoteQueUsr leader = session.getGroupLeader();
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
 
-	    ToolSession toolSession = toolService.getToolSession(toolSessionId);
-	    ToolActivity voteActivity = toolSession.getToolActivity();
-	    Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(voteActivity);
+	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
+	    if (leaderUserId != null) {
 
-	    // check if there is leaderSelectionTool available
-	    if (leaderSelectionActivity != null) {
-		User learner = (User) getUserManagementService().findById(User.class, user.getQueUsrId().intValue());
-		String outputName = VoteAppConstants.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
-		ToolSession leaderSelectionSession = lamsCoreToolService.getToolSessionByLearner(learner,
-			leaderSelectionActivity);
-		ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
+		leader = getVoteUserBySession(leaderUserId, session.getUid());
 
-		// check if tool produced output
-		if (output != null && output.getValue() != null) {
-		    Long userId = output.getValue().getLong();
-		    leader = this.getVoteUserBySession(userId, session.getUid());
-
-		    // create new user in a DB
-		    if (leader == null) {
-			logger.debug("creating new user with userId: " + userId);
-			User leaderDto = (User) getUserManagementService().findById(User.class, userId.intValue());
-			String userName = leaderDto.getLogin();
-			String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-			leader = new VoteQueUsr(userId, userName, fullName, session, new TreeSet());
-			voteUserDAO.saveVoteUser(user);
-		    }
-
-		    // set group leader
-		    session.setGroupLeader(leader);
-		    this.updateVoteSession(session);
+		// create new user in a DB
+		if (leader == null) {
+		    logger.debug("creating new user with userId: " + leaderUserId);
+		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    String userName = leaderDto.getLogin();
+		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
+		    leader = new VoteQueUsr(leaderUserId, userName, fullName, session, new TreeSet());
+		    voteUserDAO.saveVoteUser(user);
 		}
+
+		// set group leader
+		session.setGroupLeader(leader);
+		this.updateVoteSession(session);
 	    }
 	}
 
 	return leader;
     }
-    
-    /**
-     * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous activities set first,
-     * and then inside the parent set.
-     */
-    private static Activity getNearestLeaderSelectionActivity(Activity activity) {
-	
-	//check if current activity is Leader Select one. if so - stop searching and return it.
-	Class activityClass = Hibernate.getClass(activity);
-	if (activityClass.equals(ToolActivity.class)) {
-	    ToolActivity toolActivity;
-	    
-	    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
-	    // it here again
-	    Hibernate.initialize(activity);
-	    if (activity instanceof HibernateProxy) {
-		toolActivity = (ToolActivity) ((HibernateProxy) activity).getHibernateLazyInitializer()
-	                .getImplementation();
-	    } else {
-		toolActivity = (ToolActivity) activity;
-	    }
-	    
-	    if (VoteAppConstants.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
-		return activity;
-	    }
-	}
-	
-	//check previous activity
-	Transition transitionTo = activity.getTransitionTo();
-	if (transitionTo != null) {
-	    Activity fromActivity = transitionTo.getFromActivity();
-	    return getNearestLeaderSelectionActivity(fromActivity);
-	}
-	
-	//check parent activity
-	Activity parent = activity.getParentActivity();
-	if (parent != null) {
-	    return getNearestLeaderSelectionActivity(parent);
-	}
-	
-	return null;
-    }
-    
+
     @Override
     public void copyAnswersFromLeader(VoteQueUsr user, VoteQueUsr leader) {
 
@@ -245,9 +178,9 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	List<VoteUsrAttempt> leaderAttempts = this.getAttemptsForUser(leader.getUid());
 	List<VoteUsrAttempt> userAttempts = this.getAttemptsForUser(user.getUid());
-	
+
 	for (VoteUsrAttempt leaderAttempt : leaderAttempts) {
-	    
+
 	    VoteQueContent question = leaderAttempt.getVoteQueContent();
 	    Date attempTime = leaderAttempt.getAttemptTime();
 	    String timeZone = leaderAttempt.getTimeZone();
@@ -259,27 +192,27 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    userAttempt = userAttemptDb;
 		}
 	    }
-	    
+
 	    // if response doesn't exist - create VoteUsrAttempt in the db
 	    if (userAttempt == null) {
 		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, question, user, userEntry,
 			true);
 		this.createVoteUsrAttempt(voteUsrAttempt);
 
-	    // if it's been changed by the leader 
+		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
 		userAttempt.setUserEntry(userEntry);
 		userAttempt.setAttemptTime(attempTime);
 		userAttempt.setTimeZone(timeZone);
 		this.updateVoteUsrAttempt(userAttempt);
-		
+
 		// remove userAttempt from the list so we can know which one is redundant(presumably, leader has removed
 		// this one)
 		userAttempts.remove(userAttempt);
 	    }
 	}
-	
-	//remove redundant ones
+
+	// remove redundant ones
 	for (VoteUsrAttempt redundantUserAttempt : userAttempts) {
 	    this.removeAttempt(redundantUserAttempt);
 	}
@@ -288,8 +221,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     @Override
     public VoteGeneralLearnerFlowDTO prepareChartData(HttpServletRequest request, Long toolContentID,
 	    Long toolSessionUid, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
-	
-	VoteContent voteContent = this.retrieveVote(toolContentID);
+
+	VoteContent voteContent = this.getVoteContent(toolContentID);
 
 	int entriesCount = 0;
 	Set<VoteUsrAttempt> userEntries = null;
@@ -297,7 +230,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    entriesCount = this.getSessionEntriesCount(toolSessionUid);
 	    userEntries = this.getSessionUserEntriesSet(toolSessionUid);
 	}
-	
+
 	Long mapIndex = 1L;
 	int totalStandardVotesCount = 0;
 
@@ -307,7 +240,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	Map<Long, Long> mapStandardToolSessionUid = new TreeMap<Long, Long>(new VoteComparator());
 	Map<Long, String> mapStandardNominationsContent = new TreeMap<Long, String>(new VoteComparator());
 	Map<Long, Double> mapVoteRates = new TreeMap<Long, Double>(new VoteComparator());
-	
+
 	for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
 
 	    mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
@@ -323,11 +256,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	    Double voteRate = (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d;
 	    mapVoteRates.put(mapIndex, voteRate);
-	    
+
 	    // mapIndex++
 	    mapIndex = new Long(mapIndex + 1);
 	}
-	
+
 	// open votes
 	if (voteContent.isAllowText()) {
 	    int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
@@ -349,19 +282,19 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	voteGeneralLearnerFlowDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 	voteGeneralLearnerFlowDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	
+
 	request.setAttribute(LIST_USER_ENTRIES_CONTENT, userEntries);
 
 	// return value is only used in VoteChartGeneratorAction
 	return voteGeneralLearnerFlowDTO;
     }
-    
+
     @Override
     public LinkedList<SessionDTO> getSessionDTOs(Long toolContentID) {
 
 	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
 
-	VoteContent voteContent = this.retrieveVote(toolContentID);
+	VoteContent voteContent = this.getVoteContent(toolContentID);
 	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
 
 	    SessionDTO sessionDTO = new SessionDTO();
@@ -495,7 +428,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 		double voteRate = (allSessionsVotesCount != 0) ? ((votesCount * 100) / allSessionsVotesCount) : 0d;
 		totalMapVoteRates.put(mapIndex, voteRate);
-		
+
 		totalStandardVotesCount += votesCount;
 
 		// mapIndex++
@@ -526,7 +459,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    if (userEntry == null || userEntry.length() == 0) {
 		continue;
 	    }
-	    
+
 	    VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
 	    voteMonitoredAnswersDTO.setQuestion(userEntry);
 
@@ -598,7 +531,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	return monitoredAnswersDTOs;
     }
-    
+
     @Override
     public List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID) {
 	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
@@ -620,7 +553,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 			reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
 			reflectionDTO.setUserName(user.getFullname());
 			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			//String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+			// String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
 			reflectionDTO.setEntry(notebookEntry.getEntry());
 			reflectionsContainerDTO.add(reflectionDTO);
 		    }
@@ -650,541 +583,207 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		}
 	    }
 	}
-	
+
 	return reflectionsContainerDTO;
     }
 
-    public void createVote(VoteContent voteContent) throws VoteApplicationException {
-	try {
-	    voteContentDAO.saveVoteContent(voteContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is creating vote content: "
-		    + e.getMessage(), e);
-	}
+    public VoteContent getVoteContent(Long toolContentID) {
+	return voteContentDAO.getVoteContentByContentId(toolContentID);
     }
 
-    public VoteContent retrieveVote(Long toolContentID) throws VoteApplicationException {
-	try {
-	    return voteContentDAO.findVoteContentById(toolContentID);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is loading vote content: " + e.getMessage(), e);
-	}
+    public void updateVoteContent(VoteContent voteContent) {
+	voteContentDAO.updateVoteContent(voteContent);
     }
 
-    public void updateVoteContent(VoteContent voteContent) throws VoteApplicationException {
-	try {
-	    voteContentDAO.updateVoteContent(voteContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote content: "
-		    + e.getMessage(), e);
-	}
+    public VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
+	return voteQueContentDAO.getQuestionByDisplayOrder(displayOrder, voteContentUid);
     }
 
-    public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid)
-	    throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting vote que content by display order: " + e.getMessage(), e);
-	}
+    public VoteQueUsr getUserById(long voteQueUsrId) {
+	VoteQueUsr voteQueUsr = voteUserDAO.getVoteQueUsrById(voteQueUsrId);
+	return voteQueUsr;
     }
 
-    public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException {
-	try {
-	    VoteQueUsr voteQueUsr = voteUserDAO.getVoteQueUsrById(voteQueUsrId);
-	    return voteQueUsr;
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr: " + e.getMessage(),
-		    e);
-	}
-    }
-
-    public List retrieveVoteQueContentsByToolContentId(long voteContentId) throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getVoteQueContentsByContentId(voteContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is loading vote que usr: " + e.getMessage(), e);
-	}
-    }
-
-    public void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.saveVoteQueContent(voteQueContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is creating vote que content: "
-		    + e.getMessage(), e);
-	}
+    public void createVoteQue(VoteQueContent voteQueContent) {
+	voteQueContentDAO.saveQuestion(voteQueContent);
     }
 
     public List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
 	    final Long voteSessionUid) {
-	try {
-	    return voteUsrAttemptDAO.getAttemptsForQuestionContentAndSessionUid(questionUid,
-		    voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving usernames for votes: "
-		    + e.getMessage(), e);
-	}
+	return voteUsrAttemptDAO.getAttemptsForQuestionContentAndSessionUid(questionUid, voteSessionUid);
     }
 
     public Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid) {
-	try {
-	    return voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting all user entries, standard plus open text" + e.getMessage(),
-		    e);
-	}
-
+	return voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
     }
 
-    public Set<String> getAttemptsForUserAndSession(final Long queUsrUid, final Long sessionUid)
-	    throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAttemptsForUserAndSession(queUsrUid, sessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting  user entries: "
-		    + e.getMessage(), e);
-	}
-
+    public Set<String> getAttemptsForUserAndSession(final Long queUsrUid, final Long sessionUid) {
+	return voteUsrAttemptDAO.getAttemptsForUserAndSession(queUsrUid, sessionUid);
     }
 
-    public Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getSessionUserEntriesSet(voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting session user entries: "
-		    + e.getMessage(), e);
-	}
+    public Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid) {
+	return voteUsrAttemptDAO.getSessionUserEntriesSet(voteSessionUid);
     }
 
-    public VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getVoteQueContentByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting vote que content by uid: "
-		    + e.getMessage(), e);
+    public VoteQueContent getVoteQueContentByUID(Long uid) {
+	if (uid == null) {
+	    return null;
 	}
+
+	return voteQueContentDAO.getQuestionByUid(uid);
     }
 
-    public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.saveOrUpdateVoteQueContent(voteQueContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote que content: "
-		    + e.getMessage(), e);
-	}
+    public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) {
+	voteQueContentDAO.saveOrUpdateQuestion(voteQueContent);
     }
 
-    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getUserBySessionOnly(voteSession);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr by vote session "
-		    + e.getMessage(), e);
+    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) {
+	return voteUserDAO.getUserBySessionOnly(voteSession);
+    }
+
+    public void createVoteSession(VoteSession voteSession) {
+	voteSessionDAO.saveVoteSession(voteSession);
+    }
+
+    public VoteSession getVoteSessionByUID(Long uid) {
+	return voteSessionDAO.getVoteSessionByUID(uid);
+    }
+
+    public int getVoteSessionPotentialLearnersCount(Long sessionUid) {
+	VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
+	if (session != null) {
+	    Set<User> potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
+	    return potentialLearners != null ? potentialLearners.size() : 0;
+	} else {
+	    VoteServicePOJO.logger
+		    .error("Unable to find vote session record id=" + sessionUid + ". Returning 0 users.");
+	    return 0;
 	}
     }
 
-    public void removeQuestionContentByVoteUid(final Long voteContentUid) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.removeQuestionContentByVoteUid(voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is removing vote que content by vote content id: " + e.getMessage(), e);
-	}
+    public void createVoteQueUsr(VoteQueUsr voteQueUsr) {
+	voteUserDAO.saveVoteUser(voteQueUsr);
     }
 
-    public void resetAllQuestions(final Long voteContentUid) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.resetAllQuestions(voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is resetting all questions: "
-		    + e.getMessage(), e);
-	}
+    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid) {
+	return voteUserDAO.getVoteUserBySession(queUsrId, sessionUid);
     }
 
-    public void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.cleanAllQuestions(voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is cleaning all questions: "
-		    + e.getMessage(), e);
-	}
+    public VoteQueUsr getVoteUserByUID(Long uid) {
+	return voteUserDAO.getVoteUserByUID(uid);
     }
 
-    public void createVoteSession(VoteSession voteSession) throws VoteApplicationException {
-	try {
-	    voteSessionDAO.saveVoteSession(voteSession);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is creating vote session: "
-		    + e.getMessage(), e);
-	}
+    public void updateVoteUser(VoteQueUsr voteUser) {
+	voteUserDAO.updateVoteUser(voteUser);
     }
 
-    public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException {
-	try {
-	    return voteSessionDAO.getVoteSessionByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting voteSession by uid: "
-		    + e.getMessage(), e);
-	}
+    public VoteQueUsr getUserByUserId(Long userID) {
+	VoteQueUsr voteQueUsr = voteUserDAO.getUserByUserId(userID);
+	return voteQueUsr;
     }
 
-    public int getVoteSessionPotentialLearnersCount(Long sessionUid) throws VoteApplicationException {
-	try {
-	    VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
-	    if (session != null) {
-		Set<User> potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
-		return potentialLearners != null ? potentialLearners.size() : 0;
-	    } else {
-		VoteServicePOJO.logger.error("Unable to find vote session record id=" + sessionUid
-			+ ". Returning 0 users.");
-		return 0;
-	    }
-	} catch (LamsToolServiceException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting count of potential voteSession learners: " + e.getMessage(),
-		    e);
-	}
+    public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
+	voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
     }
 
-    public void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException {
-	try {
-	    voteUserDAO.saveVoteUser(voteQueUsr);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is creating vote QueUsr: " + e.getMessage(), e);
-	}
+    public List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long voteQueContentId) {
+	return voteUsrAttemptDAO.getStandardAttemptsByQuestionUid(voteQueContentId);
     }
 
-    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid)
-	    throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getVoteUserBySession(queUsrId, sessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr: " + e.getMessage(),
-		    e);
-	}
+    public int getSessionEntriesCount(final Long voteSessionUid) {
+	return voteUsrAttemptDAO.getSessionEntriesCount(voteSessionUid);
     }
 
-    public VoteQueUsr getVoteUserByUID(Long uid) throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getVoteUserByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting the vote QueUsr by uid."
-		    + e.getMessage(), e);
-	}
+    public VoteUsrAttempt getAttemptByUID(Long uid) {
+	return voteUsrAttemptDAO.getAttemptByUID(uid);
     }
 
-    public void updateVoteUser(VoteQueUsr voteUser) throws VoteApplicationException {
-	try {
-	    voteUserDAO.updateVoteUser(voteUser);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating VoteQueUsr: " + e.getMessage(),
-		    e);
-	}
+    public int getAttemptsForQuestionContent(final Long voteQueContentId) {
+	return voteUsrAttemptDAO.getAttemptsForQuestionContent(voteQueContentId);
     }
 
-    public VoteQueUsr retrieveVoteQueUsr(Long userID) throws VoteApplicationException {
-	try {
-	    VoteQueUsr voteQueUsr = voteUserDAO.findVoteUserById(userID);
-	    return voteQueUsr;
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving VoteQueUsr: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
-	try {
-	    voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is creating vote UsrAttempt: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public List<VoteUsrAttempt> getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId) {
-	try {
-	    return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndContentUid(voteQueContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting all standard attempts entries count: " + e.getMessage(), e);
-	}
-
-    }
-
-    public int getSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getSessionEntriesCount(voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting all attempts session entries count: " + e.getMessage(), e);
-	}
-    }
-
-    public VoteUsrAttempt getAttemptByUID(Long uid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAttemptByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting attemptby uid: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAttemptsForQuestionContent(voteQueContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting vote UsrAttempt by question content id only: "
-			    + e.getMessage(), e);
-	}
-    }
-
-    public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid)
-	    throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContentId,
-		    voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is getting vote UsrAttempt by question content id and session uid: "
-			    + e.getMessage(), e);
-	}
+    public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid) {
+	return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
     }
 
     public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(queUsrId, voteQueContentId,
-		    toolSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote UsrAttempt: "
-		    + e.getMessage(), e);
-	}
+	    final Long voteQueContentId, final Long toolSessionUid) {
+	return voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(queUsrId, voteQueContentId,
+		toolSessionUid);
     }
 
-    public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
-	try {
-	    voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote UsrAttempt: "
-		    + e.getMessage(), e);
-	}
+    public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
+	voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
     }
 
-    public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid)
-	    throws VoteApplicationException {
-	try {
-	    voteUsrAttemptDAO.removeAttemptsForUserandSession(queUsrId, sessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing by user and votesession id : "
-		    + e.getMessage(), e);
-	}
+    public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
+	voteUsrAttemptDAO.removeAttemptsForUserandSession(queUsrId, sessionUid);
     }
 
-    public List<VoteUsrAttempt> getAttemptsForUser(final Long userUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAttemptsForUser(userUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting the attempts by user id: "
-		    + e.getMessage(), e);
-	}
-
+    public List<VoteUsrAttempt> getAttemptsForUser(final Long userUid) {
+	return voteUsrAttemptDAO.getAttemptsForUser(userUid);
     }
 
-    public int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getUserEnteredVotesCountForContent(voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting the user entered votes count:"
-		    + e.getMessage(), e);
-	}
-
+    public int getUserEnteredVotesCountForContent(final Long voteContentUid) {
+	return voteUsrAttemptDAO.getUserEnteredVotesCountForContent(voteContentUid);
     }
 
-    public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getVoteQueContentByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is retrieving by uid  vote question content: " + e.getMessage(), e);
-	}
+    public VoteQueContent getQuestionByUid(Long uid) {
+	return voteQueContentDAO.getQuestionByUid(uid);
     }
 
-    public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.updateVoteQueContent(voteQueContent);
-
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote content by question: "
-		    + e.getMessage(), e);
-	}
-
+    public void removeVoteQueContent(VoteQueContent voteQueContent) {
+	voteQueContentDAO.removeQuestion(voteQueContent);
     }
 
-    public void cleanAllQuestionsSimple(final Long voteContentId) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.cleanAllQuestionsSimple(voteContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is cleaning vote question content by voteContentId : "
-			    + e.getMessage(), e);
-	}
+    public VoteSession getSessionBySessionId(Long voteSessionId) {
+	return voteSessionDAO.getSessionBySessionId(voteSessionId);
     }
 
-    public List getAllQuestionEntries(final Long uid) throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getAllQuestionEntries(uid.longValue());
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting by uid  vote question content: "
-		    + e.getMessage(), e);
-	}
+    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) {
+	return voteUserDAO.getCompletedVoteUserBySessionUid(voteSessionUid);
     }
 
-    public void removeVoteQueContentByUID(Long uid) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.removeVoteQueContentByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is removing by uid  vote question content: " + e.getMessage(), e);
-	}
+    public List getVoteUserBySessionUid(final Long voteSessionUid) {
+	return voteUserDAO.getVoteUserBySessionUid(voteSessionUid);
     }
 
-    public void removeVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException {
-	try {
-	    voteQueContentDAO.removeVoteQueContent(voteQueContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing vote question content: "
-		    + e.getMessage(), e);
-	}
+    public List getSessionNamesFromContent(VoteContent voteContent) {
+	return voteSessionDAO.getSessionNamesFromContent(voteContent);
     }
 
-    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentId) {
-	try {
-	    return voteQueContentDAO.getQuestionContentByQuestionText(question, voteContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is retrieving question content by question text: " + e.getMessage(), e);
-	}
+    public void updateVote(VoteContent vote) {
+	voteContentDAO.updateVoteContent(vote);
     }
 
-    public VoteSession retrieveVoteSession(Long voteSessionId) throws VoteApplicationException {
-	try {
-	    return voteSessionDAO.findVoteSessionById(voteSessionId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving by id vote session : "
-		    + e.getMessage(), e);
-	}
+    public void updateVoteSession(VoteSession voteSession) {
+	voteSessionDAO.updateVoteSession(voteSession);
     }
 
-    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getCompletedVoteUserBySessionUid(voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException(
-		    "Exception occured when lams is retrieving completed users by session uid: " + e.getMessage(), e);
-	}
+    public void deleteVote(VoteContent vote) {
+	voteContentDAO.removeVote(vote);
     }
 
-    public List getVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getVoteUserBySessionUid(voteSessionUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving users by session uid: "
-		    + e.getMessage(), e);
-	}
+    public void deleteVoteById(Long voteId) {
+	voteContentDAO.removeVoteById(voteId);
     }
 
-    public VoteContent retrieveVoteBySessionId(Long voteSessionId) throws VoteApplicationException {
-	try {
-	    return voteContentDAO.getVoteContentBySession(voteSessionId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving vote by session id: "
-		    + e.getMessage(), e);
-	}
+    public int countSessionComplete() {
+	return voteSessionDAO.countSessionComplete();
     }
 
-    public List getSessionNamesFromContent(VoteContent voteContent) throws VoteApplicationException {
-	try {
-	    return voteSessionDAO.getSessionNamesFromContent(voteContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting session names from content: "
-		    + e.getMessage(), e);
-	}
+    public void deleteVoteSession(VoteSession voteSession) {
+	voteSessionDAO.removeVoteSession(voteSession);
     }
 
-    public void updateVote(VoteContent vote) throws VoteApplicationException {
-	try {
-	    voteContentDAO.updateVoteContent(vote);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating" + " the vote content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void updateVoteSession(VoteSession voteSession) throws VoteApplicationException {
-	try {
-	    voteSessionDAO.updateVoteSession(voteSession);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is updating vote session : "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void deleteVote(VoteContent vote) throws VoteApplicationException {
-	try {
-	    voteContentDAO.removeVote(vote);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing" + " the vote content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void deleteVoteById(Long voteId) throws VoteApplicationException {
-	try {
-	    voteContentDAO.removeVoteById(voteId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing by id" + " the vote content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public int countSessionComplete() throws VoteApplicationException {
-	try {
-	    return voteSessionDAO.countSessionComplete();
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is counting incomplete sessions"
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void deleteVoteSession(VoteSession voteSession) throws VoteApplicationException {
-	try {
-	    voteSessionDAO.removeVoteSession(voteSession);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is deleting" + " the vote session: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void removeAttempt(VoteUsrAttempt attempt) throws VoteApplicationException {
-	try {
-	    voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing" + " the attempt: "
-		    + e.getMessage(), e);
-	}
+    public void removeAttempt(VoteUsrAttempt attempt) {
+	voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
     }
 
     /**
      * logs hiding of a user entered vote
      */
-    public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
+    public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) {
 	auditService.logHideEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), voteUsrAttempt
 		.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
@@ -1192,12 +791,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     /**
      * logs showing of a user entered vote
      */
-    public void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
+    public void showOpenVote(VoteUsrAttempt voteUsrAttempt) {
 	auditService.logShowEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), voteUsrAttempt
 		.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
 
-    public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException {
+    public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) {
 	try {
 	    voteUserDAO.removeVoteUser(voteQueUsr);
 	} catch (DataAccessException e) {
@@ -1206,75 +805,32 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public void saveVoteContent(VoteContent vote) throws VoteApplicationException {
-	try {
-	    voteContentDAO.saveVoteContent(vote);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is saving" + " the vote content: "
-		    + e.getMessage(), e);
-	}
+    public void saveVoteContent(VoteContent vote) {
+	voteContentDAO.saveVoteContent(vote);
     }
 
-    public List<Long> getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException {
-	try {
-	    return voteSessionDAO.getSessionsFromContent(voteContent);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting" + " the vote sessions list: "
-		    + e.getMessage(), e);
-	}
+    public List<Long> getSessionsFromContent(VoteContent voteContent) {
+	return voteSessionDAO.getSessionsFromContent(voteContent);
     }
 
-    public int getTotalNumberOfUsers() throws VoteApplicationException {
-	try {
-	    return voteUserDAO.getTotalNumberOfUsers();
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is retrieving total number of VoteQueUsr: "
-		    + e.getMessage(), e);
-	}
+    public int getTotalNumberOfUsers() {
+	return voteUserDAO.getTotalNumberOfUsers();
     }
 
-    public User getCurrentUserData(String username) throws VoteApplicationException {
-	try {
-	    /**
-	     * this will return null if the username not found
-	     */
-	    User user = userManagementService.getUserByLogin(username);
-	    if (user == null) {
-		VoteServicePOJO.logger.error("No user with the username: " + username + " exists.");
-		throw new VoteApplicationException("No user with that username exists.");
-	    }
-	    return user;
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Unable to find current user information" + " Root Cause: ["
-		    + e.getMessage() + "]", e);
+    public User getCurrentUserData(String username) {
+	/**
+	 * this will return null if the username not found
+	 */
+	User user = userManagementService.getUserByLogin(username);
+	if (user == null) {
+	    VoteServicePOJO.logger.error("No user with the username: " + username + " exists.");
+	    throw new VoteApplicationException("No user with that username exists.");
 	}
-    }
-
-    /**
-     * 
-     * Unused method
-     * 
-     * @param lessonId
-     * @return
-     * @throws VoteApplicationException
-     */
-    public Lesson getCurrentLesson(long lessonId) throws VoteApplicationException {
-	try {
-	    /**
-	     * this is a mock implementation to make the project compile and work. When the Lesson service is ready, we
-	     * need to switch to real service implementation.
-	     */
-	    return new Lesson();
-	    /** return lsDAO.find(lsessionId); */
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is loading" + " learning session:"
-		    + e.getMessage(), e);
-	}
+	return user;
     }
 
     @Override
-    public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid)
-	    throws VoteApplicationException {
+    public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid) {
 	try {
 	    return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(userUid, questionUid);
 	} catch (DataAccessException e) {
@@ -1285,24 +841,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     @Override
-    public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException {
-	Iterator questionIterator = voteContent.getVoteQueContents().iterator();
-
-	while (questionIterator.hasNext()) {
-	    VoteQueContent voteQueContent = (VoteQueContent) questionIterator.next();
-	    Iterator attemptsIterator = voteQueContent.getVoteUsrAttempts().iterator();
-	    while (attemptsIterator.hasNext()) {
-		/**
-		 * proved the fact that there is at least one attempt for this content.
-		 */
-		return true;
-	    }
-	}
-	return false;
+    public boolean studentActivityOccurredGlobal(VoteContent voteContent) {
+	return !voteContent.getVoteSessions().isEmpty();
     }
 
     @Override
-    public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException {
+    public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) {
 	boolean studentActivityOccurredGlobal = studentActivityOccurredGlobal(voteContent);
 
 	int userEnteredVotesCount = getUserEnteredVotesCountForContent(voteContent.getUid());
@@ -1310,25 +854,82 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    return true;
 	}
 
-	//there is no votes/nominations for this content
+	// there is no votes/nominations for this content
 	return false;
+    }
+
+    @Override
+    public void recalculateUserAnswers(VoteContent content, Set<VoteQueContent> oldQuestions,
+	    List<VoteQuestionDTO> questionDTOs, List<VoteQuestionDTO> deletedQuestions) {
+
+	// create list of modified questions
+	List<VoteQuestionDTO> modifiedQuestions = new ArrayList<VoteQuestionDTO>();
+	for (VoteQueContent oldQuestion : oldQuestions) {
+	    for (VoteQuestionDTO questionDTO : questionDTOs) {
+		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
+
+		    // question is different
+		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
+			modifiedQuestions.add(questionDTO);
+		    }
+		}
+	    }
+	}
+
+	Set<VoteSession> sessionList = content.getVoteSessions();
+	for (VoteSession session : sessionList) {
+	    Long toolSessionId = session.getVoteSessionId();
+	    Set<VoteQueUsr> sessionUsers = session.getVoteQueUsers();
+
+	    for (VoteQueUsr user : sessionUsers) {
+
+		// get all finished user results
+		List<VoteUsrAttempt> userAttempts = this.getAttemptsForUser(user.getUid());
+		Iterator<VoteUsrAttempt> iter = userAttempts.iterator();
+		while (iter.hasNext()) {
+		    VoteUsrAttempt userAttempt = iter.next();
+
+		    VoteQueContent question = userAttempt.getVoteQueContent();
+
+		    boolean isRemoveQuestionResult = false;
+
+		    // [+] if the question is modified
+		    for (VoteQuestionDTO modifiedQuestion : modifiedQuestions) {
+			if (question.getUid().equals(modifiedQuestion.getUid())) {
+			    isRemoveQuestionResult = true;
+			    break;
+			}
+		    }
+
+		    // [+] if the question was removed
+		    for (VoteQuestionDTO deletedQuestion : deletedQuestions) {
+			if (question.getUid().equals(deletedQuestion.getUid())) {
+			    isRemoveQuestionResult = true;
+			    break;
+			}
+		    }
+
+		    if (isRemoveQuestionResult) {
+			iter.remove();
+			voteUsrAttemptDAO.removeVoteUsrAttempt(userAttempt);
+		    }
+
+		    // [+] doing nothing if the new question was added
+
+		}
+
+	    }
+	}
+
     }
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (fromContentId == null) {
-	    //attempt retrieving tool's default content id with signatute VoteAppConstants.MY_SIGNATURE
-	    long defaultContentId = 0;
-	    try {
-		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-		fromContentId = new Long(defaultContentId);
-	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
-			+ VoteAppConstants.MY_SIGNATURE);
-		throw new ToolException("WARNING! default content has not been setup for signature"
-			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
-	    }
+	    // attempt retrieving tool's default content id with signatute VoteAppConstants.MY_SIGNATURE
+	    long defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
+	    fromContentId = new Long(defaultContentId);
 	}
 
 	if (toContentId == null) {
@@ -1336,43 +937,22 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    throw new ToolException("toContentId is missing");
 	}
 
-	try {
-	    VoteContent fromContent = voteContentDAO.findVoteContentById(fromContentId);
+	VoteContent fromContent = voteContentDAO.getVoteContentByContentId(fromContentId);
 
-	    if (fromContent == null) {
-		//attempt retrieving tool's default content id with signatute  VoteAppConstants.MY_SIGNATURE
-		long defaultContentId = 0;
-		try {
-		    defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-		    fromContentId = new Long(defaultContentId);
-		} catch (Exception e) {
-		    VoteServicePOJO.logger.error("default content id has not been setup for signature: "
-			    + VoteAppConstants.MY_SIGNATURE);
-		    throw new ToolException("WARNING! default content has not been setup for signature"
-			    + VoteAppConstants.MY_SIGNATURE + " Can't continue!");
-		}
+	if (fromContent == null) {
+	    // attempt retrieving tool's default content id with signatute VoteAppConstants.MY_SIGNATURE
+	    long defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
+	    fromContentId = new Long(defaultContentId);
 
-		fromContent = voteContentDAO.findVoteContentById(fromContentId);
-	    }
+	    fromContent = voteContentDAO.getVoteContentByContentId(fromContentId);
+	}
 
-	    try {
-		VoteContent toContent = VoteContent.newInstance(voteToolContentHandler, fromContent, toContentId);
-		if (toContent == null) {
-		    VoteServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
-		    throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
-		} else {
-		    voteContentDAO.saveVoteContent(toContent);
-		}
-
-	    } catch (ItemNotFoundException e) {
-		VoteServicePOJO.logger.error("exception occurred: " + e);
-	    } catch (RepositoryCheckedException e) {
-		VoteServicePOJO.logger.error("exception occurred: " + e);
-	    }
-	} catch (DataAccessException e) {
-	    VoteServicePOJO.logger
-		    .error("throwing ToolException: Exception occured when lams is copying content between content ids.");
-	    throw new ToolException("Exception occured when lams is copying content between content ids.");
+	VoteContent toContent = VoteContent.newInstance(fromContent, toContentId);
+	if (toContent == null) {
+	    VoteServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
+	    throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
+	} else {
+	    voteContentDAO.saveVoteContent(toContent);
 	}
     }
 
@@ -1385,7 +965,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    throw new ToolException("toolContentID is missing");
 	}
 
-	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
+	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentID);
 
 	if (voteContent != null) {
 	    Iterator sessionIterator = voteContent.getVoteSessions().iterator();
@@ -1408,7 +988,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    }
 		}
 	    }
-	    //removed all existing responses of toolContent with toolContentID
+	    // removed all existing responses of toolContent with toolContentID
 	    voteContentDAO.removeVoteById(toolContentID);
 	} else {
 	    VoteServicePOJO.logger.error("Warning!!!, We should have not come here. voteContent is null.");
@@ -1423,7 +1003,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    logger.debug("Removing Vote attempts for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
-	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentId);
 	if (voteContent == null) {
 	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
@@ -1447,10 +1027,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     @Override
     public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
-	VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentID);
+	VoteContent toolContentObj = voteContentDAO.getVoteContentByContentId(toolContentID);
 	if (toolContentObj == null) {
 	    long defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-	    toolContentObj = voteContentDAO.findVoteContentById(defaultContentId);
+	    toolContentObj = voteContentDAO.getVoteContentByContentId(defaultContentId);
 	}
 
 	if (toolContentObj == null) {
@@ -1459,20 +1039,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	try {
 	    // set ToolContentHandler as null to avoid copy file node in repository again.
-	    toolContentObj = VoteContent.newInstance(null, toolContentObj, toolContentID);
+	    toolContentObj = VoteContent.newInstance(toolContentObj, toolContentID);
 
 	    // clear unnecessary information attach
 	    toolContentObj.setVoteSessions(null);
-	    Set<VoteQueContent> ques = toolContentObj.getVoteQueContents();
-	    for (VoteQueContent que : ques) {
-		que.setMcUsrAttempts(null);
-	    }
 	    exportContentService.exportToolContent(toolContentID, toolContentObj, voteToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
-	    throw new ToolException(e);
-	} catch (ItemNotFoundException e) {
-	    throw new ToolException(e);
-	} catch (RepositoryCheckedException e) {
 	    throw new ToolException(e);
 	}
     }
@@ -1507,13 +1079,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * group have the same toolSessionID.
      * 
      * @param toolSessionID
-     *                the generated tool session id.
+     *            the generated tool session id.
      * @param toolSessionName
-     *                the tool session name.
+     *            the tool session name.
      * @param toolContentID
-     *                the tool content id specified.
+     *            the tool content id specified.
      * @throws ToolException
-     *                 if an error occurs e.g. defaultContent is missing.
+     *             if an error occurs e.g. defaultContent is missing.
      * 
      */
     public void createToolSession(Long toolSessionID, String toolSessionName, Long toolContentID) throws ToolException {
@@ -1523,41 +1095,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    throw new ToolException("toolSessionID is missing");
 	}
 
-	long defaultContentId = 0;
-	if (toolContentID == null) {
-
-	    try {
-		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-		toolContentID = new Long(defaultContentId);
-	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
-			+ VoteAppConstants.MY_SIGNATURE);
-		throw new ToolException("WARNING! default content has not been setup for signature"
-			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
-	    }
-	}
-
-	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
-
-	if (voteContent == null) {
-
-	    try {
-		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-		toolContentID = new Long(defaultContentId);
-	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
-			+ VoteAppConstants.MY_SIGNATURE);
-		throw new ToolException("WARNING! default content has not been setup for signature"
-			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
-	    }
-
-	    voteContent = voteContentDAO.findVoteContentById(toolContentID);
-	}
+	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentID);
 
 	/*
 	 * create a new a new tool session if it does not already exist in the tool session table
 	 */
-	VoteSession voteSession = retrieveVoteSession(toolSessionID);
+	VoteSession voteSession = getSessionBySessionId(toolSessionID);
 	if (voteSession == null) {
 	    try {
 		voteSession = new VoteSession(toolSessionID, new Date(System.currentTimeMillis()),
@@ -1573,11 +1116,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     /**
-     * Implemented as part of the tool contract. 
+     * Implemented as part of the tool contract.
      * 
      * @param toolSessionID
      * @param toolContentID
-     *                return
+     *            return
      * @throws ToolException
      */
     public void removeToolSession(Long toolSessionID) throws DataMissingException, ToolException {
@@ -1588,7 +1131,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	VoteSession voteSession = null;
 	try {
-	    voteSession = retrieveVoteSession(toolSessionID);
+	    voteSession = getSessionBySessionId(toolSessionID);
 	} catch (VoteApplicationException e) {
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
@@ -1608,11 +1151,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     /**
-     * Implemtented as part of the tool contract. 
+     * Implemtented as part of the tool contract.
      * 
      * @param toolSessionID
      * @param learnerId
-     *                return String
+     *            return String
      * @throws ToolException
      * 
      */
@@ -1634,7 +1177,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	VoteSession voteSession = null;
 	try {
-	    voteSession = retrieveVoteSession(toolSessionID);
+	    voteSession = getSessionBySessionId(toolSessionID);
 	} catch (VoteApplicationException e) {
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
@@ -1655,7 +1198,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
      * 
      * @param toolSessionID
-     *                return ToolSessionExportOutputData
+     *            return ToolSessionExportOutputData
      * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(Long toolSessionID) throws DataMissingException, ToolException {
@@ -1666,7 +1209,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
      * 
      * @param toolSessionIDs
-     *                return ToolSessionExportOutputData
+     *            return ToolSessionExportOutputData
      * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(List toolSessionIDs) throws DataMissingException,
@@ -1675,27 +1218,28 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     }
 
-    public IToolVO getToolBySignature(String toolSignature) throws VoteApplicationException {
+    public IToolVO getToolBySignature(String toolSignature) {
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
-    public long getToolDefaultContentIdBySignature(String toolSignature) throws VoteApplicationException {
+    public long getToolDefaultContentIdBySignature(String toolSignature) {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	return contentId;
     }
 
-    public VoteQueContent getToolDefaultQuestionContent(long contentId) throws VoteApplicationException {
-	VoteQueContent voteQueContent = voteQueContentDAO.getToolDefaultQuestionContent(contentId);
+    @Override
+    public VoteQueContent getDefaultVoteContentFirstQuestion() {
+	VoteQueContent voteQueContent = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
 	return voteQueContent;
     }
-
+    
     public List getToolSessionsForContent(VoteContent vote) {
 	List listToolSessionIds = voteSessionDAO.getSessionsFromContent(vote);
 	return listToolSessionIds;
     }
-    
+
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -1706,22 +1250,22 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	VoteContent content = retrieveVote(toolContentId);
+	VoteContent content = getVoteContent(toolContentId);
 	if (content == null) {
 	    long defaultToolContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-	    content = retrieveVote(defaultToolContentId);
+	    content = getVoteContent(defaultToolContentId);
 	}
 	return getVoteOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
-    
+
     public String getToolContentTitle(Long toolContentId) {
-	return retrieveVote(toolContentId).getTitle();
+	return getVoteContent(toolContentId).getTitle();
     }
-    
+
     public boolean isContentEdited(Long toolContentId) {
-	return retrieveVote(toolContentId).isDefineLater();
+	return getVoteContent(toolContentId).isDefineLater();
     }
-   
+
     /**
      * Get the tool output for the given tool output names.
      * 
@@ -1750,7 +1294,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	VoteContent toolContentObj = new VoteContent();
-	toolContentObj.setContentInUse(false);
 	toolContentObj.setCreatedBy(user.getUserID().longValue());
 	toolContentObj.setCreationDate(now);
 	toolContentObj.setDefineLater(false);
@@ -1778,10 +1321,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    Integer maxCount = WDDXProcessor.convertToInteger(importValues,
 		    ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
 	    toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
-	    
+
 	    Integer minCount = WDDXProcessor.convertToInteger(importValues,
-			    ToolContentImport102Manager.CONTENT_VOTE_MINCHOOSE);
-		    toolContentObj.setMinNominationCount(minCount != null ? minCount.toString() : "1");	    
+		    ToolContentImport102Manager.CONTENT_VOTE_MINCHOOSE);
+	    toolContentObj.setMinNominationCount(minCount != null ? minCount.toString() : "1");
 
 	} catch (WDDXProcessorConversionException e) {
 	    VoteServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
@@ -1802,7 +1345,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    int order = 1;
 	    while (iter.hasNext()) {
 		String element = (String) iter.next();
-		VoteQueContent nomination = new VoteQueContent(element, toolContentObj, null);
+		VoteQueContent nomination = new VoteQueContent(element, toolContentObj);
 		nomination.setDisplayOrder(order++);
 		toolContentObj.getVoteQueContents().add(nomination);
 	    }
@@ -1819,7 +1362,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	VoteContent toolContentObj = null;
 	if (toolContentId != null) {
-	    toolContentObj = retrieveVote(toolContentId);
+	    toolContentObj = getVoteContent(toolContentId);
 	}
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -1844,13 +1387,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    public List getAllQuestionEntriesSorted(final long voteContentId) throws VoteApplicationException {
-	try {
-	    return voteQueContentDAO.getAllQuestionEntriesSorted(voteContentId);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting all question entries: "
-		    + e.getMessage(), e);
-	}
+    public List<VoteQueContent> getAllQuestionsSorted(final long voteContentId) {
+	return voteQueContentDAO.getAllQuestionsSorted(voteContentId);
     }
 
     /**
@@ -1876,7 +1414,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteSessionDAO
-     *                The voteSessionDAO to set.
+     *            The voteSessionDAO to set.
      */
     public void setvoteSessionDAO(IVoteSessionDAO voteSessionDAO) {
 	this.voteSessionDAO = voteSessionDAO;
@@ -1891,7 +1429,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteUserDAO
-     *                The voteUserDAO to set.
+     *            The voteUserDAO to set.
      */
     public void setvoteUserDAO(IVoteUserDAO voteUserDAO) {
 	this.voteUserDAO = voteUserDAO;
@@ -1906,7 +1444,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteUsrAttemptDAO
-     *                The voteUsrAttemptDAO to set.
+     *            The voteUsrAttemptDAO to set.
      */
     public void setvoteUsrAttemptDAO(IVoteUsrAttemptDAO voteUsrAttemptDAO) {
 	this.voteUsrAttemptDAO = voteUsrAttemptDAO;
@@ -1929,7 +1467,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteToolContentHandler
-     *                The voteToolContentHandler to set.
+     *            The voteToolContentHandler to set.
      */
     public void setVoteToolContentHandler(IToolContentHandler voteToolContentHandler) {
 	this.voteToolContentHandler = voteToolContentHandler;
@@ -1944,7 +1482,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param learnerService
-     *                The learnerService to set.
+     *            The learnerService to set.
      */
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
@@ -1959,7 +1497,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteContentDAO
-     *                The voteContentDAO to set.
+     *            The voteContentDAO to set.
      */
     public void setvoteContentDAO(IVoteContentDAO voteContentDAO) {
 	this.voteContentDAO = voteContentDAO;
@@ -1974,7 +1512,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteQueContentDAO
-     *                The voteQueContentDAO to set.
+     *            The voteQueContentDAO to set.
      */
     public void setvoteQueContentDAO(IVoteQueContentDAO voteQueContentDAO) {
 	this.voteQueContentDAO = voteQueContentDAO;
@@ -1989,7 +1527,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteContentDAO
-     *                The voteContentDAO to set.
+     *            The voteContentDAO to set.
      */
     public void setVoteContentDAO(IVoteContentDAO voteContentDAO) {
 	this.voteContentDAO = voteContentDAO;
@@ -2004,7 +1542,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteQueContentDAO
-     *                The voteQueContentDAO to set.
+     *            The voteQueContentDAO to set.
      */
     public void setVoteQueContentDAO(IVoteQueContentDAO voteQueContentDAO) {
 	this.voteQueContentDAO = voteQueContentDAO;
@@ -2019,7 +1557,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteSessionDAO
-     *                The voteSessionDAO to set.
+     *            The voteSessionDAO to set.
      */
     public void setVoteSessionDAO(IVoteSessionDAO voteSessionDAO) {
 	this.voteSessionDAO = voteSessionDAO;
@@ -2034,7 +1572,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteUserDAO
-     *                The voteUserDAO to set.
+     *            The voteUserDAO to set.
      */
     public void setVoteUserDAO(IVoteUserDAO voteUserDAO) {
 	this.voteUserDAO = voteUserDAO;
@@ -2049,7 +1587,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param voteUsrAttemptDAO
-     *                The voteUsrAttemptDAO to set.
+     *            The voteUsrAttemptDAO to set.
      */
     public void setVoteUsrAttemptDAO(IVoteUsrAttemptDAO voteUsrAttemptDAO) {
 	this.voteUsrAttemptDAO = voteUsrAttemptDAO;
@@ -2064,7 +1602,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param auditService
-     *                The auditService to set.
+     *            The auditService to set.
      */
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
@@ -2087,7 +1625,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param coreNotebookService
-     *                The coreNotebookService to set.
+     *            The coreNotebookService to set.
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -2110,18 +1648,22 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     /**
      * @param messageService
-     *                The MessageService to set.
+     *            The MessageService to set.
      */
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
-    
+
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
     }
 
-    public void removeNominationsFromCache(VoteContent voteContent) {
-	voteContentDAO.removeNominationsFromCache(voteContent);
+    public void removeQuestionsFromCache(VoteContent voteContent) {
+	voteContentDAO.removeQuestionsFromCache(voteContent);
+    }
+
+    public void removeVoteContentFromCache(VoteContent voteContent) {
+	voteContentDAO.removeVoteContentFromCache(voteContent);
     }
 
     public void setDataFlowDAO(IDataFlowDAO dataFlowDAO) {

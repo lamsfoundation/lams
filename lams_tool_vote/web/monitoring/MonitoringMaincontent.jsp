@@ -100,8 +100,7 @@
 			submitMethod(actionMethod);
 		}
 		
-		function submitOpenVote(currentUid, actionMethod)
-		{
+		function submitOpenVote(currentUid, actionMethod) {
 			document.VoteMonitoringForm.currentUid.value=currentUid;
 	        submitMethod(actionMethod);
 		}
@@ -110,7 +109,6 @@
 	
 </lams:head>
 <body class="stripes" onLoad="init();">
-
 
 	<div id="page">
 			<h1> <fmt:message key="label.monitoring"/> </h1>
@@ -125,9 +123,7 @@
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="httpSessionID"/>		
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="contentFolderID"/>						
-		<html:hidden property="activeModule"/>
-		<html:hidden property="defineLaterInEditMode"/>
+		<html:hidden property="contentFolderID"/>
 		<html:hidden property="responseId"/>	 
 		<html:hidden property="currentUid"/>
 		

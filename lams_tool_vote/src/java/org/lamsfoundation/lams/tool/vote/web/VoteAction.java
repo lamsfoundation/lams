@@ -28,13 +28,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -42,10 +43,10 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
-import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteNominationContentDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
@@ -61,7 +62,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Ozgur Demirtas
  */
 public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
-    static Logger logger = Logger.getLogger(VoteAction.class.getName());
+    private static Logger logger = Logger.getLogger(VoteAction.class.getName());
 
     /**
      * 
@@ -77,93 +78,20 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
-	SessionMap sessionMap = new SessionMap();
-	VoteUtils.saveRichText(request, voteGeneralAuthoringDTO, sessionMap);
+	
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+
+	if (richTextTitle != null) {
+	    voteGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	}
+
+	if (richTextInstructions != null) {
+	    voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+	}
+	
 	voteAuthoringForm.resetUserAction();
 	return null;
-    }
-
-    /**
-     * used in define later mode to switch from view-only to editable screen
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
-     */
-    public ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-
-	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
-
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	voteAuthoringForm.setHttpSessionID(httpSessionID);
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	voteAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = VoteAppConstants.DEFINE_LATER;
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	VoteContent voteContent = voteService.retrieveVote(new Long(strToolContentID));
-
-	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
-	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-
-	voteGeneralAuthoringDTO.setActivityTitle(voteContent.getTitle());
-	voteAuthoringForm.setTitle(voteContent.getTitle());
-
-	voteGeneralAuthoringDTO.setActivityInstructions(voteContent.getInstructions());
-
-	sessionMap.put(VoteAppConstants.ACTIVITY_TITLE_KEY, voteContent.getTitle());
-	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, voteContent.getInstructions());
-
-	voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
-	boolean isContentInUse = VoteUtils.isContentInUse(voteContent);
-	VoteUtils.setDefineLater(request, true, strToolContentID, voteService);
-
-	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
-	voteAuthoringForm.setToolContentID(strToolContentID);
-	voteAuthoringForm.setActiveModule(activeModule);
-	voteAuthoringForm.setCurrentTab("1");
-
-	List listNominationContentDTO = new LinkedList();
-
-	Iterator queIterator = voteContent.getVoteQueContents().iterator();
-	while (queIterator.hasNext()) {
-	    VoteNominationContentDTO voteNominationContentDTO = new VoteNominationContentDTO();
-
-	    VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
-	    if (voteQueContent != null) {
-
-		voteNominationContentDTO.setQuestion(voteQueContent.getQuestion());
-		voteNominationContentDTO.setDisplayOrder(new Integer(voteQueContent.getDisplayOrder()).toString());
-		// voteNominationContentDTO.setFeedback(voteQueContent.getFeedback());
-		listNominationContentDTO.add(voteNominationContentDTO);
-	    }
-	}
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-
-	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
@@ -180,17 +108,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteAuthoringForm.setToolContentID(toolContentID);
 	voteGeneralAuthoringDTO.setToolContentID(toolContentID);
 
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
-	voteAuthoringForm.setActiveModule(activeModule);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
-
 	String httpSessionID = request.getParameter(VoteAppConstants.HTTP_SESSION_ID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-
-	String defineLaterInEditMode = request.getParameter(VoteAppConstants.DEFINE_LATER_IN_EDIT_MODE);
-	voteAuthoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
 
 	String lockOnFinish = request.getParameter(VoteAppConstants.LOCK_ON_FINISH);
 	voteAuthoringForm.setLockOnFinish(lockOnFinish);
@@ -229,54 +149,32 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    maxInputs = "0";
 	}
 	voteAuthoringForm.setMaxInputs(new Short(maxInputs));
+	
+	ToolAccessMode mode = getAccessMode(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
     }
 
     /**
-     * persists error messages to request scope
-     * 
-     * @param request
-     * @param message
-     */
-    public void persistInRequestError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
-    }
-
-    /**
-     * moveNominationDown
-     * 
      * moves a nomination down in the authoring list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveNominationDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
-	listNominationContentDTO = AuthoringUtil.swapNodes(listNominationContentDTO, questionIndex, "down");
-	listNominationContentDTO = AuthoringUtil.reorderSimpleListNominationContentDTO(listNominationContentDTO);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	questionDTOs = AuthoringUtil.swapQuestions(questionDTOs, questionIndex, "down");
+	
+	questionDTOs = AuthoringUtil.reorderQuestionDTOs(questionDTOs);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 
 	String richTextTitle = request.getParameter(VoteAppConstants.TITLE);
 
@@ -297,64 +195,43 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
 
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * moveNominationUp
-     * 
      * moves a nomination up in the authoring list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveNominationUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
-	listNominationContentDTO = AuthoringUtil.swapNodes(listNominationContentDTO, questionIndex, "up");
+	questionDTOs = AuthoringUtil.swapQuestions(questionDTOs, questionIndex, "up");
 
-	listNominationContentDTO = AuthoringUtil.reorderSimpleListNominationContentDTO(listNominationContentDTO);
+	questionDTOs = AuthoringUtil.reorderQuestionDTOs(questionDTOs);
 
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 
 	String richTextTitle = request.getParameter(VoteAppConstants.TITLE);
 
@@ -375,74 +252,58 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
 
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * removeNomination
-     * 
      * removes a nomination from the authoring list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward removeNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
-	String questionIndex = request.getParameter("questionIndex");
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	String questionIndexToDelete = request.getParameter("questionIndex");
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
-	VoteNominationContentDTO voteNominationContentDTO = null;
-	Iterator listIterator = listNominationContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    voteNominationContentDTO = (VoteNominationContentDTO) listIterator.next();
+	List<VoteQuestionDTO> listFinalQuestionDTO = new LinkedList<VoteQuestionDTO>();
+	int queIndex = 0;
+	for (VoteQuestionDTO questionDTO : questionDTOs) {
 
-	    String displayOrder = voteNominationContentDTO.getDisplayOrder();
+	    String questionText = questionDTO.getNomination();
+	    String displayOrder = questionDTO.getDisplayOrder();
 
-	    if (displayOrder != null && !displayOrder.equals("")) {
-		if (displayOrder.equals(questionIndex)) {
-		    break;
-		}
-
+	    if (questionText != null && !questionText.equals("") && (!displayOrder.equals(questionIndexToDelete))) {
+		
+		++queIndex;
+		questionDTO.setDisplayOrder(new Integer(queIndex).toString());
+		listFinalQuestionDTO.add(questionDTO);
+	    }
+	    if ((questionText != null) && (!questionText.isEmpty()) && displayOrder.equals(questionIndexToDelete)) {
+		List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);;
+		deletedQuestionDTOs.add(questionDTO);
+		sessionMap.put(LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
 	    }
 	}
 
-	voteNominationContentDTO.setNomination("");
-
-	listNominationContentDTO = AuthoringUtil.reorderListNominationContentDTO(listNominationContentDTO,
-		questionIndex);
-
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, listFinalQuestionDTO);
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, listFinalQuestionDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 
 	String richTextTitle = request.getParameter(VoteAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(VoteAppConstants.INSTRUCTIONS);
@@ -462,69 +323,46 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
 
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * newEditableNominationBox
-     * 
      * enables editing a nomination
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward newEditableNominationBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
 	voteAuthoringForm.setEditableNominationIndex(questionIndex);
 
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	String editableNomination = "";
-	String editableFeedback = "";
-	Iterator listIterator = listNominationContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    VoteNominationContentDTO voteNominationContentDTO = (VoteNominationContentDTO) listIterator.next();
-	    String question = voteNominationContentDTO.getNomination();
-	    String displayOrder = voteNominationContentDTO.getDisplayOrder();
+	Iterator iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    VoteQuestionDTO voteQuestionDTO = (VoteQuestionDTO) iter.next();
+	    String question = voteQuestionDTO.getNomination();
+	    String displayOrder = voteQuestionDTO.getDisplayOrder();
 
 	    if (displayOrder != null && !displayOrder.equals("")) {
 		if (displayOrder.equals(questionIndex)) {
-		    editableFeedback = voteNominationContentDTO.getFeedback();
-		    editableNomination = voteNominationContentDTO.getNomination();
+		    editableNomination = voteQuestionDTO.getNomination();
 		    break;
 		}
 
@@ -533,7 +371,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
@@ -547,30 +384,14 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
 	voteGeneralAuthoringDTO.setEditableNominationText(editableNomination);
-	voteGeneralAuthoringDTO.setEditableNominationFeedback(editableFeedback);
-	voteAuthoringForm.setFeedback(editableFeedback);
-
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
 	return mapping.findForward("editNominationBox");
     }
 
     /**
-     * newNominationBox
-     * 
      * enables adding a new nomination
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward newNominationBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -578,12 +399,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
-
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -598,28 +417,13 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 	return mapping.findForward("newNominationBox");
     }
 
     /**
-     * addSingleNomination
-     * 
      * enables adding a new nomination to the authoring nominations list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward addSingleNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -629,45 +433,37 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	VoteContent voteContent = voteService.retrieveVote(new Long(strToolContentID));
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
-	AuthoringUtil authoringUtil = new AuthoringUtil();
-
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	String newNomination = request.getParameter("newNomination");
 
-	String feedback = request.getParameter("feedback");
-
-	int listSize = listNominationContentDTO.size();
+	int listSize = questionDTOs.size();
 
 	if (newNomination != null && newNomination.length() > 0) {
-	    boolean duplicates = AuthoringUtil.checkDuplicateNominations(listNominationContentDTO, newNomination);
+	    boolean duplicates = AuthoringUtil.checkDuplicateNominations(questionDTOs, newNomination);
 
 	    if (!duplicates) {
-		VoteNominationContentDTO voteNominationContentDTO = new VoteNominationContentDTO();
-		voteNominationContentDTO.setDisplayOrder(new Long(listSize + 1).toString());
-		voteNominationContentDTO.setFeedback(feedback);
-		voteNominationContentDTO.setNomination(newNomination);
+		VoteQuestionDTO voteQuestionDTO = new VoteQuestionDTO();
+		voteQuestionDTO.setDisplayOrder(new Long(listSize + 1).toString());
+		voteQuestionDTO.setNomination(newNomination);
 
-		listNominationContentDTO.add(voteNominationContentDTO);
+		questionDTOs.add(voteQuestionDTO);
 	    }
 	}
 	
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	String richTextTitle = (String) sessionMap.get(VoteAppConstants.ACTIVITY_TITLE_KEY);
 	String richTextInstructions = (String) sessionMap.get(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
@@ -676,61 +472,40 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteAuthoringForm.setTitle(richTextTitle);
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
-
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
-
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * saveSingleNomination saves a new or updated nomination in the authoring nominations list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
+     * saves a new or updated nomination in the authoring nominations list
      */
     public ActionForward saveSingleNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
-
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	String editNominationBoxRequest = request.getParameter("editNominationBoxRequest");
-
-	VoteContent voteContent = voteService.retrieveVote(new Long(strToolContentID));
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 
@@ -738,28 +513,24 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
-	AuthoringUtil authoringUtil = new AuthoringUtil();
-
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	String newNomination = request.getParameter("newNomination");
-
-	String feedback = request.getParameter("feedback");
 
 	String editableNominationIndex = request.getParameter("editableNominationIndex");
 
 	if (newNomination != null && newNomination.length() > 0) {
 	    if (editNominationBoxRequest != null && editNominationBoxRequest.equals("false")) {
-		boolean duplicates = AuthoringUtil.checkDuplicateNominations(listNominationContentDTO, newNomination);
+		boolean duplicates = AuthoringUtil.checkDuplicateNominations(questionDTOs, newNomination);
 
 		if (!duplicates) {
-		    VoteNominationContentDTO voteNominationContentDTO = null;
-		    Iterator listIterator = listNominationContentDTO.iterator();
-		    while (listIterator.hasNext()) {
-			voteNominationContentDTO = (VoteNominationContentDTO) listIterator.next();
+		    VoteQuestionDTO voteQuestionDTO = null;
+		    Iterator iter = questionDTOs.iterator();
+		    while (iter.hasNext()) {
+			voteQuestionDTO = (VoteQuestionDTO) iter.next();
 
-			String question = voteNominationContentDTO.getNomination();
-			String displayOrder = voteNominationContentDTO.getDisplayOrder();
+			String question = voteQuestionDTO.getNomination();
+			String displayOrder = voteQuestionDTO.getDisplayOrder();
 
 			if (displayOrder != null && !displayOrder.equals("")) {
 			    if (displayOrder.equals(editableNominationIndex)) {
@@ -769,24 +540,23 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 			}
 		    }
 
-		    voteNominationContentDTO.setQuestion(newNomination);
-		    voteNominationContentDTO.setFeedback(feedback);
-		    voteNominationContentDTO.setDisplayOrder(editableNominationIndex);
+		    voteQuestionDTO.setQuestion(newNomination);
+		    voteQuestionDTO.setDisplayOrder(editableNominationIndex);
 
-		    listNominationContentDTO = AuthoringUtil.reorderUpdateListNominationContentDTO(
-			    listNominationContentDTO, voteNominationContentDTO, editableNominationIndex);
+		    questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(
+			    questionDTOs, voteQuestionDTO, editableNominationIndex);
 		} else {
 		    //duplicate question entry, not adding
 		}
 	    } else {
 		//request for edit and save
-		VoteNominationContentDTO voteNominationContentDTO = null;
-		Iterator listIterator = listNominationContentDTO.iterator();
-		while (listIterator.hasNext()) {
-		    voteNominationContentDTO = (VoteNominationContentDTO) listIterator.next();
+		VoteQuestionDTO voteQuestionDTO = null;
+		Iterator iter = questionDTOs.iterator();
+		while (iter.hasNext()) {
+		    voteQuestionDTO = (VoteQuestionDTO) iter.next();
 
-		    String question = voteNominationContentDTO.getNomination();
-		    String displayOrder = voteNominationContentDTO.getDisplayOrder();
+		    String question = voteQuestionDTO.getNomination();
+		    String displayOrder = voteQuestionDTO.getDisplayOrder();
 
 		    if (displayOrder != null && !displayOrder.equals("")) {
 			if (displayOrder.equals(editableNominationIndex)) {
@@ -796,19 +566,18 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 		    }
 		}
 
-		voteNominationContentDTO.setNomination(newNomination);
-		voteNominationContentDTO.setFeedback(feedback);
-		voteNominationContentDTO.setDisplayOrder(editableNominationIndex);
+		voteQuestionDTO.setNomination(newNomination);
+		voteQuestionDTO.setDisplayOrder(editableNominationIndex);
 
-		listNominationContentDTO = AuthoringUtil.reorderUpdateListNominationContentDTO(
-			listNominationContentDTO, voteNominationContentDTO, editableNominationIndex);
+		questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(
+			questionDTOs, voteQuestionDTO, editableNominationIndex);
 	    }
 	} else {
 	    //entry blank, not adding
 	}
 
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
 	String richTextTitle = (String) sessionMap.get(VoteAppConstants.ACTIVITY_TITLE_KEY);
 	String richTextInstructions = (String) sessionMap.get(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
@@ -817,43 +586,24 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteAuthoringForm.setTitle(richTextTitle);
 	voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	voteGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
-
-	voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
-
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * submitAllContent
-     * 
      * persists the nominations list and other user selections in the db.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -864,24 +614,17 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
-	String activeModule = request.getParameter(VoteAppConstants.ACTIVE_MODULE);
-
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	List listNominationContentDTO = (List) sessionMap.get(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY);
-
-	Map mapNominationContent = AuthoringUtil.extractMapNominationContent(listNominationContentDTO);
-
-	Map mapFeedback = AuthoringUtil.extractMapFeedback(listNominationContentDTO);
+	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	ActionMessages errors = new ActionMessages();
-
-	if (mapNominationContent.size() == 0
+	if (questionDTOs.isEmpty()
 		&& (voteAuthoringForm.getAssignedDataFlowObject() == null || voteAuthoringForm
 			.getAssignedDataFlowObject() == 0)) {
 	    ActionMessage error = new ActionMessage("nominations.none.submitted");
@@ -889,63 +632,71 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	}
 
 	String maxNomCount = voteAuthoringForm.getMaxNominationCount();
+	if (maxNomCount != null) {
+	    if (maxNomCount.equals("0") || maxNomCount.contains("-")) {
+		ActionMessage error = new ActionMessage("maxNomination.invalid");
+		errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    }
 
-	if (activeModule != null) {
-	    if (activeModule.equals(VoteAppConstants.AUTHORING)) {
-		if (maxNomCount != null) {
-		    if (maxNomCount.equals("0") || maxNomCount.contains("-")) {
-			ActionMessage error = new ActionMessage("maxNomination.invalid");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    try {
+		int intMaxNomCount = new Integer(maxNomCount).intValue();
+	    } catch (NumberFormatException e) {
+		ActionMessage error = new ActionMessage("maxNomination.invalid");
+		errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    }
+	}
+
+	//verifyDuplicateNominations
+	Map mapQuestion = AuthoringUtil.extractMapQuestion(questionDTOs);
+	int optionCount = 0;
+	boolean isNominationsDuplicate = false;
+	for (long i = 1; i <= VoteAppConstants.MAX_OPTION_COUNT; i++) {
+	    String currentOption = (String) mapQuestion.get(new Long(i).toString());
+
+	    optionCount = 0;
+	    for (long j = 1; j <= VoteAppConstants.MAX_OPTION_COUNT; j++) {
+		String backedOption = (String) mapQuestion.get(new Long(j).toString());
+
+		if (currentOption != null && backedOption != null) {
+		    if (currentOption.equals(backedOption)) {
+			optionCount++;
 		    }
 
-		    try {
-			int intMaxNomCount = new Integer(maxNomCount).intValue();
-		    } catch (NumberFormatException e) {
-			ActionMessage error = new ActionMessage("maxNomination.invalid");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    if (optionCount > 1) {
+			isNominationsDuplicate = true;
 		    }
 		}
 	    }
 	}
 
-	boolean nominationsDuplicate = AuthoringUtil.verifyDuplicateNominations(mapNominationContent);
-
-	if (nominationsDuplicate == true) {
+	if (isNominationsDuplicate == true) {
 	    ActionMessage error = new ActionMessage("nominations.duplicate");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
-
-	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
 	DataFlowObject assignedDataFlowObject = null;
 
-	if (activeModule.equals(VoteAppConstants.AUTHORING)) {
-
-	    List<DataFlowObject> dataFlowObjects = voteService.getDataFlowObjects(new Long(strToolContentID));
-	    List<String> dataFlowObjectNames = null;
-	    if (dataFlowObjects != null) {
-		dataFlowObjectNames = new ArrayList<String>(dataFlowObjects.size());
-		int objectIndex = 1;
-		for (DataFlowObject dataFlowObject : dataFlowObjects) {
-		    dataFlowObjectNames.add(dataFlowObject.getDisplayName());
-		    if (VoteAppConstants.DATA_FLOW_OBJECT_ASSIGMENT_ID.equals(dataFlowObject.getToolAssigmentId())) {
-			voteAuthoringForm.setAssignedDataFlowObject(objectIndex);
-		    }
-		    objectIndex++;
-
+	List<DataFlowObject> dataFlowObjects = voteService.getDataFlowObjects(new Long(strToolContentID));
+	List<String> dataFlowObjectNames = null;
+	if (dataFlowObjects != null) {
+	    dataFlowObjectNames = new ArrayList<String>(dataFlowObjects.size());
+	    int objectIndex = 1;
+	    for (DataFlowObject dataFlowObject : dataFlowObjects) {
+		dataFlowObjectNames.add(dataFlowObject.getDisplayName());
+		if (VoteAppConstants.DATA_FLOW_OBJECT_ASSIGMENT_ID.equals(dataFlowObject.getToolAssigmentId())) {
+		    voteAuthoringForm.setAssignedDataFlowObject(objectIndex);
 		}
+		objectIndex++;
 
 	    }
+	}
+	voteGeneralAuthoringDTO.setDataFlowObjectNames(dataFlowObjectNames);
 
-	    voteGeneralAuthoringDTO.setDataFlowObjectNames(dataFlowObjectNames);
-
-	    if (voteAuthoringForm.getAssignedDataFlowObject() != null
-		    && voteAuthoringForm.getAssignedDataFlowObject() != 0) {
-		assignedDataFlowObject = dataFlowObjects.get(voteAuthoringForm.getAssignedDataFlowObject() - 1);
-	    }
+	if (voteAuthoringForm.getAssignedDataFlowObject() != null && voteAuthoringForm.getAssignedDataFlowObject() != 0) {
+	    assignedDataFlowObject = dataFlowObjects.get(voteAuthoringForm.getAssignedDataFlowObject() - 1);
 	}
 
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -961,78 +712,104 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	sessionMap.put(VoteAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	voteGeneralAuthoringDTO.setMapNominationContent(mapNominationContent);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
-	VoteContent voteContentTest = voteService.retrieveVote(new Long(strToolContentID));
+	VoteContent voteContentTest = voteService.getVoteContent(new Long(strToolContentID));
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    VoteAction.logger.error("errors saved: " + errors);
 	}
 
-	VoteContent voteContent = voteContentTest;
 	if (errors.isEmpty()) {
-	    /* to remove deleted entries in the questions table based on mapNominationContent */
-	    authoringUtil.removeRedundantNominations(mapNominationContent, voteService, voteAuthoringForm, request,
-		    strToolContentID);
+	    ToolAccessMode mode = getAccessMode(request);
+	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	    voteContent = authoringUtil.saveOrUpdateVoteContent(mapNominationContent, mapFeedback, voteService,
-		    voteAuthoringForm, request, voteContentTest, strToolContentID, assignedDataFlowObject);
+	    List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);
 
-	    long defaultContentID = 0;
-	    defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-
-	    if (voteContent != null) {
-		voteGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
+	    // in case request is from monitoring module - recalculate User Answers
+	    if (mode.isTeacher()) {
+		Set<VoteQueContent> oldQuestions = voteContentTest.getVoteQueContents();
+		voteService.removeQuestionsFromCache(voteContentTest);
+		VoteUtils.setDefineLater(request, false, strToolContentID, voteService);
+		    
+		// recalculate User Answers
+		voteService.recalculateUserAnswers(voteContentTest, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }
-
-	    authoringUtil.reOrganizeDisplayOrder(mapNominationContent, voteService, voteAuthoringForm, voteContent);
-
-	    VoteUtils.setDefineLater(request, false, strToolContentID, voteService);
-
-	    if (activeModule.equals(VoteAppConstants.AUTHORING)) {
-		//standard authoring close
-		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	    } else {
-		//go back to view only screen
-		voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
-	    }
-
-	} else {
-
-	    if (voteContent != null) {
-		long defaultContentID = 0;
-		defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-
-		if (voteContent != null) {
-		    voteGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
+	    
+	    // remove deleted questions
+	    for (VoteQuestionDTO deletedQuestionDTO : deletedQuestionDTOs) {
+		VoteQueContent removeableQuestion = voteService.getVoteQueContentByUID(deletedQuestionDTO.getUid());
+		if (removeableQuestion != null) {
+//		    Set<McUsrAttempt> attempts = removeableQuestion.getMcUsrAttempts();
+//		    Iterator<McUsrAttempt> iter = attempts.iterator();
+//		    while (iter.hasNext()) {
+//			McUsrAttempt attempt = iter.next();
+//			iter.remove();
+//		    }
+//		    mcService.updateQuestion(removeableQuestion);
+		    voteContentTest.getVoteQueContents().remove(removeableQuestion);
+		    voteService.removeVoteQueContent(removeableQuestion);
 		}
-
 	    }
+
+	    // store content
+	    VoteContent voteContent = AuthoringUtil.saveOrUpdateVoteContent(voteService, voteAuthoringForm, request,
+		    voteContentTest, strToolContentID);
+
+	    //store questions
+	    voteContent = AuthoringUtil.createQuestions(questionDTOs, voteService, voteContent);
+
+	    //store DataFlowObjectAssigment
+	    voteService.saveDataFlowObjectAssigment(assignedDataFlowObject);
+
+	    //reOrganizeDisplayOrder
+	    List<VoteQueContent> sortedQuestions = voteService.getAllQuestionsSorted(voteContent.getUid().longValue());
+	    Iterator iter = sortedQuestions.iterator();
+	    while (iter.hasNext()) {
+		VoteQueContent question = (VoteQueContent) iter.next();
+
+		VoteQueContent existingQuestion = voteService.getQuestionByUid(question.getUid());
+		voteService.saveOrUpdateVoteQueContent(existingQuestion);
+	    }
+
+	    // standard authoring close
+	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+
 	}
 
 	voteAuthoringForm.resetUserAction();
-	voteGeneralAuthoringDTO.setMapNominationContent(mapNominationContent);
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
-	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
-	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
+	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
+	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(listNominationContentDTO.size()));
 
 	voteGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	voteGeneralAuthoringDTO.setActiveModule(activeModule);
 
 	voteAuthoringForm.setToolContentID(strToolContentID);
 	voteAuthoringForm.setHttpSessionID(httpSessionID);
-	voteAuthoringForm.setActiveModule(activeModule);
 	voteAuthoringForm.setCurrentTab("1");
 
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
+    }
+    
+    /**
+     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
+     * 
+     * @param request
+     * @return
+     */
+    private ToolAccessMode getAccessMode(HttpServletRequest request) {
+	ToolAccessMode mode;
+	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
+	    mode = ToolAccessMode.TEACHER;
+	} else {
+	    mode = ToolAccessMode.AUTHOR;
+	}
+	return mode;
     }
 
 }

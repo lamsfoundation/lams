@@ -61,7 +61,7 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 	this.getHibernateTemplate().saveOrUpdate(vote);
     }
 
-    public VoteContent findVoteContentById(Long voteContentId) {
+    public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(query).setLong(0, voteContentId.longValue()).list();
@@ -117,7 +117,7 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
     }
 
     public void addVoteSession(Long voteContentId, VoteSession voteSession) {
-	VoteContent content = findVoteContentById(voteContentId);
+	VoteContent content = getVoteContentByContentId(voteContentId);
 	voteSession.setVoteContent(content);
 	content.getVoteSessions().add(voteSession);
 	this.getHibernateTemplate().saveOrUpdate(voteSession);
@@ -125,24 +125,18 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 
     }
 
-    public List findAll(Class objClass) {
-	String query = "from obj in class " + objClass.getName();
-	return this.getHibernateTemplate().find(query);
-    }
-
-    public void flush() {
-	this.getHibernateTemplate().flush();
-    }
-
-    public void removeNominationsFromCache(VoteContent voteContent) {
+    public void removeQuestionsFromCache(VoteContent voteContent) {
 	if (voteContent != null) {
-
 	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
 		getHibernateTemplate().evict(question);
 	    }
+	}
+    }
+    
+    public void removeVoteContentFromCache(VoteContent voteContent) {
+	if (voteContent != null) {
 	    getHibernateTemplate().evict(voteContent);
 	}
-
     }
 
     @Override

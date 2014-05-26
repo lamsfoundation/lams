@@ -131,28 +131,7 @@
 		    path="/VoteErrorBox.jsp"
 		    redirect="false"
 	  	/>
-    </action>
-    
-    
-   <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action path="/defineLaterStarter" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteDLStarterAction" 
-   			name="VoteAuthoringForm" 
-	      	scope="request"   			
-   			input="/index.jsp"> 
-	
-	      <forward
-	        name="load"
-	        path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="false"
-	      />
-
-	  	<forward
-		    name="errorList"
-	        path="/VoteErrorBox.jsp"
-		    redirect="false"
-	  	/>
-	</action>  
+    </action> 
     
 	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
 	<action

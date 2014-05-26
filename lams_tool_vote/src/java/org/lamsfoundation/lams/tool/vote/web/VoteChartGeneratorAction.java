@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,16 +36,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -89,7 +85,7 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	    
 	//sessionId should not be blank
 	} else if (!StringUtils.isBlank(currentSessionId)) {
-	    VoteSession voteSession = getVoteService().retrieveVoteSession(new Long(currentSessionId));
+	    VoteSession voteSession = getVoteService().getSessionBySessionId(new Long(currentSessionId));
 	    VoteContent voteContent = voteSession.getVoteContent();
 
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = getVoteService().prepareChartData(request,

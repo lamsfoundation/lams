@@ -23,9 +23,7 @@
 package org.lamsfoundation.lams.tool.vote;
 
 /**
- * <p>
  * Defines constants used throughout the application
- * </p>
  * 
  * @author Ozgur Demirtas
  * 
@@ -33,9 +31,9 @@ package org.lamsfoundation.lams.tool.vote;
 public interface VoteAppConstants {
 
     public static final String MY_SIGNATURE = "lavote11";
-    public static final String DEFAULT_CONTENT_ID = "defaultContentId";
     public static final String TOOL_SERVICE = "tool_service";
     public static final String ERROR_VOTEAPPLICATION = "error.exception.VoteApplication";
+    public static final String DEFINE_LATER = "defineLater";
 
     /*
      * Struts level constants
@@ -51,7 +49,6 @@ public interface VoteAppConstants {
     public static final String ALL_NOMINATIONS = "allNominations";
     public static final String LOAD_MONITORING_CONTENT = "loadMonitoring";
     public static final String MONITORING_STARTER_REDIRECT = "monitoringStarterRedirect";
-    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY = "loadMonitoringEditActivity";
     public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String INDIVIDUAL_REPORT = "individualReport";
     public static final String EXIT_PAGE = "exitPage";
@@ -91,21 +88,15 @@ public interface VoteAppConstants {
     public static final String LEARNER_NOTEBOOK = "learnerNotebook";
 
     public static final String AUTHORING = "authoring";
-    public static final String SOURCE_VOTE_STARTER = "sourceVoteStarter";
     public static final String REMOVABLE_OPTION_INDEX = "removableOptionIndex";
     public static final String AUTHORING_CANCELLED = "authoringCancelled";
-    public static final String DEFINE_LATER_EDIT_ACTIVITY = "defineLaterEditActivity";
-    public static final String ACTIVE_MODULE = "activeModule";
-    public static final String DEFINE_LATER_IN_EDIT_MODE = "defineLaterInEditMode";
     public static final String REQUEST_LEARNING_REPORT = "requestLearningReport";
     public static final String REQUEST_LEARNING_REPORT_PROGRESS = "requestLearningReportProgress";
     public static final String VOTE_GENERAL_AUTHORING_DTO = "voteGeneralAuthoringDTO";
-    public static final String MAP_OPTIONS_CONTENT_KEY = "mapOptionsContentKey";
     public static final String HTTP_SESSION_ID = "httpSessionID";
-    public static final String LIST_NOMINATION_CONTENT_DTO = "listNominationContentDTO";
-    public static final String LIST_NOMINATION_CONTENT_DTO_KEY = "listNominationContentDTOKey";
+    public static final String LIST_QUESTION_DTO = "listQuestionDTO";
+    public static final String LIST_DELETED_QUESTION_DTOS = "deletedQuestionDTOs";
 
-    public static final String TOTAL_NOMINATION_COUNT = "totalNominationCount";
     public static final String MAX_INPUTS = "maxInputs";
 
     public static final String EXPORT_PORTFOLIO_DTO = "exportPortfolioDto";
@@ -129,11 +120,10 @@ public interface VoteAppConstants {
     public static final String TOOL_SESSION_ID = "toolSessionID";
     public static final String ATTR_CONTENT = "content";
     public static final String USER_ID = "userID";
-    public static final String MAX_OPTION_INDEX = "maxOptionIndex";
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT = "removeToolContent";
     public static final String OPT_INDEX = "optIndex";
-    
+
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_GROUP_USERS = "groupUsers";
@@ -152,18 +142,12 @@ public interface VoteAppConstants {
      * authoring mode constants
      */
     public static final String IS_DEFINE_LATER = "isDefineLater";
-    public static final String DEFAULT_CONTENT_ID_STR = "defaultContentIdStr";
-    public static final String DEFAULT_QUESTION_CONTENT = "defaultQuestionContent";
-    public static final String DEFAULT_OPTION_CONTENT = "defaultOptionContent";
     public static final String MAP_QUESTIONS_CONTENT = "mapQuestionsContent";
     public static final String MAP_QUESTION_CONTENT = "mapQuestionContent";
-    public static final String MAP_OPTIONS_CONTENT = "mapOptionsContent";
     public static final String MAP_VOTERATES_CONTENT = "mapVoteRatesContent";
     public static final String MAP_STANDARD_USER_COUNT = "mapStandardUserCount";
     public static final String MAP_STANDARD_NOMINATIONS_VISIBILITY = "mapStandardNominationsVisibility";
     public static final String MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT = "mapStandardNominationsHTMLedContent";
-    public static final String MAP_OPTIONS_CONTENT_FCK = "mapOptionsContentFck";
-    public static final String MAP_DEFAULTOPTIONS_CONTENT = "mapDefaultOptionsContent";
     public static final String MAP_DISABLED_QUESTIONS = "mapDisabledQuestions";
     public static final String MAP_GENERAL_OPTIONS_CONTENT = "mapGeneralOptionsContent";
     public static final String MAP_GENERAL_SELECTED_OPTIONS_CONTENT = "mapGeneralSelectedOptionsContent";
@@ -187,24 +171,16 @@ public interface VoteAppConstants {
 
     public static final String SELECTED_QUESTION = "selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX = "selectedQuestionIndex";
-    public static final String DEFAULT_QUESTION_UID = "defaultQuestionUid";
 
     public static final String TITLE = "title";
     public static final String INSTRUCTIONS = "instructions";
     public static final String CREATION_DATE = "creationDate";
-    public static final String DEFINE_LATER = "defineLater";
     public static final String VIEW_ANSWERS = "viewAnswers";
     public static final String WAIT_FOR_LEADER = "waitForLeader";
-
-    public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
 
     public static final String REFLECT = "reflect";
     public static final String ON = "ON";
     public static final String OFF = "OFF";
-    public static final String RICHTEXT_FEEDBACK_CORRECT = "richTextFeedbackCorrect";
-    public static final String RICHTEXT_INCORRECT_FEEDBACK = "richTextIncorrectFeedback";
-    public static final String RICHTEXT_CORRECT_FEEDBACK = "richTextCorrectFeedback";
-    public static final String RICHTEXT_FEEDBACK_INCORRECT = "richTextFeedbackInCorrect";
     public static final String RICHTEXT_TITLE = "richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
     public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
@@ -225,7 +201,6 @@ public interface VoteAppConstants {
     public static final String OPTION_OFF = "false";
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";
-    public static final String MONITORING = "monitoring";
     public static final String REMOVABLE_QUESTION_INDEX = "removableQuestionIndex";
     public static final String EXISTS_OPEN_VOTES = "existsOpenVotes";
 
@@ -241,7 +216,6 @@ public interface VoteAppConstants {
     /* learner mode contants */
     public static final String MAP_QUESTION_CONTENT_LEARNER = "mapQuestionContentLearner";
     public static final String CURRENT_QUESTION_INDEX = "currentQuestionIndex";
-    public static final String TOTAL_QUESTION_COUNT = "totalQuestionCount";
     public static final String MAP_ANSWERS = "mapAnswers";
     public static final String CURRENT_ANSWER = "currentAnswer";
     public static final String REPORT_TITLE_LEARNER = "reportTitleLearner";
@@ -266,7 +240,6 @@ public interface VoteAppConstants {
     public static final String MONITORING_ERROR = "monitoringError";
     public static final String MAP_MONITORING_QUESTIONS = "mapMonitoringQuestions";
     public static final String MONITORED_CONTENT_ID = "monitoredContentId";
-    public static final String EDITACTIVITY_EDITMODE = "editActivityEditMode";
     public static final String VALIDATION_ERROR = "validationError";
     public static final String FORM_INDEX = "formIndex";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
@@ -291,9 +264,6 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_CONTENTID_REQUIRED = "userExceptionContentIdRequired";
     public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED = "userExceptionToolSessionIdRequired";
     public static final String USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT = "userExceptionToolSessionIdInconsistent";
-    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE = "userExceptionDefaultContentNotAvailable";
-    public static final String USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE = "userExceptionDefaultQuestionContentNotAvailable";
-    public static final String USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE = "userExceptionDefaultOptionsContentNotAvailable";
     public static final String USER_EXCEPTION_USERID_NOTAVAILABLE = "userExceptionUserIdNotAvailable";
     public static final String USER_EXCEPTION_USERID_NOTNUMERIC = "userExceptionUserIdNotNumeric";
     public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS = "userExceptionOnlyContentAndNoSessions";
@@ -320,8 +290,8 @@ public interface VoteAppConstants {
     public static final String SUCCESS = "success";
 
     public static final Integer DATA_FLOW_OBJECT_ASSIGMENT_ID = 0;
-    
-    //Leader selection tool Constants
+
+    // Leader selection tool Constants
     public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     public static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 }

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +51,6 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -120,15 +118,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String userID = request.getParameter(USER_ID);
 	voteLearningForm.setUserID(userID);
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 	VoteContent voteContent = voteSession.getVoteContent();
 
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
 	Long toolContentID = voteContent.getVoteContentId();
-
-	setContentInUse(request, voteService, toolContentID);
 
 	Long toolSessionUid = voteSession.getUid();
 
@@ -185,17 +181,18 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String revisitingUser = request.getParameter(REVISITING_USER);
 	voteLearningForm.setRevisitingUser(revisitingUser);
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 	VoteContent voteContent = voteSession.getVoteContent();
 
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
-	Long toolContentID = voteContent.getVoteContentId();
-	setContentInUse(request, voteService, toolContentID);
-
 	if (revisitingUser.equals("true")) {
-	    VoteQueUsr voteQueUsr = LearningUtil.getUser(voteService);
+	    /* get back login user DTO */
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    long userId = toolUser.getUserID().longValue();
+	    VoteQueUsr voteQueUsr = voteService.getUserByUserId(userId);
 
 	    List attempts = voteService.getAttemptsForUser(voteQueUsr.getUid());
 
@@ -251,13 +248,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 	VoteContent voteContent = voteSession.getVoteContent();
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
-
-	Long toolContentID = voteContent.getVoteContentId();
-	setContentInUse(request, voteService, toolContentID);
 
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
@@ -289,7 +283,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 	String userID = request.getParameter(USER_ID);
 	voteLearningForm.setUserID(userID);
 
@@ -316,7 +310,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	VoteUtils.cleanUpSessionAbsolute(request);
+	VoteUtils.cleanUpUserExceptions(request);
 
 	String nextUrl = null;
 	try {
@@ -371,7 +365,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String userEntry = request.getParameter(USER_ENTRY);
 	voteLearningForm.setUserEntry(userEntry);
 
-	VoteSession session = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession session = voteService.getSessionBySessionId(new Long(toolSessionID));
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
 	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
@@ -405,10 +399,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
 	Long toolContentID = voteContent.getVoteContentId();
-
-	Long toolContentUID = voteContent.getUid();
-
-	setContentInUse(request, voteService, toolContentID);
+	Long voteContentUid = voteContent.getUid();
 
 	boolean userEntryAvailable = false;
 	if ((userEntry != null) && (userEntry.length() > 0)) {
@@ -426,12 +417,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteService.removeAttemptsForUserandSession(user.getUid(), session.getUid());
 
 	/* to minimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent structure */
-	Map mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionContentMap(request, voteService, voteContent,
+	Map<String, String> mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent,
 		voteDisplayOrderIds);
 
 	if (mapGeneralCheckedOptionsContent.size() > 0) {
 	    LearningUtil.createAttempt(voteService, user, mapGeneralCheckedOptionsContent, "", session,
-		    toolContentUID);
+		    voteContentUid);
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() == 0 && (userEntryAvailable == true))) {
@@ -439,7 +430,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	    if (userEntry.length() > 0) {
 		LearningUtil.createAttempt(voteService, user, mapLeanerCheckedOptionsContent, userEntry,
-			session, toolContentUID);
+			session, voteContentUid);
 	    }
 	}
 
@@ -448,7 +439,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	    if (userEntry.length() > 0) {
 		LearningUtil.createAttempt(voteService, user, mapLeanerCheckedOptionsContent, userEntry,
-			session, toolContentUID);
+			session, voteContentUid);
 	    }
 	}
 
@@ -491,7 +482,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String revisitingUser = request.getParameter(REVISITING_USER);
 	voteLearningForm.setRevisitingUser(revisitingUser);
 
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 
 	VoteContent voteContent = voteSession.getVoteContent();
 
@@ -504,10 +495,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 
-	Long toolContentID = voteContent.getVoteContentId();
-	Map mapQuestionsContent = new TreeMap(new VoteComparator());
-	mapQuestionsContent = LearningUtil.buildQuestionContentMap(request, voteService, voteContent, null);
-
+	Map<String, String> mapQuestionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
 	request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 
 	Map mapGeneralCheckedOptionsContent = new TreeMap(new VoteComparator());
@@ -521,12 +509,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 	return (mapping.findForward(LOAD_LEARNER));
-    }
-
-    protected void setContentInUse(HttpServletRequest request, IVoteService voteService, Long toolContentID) {
-	VoteContent voteContent = voteService.retrieveVote(toolContentID);
-	voteContent.setContentInUse(true);
-	voteService.saveVoteContent(voteContent);
     }
 
     /**
@@ -550,7 +532,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	VoteSession session = voteService.retrieveVoteSession(toolSessionId);
+	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	VoteQueUsr leader = session.getGroupLeader();
 	
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
@@ -591,7 +573,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
+	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 
 	VoteContent voteContent = voteSession.getVoteContent();
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();

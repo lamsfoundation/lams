@@ -4,15 +4,15 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
+ * it under the terms of the GNU General License version 2.0
  * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
@@ -22,44 +22,38 @@
 
 package org.lamsfoundation.lams.tool.vote.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 /**
- * @author Ozgur Demirtas
- * 
- * <p>
  * Interface that defines the contract for VoteContent access
- * </p>
+ * 
+ * @author Ozgur Demirtas
  */
 public interface IVoteContentDAO {
-    public VoteContent getVoteContentByUID(Long uid);
+    VoteContent getVoteContentByUID(Long uid);
 
-    public VoteContent findVoteContentById(Long voteContentId);
+    VoteContent getVoteContentByContentId(Long voteContentId);
 
-    public VoteContent getVoteContentBySession(Long voteSessionId);
+    VoteContent getVoteContentBySession(Long voteSessionId);
 
-    public void saveVoteContent(VoteContent voteContent);
+    void saveVoteContent(VoteContent voteContent);
 
-    public void updateVoteContent(VoteContent voteContent);
+    void updateVoteContent(VoteContent voteContent);
 
-    public void saveOrUpdateVote(VoteContent voteContent);
+    void saveOrUpdateVote(VoteContent voteContent);
 
-    public void removeVote(VoteContent voteContent);
+    void removeVote(VoteContent voteContent);
 
-    public void removeVoteById(Long voteContentId);
+    void removeVoteById(Long voteContentId);
 
-    public void removeVoteSessions(VoteContent voteContent);
+    void removeVoteSessions(VoteContent voteContent);
 
-    public void addVoteSession(Long voteContentId, VoteSession voteSession);
+    void addVoteSession(Long voteContentId, VoteSession voteSession);
 
-    public List findAll(Class objClass);
-
-    public void flush();
-
-    public void removeNominationsFromCache(VoteContent voteContent);
+    void removeQuestionsFromCache(VoteContent voteContent);
     
-    public void delete(Object object);
+    void removeVoteContentFromCache(VoteContent voteContent);
+
+    void delete(Object object);
 }

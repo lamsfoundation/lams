@@ -23,10 +23,6 @@
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * <p>

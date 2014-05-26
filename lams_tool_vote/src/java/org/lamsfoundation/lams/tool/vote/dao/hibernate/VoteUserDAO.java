@@ -59,7 +59,7 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	return null;
     }
 
-    public VoteQueUsr findVoteUserById(Long userId) {
+    public VoteQueUsr getUserByUserId(Long userId) {
 	String query = "from VoteQueUsr user where user.queUsrId=?";
 
 	List list = getSession().createQuery(query).setLong(0, userId.longValue()).list();
