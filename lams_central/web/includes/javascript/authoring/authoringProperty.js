@@ -962,6 +962,7 @@ var PropertyLib = {
 			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
+			$('.propertiesContentFieldDescription', content).val(activity.description ? activity.description : '');
 			$('.propertiesContentFieldGateType', content).val(activity.gateType);
 			
 			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
@@ -986,6 +987,9 @@ var PropertyLib = {
 						redrawNeeded = true;
             		}
 				}
+				
+				activity.description = $('.propertiesContentFieldDescription', content).val();
+				
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
 				if (activity.gateType == 'schedule') {
 					$(".propertiesContentRowGateSchedule").show();
@@ -1041,7 +1045,7 @@ var PropertyLib = {
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
 			
-			$('input, select', content).change(changeFunction);
+			$('input, textarea, select', content).change(changeFunction);
 			PropertyLib.fillToolInputDropdown(activity, activity.input);
 			changeFunction.call(content);
 		}

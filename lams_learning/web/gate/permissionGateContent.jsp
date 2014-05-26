@@ -20,5 +20,9 @@
 	--%>
 
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
-
+	<%@ taglib uri="tags-lams" prefix="lams" %>
+	
+	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/>
+	
 	<p><fmt:message key="label.permission.gate.message"/></p>
+	

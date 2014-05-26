@@ -18,10 +18,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <c:if test="${not empty GateForm.map.gate.description}">
 	<!-- general information section--> 
-	<p><c:out value="${GateForm.map.gate.description}"/></p>
+	<p><lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/></p>
 </c:if>
 	
 <!--waiting learner information table-->

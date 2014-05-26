@@ -846,7 +846,7 @@ function openLearningDesign(learningDesignID) {
 					// Gate Activity
 					case 3: var gateType = 'sync';
 					case 4: var gateType = gateType || 'schedule';
-					case 5: var gateType = gateType || 'permision';
+					case 5: var gateType = gateType || 'permission';
 					case 14:
 						var gateType = gateType || 'condition';
 						activity = new ActivityLib.GateActivity(
@@ -854,6 +854,8 @@ function openLearningDesign(learningDesignID) {
 							activityData.activityUIID,
 							activityData.xCoord,
 							activityData.yCoord,
+							activityData.activityTitle,
+							activityData.description,
 							gateType,
 							activityData.gateStartTimeOffset,
 							activityData.gateActivityCompletionBased);
@@ -1469,6 +1471,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'xCoord' 				 : x,
 			'yCoord' 				 : y,
 			'activityTitle' 		 : activity.title,
+			'description'			 : activity.description,
 			'activityCategoryID' 	 : activityCategoryID,
 			'activityTypeID'     	 : activityTypeID,
 			'orderID'				 : activity.orderID,
@@ -1476,14 +1479,14 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 										activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 			'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
+			'gateActivityLevelID'    : activity instanceof ActivityLib.GateActivity ? 1 : null,
 			'minOptions'			 : activity.minOptions,
 			'maxOptions'			 : activity.maxOptions,
 			'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 			'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 			
 			'gradebookToolOutputDefinitionName' : null,
-			'helpText' : null,
-			'description' : null
+			'helpText' : null
 		});
 
 		var activityTransitions = activity instanceof ActivityLib.BranchingActivity ?

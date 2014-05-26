@@ -25,6 +25,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
+<lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/>
+
 <c:choose>
 	<c:when test="${not empty GateForm.map.reachDate}">
 		<p><fmt:message key="label.schedule.gate.reach"/> <lams:Date value="${GateForm.map.reachDate}"/><br />

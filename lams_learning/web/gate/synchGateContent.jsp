@@ -24,6 +24,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
+<lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/>
 
 <p><fmt:message key="label.synch.gate.message"/></p> 
 <p><fmt:message key="label.gate.waiting.learners">  

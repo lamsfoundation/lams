@@ -31,6 +31,10 @@ div.propertiesDialogContainer .ui-dialog-titlebar {
 	padding: 0 0 0 5px;
 }
 
+div.propertiesDialogContainer .dialogContainer table {
+	width: 100%;
+}
+
 div.propertiesDialogContainer .dialogContainer td {
 	padding-bottom: 5px;
 }
@@ -47,7 +51,7 @@ tr.propertiesContentRowGateSchedule input.spinner {
 	width: 30px;
 }
 
-input.propertiesContentFieldTitle {
+input.propertiesContentFieldTitle, textarea.propertiesContentFieldDescription {
 	width: 98%;	
 }
 

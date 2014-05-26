@@ -82,9 +82,11 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, uiid, x, y, gateType, startTimeOffset, gateActivityCompletionBased) {
+	GateActivity : function(id, uiid, x, y, title, description, gateType, startTimeOffset, gateActivityCompletionBased) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.title = title;
+		this.description = description;
 		this.gateType = gateType || 'permission';
 		if (gateType == 'schedule') {
 			var day = 24*60;

@@ -368,6 +368,14 @@
 			</tr>
 			<tr>
 				<td>
+					Description:
+				</td>
+				<td colspan="3">
+					 <textarea class="propertiesContentFieldDescription"></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
 					Type:
 				</td>
 				<td colspan="3">
