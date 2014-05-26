@@ -95,6 +95,8 @@ var ActivityLib = {
 			
 			this.gateActivityCompletionBased = gateActivityCompletionBased;
 		};
+		// mapping between tool output and gate states ("branches"), if applicable
+		this.conditionsToBranches = [];
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -157,12 +159,20 @@ var ActivityLib = {
 	/**
 	 * Represents a subsequence of activities. It is not displayed on canvas.
 	 */
-	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
+	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom, defaultBranch) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title || ('Branch ' + (branchingActivity.branches.length + 1));
 		this.branchingActivity = branchingActivity;
 		this.transitionFrom = transitionFrom;
+		this.defaultBranch = defaultBranch;
+		if (defaultBranch) {
+			this.defaultBranch = true;
+			// there can be only one default branch
+			$.each(branchingActivity.branches, function(){
+				this.defaultBranch = false;
+			});
+		}
 	},
 	
 	
@@ -671,7 +681,7 @@ var ActivityLib = {
 			});
 			if (!branch) {
 				// create a new branch
-				branch = new ActivityLib.BranchActivity(null, null, branchData, fromActivity.branchingActivity);
+				branch = new ActivityLib.BranchActivity(null, null, branchData, fromActivity.branchingActivity, false);
 			}
 		}
 		
@@ -688,6 +698,9 @@ var ActivityLib = {
 			branch.transitionFrom = transition;
 			transition.branch = branch;
 			fromActivity.branchingActivity.branches.push(branch);
+			if (fromActivity.branchingActivity.branches.length == 1) {
+				branch.defaultBranch = true;
+			}
 		}
 		
 		setModified(true);
@@ -709,6 +722,11 @@ var ActivityLib = {
 			// remove corresponding branch
 			var branches = transition.branch.branchingActivity.branches;
 			branches.splice(branches.indexOf(transition.branch), 1);
+			
+			if (transition.branch.defaultBranch && branches.length > 0) {
+				// reset the first branch as the default one
+				branches[0].defaultBranch = true;
+			}
 		}
 		
 		if (!redraw){
@@ -716,13 +734,15 @@ var ActivityLib = {
 			$.each(layout.activities, function(){
 				var coreActivity =  this.branchingActivity || this;
 				if (coreActivity.grouping || coreActivity.input) {
-					var candidate = this,
+					var candidate = this.branchingActivity ? coreActivity.start : this,
 						groupingFound = false,
 						inputFound = false;
 					do {
 						if (candidate.transitions && candidate.transitions.to.length > 0) {
 							candidate = candidate.transitions.to[0].fromActivity;
-						} else if (candidate.parentActivity) {
+						} else if (candidate.branchingActivity && !candidate.isStart) {
+							candidate = candidate.branchingActivity.start;
+						}  else if (!candidate.branchingActivity && candidate.parentActivity) {
 							candidate = candidate.parentActivity;
 						} else {
 							candidate = null;

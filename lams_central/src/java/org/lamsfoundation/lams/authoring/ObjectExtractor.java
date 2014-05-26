@@ -2736,7 +2736,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	Long entryId = JsonUtil.optLong(details, AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_ID);
 	Integer entryUIID = details.getInt(AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_UIID);
 
-	Integer sequenceActivityUIID = details.getInt(AuthoringJsonTags.BRANCH_SEQUENCE_ACTIVITY_UIID);
+	Integer sequenceActivityUIID = (Integer) JsonUtil.opt(details, AuthoringJsonTags.BRANCH_SEQUENCE_ACTIVITY_UIID);
 	Boolean gateOpenWhenConditionMet = (Boolean) JsonUtil.opt(details,
 		AuthoringJsonTags.BRANCH_GATE_OPENS_WHEN_CONDITION_MET);
 	Integer branchingActivityUIID = null;

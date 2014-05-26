@@ -903,6 +903,7 @@ function openLearningDesign(learningDesignID) {
 								null, null, 0, 0, null, null, branchingEdge.branchingActivity);
 						layout.activities.push(branchingEdge);
 						
+						branchingEdge.branchingActivity.defaultActivityUIID = activityData.defaultActivityUIID;
 						if (branchingType == 'optional'){
 							branchingEdge.branchingActivity.minOptions = activityData.minOptions;
 							branchingEdge.branchingActivity.maxOptions = activityData.maxOptions;
@@ -978,10 +979,19 @@ function openLearningDesign(learningDesignID) {
 							&& this.branchingActivity.id == branchingID){
 						var branchingActivity = this.branchingActivity;
 						branchingActivity.branches = branches;
+						var defaultBranchSet = false;
 						$.each(branches, function(){
 							this.branchingActivity = branchingActivity;
+							if (branchingActivity.defaultActivityUIID == this.uiid && !defaultBranchSet){
+								this.defaultBranch = true;
+								defaultBranchSet = true;
+							}
 						});
 						
+						branchingActivity.defaultActivityUIID = null;
+						if (!defaultBranchSet && branches.length > 0) {
+							branches[0].defaultBranch = true;
+						}
 						return false;
 					}
 				});
@@ -1053,9 +1063,10 @@ function openLearningDesign(learningDesignID) {
 			// apply group -> branch mappings
 			$.each(ld.branchMappings, function(){
 				var entry = this,
-					group = null,
 					input = null,
-					branch = null;
+					group = null,
+					branch = null,
+					gate = null;
 				$.each(layout.activities, function(){
 					// is it the branch we're looking for?
 					if (this instanceof ActivityLib.BranchingEdgeActivity && this.isStart) {
@@ -1073,31 +1084,45 @@ function openLearningDesign(learningDesignID) {
 								return false;
 							}
 						});
+					}
+					// is it the gate we're looking for
+					else if (this instanceof ActivityLib.GateActivity && entry.gateActivityUIID == this.uiid) {
+						gate = this;
 					} else if (entry.condition && entry.condition.toolActivityUIID == this.uiid) {
 						input = this;
 					}
 					
 					// found both, no need to continue iteration
-					if (branch && (group || input)) {
+					if ((gate || branch) && (input || group)) {
 						return false;
 					}
 				});
 				
-				if (branch) {
-					if (group) {
+				if (group) {
+					if (branch) {
 						branch.branchingActivity.groupsToBranches.push({
 							'id'	 : entry.entryID,
 							'uiid'   : entry.entryUIID,
 							'group'  : group,
 							'branch' : branch
 						});
-					} else if (input) {
+					}
+				} else if (input) {
+					if (branch) {
 						branch.branchingActivity.input = input;
 						branch.branchingActivity.conditionsToBranches.push({
 							'id'	    : entry.entryID,
 							'uiid'      : entry.entryUIID,
 							'condition' : entry.condition,
 							'branch'    : branch
+						});
+					} else if (gate) {
+						gate.input = input;
+						gate.conditionsToBranches.push({
+							'id'	    : entry.entryID,
+							'uiid'      : entry.entryUIID,
+							'condition' : entry.condition,
+							'branch'    : entry.gateOpenWhenConditionMet ? 'open' : 'closed'
 						});
 					}
 				}
@@ -1219,10 +1244,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		if (this instanceof ActivityLib.BranchingEdgeActivity){
 			if (this.isStart){
 				var branchingActivity = this.branchingActivity;
+				branchingActivity.defaultActivityUIID = null;
 				layoutActivities.push(branchingActivity);
 				
 				$.each(branchingActivity.branches, function(branchOrderID){
-					if (!branchingActivity.defaultActivityUIID) {
+					if (!branchingActivity.defaultActivityUIID && this.defaultBranch) {
 						branchingActivity.defaultActivityUIID = this.uiid;
 					}
 					this.defaultActivityUIID = null;
@@ -1249,6 +1275,11 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 						childActivity = childActivity.transitions.from[0].toActivity;
 					}
 				});
+				
+				if (!branchingActivity.defaultActivityUIID && branchingActivity.branches.length > 0) {
+					branchingActivity.defaultActivityUIID = branchingActivity.branches[0].uiid;
+					branchingActivity.branches[0].defaultBranch = true;
+				}
 			}
 		} else {
 			layoutActivities.push(this);
@@ -1324,7 +1355,34 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				case 'sync'      : activityTypeID = 3; break;
 				case 'schedule'  : activityTypeID = 4; break;
 				case 'permission' : activityTypeID = 5; break;
-				case 'condition' : activityTypeID = 14; break;
+				case 'condition' :
+					activityTypeID = 14;
+						
+					if (activity.input) {
+						$.each(activity.conditionsToBranches, function(index){
+							if (!this.branch) {
+								return true;
+							}
+							
+							var condition = this.condition;
+							if (condition) {
+								condition.orderID = index + 1;
+								if (condition.exactMatchValue) {
+									condition.startValue = condition.endValue = null;
+								}
+							}
+							
+							branchMappings.push({
+								'entryID'			       : this.id,
+								'entryUIID'			       : this.uiid,
+								'gateActivityUIID'	   	   : activity.uiid,
+								'gateOpenWhenConditionMet' : this.branch == 'open',
+								'condition'			       : condition
+							});
+						});
+					}
+					
+					break;
 			}
 		} else if (activity instanceof ActivityLib.ParallelActivity) {
 			activityTypeID = 6;
@@ -1342,11 +1400,12 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					// no break, so fall to 'tool'
 				case 'tool' :
 					activityTypeID = activityTypeID  || 12;
-					var branchMappingCopy = branchMappingCopy || activity.conditionsToBranches.slice(),
-						// yes, yes, a lousy construction
-						branchMapping = branchMapping || (activity.conditionsToBranches = []);
 						
 					if (activity.defaultActivityUIID && (activityTypeID == 11 || activity.input)) {
+						var branchMappingCopy = branchMappingCopy || activity.conditionsToBranches.slice(),
+							// yes, yes, a lousy construction
+							branchMapping = branchMapping || (activity.conditionsToBranches = []);
+						
 						$.each(branchMappingCopy, function(index){
 							if (activity.branches.indexOf(this.branch) == -1){
 								return true;

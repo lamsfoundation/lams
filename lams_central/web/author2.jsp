@@ -226,9 +226,9 @@
 			</tr>
 			<tr>
 				<td class="branchMappingLabelCell branchMappingFreeItemHeaderCell"></td>
-				<td class="branchMappingLabelCell">Branches</td>
+				<td class="branchMappingLabelCell branchMappingFreeBranchHeaderCell"></td>
 				<td class="branchMappingLabelCell branchMappingBoundItemHeaderCell"></td>
-				<td class="branchMappingLabelCell">Branch</td>
+				<td class="branchMappingLabelCell branchMappingBoundBranchHeaderCell"></td>
 			</tr>
 			<tr>
 				<td class="branchMappingFreeItemCell branchMappingListCell"></td>
@@ -254,6 +254,14 @@
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Default?
+				</td>
+				<td>
+					<input class="propertiesContentFieldDefault" type="checkbox"></input>
 				</td>
 			</tr>
 		</table>
@@ -371,6 +379,14 @@
 					 </select>
 				</td>
 			</tr>
+			<tr>
+				<td>
+					Input (Tool):
+				</td>
+				<td>
+					  <select class="propertiesContentFieldInput"></select>
+				</td>
+			</tr>
 			<tr class="propertiesContentRowGateSchedule">
 				<td>
 					Delay:
@@ -391,6 +407,16 @@
 				</td>
 				<td>
 					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox"></input>
+				</td>
+			</tr>
+			<tr class="propertiesContentRowConditions">
+				<td colspan="3">
+					<div class="propertiesContentFieldCreateConditions">Create conditions</div>
+				</td>
+			</tr>
+			<tr class="propertiesContentRowConditions">
+				<td colspan="3">
+					<div class="propertiesContentFieldMatchConditions">Map gate conditions</div>
 				</td>
 			</tr>
 		</table>
@@ -436,12 +462,12 @@
 					  <select class="propertiesContentFieldInput"></select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
 					<div class="propertiesContentFieldCreateConditions">Create conditions</div>
 				</td>
 			</tr>
-			</tr>
+			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
 					<div class="propertiesContentFieldMatchConditions">Match conditions to branches</div>
 				</td>
