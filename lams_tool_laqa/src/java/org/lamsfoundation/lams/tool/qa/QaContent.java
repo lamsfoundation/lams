@@ -105,9 +105,6 @@ public class QaContent implements Serializable {
     private boolean synchInMonitor;
 
     /** nullable persistent field */
-    private boolean contentLocked;
-
-    /** nullable persistent field */
     private Date creationDate;
 
     /** nullable persistent field */
@@ -130,10 +127,9 @@ public class QaContent implements Serializable {
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked,
-	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
-	    boolean useSelectLeaderToolOuput) {
+	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean showOtherAnswers,
+	    boolean reflect, String reflectionSubject, Date creationDate, Date updateDate, Set qaQueContents,
+	    Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -146,7 +142,6 @@ public class QaContent implements Serializable {
 	this.allowRateAnswers = allowRateAnswers;
 	this.synchInMonitor = synchInMonitor;
 	this.lockWhenFinished = lockWhenFinished;
-	this.contentLocked = contentLocked;
 	this.showOtherAnswers = showOtherAnswers;
 	this.reflect = reflect;
 	this.reflectionSubject = reflectionSubject;
@@ -174,8 +169,8 @@ public class QaContent implements Serializable {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
 		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
 		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(), qa.isLockWhenFinished(),
-		qa.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
-		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
+		qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa.getCreationDate(),
+		qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
 			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
@@ -448,21 +443,6 @@ public class QaContent implements Serializable {
      */
     public void setMonitoringReportTitle(String monitoringReportTitle) {
 	this.monitoringReportTitle = monitoringReportTitle;
-    }
-
-    /**
-     * @return Returns the contentLocked.
-     */
-    public boolean isContentLocked() {
-	return contentLocked;
-    }
-
-    /**
-     * @param contentLocked
-     *            The contentLocked to set.
-     */
-    public void setContentLocked(boolean contentLocked) {
-	this.contentLocked = contentLocked;
     }
 
     /**

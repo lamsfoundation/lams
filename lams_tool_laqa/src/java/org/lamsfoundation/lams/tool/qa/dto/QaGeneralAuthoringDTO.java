@@ -58,8 +58,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected Boolean allowRichEditor;
     protected Boolean useSelectLeaderToolOuput;
 
-    protected String monitoredContentInUse;
-
     protected String httpSessionID;
     protected String requestedModule;
     protected String isDefineLater;
@@ -81,13 +79,12 @@ public class QaGeneralAuthoringDTO implements Comparable {
 		.append("targetMode: ", targetMode).append("defaultQuestionContent: ", defaultQuestionContent)
 		.append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ", activityTitle)
 		.append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
-		.append("usernameVisible: ", usernameVisible)
-		.append("allowRateAnswers: ", allowRateAnswers).append("showOtherAnswers: ", showOtherAnswers)
-		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
-		.append("lockWhenFinished: ", lockWhenFinished).append("editActivityEditMode: ", editActivityEditMode)
+		.append("usernameVisible: ", usernameVisible).append("allowRateAnswers: ", allowRateAnswers)
+		.append("showOtherAnswers: ", showOtherAnswers).append("synchInMonitor: ", synchInMonitor)
+		.append("questionsSequenced: ", questionsSequenced).append("lockWhenFinished: ", lockWhenFinished)
+		.append("editActivityEditMode: ", editActivityEditMode)
 		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule)
-		.append("isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("sbmtSuccess: ", sbmtSuccess)
+		.append("isDefineLater: ", isDefineLater).append("sbmtSuccess: ", sbmtSuccess)
 		.append("userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
     }
 
@@ -100,7 +97,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param userExceptionQuestionsDuplicate
-     *                The userExceptionQuestionsDuplicate to set.
+     *            The userExceptionQuestionsDuplicate to set.
      */
     public void setUserExceptionQuestionsDuplicate(String userExceptionQuestionsDuplicate) {
 	this.userExceptionQuestionsDuplicate = userExceptionQuestionsDuplicate;
@@ -115,25 +112,10 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param httpSessionID
-     *                The httpSessionID to set.
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
 	this.httpSessionID = httpSessionID;
-    }
-
-    /**
-     * @return Returns the monitoredContentInUse.
-     */
-    public String getMonitoredContentInUse() {
-	return monitoredContentInUse;
-    }
-
-    /**
-     * @param monitoredContentInUse
-     *                The monitoredContentInUse to set.
-     */
-    public void setMonitoredContentInUse(String monitoredContentInUse) {
-	this.monitoredContentInUse = monitoredContentInUse;
     }
 
     /**
@@ -145,7 +127,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param editActivityEditMode
-     *                The editActivityEditMode to set.
+     *            The editActivityEditMode to set.
      */
     public void setEditActivityEditMode(String editActivityEditMode) {
 	this.editActivityEditMode = editActivityEditMode;
@@ -160,7 +142,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param isDefineLater
-     *                The isDefineLater to set.
+     *            The isDefineLater to set.
      */
     public void setIsDefineLater(String isDefineLater) {
 	this.isDefineLater = isDefineLater;
@@ -175,7 +157,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param toolContentID
-     *                The toolContentID to set.
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
@@ -190,7 +172,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param targetMode
-     *                The targetMode to set.
+     *            The targetMode to set.
      */
     public void setTargetMode(String targetMode) {
 	this.targetMode = targetMode;
@@ -205,7 +187,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param monitoringOriginatedDefineLater
-     *                The monitoringOriginatedDefineLater to set.
+     *            The monitoringOriginatedDefineLater to set.
      */
     public void setMonitoringOriginatedDefineLater(String monitoringOriginatedDefineLater) {
 	this.monitoringOriginatedDefineLater = monitoringOriginatedDefineLater;
@@ -220,7 +202,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param activeModule
-     *                The activeModule to set.
+     *            The activeModule to set.
      */
     public void setActiveModule(String activeModule) {
 	this.activeModule = activeModule;
@@ -235,7 +217,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param defineLaterInEditMode
-     *                The defineLaterInEditMode to set.
+     *            The defineLaterInEditMode to set.
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
 	this.defineLaterInEditMode = defineLaterInEditMode;
@@ -250,7 +232,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param showAuthoringTabs
-     *                The showAuthoringTabs to set.
+     *            The showAuthoringTabs to set.
      */
     public void setShowAuthoringTabs(String showAuthoringTabs) {
 	this.showAuthoringTabs = showAuthoringTabs;
@@ -274,7 +256,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param defaultContentIdStr
-     *                The defaultContentIdStr to set.
+     *            The defaultContentIdStr to set.
      */
     public void setDefaultContentIdStr(String defaultContentIdStr) {
 	this.defaultContentIdStr = defaultContentIdStr;
@@ -289,7 +271,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param defaultQuestionContent
-     *                The defaultQuestionContent to set.
+     *            The defaultQuestionContent to set.
      */
     public void setDefaultQuestionContent(String defaultQuestionContent) {
 	this.defaultQuestionContent = defaultQuestionContent;
@@ -304,7 +286,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param requestedModule
-     *                The requestedModule to set.
+     *            The requestedModule to set.
      */
     public void setRequestedModule(String requestedModule) {
 	this.requestedModule = requestedModule;
@@ -319,7 +301,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param activityInstructions
-     *                The activityInstructions to set.
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
 	this.activityInstructions = activityInstructions;
@@ -334,7 +316,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param activityTitle
-     *                The activityTitle to set.
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
 	this.activityTitle = activityTitle;
@@ -349,7 +331,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param questionsSequenced
-     *                The questionsSequenced to set.
+     *            The questionsSequenced to set.
      */
     public void setQuestionsSequenced(String questionsSequenced) {
 	this.questionsSequenced = questionsSequenced;
@@ -364,7 +346,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param synchInMonitor
-     *                The synchInMonitor to set.
+     *            The synchInMonitor to set.
      */
     public void setSynchInMonitor(String synchInMonitor) {
 	this.synchInMonitor = synchInMonitor;
@@ -379,12 +361,12 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param usernameVisible
-     *                The usernameVisible to set.
+     *            The usernameVisible to set.
      */
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
     }
-    
+
     /**
      * @return Returns the allowRateAnswers.
      */
@@ -394,12 +376,12 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param allowRateAnswers
-     *                The allowRateAnswers to set.
+     *            The allowRateAnswers to set.
      */
     public void setAllowRateAnswers(String allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
     }
-    
+
     /**
      * @return Returns the currentTab.
      */
@@ -409,7 +391,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param currentTab
-     *                The currentTab to set.
+     *            The currentTab to set.
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
@@ -424,7 +406,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param sbmtSuccess
-     *                The sbmtSuccess to set.
+     *            The sbmtSuccess to set.
      */
     public void setSbmtSuccess(String sbmtSuccess) {
 	this.sbmtSuccess = sbmtSuccess;
@@ -439,7 +421,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param contentFolderID
-     *                The contentFolderID to set.
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
@@ -454,7 +436,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param editableQuestionText
-     *                The editableQuestionText to set.
+     *            The editableQuestionText to set.
      */
     public void setEditableQuestionText(String editableQuestionText) {
 	this.editableQuestionText = editableQuestionText;
@@ -469,7 +451,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param editableQuestionFeedback
-     *                The editableQuestionFeedback to set.
+     *            The editableQuestionFeedback to set.
      */
     public void setEditableQuestionFeedback(String editableQuestionFeedback) {
 	this.editableQuestionFeedback = editableQuestionFeedback;
@@ -484,7 +466,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param reflect
-     *                The reflect to set.
+     *            The reflect to set.
      */
     public void setReflect(String reflect) {
 	this.reflect = reflect;
@@ -499,7 +481,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
@@ -514,7 +496,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param lockWhenFinished
-     *                The lockWhenFinished to set.
+     *            The lockWhenFinished to set.
      */
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -529,27 +511,26 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     /**
      * @param showOtherAnswers
-     *                The showOtherAnswers to set.
+     *            The showOtherAnswers to set.
      */
     public void setShowOtherAnswers(String showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
 
     public Boolean getAllowRichEditor() {
-        return allowRichEditor;
+	return allowRichEditor;
     }
 
     public void setAllowRichEditor(Boolean allowRichEditor) {
-        this.allowRichEditor = allowRichEditor;
+	this.allowRichEditor = allowRichEditor;
     }
-    
+
     public Boolean getUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(Boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
-    
+
 }

@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -125,13 +124,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	
 
 	/* this section is related to summary tab. Starts here. */
-
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	boolean isContentInUse = qaContent.isContentLocked();
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
 	generalMonitoringDTO.setContentFolderID(contentFolderID);
 	int countSessionComplete = qaService.countSessionComplete(qaContent);

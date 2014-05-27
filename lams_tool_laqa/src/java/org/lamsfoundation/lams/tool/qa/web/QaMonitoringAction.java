@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -135,13 +134,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	boolean isContentInUse = qaContent.isContentLocked();
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
@@ -166,12 +158,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
-
-	generalMonitoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
-
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	editActivityDTO.setMonitoredContentInUse(new Boolean(false).toString());
-	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
 	generalMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 

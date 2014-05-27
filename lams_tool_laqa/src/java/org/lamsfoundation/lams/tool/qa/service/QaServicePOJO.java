@@ -375,11 +375,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	QaSession session = getSessionById(new Long(toolSessionID));
 	QaContent qaContent = session.getQaContent();
-	//set content in use
-	if (!qaContent.isContentLocked()) {
-	    qaContent.setContentLocked(true);
-	    updateQa(qaContent);
-	}
 	
 	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder),
 		qaContent.getUid());
@@ -1264,7 +1259,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	QaContent toolContentObj = new QaContent();
-	toolContentObj.setContentLocked(false);
 	toolContentObj.setCreatedBy(user.getUserID().longValue());
 	toolContentObj.setCreationDate(now);
 	toolContentObj.setDefineLater(false);

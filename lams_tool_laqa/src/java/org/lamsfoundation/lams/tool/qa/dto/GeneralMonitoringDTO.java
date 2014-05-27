@@ -35,7 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class GeneralMonitoringDTO implements Comparable {
     protected String userExceptionNoStudentActivity;
     protected String userExceptionContentInUse;
-    protected String monitoredContentInUse;
 
     protected String defineLaterInEditMode;
 
@@ -48,16 +47,6 @@ public class GeneralMonitoringDTO implements Comparable {
     protected String defaultQuestionContent;
 
     protected String contentFolderID;
-
-    public String toString() {
-	return new ToStringBuilder(this).append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
-		.append("userExceptionContentInUse: ", userExceptionContentInUse)
-		.append("defineLaterInEditMode: ", defineLaterInEditMode)
-		.append("monitoredContentInUse: ", monitoredContentInUse).append("activityTitle: ", activityTitle)
-		.append("activityInstructions: ", activityInstructions)
-		.append("defaultQuestionContent: ", defaultQuestionContent).append("countAllUsers: ", countAllUsers)
-		.append("countSessionComplete: ", countSessionComplete).toString();
-    }
 
     public int compareTo(Object o) {
 	GeneralMonitoringDTO generalMonitoringDTO = (GeneralMonitoringDTO) o;
@@ -81,21 +70,6 @@ public class GeneralMonitoringDTO implements Comparable {
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
 	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
-     * @return Returns the monitoredContentInUse.
-     */
-    public String getMonitoredContentInUse() {
-	return monitoredContentInUse;
-    }
-
-    /**
-     * @param monitoredContentInUse
-     *            The monitoredContentInUse to set.
-     */
-    public void setMonitoredContentInUse(String monitoredContentInUse) {
-	this.monitoredContentInUse = monitoredContentInUse;
     }
 
     /**

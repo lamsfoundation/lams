@@ -262,7 +262,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
 	request.getSession().removeAttribute(DEFINE_LATER);
 	request.getSession().removeAttribute(SOURCE_MC_STARTER);
-	request.getSession().removeAttribute(IS_MONITORED_CONTENT_IN_USE);
 	request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
 	request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
 	request.getSession().removeAttribute(REQUEST_LEARNING_REPORT);

@@ -20,9 +20,8 @@
 	</lams:head>
 	
 	<body class="stripes">
-		<table cellpadding="0">
 
-			<html:form  action="/monitoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">			
+		<html:form  action="/monitoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">			
 			<html:hidden property="dispatch" value="saveSingleQuestion"/>
 			<html:hidden property="toolContentID"/>
 			<html:hidden property="currentTab" styleId="currentTab" />
@@ -34,9 +33,6 @@
 			<html:hidden property="editableQuestionIndex"/>														
 			<html:hidden property="editQuestionBoxRequest" value="true"/>																	
 
-		
-			<tr>
-			<td>
 			<table class="innerforms">
 		
 				<tr>
@@ -95,13 +91,9 @@
 				</tr>
 				
 
-			</table>				
-			</td>
-			</tr>
+			</table>
 				
-			</html:form>
-			
-		</table>
+		</html:form>
 
 	</body>
 </lams:html>

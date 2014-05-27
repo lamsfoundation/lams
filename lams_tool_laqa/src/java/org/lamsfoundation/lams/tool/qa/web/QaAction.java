@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -999,21 +998,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
-	boolean isContentInUse = qaContent.isContentLocked();
-
-	qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
-	if (isContentInUse == true) {
-	    //monitoring url does not allow editActivity since the content is in use
-	    persistError(request, "error.content.inUse");
-	    qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-
-	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	if (isContentInUse == true) {
-	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-	}
-	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
 	QaUtils.setDefineLater(request, true, strToolContentID, qaService);
 

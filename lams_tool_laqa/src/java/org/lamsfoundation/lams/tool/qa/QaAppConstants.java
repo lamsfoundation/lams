@@ -96,7 +96,6 @@ public interface QaAppConstants {
     public static final String REFLECT = "reflect";
     public static final String REFLECTION_SUBJECT = "reflectionSubject";
 
-    public static final String IS_MONITORED_CONTENT_IN_USE = "isMonitoredContentInUse";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY = "loadMonitoringEditActivity";
     public static final String IS_PORTFOLIO_EXPORT = "isPortfolioExport";
     public static final String GENERAL_LEARNER_FLOW_DTO = "generalLearnerFlowDTO";
@@ -172,7 +171,6 @@ public interface QaAppConstants {
 
     public static final String COUNT_ALL_USERS = "countAllUsers";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
-    public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
 
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";

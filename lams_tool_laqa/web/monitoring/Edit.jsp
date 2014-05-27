@@ -5,22 +5,6 @@
 
 <%@ include file="/common/messages.jsp"%>
 
-<c:if test="${editActivityDTO.monitoredContentInUse != 'true'}"> 
-	<c:if test="${qaGeneralMonitoringDTO.defineLaterInEditMode != 'true'}">
-		<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
-	</c:if>
-						
-	<c:if test="${qaGeneralMonitoringDTO.defineLaterInEditMode == 'true'}">
-		<jsp:include page="/authoring/BasicContent.jsp" />
-	</c:if>
-</c:if>
-
-
-	<c:if test="${editActivityDTO.monitoredContentInUse == 'true'}"> 			
-		<div class="warning">
-			<fmt:message key="error.content.inUse"/>
-		</div>
-		<br/>
 		<table>
 			<tr>
 			 <td width="10%" nowrap valign="top" class="field-name">
@@ -38,6 +22,5 @@
 			 	<c:out value="${content.instructions}" escapeXml="false"/>
 			 </td>
 			</tr>			 
-		</table>
-	</c:if> 																									
+		</table>																								
 		

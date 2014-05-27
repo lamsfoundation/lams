@@ -163,14 +163,6 @@
     />
     
     <property
-        name="contentLocked"
-        type="boolean"
-        access="property"        
-        column="content_inUse"
-        length="1"
-    />
-    
-    <property
         name="showOtherAnswers"
         type="boolean"
         access="property"        
