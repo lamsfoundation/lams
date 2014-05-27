@@ -39,7 +39,7 @@ var DecorationLib = {
 			this.id = +id || null;
 			this.uiid = +uiid || ++layout.ld.maxUIID;
 			// set a default title, if none provided
-			this.title = title || 'Label';
+			this.title = title || LABELS.DEFAULT_ANNOTATION_LABEL_TITLE;
 			
 			this.draw = DecorationLib.methods.label.draw;
 			this.loadPropertiesDialogContent = PropertyLib.labelProperties;

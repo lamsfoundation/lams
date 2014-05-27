@@ -175,7 +175,7 @@ var HandlerLib = {
 	 */
 	drawTransitionStartHandler : function(activity, event, x, y) {
 		if (activity.fromTransition && !(activity instanceof ActivityLib.BranchingEdgeActivity)) {
-			alert('Transition from this activity already exists');
+			alert(LABELS.TRANSITION_FROM_EXISTS_ERROR);
 		}
 		
 		HandlerLib.resetCanvasMode();

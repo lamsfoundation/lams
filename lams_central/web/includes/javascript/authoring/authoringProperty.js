@@ -17,7 +17,7 @@ var PropertyLib = {
 						'of' :  '#canvas'
 					},
 					'resizable'     : false,
-					'title'         : 'Properties'
+					'title'         : LABELS.PROPERTIES_DIALOG_TITLE
 				});
 		// for proximity detection throttling (see handlers)
 		propertiesDialog.lastRun = 0;
@@ -38,10 +38,10 @@ var PropertyLib = {
 			'position' : {
 				'of' :  '#canvas'
 			},
-			'title'  : 'Group Naming',
+			'title'  : LABELS.GROUP_NAMING_DIALOG_TITLE,
 			'buttons' : [
 			             {
-			            	'text'   : 'OK',
+			            	'text'   : LABELS.OK_BUTTON,
 			            	'click'  : function() {
 			            		var dialog = $(this),
 			            			activity = dialog.dialog('option', 'parentObject'),
@@ -51,7 +51,7 @@ var PropertyLib = {
 			            		$('input', dialog).each(function(){
 			            			var groupName = $(this).val().trim();
 				            		if (!nameValidator.test(groupName)) {
-				            			error = 'Group name can not contain any of these characters < > ^ * @ % $';
+				            			error = LABELS.GROUP_TITLE_VALIDATION_ERORR;
 				            			return false;
 				            		}
 			            		});
@@ -69,7 +69,7 @@ var PropertyLib = {
 							}
 			             },
 			             {
-			            	'text'   : 'Cancel',
+			            	'text'   : LABELS.CANCEL_BUTTON,
 			            	'click'  : function() {
 								$(this).dialog('close');
 							}
@@ -94,15 +94,16 @@ var PropertyLib = {
 			},
 			'width'  : 800,
 			'height' : 400,
-			'title'  : 'Match Groups to Branches',
+			'title'  : LABELS.GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE,
 			'buttons' : [
 			             {
-			            	'text'   : 'OK',
+			            	'text'   : LABELS.OK_BUTTON,
 			            	'click'  : function() {
 			            		var dialog = $(this),
 			            			branchingActivity = dialog.dialog('option', 'branchingActivity'),
 			            			assignedToDefault = false,
-			            			defaultBranch = null;
+			            			defaultBranch = null,
+			            			close = true;
 
 			            		// find references to groups and branches
 			            		branchingActivity.groupsToBranches = [];
@@ -154,10 +155,13 @@ var PropertyLib = {
 			            		});
 			            		
 		            			if (assignedToDefault){
-		            				alert('All remaining groups will be mapped to the default branch');
+		            				close = confirm(LABELS.GROUPS_TO_DEFAULT_BRANCH_CONFIRM);
 		            			}
-			            		dialog.dialog('close');
-			            		setModified(true);
+		            			
+		            			if (close) {
+				            		dialog.dialog('close');
+				            		setModified(true);
+		            			}
 			            	}
 			             }
 			]
@@ -180,8 +184,8 @@ var PropertyLib = {
 		}).click(function(){
 			PropertyLib.removeBranchMapping(gtbDialog);
 		});
-		$('.branchMappingFreeItemHeaderCell', gtbDialog).text('Groups');
-		$('.branchMappingBoundItemHeaderCell', gtbDialog).text('Group');
+		$('.branchMappingFreeItemHeaderCell', gtbDialog).text(LABELS.BRANCH_MAPPING_GROUPS_HEADER);
+		$('.branchMappingBoundItemHeaderCell', gtbDialog).text(LABELS.BRANCH_MAPPING_GROUP_HEADER);
 		
 		layout.dialogs.push(gtbDialog);
 		
@@ -197,18 +201,18 @@ var PropertyLib = {
 			},
 			'width'  : 400,
 			'height' : 400,
-			'title'  : 'Select Output Conditions for Input',
+			'title'  : LABELS.CONDITIONS_DIALOG_TITLE,
 			'buttons' : [
 				{
 					'class'  : 'outputSelectDependent rangeOutputButton',
-					'text'   : 'Clear all',
+					'text'   : LABELS.CLEAR_ALL_BUTTON,
 					'click'  : function() {
 						// remove all range conditions
 						var rows = $('#rangeConditions td', this).closest('tr');
 						rows.each(function(){
 							// check for conditions already linked to branches/gate states
 							if ($(this).data('mappingEntry').branch) {
-								if (!confirm('There are conditions linked to an existing branch.\nDo you wish to remove them?')) {
+								if (!confirm(LABELS.CLEAR_ALL_CONFIRM)) {
 									rows = null;
 								}
 								return false;
@@ -222,19 +226,19 @@ var PropertyLib = {
 				},
 				{
 					'class'  : 'outputSelectDependent rangeOutputButton',
-					'text'   : 'Remove',
+					'text'   : LABELS.REMOVE_CONDITION_BUTTON,
 					'click'  : function() {
 						// remove the selected range condition
 						var selected = $('#rangeConditions tr.selected', this);
 						if (!selected.data('mappingEntry').branch
-								|| confirm('This condition is linked to an existing branch.\nDo you wish to remove it?')) {
+								|| confirm(LABELS.REMOVE_CONDITION_CONFIRM)) {
 							selected.remove();
 						}
 					}
 				},
 				{
 					'class'  : 'outputSelectDependent complexOutputButton',
-					'text'   : 'Refresh',
+					'text'   : LABELS.REFRESH_BUTTON,
 					'click'  : function() {
 						// get output definitions again
 						$(this).dialog('option', 'refreshDefinitions')();
@@ -242,14 +246,14 @@ var PropertyLib = {
 					}
 				},
 				{
-					'text'   : 'Cancel',
+					'text'   : LABELS.CANCEL_BUTTON,
 					'click'  : function() {
 						var dialog = $(this);
 						dialog.dialog('close');
 					}
 				},
 				{
-					'text'   : 'OK',
+					'text'   : LABELS.OK_BUTTON,
 					'click'  : function() {
 						var dialog = $(this),
 							activity = dialog.dialog('option', 'parentObject');
@@ -343,11 +347,11 @@ var PropertyLib = {
 						var suffix = '';
 						switch(this.type) {
 							case 'OUTPUT_COMPLEX' :
-								suffix = ' (user defined)';
+								suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
 								break;
 													
 							case 'OUTPUT_LONG' :
-								suffix = ' (range)';
+								suffix = LABELS.RANGE_OUTPUT_SUFFIX;
 								break;
 						};
 		
@@ -406,8 +410,7 @@ var PropertyLib = {
 					// if user choosed to refresh the conditions and there are existing mappings, ask him to confirm
 					if (entries.length == 0
 							|| (useDefaultConditions
-									&& confirm('You are about to update your conditions for the selected output definition.\n'
-												+ 'This will clear all links to existing branches.\nDo you wish to continue?'))) {
+									&& confirm(LABELS.REFRESH_CONDITIONS_CONFIRM))) {
 						if (entries.length > 0) {
 							// clear existing mappings
 							entries = [];
@@ -492,13 +495,14 @@ var PropertyLib = {
 					conditionText = null;
 				
 				if (condition.exactMatchValue) {
-					conditionText = 'Exact value of ' + +condition.exactMatchValue;
+					conditionText = LABELS.EXACT_CONDITION_DESCRIPTION + +condition.exactMatchValue;
 				} else if (typeof condition.startValue == 'undefined') {
-					conditionText = 'Less than or eq ' + +condition.endValue;
+					conditionText = LABELS.LESS_CONDITION_DESCRIPTION + +condition.endValue;
 				} else if (typeof condition.endValue == 'undefined') {
-					conditionText = 'Greater than or eq ' + +condition.startValue;
+					conditionText = LABELS.GREATER_CONDITION_DESCRIPTION + +condition.startValue;
 				} else {
-					conditionText = 'Range ' + +condition.startValue + ' to ' + +condition.endValue;
+					conditionText = LABELS.RANGE_CONDITION_DESCRIPTION.replace('[0]', +condition.startValue)
+																	  .replace('[1]', +condition.endValue);
 				}
 				
 				var row = $('<tr />').appendTo(rangeConditionNames).data('mappingEntry', mappingEntry).click(function(){
@@ -550,7 +554,7 @@ var PropertyLib = {
 						|| (typeof condition.endValue == 'undefined'
 							&& (typeof existingCondition.endValue == 'undefined' || existingCondition.endValue >= condition.startValue))
 						|| (!(condition.startValue > existingCondition.endValue) && !(condition.endValue < existingCondition.startValue))) {
-						alert('The start value can not be within the range of an existing condition');
+						alert(LABELS.RANGE_CONDITION_ADD_START_ERROR);
 						condition = null;
 						return false;
 					}
@@ -559,7 +563,7 @@ var PropertyLib = {
 						|| (typeof condition.startValue == 'undefined'
 							&& (typeof existingCondition.startValue == 'undefined' || existingCondition.startValue <= condition.endValue))
 						|| (!(condition.endValue < existingCondition.startValue) && !(condition.startValue > existingCondition.endValue))) {
-						alert('The end value can not be within the range of an existing condition');
+						alert(LABELS.RANGE_CONDITION_ADD_END_ERROR);
 						condition = null;
 						return false;
 					}
@@ -572,7 +576,7 @@ var PropertyLib = {
 				// find an unique name for the new condition
 				var nameIndex = 1;
 				while (!condition.displayName) {
-					condition.displayName = 'Untitled ' + nameIndex;
+					condition.displayName = LABELS.DEFAULT_RANGE_CONDITION_TITLE_PREFIX + nameIndex;
 					$('input', rangeConditionNames).each(function(){
 						if (condition.displayName == $(this).val()) {
 							condition.displayName = null;
@@ -675,9 +679,8 @@ var PropertyLib = {
 	    			
 	        		// were any conditions assigned to the default branch?
 	    			if (assignedToDefault) {
-	    				close = confirm(isGate ?
-	    						  "All remaining conditions will be mapped to the selected gate's closed state"
-	    						: "All remaining conditions will be mapped to the default branch");
+	    				close = confirm(isGate ? LABELS.CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM 
+	    									   : LABELS.CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM);
 	    			}
 	    			
 	    			if (close) {
@@ -706,8 +709,8 @@ var PropertyLib = {
 		}).click(function(){
 			PropertyLib.removeBranchMapping(ctbDialog);
 		});
-		$('.branchMappingFreeItemHeaderCell', ctbDialog).text('Conditions');
-		$('.branchMappingBoundItemHeaderCell', ctbDialog).text('Condition');
+		$('.branchMappingFreeItemHeaderCell', ctbDialog).text(LABELS.BRANCH_MAPPING_CONDITIONS_HEADER);
+		$('.branchMappingBoundItemHeaderCell', ctbDialog).text(LABELS.BRANCH_MAPPING_CONDITION_HEADER);
 		
 		layout.dialogs.push(ctbDialog);
 	},
@@ -762,14 +765,14 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != transition.title) {
-            		if (!nameValidator.test(newTitle)) {
-            			alert('Transition title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+            		if (nameValidator.test(newTitle)) {
 						transition.title = newTitle;
 						if (transition.branch) {
 							transition.branch.title = newTitle;
 						}
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				
@@ -821,11 +824,11 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('Activity title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				
@@ -870,11 +873,11 @@ var PropertyLib = {
 					newTitle = $('.propertiesContentFieldTitle', content).val(),
 					newGroupCount = +$('.propertiesContentFieldGroupCount', content).val();
 				if (newTitle != activity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('Grouping title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				
@@ -899,7 +902,8 @@ var PropertyLib = {
 				
 				if (activity.groupCount != newGroupCount){
 					activity.groupCount = newGroupCount;
-					activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount, activity.groups, 'name', 'Group ');
+					activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount, activity.groups, 'name',
+																	  LABELS.DEFAULT_GROUP_PREFIX);
 				} 
 				activity.learnerCount = +$('.propertiesContentFieldLearnerCount', content).val();
 				activity.equalSizes = $('.propertiesContentFieldEqualSizes', content).is(':checked');
@@ -980,11 +984,11 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				
@@ -1114,11 +1118,11 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != branchingActivity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						branchingActivity.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
@@ -1217,11 +1221,11 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
@@ -1265,13 +1269,13 @@ var PropertyLib = {
 					activity = content.data('parentObject'),
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != activity.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
-						activity.title = newTitle;
+					if (nameValidator.test(newTitle)) {
+            			activity.title = newTitle;
 						activity.draw();
 						ActivityLib.addSelectEffect(activity, true);
 						setModified(true);
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 			});
@@ -1342,11 +1346,11 @@ var PropertyLib = {
 					color = region.items.shape.attr('fill'),
 					newColor = $('.propertiesContentFieldColor', content).val();
 				if (newTitle != region.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						region.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				redrawNeeded |= newColor != color;
@@ -1382,11 +1386,11 @@ var PropertyLib = {
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				if (newTitle != label.title) {
-					if (!nameValidator.test(newTitle)) {
-            			alert('The title can not contain any of these characters < > ^ * @ % $');
-            		} else {
+					if (nameValidator.test(newTitle)) {
 						label.title = newTitle;
 						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
             		}
 				}
 				
@@ -1548,9 +1552,9 @@ var PropertyLib = {
 		
 		// find group names and create DOM elements out of them
 		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
-				grouping.groups, 'name', 'Group ');
+				grouping.groups, 'name', LABELS.DEFAULT_GROUP_PREFIX);
 		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
-				branches, 'title', 'Branch ');
+				branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
 		
 		$.each(grouping.groups, function(){
 			var group = this,
@@ -1668,12 +1672,14 @@ var PropertyLib = {
 			branches = null;
 		
 		// customise labels depending on the receiving activity
-		$('.branchMappingFreeBranchHeaderCell', ctbDialog).text(isGate ? 'Gate' : 'Conditions');
-		$('.branchMappingBoundBranchHeaderCell', ctbDialog).text(isGate ? 'Gate' : 'Condition');
+		$('.branchMappingFreeBranchHeaderCell', ctbDialog).text(isGate ? LABELS.BRANCH_MAPPING_GATE_HEADER
+																	   : LABELS.BRANCH_MAPPING_BRANCHES_HEADER);
+		$('.branchMappingBoundBranchHeaderCell', ctbDialog).text(isGate ? LABELS.BRANCH_MAPPING_GATE_HEADER
+																		: LABELS.BRANCH_MAPPING_BRANCH_HEADER);
 		
 		// remove existing entries and add reference to the receiving activity
 		dialog.dialog('option', {
-			'title'	   : isGate ? 'Map gate conditions' : 'Match conditions to branches',
+			'title'	   : isGate ? LABELS.GATE_STATE_MAPPING_DIALOG_TITLE : LABELS.BRANCH_MAPPING_DIALOG_TITLE,
 			'activity' : activity
 		});
 		$('.branchMappingListCell', dialog).empty();
@@ -1684,7 +1690,7 @@ var PropertyLib = {
 		} else {
 			// find branch names and create DOM elements out of them
 			branches = activity.branches = PropertyLib.fillNameAndUIIDList(activity.branches.length,
-					activity.branches, 'title', 'Branch ');
+					activity.branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
 		}
 		
 		$.each(activity.conditionsToBranches, function(){
@@ -1729,7 +1735,8 @@ var PropertyLib = {
 		
 		// fill the branches list
 		$.each(branches, function(){
-			var branchTitle = (isGate ? this : this.title) + (this == defaultBranch ? ' (default)' : ''),
+			var branchTitle = (isGate ? (this == 'open' ? LABELS.GATE_STATE_OPEN : LABELS.GATE_STATE_CLOSED) : this.title)
+							+ (this == defaultBranch ? BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ''),
 				branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell).text(branchTitle);
 			if (isGate) {
 				branchElem.attr('gateState', this);

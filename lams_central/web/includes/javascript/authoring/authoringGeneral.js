@@ -98,7 +98,7 @@ $(document).ready(function() {
 			|| layout.regions.length > 0
 			|| layout.labels.length > 0
 			|| layout.floatingActivity)) {
-			return 'Your design is not saved.\nAny changes you made since you last saved will be lost.';
+			return LABELS.NAVIGATE_AWAY_CONFIRM;
 		}
 	};
 });
@@ -256,7 +256,7 @@ function initLayout() {
 	// creates a new folder
     {
 		'class'    : 'leftDialogButton',
-		'text'     : 'New',
+		'text'     : LABELS.NEW_FOLDER_BUTTON,
 		'tabIndex' : -1,
 		'click'    : function(){
     		var dialog = $(this),
@@ -267,20 +267,20 @@ function initLayout() {
     			return;
     		}
     		
-			var	title = prompt('Please enter the name for a new folder');
+			var	title = prompt(LABELS.NEW_FOLDER_TITLE_PROMPT);
 			// skip if no name was provided
 			if (!title) {
 				return;
 			}
 			if (!nameValidator.test(title)) {
-    			alert('The title can not contain any of these characters < > ^ * @ % $');
+    			alert(LABELS.TITLE_VALIDATION_ERROR);
     			return;
     		}
 			
 			var parentFolder = ldNode.data.learningDesignId ? ldNode.parent : ldNode;
 			$.each(parentFolder.children, function(){
 				if (this.label == title) {
-					alert('A folder with this name already exists.');
+					alert(LABELS.FOLDER_EXISTS_ERROR);
 					title = null;
 					return false;
 				}
@@ -301,7 +301,7 @@ function initLayout() {
 					'parentFolderID' : parentFolder.data.folderID
 				},
 				success : function(response) {
-					// still process WDDX packed, to be changed when we get rid of Flash Authoring
+					// still process WDDX packet, to be changed when we get rid of Flash Authoring
 					var messageIndex = response.indexOf("folderID'><number>") + 18,
 						folderID = response.substring(messageIndex, response.indexOf('<', messageIndex));
 					
@@ -323,7 +323,7 @@ function initLayout() {
 	// copy sequence or folder
     {
 		'class'    : 'leftDialogButton',
-		'text'     : 'Copy',
+		'text'     : LABELS.COPY_BUTTON,
 		'tabIndex' : -1,
 		'click'    : function(){
     		var dialog = $(this),
@@ -345,7 +345,7 @@ function initLayout() {
 	// pastes sequence or folder
     {
 		'class'    : 'leftDialogButton',
-		'text'     : 'Paste',
+		'text'     : LABELS.PASTE_BUTTON,
 		'tabIndex' : -1,
 		'click'    : function(){
     		var dialog = $(this),
@@ -390,7 +390,7 @@ function initLayout() {
 	// removes sequence or folder
     {
 		'class'    : 'leftDialogButton',
-		'text'     : 'Delete',
+		'text'     : LABELS.DELETE_BUTTON,
 		'tabIndex' : -1,
 		'click'    : function(){
     		var dialog = $(this),
@@ -398,7 +398,7 @@ function initLayout() {
 				// hightlighted sequence/folder in the tree
 				ldNode = tree.getHighlightedNode(),
 				isFolder = ldNode && !ldNode.data.learningDesignId;
-    		if (!ldNode || !confirm('Are you sure you want to delete this ' + (isFolder ? 'folder' : 'sequence') + '?')) {
+    		if (!ldNode || !confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
     			return;
     		}
 			
@@ -434,7 +434,7 @@ function initLayout() {
 	// renames sequence or folder
     {
 		'class'    : 'leftDialogButton',
-		'text'     : 'Rename',
+		'text'     : LABELS.RENAME_BUTTON,
 		'tabIndex' : -1,
 		'click'    : function(){
     		var dialog = $(this),
@@ -445,20 +445,21 @@ function initLayout() {
     		if (!ldNode) {
     			return;
     		}
-			var title = prompt('Please enter the new name for ' + (isFolder ? 'folder' : 'sequence') + ' "' + ldNode.label + '"');
+			var title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
+						+ ' "' + ldNode.label + '"');
 			
 			// skip if no name or the same name was provided
 			if (!title || ldNode.label == title) {
 				return;
 			}
 			if (!nameValidator.test(title)) {
-    			alert('The title can not contain any of these characters < > ^ * @ % $');
+    			alert(LABELS.TITLE_VALIDATION_ERROR);
     			return;
     		}
 			
 			$.each(ldNode.parent.children, function(){
 				if (this.label == title && (isFolder == (this.data.folderID != null))) {
-					alert('A ' + (isFolder ? 'folder' : 'sequence') + ' with this name already exists.');
+					alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
 					title = null;
 					return false;
 				}
@@ -527,7 +528,7 @@ function initLayout() {
 		             {
 		            	'id'	 : 'openLdStoreButton',
 		            	'class'  : 'defaultFocus',
-		            	'text'   : 'Open',
+		            	'text'   : LABELS.OPEN_BUTTON,
 		            	'click'  : function() {
 		            		var dialog = $(this),
 		            			tree = dialog.dialog('option', 'ldTree'),
@@ -540,7 +541,7 @@ function initLayout() {
 		            		
 		            		// no LD was chosen
 		            		if (!learningDesignID) {
-		            			alert("Please choose a sequence");
+		            			alert(LABELS.SEQUENCE_NOT_SELECTED_ERROR);
 		            			return;
 		            		}
 		            		
@@ -553,18 +554,18 @@ function initLayout() {
 		'buttonsSave' : sharedButtons.concat([
 			             {
 			            	'class'  : 'defaultFocus',
-			            	'text'   : 'Save',
+			            	'text'   : LABELS.SAVE_BUTTON,
 			            	'click'  : function() {	
 			            		var dialog = $(this),
 			            			container = dialog.closest('.ui-dialog'),
 			            			title = $('#ldStoreDialogNameField', container).val().trim();
 			            		if (!title) {
-			            			alert('Please enter a title for the sequence');
+			            			alert(LABELS.SAVE_SEQUENCE_TITLE_PROMPT);
 			            			return;
 			            		}
 			            		
 			            		if (!nameValidator.test(title)) {
-			            			alert('Sequence title can not contain any of these characters < > ^ * @ % $');
+			            			alert(LABELS.TITLE_VALIDATION_ERROR);
 			            			return;
 			            		}
 			            		
@@ -600,7 +601,7 @@ function initLayout() {
 			            		
 			            		if (!folderID) {
 			            			// although an existing sequence can be highlighted 
-			            			alert('Please choose a folder');
+			            			alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
 			            			return;
 			            		}
 			            		
@@ -617,7 +618,7 @@ function initLayout() {
 			            			});
 			            		}
 			            		if (learningDesignID
-			            				&& !confirm('Are you sure you want to overwrite the existing sequence?')) {
+			            				&& !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
 			            			return;
 			            		}
 
@@ -734,7 +735,7 @@ function openLearningDesign(learningDesignID) {
 		},
 		success : function(response) {
 			if (!response) {
-				alert('Error while loading sequence');
+				alert(LABELS.SEQUENCE_LOAD_ERROR);
 				return;
 			}
 			
@@ -1203,7 +1204,7 @@ function openLearningDesign(learningDesignID) {
 			updateAccess(response.access);
 			
 			if (!ld.validDesign) {
-				var dialog = layout.items.infoDialog.html('The sequence is not valid.<br />It needs to be corrected before it can be used in lessons.');
+				var dialog = layout.items.infoDialog.html(LABELS.SEQUENCE_NOT_VALID);
 				dialog.dialog('open');
 				
 				setTimeout(function(){
@@ -1589,7 +1590,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			
 			// check if there were any validation errors
 			if (response.validation.length > 0) {
-				var message = 'While saving the sequence there were following validation issues:\n';
+				var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '\n';
 				$.each(response.validation, function() {
 					var uiid = this.UIID,
 						title = '';
@@ -1675,7 +1676,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				});
 				
 				if (response.validation.length == 0) {
-					alert('Congratulations! Your design is valid and has been saved.');
+					alert(LABELS.SAVE_SUCCESSFUL);
 				}
 				
 				result = true;
@@ -1685,7 +1686,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			updateAccess(response.access);
 		},
 		error : function(){
-			alert('Error while saving the sequence');
+			alert(LABELS.SEQUENCE_SAVE_ERROR);
 		}
 	});
 	

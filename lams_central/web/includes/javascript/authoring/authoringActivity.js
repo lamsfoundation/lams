@@ -60,14 +60,14 @@ var ActivityLib = {
 		this.groupingID = +groupingID || null;
 		this.groupingUIID = +groupingUIID  || ++layout.ld.maxUIID;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.title = title || 'Grouping';
+		this.title = title || LABELS.DEFAULT_GROUPING_TITLE;
 		this.groupingType = groupingType || 'random';
 		this.groupDivide = groupDivide || 'groups';
 		this.groupCount = +groupCount || 2;
 		this.learnerCount = +learnerCount || 1;
 		this.equalSizes = equalSizes || false;
 		this.viewLearners = viewLearners || false;
-		this.groups = groups || PropertyLib.fillNameAndUIIDList(this.groupCount, [], 'name', 'Group ');
+		this.groups = groups || PropertyLib.fillNameAndUIIDList(this.groupCount, [], 'name', LABELS.DEFAULT_GROUP_PREFIX);
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -129,7 +129,7 @@ var ActivityLib = {
 			this.isStart = true;
 			branchingActivity = new ActivityLib.BranchingActivity(id, uiid, this);
 			branchingActivity.branchingType = branchingType || 'chosen';
-			branchingActivity.title = title || 'Branching';
+			branchingActivity.title = title || LABELS.DEFAULT_BRANCHING_TITLE;
 		}
 		this.branchingActivity = branchingActivity;
 		
@@ -164,7 +164,7 @@ var ActivityLib = {
 	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom, defaultBranch) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
-		this.title = title || ('Branch ' + (branchingActivity.branches.length + 1));
+		this.title = title || (LABELS.DEFAULT_BRANCH_PREFIX + (branchingActivity.branches.length + 1));
 		this.branchingActivity = branchingActivity;
 		this.transitionFrom = transitionFrom;
 		this.defaultBranch = defaultBranch;
@@ -202,7 +202,7 @@ var ActivityLib = {
 	 * Constructor for an Optional Activity.
 	 */
 	OptionalActivity : function(id, uiid, x, y, title, minOptions, maxOptions) {
-		DecorationLib.Container.call(this, id, uiid, title || 'Optional Activity');
+		DecorationLib.Container.call(this, id, uiid, title || LABELS.DEFAULT_OPTIONAL_ACTIVITY_TITLE);
 		
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
@@ -224,7 +224,7 @@ var ActivityLib = {
 	 * Constructor for a Floating Activity.
 	 */
 	FloatingActivity : function(id, uiid, x, y) {
-		DecorationLib.Container.call(this, id, uiid, 'Support Activity');
+		DecorationLib.Container.call(this, id, uiid, LABELS.SUPPORT_ACTIVITY_TITLE);
 		
 		this.draw = ActivityLib.draw.floatingActivity;
 		this.draw(x, y);
@@ -366,7 +366,7 @@ var ActivityLib = {
 								 'fill' : layout.colors.gate
 							 });
 			
-			paper.text(x + 15, y + 14, 'STOP')
+			paper.text(x + 15, y + 14, LABELS.GATE_ACTIVITY_LABEL)
 			     .attr({
 					'font-size' : 9,
 					'font' : 'sans-serif',
@@ -402,8 +402,8 @@ var ActivityLib = {
 							 });
 			
 			var title = this.branchingActivity.title;
-			paper.text(x + 8, y + 27,  title + (this.isStart ? '\nstart'
-		                                        		 : '\nend'))
+			paper.text(x + 8, y + 27,  title + '\n' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
+		                                        		 	 		: LABELS.BRANCHING_END_SUFFIX))
 			     .attr({
 					'font-size' : 9,
 					'font' : 'sans-serif'
@@ -564,7 +564,7 @@ var ActivityLib = {
 		var coreActivity =  activity.branchingActivity || this;
 		if (!forceRemove && activity instanceof ActivityLib.BranchingEdgeActivity){
 			// user removes one of the branching edges, so remove the whole activity
-			if (confirm('Are you sure you want to remove the whole branching activity?')){
+			if (confirm(LABELS.REMOVE_ACTIVITY_CONFIRM)){
 				var otherEdge = activity.isStart ? coreActivity.end
 						                         : coreActivity.start;
 				ActivityLib.removeActivity(otherEdge, true);
@@ -641,7 +641,7 @@ var ActivityLib = {
 		if (!redraw
 				&& toActivity.transitions.to.length > 0
 				&& !(toActivity instanceof ActivityLib.BranchingEdgeActivity && !toActivity.isStart)) {
-			alert('Transition to this activity already exists');
+			alert(LABELS.TRANSITION_TO_EXISTS_ERROR);
 			return;
 		}
 
@@ -650,8 +650,7 @@ var ActivityLib = {
 				&& fromActivity.transitions.from.length > 0
 				&& !(fromActivity instanceof ActivityLib.BranchingEdgeActivity && fromActivity.isStart)
 				&& !(toActivity instanceof ActivityLib.BranchingEdgeActivity  && toActivity.isStart)) {
-			if (confirm('Transition from this activity already exists.\n' +
-					    'Do you want to create branching here?')) {
+			if (confirm(LABELS.BRANCHING_CREATE_CONFIRM)) {
 				ActivityLib.addBranching(fromActivity, toActivity);
 			}
 			return;

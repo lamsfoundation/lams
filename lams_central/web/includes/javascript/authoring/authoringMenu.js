@@ -46,7 +46,7 @@ var MenuLib = {
 	 */
 	addBranching : function(){
 		HandlerLib.resetCanvasMode();
-		var dialog = layout.items.infoDialog.text('Place the branching point');
+		var dialog = layout.items.infoDialog.text(LABELS.BRANCHING_START_PLACE_PROMPT);
 		dialog.dialog('open');
 		
 		var branchingActivity = null;
@@ -71,7 +71,7 @@ var MenuLib = {
 			} else {
 				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
-				dialog.text('Place the converge point');
+				dialog.text(LABELS.BRANCHING_END_PLACE_PROMPT);
 			}
 		});
 	},
@@ -105,7 +105,7 @@ var MenuLib = {
 	addAnnotationRegion : function() {
 		HandlerLib.resetCanvasMode();
 		
-		var dialog = layout.items.infoDialog.text('Click and hold to start drawing an annotation region');
+		var dialog = layout.items.infoDialog.text(LABELS.ANNOTATION_REGION_PLACE_PROMPT);
 		dialog.dialog('open');
 	
 		canvas.css('cursor', 'crosshair').mousedown(function(event){
@@ -130,7 +130,7 @@ var MenuLib = {
 	addAnnotationLabel : function() {
 		HandlerLib.resetCanvasMode();
 		
-		var dialog = layout.items.infoDialog.text('Click to add an annotation label');
+		var dialog = layout.items.infoDialog.text(LABELS.ANNOTATION_LABEL_PLACE_PROMPT);
 		dialog.dialog('open');
 	
 		canvas.css('cursor', 'pointer').click(function(event){
@@ -155,7 +155,7 @@ var MenuLib = {
 	addOptionalActivity : function() {
 		HandlerLib.resetCanvasMode();
 		
-		var dialog = layout.items.infoDialog.text('Click to add an optional activity container.');
+		var dialog = layout.items.infoDialog.text(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT);
 		dialog.dialog('open');
 	
 		canvas.css('cursor', 'pointer').click(function(event){
@@ -185,7 +185,7 @@ var MenuLib = {
 		}
 		HandlerLib.resetCanvasMode();
 		
-		var dialog = layout.items.infoDialog.text('Click to add a support activity container.');
+		var dialog = layout.items.infoDialog.text(LABELS.SUPPORT_ACTIVITY_PLACE_PROMPT);
 		dialog.dialog('open');
 	
 		canvas.css('cursor', 'pointer').click(function(event){
@@ -216,7 +216,7 @@ var MenuLib = {
 	addTransition : function() {
 		HandlerLib.resetCanvasMode();
 		
-		var dialog = layout.items.infoDialog.text('Click on an activity');
+		var dialog = layout.items.infoDialog.text(LABELS.TRANSITION_PLACE_PROMPT);
 		dialog.dialog('open');
 		
 		canvas.css('cursor', 'pointer').click(function(event){
@@ -287,7 +287,7 @@ var MenuLib = {
 		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
 		dialog.dialog('option', {
-			'title'  : 'Save sequence',
+			'title'  : LABELS.SAVE_DIALOG_TITLE,
 			'buttons' : dialog.dialog('option', 'buttonsSave'),
 			// it informs widgets that it is saved dialog
 			'dialogClass': 'ldStoreDialogSave'
@@ -345,7 +345,7 @@ var MenuLib = {
 					$.each(response.folders, function(){
 						result.push({'type'            : 'text',
 								  	 'label'           : this.isRunSequencesFolder ?
-								  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
+								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
 								  	 'folderID'		   : this.folderID
 									 });
 					});
@@ -371,9 +371,7 @@ var MenuLib = {
 	 */
 	arrangeActivities : function(){
 		if ((layout.regions.length > 0 || layout.labels.length > 0)
-				&& !confirm('There are annotations on the canvas.\n'
-				   + 'They will be not arranged automatically, you will have to adjust them manually later.\n'
-				   + 'Do you want to continue?')) {
+				&& !confirm(LABELS.ARRANGE_CONFIRM)) {
 			return;
 		}
 
@@ -658,7 +656,7 @@ var MenuLib = {
 					  || layout.regions.length > 0
 					  || layout.labels.length > 0
 					  || layout.floatingActivity)
-				&& !confirm('Are you sure you want to remove all existing elements?')){
+				&& !confirm(LABELS.CLEAR_CANVAS_CONFIRM)){
 			return;
 		}
 		
@@ -718,13 +716,13 @@ var MenuLib = {
 		}
 		// only tool activities can be copied (todo?)
 		if (!(activity instanceof ActivityLib.ToolActivity)) {
-			alert('Sorry, you can not paste this type of activity');
+			alert(LABELS.PASTE_ERROR);
 			return;
 		}
 		
 		// find an unqiue title for the new activity
 		var copyCount = 1, 
-			title = 'Copy of ' + activity.title;
+			title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', '') + activity.title;
 		while (true) {
 			var sameTitleFound = false;
 			$.each(layout.activities, function(){
@@ -736,7 +734,7 @@ var MenuLib = {
 			
 			if (sameTitleFound) {
 				copyCount++;
-				title = 'Copy (' + copyCount + ') of ' + activity.title;
+				title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', '(' + copyCount + ')') + activity.title;
 			} else {
 				break;
 			}
@@ -772,13 +770,13 @@ var MenuLib = {
 				'method' : 'initializeLesson',
 				'learningDesignID' : layout.ld.learningDesignID,
 				'copyType' : 3,
-				'lessonName' : 'Preview'
+				'lessonName' : LABELS.PREVIEW_LESSON_DEFAULT_TITLE
 			},
 			cache : false,
 			dataType : 'text',
 			success : function(lessonID) {
 				if (!lessonID) {
-					alert('Error while initialising lesson for preview');
+					alert(LABELS.PREVIEW_ERROR);
 					return;
 				}
 				
@@ -881,7 +879,7 @@ var MenuLib = {
 					'show'     : 'fold',
 					'hide'     : 'fold',
 					'resizable': false,
-					'title'	   : 'Image export'
+					'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE
 			   });
 	},
 	
@@ -943,7 +941,7 @@ var MenuLib = {
 					'show'     : 'fold',
 					'hide'     : 'fold',
 					'resizable': false,
-					'title'	   : 'Image export'
+					'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE
 			   });
 	},
 	
