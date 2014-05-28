@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -81,11 +82,11 @@ import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -132,6 +133,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IQaWizardDAO qaWizardDAO;
 
     private ICoreNotebookService coreNotebookService;
+    private IEventNotificationService eventNotificationService;
+    private MessageService messageService;
 
     private Random generator = new Random();
     
@@ -797,6 +800,32 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	
 	return reflectionDTOs;
     }
+    
+    @Override
+    public void notifyTeachersOnResponseSubmit(Long sessionId) {
+	final String NEW_LINE_CHARACTER = "<br>";
+	
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(toolUser.getUserID().longValue());
+	QaQueUsr user = getUserByIdAndSession(userId, new Long(sessionId));
+	
+	String fullName = user.getFullname();
+
+	String message = NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + messageService.getMessage("label.user.has.answered.questions", new Object[] { fullName });
+	
+	List<QaUsrResp> responses = qaUsrRespDAO.getResponsesByUserUid(user.getUid());
+	for (QaUsrResp response : responses) {
+	    String question = response.getQaQuestion().getQuestion();
+	    String answer = response.getAnswer();
+	    
+	    message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + question + answer;
+	}
+	
+	message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
+	
+	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
+    }
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
@@ -1278,6 +1307,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	toolContentObj.setLockWhenFinished(true);
 	toolContentObj.setShowOtherAnswers(true);
 	toolContentObj.setAllowRateAnswers(false);
+	toolContentObj.setNotifyTeachersOnResponseSubmit(false);
 
 	Boolean bool;
 	try {
@@ -1340,6 +1370,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
+    
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
     }
 
     public void updateEntry(NotebookEntry notebookEntry) {

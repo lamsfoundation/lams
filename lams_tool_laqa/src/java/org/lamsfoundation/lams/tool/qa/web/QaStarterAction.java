@@ -340,6 +340,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
 	qaAuthoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
+	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(qaContent.isNotifyTeachersOnResponseSubmit() ? "1" : "0");
 	qaAuthoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
 	qaAuthoringForm.setSynchInMonitor(qaContent.isSynchInMonitor() ? "1" : "0");
 	qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");

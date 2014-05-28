@@ -118,6 +118,14 @@
         column="allow_rate_answers"
         length="1"
     />
+    
+    <property
+        name="notifyTeachersOnResponseSubmit"
+        type="boolean"
+        access="property"        
+        column="notify_response_submit"
+        length="1"
+    />
 
  
     <property

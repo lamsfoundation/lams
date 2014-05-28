@@ -37,6 +37,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
+
+    private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
     
     private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from "
 	    + QaUsrResp.class.getName() + " as r where r.qaQuestion.qaContent.qaContentId=?";
@@ -71,6 +73,13 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	} else {
 	    return (QaUsrResp) list.get(list.size() - 1);
 	}
+    }
+    
+    @Override
+    public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
+	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER).setLong("userUid", userUid.longValue())
+		.list();
+	return list;
     }
     
     public int getCountResponsesByQaContent(final Long qaContentId) {

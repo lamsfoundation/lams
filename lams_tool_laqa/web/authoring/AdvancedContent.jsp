@@ -57,8 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"
-		styleClass="noBorder">
-	</html:checkbox>
+		styleClass="noBorder"/>
 	<label for="useSelectLeaderToolOuput">
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
@@ -66,8 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p class="small-space-top">
 	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="doShowOtherAnswers();"
-		styleClass="noBorder" disabled="${formBean.useSelectLeaderToolOuput}">
-	</html:checkbox>
+		styleClass="noBorder" disabled="${formBean.useSelectLeaderToolOuput}"/>
 	<label for="showOtherAnswers">
 		<fmt:message key="label.learner.answer" />
 	</label>
@@ -76,8 +74,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <p>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible" styleClass="noBorder" 
-			disabled="${formBean.showOtherAnswers == 0}">
-	</html:checkbox>
+			disabled="${formBean.showOtherAnswers == 0}"/>
 	<label for="usernameVisible">
 		<fmt:message key="label.show.names" />
 	</label>
@@ -86,16 +83,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <p>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<html:checkbox property="allowRateAnswers" value="1" styleId="allowRateAnswers" styleClass="noBorder" 
-			disabled="${formBean.showOtherAnswers == 0}">
-	</html:checkbox>
+			disabled="${formBean.showOtherAnswers == 0}"/>
 	<label for="allowRateAnswers">
 		<fmt:message key="label.authoring.allow.rate.answers" />
 	</label>
 </p>
 
+<p class="small-space-top">
+	<html:checkbox property="notifyTeachersOnResponseSubmit" value="1" styleClass="noBorder" styleId="notifyTeachersOnResponseSubmit"/>
+	<label for="notifyTeachersOnResponseSubmit">
+		<fmt:message key="label.notify.teachers.on.response.submit" />
+	</label>
+</p>
+
 <p>
-	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
-	</html:checkbox>
+	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect"/>
 	<label for="reflect">
 		<fmt:message key="label.reflect" />
 	</label>
@@ -125,8 +127,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
-		styleClass="noBorder">
-	</html:checkbox>
+		styleClass="noBorder"/>
 	<label for="questionsSequenced">
 		<fmt:message key="radiobox.questionsSequenced" />
 	</label>
@@ -134,8 +135,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<html:checkbox property="lockWhenFinished" value="1" styleId="lockWhenFinished"
-		styleClass="noBorder">
-	</html:checkbox>
+		styleClass="noBorder"/>
 	<label for="lockWhenFinished">
 		<fmt:message key="label.lockWhenFinished" />
 	</label>
@@ -143,8 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<html:checkbox property="allowRichEditor" value="1" styleId="allowRichEditor"
-		styleClass="noBorder">
-	</html:checkbox>
+		styleClass="noBorder"/>
 	<label for="allowRichEditor">
 		<fmt:message key="label.allowRichEditor" />
 	</label>

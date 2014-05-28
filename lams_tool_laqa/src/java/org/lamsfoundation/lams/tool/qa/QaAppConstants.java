@@ -88,6 +88,7 @@ public interface QaAppConstants {
     public static final String SYNC_IN_MONITOR = "synchInMonitor";
     public static final String USERNAME_VISIBLE = "usernameVisible";
     public static final String ALLOW_RATE_ANSWERS = "allowRateAnswers";
+    public static final String NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT = "notifyTeachersOnResponseSubmit";
     public static final String QUESTIONS_SEQUENCED = "questionsSequenced";
 
     public static final String SOURCE_MC_STARTER = "sourceMcStarter";

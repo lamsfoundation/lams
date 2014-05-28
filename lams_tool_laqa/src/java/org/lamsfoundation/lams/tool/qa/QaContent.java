@@ -100,6 +100,8 @@ public class QaContent implements Serializable {
 
     /** nullable persistent field */
     private boolean allowRateAnswers;
+    
+    private boolean notifyTeachersOnResponseSubmit;
 
     /** nullable persistent field */
     private boolean synchInMonitor;
@@ -127,9 +129,10 @@ public class QaContent implements Serializable {
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean showOtherAnswers,
-	    boolean reflect, String reflectionSubject, Date creationDate, Date updateDate, Set qaQueContents,
-	    Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
+	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean synchInMonitor,
+	    boolean lockWhenFinished, boolean showOtherAnswers, boolean reflect, String reflectionSubject,
+	    Date creationDate, Date updateDate, Set qaQueContents, Set qaSessions, Set<QaCondition> conditions,
+	    boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -140,6 +143,7 @@ public class QaContent implements Serializable {
 	this.questionsSequenced = questionsSequenced;
 	this.usernameVisible = usernameVisible;
 	this.allowRateAnswers = allowRateAnswers;
+	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
 	this.synchInMonitor = synchInMonitor;
 	this.lockWhenFinished = lockWhenFinished;
 	this.showOtherAnswers = showOtherAnswers;
@@ -168,10 +172,11 @@ public class QaContent implements Serializable {
 	    RepositoryCheckedException {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
 		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
-		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(), qa.isLockWhenFinished(),
-		qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa.getCreationDate(),
-		qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
-			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
+		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
+		qa.isSynchInMonitor(), qa.isLockWhenFinished(), qa.isShowOtherAnswers(), qa.isReflect(),
+		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
+		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(),
+		qa.isUseSelectLeaderToolOuput());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -413,6 +418,17 @@ public class QaContent implements Serializable {
      */
     public void setAllowRateAnswers(boolean allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
+    }
+    
+    /**
+     * @return
+     */
+    public boolean isNotifyTeachersOnResponseSubmit() {
+	return notifyTeachersOnResponseSubmit;
+    }
+
+    public void setNotifyTeachersOnResponseSubmit(boolean notifyTeachersOnResponseSubmit) {
+	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
     }
 
     /**

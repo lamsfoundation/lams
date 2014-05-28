@@ -175,6 +175,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+	qaLearningForm.resetAll();
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
@@ -182,8 +183,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-
-	qaLearningForm.resetAll();
+	    
+	// notify teachers on response submit
+	if (errors.isEmpty() && qaContent.isNotifyTeachersOnResponseSubmit()) {
+	    qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
+	}
+	
 	return (mapping.findForward(forwardName));
     }
 

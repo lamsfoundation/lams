@@ -96,6 +96,9 @@ public abstract class QaUtils implements QaAppConstants {
 	String allowRateAnswers = request.getParameter(ALLOW_RATE_ANSWERS);
 	qaAuthoringForm.setAllowRateAnswers(allowRateAnswers);
 	qaGeneralAuthoringDTO.setAllowRateAnswers(allowRateAnswers);
+	
+	String notifyTeachersOnResponseSubmit = request.getParameter(NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
+	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmit);
 
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
 	qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);

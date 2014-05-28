@@ -64,6 +64,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String endLearningMessage;
     protected String usernameVisible;
     protected String allowRateAnswers;
+    protected String notifyTeachersOnResponseSubmit;
     protected String showOtherAnswers;
     protected String questionsSequenced;
     protected String lockWhenFinished;
@@ -147,26 +148,13 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.synchInMonitor = OPTION_OFF;
 	this.usernameVisible = OPTION_OFF;
 	this.allowRateAnswers = OPTION_OFF;
+	this.notifyTeachersOnResponseSubmit = OPTION_OFF;
 	this.questionsSequenced = OPTION_OFF;
 	this.lockWhenFinished = OPTION_OFF;
 	this.reflect = OPTION_OFF;
 	this.allowRichEditor = false;
 	this.required = false;
 	this.useSelectLeaderToolOuput = false;
-    }
-
-    public String toString() {
-	return new ToStringBuilder(this).append("Listing current QaAuthoringForm properties: ")
-		.append("toolContentID: ", toolContentID).append("currentTab: ", currentTab)
-		.append("activeModule: ", activeModule).append("defaultContentIdStr: ", defaultContentIdStr)
-		.append("title: ", title).append("instructions: ", instructions).append("reportTitle: ", reportTitle)
-		.append("monitoringReportTitle: ", monitoringReportTitle)
-		.append("endLearningMessage: ", endLearningMessage)
-		.append("usernameVisible: ", usernameVisible)
-		.append("allowRateAnswers: ", allowRateAnswers).append("showOtherAnswers: ", showOtherAnswers)
-		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
-		.append("lockWhenFinished: ", lockWhenFinished).append("reflect: ", reflect)
-		.append("defineLaterInEditMode: ", defineLaterInEditMode).toString();
     }
 
     /**
@@ -407,6 +395,21 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setAllowRateAnswers(String allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
+    }
+    
+    /**
+     * @return Returns the notifyTeachersOnResponseSubmit.
+     */
+    public String getNotifyTeachersOnResponseSubmit() {
+	return notifyTeachersOnResponseSubmit;
+    }
+
+    /**
+     * @param notifyTeachersOnResponseSubmit
+     *                The notifyTeachersOnResponseSubmit to set.
+     */
+    public void setNotifyTeachersOnResponseSubmit(String notifyTeachersOnResponseSubmit) {
+	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
     }
 
     /**

@@ -46,6 +46,22 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.notify.teachers.on.response.submit" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${content.notifyTeachersOnResponseSubmit}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.allow.rate.answers" />
 		</td>
 		<td>
@@ -58,7 +74,7 @@
 				</c:otherwise>
 			</c:choose>	
 		</td>
-	</tr>	
+	</tr>
 	
 	<tr>
 		<td>

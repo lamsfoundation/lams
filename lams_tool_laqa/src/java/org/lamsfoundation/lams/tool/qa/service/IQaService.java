@@ -329,5 +329,12 @@ public interface IQaService {
      * @return
      */
     List<ReflectionDTO> getReflectList(QaContent content, String userID);
+    
+    /**
+     * notifyTeachersOnResponseSubmit
+     * 
+     * @param sessionId
+     */
+    void notifyTeachersOnResponseSubmit(Long sessionId);
 
 }
