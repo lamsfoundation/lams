@@ -36,7 +36,7 @@
 	      	showMessage(gurl);
 	      	return false;
 		}
-		function checkNew(checkFinishedLock){
+		function checkNew(){
  		    var reqIDVar = new Date();
 				
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();				

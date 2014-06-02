@@ -79,48 +79,29 @@ public class CompleteItemServlet extends HttpServlet {
 	 *             if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-		String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-		
-		HttpSession ss = SessionManager.getSession();
-		
-		// get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-		Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
-		service.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
-
-		// set resource item complete tag
-		SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
-		for (ResourceItem item : resourceItemList) {
-		    if (item.getUid().equals(resourceItemUid)) {
-				item.setComplete(true);
-				break;
-		    }
-		}
-		
-		ResourceUser rUser = service.getUserByIDAndSession(new Long(user.getUserID()), sessionId);
-		
-		response.setContentType("text/javascript");
-	    PrintWriter out = response.getWriter();
-	    
-	    if(!rUser.isSessionFinished()) {
-	    	out.println("window.parent.opener.checkNew(false);");
-	    	out.println("window.parent.opener=null;");
-	    	out.println("window.parent.close();");
-	    } else {
-	    	out.println("window.parent.opener.checkNew(true);");
-	    	out.println("window.parent.opener=null;");
-	    	out.println("window.parent.close();");
-	    }
-	    
-	    out.println();
-	    out.flush();
-	    out.close();
+		throws ServletException, IOException {
+        	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+        	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+        	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+        
+        	Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+        	
+        	HttpSession ss = SessionManager.getSession();
+        	
+        	// get back login user DTO
+        	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        
+        	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+        	service.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
+        
+        	// set resource item complete tag
+        	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+        	for (ResourceItem item : resourceItemList) {
+        	    if (item.getUid().equals(resourceItemUid)) {
+        			item.setComplete(true);
+        			break;
+        	    }
+        	}
 	}
 	
 	/**

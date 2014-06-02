@@ -55,7 +55,7 @@
 						    var url="<c:url value="/learning/completeItem"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
 							jQuery.ajax({
 								type:   'GET',
-								dateType: 	'script',
+								dataType: 	'script',
 								url:    url,
 								timeout: 5000,
 
@@ -66,12 +66,19 @@
 									jQuery("input#FinishInstruction").addClass("disabled");
 								},
 
-								error: function() {
-									alert('server timeout');
+								error: function(jqXHR, textStatus, errorThrown) {
+									alert('Error while marking item as complete.\nStatus: ' + textStatus + '\nError: ' + errorThrown);
 								},
 
-								success:  function(data) {
-									eval(data);
+								success:  function() {
+									var winParent = window.parent;
+									if (!winParent.opener.checkNew) {
+										// there can be an extra iframe in the hierarchy
+										winParent = winParent.parent;
+									}
+									winParent.opener.checkNew();
+									winParent.opener=null;
+									winParent.close();
 								},
 
 								complete:  function() {
