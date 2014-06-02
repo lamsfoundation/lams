@@ -17,7 +17,7 @@
 					
 					<div class="comment-by">
 						<fmt:message key="label.learning.by" />
-						${comment.createBy.loginName}
+						<c:out value="${comment.createBy.firstName} ${comment.createBy.lastName}" escapeXml="true"/> 
 								-				
 						<lams:Date value="${comment.createDate}" />
 					
