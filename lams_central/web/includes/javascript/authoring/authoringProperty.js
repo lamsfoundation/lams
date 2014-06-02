@@ -1,11 +1,720 @@
 ﻿/**
  * This file contains methods for Activity properties dialogs.
  */
-var PropertyLib = {
+
+/**
+ * Stores different Activity properties structures.
+ */
+var PropertyDefs = {
+		
+	/**
+	 * Properties dialog content for Branching activities.
+	 */
+	branchingProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent,
+			fillWidgetsFunction = function(){
+				// fill widgets based on data stored in Activity object
+				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
+				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
+				// see what grouping and input Tools are available
+				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
+				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
+				
+				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
+																				 activity.branchingActivity.minOptions)
+																		.spinner('option', 'max',
+																				 activity.branchingActivity.branches.length);
+				$('.propertiesContentFieldOptionalSequenceMax', content).spinner('value',
+																				 activity.branchingActivity.maxOptions)
+																		.spinner('option', {
+																			'min' : activity.branchingActivity.minOptions,
+																			'max' : activity.branchingActivity.branches.length
+																		});
+				if (activity.branchingActivity.branches.length == 0) {
+					// no branches = no buttons to define and match groups/conditions to branches
+					$('.propertiesContentRowConditions', content)
+						.add($('.propertiesContentFieldMatchGroups', content).closest('tr'))
+						.hide();
+				}
+			}
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			// extra buttons for group/input based branching
+			$('.propertiesContentFieldMatchGroups', content).button().click(function(){
+				PropertyLib.openGroupsToBranchesMappingDialog(activity.branchingActivity);
+			});
+			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
+				PropertyLib.openOutputConditionsDialog(activity.branchingActivity);
+			});
+			$('.propertiesContentFieldMatchConditions', content).button().click(function(){
+				PropertyLib.openConditionsToBranchesMappingDialog(activity.branchingActivity);
+			});
+			
+			// if the user changed something in the dialog, save the state
+			// make onChange function a local variable, because it's used several times
+			var changeFunction = function(){
+				// extract changed properties and redraw the activity
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					branchingActivity = activity.branchingActivity,
+					redrawNeeded = false,
+					newTitle = $('.propertiesContentFieldTitle', content).val();
+				// validate and save the title
+				if (newTitle != branchingActivity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						branchingActivity.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
+				
+				// show/hide group match button
+				var groupingRow = $('.propertiesContentFieldGrouping', content).closest('tr');
+				if (branchingActivity.branchingType == 'group') {
+					branchingActivity.grouping = groupingRow.show()
+												.find('option:selected').data('grouping');
+				} else {
+					groupingRow.hide();
+				}
+				$('.propertiesContentFieldMatchGroups', content).closest('tr')
+					.css('display', branchingActivity.grouping && branchingActivity.branches.length > 0 ? '' : 'none');
+				
+				// show/hide conditions define/match buttons
+				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
+					inputDefinitionRows = $('.propertiesContentRowConditions', content);
+				if (branchingActivity.branchingType == 'tool') {
+					branchingActivity.input = inputRow.show()
+						.find('option:selected').data('input');
+					// no branches = no buttons
+					if (branchingActivity.input && branchingActivity.branches.length > 0) {
+						inputDefinitionRows.show();
+					} else {
+						inputDefinitionRows.hide();
+					}
+				} else {
+					inputRow.hide();
+					inputDefinitionRows.hide();
+				}
+				
+				var optionalSequenceRows = $('.spinner', content).closest('tr');
+				if (branchingActivity.branchingType == 'optional') {
+					optionalSequenceRows.show();
+				} else {
+					optionalSequenceRows.hide();
+				}
+
+				// if title changed, redraw branching and converge points
+				if (redrawNeeded) {
+					branchingActivity.start.draw();
+					branchingActivity.end.draw();
+					ActivityLib.addSelectEffect(layout.selectedObject, true);
+				}
+				
+				GeneralLib.setModified(true);
+			}
+			
+			// min can not be higher than max; neither of them can be higher than number of branches
+			$('.propertiesContentFieldOptionalSequenceMin', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
+				  if (value != activity.branchingActivity.minOptions) {
+					  $(this, content).spinner('value', activity.branchingActivity.minOptions);
+				  }
+				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
+					  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('value', value);
+				  }
+				  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('option', 'min', value);
+			  });
+			
+			
+			$('.propertiesContentFieldOptionalSequenceMax', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.branchingActivity.maxOptions = Math.min(value, activity.branchingActivity.branches.length);
+				  if (value != activity.branchingActivity.maxOptions) {
+					  $(this, content).spinner('value', activity.branchingActivity.maxOptions);
+				  }
+			  });
+			
+			// set up the handler and run functions for the first time
+			$('input, select', content).change(changeFunction);
+			fillWidgetsFunction();
+			changeFunction.call(content);
+		}
+		
+		
+		fillWidgetsFunction();
+	},
+	
+	
+	/**
+	 * Properties dialog content for Gates.
+	 */
+	gateProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			$('.propertiesContentFieldDescription', content).val(activity.description ? activity.description : '');
+			$('.propertiesContentFieldGateType', content).val(activity.gateType);
+			
+			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
+				PropertyLib.openOutputConditionsDialog(activity);
+			});
+			$('.propertiesContentFieldMatchConditions', content).button().click(function(){
+				PropertyLib.openConditionsToBranchesMappingDialog(activity);
+			});
+			
+			// make onChange function a local variable, because it's used several times
+			var changeFunction = function(){
+				// extract changed properties and redraw the activity
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle = $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != activity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				
+				// only Gate activity has description
+				activity.description = $('.propertiesContentFieldDescription', content).val();
+				
+				activity.gateType = $('.propertiesContentFieldGateType', content).val();
+				if (activity.gateType == 'schedule') {
+					// show inputs for setting delay before the gate is closed
+					$(".propertiesContentRowGateSchedule").show();
+					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
+					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
+					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
+					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased').is(':checked');
+				} else {
+					$(".propertiesContentRowGateSchedule").hide();
+				}
+				
+				// Gate can be input-based
+				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
+					inputDefinitionRows = $('.propertiesContentRowConditions', content);
+				if (activity.gateType == 'condition') {
+					activity.input = inputRow.show().find('option:selected').data('input');
+					if (activity.input) {
+						inputDefinitionRows.show();
+					} else {
+						inputDefinitionRows.hide();
+					}
+				} else {
+					inputRow.hide();
+					inputDefinitionRows.hide();
+				}
+				
+				if (redrawNeeded) {
+					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
+				}
+				
+				GeneralLib.setModified(true);
+			};
+			
+			// create groups/learners spinners
+			$('.propertiesContentFieldOffsetDay', content).spinner({
+				'min' : 0,
+				'max' : 364
+			}).spinner('value', activity.offsetDay || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldOffsetHour', content).spinner({
+				'min' : 0,
+				'max' : 23
+			}).spinner('value', activity.offsetHour || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldOffsetMinute', content).spinner({
+				'min' : 0,
+				'max' : 59
+			}).spinner('value', activity.offsetMinute || 0)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
+			
+			$('input, textarea, select', content).change(changeFunction);
+			PropertyLib.fillToolInputDropdown(activity, activity.input);
+			changeFunction.call(content);
+		}
+		
+		if (activity.transitions.to.length == 0){
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('checked', null)
+				.attr('disabled', 'disabled');
+		} else {
+			$('.propertiesContentFieldActivityCompletionBased', content)
+				.attr('disabled', null);
+		}
+		
+		PropertyLib.fillToolInputDropdown(activity, activity.input);
+	},
+	
+
+	/**
+	 * Properties dialog content for Grouping activities.
+	 */
+	groupingProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+
+		if (!content) {
+			// make onChange function a local variable, because it's used several times
+			var changeFunction = function(){
+				// extract changed properties and redraw the activity, if needed
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle = $('.propertiesContentFieldTitle', content).val(),
+					newGroupCount = +$('.propertiesContentFieldGroupCount', content).val();
+				
+				// validate and save the title
+				if (newTitle != activity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				
+				activity.groupingType = $('.propertiesContentFieldGroupingType', content).val();
+				
+				$('input[name="propertiesContentFieldGroupDivide"]', content).each(function(){
+						// enable/disable division types, depending on radio buttons next to them
+						$(this).next().find('.spinner').spinner('option', 'disabled', !$(this).is(':checked'));
+					})
+					// hide group/learner division with some grouping types
+					.add($('.propertiesContentFieldLearnerCount', content).closest('tr'))
+					.css('display', activity.groupingType == 'monitor' ? 'none' : '');
+				
+				$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', content)
+					.closest('tr').css('display', activity.groupingType == 'learner' ? '' : 'none');
+				
+				activity.groupDivide = activity.groupingType == 'monitor'
+									   || $('.propertiesContentFieldGroupCountEnable', content).is(':checked')
+									   ? 'groups' : 'learners';
+				$('.propertiesContentFieldNameGroups', content).css('display', activity.groupDivide == 'groups' ? '' : 'none');		
+				
+				if (activity.groupCount != newGroupCount){
+					activity.groupCount = newGroupCount;
+					activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount, activity.groups, 'name',
+																	  LABELS.DEFAULT_GROUP_PREFIX);
+				} 
+				activity.learnerCount = +$('.propertiesContentFieldLearnerCount', content).val();
+				activity.equalSizes = $('.propertiesContentFieldEqualSizes', content).is(':checked');
+				activity.viewLearners = $('.propertiesContentFieldViewLearners', content).is(':checked');
+				
+				if (redrawNeeded) {
+					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
+				}
+				
+				GeneralLib.setModified(true);
+			};
+			
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			
+			// init widgets
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			$('.propertiesContentFieldGroupingType', content).val(activity.groupingType);
+			if (activity.groupDivide == 'learners') {
+				$('.propertiesContentFieldLearnerCountEnable', content).attr('checked', 'checked');
+			} else {
+				$('.propertiesContentFieldGroupCountEnable', content).attr('checked', 'checked');
+			}	
+			
+			// create groups/learners spinners
+			$('.propertiesContentFieldGroupCount', content).spinner({
+				'min' : 2,
+				'disabled' : activity.groupDivide == 'learners'
+			}).spinner('value', activity.groupCount)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldLearnerCount', content).spinner({
+				'min' 	   : 1,
+				'disabled' : activity.groupDivide == 'groups'
+			}).spinner('value', activity.learnerCount)
+			  .on('spinchange', changeFunction);
+			
+			$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
+			$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
+			$('.propertiesContentFieldNameGroups', content).button().click(function(){
+				PropertyLib.openGroupNamingDialog(activity);
+			});
+			
+			$('input, select', content).change(changeFunction);
+			changeFunction.call(content);
+		}
+	},
+	
+	
+	/**
+	 * Properties dialog content for labels (annotations).
+	 */
+	labelProperties : function() {
+		var label = this,
+			content = label.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = label.propertiesContent = $('#propertiesContentLabel').clone().attr('id', null)
+													.show().data('parentObject', label);
+			$('.propertiesContentFieldTitle', content).val(label.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the label, if needed
+				var content = $(this).closest('.dialogContainer'),
+					label = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != label.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						label.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				
+				if (redrawNeeded) {
+					label.draw();
+					ActivityLib.addSelectEffect(label, true);
+					GeneralLib.setModified(true);
+				}
+			});
+		}
+	},
+	
+	
+	/**
+	 * Properties dialog content for Optional Activity.
+	 */
+	optionalActivityProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+
+		activity.minOptions = Math.min(activity.minOptions, activity.childActivityDefs.length);
+		activity.maxOptions = Math.min(activity.maxOptions, activity.childActivityDefs.length);
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentOptionalActivity').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the Activity, if needed
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != activity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+            			activity.title = newTitle;
+						activity.draw();
+						ActivityLib.addSelectEffect(activity, true);
+						GeneralLib.setModified(true);
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+			});
+			
+			// min can not be higher than max; neither of them can be higher than children count
+			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.minOptions = Math.min(value, activity.childActivityDefs.length);
+				  if (value != activity.minOptions) {
+					  $(this, content).spinner('value', activity.minOptions);
+				  }
+				  if (activity.minOptions > activity.maxOptions) {
+					  $('.propertiesContentFieldOptionalActivityMax', content).spinner('value', value);
+				  }
+				  $('.propertiesContentFieldOptionalActivityMax', content).spinner('option', 'min', value);
+			  });
+			
+			
+			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
+			  .on('spinchange', function(){
+				  var value = +$(this).val();
+				  activity.maxOptions = Math.min(value, activity.childActivityDefs.length);
+				  if (value != activity.maxOptions) {
+					  $(this, content).spinner('value', activity.maxOptions);
+				  }
+			  });
+		}
+		
+		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minOptions)
+																.spinner('option', 'max', activity.childActivityDefs.length);
+		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxOptions)
+																.spinner('option', {
+																	'min' : activity.minOptions,
+																	'max' : activity.childActivityDefs.length
+																});
+	},
+
+	
+	/**
+	 * Properties dialog content for Parallel activities.
+	 */
+	parallelProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent;
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentParallel').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			
+			$('input, select', content).change(function(){
+				// extract changed properties and redraw the activity
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != activity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
+									.data('grouping');
+				if (newGroupingValue != activity.grouping) {
+					activity.grouping = newGroupingValue;
+					redrawNeeded = true;
+				}
+				
+				if (redrawNeeded) {
+					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
+					GeneralLib.setModified(true);
+				}
+			});
+		}
+		
+		PropertyLib.fillGroupingDropdown(activity, activity.grouping);
+	},
+
+	
+	/**
+	 * Properties dialog content for regions (annotations).
+	 */
+	regionProperties : function() {
+		var region = this,
+			content = region.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = region.propertiesContent = $('#propertiesContentRegion').clone().attr('id', null)
+													.show().data('parentObject', region);
+			
+			$('.propertiesContentFieldTitle', content).val(region.title);
+			var color = region.items.shape.attr('fill');
+			// init colour chooser
+			$('.propertiesContentFieldColor', content).val(color)
+													  .simpleColor({
+														'colors' : layout.colors.annotationPalette,
+														'chooserCSS' : {
+															'left'	   : 0,
+															'top'      : '30px',
+															'margin'   : '0'
+														}
+													  });
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					region = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle = $('.propertiesContentFieldTitle', content).val(),
+					color = region.items.shape.attr('fill'),
+					newColor = $('.propertiesContentFieldColor', content).val();
+				
+				// validate and save the title
+				if (newTitle != region.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						region.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				redrawNeeded |= newColor != color;
+				
+				if (redrawNeeded) {
+					region.draw(null, null, null, null, newColor);
+					ActivityLib.addSelectEffect(region, true);
+					GeneralLib.setModified(true);
+				}
+			});
+		}
+	},
+
+	
+	/**
+	 * Properties dialog content for Tool activities.
+	 */
+	toolProperties : function() {
+		var activity = this,
+			content = activity.propertiesContent,
+			allowsGrouping = !this.parentActivity || !(this.parentActivity instanceof ActivityDefs.ParallelActivity);
+		
+		if (!content) {
+			// first run, create the content
+			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
+													.show().data('parentObject', activity);
+			$('.propertiesContentFieldTitle', content).val(activity.title);
+			if (!allowsGrouping) {
+				// parts of Parallel Activity can not be grouped
+				$('.propertiesContentFieldGrouping', content).closest('tr').remove();
+			}
+			
+			$('input, select', content).change(function(){
+				// extract changed properties and redraw the activity
+				var content = $(this).closest('.dialogContainer'),
+					activity = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != activity.title) {
+					if (GeneralLib.nameValidator.test(newTitle)) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				
+				var selectedGrouping = $('.propertiesContentFieldGrouping option:selected', content);
+				if (selectedGrouping.length > 0){
+					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
+										.data('grouping');
+					if (newGroupingValue != activity.grouping) {
+						activity.grouping = newGroupingValue;
+						redrawNeeded = true;
+					}
+				}
+				
+				if (redrawNeeded) {
+					activity.draw();
+					ActivityLib.addSelectEffect(activity, true);
+					GeneralLib.setModified(true);
+				}
+			});
+		}
+		
+		if (allowsGrouping){
+			PropertyLib.fillGroupingDropdown(activity, activity.grouping);
+		}
+	},
+
+	
+	/**
+	 * Properties dialog content for transitions.
+	 */
+	transitionProperties : function() {
+		var transition = this,
+			content = transition.propertiesContent;
+		if (!content) {
+			// first run, create the content
+			content = transition.propertiesContent = $('#propertiesContentTransition').clone().attr('id', null)
+													.show().data('parentObject', transition);
+			$('.propertiesContentFieldTitle', content).val(transition.title);
+			
+			var defaultBranch = $('.propertiesContentFieldDefault', content);
+			if (transition.branch) {
+				defaultBranch.show();
+			} else {
+				defaultBranch.hide();
+			}
+			
+			$('input', content).change(function(){
+				// extract changed properties and redraw the transition
+				var content = $(this).closest('.dialogContainer'),
+					transition = content.data('parentObject'),
+					redrawNeeded = false,
+					newTitle =  $('.propertiesContentFieldTitle', content).val();
+				
+				// validate and save the title
+				if (newTitle != transition.title) {
+            		if (GeneralLib.nameValidator.test(newTitle)) {
+						transition.title = newTitle;
+						if (transition.branch) {
+							transition.branch.title = newTitle;
+						}
+						redrawNeeded = true;
+            		} else {
+            			alert(LABELS.TITLE_VALIDATION_ERROR);
+            		}
+				}
+				
+				if (transition.branch) {
+					transition.branch.defaultBranch = $('.propertiesContentFieldDefault', content).is(':checked');
+					if (transition.branch.defaultBranch) {
+						// reset default branch marker in other branches, there can be only one
+						$.each(transition.branch.branchingActivity.branches, function(){
+							if (this != transition.branch) {
+								this.defaultBranch = false;
+							}
+						});
+					}
+				}
+				
+				if (redrawNeeded) {
+					transition.draw();
+					ActivityLib.addSelectEffect(activity, true);
+					GeneralLib.setModified(true);
+				}
+			});
+		}
+
+		$('.propertiesContentFieldDefault', content).attr('checked',
+				transition.branch && transition.branch.defaultBranch ? 'checked' : null);
+	}
+},
+
+
+
+/**
+ * Contains Properties dialog manipulation methods.
+ */
+PropertyLib = {
 		
 	init : function(){
 		// initialise the properties dialog singleton
-		var propertiesDialog = layout.items.propertiesDialog =
+		var propertiesDialog = layout.propertiesDialog =
 			$('<div />')
 				.appendTo('body')
 				.dialog({
@@ -25,12 +734,12 @@ var PropertyLib = {
 		propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
 		propertiesDialog.container.addClass('propertiesDialogContainer')
 								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
-		 						  .mousemove(HandlerLib.approachPropertiesDialogHandler)
+		 						  .mousemove(HandlerPropertyLib.approachPropertiesDialogHandler)
 		                          .find('.ui-dialog-titlebar-close').remove();
 		layout.dialogs.push(propertiesDialog);
 		
 		// initialise dialog from group naming
-		layout.items.groupNamingDialog = $('<div />').dialog({
+		layout.groupNamingDialog = $('<div />').dialog({
 			'autoOpen' : false,
 			'modal'  : true,
 			'show'   : 'fold',
@@ -45,16 +754,19 @@ var PropertyLib = {
 			            	'click'  : function() {
 			            		var dialog = $(this),
 			            			activity = dialog.dialog('option', 'parentObject'),
+			            			names = [],
 			            			error = null;
 			            		
-			            		// extract group names from text fields
+			            		// extract group names from text fields and validate them
 			            		$('input', dialog).each(function(){
 			            			var groupName = $(this).val().trim();
-				            		if (!nameValidator.test(groupName)) {
+				            		if (GeneralLib.nameValidator.test(groupName)) {
+				            			names.push(groupName);
+				            		} else {
 				            			error = LABELS.GROUP_TITLE_VALIDATION_ERORR;
 				            			return false;
 				            		}
-			            		});
+			            		}); 
 			            		
 			            		if (error) {
 			            			alert(error);
@@ -62,7 +774,7 @@ var PropertyLib = {
 			            		}
 			            		
 			            		$('input', dialog).each(function(index){
-		            				activity.groups[index].name = $(this).val().trim();
+		            				activity.groups[index].name = names[index];
 			            		});
 			            		
 			            		dialog.dialog('close');
@@ -77,11 +789,11 @@ var PropertyLib = {
 			]
 		});
 		// add to dialogs array so they can be easily closed at once
-		layout.dialogs.push(layout.items.groupNamingDialog);
+		layout.dialogs.push(layout.groupNamingDialog);
 		
 		
 		// initialise dialog for matching groups to branches in branching activities
-		var gtbDialog = layout.items.groupsToBranchesMappingDialog = $('#branchMappingDialog')
+		var gtbDialog = layout.groupsToBranchesMappingDialog = $('#branchMappingDialog')
 			.clone()
 			.attr('id','gtbDialog')
 			.dialog({
@@ -101,12 +813,12 @@ var PropertyLib = {
 			            	'click'  : function() {
 			            		var dialog = $(this),
 			            			branchingActivity = dialog.dialog('option', 'branchingActivity'),
+			            			groupsToBranches = [],
 			            			assignedToDefault = false,
 			            			defaultBranch = null,
 			            			close = true;
 
 			            		// find references to groups and branches
-			            		branchingActivity.groupsToBranches = [];
 			            		$('.branchMappingBoundItemCell div, .branchMappingFreeItemCell div', dialog).each(function(){
 			            			var groupUIID = +$(this).attr('uiid'),
 			            				boundItem = $(this).data('boundItem'),
@@ -114,6 +826,7 @@ var PropertyLib = {
 			            				group = null,
 			            				branch = null;
 			            			
+			            			// look for branch
 			            			if (branchUIID) {
 				            			$.each(branchingActivity.branches, function(){
 				            				if (branchUIID == this.uiid) {
@@ -122,6 +835,7 @@ var PropertyLib = {
 				            				}
 				            			});
 			            			} else {
+			            				// assign to default branch
 			            				if (!defaultBranch) {
 			            					$.each(branchingActivity.branches, function(){
 			            						if (this.defaultBranch) {
@@ -139,6 +853,7 @@ var PropertyLib = {
 			            				assignedToDefault = true;
 			            			}
 			            			
+			            			// look for group
 			            			$.each(branchingActivity.grouping.groups, function(){
 			            				if (groupUIID == this.uiid) {
 			            					group = this;
@@ -147,7 +862,7 @@ var PropertyLib = {
 			            			});
 			            			
 			            			// add the mapping
-			            			branchingActivity.groupsToBranches.push({
+			            			groupsToBranches.push({
 			            				'uiid'   : ++layout.ld.maxUIID,
 			            				'group'  : group,
 			            				'branch' : branch
@@ -155,12 +870,14 @@ var PropertyLib = {
 			            		});
 			            		
 		            			if (assignedToDefault){
+		            				// ask the user if it's OK to assign groups to default branch
 		            				close = confirm(LABELS.GROUPS_TO_DEFAULT_BRANCH_CONFIRM);
 		            			}
 		            			
 		            			if (close) {
+		            				branchingActivity.groupsToBranches = groupsToBranches;
 				            		dialog.dialog('close');
-				            		setModified(true);
+				            		GeneralLib.setModified(true);
 		            			}
 			            	}
 			             }
@@ -191,7 +908,7 @@ var PropertyLib = {
 		
 		
 		// initialise dialog for defining input conditions
-		var outputConditionsDialog = layout.items.outputConditionsDialog = $('#outputConditionsDialog').dialog({
+		var outputConditionsDialog = layout.outputConditionsDialog = $('#outputConditionsDialog').dialog({
 			'autoOpen' : false,
 			'modal'  : true,
 			'show'   : 'fold',
@@ -259,7 +976,7 @@ var PropertyLib = {
 							activity = dialog.dialog('option', 'parentObject');
 						
 						// extract created mappings from UI
-						if (activity instanceof ActivityLib.BranchingActivity) {
+						if (activity instanceof ActivityDefs.BranchingActivity) {
 							activity.conditionsToBranches = [];
 							$('#rangeConditions tr, #complexConditions li', dialog).each(function(){
 								// if it's hidden, then another output was selected, so skip it
@@ -304,7 +1021,7 @@ var PropertyLib = {
 			 * Get output definitions from Tool activity
 			 */
 			'refreshDefinitions' : function(){
-				var dialog = layout.items.outputConditionsDialog,
+				var dialog = layout.outputConditionsDialog,
 					activity = dialog.dialog('option', 'parentObject');
 				
 				$.ajax({
@@ -327,7 +1044,7 @@ var PropertyLib = {
 			 * Link output data to UI widgets
 			 */
 			'buildContent' : function(useDefaultConditions) {
-				var dialog = layout.items.outputConditionsDialog,
+				var dialog = layout.outputConditionsDialog,
 					activity = dialog.dialog('option', 'parentObject'),
 					outputSelect = $('#outputSelect', dialog),
 					emptyOption = $('option[value="none"]', outputSelect).attr('selected', 'selected'),
@@ -376,7 +1093,7 @@ var PropertyLib = {
 			 * Rebuild dialog content based on selected output
 			 */
 			'outputChange' : function(useDefaultConditions){
-				var dialog = layout.items.outputConditionsDialog,
+				var dialog = layout.outputConditionsDialog,
 					container = dialog.closest('.ui-dialog'),
 				 	activity = dialog.dialog('option', 'parentObject'),
 				    outputOption = $('#outputSelect option:selected', dialog),
@@ -464,7 +1181,7 @@ var PropertyLib = {
 			 * Show widgets appropriate for given range definition
 			 */
 			'rangeOptionChange' : function(){
-				var dialog = layout.items.outputConditionsDialog,
+				var dialog = layout.outputConditionsDialog,
 					selectedOption = $('#rangeOptionSelect option:selected', dialog).attr('value');
 				
 				switch(selectedOption){
@@ -520,7 +1237,7 @@ var PropertyLib = {
 		$('#rangeOptionSelect', outputConditionsDialog).change(outputConditionsDialog.dialog('option', 'rangeOptionChange'));
 		// add a new range condition
 		$('#rangeAddButton', outputConditionsDialog).button().click(function(){
-			var dialog = layout.items.outputConditionsDialog, 
+			var dialog = layout.outputConditionsDialog, 
 				rangeConditionNames = $('#rangeConditions', dialog),
 				selectedOption = $('#rangeOptionSelect option:selected', dialog).attr('value'),
 				output = $('#outputSelect option:selected', dialog).data('output'),
@@ -598,7 +1315,7 @@ var PropertyLib = {
 		
 		
 		// initialise dialog for matching conditions to branches/gate states in branching/gate activities
-		var ctbDialog = layout.items.conditionsToBranchesMappingDialog = $('#branchMappingDialog')
+		var ctbDialog = layout.conditionsToBranchesMappingDialog = $('#branchMappingDialog')
 			.clone()
 			.attr('id','ctbDialog')
 			.dialog({
@@ -626,13 +1343,14 @@ var PropertyLib = {
 				'beforeClose' : function(event) {
             		var dialog = $(this),
 	        			activity = dialog.dialog('option', 'activity'),
-	        			isGate = activity instanceof ActivityLib.GateActivity,
+	        			mappingCopy = activity.conditionsToBranches.slice(),
+	        			isGate = activity instanceof ActivityDefs.GateActivity,
 	        			assignedToDefault = false,
 	        			defaultBranch = isGate ? 'closed' : null,
 	        			close = true;
 	        		
             		// see what was mapped
-	    			$.each(activity.conditionsToBranches, function(){
+	    			$.each(mappingCopy, function(){
 	    				var mappingEntry = this;
 	    				mappingEntry.branch = null;
 	            		// find references to conditions and branches
@@ -684,7 +1402,8 @@ var PropertyLib = {
 	    			}
 	    			
 	    			if (close) {
-	            		setModified(true);
+	    				activity.conditionsToBranches = mappingCopy;
+	            		GeneralLib.setModified(true);
 	    			}
 	    			
 	    			// if false, the dialog will not close
@@ -717,896 +1436,6 @@ var PropertyLib = {
 	
 	
 	/**
-	 * Opens properties dialog with the contents specific for each activity
-	 */
-	openPropertiesDialog : function(object) {
-		object.loadPropertiesDialogContent();
-		var dialog = layout.items.propertiesDialog;
-		dialog.children().detach();
-		dialog.append(object.propertiesContent);
-		dialog.dialog('open');
-		dialog.find('input').blur();
-		var box = object.items.getBBox(),
-			x = box.x2 + canvas.offset().left + 5,
-			y = box.y + canvas.offset().top;
-		dialog.dialog('option', 'position',	[x, y]);
-		if (dialog.offset().left < box.x2 + canvas.offset().left) {
-			// if dialog covers the activity (too close to right border),
-			// move it to the other side
-			x = box.x + canvas.offset().left - dialog.width() - 35;
-			dialog.dialog('option', 'position',	[x, y]);
-		}
-	},
-	
-	
-	/**
-	 * Properties dialog content for transitions.
-	 */
-	transitionProperties : function() {
-		var transition = this,
-			content = transition.propertiesContent;
-		if (!content) {
-			// first run, create the content
-			content = transition.propertiesContent = $('#propertiesContentTransition').clone().attr('id', null)
-													.show().data('parentObject', transition);
-			$('.propertiesContentFieldTitle', content).val(transition.title);
-			
-			var defaultBranch = $('.propertiesContentFieldDefault', content);
-			if (transition.branch) {
-				defaultBranch.show();
-			} else {
-				defaultBranch.hide();
-			}
-			
-			$('input', content).change(function(){
-				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
-					transition = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != transition.title) {
-            		if (nameValidator.test(newTitle)) {
-						transition.title = newTitle;
-						if (transition.branch) {
-							transition.branch.title = newTitle;
-						}
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				
-				if (transition.branch) {
-					transition.branch.defaultBranch = $('.propertiesContentFieldDefault', content).is(':checked');
-					if (transition.branch.defaultBranch) {
-						$.each(transition.branch.branchingActivity.branches, function(){
-							if (this != transition.branch) {
-								this.defaultBranch = false;
-							}
-						});
-					}
-				}
-				
-				if (redrawNeeded) {
-					transition.draw();
-					ActivityLib.addSelectEffect(activity, true);
-					setModified(true);
-				}
-			});
-		}
-
-		$('.propertiesContentFieldDefault', content).attr('checked',
-				transition.branch && transition.branch.defaultBranch ? 'checked' : null);
-	},
-	
-	
-	/**
-	 * Properties dialog content for Tool activities.
-	 */
-	toolProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent,
-			allowsGrouping = !this.parentActivity || !(this.parentActivity instanceof ActivityLib.ParallelActivity);
-		
-		if (!content) {
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			$('.propertiesContentFieldTitle', content).val(activity.title);
-			if (!allowsGrouping) {
-				$('.propertiesContentFieldGrouping', content).closest('tr').remove();
-			}
-			
-			$('input, select', content).change(function(){
-				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != activity.title) {
-					if (nameValidator.test(newTitle)) {
-						activity.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				
-				var selectedGrouping = $('.propertiesContentFieldGrouping option:selected', content);
-				if (selectedGrouping.length > 0){
-					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
-										.data('grouping');
-					if (newGroupingValue != activity.grouping) {
-						activity.grouping = newGroupingValue;
-						redrawNeeded = true;
-					}
-				}
-				
-				if (redrawNeeded) {
-					activity.draw();
-					ActivityLib.addSelectEffect(activity, true);
-					setModified(true);
-				}
-			});
-		}
-		
-		if (allowsGrouping){
-			PropertyLib.fillGroupingDropdown(activity, activity.grouping);
-		}
-	},
-	
-	
-	/**
-	 * Properties dialog content for Grouping activities.
-	 */
-	groupingProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent;
-
-		if (!content) {
-			// make onChange function a local variable, because it's used several times
-			var changeFunction = function(){
-				// extract changed properties and redraw the activity, if needed
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle = $('.propertiesContentFieldTitle', content).val(),
-					newGroupCount = +$('.propertiesContentFieldGroupCount', content).val();
-				if (newTitle != activity.title) {
-					if (nameValidator.test(newTitle)) {
-						activity.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				
-				activity.groupingType = $('.propertiesContentFieldGroupingType', content).val();
-				
-				$('input[name="propertiesContentFieldGroupDivide"]', content).each(function(){
-						// enable/disable division types, depending on radio buttons next to them
-						$(this).next().find('.spinner').spinner('option', 'disabled', !$(this).is(':checked'));
-					})
-					// hide group/learner division with some grouping types
-					.add($('.propertiesContentFieldLearnerCount', content).closest('tr'))
-					.css('display', activity.groupingType == 'monitor' ? 'none' : '');
-				
-				$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', content)
-					.closest('tr').css('display', activity.groupingType == 'learner' ? '' : 'none');
-				
-				activity.groupDivide = activity.groupingType == 'monitor' ||
-					$('.propertiesContentFieldGroupCountEnable', content).is(':checked') ?
-					'groups' : 'learners';
-				$('.propertiesContentFieldNameGroups', content).css('display',
-						activity.groupDivide == 'groups' ? '' : 'none');		
-				
-				if (activity.groupCount != newGroupCount){
-					activity.groupCount = newGroupCount;
-					activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount, activity.groups, 'name',
-																	  LABELS.DEFAULT_GROUP_PREFIX);
-				} 
-				activity.learnerCount = +$('.propertiesContentFieldLearnerCount', content).val();
-				activity.equalSizes = $('.propertiesContentFieldEqualSizes', content).is(':checked');
-				activity.viewLearners = $('.propertiesContentFieldViewLearners', content).is(':checked');
-				
-				if (redrawNeeded) {
-					activity.draw();
-					ActivityLib.addSelectEffect(activity, true);
-				}
-				
-				setModified(true);
-			};
-			
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			
-			// init widgets
-			$('.propertiesContentFieldTitle', content).val(activity.title);
-			$('.propertiesContentFieldGroupingType', content).val(activity.groupingType);
-			if (activity.groupDivide == 'learners') {
-				$('.propertiesContentFieldLearnerCountEnable', content).attr('checked', 'checked');
-			} else {
-				$('.propertiesContentFieldGroupCountEnable', content).attr('checked', 'checked');
-			}	
-			
-			// create groups/learners spinners
-			$('.propertiesContentFieldGroupCount', content).spinner({
-				'min' : 2,
-				'disabled' : activity.groupDivide == 'learners'
-			}).spinner('value', activity.groupCount)
-			  .on('spinchange', changeFunction);
-			
-			$('.propertiesContentFieldLearnerCount', content).spinner({
-				'min' 	   : 1,
-				'disabled' : activity.groupDivide == 'groups'
-			}).spinner('value', activity.learnerCount)
-			  .on('spinchange', changeFunction);
-			
-			$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
-			$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
-			$('.propertiesContentFieldNameGroups', content).button().click(function(){
-				PropertyLib.openGroupNamingDialog(activity);
-			});
-			
-			$('input, select', content).change(changeFunction);
-			changeFunction.call(content);
-		}
-	},
-	
-	
-	/**
-	 * Properties dialog content for Gates.
-	 */
-	gateProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent;
-		if (!content) {
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			$('.propertiesContentFieldTitle', content).val(activity.title);
-			$('.propertiesContentFieldDescription', content).val(activity.description ? activity.description : '');
-			$('.propertiesContentFieldGateType', content).val(activity.gateType);
-			
-			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
-				PropertyLib.openOutputConditionsDialog(activity);
-			});
-			$('.propertiesContentFieldMatchConditions', content).button().click(function(){
-				PropertyLib.openConditionsToBranchesMappingDialog(activity);
-			});
-			
-			// make onChange function a local variable, because it's used several times
-			var changeFunction = function(){
-				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle = $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != activity.title) {
-					if (nameValidator.test(newTitle)) {
-						activity.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				
-				activity.description = $('.propertiesContentFieldDescription', content).val();
-				
-				activity.gateType = $('.propertiesContentFieldGateType', content).val();
-				if (activity.gateType == 'schedule') {
-					$(".propertiesContentRowGateSchedule").show();
-					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
-					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
-					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
-					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased').is(':checked');
-				} else {
-					$(".propertiesContentRowGateSchedule").hide();
-				}
-				
-				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
-					inputDefinitionRows = $('.propertiesContentRowConditions', content);
-				if (activity.gateType == 'condition') {
-					activity.input = inputRow.show().find('option:selected').data('input');
-					if (activity.input) {
-						inputDefinitionRows.show();
-					} else {
-						inputDefinitionRows.hide();
-					}
-				} else {
-					inputRow.hide();
-					inputDefinitionRows.hide();
-				}
-				
-				if (redrawNeeded) {
-					activity.draw();
-					ActivityLib.addSelectEffect(activity, true);
-				}
-				
-				setModified(true);
-			};
-			
-			// create groups/learners spinners
-			$('.propertiesContentFieldOffsetDay', content).spinner({
-				'min' : 0,
-				'max' : 364
-			}).spinner('value', activity.offsetDay || 0)
-			  .on('spinchange', changeFunction);
-			
-			$('.propertiesContentFieldOffsetHour', content).spinner({
-				'min' : 0,
-				'max' : 23
-			}).spinner('value', activity.offsetHour || 0)
-			  .on('spinchange', changeFunction);
-			
-			$('.propertiesContentFieldOffsetMinute', content).spinner({
-				'min' : 0,
-				'max' : 59
-			}).spinner('value', activity.offsetMinute || 0)
-			  .on('spinchange', changeFunction);
-			
-			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
-			
-			$('input, textarea, select', content).change(changeFunction);
-			PropertyLib.fillToolInputDropdown(activity, activity.input);
-			changeFunction.call(content);
-		}
-		
-		if (activity.transitions.to.length == 0){
-			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('checked', null)
-				.attr('disabled', 'disabled');
-		} else {
-			$('.propertiesContentFieldActivityCompletionBased', content)
-				.attr('disabled', null);
-		}
-		
-		PropertyLib.fillToolInputDropdown(activity, activity.input);
-	},
-	
-	
-	/**
-	 * Properties dialog content for Branching activities.
-	 */
-	branchingProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent,
-			fillWidgetsFunction = function(){
-				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
-				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
-				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
-				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
-				
-				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
-																				 activity.branchingActivity.minOptions)
-																		.spinner('option', 'max',
-																				 activity.branchingActivity.branches.length);
-				$('.propertiesContentFieldOptionalSequenceMax', content).spinner('value',
-																				 activity.branchingActivity.maxOptions)
-																		.spinner('option', {
-																			'min' : activity.branchingActivity.minOptions,
-																			'max' : activity.branchingActivity.branches.length
-																		});
-				if (activity.branchingActivity.branches.length == 0) {
-					$('.propertiesContentRowConditions', content)
-						.add($('.propertiesContentFieldMatchGroups', content).closest('tr'))
-						.hide();
-				}
-			}
-		
-		if (!content) {
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			$('.propertiesContentFieldMatchGroups', content).button().click(function(){
-				PropertyLib.openGroupsToBranchesMappingDialog(activity.branchingActivity);
-			});
-			$('.propertiesContentFieldCreateConditions', content).button().click(function(){
-				PropertyLib.openOutputConditionsDialog(activity.branchingActivity);
-			});
-			$('.propertiesContentFieldMatchConditions', content).button().click(function(){
-				PropertyLib.openConditionsToBranchesMappingDialog(activity.branchingActivity);
-			});
-			
-			var changeFunction = function(){
-				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					branchingActivity = activity.branchingActivity,
-					redrawNeeded = false,
-					newTitle = $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != branchingActivity.title) {
-					if (nameValidator.test(newTitle)) {
-						branchingActivity.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
-				
-				var groupingRow = $('.propertiesContentFieldGrouping', content).closest('tr');
-				if (branchingActivity.branchingType == 'group') {
-					branchingActivity.grouping = groupingRow.show()
-												.find('option:selected').data('grouping');
-				} else {
-					groupingRow.hide();
-				}
-				$('.propertiesContentFieldMatchGroups', content).closest('tr')
-					.css('display', branchingActivity.grouping && branchingActivity.branches.length > 0 ? '' : 'none');
-				
-				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
-					inputDefinitionRows = $('.propertiesContentRowConditions', content);
-				if (branchingActivity.branchingType == 'tool') {
-					branchingActivity.input = inputRow.show()
-						.find('option:selected').data('input');
-					if (branchingActivity.input && branchingActivity.branches.length > 0) {
-						inputDefinitionRows.show();
-					} else {
-						inputDefinitionRows.hide();
-					}
-				} else {
-					inputRow.hide();
-					inputDefinitionRows.hide();
-				}
-				
-				var optionalSequenceRows = $('.spinner', content).closest('tr');
-				if (branchingActivity.branchingType == 'optional') {
-					optionalSequenceRows.show();
-				} else {
-					optionalSequenceRows.hide();
-				}
-
-				if (redrawNeeded) {
-					branchingActivity.start.draw();
-					branchingActivity.end.draw();
-					ActivityLib.addSelectEffect(layout.items.selectedObject, true);
-				}
-				
-				setModified(true);
-			}
-			
-			$('.propertiesContentFieldOptionalSequenceMin', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
-				  var value = +$(this).val();
-				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
-				  if (value != activity.branchingActivity.minOptions) {
-					  $(this, content).spinner('value', activity.branchingActivity.minOptions);
-				  }
-				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
-					  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('value', value);
-				  }
-				  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('option', 'min', value);
-			  });
-			
-			
-			$('.propertiesContentFieldOptionalSequenceMax', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
-				  var value = +$(this).val();
-				  activity.branchingActivity.maxOptions = Math.min(value, activity.branchingActivity.branches.length);
-				  if (value != activity.branchingActivity.maxOptions) {
-					  $(this, content).spinner('value', activity.branchingActivity.maxOptions);
-				  }
-			  });
-			
-			$('input, select', content).change(changeFunction);
-			fillWidgetsFunction();
-			changeFunction.call(content);
-		}
-		
-		
-		fillWidgetsFunction();
-	},
-	
-	
-	/**
-	 * Properties dialog content for Parallel activities.
-	 */
-	parallelProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent;
-		
-		if (!content) {
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentParallel').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			$('.propertiesContentFieldTitle', content).val(activity.title);
-			
-			$('input, select', content).change(function(){
-				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != activity.title) {
-					if (nameValidator.test(newTitle)) {
-						activity.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
-									.data('grouping');
-				if (newGroupingValue != activity.grouping) {
-					activity.grouping = newGroupingValue;
-					redrawNeeded = true;
-				}
-				
-				if (redrawNeeded) {
-					activity.draw();
-					ActivityLib.addSelectEffect(activity, true);
-					setModified(true);
-				}
-			});
-		}
-		
-		PropertyLib.fillGroupingDropdown(activity, activity.grouping);
-	},
-	
-	
-	/**
-	 * Properties dialog content for Optional Activity.
-	 */
-	optionalActivityProperties : function() {
-		var activity = this,
-			content = activity.propertiesContent;
-
-		activity.minOptions = Math.min(activity.minOptions, activity.childActivities.length);
-		activity.maxOptions = Math.min(activity.maxOptions, activity.childActivities.length);
-		
-		if (!content) {
-			// first run, create the content
-			content = activity.propertiesContent = $('#propertiesContentOptionalActivity').clone().attr('id', null)
-													.show().data('parentObject', activity);
-			$('.propertiesContentFieldTitle', content).val(activity.title);
-			
-			$('input', content).change(function(){
-				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
-					activity = content.data('parentObject'),
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != activity.title) {
-					if (nameValidator.test(newTitle)) {
-            			activity.title = newTitle;
-						activity.draw();
-						ActivityLib.addSelectEffect(activity, true);
-						setModified(true);
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-			});
-				
-			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
-				  var value = +$(this).val();
-				  activity.minOptions = Math.min(value, activity.childActivities.length);
-				  if (value != activity.minOptions) {
-					  $(this, content).spinner('value', activity.minOptions);
-				  }
-				  if (activity.minOptions > activity.maxOptions) {
-					  $('.propertiesContentFieldOptionalActivityMax', content).spinner('value', value);
-				  }
-				  $('.propertiesContentFieldOptionalActivityMax', content).spinner('option', 'min', value);
-			  });
-			
-			
-			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
-				  var value = +$(this).val();
-				  activity.maxOptions = Math.min(value, activity.childActivities.length);
-				  if (value != activity.maxOptions) {
-					  $(this, content).spinner('value', activity.maxOptions);
-				  }
-			  });
-		}
-		
-		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minOptions)
-																.spinner('option', 'max', activity.childActivities.length);
-		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxOptions)
-																.spinner('option', {
-																	'min' : activity.minOptions,
-																	'max' : activity.childActivities.length
-																});
-	},
-	
-	
-	/**
-	 * Properties dialog content for regions (annotations).
-	 */
-	regionProperties : function() {
-		var region = this,
-			content = region.propertiesContent;
-		if (!content) {
-			// first run, create the content
-			content = region.propertiesContent = $('#propertiesContentRegion').clone().attr('id', null)
-													.show().data('parentObject', region);
-			
-			$('.propertiesContentFieldTitle', content).val(region.title);
-			var color = region.items.shape.attr('fill');
-			$('.propertiesContentFieldColor', content).val(color)
-													  .simpleColor({
-														'colors' : layout.colors.annotationPalette,
-														'chooserCSS' : {
-															'left'	   : 0,
-															'top'      : '30px',
-															'margin'   : '0'
-														}
-													  });
-			
-			$('input', content).change(function(){
-				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
-					region = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle = $('.propertiesContentFieldTitle', content).val(),
-					color = region.items.shape.attr('fill'),
-					newColor = $('.propertiesContentFieldColor', content).val();
-				if (newTitle != region.title) {
-					if (nameValidator.test(newTitle)) {
-						region.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				redrawNeeded |= newColor != color;
-				
-				if (redrawNeeded) {
-					region.draw(null, null, null, null, newColor);
-					ActivityLib.addSelectEffect(region, true);
-					setModified(true);
-				}
-			});
-		}
-		
-		
-	},
-	
-	
-	/**
-	 * Properties dialog content for labels (annotations).
-	 */
-	labelProperties : function() {
-		var label = this,
-			content = label.propertiesContent;
-		if (!content) {
-			// first run, create the content
-			content = label.propertiesContent = $('#propertiesContentLabel').clone().attr('id', null)
-													.show().data('parentObject', label);
-			$('.propertiesContentFieldTitle', content).val(label.title);
-			
-			$('input', content).change(function(){
-				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
-					label = content.data('parentObject'),
-					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				if (newTitle != label.title) {
-					if (nameValidator.test(newTitle)) {
-						label.title = newTitle;
-						redrawNeeded = true;
-            		} else {
-            			alert(LABELS.TITLE_VALIDATION_ERROR);
-            		}
-				}
-				
-				if (redrawNeeded) {
-					label.draw();
-					ActivityLib.addSelectEffect(label, true);
-					setModified(true);
-				}
-			});
-		}
-	},
-	
-	
-	/**
-	 * 	Find all groupings on canvas and fill dropdown menu with their titles
-	 */
-	fillGroupingDropdown : function(activity, grouping) {
-		// find all groupings on canvas and fill dropdown menu with their titles
-		var emptyOption = $('<option />').attr('selected', 'selected'),
-			groupingDropdown = $('.propertiesContentFieldGrouping', activity.propertiesContent).empty().append(emptyOption),
-			groupings = [];
-		
-		if (activity.parentActivity && activity.parentActivity instanceof ActivityLib.FloatingActivity) {
-			// Support activities can use any grouping on canvas
-			$.each(layout.activities, function(){
-				if (this instanceof ActivityLib.GroupingActivity) {
-					groupings.push(this);
-				}
-			});
-		} else {
-			// normal activities can use only preceeding groupings
-			var candidate = activity.branchingActivity ? activity.branchingActivity.start : activity;
-			do {
-				if (candidate.transitions && candidate.transitions.to.length > 0) {
-					candidate = candidate.transitions.to[0].fromActivity;
-				} else if (candidate.branchingActivity && !candidate.isStart) {
-					candidate = candidate.branchingActivity.start;
-				}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-					candidate = candidate.parentActivity;
-				} else {
-					candidate = null;
-				}
-				
-				if (candidate instanceof ActivityLib.GroupingActivity) {
-					groupings.push(candidate);
-				}
-			} while (candidate != null);
-		}
-
-		// fill dropdown menu
-		$.each(groupings, function(){
-			var option = $('<option />').text(this.title)
-						.appendTo(groupingDropdown)
-						// store reference to grouping object
-						.data('grouping', this);
-			if (this == grouping) {
-				emptyOption.removeAttr('selected');
-				option.attr('selected', 'selected');
-			}
-		});
-	},
-	
-	
-	/**
-	 * 	Find all activities that support outputs and fill dropdown menu with their titles
-	 */
-	fillToolInputDropdown : function(activity, input) {
-		// find all tools that support input and fill dropdown menu with their titles
-		var emptyOption = $('<option />'),
-			inputDropdown = $('.propertiesContentFieldInput', activity.propertiesContent).empty().append(emptyOption),
-			inputActivities = [],
-			candidate = activity.branchingActivity ? activity.branchingActivity.start : activity;
-
-		do {
-			if (candidate.transitions && candidate.transitions.to.length > 0) {
-				candidate = candidate.transitions.to[0].fromActivity;
-			} else if (candidate.branchingActivity && !candidate.isStart) {
-				candidate = candidate.branchingActivity.start;
-			}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-				candidate = candidate.parentActivity;
-			} else {
-				candidate = null;
-			}
-			
-			if (candidate instanceof ActivityLib.ToolActivity
-					&& layout.toolMetadata[candidate.learningLibraryID].supportsOutputs) {
-				inputActivities.push(candidate);
-			}
-		} while (candidate != null);
-		
-
-		// fill dropdown menu
-		$.each(inputActivities, function(){
-			var option = $('<option />').text(this.title)
-						.appendTo(inputDropdown)
-						// store reference to grouping object
-						.data('input', this);
-			if (this == input) {
-				emptyOption.removeAttr('selected');
-				option.attr('selected', 'selected');
-			}
-		});
-
-	},
-	
-	
-	/**
-	 * Fills group naming dialog with existing group names and opens it.
-	 */
-	openGroupNamingDialog : function(activity) {
-		var dialog = layout.items.groupNamingDialog;
-		// remove existing entries and add reference to the initiating activity
-		dialog.empty().dialog('option', 'parentObject', activity);
-		
-		$.each(activity.groups, function(){
-			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.name);
-			dialog.append('<br />');
-		});
-		
-		dialog.dialog('open');
-	},
-	
-	
-	/**
-	 * Creates group and branch names, if they are not already provided.
-	 */
-	fillNameAndUIIDList : function(size, existingList, nameAttr, prefix) {
-		var list = [];
-		for (var itemIndex = 1; itemIndex <= size; itemIndex++) {
-			// generate a name and an UIID if they do not exist
-			var item = itemIndex > existingList.length ? {} : existingList[itemIndex - 1];
-			if (!item[nameAttr]) {
-				item[nameAttr] = prefix + itemIndex;
-			}
-			if (!item.uiid) {
-				item.uiid = ++layout.ld.maxUIID;
-			}
-			list.push(item);
-		}
-		return list;
-	},
-	
-	
-	/**
-	 * Opens dialog for assigned groups to branches in branching activity.
-	 */
-	openGroupsToBranchesMappingDialog : function(branchingActivity ) {
-		var dialog = layout.items.groupsToBranchesMappingDialog,
-			grouping = branchingActivity.grouping,
-			groupsCell = $('.branchMappingFreeItemCell', dialog),
-			branchesCell = $('.branchMappingFreeBranchCell', dialog),
-			groupCell = $('.branchMappingBoundItemCell', dialog),
-			branchCell = $('.branchMappingBoundBranchCell', dialog),
-			branches = branchingActivity.branches;
-		
-		// remove existing entries and add reference to the initiating activity
-		dialog.dialog('option', 'branchingActivity', branchingActivity);
-		$('.branchMappingListCell', dialog).empty();
-		
-		// find group names and create DOM elements out of them
-		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
-				grouping.groups, 'name', LABELS.DEFAULT_GROUP_PREFIX);
-		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
-				branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
-		
-		$.each(grouping.groups, function(){
-			var group = this,
-				groupElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
-										.text(group.name).attr('uiid', group.uiid);
-			
-			// check if a group-branch mapping is already defined
-			$.each(branchingActivity.groupsToBranches, function() {
-				if (this.group == group && branches.indexOf(this.branch) != -1) {
-					var branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
-												 .appendTo(branchCell)
-												 .text(this.branch.title)
-												 .attr('uiid', this.branch.uiid)
-												 .data('boundItem', groupElem);
-					groupElem.appendTo(groupCell).data('boundItem', branchElem);
-					groupElem = null;
-					return false;
-				}
-			});
-			
-			if (groupElem) {
-				// no existing mapping was found, make the group available for mapping
-				groupElem.appendTo(groupsCell);
-			}
-		});
-		$.each(branches, function(){
-			$('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell)
-						.text(this.title).attr('uiid', this.uiid);
-		});
-		
-		dialog.dialog('open');
-	},
-	
-	
-	/**
-	 * Selects a list item and optionally the matched pair.
-	 */
-	selectBranchMappingListItem : function(){
-		var item = $(this),
-			boundItem = item.data('boundItem');
-		
-		item.siblings().removeClass('selected');
-		item.addClass('selected');
-		
-		if (boundItem) {
-			boundItem.siblings().removeClass('selected');
-			boundItem.addClass('selected');
-		}
-	},
-	
-	
-	/**
 	 * Make a pair out of selected group/condition and branch.
 	 */
 	addBranchMapping : function(dialog){
@@ -1633,38 +1462,124 @@ var PropertyLib = {
 	
 	
 	/**
-	 * Remove a mapping of group/condition and branch.
+	 * 	Find all groupings on canvas and fill dropdown menu with their titles
 	 */
-	removeBranchMapping : function(dialog) {
-		var selectedItem = $('.branchMappingBoundItemCell .selected', dialog),
-			selectedBranch =  $('.branchMappingBoundBranchCell .selected', dialog);
-	
-		if (selectedItem.length != 1 || selectedBranch.length != 1) {
-			return;
-		}
+	fillGroupingDropdown : function(activity, grouping) {
+		// find all groupings on canvas and fill dropdown menu with their titles
+		var emptyOption = $('<option />').attr('selected', 'selected'),
+			groupingDropdown = $('.propertiesContentFieldGrouping', activity.propertiesContent).empty().append(emptyOption),
+			groupings = [];
 		
-		selectedItem.removeData('boundItem');
-		selectedBranch.remove();
-		$('.branchMappingFreeItemCell', dialog).append(selectedItem);
-	},
-
-	
-	openOutputConditionsDialog : function(activity){
-		if (!activity || !activity.input) {
-			return;
+		if (activity.parentActivity && activity.parentActivity instanceof ActivityDefs.FloatingActivity) {
+			// Support activities can use any grouping on canvas
+			$.each(layout.activities, function(){
+				if (this instanceof ActivityDefs.GroupingActivity) {
+					groupings.push(this);
+				}
+			});
+		} else {
+			// normal activities can use only preceeding groupings
+			var candidate = activity.branchingActivity ? activity.branchingActivity.start : activity;
+			do {
+				if (candidate.transitions && candidate.transitions.to.length > 0) {
+					candidate = candidate.transitions.to[0].fromActivity;
+				} else if (candidate.branchingActivity && !candidate.isStart) {
+					candidate = candidate.branchingActivity.start;
+				}  else if (!candidate.branchingActivity && candidate.parentActivity) {
+					candidate = candidate.parentActivity;
+				} else {
+					candidate = null;
+				}
+				
+				if (candidate instanceof ActivityDefs.GroupingActivity) {
+					groupings.push(candidate);
+				}
+			} while (candidate != null);
 		}
 
-		$('#outputConditionsDialog').dialog('option', 'parentObject', activity)
-			  						.dialog('open');
+		// fill dropdown menu
+		$.each(groupings, function(){
+			var option = $('<option />').text(this.title)
+						.appendTo(groupingDropdown)
+						// store reference to grouping object
+						.data('grouping', this);
+			if (this == grouping) {
+				emptyOption.removeAttr('selected');
+				option.attr('selected', 'selected');
+			}
+		});
 	},
 	
 	
 	/**
+	 * Creates group and branch names, if they are not already provided.
+	 */
+	fillNameAndUIIDList : function(size, existingList, nameAttr, prefix) {
+		var list = [];
+		for (var itemIndex = 1; itemIndex <= size; itemIndex++) {
+			// generate a name and an UIID if they do not exist
+			var item = itemIndex > existingList.length ? {} : existingList[itemIndex - 1];
+			if (!item[nameAttr]) {
+				item[nameAttr] = prefix + itemIndex;
+			}
+			if (!item.uiid) {
+				item.uiid = ++layout.ld.maxUIID;
+			}
+			list.push(item);
+		}
+		return list;
+	},
+	
+	
+	/**
+	 * 	Find all activities that support outputs and fill dropdown menu with their titles
+	 */
+	fillToolInputDropdown : function(activity, input) {
+		// find all tools that support input and fill dropdown menu with their titles
+		var emptyOption = $('<option />'),
+			inputDropdown = $('.propertiesContentFieldInput', activity.propertiesContent).empty().append(emptyOption),
+			inputActivityDefs = [],
+			candidate = activity.branchingActivity ? activity.branchingActivity.start : activity;
+
+		do {
+			if (candidate.transitions && candidate.transitions.to.length > 0) {
+				candidate = candidate.transitions.to[0].fromActivity;
+			} else if (candidate.branchingActivity && !candidate.isStart) {
+				candidate = candidate.branchingActivity.start;
+			}  else if (!candidate.branchingActivity && candidate.parentActivity) {
+				candidate = candidate.parentActivity;
+			} else {
+				candidate = null;
+			}
+			
+			if (candidate instanceof ActivityDefs.ToolActivity
+					&& layout.toolMetadata[candidate.learningLibraryID].supportsOutputs) {
+				inputActivityDefs.push(candidate);
+			}
+		} while (candidate != null);
+		
+
+		// fill dropdown menu
+		$.each(inputActivityDefs, function(){
+			var option = $('<option />').text(this.title)
+						.appendTo(inputDropdown)
+						// store reference to grouping object
+						.data('input', this);
+			if (this == input) {
+				emptyOption.removeAttr('selected');
+				option.attr('selected', 'selected');
+			}
+		});
+
+	},
+	
+		
+	/**
 	 * Opens dialog for assigned conditions to branches/gate states in branching/gate activity
 	 */
 	openConditionsToBranchesMappingDialog : function(activity) {
-		var isGate = activity instanceof ActivityLib.GateActivity, 
-			dialog = layout.items.conditionsToBranchesMappingDialog,
+		var isGate = activity instanceof ActivityDefs.GateActivity, 
+			dialog = layout.conditionsToBranchesMappingDialog,
 			conditionsCell = $('.branchMappingFreeItemCell', dialog),
 			branchesCell = $('.branchMappingFreeBranchCell', dialog),
 			conditionCell = $('.branchMappingBoundItemCell', dialog),
@@ -1746,5 +1661,144 @@ var PropertyLib = {
 		});
 		
 		dialog.dialog('open');
+	},
+	
+	
+	/**
+	 * Fills group naming dialog with existing group names and opens it.
+	 */
+	openGroupNamingDialog : function(activity) {
+		var dialog = layout.groupNamingDialog;
+		// remove existing entries and add reference to the initiating activity
+		dialog.empty().dialog('option', 'parentObject', activity);
+		
+		$.each(activity.groups, function(){
+			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.name);
+			dialog.append('<br />');
+		});
+		
+		dialog.dialog('open');
+	},
+	
+	
+	openOutputConditionsDialog : function(activity){
+		if (!activity || !activity.input) {
+			return;
+		}
+
+		$('#outputConditionsDialog').dialog('option', 'parentObject', activity)
+			  						.dialog('open');
+	},
+	
+	
+	/**
+	 * Opens properties dialog with the contents specific for each activity
+	 */
+	openPropertiesDialog : function(object) {
+		object.loadPropertiesDialogContent();
+		var dialog = layout.propertiesDialog;
+		dialog.children().detach();
+		dialog.append(object.propertiesContent);
+		dialog.dialog('open');
+		dialog.find('input').blur();
+		var box = object.items.getBBox(),
+			x = box.x2 + canvas.offset().left + 5,
+			y = box.y + canvas.offset().top;
+		dialog.dialog('option', 'position',	[x, y]);
+		if (dialog.offset().left < box.x2 + canvas.offset().left) {
+			// if dialog covers the activity (too close to right border),
+			// move it to the other side
+			x = box.x + canvas.offset().left - dialog.width() - 35;
+			dialog.dialog('option', 'position',	[x, y]);
+		}
+	},
+	
+	
+	/**
+	 * Opens dialog for assigned groups to branches in branching activity.
+	 */
+	openGroupsToBranchesMappingDialog : function(branchingActivity ) {
+		var dialog = layout.groupsToBranchesMappingDialog,
+			grouping = branchingActivity.grouping,
+			groupsCell = $('.branchMappingFreeItemCell', dialog),
+			branchesCell = $('.branchMappingFreeBranchCell', dialog),
+			groupCell = $('.branchMappingBoundItemCell', dialog),
+			branchCell = $('.branchMappingBoundBranchCell', dialog),
+			branches = branchingActivity.branches;
+		
+		// remove existing entries and add reference to the initiating activity
+		dialog.dialog('option', 'branchingActivity', branchingActivity);
+		$('.branchMappingListCell', dialog).empty();
+		
+		// find group names and create DOM elements out of them
+		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
+				grouping.groups, 'name', LABELS.DEFAULT_GROUP_PREFIX);
+		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
+				branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
+		
+		$.each(grouping.groups, function(){
+			var group = this,
+				groupElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+										.text(group.name).attr('uiid', group.uiid);
+			
+			// check if a group-branch mapping is already defined
+			$.each(branchingActivity.groupsToBranches, function() {
+				if (this.group == group && branches.indexOf(this.branch) != -1) {
+					var branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
+												 .appendTo(branchCell)
+												 .text(this.branch.title)
+												 .attr('uiid', this.branch.uiid)
+												 .data('boundItem', groupElem);
+					groupElem.appendTo(groupCell).data('boundItem', branchElem);
+					groupElem = null;
+					return false;
+				}
+			});
+			
+			if (groupElem) {
+				// no existing mapping was found, make the group available for mapping
+				groupElem.appendTo(groupsCell);
+			}
+		});
+		$.each(branches, function(){
+			$('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell)
+						.text(this.title).attr('uiid', this.uiid);
+		});
+		
+		dialog.dialog('open');
+	},
+	
+	
+	/**
+	 * Selects a list item and optionally the matched pair.
+	 */
+	selectBranchMappingListItem : function(){
+		var item = $(this),
+			boundItem = item.data('boundItem');
+		
+		item.siblings().removeClass('selected');
+		item.addClass('selected');
+		
+		if (boundItem) {
+			boundItem.siblings().removeClass('selected');
+			boundItem.addClass('selected');
+		}
+	},
+	
+	
+	/**
+	 * Remove a mapping of group/condition and branch.
+	 */
+	removeBranchMapping : function(dialog) {
+		var selectedItem = $('.branchMappingBoundItemCell .selected', dialog),
+			selectedBranch =  $('.branchMappingBoundBranchCell .selected', dialog);
+	
+		if (selectedItem.length != 1 || selectedBranch.length != 1) {
+			return;
+		}
+		
+		selectedItem.removeData('boundItem');
+		selectedBranch.remove();
+		$('.branchMappingFreeItemCell', dialog).append(selectedItem);
 	}
 };

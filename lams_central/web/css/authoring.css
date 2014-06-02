@@ -66,6 +66,25 @@ div#infoDialog {
 }
 
 
+div.exportDialog {
+	text-align: center;
+	font-size: 17px;
+	font-weight: bold;
+}
+
+div.exportDialog a {
+	text-decoration: none;
+}
+
+div.exportDialog iframe {
+	display: none;
+}
+
+div#exportLDDialog {
+	cursor: pointer;
+}
+
+
 div#ldStoreDialog > table {
 	width: 100%;
 	height: 682px;
@@ -259,8 +278,10 @@ div#toolbar .ui-button, div#toolbar .split-ui-button {
 	font-size: 11px;
 }
 
-div#toolbar .split-ui-button + ul {
+div#toolbar .split-ui-button + ul, div#toolbar .split-ui-button + ul ul {
 	font-size: 11px;
+	font-weight: bold;
+	list-style: none;
 	color: #2E6E9E;
 	z-index: 1100;
 }
@@ -272,6 +293,10 @@ div#toolbar .split-ui-button + ul li {
 
 div#toolbar .split-ui-button + ul li:hover {
 	background-color: #dfeffc;
+}
+
+div#toolbar .split-ui-button + ul ul {
+	white-space: nowrap;
 }
 
 table#authoringTable {

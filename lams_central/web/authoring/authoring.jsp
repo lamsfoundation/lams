@@ -55,6 +55,7 @@
 				
 				// DecorationLib
 				DEFAULT_ANNOTATION_LABEL_TITLE : 'Label',
+				REGION_FIT_BUTTON_TOOLTIP : 'Fit',
 				
 				// General
 				NEW_FOLDER_BUTTON : 'New',
@@ -88,9 +89,11 @@
 				
 				// MenuLib
 				EXPORT_IMAGE_DIALOG_TITLE : 'Image export',
+				EXPORT_SEQUENCE_DIALOG_TITLE : 'Sequence export',
 				ACTIVITY_COPY_TITLE_PREFIX : 'Copy [0] of ',
 				PREVIEW_LESSON_DEFAULT_TITLE : 'Preview',
 				SAVE_DIALOG_TITLE : 'Save sequence',
+				OPEN_DIALOG_TITLE : 'Open sequence',
 				RUN_SEQUENCES_FOLDER : '<fmt:message key="label.tab.lesson.sequence.folder" />',
 				ARRANGE_CONFIRM : 'There are annotations on the canvas.\n'
 	   				+ 'They will be not arranged automatically, you will have to adjust them manually later.\n'
@@ -146,14 +149,16 @@
 				RANGE_CONDITION_ADD_END_ERROR : 'The end value can not be within the range of an existing condition',
 				GROUP_TITLE_VALIDATION_ERORR : 'Group name can not contain any of these characters < > ^ * @ % $'
 			},
-					
+			
+			isReadOnlyMode = false,
 			initContentFolderID = '${contentFolderID}',
+			initLearningDesignID = '${param.learningDesignID}',
 			initAccess = ${access};
 	</script>
 </lams:head>
-<body onresize="javascript:resizePaper()">
-	<div id="toolbar" class="ui-widget-header ui-corner-all">
-		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign(false, false)">
+<body onresize="javascript:GeneralLib.resizePaper()">
+	<div id="toolbar" class="ui-corner-all">
+		<div class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
 			New
 		</div>
 		<div>
@@ -176,9 +181,18 @@
 			</div>
 			<ul>
 				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
-				<li id="exportButton" onClick="javascript:MenuLib.exportLearningDesign()">Export</li>
-				<li onClick="javascript:MenuLib.convertToPNG()">Image PNG</li>
-				<li onClick="javascript:MenuLib.convertToSVG()">Image SVG</li>
+				<li>Export<span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
+					<ul>
+						<li class="exportSequenceButton"
+							title="Standard LAMS ZIP format"
+							onClick="javascript:MenuLib.exportLearningDesign(1)">Sequence LAMS</li>
+						<li class="exportSequenceButton"
+							title="IMS Learning Design Level A Format (This format cannot be reimported back into LAMS. Export only!)"
+							onClick="javascript:MenuLib.exportLearningDesign(2)">Sequence IMS</li>
+						<li class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)">Image PNG</li>
+						<li class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)">Image SVG</li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
@@ -229,7 +243,7 @@
 				<li onClick="javascript:MenuLib.addAnnotationRegion()">Region</li>
 			</ul>
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
+		<div class="ui-button" onClick="javascript:GeneralLib.arrangeActivities()">
 			Arrange
 		</div>
 		<div id="previewButton" class="ui-button" onClick="javascript:MenuLib.openPreview()">
@@ -733,9 +747,15 @@
 	
 	
 	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
-	<div id="exportImageDialog" class="dialogContainer">
-		<div class="dialogTitle">Right-click on the image and save it</div>
-		<div id="exportCanvas"></div>
+	<div id="exportImageDialog" class="dialogContainer exportDialog">
+		<a href="#">Click here to download the image.</a>
+	</div>
+	
+	
+	<!-- EXPORT LEARNING DESIGN DIALOG -->
+	<div id="exportLDDialog" class="dialogContainer exportDialog">
+		<span>Please wait for the download.<br />Close the dialog when the download is finished.</span>
+		<iframe></iframe>
 	</div>
 </body>
 </lams:html>

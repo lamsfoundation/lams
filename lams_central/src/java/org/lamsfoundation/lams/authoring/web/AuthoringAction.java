@@ -84,7 +84,8 @@ import com.google.gson.GsonBuilder;
  * @author Manpreet Minhas
  * 
  * @struts.action path = "/authoring/author" parameter = "method" validate = "false"
- * @struts:action-forward name="openAutoring" path="/author2.jsp"
+ * @struts:action-forward name="openAutoring" path="/authoring/authoring.jsp"
+ * @struts:action-forward name="svgGenerator" path="/authoring/svgGenerator.jsp"
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -122,6 +123,29 @@ public class AuthoringAction extends LamsDispatchAction {
 	Gson gson = new GsonBuilder().create();
 	request.setAttribute("access", gson.toJson(accessList));
 	return mapping.findForward("openAutoring");
+    }
+    
+
+    public ActionForward generateSVG(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
+
+	return mapping.findForward("svgGenerator");
+    }
+    
+    public ActionForward exportSequence(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	String type = request.getParameter("type");
+	
+	if ("image".equalsIgnoreCase(type)){
+	    String image = request.getParameter("image");
+	    String name = request.getParameter("name");
+	    name =  FileUtil.encodeFilenameForDownload(request, name);
+	    response.setContentType("application/x-download");
+	    response.setHeader("Content-Disposition", "attachment;filename=" + name);
+	}
+	
+	return null;
     }
 
     /**

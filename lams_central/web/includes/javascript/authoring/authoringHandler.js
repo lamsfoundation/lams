@@ -2,63 +2,11 @@
  * This file contains event handlers for interaction with canvas and other Authoring elements.
  */
 
+/**
+ * Contains general (canvas, group of shapes) action handlers
+ */
 var HandlerLib = {
 		
-	/**
-	 * Default mode for canvas. Run after special mode is no longer needed.
-	 */
-	resetCanvasMode : function(init){
-		// so elements understand that no events should be triggered, i.e. canvas is "dead"
-		layout.drawMode = !init;
-		
-		// remove selection if exists
-		ActivityLib.removeSelectEffect();
-		canvas.css('cursor', 'default')
-		      .off('click')
-		      .off('mousedown')
-		      .off('mouseup')
-		      .off('mousemove');
-
-		if (init) {
-			 // if clicked anywhere, activity selection is gone
-			canvas.click(HandlerLib.canvasClickHandler)
-		     // when mouse gets closer to properties dialog, make it fully visible
-		    	  .mousemove(HandlerLib.approachPropertiesDialogHandler);
-		}
-	},
-	
-	
-	/**
-	 * Makes properties dialog fully visible.
-	 */
-	approachPropertiesDialogHandler : function(event) {
-		// properties dialog is a singleton
-		var dialog = layout.items.propertiesDialog;
-		// do not run this method too often
-		var thisRun = new Date().getTime();
-		if (thisRun - dialog.lastRun < layout.conf.propertiesDialogDimThrottle){
-			return;
-		}
-		dialog.lastRun = thisRun;
-		
-		// is the dialog visible at all?
-		if (layout.items.selectedObject) {
-			// calculate dim/show threshold
-			var container = dialog.container,
-			    dialogPosition = container.offset(),
-			    dialogStartX = dialogPosition.left,
-			    dialogStartY = dialogPosition.top,
-			    dialogEndX   = dialogStartX + container.width(),
-			    dialogEndY   = dialogStartY + container.height(),
-			    dimTreshold = layout.conf.propertiesDialogDimThreshold,
-			    tooFarX = event.pageX < dialogStartX - dimTreshold || event.pageX > dialogEndX + dimTreshold,
-			    tooFarY = event.pageY < dialogStartY - dimTreshold || event.pageY > dialogEndY + dimTreshold,
-			    opacity = tooFarX || tooFarY ? layout.conf.propertiesDialogDimOpacity : 1;
-
-			container.css('opacity', opacity);
-		}
-	},
-
 	/**
 	 * Remove activity selection when user clicks on canvas.
 	 */
@@ -75,12 +23,13 @@ var HandlerLib = {
 	
 	
 	/**
-	 * Start dragging an activity or transition.
+	 * Start dragging an activity or a transition.
 	 */
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
 		// clear "clicked" flag, just in case
 		items.clicked = false;
 		
+		// if there is already a function waiting to be started, clear it
 		if (items.dragStarter) {
 			// prevent confusion when double clicking
 			clearTimeout(items.dragStarter);
@@ -108,16 +57,16 @@ var HandlerLib = {
 			items.attr('cursor', 'move');
 			
 			var parentObject = draggedElement.data('parentObject');
-				sticky = parentObject && (parentObject instanceof ActivityLib.ParallelActivity
-										  || parentObject instanceof ActivityLib.OptionalActivity
-										  || parentObject instanceof ActivityLib.FloatingActivity);
+				sticky = parentObject && (parentObject instanceof ActivityDefs.ParallelActivity
+										  || parentObject instanceof ActivityDefs.OptionalActivity
+										  || parentObject instanceof ActivityDefs.FloatingActivity);
 				
 			// hide child activities while moving the parent around
 			if (sticky) {
-				$.each(parentObject.childActivities, function(){
+				$.each(parentObject.childActivityDefs, function(){
 					this.items.hide();
-					if (this.childActivities) {
-						$.each(this.childActivities, function() {
+					if (this.childActivityDefs) {
+						$.each(this.childActivityDefs, function() {
 							this.items.hide();
 						});
 					}
@@ -132,7 +81,7 @@ var HandlerLib = {
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
 				items.unmouseup();
-				layout.items.bin.attr('fill', 'transparent');
+				layout.bin.attr('fill', 'transparent');
 				
 				// do whetver needs to be done with the dragged elements
 				mouseupHandler(mouseupEvent);
@@ -144,7 +93,7 @@ var HandlerLib = {
 			canvas.mouseup(mouseup);
 			items.mouseup(mouseup);
 			
-			setModified(true);
+			GeneralLib.setModified(true);
 		}, layout.conf.dragStartThreshold);
 	},
 	
@@ -164,17 +113,399 @@ var HandlerLib = {
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
-			layout.items.bin.attr('fill', layout.colors.binActive);
+			layout.bin.attr('fill', layout.colors.binActive);
 		} else {
-			layout.items.bin.attr('fill', 'transparent');
+			layout.bin.attr('fill', 'transparent');
 		}
 	},
 	
+	
+	/**
+	 * Rewrites a shape's coordinates, so it is where the user dropped it.
+	 */
+	dropObject : function(object) {
+		// finally transform the dragged elements
+		var transformation = object.items.shape.attr('transform');
+		object.items.transform('');
+		if (transformation.length > 0) {
+			// find new X and Y and redraw the object
+			var box = object.items.shape.getBBox(),
+				x = box.x,
+				// adjust this coordinate for annotation labels
+				y = box.y + (object instanceof DecorationDefs.Label ? 6 : 0);
+			object.draw(x + transformation[0][1],
+						y + transformation[0][2]);
+		}
+		
+		// add space if dropped object is next to border
+		GeneralLib.resizePaper();
+	},
+	
+	
+	/**
+	 * Checks whether activity or transition is over rubbish bin.
+	 */
+	isElemenentBinned : function(event) {
+		var translatedEvent = GeneralLib.translateEventOnCanvas(event);
+		return Raphael.isPointInsideBBox(layout.bin.getBBox(), translatedEvent[0], translatedEvent[1]); 
+	},
+	
+	
+	/**
+	 * Selects an activity/transition/annotation.
+	 */
+	itemClickHandler : function(event) {
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var parentObject = this.data('parentObject');
+		// inform that user wants to select, not drag the activity
+		parentObject.items.clicked = true;
+		if (parentObject != layout.selectedObject) {
+			HandlerLib.canvasClickHandler(event);
+			ActivityLib.addSelectEffect(parentObject, true);
+		}
+		
+		// so canvas handler unselectActivityHandler() is not run
+		event.preventDefault();
+	},
+	
+	
+	/**
+	 * Default mode for canvas. Run after draw mode is no longer needed.
+	 */
+	resetCanvasMode : function(init){
+		// so elements understand that no events should be triggered, i.e. canvas is "dead"
+		layout.drawMode = !init;
+		
+		// remove selection if exists
+		ActivityLib.removeSelectEffect();
+		canvas.css('cursor', 'default')
+		      .off('click')
+		      .off('mousedown')
+		      .off('mouseup')
+		      .off('mousemove');
+
+		if (init) {
+			 // if clicked anywhere, activity selection is gone
+			canvas.click(HandlerLib.canvasClickHandler)
+		     // when mouse gets closer to properties dialog, make it fully visible
+		    	  .mousemove(HandlerPropertyLib.approachPropertiesDialogHandler);
+		}
+	}
+},
+
+
+
+/**
+ * Contains handlers for actions over Activities.
+ */
+HandlerActivityLib = {
+		
+	/**
+	 * Double click opens activity authoring.
+	 */
+	activityDblclickHandler : function(event) {
+		var activity = this.data('parentObject');
+		// inform that user wants to open, not drag the activity
+		activity.items.clicked = true;
+		ActivityLib.openActivityAuthoring(activity);
+	},
+	
+	
+	/**
+	 * Starts drawing a transition or dragging an activity.
+	 */
+	activityMousedownHandler : function(event, x, y){
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var activity = this.data('parentObject');
+		if (event.ctrlKey) {
+			 // when CTRL is held down, start drawing a transition
+			 HandlerTransitionLib.drawTransitionStartHandler(activity, event, x, y);
+		} else if (!activity.parentActivity
+				|| !(activity.parentActivity instanceof ActivityDefs.ParallelActivity)){
+			var mouseupHandler = function(event){
+				if (HandlerLib.isElemenentBinned(event)) {
+					// if the activity was over rubbish bin, remove it
+					ActivityLib.removeActivity(activity);
+				} else {
+					// finalise movement - rewrite coordinates, see if the activity was not added to a container
+					HandlerLib.dropObject(activity);
+
+					var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+						endX = translatedEvent[0],
+						endY = translatedEvent[1];
+					ActivityLib.dropActivity(activity, endX, endY);
+				}
+			}
+			// start dragging the activity
+			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
+		}
+	},
+	
+	
+	/**
+	 * Lighthens up branching edges in the same colour for identifictation.
+	 */
+	branchingEdgeMouseoverHandler : function() {
+		var branchingActivity = this.data('parentObject').branchingActivity,
+			startItems = branchingActivity.start.items,
+			endItems = branchingActivity.end.items;
+		if (!startItems.isDragged && !endItems.isDragged) {
+			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+		}
+	},
+	
+	
+	/**
+	 * Return branching edges to their normal colours.
+	 */
+	branchingEdgeMouseoutHandler : function() {
+		var branchingActivity = this.data('parentObject').branchingActivity,
+			startItems = branchingActivity.start.items,
+			endItems = branchingActivity.end.items;
+		
+		if (!startItems.isDragged && !endItems.isDragged) {
+			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
+			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
+		}
+	}
+},
+
+
+
+/**
+ * Contains handlers for actions over Decoration elements.
+ */
+HandlerDecorationLib = {
+		
+	/**
+	 * Starts dragging a container
+	 */
+	containerMousedownHandler : function(event, x, y){
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var container = this.data('parentObject');
+		// allow transition dragging
+		var mouseupHandler = function(event){
+			if (HandlerLib.isElemenentBinned(event)) {
+				// if the container was over rubbish bin, remove it
+				if (container instanceof DecorationDefs.Region) {
+					DecorationLib.removeRegion(container);
+				} else {
+					ActivityLib.removeActivity(container);
+				}
+			} else {
+				HandlerLib.dropObject(container);
+				if (container instanceof ActivityDefs.FloatingActivity
+					|| container instanceof ActivityDefs.OptionalActivity
+					|| container instanceof ActivityDefs.ParallelActivity) {
+					ActivityLib.dropActivity(container);
+				}
+			}
+		}
+			
+		HandlerLib.dragItemsStartHandler(container.items, this, mouseupHandler, event, x, y);
+	},
+		
+	/**
+	 * Start drawing a region.
+	 */
+	drawRegionStartHandler : function(startEvent) {
+		HandlerLib.resetCanvasMode();
+		
+		// remember what were the drawing start coordinates
+		var translatedEvent = GeneralLib.translateEventOnCanvas(startEvent),
+			data = {
+				'startX' : translatedEvent[0],
+				'startY' : translatedEvent[1]
+			};
+			
+		canvas.mousemove(function(event){
+			HandlerDecorationLib.drawRegionMoveHandler(data, event);
+		})
+		.mouseup(function(event){
+			HandlerDecorationLib.drawRegionEndHandler(data);
+		});
+	},
+	
+	
+	/**
+	 * Keep drawing a region.
+	 */
+	drawRegionMoveHandler : function(data, event) {
+		var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+			x = translatedEvent[0],
+			y = translatedEvent[1];
+		
+		if (data.shape) {
+			// remove the previous rectangle
+			data.shape.remove();
+		}
+		
+		data.shape = paper.path(Raphael.format('M {0} {1} h {2} v {3} h -{2} z',
+								x < data.startX ? x : data.startX,
+								y < data.startY ? y : data.startY,
+								Math.abs(x - data.startX),
+								Math.abs(y - data.startY)))
+						  .attr({
+							'fill'    : layout.colors.annotation,
+							'opacity' : 0.3
+						  });
+		
+		// immediatelly show which activities will be enveloped
+		var childActivityDefs = DecorationLib.getChildActivityDefs(data.shape);
+		$.each(layout.activities, function(){
+			if (!this.parentActivity && $.inArray(this, childActivityDefs) > -1){
+				ActivityLib.addSelectEffect(this, false);
+			} else {
+				ActivityLib.removeSelectEffect(this);
+			}
+		});
+	},
+	
+	
+	/**
+	 * Finalise region drawing.
+	 */
+	drawRegionEndHandler : function(data) {
+		// remove select effect from all activities
+		$.each(layout.activities, function(){
+			ActivityLib.removeSelectEffect(this);
+		});
+		
+		if (data.shape) {
+			var box = data.shape.getBBox(),
+				region = DecorationLib.addRegion(box.x, box.y, box.x2, box.y2);
+			data.shape.remove();
+			ActivityLib.addSelectEffect(region, true);
+		}
+		HandlerLib.resetCanvasMode(true);
+	},
+	
+	
+	/**
+	 * Starts dragging a label
+	 */
+	labelMousedownHandler : function(event, x, y){
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
+		var label = this.data('parentObject');
+		// allow transition dragging
+		var mouseupHandler = function(event){
+			if (HandlerLib.isElemenentBinned(event)) {
+				// if the region was over rubbish bin, remove it
+				DecorationLib.removeLabel(label);
+			} else {
+				HandlerLib.dropObject(label);
+			}
+		}
+			
+		HandlerLib.dragItemsStartHandler(label.items, this, mouseupHandler, event, x, y);
+	},
+	
+	
+	/**
+	 * Start resizing a region.
+	 */
+	resizeRegionStartHandler : function(event) {
+		// otherwise mousedown handler (dragging) can be triggered
+		event.stopImmediatePropagation();
+		event.preventDefault();
+		
+		HandlerLib.resetCanvasMode();
+		
+		var region = this.data('parentObject');
+			
+		canvas.mousemove(function(event){
+			HandlerDecorationLib.resizeRegionMoveHandler(region, event);
+		})
+		.mouseup(function(){
+			HandlerLib.resetCanvasMode(true);
+			ActivityLib.addSelectEffect(region, true);
+		});
+		
+		GeneralLib.setModified(true);
+	},
+	
+	
+	/**
+	 * Keep resising a region.
+	 */
+	resizeRegionMoveHandler : function(region, event){
+		var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+			x = translatedEvent[0],
+			y = translatedEvent[1];
+	
+		// keep the initial coordinates and adjust end coordinates
+		region.draw(null, null, x, y);
+	}
+},
+
+
+
+/**
+ * Contains handlers for actions over Properties dialog.
+ */
+HandlerPropertyLib = {
+		
+	/**
+	 * Makes properties dialog fully visible.
+	 */
+	approachPropertiesDialogHandler : function(event) {
+		// properties dialog is a singleton
+		var dialog = layout.propertiesDialog,
+			// do not run this method too often
+			thisRun = new Date().getTime();
+		if (thisRun - dialog.lastRun < layout.conf.propertiesDialogDimThrottle){
+			return;
+		}
+		dialog.lastRun = thisRun;
+		
+		// is the dialog visible at all?
+		if (layout.selectedObject) {
+			// calculate dim/show threshold
+			var container = dialog.container,
+			    dialogPosition = container.offset(),
+			    dialogStartX = dialogPosition.left,
+			    dialogStartY = dialogPosition.top,
+			    dialogEndX   = dialogStartX + container.width(),
+			    dialogEndY   = dialogStartY + container.height(),
+			    dimTreshold = layout.conf.propertiesDialogDimThreshold,
+			    tooFarX = event.pageX < dialogStartX - dimTreshold || event.pageX > dialogEndX + dimTreshold,
+			    tooFarY = event.pageY < dialogStartY - dimTreshold || event.pageY > dialogEndY + dimTreshold,
+			    opacity = tooFarX || tooFarY ? layout.conf.propertiesDialogDimOpacity : 1;
+
+			container.css('opacity', opacity);
+		}
+	}	
+},
+
+
+
+/**
+ * Contains handlers for actions over Transitions
+ */
+HandlerTransitionLib = {
+
 	/**
 	 * Start drawing a transition.
 	 */
 	drawTransitionStartHandler : function(activity, event, x, y) {
-		if (activity.fromTransition && !(activity instanceof ActivityLib.BranchingEdgeActivity)) {
+		if (activity.fromTransition && !(activity instanceof ActivityDefs.BranchingEdgeActivity)) {
 			alert(LABELS.TRANSITION_FROM_EXISTS_ERROR);
 		}
 		
@@ -184,10 +515,10 @@ var HandlerLib = {
 			startY = y  + canvas.scrollTop()  - canvas.offset().top;
 		
 		canvas.mousemove(function(event){
-			HandlerLib.drawTransitionMoveHandler(activity, event, startX, startY);
+			HandlerTransitionLib.drawTransitionMoveHandler(activity, event, startX, startY);
 		})
 		.mouseup(function(event){
-			HandlerLib.drawTransitionEndHandler(activity, event);
+			HandlerTransitionLib.drawTransitionEndHandler(activity, event);
 		});
 	},
 	
@@ -202,7 +533,7 @@ var HandlerLib = {
 			activity.tempTransition = null;
 		}
 		
-		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+		var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 			endX = translatedEvent[0],
 			endY = translatedEvent[1];
 		
@@ -246,214 +577,6 @@ var HandlerLib = {
 	},
 	
 	
-	/**
-	 * Start drawing a region.
-	 */
-	drawRegionStartHandler : function(startEvent) {
-		HandlerLib.resetCanvasMode();
-		
-		// remember what were the drawing start coordinates
-		var translatedEvent = ActivityLib.translateEventOnCanvas(startEvent),
-			data = {
-				'startX' : translatedEvent[0],
-				'startY' : translatedEvent[1]
-			};
-			
-		canvas.mousemove(function(event){
-			HandlerLib.drawRegionMoveHandler(data, event);
-		})
-		.mouseup(function(event){
-			HandlerLib.drawRegionEndHandler(data);
-		});
-	},
-	
-	
-	/**
-	 * Keep drawing a region.
-	 */
-	drawRegionMoveHandler : function(data, event) {
-		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
-			x = translatedEvent[0],
-			y = translatedEvent[1];
-		
-		if (data.shape) {
-			// remove the previous rectangle
-			data.shape.remove();
-		}
-		
-		data.shape = paper.path(Raphael.format('M {0} {1} h {2} v {3} h -{2} z',
-								x < data.startX ? x : data.startX,
-								y < data.startY ? y : data.startY,
-								Math.abs(x - data.startX),
-								Math.abs(y - data.startY)))
-						  .attr({
-							'fill'    : layout.colors.annotation,
-							'opacity' : 0.3
-						  });
-		
-		// immediatelly show which activities will be enveloped
-		var childActivities = DecorationLib.getChildActivities(data.shape);
-		$.each(layout.activities, function(){
-			if (!this.parentActivity && $.inArray(this, childActivities) > -1){
-				ActivityLib.addSelectEffect(this, false);
-			} else {
-				ActivityLib.removeSelectEffect(this);
-			}
-		});
-	},
-	
-	
-	/**
-	 * Finalise region drawing.
-	 */
-	drawRegionEndHandler : function(data) {
-		// remove select effect from all activities
-		$.each(layout.activities, function(){
-			ActivityLib.removeSelectEffect(this);
-		});
-		
-		if (data.shape) {
-			var box = data.shape.getBBox(),
-				region = DecorationLib.addRegion(box.x, box.y, box.x2, box.y2);
-			data.shape.remove();
-			ActivityLib.addSelectEffect(region, true);
-		}
-		HandlerLib.resetCanvasMode(true);
-	},
-	
-	
-	/**
-	 * Start resizing a region.
-	 */
-	resizeRegionStartHandler : function(event) {
-		// otherwise mousedown handler (dragging) can be triggered
-		event.stopImmediatePropagation();
-		event.preventDefault();
-		
-		HandlerLib.resetCanvasMode();
-		
-		var region = this.data('parentObject');
-			
-		canvas.mousemove(function(event){
-			HandlerLib.resizeRegionMoveHandler(region, event);
-		})
-		.mouseup(function(){
-			HandlerLib.resetCanvasMode(true);
-			ActivityLib.addSelectEffect(region, true);
-		});
-		
-		setModified(true);
-	},
-	
-	
-	/**
-	 * Keep resising a region.
-	 */
-	resizeRegionMoveHandler : function(region, event){
-		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
-			x = translatedEvent[0],
-			y = translatedEvent[1];
-	
-		// keep the initial coordinates and adjust end coordinates
-		region.draw(null, null, x, y);
-	},
-	
-	
-	/**
-	 * Lighthens up branching edges in the same colour for identifictation.
-	 */
-	branchingEdgeMouseoverHandler : function() {
-		var branchingActivity = this.data('parentObject').branchingActivity,
-			startItems = branchingActivity.start.items,
-			endItems = branchingActivity.end.items;
-		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
-		}
-	},
-	
-	
-	/**
-	 * Return branching edges to their normal colours.
-	 */
-	branchingEdgeMouseoutHandler : function() {
-		var branchingActivity = this.data('parentObject').branchingActivity,
-			startItems = branchingActivity.start.items,
-			endItems = branchingActivity.end.items;
-		
-		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
-		}
-	},
-	
-	
-	/**
-	 * Starts drawing a transition or dragging an activity.
-	 */
-	activityMousedownHandler : function(event, x, y){
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
-			return;
-		}
-		
-		var activity = this.data('parentObject');
-		if (event.ctrlKey) {
-			 // when CTRL is held down, start drawing a transition
-			 HandlerLib.drawTransitionStartHandler(activity, event, x, y);
-		} else if (!activity.parentActivity
-				|| !(activity.parentActivity instanceof ActivityLib.ParallelActivity)){
-			var mouseupHandler = function(event){
-				if (HandlerLib.isElemenentBinned(event)) {
-					// if the activity was over rubbish bin, remove it
-					ActivityLib.removeActivity(activity);
-				} else {
-					HandlerLib.dropObject(activity);
-
-					var translatedEvent = ActivityLib.translateEventOnCanvas(event),
-						endX = translatedEvent[0],
-						endY = translatedEvent[1];
-					ActivityLib.dropActivity(activity, endX, endY);
-				}
-			}
-			// start dragging the activity
-			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
-		}
-	},
-	
-	
-	/**
-	 * Selects an activity.
-	 */
-	itemClickHandler : function(event) {
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
-			return;
-		}
-		
-		var parentObject = this.data('parentObject');
-		// inform that user wants to select, not drag the activity
-		parentObject.items.clicked = true;
-		if (parentObject != layout.items.selectedObject) {
-			HandlerLib.canvasClickHandler(event);
-			ActivityLib.addSelectEffect(parentObject, true);
-		}
-		
-		// so canvas handler unselectActivityHandler() is not run
-		event.preventDefault();
-	},
-	
-	
-	/**
-	 * Opens activity authoring.
-	 */
-	activityDblclickHandler : function(event) {
-		var activity = this.data('parentObject');
-		// inform that user wants to open, not drag the activity
-		activity.items.clicked = true;
-		ActivityLib.openActivityAuthoring(activity);
-	},
-	
 	
 	/**
 	 * Starts dragging a transition.
@@ -471,93 +594,5 @@ var HandlerLib = {
 		}
 			
 		HandlerLib.dragItemsStartHandler(transition.items, this, mouseupHandler, event, x, y);
-	},
-	
-	
-	/**
-	 * Starts dragging a container
-	 */
-	containerMousedownHandler : function(event, x, y){
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
-			return;
-		}
-		
-		var container = this.data('parentObject');
-		// allow transition dragging
-		var mouseupHandler = function(event){
-			if (HandlerLib.isElemenentBinned(event)) {
-				// if the container was over rubbish bin, remove it
-				if (container instanceof DecorationLib.Region) {
-					DecorationLib.removeRegion(container);
-				} else {
-					ActivityLib.removeActivity(container);
-				}
-			} else {
-				HandlerLib.dropObject(container);
-				if (container instanceof ActivityLib.FloatingActivity
-					|| container instanceof ActivityLib.OptionalActivity
-					|| container instanceof ActivityLib.ParallelActivity) {
-					ActivityLib.dropActivity(container);
-				}
-			}
-		}
-			
-		HandlerLib.dragItemsStartHandler(container.items, this, mouseupHandler, event, x, y);
-	},
-	
-	
-	/**
-	 * Starts dragging a label
-	 */
-	labelMousedownHandler : function(event, x, y){
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
-			return;
-		}
-		
-		var label = this.data('parentObject');
-		// allow transition dragging
-		var mouseupHandler = function(event){
-			if (HandlerLib.isElemenentBinned(event)) {
-				// if the region was over rubbish bin, remove it
-				DecorationLib.removeLabel(label);
-			} else {
-				HandlerLib.dropObject(label);
-			}
-		}
-			
-		HandlerLib.dragItemsStartHandler(label.items, this, mouseupHandler, event, x, y);
-	},
-	
-	
-	dropObject : function(object) {
-		// finally transform the dragged elements
-		var transformation = object.items.shape.attr('transform');
-		object.items.transform('');
-		if (transformation.length > 0) {
-			// find new X and Y and redraw the object
-			var box = object.items.shape.getBBox(),
-				x = box.x,
-				// adjust this coordinate for annotation labels
-				y = box.y + (object instanceof DecorationLib.Label ? 6 : 0);
-			object.draw(x + transformation[0][1],
-						y + transformation[0][2]);
-		}
-		
-		// add space if dropped object is next to border
-		resizePaper();
-	},
-	
-	
-	/**
-	 * Checks whether activity or transition is over rubbish bin.
-	 */
-	isElemenentBinned : function(event) {
-		var translatedEvent = ActivityLib.translateEventOnCanvas(event);
-		
-		// highlight rubbish bin if dragged elements are over it
-		return Raphael.isPointInsideBBox(layout.items.bin.getBBox(),
-										 translatedEvent[0], translatedEvent[1]); 
 	}
 };
