@@ -91,7 +91,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapQuestions;
 
-    protected Map<String, QaQuestionDTO> mapQuestionContentLearner;
+    protected Map<Integer, QaQuestionDTO> mapQuestionContentLearner;
 
     protected List listMonitoredAnswersContainerDTO;
 
@@ -146,7 +146,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapQuestionContentLearner.
      */
-    public Map<String, QaQuestionDTO> getMapQuestionContentLearner() {
+    public Map<Integer, QaQuestionDTO> getMapQuestionContentLearner() {
 	return mapQuestionContentLearner;
     }
 
@@ -154,7 +154,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
      * @param mapQuestionContentLearner
      *            The mapQuestionContentLearner to set.
      */
-    public void setMapQuestionContentLearner(Map<String, QaQuestionDTO> mapQuestionContentLearner) {
+    public void setMapQuestionContentLearner(Map<Integer, QaQuestionDTO> mapQuestionContentLearner) {
 	this.mapQuestionContentLearner = mapQuestionContentLearner;
     }
 

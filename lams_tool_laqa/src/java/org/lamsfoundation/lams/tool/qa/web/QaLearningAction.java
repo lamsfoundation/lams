@@ -135,7 +135,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		mapAnswers.put(questionIndexString, answer);
 		mapAnswersPresentable.put(questionIndexString, answer);
 
-		Map<String, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		Map<Integer, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 		QaQuestionDTO dto = questionContentMap.get(questionIndexString);
 		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexString));
@@ -154,7 +154,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    mapAnswersPresentable = MonitoringUtil.removeNewLinesMap(mapAnswersPresentable);
 
 	    // only need to check the final question as the others will have been checked when the user clicked next.
-	    Map<String, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	    Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	    int numQuestions = questionMap.size();
 	    String finalQuestionIndex = new Integer(numQuestions).toString();
 	    QaQuestionDTO dto = questionMap.get(finalQuestionIndex);
@@ -183,7 +183,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	    
+
 	// notify teachers on response submit
 	if (errors.isEmpty() && qaContent.isNotifyTeachersOnResponseSubmit()) {
 	    qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
@@ -289,7 +289,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 
 	// create mapQuestions
-	Map<String, QaQuestionDTO> mapQuestions = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	Map<Integer, QaQuestionDTO> mapQuestions = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
 	generalLearnerFlowDTO.setRemainingQuestionCount(new Integer(mapQuestions.size()).toString());
@@ -562,7 +562,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	// is this question required and are they trying to go to the next question?
 	// if so, check if the answer is blank and generate an error if it is blank.
-	Map<String, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	Map<Integer, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	QaQuestionDTO dto = questionContentMap.get(currentQuestionIndex);
 	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
 	if (getNextQuestion && isRequiredQuestionMissed) {

@@ -83,13 +83,13 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
 
 	//create mapQuestions
-	Map<String, QaQuestionDTO> mapQuestions = new TreeMap<String, QaQuestionDTO>();
+	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
 	for (QaQueContent question : qaContent.getQaQueContents()) {
 	    int displayOrder = question.getDisplayOrder();
 	    if (displayOrder != 0) {
 		//add the question to the questions Map in the displayOrder
 		QaQuestionDTO questionDTO = new QaQuestionDTO(question);
-		mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO);
+		mapQuestions.put(displayOrder, questionDTO);
 	    }
 	}
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
@@ -125,7 +125,7 @@ public class LearningUtil implements QaAppConstants {
     /**
      */
     public static void populateAnswers(Map sessionMap, QaContent qaContent, QaQueUsr qaQueUsr,
-	    Map<String, QaQuestionDTO> mapQuestions, GeneralLearnerFlowDTO generalLearnerFlowDTO,
+	    Map<Integer, QaQuestionDTO> mapQuestions, GeneralLearnerFlowDTO generalLearnerFlowDTO,
 	    IQaService qaService) {
 	
 	//create mapAnswers

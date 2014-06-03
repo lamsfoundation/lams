@@ -163,7 +163,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	/* holds the question contents for a given tool session and relevant content */
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
-	Map<String, QaQuestionDTO> mapQuestions = new TreeMap<String,QaQuestionDTO>();
+	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
@@ -228,7 +228,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		     *  add the question to the questions Map in the displayOrder
 		     */
 		    QaQuestionDTO questionDTO = new QaQuestionDTO(qaQuestion);
-		    mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO);
+		    mapQuestions.put(displayOrder, questionDTO);
 
 		    mapQuestionStrings.put(new Integer(displayOrder).toString(), qaQuestion.getQuestion());
 		    
