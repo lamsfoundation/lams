@@ -782,6 +782,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public String getToolContentTitle(Long toolContentId) {
 	return qaDAO.getQaByContentId(toolContentId).getTitle();
     }
+    
+    public boolean isContentEdited(Long toolContentId) {
+	return qaDAO.getQaByContentId(toolContentId).isDefineLater();
+    }
 
     /**
      * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
