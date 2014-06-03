@@ -70,11 +70,13 @@
 	<%@ include file="/common/messages.jsp"%>
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" scope="request"/>
+		
 		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<table id="questionTable" cellpadding="0" cellspacing="0">
 			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">

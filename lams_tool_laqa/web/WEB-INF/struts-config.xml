@@ -54,27 +54,9 @@
 
 	    <forward
 			name="load"
-			path="/AuthoringMaincontent.jsp"
+			path="/authoring/AuthoringTabsHolder.jsp"
 			redirect="false"
 	    />
-	
-	    <forward
-			name="loadViewOnly"
-	      	path="/authoring/AuthoringTabsHolder.jsp"
-	      	redirect="false"
-	    />
-
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
 	
 	</action>
 	
@@ -82,7 +64,7 @@
       path="/authoring"
       type="org.lamsfoundation.lams.tool.qa.web.QaAction"
       name="QaAuthoringForm"
-      input="/AuthoringMaincontent.jsp"
+      input="/authoring/AuthoringTabsHolder.jsp"
       parameter="dispatch"
       scope="request"
       unknown="false"
@@ -91,27 +73,9 @@
     
 	  	<forward
 	        name="load"
-	        path="/AuthoringMaincontent.jsp"
+	        path="/authoring/AuthoringTabsHolder.jsp"
 	        redirect="false"
 		/>
-	
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
-	  	<forward
-		    name="refreshMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	  
-	    <forward
-			name="loadViewOnly"
-			path="/authoring/AuthoringTabsHolder.jsp"
-			redirect="false"
-	    />
 	    
 	    <forward
 			name="newQuestionBox"
@@ -222,18 +186,6 @@
 	        path="/learning/LearnerRep.jsp"
 		    redirect="false"
 	      />
-
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-		    name="refreshMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
 	      
 	      <forward
 	        name="learningStarter"
@@ -293,18 +245,6 @@
 		    redirect="false"
 	      />
 	      
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	      
-	  	<forward
-		    name="refreshMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	      
 	    <forward
 	        name="learningStarter"
 	        path="/learningIndex.jsp"
@@ -336,35 +276,7 @@
 		    redirect="false"
 	  	/>   
 	  	
-	</action>
-	
-	   <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action 
-   	path="/defineLaterStarter" 
-   	type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
-   	name="QaAuthoringForm" 
-	scope="request"
-   	input="/index.jsp"> 
-
-	  	<forward
-		    name="load"
-          	path="/AuthoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-	        name="starter"
-	        path="/index.jsp"
-	        redirect="false"
-	     />
-	  
-        <forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-	  	
-	</action>  
+	</action> 
 	
 	 <action
 		path="/monitoringStarter"
@@ -376,13 +288,7 @@
 		validate="true">
 		
 	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-		
-	  	<forward
-		    name="refreshMonitoring"
+		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="false"
 	  	/>
@@ -397,47 +303,10 @@
 	      parameter="dispatch"
 	      unknown="false"
 	      validate="true">
-	      
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	      
-	  	<forward
-		    name="refreshMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-
-        <forward
-          name="load"
-          path="/monitoring/MonitoringMaincontent.jsp"
-          redirect="false"
-        />
-	  	
-	  	<forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-
-	    <forward
-			name="newQuestionBox"
-			path="/monitoring/newQuestionBox.jsp"
-			redirect="false"
-	    />
-
-	    <forward
-			name="editQuestionBox"
-			path="/monitoring/editQuestionBox.jsp"
-			redirect="false"
-	    />
 
 	</action>
 	
-	<action path="/clearsession"
-		type="org.lamsfoundation.lams.tool.qa.web.ClearSessionAction">
+	<action path="/clearsession" type="org.lamsfoundation.lams.tool.qa.web.ClearSessionAction">
 	</action>   
 	
 	<action

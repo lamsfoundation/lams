@@ -1,25 +1,4 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
@@ -42,16 +21,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</lams:head>
 
 	<body>
-		<html:form action="/authoring?validate=false"
-			styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+		<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" scope="request"/>
 
 			<html:hidden property="dispatch" value="saveSingleQuestion" />
 			<html:hidden property="toolContentID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="activeModule" />
 			<html:hidden property="httpSessionID" />
-			<html:hidden property="defaultContentIdStr" />
-			<html:hidden property="defineLaterInEditMode" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="editableQuestionIndex" />
 			<html:hidden property="editQuestionBoxRequest" value="true" />
@@ -65,9 +42,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 
 			<div class="field-name space-top">
-				<html:checkbox property="required" value="1" styleId="required"
-					styleClass="noBorder">
-				</html:checkbox>
+				<html:checkbox property="required" value="1" styleId="required" styleClass="noBorder"/>
+				
 				<label for="required">
 					<fmt:message key="label.required.desc" />
 				</label>

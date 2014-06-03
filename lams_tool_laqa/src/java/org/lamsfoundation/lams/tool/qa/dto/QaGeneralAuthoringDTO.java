@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dto;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * <p>
@@ -36,13 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class QaGeneralAuthoringDTO implements Comparable {
     protected String toolContentID;
     protected String currentTab;
-    protected String activeModule;
-    protected String defineLaterInEditMode;
-    protected String showAuthoringTabs;
-    protected String monitoringOriginatedDefineLater;
-    protected String targetMode;
-    protected String defaultQuestionContent;
-    protected String defaultContentIdStr;
 
     protected String activityTitle;
     protected String activityInstructions;
@@ -50,7 +42,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String allowRateAnswers;
     protected String showOtherAnswers;
     protected String reflect;
-    protected String synchInMonitor;
     protected String questionsSequenced;
     protected String lockWhenFinished;
     protected String editActivityEditMode;
@@ -59,34 +50,12 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected Boolean useSelectLeaderToolOuput;
 
     protected String httpSessionID;
-    protected String requestedModule;
-    protected String isDefineLater;
 
-    protected String sbmtSuccess;
     protected String userExceptionQuestionsDuplicate;
 
     protected String contentFolderID;
     protected String editableQuestionText;
     protected String editableQuestionFeedback;
-
-    public String toString() {
-	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
-		.append("contentFolderID: ", contentFolderID).append("httpSessionID: ", httpSessionID)
-		.append("currentTab: ", currentTab).append("activeModule: ", activeModule)
-		.append("defineLaterInEditMode: ", defineLaterInEditMode)
-		.append("showAuthoringTabs: ", showAuthoringTabs)
-		.append("monitoringOriginatedDefineLater: ", monitoringOriginatedDefineLater)
-		.append("targetMode: ", targetMode).append("defaultQuestionContent: ", defaultQuestionContent)
-		.append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ", activityTitle)
-		.append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
-		.append("usernameVisible: ", usernameVisible).append("allowRateAnswers: ", allowRateAnswers)
-		.append("showOtherAnswers: ", showOtherAnswers).append("synchInMonitor: ", synchInMonitor)
-		.append("questionsSequenced: ", questionsSequenced).append("lockWhenFinished: ", lockWhenFinished)
-		.append("editActivityEditMode: ", editActivityEditMode)
-		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule)
-		.append("isDefineLater: ", isDefineLater).append("sbmtSuccess: ", sbmtSuccess)
-		.append("userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
-    }
 
     /**
      * @return Returns the userExceptionQuestionsDuplicate.
@@ -134,21 +103,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the isDefineLater.
-     */
-    public String getIsDefineLater() {
-	return isDefineLater;
-    }
-
-    /**
-     * @param isDefineLater
-     *            The isDefineLater to set.
-     */
-    public void setIsDefineLater(String isDefineLater) {
-	this.isDefineLater = isDefineLater;
-    }
-
-    /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
@@ -163,81 +117,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
 	this.toolContentID = toolContentID;
     }
 
-    /**
-     * @return Returns the targetMode.
-     */
-    public String getTargetMode() {
-	return targetMode;
-    }
-
-    /**
-     * @param targetMode
-     *            The targetMode to set.
-     */
-    public void setTargetMode(String targetMode) {
-	this.targetMode = targetMode;
-    }
-
-    /**
-     * @return Returns the monitoringOriginatedDefineLater.
-     */
-    public String getMonitoringOriginatedDefineLater() {
-	return monitoringOriginatedDefineLater;
-    }
-
-    /**
-     * @param monitoringOriginatedDefineLater
-     *            The monitoringOriginatedDefineLater to set.
-     */
-    public void setMonitoringOriginatedDefineLater(String monitoringOriginatedDefineLater) {
-	this.monitoringOriginatedDefineLater = monitoringOriginatedDefineLater;
-    }
-
-    /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *            The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *            The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
-    }
-
-    /**
-     * @return Returns the showAuthoringTabs.
-     */
-    public String getShowAuthoringTabs() {
-	return showAuthoringTabs;
-    }
-
-    /**
-     * @param showAuthoringTabs
-     *            The showAuthoringTabs to set.
-     */
-    public void setShowAuthoringTabs(String showAuthoringTabs) {
-	this.showAuthoringTabs = showAuthoringTabs;
-    }
-
     public int compareTo(Object o) {
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = (QaGeneralAuthoringDTO) o;
 
@@ -245,51 +124,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
 	    return 1;
 	else
 	    return 0;
-    }
-
-    /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *            The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
-    }
-
-    /**
-     * @return Returns the defaultQuestionContent.
-     */
-    public String getDefaultQuestionContent() {
-	return defaultQuestionContent;
-    }
-
-    /**
-     * @param defaultQuestionContent
-     *            The defaultQuestionContent to set.
-     */
-    public void setDefaultQuestionContent(String defaultQuestionContent) {
-	this.defaultQuestionContent = defaultQuestionContent;
-    }
-
-    /**
-     * @return Returns the requestedModule.
-     */
-    public String getRequestedModule() {
-	return requestedModule;
-    }
-
-    /**
-     * @param requestedModule
-     *            The requestedModule to set.
-     */
-    public void setRequestedModule(String requestedModule) {
-	this.requestedModule = requestedModule;
     }
 
     /**
@@ -338,21 +172,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the synchInMonitor.
-     */
-    public String getSynchInMonitor() {
-	return synchInMonitor;
-    }
-
-    /**
-     * @param synchInMonitor
-     *            The synchInMonitor to set.
-     */
-    public void setSynchInMonitor(String synchInMonitor) {
-	this.synchInMonitor = synchInMonitor;
-    }
-
-    /**
      * @return Returns the usernameVisible.
      */
     public String getUsernameVisible() {
@@ -395,21 +214,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    /**
-     * @return Returns the sbmtSuccess.
-     */
-    public String getSbmtSuccess() {
-	return sbmtSuccess;
-    }
-
-    /**
-     * @param sbmtSuccess
-     *            The sbmtSuccess to set.
-     */
-    public void setSbmtSuccess(String sbmtSuccess) {
-	this.sbmtSuccess = sbmtSuccess;
     }
 
     /**

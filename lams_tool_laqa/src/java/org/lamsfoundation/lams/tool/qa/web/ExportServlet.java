@@ -136,7 +136,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    throw new QaApplicationException(error);
 	}
 
-	QaContent content = qaService.getQa(toolContentID.longValue());
+	QaContent content = qaService.getQaContent(toolContentID.longValue());
 
 	if (content == null) {
 	    String error = "Data is missing from the database. Unable to Continue";

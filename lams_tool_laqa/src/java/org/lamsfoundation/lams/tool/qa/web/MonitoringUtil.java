@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -66,16 +65,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class MonitoringUtil implements QaAppConstants {
 
     /**
-     * User id is needed if learnerRequest = true, as it is required to work out
-     * if the data being analysed is the current user (for not show other names)
-     * or to work out which is the user's answers (for not show all answers).
+     * User id is needed if learnerRequest = true, as it is required to work out if the data being analysed is the
+     * current user (for not show other names) or to work out which is the user's answers (for not show all answers).
      */
     public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
-	    String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId,
-	    String userId) {
+	    String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId, String userId) {
 	List<Map<String, QaMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, QaMonitoredUserDTO>>();
 
-	QaSession session = qaService.retrieveQaSession(new Long(sessionId).longValue());
+	QaSession session = qaService.getSessionById(new Long(sessionId).longValue());
 
 	List<QaQueUsr> listUsers = new LinkedList<QaQueUsr>();
 	if (!isLearnerRequest) {
@@ -97,31 +94,18 @@ public class MonitoringUtil implements QaAppConstants {
 		listUsers = new ArrayList<QaQueUsr>();
 		QaQueUsr currentUser = qaService.getUserByIdAndSession(new Long(userId).longValue(),
 			session.getQaSessionId());
-		if (currentUser != null){
+		if (currentUser != null) {
 		    listUsers.add(currentUser);
 		}
 	    }
 	}
 
-	Map sessionUsersAttempts = populateSessionUsersAttempts(qaService, new Long(sessionId), listUsers,
-		questionUid, isUserNamesVisible, isLearnerRequest, userId);
-	listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-
-	return convertToMap(listMonitoredAttemptsContainerDTO);
-    }
-
-    /**
-     * Populates all the user's attempt data of a particular tool session.
-     * User id is needed if isUserNamesVisible is false && is learnerRequest =
-     * true, as it is required to work out if the data being analysed is the
-     * current user.
-     */
-    private static Map<String, QaMonitoredUserDTO> populateSessionUsersAttempts(IQaService qaService, Long sessionId,
-	    List<QaQueUsr> listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId) {
-
+	/**
+	 * Populates all the user's attempt data of a particular tool session. User id is needed if isUserNamesVisible
+	 * is false && is learnerRequest = true, as it is required to work out if the data being analysed is the current
+	 * user.
+	 */
 	List<QaMonitoredUserDTO> qaMonitoredUserDTOs = new LinkedList<QaMonitoredUserDTO>();
-	QaContent qaContent = qaService.getQaContentBySessionId(sessionId);
-	
 	for (QaQueUsr user : (List<QaQueUsr>) listUsers) {
 	    QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), new Long(questionUid));
 	    if (response != null) {
@@ -142,7 +126,7 @@ public class MonitoringUtil implements QaAppConstants {
 		qaMonitoredUserDTO.setSessionId(sessionId.toString());
 		qaMonitoredUserDTO.setResponse(response.getAnswer());
 
-		//String responsePresentable = QaUtils.replaceNewLines(response.getAnswer());
+		// String responsePresentable = QaUtils.replaceNewLines(response.getAnswer());
 		qaMonitoredUserDTO.setResponsePresentable(response.getAnswer());
 
 		qaMonitoredUserDTO.setQuestionUid(questionUid);
@@ -158,45 +142,39 @@ public class MonitoringUtil implements QaAppConstants {
 		qaMonitoredUserDTOs.add(qaMonitoredUserDTO);
 	    }
 	}
-	
-	//convert To McMonitoredUserDTOMap
-	Map<String, QaMonitoredUserDTO> map = new TreeMap<String, QaMonitoredUserDTO>(new QaStringComparator());
+
+	// convert To McMonitoredUserDTOMap
+	Map<String, QaMonitoredUserDTO> sessionUsersAttempts = new TreeMap<String, QaMonitoredUserDTO>(
+		new QaStringComparator());
 	Long mapIndex = new Long(1);
 	for (QaMonitoredUserDTO data : qaMonitoredUserDTOs) {
-	    map.put(mapIndex.toString(), data);
+	    sessionUsersAttempts.put(mapIndex.toString(), data);
 	    mapIndex = mapIndex + 1;
 	}
-	return map;
-    }
+	listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 
-    public static Map removeNewLinesMap(Map map) {
-	Map newMap = new TreeMap(new QaStringComparator());
-
-	Iterator itMap = map.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
-	    newMap.put(pairs.getKey(), QaUtils.replaceNewLines(pairs.getValue().toString()));
-	}
-	return newMap;
-    }
-
-    private static Map convertToMap(List list) {
+	//convertToMap
 	Map map = new TreeMap(new QaStringComparator());
-
-	Iterator listIterator = list.iterator();
-	Long mapIndex = new Long(1);
-
+	Iterator listIterator = listMonitoredAttemptsContainerDTO.iterator();
+	Long mapIndex2 = new Long(1);
 	while (listIterator.hasNext()) {
 	    Map data = (Map) listIterator.next();
-	    map.put(mapIndex.toString(), data);
-	    mapIndex = new Long(mapIndex.longValue() + 1);
+	    map.put(mapIndex2.toString(), data);
+	    mapIndex2 = new Long(mapIndex2.longValue() + 1);
 	}
 	return map;
     }
 
-    private static void buildQaStatsDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
-	QaStatsDTO qaStatsDTO = new QaStatsDTO();
+    public static void setUpMonitoring(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
 
+	// setting up the advanced summary for LDEV-1662
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
+
+	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+
+	//buildQaStatsDTO
+	QaStatsDTO qaStatsDTO = new QaStatsDTO();
 	int countSessionComplete = 0;
 	int countAllUsers = 0;
 	Iterator iteratorSession = qaContent.getQaSessions().iterator();
@@ -219,27 +197,14 @@ public class MonitoringUtil implements QaAppConstants {
 		}
 	    }
 	}
-
 	qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-
 	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
-    }
 
-    public static void setUpMonitoring(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
-	
-	// setting up the advanced summary for LDEV-1662
-	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
-	
-	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
-
-	buildQaStatsDTO(request, qaService, qaContent);
-	
-	//generateGroupsSessionData
+	// generateGroupsSessionData
 	List<GroupDTO> listAllGroupsDTO = buildGroupBasedSessionData(request, qaContent, qaService);
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
-	
+
 	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
 	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
@@ -253,12 +218,11 @@ public class MonitoringUtil implements QaAppConstants {
 	    request.setAttribute(QaAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
     }
-    
-    public static List<GroupDTO> buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
+
+    public static List<GroupDTO> buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent,
+	    IQaService qaService) {
 	List<QaQueContent> questions = qaService.getAllQuestionEntries(qaContent.getUid());
-
 	List<GroupDTO> groupDTOs = new LinkedList<GroupDTO>();
-
 	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
 	sessions.addAll(qaContent.getQaSessions());
 	for (QaSession session : sessions) {
@@ -291,7 +255,6 @@ public class MonitoringUtil implements QaAppConstants {
 	    groupDTO.setSessionName(sessionName);
 	    groupDTO.setSessionId(sessionId);
 	    groupDTOs.add(groupDTO);
-
 	}
 	return groupDTOs;
     }

@@ -33,22 +33,15 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-
-/**
- * @author Ozgur Demirtas
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- */
 
 /**
  * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
  * hibernate mapping resides in: QaContent.hbm.xml
  * 
  * Holds content representation for the tool. Default content is made available to the tool by the database.
+ * 
+ * @author Ozgur Demirtas
  */
 public class QaContent implements Serializable {
 
@@ -92,7 +85,7 @@ public class QaContent implements Serializable {
     private boolean showOtherAnswers;
 
     private boolean allowRichEditor;
-    
+
     private boolean useSelectLeaderToolOuput;
 
     /** nullable persistent field */
@@ -100,11 +93,8 @@ public class QaContent implements Serializable {
 
     /** nullable persistent field */
     private boolean allowRateAnswers;
-    
-    private boolean notifyTeachersOnResponseSubmit;
 
-    /** nullable persistent field */
-    private boolean synchInMonitor;
+    private boolean notifyTeachersOnResponseSubmit;
 
     /** nullable persistent field */
     private Date creationDate;
@@ -129,10 +119,10 @@ public class QaContent implements Serializable {
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean synchInMonitor,
-	    boolean lockWhenFinished, boolean showOtherAnswers, boolean reflect, String reflectionSubject,
-	    Date creationDate, Date updateDate, Set qaQueContents, Set qaSessions, Set<QaCondition> conditions,
-	    boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
+	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
+	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
+	    Set qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
+	    boolean useSelectLeaderToolOuput) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -144,7 +134,6 @@ public class QaContent implements Serializable {
 	this.usernameVisible = usernameVisible;
 	this.allowRateAnswers = allowRateAnswers;
 	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
-	this.synchInMonitor = synchInMonitor;
 	this.lockWhenFinished = lockWhenFinished;
 	this.showOtherAnswers = showOtherAnswers;
 	this.reflect = reflect;
@@ -168,15 +157,13 @@ public class QaContent implements Serializable {
      *            the new qa content id.
      * @return the new qa content object.
      */
-    public static QaContent newInstance(QaContent qa, Long newContentId) throws ItemNotFoundException,
-	    RepositoryCheckedException {
+    public static QaContent newInstance(QaContent qa, Long newContentId) {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
 		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
 		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
-		qa.isSynchInMonitor(), qa.isLockWhenFinished(), qa.isShowOtherAnswers(), qa.isReflect(),
-		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
-		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(),
-		qa.isUseSelectLeaderToolOuput());
+		qa.isLockWhenFinished(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
+		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
+			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -268,7 +255,7 @@ public class QaContent implements Serializable {
 		.append("username_visible:", isUsernameVisible())
 		.append("allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater())
 		.append("report_title: ", getReportTitle()).append("reflection subject: ", getReflectionSubject())
-		.append("synch_in_monitor: ", isSynchInMonitor()).toString();
+		.toString();
     }
 
     @Override
@@ -346,21 +333,6 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * @return Returns the synchInMonitor.
-     */
-    public boolean isSynchInMonitor() {
-	return synchInMonitor;
-    }
-
-    /**
-     * @param synchInMonitor
-     *            The synchInMonitor to set.
-     */
-    public void setSynchInMonitor(boolean synchInMonitor) {
-	this.synchInMonitor = synchInMonitor;
-    }
-
-    /**
      * @return Returns the updateDate.
      */
     public Date getUpdateDate() {
@@ -419,7 +391,7 @@ public class QaContent implements Serializable {
     public void setAllowRateAnswers(boolean allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
     }
-    
+
     /**
      * @return
      */
@@ -558,13 +530,13 @@ public class QaContent implements Serializable {
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
     }
-    
+
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**

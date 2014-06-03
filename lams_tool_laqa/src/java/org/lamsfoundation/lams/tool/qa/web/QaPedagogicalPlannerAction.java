@@ -58,7 +58,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	QaPedagogicalPlannerForm plannerForm = (QaPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaContent qaContent = getQaService().getQa(toolContentID);
+	QaContent qaContent = getQaService().getQaContent(toolContentID);
 	plannerForm.fillForm(qaContent);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
@@ -71,7 +71,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
 
-	    QaContent qaContent = getQaService().getQa(plannerForm.getToolContentID());
+	    QaContent qaContent = getQaService().getQaContent(plannerForm.getToolContentID());
 
 	    int questionIndex = 0;
 	    String question = null;
@@ -85,7 +85,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 			QaQueContent qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 				(long) questionIndex + 1, qaContent.getUid());
 			qaQuestion.setQuestion(question);
-			getQaService().saveOrUpdateQaQueContent(qaQuestion);
+			getQaService().saveOrUpdateQuestion(qaQuestion);
 
 		    } else {
 			QaQueContent qaQuestion = new QaQueContent();
@@ -93,17 +93,18 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 			qaQuestion.setRequired(false);
 			qaQuestion.setQaContent(qaContent);
 			qaQuestion.setQuestion(question);
-			getQaService().saveOrUpdateQaQueContent(qaQuestion);
+			getQaService().saveOrUpdateQuestion(qaQuestion);
 		    }
 		    questionIndex++;
 		}
 	    } while (question != null);
 	    if (questionIndex < qaContent.getQaQueContents().size()) {
 		getQaService().removeQuestionsFromCache(qaContent);
+		getQaService().removeQaContentFromCache(qaContent);
 		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
 		    QaQueContent qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 			    (long) questionIndex + 1, qaContent.getUid());
-		    getQaService().removeQaQueContent(qaQuestion);
+		    getQaService().removeQuestion(qaQuestion);
 		}
 	    }
 	} else {

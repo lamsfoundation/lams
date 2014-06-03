@@ -23,80 +23,40 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.util;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @author Ozgur Demirtas
- * 
  * Common utility functions live here.
+ * 
+ * @author Ozgur Demirtas
  */
 public abstract class QaUtils implements QaAppConstants {
 
-    /**
-     * 
-     * @param request
-     * @param defaultQaContent
-     * @param qaAuthoringForm
-     */
-    public static void populateAuthoringDTO(HttpServletRequest request, QaContent defaultQaContent,
-	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO) {
-	qaGeneralAuthoringDTO.setActivityTitle(defaultQaContent.getTitle());
-	qaGeneralAuthoringDTO.setActivityInstructions(defaultQaContent.getInstructions());
-    }
-
-    public static String replaceNewLines(String text) {
-	
-	String newText = "";
-	if (text != null) {
-	    newText = text.replaceAll("\n", "<br>");
-	    
-	}
-
-	return newText;
-    }
-
-    public static void setFormProperties(HttpServletRequest request, IQaService qaService,
-	    QaAuthoringForm qaAuthoringForm, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID,
-	    String defaultContentIdStr, String activeModule, SessionMap sessionMap, String httpSessionID) {
+    public static void setFormProperties(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
+	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID, String httpSessionID) {
 
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 
 	qaAuthoringForm.setToolContentID(strToolContentID);
 
-	if ((defaultContentIdStr != null) && (defaultContentIdStr.length() > 0))
-	    qaAuthoringForm.setDefaultContentIdStr(new Long(defaultContentIdStr).toString());
-
-	qaAuthoringForm.setActiveModule(activeModule);
-	qaGeneralAuthoringDTO.setActiveModule(activeModule);
-
-	String synchInMonitor = request.getParameter(SYNC_IN_MONITOR);
-	qaAuthoringForm.setSynchInMonitor(synchInMonitor);
-	qaGeneralAuthoringDTO.setSynchInMonitor(synchInMonitor);
-
 	String usernameVisible = request.getParameter(USERNAME_VISIBLE);
 	qaAuthoringForm.setUsernameVisible(usernameVisible);
 	qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
-	
+
 	String allowRateAnswers = request.getParameter(ALLOW_RATE_ANSWERS);
 	qaAuthoringForm.setAllowRateAnswers(allowRateAnswers);
 	qaGeneralAuthoringDTO.setAllowRateAnswers(allowRateAnswers);
-	
+
 	String notifyTeachersOnResponseSubmit = request.getParameter(NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
 	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmit);
 
@@ -113,96 +73,47 @@ public abstract class QaUtils implements QaAppConstants {
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
 
 	String reflect = request.getParameter(REFLECT);
-	
+
 	qaAuthoringForm.setReflect(reflect);
 	qaGeneralAuthoringDTO.setReflect(reflect);
 
 	String reflectionSubject = request.getParameter(REFLECTION_SUBJECT);
-	
+
 	qaAuthoringForm.setReflectionSubject(reflectionSubject);
 	qaGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
-
 	
-	
-    }
-
-    public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException {
-	HttpSession ss = SessionManager.getSession();
-	/* get back login user DTO */
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	return user.getUserID().intValue();
+	ToolAccessMode mode;
+	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
+	    mode = ToolAccessMode.TEACHER;
+	} else {
+	    mode = ToolAccessMode.AUTHOR;
+	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
     }
 
     /**
-     * 
-     * @param long
-     *                toolContentID
-     * @return boolean determine whether a specific toolContentID exists in the
-     *         db
-     */
-    public static boolean existsContent(long toolContentID, IQaService qaService) {
-	QaContent qaContent = qaService.getQa(toolContentID);
-	if (qaContent == null)
-	    return false;
-
-	return true;
-    }
-
-    /**
-     * it is expected that the tool session id already exists in the tool
-     * sessions table existsSession(long toolSessionId)
-     * 
-     * @param toolSessionId
-     * @return boolean
-     */
-    public static boolean existsSession(long toolContentID, IQaService qaService) {
-	QaSession qaSession = qaService.getSessionById(toolContentID);
-	
-
-	if (qaSession == null)
-	    return false;
-
-	return true;
-    }
-
-    public static String getFormattedDateString(Date date) {
-	return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
-    }
-
-    /**
-     * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and
-     * ACTIVITY_TITLE ACTIVITY_INSTRUCTIONS
+     * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and ACTIVITY_TITLE ACTIVITY_INSTRUCTIONS
      * cleanUpSessionAbsolute(HttpServletRequest request)
      * 
      * @param request
      */
     public static void cleanUpSessionAbsolute(HttpServletRequest request) {
 	request.getSession().removeAttribute(MY_SIGNATURE);
-	request.getSession().removeAttribute(ERROR_QAAPPLICATION);
-	request.getSession().removeAttribute(TARGET_MODE);
-	request.getSession().removeAttribute(TARGET_MODE_AUTHORING);
-	request.getSession().removeAttribute(TARGET_MODE_LEARNING);
-	request.getSession().removeAttribute(TARGET_MODE_MONITORING);
-	request.getSession().removeAttribute(TARGET_MODE_EXPORT_PORTFOLIO);
 	request.getSession().removeAttribute(AUTHORING_STARTER);
 	request.getSession().removeAttribute(LOAD_LEARNER);
 	request.getSession().removeAttribute(LEARNING_STARTER);
 	request.getSession().removeAttribute(MONITORING_STARTER);
-	request.getSession().removeAttribute(LOAD_MONITORING);
 	request.getSession().removeAttribute(EDITABLE_RESPONSE_ID);
 	request.getSession().removeAttribute(COPY_TOOL_CONTENT);
-	request.getSession().removeAttribute(DEFAULT_CONTENT_ID_STR);
 	request.getSession().removeAttribute(TOOL_SESSION_ID);
-	request.getSession().removeAttribute(LOAD);
 	request.getSession().removeAttribute(LOAD_QUESTIONS);
 	request.getSession().removeAttribute(LOAD_STARTER);
-	request.getSession().removeAttribute(IS_DEFINE_LATER);
 	request.getSession().removeAttribute(LEARNING_MODE);
 	request.getSession().removeAttribute(IS_ADD_QUESTION);
 	request.getSession().removeAttribute(IS_REMOVE_QUESTION);
 	request.getSession().removeAttribute(IS_REMOVE_CONTENT);
 	request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
-	request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
 	request.getSession().removeAttribute(END_LEARNING_MESSSAGE);
 	request.getSession().removeAttribute(ON);
 	request.getSession().removeAttribute(OFF);
@@ -259,14 +170,8 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(SUBMIT_SUCCESS);
 	request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 	request.getSession().removeAttribute(CURRENT_ANSWER);
-	request.getSession().removeAttribute(ACTIVE_MODULE);
-	request.getSession().removeAttribute(AUTHORING);
-	request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
-	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
 	request.getSession().removeAttribute(DEFINE_LATER);
 	request.getSession().removeAttribute(SOURCE_MC_STARTER);
-	request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
-	request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
 	request.getSession().removeAttribute(REQUEST_LEARNING_REPORT);
 	request.getSession().removeAttribute(REQUEST_LEARNING_REPORT_VIEWONLY);
 	request.getSession().removeAttribute(REQUEST_PREVIEW);
@@ -276,18 +181,14 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
 	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
 	request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
-	//request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
 	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
 	request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
 	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
-	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
-	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
 	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
 	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
 	request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
 	request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
 	request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
-	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
 	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
 	request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
 	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
@@ -305,46 +206,12 @@ public abstract class QaUtils implements QaAppConstants {
     public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
 	    IQaService qaService) {
 
-	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-	
+	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
+
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
-	    qaService.updateQa(qaContent);
+	    qaService.updateQaContent(qaContent);
 	}
-    }
-
-    /**
-     * determines the struts level location to return
-     * 
-     * @param sourceMcStarter
-     * @param requestedModule
-     * @return
-     */
-    public static String getDestination(String sourceMcStarter, String requestedModule) {
-	if (requestedModule.equals(DEFINE_LATER)) {
-	    //request is from define Later url. return to  LOAD_VIEW_ONLY
-	    return LOAD_VIEW_ONLY;
-	} else if (requestedModule.equals(AUTHORING)) {
-	    //request is from authoring url. return to  LOAD_QUESTIONS
-	    return LOAD_QUESTIONS;
-	} else {
-	    //request is from an unknown source. return null
-	    return null;
-	}
-    }
-
-    public static String getCurrentLearnerID() {
-	String userID = "";
-	HttpSession ss = SessionManager.getSession();
-	
-
-	if (ss != null) {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user != null) && (user.getUserID() != null)) {
-		userID = user.getUserID().toString();
-	    }
-	}
-	return userID;
     }
 
 }

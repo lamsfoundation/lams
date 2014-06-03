@@ -30,27 +30,21 @@ import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 
 /**
- * 
  * @author Ozgur Demirtas
- * 
  */
 public interface IQaQueUsrDAO {
 
-    public QaQueUsr getQaQueUsrById(long qaQueUsrId);
+    QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId);
 
-    public QaQueUsr loadQaQueUsrById(long qaQueUsrId);
+    void createUsr(QaQueUsr usr);
 
-    public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId);
+    void updateUsr(QaQueUsr usr);
 
-    public void createUsr(QaQueUsr usr);
+    void deleteQaQueUsr(QaQueUsr qaQueUsr);
 
-    public void updateUsr(QaQueUsr usr);
+    int countSessionUser(QaSession qaSession);
 
-    public void deleteQaQueUsr(QaQueUsr qaQueUsr);
+    int getTotalNumberOfUsers(QaContent qa);
 
-    public int countSessionUser(QaSession qaSession);
-
-    public int getTotalNumberOfUsers(QaContent qa);
-
-    public List getUserBySessionOnly(final QaSession qaSession);
+    List getUserBySessionOnly(final QaSession qaSession);
 }

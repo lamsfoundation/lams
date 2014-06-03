@@ -37,11 +37,9 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
- * 
  */
-
 public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
-    static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
+    private static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
 
     private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSession.qaSessionId= :qaSession";
     private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSession.qaSessionId= :qaSessionId";
@@ -51,19 +49,6 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     public int countSessionUser(QaSession qaSession) {
 	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_USER, "qaSession", qaSession)).size();
-    }
-
-    public QaQueUsr getQaQueUsrById(long qaQueUsrId) {
-	String query = "from QaQueUsr user where user.queUsrId=?";
-
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(query).setLong(0, qaQueUsrId).list();
-
-	if (list != null && list.size() > 0) {
-	    QaQueUsr qu = (QaQueUsr) list.get(0);
-	    return qu;
-	}
-	return null;
     }
 
     public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) {
@@ -85,10 +70,6 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	List list = getSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
 		qaSession.getQaSessionId().longValue()).list();
 	return list;
-    }
-
-    public QaQueUsr loadQaQueUsrById(long qaQueUsrId) {
-	return getQaQueUsrById(qaQueUsrId);
     }
 
     public void createUsr(QaQueUsr usr) {

@@ -303,10 +303,8 @@
 		<html:hidden property="dispatch"/>
 		<html:hidden property="currentUid"/>
 		<html:hidden property="toolContentID"/>
-		<html:hidden property="activeModule"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="defaultContentIdStr"/>						
+		<html:hidden property="httpSessionID"/>					
 		<html:hidden property="contentFolderID"/>						
 		
 		<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="monitoring"/>

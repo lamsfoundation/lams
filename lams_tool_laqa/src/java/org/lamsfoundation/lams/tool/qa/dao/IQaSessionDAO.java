@@ -29,23 +29,19 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 
 /**
- *  *
  * @author Ozgur Demirtas
- * 
  */
 public interface IQaSessionDAO {
 
-    public int countSessionComplete(QaContent qa);
+    int countSessionComplete(QaContent qa);
 
-    public QaSession getQaSessionById(long qaSessionId);
+    QaSession getQaSessionById(long qaSessionId);
 
-    public void CreateQaSession(QaSession session);
+    void createSession(QaSession session);
 
-    public void UpdateQaSession(QaSession session);
+    void UpdateQaSession(QaSession session);
 
-    public void deleteQaSession(QaSession session);
+    void deleteQaSession(QaSession session);
 
-    public List getSessionsFromContent(QaContent qaContent);
-
-    public List getSessionNamesFromContent(QaContent qaContent);
+    List getSessionsFromContent(QaContent qaContent);
 }

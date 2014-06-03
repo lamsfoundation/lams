@@ -27,13 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -43,9 +40,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 
 public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
-
-    private static final String LOAD_QA_BY_SESSION = "select qa from QaContent qa left join fetch "
-	    + "qa.qaSessions session where session.qaSessionId=:sessionId";
 
     public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = ?";
@@ -62,16 +56,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     public void updateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(qa);
-    }
-
-    public QaContent getQaBySession(final Long sessionId) {
-	return (QaContent) getHibernateTemplate().execute(new HibernateCallback() {
-
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(QaContentDAO.LOAD_QA_BY_SESSION).setLong("sessionId", sessionId.longValue())
-			.uniqueResult();
-	    }
-	});
     }
 
     public void saveQa(QaContent qa) {
@@ -127,6 +111,13 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    this.getHibernateTemplate().delete(condition);
 	}
     }
+    
+    public void removeQaContentFromCache(QaContent qaContent) {
+	if (qaContent != null) {
+	    getHibernateTemplate().evict(qaContent);
+	}
+
+    }
 
     public void removeQuestionsFromCache(QaContent qaContent) {
 	if (qaContent != null) {
@@ -134,7 +125,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
 		getHibernateTemplate().evict(question);
 	    }
-	    getHibernateTemplate().evict(qaContent);
 	}
 
     }

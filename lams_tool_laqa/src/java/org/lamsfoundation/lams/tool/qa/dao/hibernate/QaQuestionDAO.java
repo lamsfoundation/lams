@@ -29,7 +29,6 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -38,25 +37,12 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO {
     private static final String LOAD_QUESTION_BY_CONTENT_UID = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid";
-    private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from qaQuestion in class QaQueContent where qaQuestion.question=:question and qaQuestion.qaContent.uid=:uid";
-    private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.displayOrder=:displayOrder and qaQuestion.qaContent.uid=:uid";
-    private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid order by qaQuestion.displayOrder";
-
-    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-
-	List list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT).setString(
-		"question", question).setLong("uid", contentUid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    QaQueContent qa = (QaQueContent) list.get(0);
-	    return qa;
-	}
-	return null;
-    }
+    private static final String LOAD_QUESTION_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.displayOrder=:displayOrder and qaQuestion.qaContent.uid=:uid";
+    private static final String LOAD_QUESTION_BY_QUESTION_UID = "from qaQuestion in class QaQueContent where qaQuestion.uid=:uid";
+    private static final String SORT_QUESTION_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid order by qaQuestion.displayOrder";
 
     public QaQueContent getQuestionByDisplayOrder(Long displayOrder, Long contentUid) {
-	List list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong(
+	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER).setLong(
 		"displayOrder", displayOrder.longValue()).setLong("uid", contentUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -65,17 +51,26 @@ public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO
 	}
 	return null;
     }
+    
+    public QaQueContent getQuestionByUid(Long questionUid) {
+	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_QUESTION_UID).setLong(
+		"uid", questionUid.longValue()).list();
 
-    public List getAllQuestionEntriesSorted(final long contentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(QaQuestionDAO.SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong(
+	if (list != null && list.size() > 0) {
+	    QaQueContent qa = (QaQueContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
+
+    public List<QaQueContent> getAllQuestionEntriesSorted(final long contentUid) {
+	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setLong(
 		"uid", contentUid).list();
 
 	return list;
     }
     
-    public List getAllQuestionEntries(final long contentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
+    public List<QaQueContent> getAllQuestionEntries(final long contentUid) {
 	List list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setLong(
 		"uid", contentUid).list();
 

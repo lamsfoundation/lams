@@ -109,13 +109,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 *  
 	 * make sure this session exists in tool's session table by now.
 	 */
-
-	if (!QaUtils.existsSession(new Long(toolSessionID).longValue(), qaService)) {
+	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
+	if (qaSession == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No session found");
 	}
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
@@ -141,7 +140,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
-		List<QaQueUsr> groupUsers = qaService.getUsersBySession(new Long(toolSessionID).longValue());
+		List<QaQueUsr> groupUsers = qaService.getUsersBySessionId(new Long(toolSessionID).longValue());
 		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, qaContent);
@@ -157,7 +156,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		qaService.copyAnswersFromLeader(qaUser, groupLeader);
 
 		qaUser.setResponseFinalized(true);
-		qaService.updateQaQueUsr(qaUser);
+		qaService.updateUser(qaUser);
 	    }
 	}
 

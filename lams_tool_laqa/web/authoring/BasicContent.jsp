@@ -1,23 +1,3 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
@@ -99,47 +79,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <div id="resourceListArea">
-	<c:if
-		test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<%@ include file="/authoring/itemlist.jsp"%>
-	</c:if>
-	<c:if
-		test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<%@ include file="/monitoring/itemlist.jsp"%>
-	</c:if>
+	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
 
 <p>
-	<c:if
-		test="${qaGeneralAuthoringDTO.activeModule == 'authoring' || qaGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${qaGeneralAuthoringDTO.defaultContentIdStr}&synchInMonitor=${qaGeneralAuthoringDTO.synchInMonitor}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&showOtherAnswers=${qaGeneralAuthoringDTO.showOtherAnswers}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.add.new.question" /> </a>
-
-	</c:if>
-	<c:if
-		test="${qaGeneralAuthoringDTO.activeModule != 'authoring' && qaGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&activeModule=${qaGeneralAuthoringDTO.activeModule}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.add.new.question" /> </a>
-	</c:if>
+	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&showOtherAnswers=${qaGeneralAuthoringDTO.showOtherAnswers}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');"
+			class="button-add-item"> 
+		<fmt:message key="label.add.new.question" /> 
+	</a>
 </p>
 
 <p>
-	<iframe
-		onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+300)+'px';"
+	<iframe onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+300)+'px';"
 		id="messageArea" name="messageArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">
 	</iframe>
 </p>
-
-<c:if test="${qaGeneralAuthoringDTO.activeModule != 'authoring'}">
-	<p class="align-right">
-		<a href="javascript:submitMethod('submitAllContent')" class="button">
-			<fmt:message key="label.save" /> </a>
-	</p>
-
-</c:if>

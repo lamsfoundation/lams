@@ -27,32 +27,30 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 
 /**
- * 
  * @author Ozgur Demirtas
- * 
  */
 public interface IQaContentDAO {
-    public QaContent getQaByContentId(long qaId);
+    QaContent getQaByContentId(long qaId);
 
-    public QaContent getQaBySession(Long sessionId);
+    void saveOrUpdateQa(QaContent qa);
 
-    public void saveOrUpdateQa(QaContent qa);
+    void saveQa(QaContent qa);
 
-    public void saveQa(QaContent qa);
+    void updateQa(QaContent qa);
 
-    public void updateQa(QaContent qa);
+    void removeQa(Long qaContentId);
 
-    public void removeQa(Long qaContentId);
+    void deleteQa(QaContent qa);
 
-    public void deleteQa(QaContent qa);
+    void removeQaById(Long qaId);
 
-    public void removeQaById(Long qaId);
+    void removeAllQaSession(QaContent content);
 
-    public void removeAllQaSession(QaContent content);
+    void deleteCondition(QaCondition condition);
 
-    public void deleteCondition(QaCondition condition);
-
-    public void removeQuestionsFromCache(QaContent qaContent);
+    void removeQuestionsFromCache(QaContent qaContent);
     
-    public void delete(Object object);
+    void removeQaContentFromCache(QaContent qaContent);
+    
+    void delete(Object object);
 }

@@ -23,33 +23,26 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dto;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
- * <p>
  * DTO that holds users attempt history data for jsp purposes
- * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class QaQuestionDTO implements Comparable {
+    private Long uid;
     private String question;
     private String displayOrder;
     private String feedback;
     private boolean required;
-
-    @Override
-    public String toString() {
-	return new ToStringBuilder(this).append("question:", question).append("feedback:", feedback).append(
-		"displayOrder:", displayOrder).append("required:", Boolean.toString(required)).toString();
-    }
 
     public QaQuestionDTO(QaQueContent que) {
 	this.question = que.getQuestion();
 	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
 	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";
 	this.required = que.isRequired();
+	this.uid = que.getUid();
     }
 
     public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required) {
@@ -67,6 +60,21 @@ public class QaQuestionDTO implements Comparable {
 	} else {
 	    return 0;
 	}
+    }
+    
+    /**
+     * @return Returns the uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(Long uid) {
+	this.uid = uid;
     }
 
     /**

@@ -24,15 +24,11 @@
 package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Authoring environment*/
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
 /**
  * @author Ozgur Demirtas
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
 public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String addContent;
@@ -48,8 +44,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String choiceAdvanced;
     protected String choiceInstructions;
 
-    protected String activeModule;
-
     /* basic content */
     protected String title;
     protected String instructions;
@@ -58,7 +52,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     protected String toolContentID;
     /* advanced content */
-    protected String synchInMonitor;
     protected String reportTitle;
     protected String monitoringReportTitle;
     protected String endLearningMessage;
@@ -85,8 +78,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     private boolean required;
     private String editQuestionBoxRequest;
 
-    protected String defineLaterInEditMode;
-    protected String defaultContentIdStr;
     protected IQaService qaService;
     
     protected boolean allowRichEditor;
@@ -126,7 +117,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.isRemoveContent = null;
 
 	this.endLearningMessage = null;
-	this.synchInMonitor = null;
 	this.reportTitle = null;
 	this.monitoringReportTitle = null;
 	this.questionsSequenced = null;
@@ -145,7 +135,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     public void resetRadioBoxes() {
-	this.synchInMonitor = OPTION_OFF;
 	this.usernameVisible = OPTION_OFF;
 	this.allowRateAnswers = OPTION_OFF;
 	this.notifyTeachersOnResponseSubmit = OPTION_OFF;
@@ -275,21 +264,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    /**
-     * @return Returns the syncInMonitor.
-     */
-    public String getSynchInMonitor() {
-	return synchInMonitor;
-    }
-
-    /**
-     * @param syncInMonitor
-     *                The syncInMonitor to set.
-     */
-    public void setSynchInMonitor(String synchInMonitor) {
-	this.synchInMonitor = synchInMonitor;
     }
 
     /**
@@ -593,36 +567,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the activeModule.
-     */
-    public String getActiveModule() {
-	return activeModule;
-    }
-
-    /**
-     * @param activeModule
-     *                The activeModule to set.
-     */
-    public void setActiveModule(String activeModule) {
-	this.activeModule = activeModule;
-    }
-
-    /**
-     * @return Returns the defaultContentIdStr.
-     */
-    public String getDefaultContentIdStr() {
-	return defaultContentIdStr;
-    }
-
-    /**
-     * @param defaultContentIdStr
-     *                The defaultContentIdStr to set.
-     */
-    public void setDefaultContentIdStr(String defaultContentIdStr) {
-	this.defaultContentIdStr = defaultContentIdStr;
-    }
-
-    /**
      * @return Returns the qaService.
      */
     public IQaService getQaService() {
@@ -635,21 +579,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setQaService(IQaService qaService) {
 	this.qaService = qaService;
-    }
-
-    /**
-     * @return Returns the defineLaterInEditMode.
-     */
-    public String getDefineLaterInEditMode() {
-	return defineLaterInEditMode;
-    }
-
-    /**
-     * @param defineLaterInEditMode
-     *                The defineLaterInEditMode to set.
-     */
-    public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-	this.defineLaterInEditMode = defineLaterInEditMode;
     }
 
     /**

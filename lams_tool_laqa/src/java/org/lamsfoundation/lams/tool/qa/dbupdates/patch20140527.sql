@@ -5,6 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LDEV-3236 Ability to change, add, remove Q&A questions even after student have reached it
 ALTER TABLE tl_laqa11_content DROP COLUMN content_inUse;
+ALTER TABLE tl_laqa11_content DROP COLUMN synch_in_monitor;
 
 ALTER TABLE tl_laqa11_content ADD COLUMN notify_response_submit TINYINT(1) NOT NULL DEFAULT 0;
 

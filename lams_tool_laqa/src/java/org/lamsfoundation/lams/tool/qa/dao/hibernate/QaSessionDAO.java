@@ -38,7 +38,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
     private static final String COUNT_SESSION_COMPLETE = "from   qaSession in class QaSession where qaSession.session_status='COMPLETE'";
     private static final String GET_SESSION_IDS_FROM_CONTENT = "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent order by qas.session_name asc";
-    private static final String GET_SESSION_NAMES_FROM_CONTENT = "select qas.session_name from QaSession qas where qas.qaContent=:qaContent order by qas.session_name asc";
 
     public int countSessionComplete(QaContent qa) {
 	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
@@ -70,7 +69,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#CreateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
-    public void CreateQaSession(QaSession session) {
+    public void createSession(QaSession session) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(session);
     }
@@ -93,10 +92,6 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
 
     public List getSessionsFromContent(QaContent qaContent) {
 	return (getHibernateTemplate().findByNamedParam(GET_SESSION_IDS_FROM_CONTENT, "qaContent", qaContent));
-    }
-
-    public List getSessionNamesFromContent(QaContent qaContent) {
-	return (getHibernateTemplate().findByNamedParam(GET_SESSION_NAMES_FROM_CONTENT, "qaContent", qaContent));
     }
 
 }

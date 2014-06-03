@@ -48,8 +48,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -73,7 +71,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	
@@ -89,31 +86,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	}
 
 	String toolContentID = qaMonitoringForm.getToolContentID();
-	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
+	QaContent qaContent = qaService.getQaContent(new Long(toolContentID).longValue());
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
-
-	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
-	if (qaContent.getTitle() == null) {
-	    generalMonitoringDTO.setActivityTitle("Questions and Answers");
-	    generalMonitoringDTO.setActivityInstructions("Please answer the questions.");
-	} else {
-	    generalMonitoringDTO.setActivityTitle(qaContent.getTitle());
-	    generalMonitoringDTO.setActivityInstructions(qaContent.getInstructions());
-	}
-
-	/* getting stats screen content from here... */
-	int countAllUsers = qaService.getTotalNumberOfUsers(qaContent);
-	if (countAllUsers == 0) {
-	    //error: countAllUsers is 0
-	    generalMonitoringDTO.setUserExceptionNoStudentActivity(new Boolean(true).toString());
-	}
-
-	generalMonitoringDTO.setCountAllUsers(new Integer(countAllUsers).toString());
-	
-	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
 
@@ -125,19 +102,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	/* this section is related to summary tab. Starts here. */
 
-	generalMonitoringDTO.setContentFolderID(contentFolderID);
-	int countSessionComplete = qaService.countSessionComplete(qaContent);
-	generalMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
-
-	qaMonitoringForm.setActiveModule(MONITORING);
-
-	/*for Edit Activity screen, BasicTab-ViewOnly*/
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
-	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
-
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
 	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
@@ -145,18 +109,18 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	List listQuestionContentDTO = new LinkedList();
+	List questionDTOs = new LinkedList();
 	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
 	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
 	    if (qaQuestion != null) {
 		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
-		listQuestionContentDTO.add(qaQuestionDTO);
+		questionDTOs.add(qaQuestionDTO);
 	    }
 	}
-	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	request.setAttribute(LIST_QUESTION_DTOS, questionDTOs);
+	sessionMap.put(LIST_QUESTION_DTOS, questionDTOs);
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	
 	// preserve conditions into sessionMap
 	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());

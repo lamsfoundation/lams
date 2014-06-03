@@ -135,15 +135,6 @@
         column="created_by"
         length="20"
     />
-
-
-    <property
-        name="synchInMonitor"
-        type="boolean"
-        access="property"        
-        column="synch_in_monitor"
-        length="1"
-    />
     
 
     <property

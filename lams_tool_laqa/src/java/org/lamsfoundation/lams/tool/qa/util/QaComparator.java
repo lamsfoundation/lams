@@ -28,11 +28,10 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * @author Ozgur Demirtas
- * 
  * A comparator implementation that can be used as a constructor to collections.
  * The TreeMap in the web layer makes use of it.
  * 
+ * @author Ozgur Demirtas
  */
 public class QaComparator implements Comparator, Serializable {
 

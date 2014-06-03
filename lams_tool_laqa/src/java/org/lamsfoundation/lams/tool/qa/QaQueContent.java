@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -60,26 +58,22 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     /** nullable persistent field */
     private QaContent qaContent;
 
-    /** persistent field */
-    private Set qaQueUsers;
-
     /** default constructor */
     public QaQueContent() {
     }
 
     public QaQueContent(String question, int displayOrder, String feedback, boolean required,
-	    QaContent qaContent, Set qaQueUsers) {
+	    QaContent qaContent) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
 	this.required = required;
 	this.qaContent = qaContent;
-	this.qaQueUsers = qaQueUsers;
     }
 
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
 	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
-		queContent.getFeedback(), queContent.isRequired(), newQaContent, new TreeSet());
+		queContent.getFeedback(), queContent.isRequired(), newQaContent);
 	return newQueContent;
     }
 
@@ -147,24 +141,6 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
      */
     public void setQaContent(org.lamsfoundation.lams.tool.qa.QaContent qaContent) {
 	this.qaContent = qaContent;
-    }
-
-    /**
-     * @return Returns the qaQueUsers.
-     */
-    public Set getQaQueUsers() {
-	if (qaQueUsers == null) {
-	    setQaQueUsers(new TreeSet());
-	}
-	return qaQueUsers;
-    }
-
-    /**
-     * @param qaQueUsers
-     *                The qaQueUsers to set.
-     */
-    public void setQaQueUsers(Set qaQueUsers) {
-	this.qaQueUsers = qaQueUsers;
     }
 
     /**

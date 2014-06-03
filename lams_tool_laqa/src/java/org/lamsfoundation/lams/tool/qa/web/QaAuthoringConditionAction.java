@@ -314,10 +314,10 @@ public class QaAuthoringConditionAction extends Action {
      */
     private List<QaQuestionDTO> getQuestionList(SessionMap sessionMap) {
 	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap
-		.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
+		.get(QaAppConstants.LIST_QUESTION_DTOS);
 	if (list == null) {
 	    list = new LinkedList<QaQuestionDTO>();
-	    sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, list);
+	    sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, list);
 	}
 	return list;
     }

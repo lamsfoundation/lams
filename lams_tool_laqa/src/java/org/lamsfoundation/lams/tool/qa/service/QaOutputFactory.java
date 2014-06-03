@@ -154,7 +154,7 @@ public class QaOutputFactory extends OutputFactory {
 	if (QaAppConstants.USER_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // user answers are loaded from the DB and array of strings is created
 
-	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaSession session = qaService.getSessionById(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
 	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] answers = new String[questions.size()];
@@ -169,7 +169,7 @@ public class QaOutputFactory extends OutputFactory {
 	} else if (QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // all users' answers are loaded from the DB and array of strings is created
 
-	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaSession session = qaService.getSessionById(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
 	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    Set<QaQueUsr> users = session.getQaQueUsers();
@@ -232,7 +232,7 @@ public class QaOutputFactory extends OutputFactory {
 		    usersAndAnswers, false);
 	} else if (QaAppConstants.QUESTIONS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // Questions asked in this Q&A activity
-	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaSession session = qaService.getSessionById(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
 	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] questionArray = new String[questions.size()];

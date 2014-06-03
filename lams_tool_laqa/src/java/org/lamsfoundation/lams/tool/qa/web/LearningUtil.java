@@ -96,31 +96,6 @@ public class LearningUtil implements QaAppConstants {
 	
 	return generalLearnerFlowDTO;
     }
-
-    public static String getRemainingQuestionCount(int currentQuestionIndex, String totalQuestionCount) {
-	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - currentQuestionIndex + 1;
-	return new Integer(remainingQuestionCount).toString();
-    }
-
-    /**
-     * feedBackAnswersProgress(HttpServletRequest request, int
-     * currentQuestionIndex) give user feedback on the remaining questions
-     * 
-     * @param qaLearningForm
-     *                return void
-     */
-    public static String feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex,
-	    String totalQuestionCount) {
-	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - currentQuestionIndex + 1;
-	String userFeedback = "";
-	if (remainingQuestionCount != 0) {
-	    userFeedback = "Remaining question count: " + remainingQuestionCount;
-	} else {
-	    userFeedback = "End of the questions.";
-	}
-
-	return userFeedback;
-    }
     
     /**
      */

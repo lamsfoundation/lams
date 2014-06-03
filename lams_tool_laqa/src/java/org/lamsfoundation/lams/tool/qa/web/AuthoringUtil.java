@@ -28,16 +28,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -45,7 +42,6 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
@@ -54,78 +50,61 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
  * Keeps all operations needed for Authoring mode.
  * 
  * @author Ozgur Demirtas
- * 
  */
 public class AuthoringUtil implements QaAppConstants {
 
-    protected static List swapNodes(List listQuestionContentDTO, String questionIndex, String direction,
-	    Set<QaCondition> conditions) {
+    protected static List<QaQuestionDTO> swapQuestions(List<QaQuestionDTO> questionDTOs, String questionIndex,
+	    String direction, Set<QaCondition> conditions) {
 
 	int intQuestionIndex = new Integer(questionIndex).intValue();
 	int intOriginalQuestionIndex = intQuestionIndex;
 
-	int replacedNodeIndex = 0;
+	int replacedQuestionIndex = 0;
 	if (direction.equals("down")) {
-	    //direction down
-	    replacedNodeIndex = ++intQuestionIndex;
+	    // direction down
+	    replacedQuestionIndex = ++intQuestionIndex;
 	} else {
-	    //direction up
-	    replacedNodeIndex = --intQuestionIndex;
-
+	    // direction up
+	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	QaQuestionDTO mainNode = extractNodeAtDisplayOrder(listQuestionContentDTO, intOriginalQuestionIndex);
+	QaQuestionDTO mainQuestion = getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
 
-	QaQuestionDTO replacedNode = extractNodeAtDisplayOrder(listQuestionContentDTO, replacedNodeIndex);
+	QaQuestionDTO replacedQuestion = getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
 
-	List listFinalQuestionContentDTO = new LinkedList();
+	List<QaQuestionDTO> newQuestionDtos = new LinkedList<QaQuestionDTO>();
 
-	listFinalQuestionContentDTO = reorderSwappedListQuestionContentDTO(listQuestionContentDTO,
-		intOriginalQuestionIndex, replacedNodeIndex, mainNode, replacedNode, conditions);
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO questionDTO = iter.next();
+	    QaQuestionDTO tempQuestion = null;
 
-	return listFinalQuestionContentDTO;
-    }
+	    if (!questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
+		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+		// normal copy
+		tempQuestion = questionDTO;
 
-    protected static List reorderSwappedListQuestionContentDTO(List listQuestionContentDTO,
-	    int intOriginalQuestionIndex, int replacedNodeIndex, QaQuestionDTO mainNode,
-	    QaQuestionDTO replacedNode, Set<QaCondition> conditions) {
+	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
+		// move type 1
+		tempQuestion = replacedQuestion;
 
-	List listFinalQuestionContentDTO = new LinkedList();
-
-	int queIndex = 0;
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) listIterator.next();
-	    queIndex++;
-	    QaQuestionDTO tempNode = null;
-	   
-	    if (!qaQuestionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
-		    && !qaQuestionDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
-		//normal copy
-		tempNode = new QaQuestionDTO(qaQuestionDTO.getQuestion(),
-			qaQuestionDTO.getDisplayOrder(),	qaQuestionDTO.getFeedback(), qaQuestionDTO.isRequired());
-	    } else if (qaQuestionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
-		//move type 1
-		tempNode = new QaQuestionDTO(replacedNode.getQuestion(),
-			replacedNode.getDisplayOrder(),replacedNode.getFeedback(), replacedNode.isRequired());
-	    } else if (qaQuestionDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
-		//move type 1
-		tempNode = new QaQuestionDTO(mainNode.getQuestion(),
-			mainNode.getDisplayOrder(), mainNode.getFeedback(), mainNode.isRequired());
+	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+		// move type 1
+		tempQuestion = mainQuestion;
 	    }
 
-	    listFinalQuestionContentDTO.add(tempNode);
+	    newQuestionDtos.add(tempQuestion);
 	}
+
 	// references in conditions also need to be changed
 	if (conditions != null) {
 	    for (QaCondition condition : conditions) {
 		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<QaQuestionDTO>(
 			new QaQuestionContentDTOComparator());
-		for (QaQuestionDTO dto : (List<QaQuestionDTO>) listFinalQuestionContentDTO) {
+		for (QaQuestionDTO dto : (List<QaQuestionDTO>) newQuestionDtos) {
 		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
 			newQuestionDTOSet.add(dto);
 		    }
@@ -133,81 +112,33 @@ public class AuthoringUtil implements QaAppConstants {
 		condition.temporaryQuestionDTOSet = newQuestionDTOSet;
 	    }
 	}
-	return listFinalQuestionContentDTO;
+
+	return newQuestionDtos;
     }
 
-    protected static QaQuestionDTO extractNodeAtDisplayOrder(List listQuestionContentDTO,
+    private static QaQuestionDTO getQuestionAtDisplayOrder(List<QaQuestionDTO> questionDTOs,
 	    int intOriginalQuestionIndex) {
 
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) listIterator.next();
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO qaQuestionDTO = iter.next();
 	    if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionDTO.getDisplayOrder())) {
 		return qaQuestionDTO;
 	    }
 	}
 	return null;
     }
-    
-    protected static Map reorderQuestionContentMap(Map mapQuestionContent) {
-	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
+
+    protected static List<QaQuestionDTO> reorderQuestionDTOs(List<QaQuestionDTO> questionDTOs) {
+	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
 
 	int queIndex = 0;
-	Iterator itMap = mapQuestionContent.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
-	    if (pairs.getValue() != null && !pairs.getValue().equals("")) {
-		++queIndex;
-		mapFinalQuestionContent.put(new Integer(queIndex).toString(), pairs.getValue());
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO qaQuestionDTO = iter.next();
 
-	    }
-	}
-	return mapFinalQuestionContent;
-    }
-
-    protected static List reorderListQuestionContentDTO(List listQuestionContentDTO, String excludeQuestionIndex) {
-
-	List listFinalQuestionContentDTO = new LinkedList();
-
-	int queIndex = 0;
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) listIterator.next();
-	    
 	    String question = qaQuestionDTO.getQuestion();
-
-	    String displayOrder = qaQuestionDTO.getDisplayOrder();
-
 	    String feedback = qaQuestionDTO.getFeedback();
-	    boolean required = qaQuestionDTO.isRequired();
-
-	    if (question != null && !question.equals("")) {
-		if (!displayOrder.equals(excludeQuestionIndex)) {
-		    ++queIndex;
-
-		    qaQuestionDTO.setQuestion(question);
-		    qaQuestionDTO.setDisplayOrder(new Integer(queIndex).toString());
-		    qaQuestionDTO.setFeedback(feedback);
-		    qaQuestionDTO.setRequired(required);
-
-		    listFinalQuestionContentDTO.add(qaQuestionDTO);
-		}
-	    }
-	}
-	return listFinalQuestionContentDTO;
-    }
-
-    protected static List reorderSimpleListQuestionContentDTO(List listQuestionContentDTO) {
-	List listFinalQuestionContentDTO = new LinkedList();
-
-	int queIndex = 0;
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) listIterator.next();
-	    
-	    String question = qaQuestionDTO.getQuestion();
-	    String displayOrder = qaQuestionDTO.getDisplayOrder();
-	    String feedback = qaQuestionDTO.getFeedback();   
 	    boolean required = qaQuestionDTO.isRequired();
 
 	    if (question != null && !question.equals("")) {
@@ -218,105 +149,68 @@ public class AuthoringUtil implements QaAppConstants {
 		qaQuestionDTO.setFeedback(feedback);
 		qaQuestionDTO.setRequired(required);
 
-		listFinalQuestionContentDTO.add(qaQuestionDTO);
+		listFinalQuestionDTO.add(qaQuestionDTO);
 	    }
 	}
-	return listFinalQuestionContentDTO;
+	return listFinalQuestionDTO;
     }
 
-    protected static List reorderUpdateListQuestionContentDTO(List listQuestionContentDTO,
+    protected static List<QaQuestionDTO> reorderUpdateQuestionDTOs(List<QaQuestionDTO> questionDTOs,
 	    QaQuestionDTO qaQuestionContentDTONew, String editableQuestionIndex) {
 
-	List listFinalQuestionContentDTO = new LinkedList();
+	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
 
 	int queIndex = 0;
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	while (listIterator.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) listIterator.next();
-	   
+	Iterator iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) iter.next();
+
 	    ++queIndex;
 
 	    String question = qaQuestionDTO.getQuestion();
 	    String displayOrder = qaQuestionDTO.getDisplayOrder();
 	    String feedback = qaQuestionDTO.getFeedback();
-	    boolean required = qaQuestionDTO.isRequired(); 
-	    
+	    boolean required = qaQuestionDTO.isRequired();
+
 	    if (displayOrder.equals(editableQuestionIndex)) {
 		qaQuestionDTO.setQuestion(qaQuestionContentDTONew.getQuestion());
 		qaQuestionDTO.setDisplayOrder(qaQuestionContentDTONew.getDisplayOrder());
 		qaQuestionDTO.setFeedback(qaQuestionContentDTONew.getFeedback());
 		qaQuestionDTO.setRequired(required);
 
-		listFinalQuestionContentDTO.add(qaQuestionDTO);
+		listFinalQuestionDTO.add(qaQuestionDTO);
 	    } else {
 		qaQuestionDTO.setQuestion(question);
 		qaQuestionDTO.setDisplayOrder(displayOrder);
 		qaQuestionDTO.setFeedback(feedback);
 		qaQuestionDTO.setRequired(required);
 
-		listFinalQuestionContentDTO.add(qaQuestionDTO);
+		listFinalQuestionDTO.add(qaQuestionDTO);
 
 	    }
 	}
-	return listFinalQuestionContentDTO;
+	return listFinalQuestionDTO;
     }
 
-    /**
-     * repopulateMap(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void repopulates the user entries into the Map
-     */
-    protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request) {
-	int intQuestionIndex = mapQuestionContent.size();
-
-	/*
-	 * if there is data in the Map remaining from previous session remove those
-	 */
-	mapQuestionContent.clear();
-
-	for (long i = 0; i < intQuestionIndex; i++) {
-	    String candidateQuestionEntry = request.getParameter("questionContent" + i);
-	    if (i == 0) {
-	    }
-	    if (candidateQuestionEntry != null && candidateQuestionEntry.length() > 0) {
-		mapQuestionContent.put(new Long(i + 1).toString(), candidateQuestionEntry);
-	    }
-	}
-    }
-
-    public QaContent saveOrUpdateQaContent(List<QaQuestionDTO> listQuestionContentDTO, IQaService qaService,
-	    QaAuthoringForm qaAuthoringForm, HttpServletRequest request, QaContent qaContent, String strToolContentID,
+    public static QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, IQaService qaService,
+	    HttpServletRequest request, QaContent qaContent, String strToolContentID,
 	    Set<QaCondition> conditions) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	String synchInMonitor = request.getParameter(QaAppConstants.SYNC_IN_MONITOR);
-
 	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
-	
 	String allowRateQuestions = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
-	
 	String notifyTeachersOnResponseSubmit = request.getParameter(QaAppConstants.NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
-
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
-
 	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
-
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
-	
 	String allowRichEditor = request.getParameter("allowRichEditor");
-	
 	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
-
 	String reflect = request.getParameter(QaAppConstants.REFLECT);
-
 	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
 
-	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-
 	boolean questionsSequencedBoolean = false;
-	boolean synchInMonitorBoolean = false;
 	boolean lockWhenFinishedBoolean = false;
 	boolean usernameVisibleBoolean = false;
 	boolean allowRateQuestionsBoolean = false;
@@ -330,10 +224,6 @@ public class AuthoringUtil implements QaAppConstants {
 	    questionsSequencedBoolean = true;
 	}
 
-	if (synchInMonitor != null && synchInMonitor.equalsIgnoreCase("1")) {
-	    synchInMonitorBoolean = true;
-	}
-
 	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
 	    lockWhenFinishedBoolean = true;
 	}
@@ -341,11 +231,11 @@ public class AuthoringUtil implements QaAppConstants {
 	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
 	    usernameVisibleBoolean = true;
 	}
-	
+
 	if (allowRateQuestions != null && allowRateQuestions.equalsIgnoreCase("1")) {
 	    allowRateQuestionsBoolean = true;
 	}
-	
+
 	if (notifyTeachersOnResponseSubmit != null && notifyTeachersOnResponseSubmit.equalsIgnoreCase("1")) {
 	    notifyTeachersOnResponseSubmitBoolean = true;
 	}
@@ -353,11 +243,11 @@ public class AuthoringUtil implements QaAppConstants {
 	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
 	    showOtherAnswersBoolean = true;
 	}
-	
+
 	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
 	    allowRichEditorBoolean = true;
 	}
-	
+
 	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
 	    useSelectLeaderToolOuputBoolean = true;
 	}
@@ -392,32 +282,25 @@ public class AuthoringUtil implements QaAppConstants {
 	qaContent.setCreatedBy(userId);
 	/** make sure we are setting the userId from the User object above */
 
-	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    qaContent.setUsernameVisible(usernameVisibleBoolean);
-	    qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
-	    qaContent.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmitBoolean);
-	    qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
-	    qaContent.setQuestionsSequenced(questionsSequencedBoolean);
-	    qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
-	    qaContent.setSynchInMonitor(synchInMonitorBoolean);
-	    qaContent.setReflect(reflectBoolean);
-	    qaContent.setReflectionSubject(reflectionSubject);
-	    qaContent.setAllowRichEditor(allowRichEditorBoolean);
-	    qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
-
-	}
+	qaContent.setUsernameVisible(usernameVisibleBoolean);
+	qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
+	qaContent.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmitBoolean);
+	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
+	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
+	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
+	qaContent.setReflect(reflectBoolean);
+	qaContent.setReflectionSubject(reflectionSubject);
+	qaContent.setAllowRichEditor(allowRichEditorBoolean);
+	qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 
 	qaContent.setConditions(new TreeSet<QaCondition>(new TextSearchConditionComparator()));
 	if (newContent) {
-	    qaService.createQa(qaContent);
+	    qaService.createQaContent(qaContent);
 	} else {
-	    qaService.updateQa(qaContent);
+	    qaService.updateQaContent(qaContent);
 	}
 
-	qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-	qaContent = createQuestionContent(listQuestionContentDTO, qaService, qaContent);
-
-	qaContent = qaService.getQa(new Long(strToolContentID).longValue());
+	qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
 
 	for (QaCondition condition : conditions) {
 	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
@@ -430,163 +313,51 @@ public class AuthoringUtil implements QaAppConstants {
 	    }
 	}
 	qaContent.setConditions(conditions);
-	qaService.updateQa(qaContent);
-	return qaContent;
-    }
-
-    /**
-     * removes unused question entries from db
-     * 
-     * @param mapQuestionContent
-     * @param qaService
-     * @param qaAuthoringForm
-     */
-    public void removeRedundantQuestions(List<QaQuestionDTO>listQuestionContentDTO, IQaService qaService, QaAuthoringForm qaAuthoringForm,
-	    HttpServletRequest request, String toolContentID) {
-
-	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
-	if (qaContent != null) {
-	    List allQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
-
-	    Iterator listIterator = allQuestions.iterator();
-	    boolean entryUsed = false;
-	    while (listIterator.hasNext()) {
-
-		QaQueContent queContent = (QaQueContent) listIterator.next();
-
-		//Checking whether to remove question with id  queContent.getUid()
-		entryUsed = false;
-		for ( QaQuestionDTO questionDTO : listQuestionContentDTO ) {
-		    if (StringUtils.equals(queContent.getQuestion(), questionDTO.getQuestion())) {
-			entryUsed = true;
-			break;
-		    }
-		}
-
-		if (entryUsed == false) {
-
-		    QaQueContent removeableQaQueContent = qaService.getQuestionContentByQuestionText(queContent
-			    .getQuestion(), qaContent.getUid());
-		    if (removeableQaQueContent != null) {
-			//Removing question with id removeableQaQueContent.getUid() 
-			qaService.removeQaQueContent(removeableQaQueContent);
-		    }
-
-		}
-	    }
-	}
-
-    }
-
-    /**
-     * persist the questions in the Map the user has submitted
-     * 
-     * LDEV-2526 note that questions have already been removed before this method is called, but
-     * their displayOrder fields haven't been updated yet.  Note also that the given
-     * mapQuestionContent maps question numbers to question strings.
-     */
-    protected QaContent createQuestionContent(List<QaQuestionDTO> listQuestionContentDTO, IQaService qaService,
-	    QaContent qaContent) {
+	qaService.updateQaContent(qaContent);
+	
+	//persist questions
 	int displayOrder = 0;
-	for ( QaQuestionDTO questionContentDTO : listQuestionContentDTO ) {
-	    
-	    // LDEV-2526 Assuming here that removed questions exist in mapQuestionContent, but that the value is empty
-	    // (this whole thing needs a rewrite).  If empty, do not attempt to persist it.
-	    // LDEV-2524 Partial rewrite - removed the old question and feedback maps and just use the original list.
-	    // Overriding the displayOrder with a new displayOrder.
-	    String questionText = questionContentDTO.getQuestion();
-	    if (StringUtils.isNotBlank(questionText)) {
-	    
-		++displayOrder;
-		
-		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(questionText, qaContent.getUid());
-		if (existingQaQueContent == null) {
-		    QaQueContent queContent = new QaQueContent(questionText, displayOrder, questionContentDTO.getFeedback(),
-			    	questionContentDTO.isRequired(), qaContent, null);
-		    qaContent.getQaQueContents().add(queContent);
-		    queContent.setQaContent(qaContent);
+	for (QaQuestionDTO questionDTO : questionDTOs) {
 
-		    qaService.createQaQue(queContent);
-		} else {
+	    String questionText = questionDTO.getQuestion();
 
-		    existingQaQueContent.setQuestion(questionText);
-		    existingQaQueContent.setFeedback(questionContentDTO.getFeedback());
-		    existingQaQueContent.setDisplayOrder(displayOrder);
-		    existingQaQueContent.setRequired(questionContentDTO.isRequired());
-		    qaService.saveOrUpdateQaQueContent(existingQaQueContent);
-		}
+	    // skip empty questions
+	    if (questionText.isEmpty()) {
+		continue;
 	    }
-	}
 
+	    ++displayOrder;
+
+	    QaQueContent question = qaService.getQuestionByUid(questionDTO.getUid());
+
+	    // in case question doesn't exist
+	    if (question == null) {
+		question = new QaQueContent(questionText, displayOrder, questionDTO.getFeedback(),
+			questionDTO.isRequired(), qaContent);
+		qaContent.getQaQueContents().add(question);
+		question.setQaContent(qaContent);
+		
+	    // in case question exists already		
+	    } else {
+
+		question.setQuestion(questionText);
+		question.setFeedback(questionDTO.getFeedback());
+		question.setDisplayOrder(displayOrder);
+		question.setRequired(questionDTO.isRequired());
+	    }
+	    
+	    qaService.saveOrUpdateQuestion(question);
+	}
+	
 	return qaContent;
     }
 
-    public static boolean checkDuplicateQuestions(List<QaQuestionDTO> listQuestionContentDTO, String newQuestion) {
-	for (QaQuestionDTO questionDTO : listQuestionContentDTO ) {
-	    if ( questionDTO.getQuestion() != null && questionDTO.getQuestion().equals(newQuestion) ) {
+    public static boolean checkDuplicateQuestions(List<QaQuestionDTO> questionDTOs, String newQuestion) {
+	for (QaQuestionDTO questionDTO : questionDTOs) {
+	    if (questionDTO.getQuestion() != null && questionDTO.getQuestion().equals(newQuestion)) {
 		return true;
 	    }
 	}
 	return false;
-    }
-
-    /**
-     * sorts the questions by the display order 
-     * 
-     * @param mapQuestionContent
-     * @param qaService
-     * @param qaAuthoringForm
-     * @param qaContent
-     */
-    public void reOrganizeDisplayOrder(IQaService qaService, QaAuthoringForm qaAuthoringForm,
-	    QaContent qaContent) {
-	if (qaContent != null) {
-	    List sortedQuestions = qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
-
-	    Iterator listIterator = sortedQuestions.iterator();
-	    int displayOrder = 1;
-	    while (listIterator.hasNext()) {
-		QaQueContent queContent = (QaQueContent) listIterator.next();
-
-		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(
-			queContent.getQuestion(), qaContent.getUid());
-		existingQaQueContent.setDisplayOrder(displayOrder);
-		qaService.saveOrUpdateQaQueContent(existingQaQueContent);
-		displayOrder++;
-	    }
-	}
-    }
-
-    /**
-     * checks if any entry is duplicate verifyDuplicatesOptionsMap(Map
-     * mapQuestions)
-     * 
-     * @param mapQuestions
-     * @return
-     */
-    public static boolean verifyDuplicatesOptionsMap(Map mapQuestions) {
-	Map originalMap = mapQuestions;
-	Map backupMap = mapQuestions;
-
-	int optionCount = 0;
-	for (long i = 1; i <= QaAppConstants.MAX_QUESTION_COUNT.longValue(); i++) {
-	    String currentOption = (String) originalMap.get(new Long(i).toString());
-
-	    optionCount = 0;
-	    for (long j = 1; j <= QaAppConstants.MAX_QUESTION_COUNT.longValue(); j++) {
-		String backedOption = (String) backupMap.get(new Long(j).toString());
-
-		if (currentOption != null && backedOption != null) {
-		    if (currentOption.equals(backedOption)) {
-			optionCount++;
-		    }
-
-		    if (optionCount > 1) {
-			return false;
-		    }
-		}
-	    }
-	}
-	return true;
     }
 }

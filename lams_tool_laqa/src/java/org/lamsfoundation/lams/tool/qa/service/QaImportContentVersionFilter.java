@@ -61,5 +61,6 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
      */
     public void up20140102To20140102() {
 	this.removeField(QaContent.class, "contentLocked");
+	this.removeField(QaContent.class, "synchInMonitor");
     }
 }
