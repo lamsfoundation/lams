@@ -102,7 +102,7 @@ function drawBarChart(chartNumber) {
 		
 		// add Y axis with percent
 		var maxValue = Math.max.apply(Math, values[chartNumber]);
-		currentBarChart.push(Raphael.g.axis(20, 189, 158, 0, maxValue, 10, 1, [], '|', 3, papers[chartNumber]).all);
+		currentBarChart.push(Raphael.g.axis(23, 189, 158, 0, maxValue, 10, 1, [], '|', 3, papers[chartNumber]).all);
 		currentBarChart.push(papers[chartNumber].text(20, 20, '%').attr('font-weight', 800));
 		
 		// bar chart does not provide a legends similar to pie chart, so draw it manually
