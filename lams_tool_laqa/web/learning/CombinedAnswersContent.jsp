@@ -19,8 +19,10 @@
 		
 			<div class="shading-bg">
 				<p>
-			 		<strong><fmt:message key="label.question" /> <c:out
-					value="${questionEntry.key}" />:</strong>
+			 		<strong>
+			 			<fmt:message key="label.question" /> 
+			 			<c:out value="${questionEntry.key}" />:
+			 		</strong>
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
@@ -31,27 +33,27 @@
 					<strong><fmt:message key="label.answer" /></strong>
 				</p>
 				
-			<c:choose>
-				<c:when test="${hasEditRight}">
-				
-					<c:choose>
-						<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-							<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
-								contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
-							</lams:CKEditor>
-						</c:when>
-				
-						<c:otherwise>
-							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-						</c:otherwise>
-					</c:choose>
+				<c:choose>
+					<c:when test="${hasEditRight}">
 					
-				</c:when>
-				
-				<c:otherwise>
-					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-				</c:otherwise>
-			</c:choose>
+						<c:choose>
+							<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
+								<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
+									contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
+								</lams:CKEditor>
+							</c:when>
+					
+							<c:otherwise>
+								<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+							</c:otherwise>
+						</c:choose>
+						
+					</c:when>
+					
+					<c:otherwise>
+						<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		
 		</c:if>

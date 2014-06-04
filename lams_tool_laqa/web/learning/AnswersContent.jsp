@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -105,8 +104,7 @@
 
 	<div id="content">
 		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}"
-				escapeXml="true" />
+			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -125,8 +123,7 @@
 			</h4>
 		</c:if>
 
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
 					<html:hidden property="method" value="getNextQuestion"/>
@@ -150,10 +147,9 @@
 				</p>
 			</logic:messagesPresent>
 
-				<p>
-				  <c:out value="${generalLearnerFlowDTO.activityInstructions}"
-						escapeXml="false" />
-				</p>
+			<p>
+				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+			</p>
 				
 			<c:choose>
 				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
@@ -165,7 +161,6 @@
 								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
 									
 								<fmt:message key="label.questions.simple" /></p>
-								
 						</c:if>
 					</c:if>
 					

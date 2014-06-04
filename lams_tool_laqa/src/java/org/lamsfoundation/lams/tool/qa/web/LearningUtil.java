@@ -113,9 +113,8 @@ public class LearningUtil implements QaAppConstants {
 	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		Long questionUid = question.getUid();
 		QaUsrResp dbResponse = qaService.getResponseByUserAndQuestion(qaQueUsr.getQueUsrId(), questionUid);
-		if (dbResponse != null) {
-		    mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), dbResponse.getAnswer());
-		}
+		String answer = (dbResponse == null) ? null : dbResponse.getAnswer();
+		mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), answer);
 	    }	    
 	    
 	    // maybe we have come in from the review screen, if so get the answers from db.

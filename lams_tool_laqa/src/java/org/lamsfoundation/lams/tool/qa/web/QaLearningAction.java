@@ -625,7 +625,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      * Smileys and math functions only put in an img tag so explicitly look for that.
      */
     private boolean isEmpty(String answer) {
-	if ((answer.indexOf("<img") > -1) || (answer.indexOf("<IMG") > -1)) {
+	if ((answer != null) && ((answer.indexOf("<img") > -1) || (answer.indexOf("<IMG") > -1))) {
 	    return false;
 	} else {
 	    return StringUtils.isBlank(WebUtil.removeHTMLtags(answer));

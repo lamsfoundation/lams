@@ -15,15 +15,15 @@
 <!--question content goes here-->
 
 <div class="shading-bg">
-	<c:forEach var="questionEntry"
-		items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+	<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
-		<c:if
-			test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}">
+		<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}">
 
 			<p>
-				<strong><fmt:message key="label.question" /> <c:out
-						value="${questionEntry.key}" />:</strong>
+				<strong>
+					<fmt:message key="label.question" /> 
+					<c:out value="${questionEntry.key}" />:
+				</strong>
 				<c:if test="${questionEntry.value.required}">
 					<fmt:message key="label.required" />
 				</c:if>
@@ -49,7 +49,6 @@
 			
 			<html:hidden property="currentQuestionIndex"value="${questionEntry.key}" />
 
-
 		</c:if>
 	</c:forEach>
 </div>
@@ -57,46 +56,35 @@
 <div class="space-bottom">
 	<!--question content ends here-->
 	<c:choose>
-		<c:when
-			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
+		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }">
 
-			<html:button property="btnGetPrevious"
-				onclick="javascript:submitMethod('getPreviousQuestion');"
-				styleClass="button">
+			<html:button property="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 				<fmt:message key="button.getPreviousQuestion" />
 			</html:button>
 
 			<div align="right">
-				<html:button property="btnDone"
-					onclick="javascript:submitMethod('submitAnswersContent');"
-					styleClass="button">
+				<html:button property="btnDone" onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 					<fmt:message key="button.done" />
 				</html:button>
 			</div>
 
 		</c:when>
 
-		<c:when
-			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
+		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount == 1) }">
 			<div align="right">
-				<html:button property="btnDone"
-					onclick="javascript:submitMethod('submitAnswersContent');"
-					styleClass="button">
+				<html:button property="btnDone" onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 					<fmt:message key="button.done" />
 				</html:button>
 			</div>
 
 		</c:when>
 
-		<c:when
-			test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
+		<c:when test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}">
 
-			<html:button property="btnGetPrevious"
-				onclick="javascript:submitMethod('getPreviousQuestion');"
-				styleClass="button">
+			<html:button property="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 				<fmt:message key="button.getPreviousQuestion" />
 			</html:button>
 			<html:button property="btnGetNext"
@@ -108,15 +96,9 @@
 		</c:when>
 
 		<c:otherwise>
-
-
-			<html:button property="btnGetNext"
-				onclick="javascript:submitMethod('getNextQuestion');"
-				styleClass="button">
+			<html:button property="btnGetNext" onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 				<fmt:message key="button.getNextQuestion" />
 			</html:button>
-
-
 		</c:otherwise>
 	</c:choose>
 
