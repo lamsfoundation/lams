@@ -289,16 +289,18 @@ public class AuthoringAction extends Action {
 	// **********************************Get Scratchie PO*********************
 	Scratchie scratchiePO = service.getScratchieByContentId(scratchieForm.getScratchie().getContentId());
 
-	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<ScratchieItem>() : scratchiePO
-		.getScratchieItems();
-	//initialize oldItems' answers
-	for (ScratchieItem oldItem: oldItems) {
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)oldItem.getAnswers()) {
-	    }
-	}
+	Set<ScratchieItem> oldItems = null;
 	
 	//allow using old and modified questions and references altogether
 	if (mode.isTeacher()) {
+	    oldItems = (scratchiePO == null) ? new HashSet<ScratchieItem>() : scratchiePO.getScratchieItems();
+	    
+	    // initialize oldItems' answers
+	    for (ScratchieItem oldItem : oldItems) {
+		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) oldItem.getAnswers()) {
+		}
+	    }
+	    
 	    service.releaseItemsFromCache(scratchiePO);
 	}
 	
@@ -337,7 +339,7 @@ public class AuthoringAction extends Action {
 	
 	//recalculate results in case content is edited from monitoring
 	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
-	 if (mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    service.recalculateUserAnswers(scratchiePO, oldItems, newItems, deletedItems);
 	}
 	
