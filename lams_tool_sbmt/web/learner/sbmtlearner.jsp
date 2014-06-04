@@ -227,7 +227,7 @@
 
 				<!--File path row -->
 				<div class="field-name">
-					<fmt:message key="label.learner.filePath" />
+					<fmt:message key="label.learner.filePath" /> <span style="color: red">*</span>
 				</div>
 
 				<html:file property="file"
@@ -236,7 +236,7 @@
 
 				<!--File Description row -->
 				<div class="field-name space-top">
-					<fmt:message key="label.learner.fileDescription" />
+					<fmt:message key="label.learner.fileDescription" /> <span style="color: red">*</span>
 				</div>
 				<html:textarea rows="5" cols="40" tabindex="2"
 					styleClass="text-area" property="description"
