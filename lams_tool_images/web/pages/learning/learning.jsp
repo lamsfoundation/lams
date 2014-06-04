@@ -144,7 +144,9 @@
 			}
 		});
 		
-		$('#mycarousel').jcarousel();
+		$('#mycarousel').jcarousel({
+			'itemFallbackDimension': 100
+		});
 
 		$('#votingForm_vote').click(function() {
 	    	var options = { 
