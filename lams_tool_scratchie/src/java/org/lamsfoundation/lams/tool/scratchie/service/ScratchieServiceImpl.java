@@ -589,13 +589,14 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
+	final int MAX_ITEM_MARK = 4;
 
 	int mark = 0;
 	// add mark only if an item was unraveled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    mark += item.getAnswers().size() - itemAttempts;
+	    mark = MAX_ITEM_MARK - (itemAttempts - 1);
 
 	    // add extra point if needed
 	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
