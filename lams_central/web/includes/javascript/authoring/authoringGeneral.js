@@ -77,7 +77,9 @@ var paper = null,
 			'regionEmptyHeight'				   : 20,
 			
 			'groupingEffectPadding'			   : 5,
-			'selectEffectPadding'			   : 7
+			'selectEffectPadding'			   : 7,
+			
+			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined'
 		},
 		
 		'colors' : {
@@ -2120,27 +2122,39 @@ GeneralLib = {
 			return;
 		}
 		layout.modified = modified;
-		var activitiesExist = layout.activities.length > 0;
-		if (modified || !activitiesExist) {
-			$('#previewButton').attr('disabled', 'disabled')
-							   .button('option', 'disabled', true);
-			$('.exportSequenceButton').attr('disabled', 'disabled')
-								      .css('opacity', 0.2);
-			$('#ldDescriptionFieldModified').text('*');
-		} else {
+		var activitiesExist = layout.activities.length > 0,
+			enableExportButton = false;
+		if (!modified && activitiesExist) {
 			$('#previewButton').attr('disabled', null)
-							   .button('option', 'disabled', false);
+						   	   .button('option', 'disabled', false);
 			$('.exportSequenceButton').attr('disabled', null)
-		      						  .css('opacity', 1);
+								  	  .css('opacity', 1);
 			$('#ldDescriptionFieldModified').text('');
+			enableExportButton = true;
+		} else {
+			$('#previewButton').attr('disabled', 'disabled')
+			   				   .button('option', 'disabled', true);
+			$('.exportSequenceButton').attr('disabled', 'disabled')
+							      	  .css('opacity', 0.2);
+			$('#ldDescriptionFieldModified').text('*');
 		}
 		
-		if (activitiesExist) {
+		if (layout.conf.supportsDownloadAttribute && activitiesExist) {
 			$('.exportImageButton').attr('disabled', null)
 			  					   .css('opacity', 1);
+			enableExportButton = true;
 		} else {
 			$('.exportImageButton').attr('disabled', 'disabled')
 			   					   .css('opacity', 0.2);
+		}
+		
+		// disabled the whole export button if all children are disabled
+		if (enableExportButton) {
+			$('#exportButton').attr('disabled', null)
+		  	  				  .css('opacity', 1);
+		} else {
+			$('#exportButton').attr('disabled', 'disabled')
+	      	  				  .css('opacity', 0.2);
 		}
 	},
 

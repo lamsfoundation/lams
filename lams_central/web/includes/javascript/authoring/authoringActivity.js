@@ -1079,6 +1079,7 @@ ActivityLib = {
 		
 		// visually remove the activity
 		activity.items.remove();
+		GeneralLib.setModified(true);
 	},
 	
 	

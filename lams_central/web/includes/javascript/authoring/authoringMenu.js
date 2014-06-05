@@ -41,8 +41,11 @@ var MenuLib = {
 				var menuItem = $(this),
 					subMenu = menuItem.children('ul');
 				if (subMenu.length > 0){
-					
 					menuItem.click(function(){
+						// do not show the submenu when the button is disabled
+						if ($(this).attr('disabled') == 'disabled') {
+							return;
+						}
 						var menu = $(this).children('ul').show().position({
 							my : "left+2px top",
 							at : "right top",
@@ -81,7 +84,6 @@ var MenuLib = {
 			'autoOpen' : false,
 			'width'	   : 320,
 			'height'   : 120,
-			'show'     : 'fold',
 			'hide'     : 'fold',
 			'draggable': false,
 			'resizable': false,
@@ -94,6 +96,11 @@ var MenuLib = {
 			layout.exportLDDialog.dialog('close');
 		});
 		layout.dialogs.push(layout.exportLDDialog);
+		
+		
+		if (!layout.conf.supportsDownloadAttribute) {
+			$('.exportImageButton').attr('title', LABELS.DOWNLOAD_NOT_SUPPORTED);
+		}
 	},
 	
 	
@@ -329,10 +336,10 @@ var MenuLib = {
 			return;
 		}
 		
-		layout.exportLDDialog.dialog('open');
 		$('iframe', layout.exportLDDialog)
 			.attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&format=' + format + '&learningDesignID='
 								  + layout.ld.learningDesignID);
+		layout.exportLDDialog.dialog('open');
 	},
 
 	

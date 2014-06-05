@@ -70,6 +70,7 @@
 				SEQUENCE_NOT_VALID : 'The sequence is not valid.<br />It needs to be corrected before it can be used in lessons.',
 				SEQUENCE_VALIDATION_ISSUES : 'While saving the sequence there were following validation issues:',
 				SAVE_SUCCESSFUL : 'Congratulations! Your design is valid and has been saved.',
+				DOWNLOAD_NOT_SUPPORTED : 'Your browser does not support on the fly downloading.',
 				NAVIGATE_AWAY_CONFIRM : 'Your design is not saved.\nAny changes you made since you last saved will be lost.',
 				DELETE_NODE_CONFIRM : 'Are you sure you want to delete this ',
 				SEQUENCE_OVERWRITE_CONFIRM : 'Are you sure you want to overwrite the existing sequence?',
@@ -181,7 +182,7 @@
 			</div>
 			<ul>
 				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
-				<li>Export<span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
+				<li id="exportButton">Export<span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
 					<ul>
 						<li class="exportSequenceButton"
 							title="Standard LAMS ZIP format"
