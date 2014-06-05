@@ -18,7 +18,8 @@
 				<c:if test="${!image.createByAuthor && image.createBy != null}">
 					<td style="align:left;">	
 						<h2>
-							<fmt:message key="label.export.uploaded.by" />: <c:out value="${image.createBy.loginName}"></c:out>
+							<fmt:message key="label.export.uploaded.by" />:
+							<c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/>
 						</h2>
 					</td>
 				</c:if>
@@ -68,7 +69,7 @@
 					<tr >
 						<th >
 							<fmt:message key="label.learning.by" />
-							<c:set var="author" value="${comment.createBy.loginName}" />
+							<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
 							<c:out value="${author}" escapeXml="true"/>
 									-				
 							<lams:Date value="${comment.createDate}" />

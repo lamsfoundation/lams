@@ -112,7 +112,7 @@
 					
 						<tr>
 							<td>
-								<c:out value="${userImageContribution.user.loginName}" escapeXml="true"/>
+								<c:out value="${userImageContribution.user.firstName} ${userImageContribution.user.lastName}" escapeXml="true"/>
 							</td>
 							
 							<c:if test="${imageGallery.allowVote}">								

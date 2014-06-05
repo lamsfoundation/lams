@@ -96,7 +96,7 @@
 						<c:set var="title">
 							<c:out value="${image.title}" escapeXml="true"/>
 							<c:if test="${!summary.itemCreateByAuthor}">
-								[ <fmt:message key="label.monitoring.by"/> <c:out value="${summary.username}]" escapeXml="true"/>
+								[ <fmt:message key="label.monitoring.by"/> <c:out value="${summary.username}" escapeXml="true"/> ]
 							</c:if>						
 						</c:set>
 						<a href="${url}" class="thickbox">

@@ -12,15 +12,13 @@
 				<tr >
 					<th >
 						<fmt:message key="label.learning.by" />
-						<c:set var="author" value="${comment.createBy.loginName}" />
+						<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
 						<c:if test="${empty author}">
 							<c:set var="author">
 								<fmt:message key="label.default.user.name" />
 							</c:set>
 						</c:if>
-						${author}
-								-				
-						<lams:Date value="${comment.createDate}" />
+						<c:out value="${author}" escapeXml="true" /> - <lams:Date value="${comment.createDate}" />
 					</th>
 				</tr>
 				

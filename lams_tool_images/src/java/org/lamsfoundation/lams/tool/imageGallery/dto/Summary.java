@@ -87,7 +87,8 @@ public class Summary {
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
+	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getFirstName() + " "
+		    + item.getCreateBy().getLastName();
 	    this.fileName = item.getFileName();
 	    this.fileUuid = item.getOriginalFileUuid();
 	    this.fileVersionId = item.getFileVersionId();
@@ -114,7 +115,8 @@ public class Summary {
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
+	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getFirstName() + " "
+		    + item.getCreateBy().getLastName();
 	    this.fileName = item.getFileName();
 	    this.fileUuid = item.getOriginalFileUuid();
 	    this.fileVersionId = item.getFileVersionId();

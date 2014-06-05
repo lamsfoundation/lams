@@ -23,7 +23,8 @@
 				<c:if test="${!image.createByAuthor && image.createBy != null}">
 					<td style="align:left;">	
 						<h2>
-							<fmt:message key="label.export.uploaded.by" />: <c:out value="${image.createBy.loginName}"></c:out>
+							<fmt:message key="label.export.uploaded.by" />:
+							<c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/>
 						</h2>
 					</td>
 				</c:if>
@@ -94,7 +95,7 @@
 							
 				<tr>
 					<td>
-						${userContribution.user.loginName}
+						<c:out value="${userContribution.user.firstName} ${userContribution.user.lastName}" escapeXml="true" />
 					</td>
 							
 					<c:if test="${imageGallery.allowVote}">								
