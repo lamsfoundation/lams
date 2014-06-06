@@ -21,8 +21,13 @@
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
 		#reflections-div {
-			width:96%;
 			padding: 80px 0 20px;
+		}
+		.ui-jqgrid tr.jqgrow td {
+		    white-space: normal !important;
+		    height:auto;
+		    vertical-align:text-top;
+		    padding-top:2px;
 		}
 	</style>
 
@@ -44,7 +49,7 @@
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'groupName', index:'groupName', width:140},
-			   		{name:'feedback', index:'feedback', width:553}
+			   		{name:'feedback', index:'feedback', width:568}
 			   	],
 			   	caption: "<fmt:message key='label.other.groups' />"
 			});
