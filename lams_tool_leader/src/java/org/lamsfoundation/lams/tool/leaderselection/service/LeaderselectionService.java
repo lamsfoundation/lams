@@ -175,6 +175,16 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 		leaderselectionToolContentHandler);
 	leaderselectionDAO.saveOrUpdate(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
+	if (content == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	content.setDefineLater(false);
+	leaderselectionDAO.saveOrUpdate(content);
+    }
 
     @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

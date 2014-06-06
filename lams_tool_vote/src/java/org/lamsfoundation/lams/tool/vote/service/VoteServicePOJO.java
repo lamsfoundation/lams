@@ -1073,21 +1073,19 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    throw new ToolException(e);
 	}
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	VoteContent voteContent = getVoteContent(toolContentId);
+	if (voteContent == null) {
+	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
+	    throw new DataMissingException("voteContent is missing");
+	}
+	voteContent.setDefineLater(false);
+	saveVoteContent(voteContent);
+    }
 
-    /**
-     * Implemented as part of the tool contract. Gets called only in the Learner mode. All the learners in the same
-     * group have the same toolSessionID.
-     * 
-     * @param toolSessionID
-     *            the generated tool session id.
-     * @param toolSessionName
-     *            the tool session name.
-     * @param toolContentID
-     *            the tool content id specified.
-     * @throws ToolException
-     *             if an error occurs e.g. defaultContent is missing.
-     * 
-     */
+    @Override
     public void createToolSession(Long toolSessionID, String toolSessionName, Long toolContentID) throws ToolException {
 
 	if (toolSessionID == null) {
@@ -1115,14 +1113,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * Implemented as part of the tool contract.
-     * 
-     * @param toolSessionID
-     * @param toolContentID
-     *            return
-     * @throws ToolException
-     */
+    @Override
     public void removeToolSession(Long toolSessionID) throws DataMissingException, ToolException {
 	if (toolSessionID == null) {
 	    VoteServicePOJO.logger.error("toolSessionID is null");
@@ -1150,15 +1141,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
-    /**
-     * Implemtented as part of the tool contract.
-     * 
-     * @param toolSessionID
-     * @param learnerId
-     *            return String
-     * @throws ToolException
-     * 
-     */
+    @Override
     public String leaveToolSession(Long toolSessionID, Long learnerId) throws DataMissingException, ToolException {
 
 	if (learnerService == null) {
@@ -1194,35 +1177,25 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return nextUrl;
     }
 
-    /**
-     * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
-     * 
-     * @param toolSessionID
-     *            return ToolSessionExportOutputData
-     * @throws ToolException
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionID) throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
     }
 
-    /**
-     * exportToolSession(Long toolSessionID) throws DataMissingException, ToolException
-     * 
-     * @param toolSessionIDs
-     *            return ToolSessionExportOutputData
-     * @throws ToolException
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIDs) throws DataMissingException,
 	    ToolException {
 	throw new ToolException("not yet implemented");
 
     }
 
+    @Override
     public IToolVO getToolBySignature(String toolSignature) {
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
+    @Override
     public long getToolDefaultContentIdBySignature(String toolSignature) {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
@@ -1235,19 +1208,18 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return voteQueContent;
     }
     
+    @Override
     public List getToolSessionsForContent(VoteContent vote) {
 	List listToolSessionIds = voteSessionDAO.getSessionsFromContent(vote);
 	return listToolSessionIds;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. Currently we have one
-     * definition, which is whether or not the user has selected a particular answer
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	VoteContent content = getVoteContent(toolContentId);
@@ -1258,39 +1230,29 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return getVoteOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getVoteContent(toolContentId).getTitle();
     }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getVoteContent(toolContentId).isDefineLater();
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return voteOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return voteOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
-    /**
-     * Import the data for a 1.0.2 Vote
-     */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	VoteContent toolContentObj = new VoteContent();
@@ -1354,9 +1316,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	voteContentDAO.saveVoteContent(toolContentObj);
     }
 
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
+    @Override
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -1387,6 +1347,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
     public List<VoteQueContent> getAllQuestionsSorted(final long voteContentId) {
 	return voteQueContentDAO.getAllQuestionsSorted(voteContentId);
     }

@@ -53,6 +53,20 @@ public interface ToolContentManager {
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
     /**
+     * Reset this tool content's define later flag to false. I.e., allowing learners to access it. The toolContentId
+     * should already exist in the tool. This method will normally be called after teacher cancels editing content in
+     * Monitor.
+     * 
+     * @param toolContentId
+     *            the tool content id of the tool content to be changed.
+     * @throws DataMissingException
+     *             if no tool content matches the toolContentId
+     * @throws ToolException
+     *             if any other error occurs
+     */
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException;
+
+    /**
      * Remove tool's content according specified the content id. It will be needed by lams to modify the learning
      * design.
      * 

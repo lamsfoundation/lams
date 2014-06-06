@@ -81,7 +81,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService {
 
-    static Logger logger = Logger.getLogger(ChatService.class.getName());
+    private static Logger logger = Logger.getLogger(ChatService.class.getName());
 
     private IChatDAO chatDAO = null;
 
@@ -222,6 +222,16 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
 	Chat toContent = Chat.newInstance(fromContent, toContentId);
 	chatDAO.saveOrUpdate(toContent);
+    }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Chat chat = chatDAO.getByContentId(toolContentId);
+	if (chat == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	chat.setDefineLater(false);
+	chatDAO.saveOrUpdate(chat);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

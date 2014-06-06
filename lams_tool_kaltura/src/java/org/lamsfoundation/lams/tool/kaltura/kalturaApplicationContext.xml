@@ -56,6 +56,7 @@
 				<prop key="logItemWatched">PROPAGATION_REQUIRED</prop>
 				<prop key="markItem">PROPAGATION_REQUIRED</prop>
 				<prop key="hide*">PROPAGATION_REQUIRED</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="rateMessage">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>

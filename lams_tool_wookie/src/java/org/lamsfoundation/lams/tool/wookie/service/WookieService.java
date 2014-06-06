@@ -322,12 +322,24 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		}
 
 	}
-
-	public void removeToolContent(Long toolContentId, boolean removeSessionData)
-			throws SessionDataExistsException, ToolException {
-		// TODO Auto-generated method stub
+	
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Wookie wookie = wookieDAO.getByContentId(toolContentId);
+	if (wookie == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
 	}
+	wookie.setDefineLater(false);
+	wookieDAO.saveOrUpdate(wookie);
+    }
 
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
+	    ToolException {
+	// TODO Auto-generated method stub
+    }
+
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Resetting Wookie completion flag for user ID " + userId + " and toolContentId "

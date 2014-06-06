@@ -617,6 +617,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     }
 
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
+
+	nbContent.setDefineLater(false);
+	saveNoticeboard(nbContent);
+    }
+
     /** @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long) */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {

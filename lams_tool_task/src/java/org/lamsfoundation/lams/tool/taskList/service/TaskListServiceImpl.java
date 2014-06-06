@@ -832,13 +832,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return getTaskListByContentId(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getTaskListByContentId(toolContentId).isDefineLater();
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedTaskListFiles tool seession");
@@ -869,10 +868,17 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    }
 	}
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	TaskList taskList = taskListDao.getByContentId(toolContentId);
+	if (taskList == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	taskList.setDefineLater(false);
+    }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	TaskList taskList = taskListDao.getByContentId(toolContentId);

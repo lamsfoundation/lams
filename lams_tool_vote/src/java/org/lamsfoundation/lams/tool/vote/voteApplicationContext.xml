@@ -85,6 +85,7 @@
 					<prop key="update*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="get*">PROPAGATION_REQUIRED, -VoteApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+              	    <prop key="resetDefineLater">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="persistFile">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-VoteApplicationException</prop>

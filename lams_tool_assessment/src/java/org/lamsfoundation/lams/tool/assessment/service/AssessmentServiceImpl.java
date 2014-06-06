@@ -996,7 +996,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			isQuestionModified = true;
 		    }
 		    
-		    //options is different
+		    //options are different
 		    Set<AssessmentQuestionOption> oldOptions = oldQuestion.getOptions();
 		    Set<AssessmentQuestionOption> newOptions = newQuestion.getOptions();
 		    for (AssessmentQuestionOption oldOption : oldOptions) {
@@ -1602,6 +1602,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	Assessment toContent = Assessment.newInstance(assessment, toContentId);
 	assessmentDao.saveObject(toContent);
+    }
+
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Assessment assessment = assessmentDao.getByContentId(toolContentId);
+	if (assessment == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	assessment.setDefineLater(false);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

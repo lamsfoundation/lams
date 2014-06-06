@@ -886,6 +886,15 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return getCommonCartridgeByContentId(toolContentId).getTitle();
     }
     
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
+	if (commonCartridge == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	commonCartridge.setDefineLater(false);
+    }
+    
     public boolean isContentEdited(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).isDefineLater();
     }

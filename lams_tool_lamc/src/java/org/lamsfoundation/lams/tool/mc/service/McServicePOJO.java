@@ -271,7 +271,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException {
+    public List getAllQuestionsSorted(final long mcContentId) throws McApplicationException {
 	try {
 	    return mcQueContentDAO.getAllQuestionEntriesSorted(mcContentId);
 	} catch (DataAccessException e) {
@@ -1379,6 +1379,16 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    throw new ToolException("toolContentId is missing");
 	}
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	McContent mcContent = getMcContent(toolContentId);
+	if (mcContent == null) {
+	    throw new DataMissingException("mcContent is missing");
+	}
+	mcContent.setDefineLater(false);
+	saveMcContent(mcContent);
+    }    
 
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {

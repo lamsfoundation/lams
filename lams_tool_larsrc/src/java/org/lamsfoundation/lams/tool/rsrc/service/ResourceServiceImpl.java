@@ -941,6 +941,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public String getToolContentTitle(Long toolContentId) {
 	return getResourceByContentId(toolContentId).getTitle();
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Resource resource = resourceDao.getByContentId(toolContentId);
+	if (resource == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	resource.setDefineLater(false);
+    }
 
     public boolean isContentEdited(Long toolContentId) {
 	return getResourceByContentId(toolContentId).isDefineLater();

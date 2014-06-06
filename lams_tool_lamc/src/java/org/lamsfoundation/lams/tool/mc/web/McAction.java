@@ -175,12 +175,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    if (mcContent != null) {
 
 		// sorts the questions by the display order
-		List<McQueContent> sortedQuestions = mcService.getAllQuestionEntriesSorted(mcContent.getUid()
+		List<McQueContent> sortedQuestions = mcService.getAllQuestionsSorted(mcContent.getUid()
 			.longValue());
-		Iterator<McQueContent> iterSort = sortedQuestions.iterator();
 		int displayOrder = 1;
-		while (iterSort.hasNext()) {
-		    McQueContent question = (McQueContent) iterSort.next();
+		for (McQueContent question : sortedQuestions) {
 		    McQueContent existingQuestion = mcService.getQuestionByUid(question.getUid());
 		    existingQuestion.setDisplayOrder(new Integer(displayOrder));
 		    mcService.updateQuestion(existingQuestion);

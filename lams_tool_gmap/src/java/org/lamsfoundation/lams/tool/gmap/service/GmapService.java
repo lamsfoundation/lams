@@ -206,6 +206,16 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	gmapDAO.saveOrUpdate(toContent);
     }
 
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Gmap gmap = gmapDAO.getByContentId(toolContentId);
+	if (gmap == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	gmap.setDefineLater(false);
+	gmapDAO.saveOrUpdate(gmap);
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub

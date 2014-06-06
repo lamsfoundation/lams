@@ -257,6 +257,16 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     }
 
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
+	if (pixlr == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	pixlr.setDefineLater(false);
+	pixlrDAO.saveOrUpdate(pixlr);
+    }
+
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub

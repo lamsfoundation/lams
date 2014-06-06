@@ -106,7 +106,7 @@ public interface IMcService {
 
     List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
 
-    List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException;
+    List getAllQuestionsSorted(final long mcContentId) throws McApplicationException;
 
     McQueContent getQuestionByUid(Long uid);
 

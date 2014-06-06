@@ -833,6 +833,15 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	dacoSessionDao.saveObject(resSession);
     }
 
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Daco daco = dacoDao.getByContentId(toolContentId);
+	if (daco == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	daco.setDefineLater(false);
+    }
+
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************

@@ -199,6 +199,16 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	Kaltura toContent = Kaltura.newInstance(fromContent, toContentId);
 	kalturaDao.saveOrUpdate(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
+	if (kaltura == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	kaltura.setDefineLater(false);
+	kalturaDao.saveOrUpdate(kaltura);
+    }
 
     @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

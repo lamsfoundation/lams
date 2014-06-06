@@ -1608,7 +1608,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public String getToolContentTitle(Long toolContentId) {
 	return getScratchieByContentId(toolContentId).getTitle();
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
+	if (scratchie == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	scratchie.setDefineLater(false);
+    }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getScratchieByContentId(toolContentId).isDefineLater();
     }

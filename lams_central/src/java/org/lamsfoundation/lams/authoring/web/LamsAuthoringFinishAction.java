@@ -69,6 +69,8 @@ public abstract class LamsAuthoringFinishAction extends Action {
     private static final String TOOL_SIGNATURE = "signature";
 
     private static final String CONFIRM_ACTION = "confirm";
+    private static final String CANCEL_ACTION = "cancel";
+
     private static final String RE_EDIT_URL = "reEditUrl";
 
     /**
@@ -107,6 +109,13 @@ public abstract class LamsAuthoringFinishAction extends Action {
 		nextUrl = WebUtil.appendParameterToURL(nextUrl, AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
 	    }
 	    response.sendRedirect(nextUrl);
+	}
+	if (StringUtils.equals(action, CANCEL_ACTION) && mode.isTeacher()) {
+	    String signature = request.getParameter(TOOL_SIGNATURE);
+	    Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+	    ToolContentManager contentManager = (ToolContentManager) findToolService(signature);
+	    contentManager.resetDefineLater(toolContentId);
 	}
 
 	return null;

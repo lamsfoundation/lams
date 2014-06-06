@@ -111,6 +111,7 @@
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="get*">PROPAGATION_REQUIRED, -java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

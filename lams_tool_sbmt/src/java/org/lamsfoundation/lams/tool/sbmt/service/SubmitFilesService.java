@@ -176,11 +176,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SubmitFiles tool seession");
@@ -197,12 +193,18 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
 	submitFilesContentDAO.saveOrUpdate(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	if (content == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	content.setDefineLater(false);
+	submitFilesContentDAO.saveOrUpdate(content);
+    }
 
-    /**
-     * @throws SessionDataExistsException
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
-     */
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
 	SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
 	if (submitFilesContent != null) {

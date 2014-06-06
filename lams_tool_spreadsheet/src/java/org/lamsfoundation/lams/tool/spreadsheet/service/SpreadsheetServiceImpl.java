@@ -555,6 +555,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedSpreadsheetFiles tool seession");
@@ -579,11 +580,22 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public String getToolContentTitle(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).getTitle();
     }
+   
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
+	if (spreadsheet == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	spreadsheet.setDefineLater(false);
+    }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).isDefineLater();
     }
     
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
@@ -598,6 +610,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	spreadsheetDao.delete(spreadsheet);
     }
 
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
@@ -625,6 +638,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SpreadsheetSession session = new SpreadsheetSession();
 	session.setSessionId(toolSessionId);
@@ -634,6 +648,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	spreadsheetSessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    SpreadsheetServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -657,44 +672,35 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	spreadsheetSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 

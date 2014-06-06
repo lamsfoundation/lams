@@ -453,16 +453,19 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
+	if (qaContent == null) {
+	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
+	    throw new DataMissingException("qaContent is missing");
+	}
+	qaContent.setDefineLater(false);
+	updateQaContent(qaContent);
+    }
 
-    /**
-     * gets called ONLY when a lesson is being created in monitoring mode. Should create the new content(toContent)
-     * based on what the author has created her content with. In q/a tool's case that is content + question's content
-     * but not user responses. The deep copy should go only as far as default content (or author created content)
-     * already goes. ToolContentManager CONTRACT
-     * 
-     * similar to public void removeToolContent(Long toolContentID) gets called by Container+Flash
-     * 
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) {
 	long defaultContentId = 0;
 	if (fromContentId == null) {
@@ -496,9 +499,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    /**
-     * Will need an update on the core tool signature: reason : when qaContent is null throw an exception
-     */
+    @Override
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	if (toolContentID == null) {

@@ -241,17 +241,14 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return getWikiByContentId(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getWikiByContentId(toolContentId).isDefineLater();
     }
    
     /* ************ Methods from ToolContentManager ************************* */
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (WikiService.logger.isDebugEnabled()) {
@@ -276,12 +273,24 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	insertUnsavedWikiContent(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Wiki wiki = wikiDAO.getByContentId(toolContentId);
+	if (wiki == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	wiki.setDefineLater(false);
+	wikiDAO.saveOrUpdate(wiki);
+    }
 
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub
     }
     
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Removing Wiki contents for user ID " + userId + " and toolContentId " + toolContentId);

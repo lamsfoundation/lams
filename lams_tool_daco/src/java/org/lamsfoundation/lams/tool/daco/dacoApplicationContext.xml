@@ -110,6 +110,7 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

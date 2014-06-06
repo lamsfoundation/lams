@@ -767,6 +767,16 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     }
 
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Forum forum = forumDao.getByContentId(toolContentId);
+	if (forum == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	forum.setDefineLater(false);
+	forum.setContentInUse(false);
+    }
+    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Forum forum = forumDao.getByContentId(toolContentId);

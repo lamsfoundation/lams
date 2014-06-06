@@ -161,39 +161,32 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	videoRecorderSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getVideoRecorderOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getVideoRecorderOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ************ Methods from ToolContentManager ************************* */
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (VideoRecorderService.logger.isDebugEnabled()) {
@@ -229,6 +222,16 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
 	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId);
 	videoRecorderDAO.saveOrUpdate(toContent);
+    }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
+	if (videoRecorder == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	videoRecorder.setDefineLater(false);
+	videoRecorderDAO.saveOrUpdate(videoRecorder);
     }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,

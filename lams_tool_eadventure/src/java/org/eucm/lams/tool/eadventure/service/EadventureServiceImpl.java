@@ -1036,6 +1036,15 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     public String getToolContentTitle(Long toolContentId) {
 	return getEadventureByContentId(toolContentId).getTitle();
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
+	if (eadventure == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	eadventure.setDefineLater(false);
+    }
 
     public boolean isContentEdited(Long toolContentId) {
 	return getEadventureByContentId(toolContentId).isDefineLater();

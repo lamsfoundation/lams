@@ -724,10 +724,21 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return getSurveyByContentId(toolContentId).getTitle();
     }
     
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Survey survey = surveyDao.getByContentId(toolContentId);
+	if (survey == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	survey.setDefineLater(false);
+    }
+    
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).isDefineLater();
     }
 
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
@@ -742,6 +753,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	surveyDao.delete(survey);
     }
 
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
@@ -767,6 +779,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	SurveySession session = new SurveySession();
 	session.setSessionId(toolSessionId);

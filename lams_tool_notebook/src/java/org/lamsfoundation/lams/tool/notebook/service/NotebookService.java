@@ -182,7 +182,18 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	Notebook toContent = Notebook.newInstance(fromContent, toContentId);
 	notebookDAO.saveOrUpdate(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	notebook.setDefineLater(false);
+	notebookDAO.saveOrUpdate(notebook);
+    }
 
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
     }

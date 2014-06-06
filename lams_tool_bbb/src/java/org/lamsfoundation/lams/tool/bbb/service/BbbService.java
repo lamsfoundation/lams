@@ -182,7 +182,18 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	Bbb toContent = Bbb.newInstance(fromContent, toContentId, bbbToolContentHandler);
 	saveOrUpdateBbb(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Bbb bbb = getBbbByContentId(toolContentId);
+	if (bbb == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	bbb.setDefineLater(false);
+	saveOrUpdateBbb(bbb);
+    }
 
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub

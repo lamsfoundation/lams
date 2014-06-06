@@ -879,6 +879,15 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public String getToolContentTitle(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).getTitle();
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
+	if (imageGallery == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	imageGallery.setDefineLater(false);
+    }
 
     public boolean isContentEdited(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).isDefineLater();

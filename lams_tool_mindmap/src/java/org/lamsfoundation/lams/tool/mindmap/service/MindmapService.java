@@ -374,6 +374,16 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	return languageOutput;
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
+	if (mindmap == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	mindmap.setDefineLater(false);
+	mindmapDAO.saveOrUpdate(mindmap);
+    }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {

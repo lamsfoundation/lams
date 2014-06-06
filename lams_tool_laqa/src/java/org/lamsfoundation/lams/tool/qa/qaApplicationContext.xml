@@ -101,6 +101,7 @@
 					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="get*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+                	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>

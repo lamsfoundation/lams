@@ -201,6 +201,16 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	Scribe toContent = Scribe.newInstance(fromContent, toContentId);
 	scribeDAO.saveOrUpdate(toContent);
     }
+    
+    @Override
+    public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	Scribe scribe = scribeDAO.getByContentId(toolContentId);
+	if (scribe == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	scribe.setDefineLater(false);
+	scribeDAO.saveOrUpdate(scribe);
+    }
 
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {

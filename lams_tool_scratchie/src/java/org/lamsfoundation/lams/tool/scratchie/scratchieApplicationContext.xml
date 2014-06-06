@@ -106,6 +106,7 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="recordItemScratched">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeUserMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

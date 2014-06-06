@@ -81,11 +81,10 @@
                 <prop key="export*">PROPAGATION_REQUIRED</prop>
                 <prop key="release*">PROPAGATION_REQUIRED</prop>
                 <prop key="finish*">PROPAGATION_REQUIRED</prop>
-                
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
                 <prop key="uploadFileToSession">PROPAGATION_REQUIRED</prop>
                 <prop key="createToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>				
-
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
