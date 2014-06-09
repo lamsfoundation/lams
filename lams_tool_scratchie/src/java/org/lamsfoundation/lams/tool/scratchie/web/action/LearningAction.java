@@ -245,12 +245,9 @@ public class LearningAction extends Action {
 	}
 
 	// calculate max score
-	int maxScore = 0;
-	for (ScratchieItem item : items) {
-	    maxScore += item.getAnswers().size() - 1;
-	    if (scratchie.isExtraPoint()) {
-		maxScore++;
-	    }
+	int maxScore = items.size() * 4;
+	if (scratchie.isExtraPoint()) {
+	    maxScore += items.size();
 	}
 
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
