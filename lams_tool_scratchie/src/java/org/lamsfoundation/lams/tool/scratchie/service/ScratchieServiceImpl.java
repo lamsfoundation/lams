@@ -589,19 +589,36 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
-	final int MAX_ITEM_MARK = 4;
 
 	int mark = 0;
 	// add mark only if an item was unraveled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    mark = MAX_ITEM_MARK - (itemAttempts - 1);
+	    // If the student gets it right the first time, then he should get 4 points.
+	    // If he gets it right the second time, the score is 2
+	    // Third time right, 1 point
+	    // Anything over the third attempt gets 0
+	    switch (itemAttempts) {
+	    case 1:
+		mark = 4;
+		
+		// add extra point if needed
+		if (scratchie.isExtraPoint()) {
+		    mark++;
+		}
+		break;
 
-	    // add extra point if needed
-	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
-		mark++;
+	    case 2:
+		mark = 2;
+		break;
+	    case 3:
+		mark = 1;
+		break;
+	    default:
+		mark = 0;
 	    }
+	    
 	}
 
 	return mark;
