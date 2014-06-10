@@ -34,7 +34,11 @@ var originalSequenceCanvas = null,
 	autoRefreshInterval = 30 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
-	autoRefreshBlocked = false;
+	autoRefreshBlocked = false,
+
+// double tap support
+	tapTimeout = 500,
+	lastTap = 0;
 
 // ********* GENERAL TABS FUNCTIONS *********
 
@@ -742,23 +746,17 @@ function updateSequenceTab() {
 					.fadeIn();
 				
 				var canvasHeight = sequenceCanvas.height(),
-					canvasWidth = sequenceCanvas.width(),
+					canvasWidth = Math.min('1010', sequenceCanvas.width()),
 					svg = $('svg', sequenceCanvas),
-					canvasPaddingTop = canvasHeight/2 - svg.attr('height')/2,
-					canvasPaddingLeft = canvasWidth/2 - svg.attr('width')/2;
+					canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2),
+					canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2);
 
-				if (canvasPaddingTop > 0) {
-					sequenceCanvas.css({
-						'padding-top' : canvasPaddingTop,
-						'height'      : canvasHeight - canvasPaddingTop		
-					});
-				}
-				if (canvasPaddingLeft > 0) {
-					sequenceCanvas.css({
-						'padding-left' : canvasPaddingLeft,
-						'width'        : canvasWidth - canvasPaddingLeft		
-					});
-				}
+				sequenceCanvas.css({
+					'padding-top'  : canvasPaddingTop,
+					'padding-left' : canvasPaddingLeft,
+					'width'        : canvasWidth - canvasPaddingLeft,
+					'height'       : canvasHeight - canvasPaddingTop
+				});
 			}
 		});
 	}
@@ -819,21 +817,29 @@ function updateSequenceTab() {
 				addActivityIconsHandlers(activity);
 				
 				if (activity.url || activity.isBranching) {
+					var dblClickFunction = 
+						// different behaviour for regular/branching activities
+						activity.isBranching ? 
+						function(){ showBranchingSequence(activity.id); }
+						:
+						function(){
+							// double click on activity shape to open Monitoring for this activity
+							openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
+						};
 					// find activity group, if it is not hidden
 					$('g#' + activity.id, sequenceCanvas)
 						.css('cursor', 'pointer')
-						.dblclick(
-							// different behaviour for regular/branching activities
-							activity.isBranching ? 
-							function(){
-								showBranchingSequence(activity.id);
-							}
-							:
-							function(){
-								// double click on activity shape to open Monitoring for this activity
-								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
-							}
-					);
+						.dblclick(dblClickFunction)
+						// double tap detection on mobile devices
+						.tap(function(event){
+						    var currentTime = new Date().getTime(),
+						    	tapLength = currentTime - lastTap;
+						    if (tapLength < tapTimeout && tapLength > 0) {
+						        event.preventDefault();
+						        dblClickFunction();
+						    }
+						    lastTap = currentTime;
+						});
 				}
 			});	
 			

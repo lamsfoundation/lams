@@ -16,6 +16,14 @@
 	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" >
+		$(document).bind("mobileinit", function(){
+		  $.mobile.loadingMessage = false;
+		  $.mobile.ignoreContentEnabled = true;
+		  $('body').attr('data-enhance', 'false');
+		});
+	</script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.mobile.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
@@ -102,7 +110,7 @@
 	<!-- Some settings need to be done in the script first and only then this file can be included -->
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
-<body>
+<body data-enhance="false">
 <div id="tabs">
 	<a id="closeButton" href="#" onClick="javascript:window.parent.closeMonitorLessonDialog()">
 		<span class="ui-icon ui-icon-closethick"></span>
