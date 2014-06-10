@@ -12,8 +12,8 @@
 	<!-- Import project specific property file; base dir for this is the importing build.xml file -->
 	<property file="build.properties" />
 	<!-- Import common property files; base dir for this is the current file -->
-	<property file="${base.dir}/common.properties"/>
 	<property file="${base.dir}/build.properties"/>
+	<property file="${base.dir}/common.properties"/>
 	<property file="${base.dir}/${osPropertiesName}.properties"/>
 	
 	<!-- Set library paths -->
