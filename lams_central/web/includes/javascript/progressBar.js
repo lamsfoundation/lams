@@ -1,41 +1,41 @@
-﻿// ------- GLOBAL VARIABLES ----------
-// IMPORTANT: set following variables on the page which imports this JS file
-var isHorizontalBar = isHorizontalBar || false;
-var hasContentFrame = hasContentFrame || true;
-var isTouchInterface = isTouchInterface || false;
-var hasDialog = hasDialog || false;
-var presenceEnabled = presenceEnabled || false;
-var REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity';
+﻿	//------- GLOBAL VARIABLES ----------
+	//IMPORTANT: set following variables on the page which imports this JS file
+var isHorizontalBar = isHorizontalBar || false,
+	hasContentFrame = hasContentFrame || true,
+	isTouchInterface = isTouchInterface || false,
+	hasDialog = hasDialog || false,
+	presenceEnabled = presenceEnabled || false,
+	REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity',
 
-// colors used in shapes
-// dark red
-var COLOR_CURRENT_ACTIVITY = "rgb(187,0,0)";
-// dark blue
-var COLOR_COMPLETED_ACTIVITY = "rgb(0,0,153)";
-// green
-var COLOR_TOSTART_ACTIVITY = "rgb(0,153,0)";
-// black
-var COLOR_STROKE_ACTIVITY = "rgb(0,0,0)";
-// red
-var COLOR_GATE = "rgb(255,0,0)";
-// white
-var COLOR_GATE_TEXT = "rgb(255,255,255)";
-// gray
-var COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)";
+	//colors used in shapes
+	//dark red
+	COLOR_CURRENT_ACTIVITY = "rgb(187,0,0)",
+	//dark blue
+	COLOR_COMPLETED_ACTIVITY = "rgb(0,0,153)",
+	//green
+	COLOR_TOSTART_ACTIVITY = "rgb(0,153,0)",
+	//black
+	COLOR_STROKE_ACTIVITY = "rgb(0,0,0)",
+	//red
+	COLOR_GATE = "rgb(255,0,0)",
+	//white
+	COLOR_GATE_TEXT = "rgb(255,255,255)",
+	//gray
+	COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)",
 
-// SVG paths for activity shapes
-var PATH_START_LINE_HORIZONTAL = 'M 0 18 h 35';
-var PATH_START_LINE_VERTICAL = 'M 70 0 v 20';
+	//SVG paths for activity shapes
+	PATH_START_LINE_HORIZONTAL = 'M 0 18 h 35',
+	PATH_START_LINE_VERTICAL = 'M 70 0 v 20',
 
-var PATH_SQUARE = " v16 h16 v-16 z";
-var PATH_BIG_SQUARE = " v26 h26 v-26 z";
-var PATH_CIRCLE = " m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0";
-var PATH_QUARTER_CIRCLE = " a16 16 0 0 0 16 16 v-16 z";
-var PATH_TRIANGLE = " l8 16 l8 -16 z";
-var PATH_OCTAGON = " l-7 7 v12 l7 7 h12 l7 -7 v-12 l-7 -7 z";
+	PATH_SQUARE = " v16 h16 v-16 z",
+	PATH_BIG_SQUARE = " v26 h26 v-26 z",
+	PATH_CIRCLE = " m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0",
+	PATH_QUARTER_CIRCLE = " a16 16 0 0 0 16 16 v-16 z",
+	PATH_TRIANGLE = " l8 16 l8 -16 z",
+	PATH_OCTAGON = " l-7 7 v12 l7 7 h12 l7 -7 v-12 l-7 -7 z",
 
-var isPreview = false;
-var controlFramePadding = 0;
+	isPreview = false,
+	controlFramePadding = 0;
 
 // ----- CONTROL FRAME & WINDOW MANIPULATION -----
 
@@ -145,25 +145,30 @@ function resizeElements() {
 }
 
 // double click triggers also single click event, this method helps
-function handleClicks(elem, click, dblclick) {
-	if (click) {
-		elem.click(function(e) {
-			setTimeout(function() {
-				// if double clicked, just reduce the counter
-				if (elem.clickcounter) {
-					elem.clickcounter--;
-				} else {
-					// no double click, so execute
-					click.call();
+function handleClicks(elem, click, dblClick) {
+	var handler = function(event) {
+		var currentTime = new Date().getTime(),
+			clickLength = currentTime - (elem.lastClick ? elem.lastClick : 0),
+			dblClicked = clickLength < 500 && clickLength > 0;
+		elem.lastClick = currentTime;
+			
+		if (dblClicked) {
+			event.preventDefault();
+			if (dblClick) {
+				clearTimeout(elem.clickTrigger);
+				dblClick();
+			}
+		} else {
+			elem.clickTrigger = setTimeout(function() {
+				if (click) {
+					click();
 				}
-			}, 300);
-		});
-	}
-	if (dblclick) {
-		elem.dblclick(function() {
-			elem.clickcounter = 2;
-			dblclick.call();
-		});
+			}, 500);
+		}
+	};
+	elem.click(handler);
+	if (elem.touchstart) {
+		elem.touchstart(handler);
 	}
 }
 
@@ -1049,10 +1054,10 @@ function fillProgressBar(barId) {
 				var currentActivityIndex = 0;
 
 				for (var activityIndex = 0; activityIndex < result.activities.length; activityIndex++) {
-					var activityData = result.activities[activityIndex];
+					var activityData = result.activities[activityIndex],
 					// prepare the Activity descriptor, but do not draw
 					// yet
-					var activity = new Activity(bar, activityIndex,
+						activity = new Activity(bar, activityIndex,
 							activityData.id, activityData.type,
 							activityData.name, activityData.status,
 							activityData.url,
@@ -1073,10 +1078,10 @@ function fillProgressBar(barId) {
 						if (!isPreview && existingActivity.type == 'b'
 								&& existingActivity.id != activity.id) {
 
-							var branchActivityId = activityIndex;
-							var afterBranchActivityId = activityIndex + 1 < activities.length ? activities[activityIndex + 1].id
-									: null;
-							var branchActivities = [ activity ];
+							var branchActivityId = activityIndex,
+								afterBranchActivityId = activityIndex + 1 < activities.length ? activities[activityIndex + 1].id
+									: null,
+								branchActivities = [ activity ];
 							activityIndex++;
 
 							// find which activities are new (branch)
