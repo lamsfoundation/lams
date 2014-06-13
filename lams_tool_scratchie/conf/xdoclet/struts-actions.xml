@@ -155,7 +155,7 @@
 			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
 		</action>
 		
-		<!-- ========== BEGIN: Learning Definitions ============================== -->
+		<!-- ========== Learning Definitions ============================== -->
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="start" >
@@ -216,7 +216,8 @@
 			<forward name="success" path="/pages/learning/results.jsp" />
 
 		</action>
-		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		<!-- ========== Monitoring Definitions ============================== -->
+		
 		<action path="/monitoring/summary"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="summary" >
@@ -239,6 +240,26 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="exportExcel" >
 		</action>
+		
+		<!-- ========== Admin Definitions ============================== -->		
+		
+		<action path="/admin/start"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AdminAction"
+			name="scratchieAdminForm" 
+			scope="request" 
+			parameter="start" 
+			validate="false">
+			<forward name="config" path="/pages/admin/config.jsp" />
+		</action>
+		<action path="/admin/saveContent"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AdminAction"
+			name="scratchieAdminForm" 
+			scope="request" 
+			parameter="saveContent" 
+			validate="false">
+			<forward name="config" path="/pages/admin/config.jsp" />
+		</action>
+		
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.ClearSessionAction">

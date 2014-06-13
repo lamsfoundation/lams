@@ -32,9 +32,9 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.Summary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -293,4 +293,8 @@ public interface IScratchieService {
 	    List<ScratchieItem> deletedItems);
     
     void releaseItemsFromCache(Scratchie scratchie);
+    
+    ScratchieConfigItem getConfigItem(String key);
+
+    void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);
 }

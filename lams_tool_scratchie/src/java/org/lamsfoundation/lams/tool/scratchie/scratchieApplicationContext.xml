@@ -40,10 +40,15 @@
         </property>
     </bean>
     
+   <bean id="scratchieConfigItemDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
     <bean id="scratchieOutputFactory" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieOutputFactory">  
     	<property name="toolMessageService"><ref bean="scratchieMessageService"/></property>  
-	</bean> 
-
+	</bean>
 
     <!-- Managers -->
 	<bean id="scratchieToolContentHandler" class="org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler">
@@ -65,6 +70,9 @@
         </property>
         <property name="scratchieSessionDao">
             <ref local="scratchieSessionDao"/>
+        </property>
+        <property name="scratchieConfigItemDao">
+            <ref local="scratchieConfigItemDao"/>
         </property>
         <property name="scratchieToolContentHandler">
             <ref local="scratchieToolContentHandler"/>

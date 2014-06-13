@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -65,6 +64,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
+import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -106,6 +107,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     private ScratchieSessionDAO scratchieSessionDao;
 
     private ScratchieAnswerVisitDAO scratchieAnswerVisitDao;
+    
+    private ScratchieConfigItemDAO scratchieConfigItemDao;
 
     // tool service
     private ScratchieToolContentHandler scratchieToolContentHandler;
@@ -187,6 +190,16 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	for (ScratchieItem item : (Set<ScratchieItem>)scratchie.getScratchieItems()) {
 	    scratchieItemDao.releaseItemFromCache(item);
 	}
+    }
+    
+    @Override
+    public ScratchieConfigItem getConfigItem(String key) {
+	return scratchieConfigItemDao.getConfigItemByKey(key);
+    }
+
+    @Override
+    public void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item) {
+	scratchieConfigItemDao.saveOrUpdate(item);
     }
 
     @Override
@@ -299,12 +312,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
+	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
 
 	// calculate mark
 	int mark = 0;
 	if (!items.isEmpty()) {
 	    for (ScratchieItem item : items) {
-		mark += getUserMarkPerItem(scratchie, item, userLogs);
+		mark += getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
 	    }
 	}
 
@@ -581,42 +595,31 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     /**
      * 
-     * 
      * @param scratchie
      * @param item
      * @param userLogs
      *            uses list of logs to reduce number of queries to DB
+     * @param presetMarks 
+     * 		  presetMarks to reduce number of queries to DB
      * @return
      */
-    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
+    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
+	    String presetMarks) {
+	
+	String[] marksArray = presetMarks.split(",");
 
 	int mark = 0;
 	// add mark only if an item was unraveled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    // If the student gets it right the first time, then he should get 4 points.
-	    // If he gets it right the second time, the score is 2
-	    // Third time right, 1 point
-	    // Anything over the third attempt gets 0
-	    switch (itemAttempts) {
-	    case 1:
-		mark = 4;
-		
-		// add extra point if needed
-		if (scratchie.isExtraPoint()) {
-		    mark++;
-		}
-		break;
+	    String markStr = (itemAttempts <= marksArray.length) ? marksArray[itemAttempts - 1]
+		    : marksArray[marksArray.length - 1];
+	    mark = Integer.parseInt(markStr);
 
-	    case 2:
-		mark = 2;
-		break;
-	    case 3:
-		mark = 1;
-		break;
-	    default:
-		mark = 0;
+	    // add extra point if needed
+	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
+		mark++;
 	    }
 	    
 	}
@@ -1356,6 +1359,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      */
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<GroupSummary>();
+	
+	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
@@ -1381,7 +1386,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    numberOfAttempts = calculateItemAttempts(answerLogs, item);
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, answerLogs);
+		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, answerLogs, presetMarks);
 
 		    isFirstChoice = (numberOfAttempts == 1) && isItemUnraveled(item, answerLogs);
 
@@ -1483,12 +1488,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	this.toolService = toolService;
     }
 
-    public ScratchieAnswerVisitDAO getScratchieAnswerVisitDao() {
-	return scratchieAnswerVisitDao;
-    }
-
     public void setScratchieAnswerVisitDao(ScratchieAnswerVisitDAO scratchieItemVisitDao) {
 	this.scratchieAnswerVisitDao = scratchieItemVisitDao;
+    }
+    
+    public void setScratchieConfigItemDao(ScratchieConfigItemDAO scratchieConfigItemDao) {
+	this.scratchieConfigItemDao = scratchieConfigItemDao;
     }
 
     // *******************************************************************************

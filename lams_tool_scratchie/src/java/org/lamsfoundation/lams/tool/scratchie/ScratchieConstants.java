@@ -154,4 +154,7 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String LEARNER_MARK = "learner.mark";
+    
+    public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";
+    public static final String ERROR_MSG_ENTERED_MARKS_NOT_COMMA_SEPARATED_INTEGERS = "error.entered.marks.not.comma.separates";
 }
