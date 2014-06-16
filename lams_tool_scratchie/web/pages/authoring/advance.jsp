@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <!-- Advance Tab Content -->
 
