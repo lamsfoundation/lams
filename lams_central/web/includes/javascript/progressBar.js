@@ -349,7 +349,7 @@ var ActivityUtils = {
 		
 		// label underneath the shape
 		var label = null,
-			content = activity.name;
+			content = activity.name || '';
 		if (isHorizontalBar) {
 			// cut lengthy activity names so they don't overlap
 			if (content.length > 23) {
@@ -1023,9 +1023,9 @@ function fillProgressBar(barId) {
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		data : {
-			'method' : 'getLearnerProgress',
+			'method'   : 'getLearnerProgress',
 			'lessonID' : lessonId,
-			'userID' : bar.userId
+			'userID'   : bar.userId
 		},
 		cache : false,
 		dataType : 'json',
@@ -1135,13 +1135,13 @@ function fillProgressBar(barId) {
 				}
 
 				// draw support activities if they exist
-				if (result.support
-						&& !supportSeparatorRow.is(':visible')) {
+				var supportSeparatorRow = $('#supportSeparatorRow');
+				if (result.support && supportSeparatorRow.length > 0 && !supportSeparatorRow.is(':visible')) {
 					supportSeparatorRow.show();
-					supportPart.height(17 + 33 * result.support.length)
-							.show();
+					$('#supportPart').height(17 + 33 * result.support.length)
+							   .show();
 
-					// separate paper for Suppor Activities frame
+					// separate paper for Support Activities frame
 					var supportPaper = Raphael('supportPart');
 
 					$.each(result.support, function(activityIndex,

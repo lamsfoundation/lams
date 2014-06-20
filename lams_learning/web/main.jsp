@@ -58,9 +58,6 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 				TOSTART_ACTIVITY : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
 				SUPPORT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>'
 			},
-		
-			supportSeparatorRow = null,
-			supportPart = null,
 			
 			parentURL = "${notifyCloseURL}",
 			lessonId = '${param.lessonID}',
@@ -84,10 +81,6 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			
 			// show if panel is not disabled in LAMS Configuration
 			if (progressPanelEnabled) {
-				// these DOM elements are accessed often, so cache reference to them
-				supportSeparatorRow = $('#supportSeparatorRow');
-				supportPart = $('#supportPart');
-				
 				$('body').layout({
 					west : {
 						applyDefaultStyles : true,
