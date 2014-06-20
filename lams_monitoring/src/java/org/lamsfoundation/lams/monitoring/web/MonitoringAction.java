@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -72,7 +73,6 @@ import org.lamsfoundation.lams.lesson.util.LearnerProgressComparator;
 import org.lamsfoundation.lams.lesson.util.LearnerProgressNameComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
-import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO.ContributeEntry;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
@@ -88,6 +88,7 @@ import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -217,7 +218,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
 
 	Lesson newLesson = null;
-	if (copyType != null && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
+	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
 	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
 		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
 	} else {
@@ -293,7 +294,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	if (!ValidationUtil.isOrgNameValid(lessonName)) {
 	    throw new IOException("Lesson name contains invalid characters");
 	}
-	
+
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 
@@ -835,7 +836,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getServletContext());
 	monitoringService.checkOwnerOrStaffMember(user.getUserID(), lessonId, "monitor lesson");
 
-
 	// should info box on Sequence tab be displayed?
 	Short sequenceTabInfoShowCount = (Short) ss.getAttribute("sequenceTabInfoShowCount");
 	if (sequenceTabInfoShowCount == null) {
@@ -996,7 +996,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
@@ -1025,17 +1025,41 @@ public class MonitoringAction extends LamsDispatchAction {
 		Long activityId = activity.getActivityId();
 		JSONObject activityJSON = new JSONObject();
 		activityJSON.put("id", activityId);
+		activityJSON.put("title", activity.getTitle());
 
-		if (activity.isBranchingActivity()) {
-		    activityJSON.put("isBranching", true);
+		int activityType = activity.getActivityTypeId();
+		activityJSON.put("type", activityType);
+		Activity parentActivity = activity.getParentActivity();
+		if (activity.isBranchingActivity() && (((BranchingActivity) activity).getXcoord() == null)) {
+		    // old branching is just a rectangle like Tool
+		    // new branching has start and finish points, it's exploded
+		    activityJSON.put("flaFormat", true);
+		    activityJSON.put("x", ((BranchingActivity) activity).getStartXcoord());
+		    activityJSON.put("y", ((BranchingActivity) activity).getStartYcoord());
+		} else if (activity.isOptionsWithSequencesActivity()
+			&& (((OptionsWithSequencesActivity) activity).getXcoord() == null)) {
+		    // old optional sequences is just a long rectangle
+		    // new optional sequences has start and finish points, it's exploded
+		    activityJSON.put("flaFormat", true);
+		    activityJSON.put("x", ((OptionsWithSequencesActivity) activity).getStartXcoord());
+		    activityJSON.put("y", ((OptionsWithSequencesActivity) activity).getStartYcoord());
+		} else if ((parentActivity != null)
+			&& (Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId())) {
+		    // Optional Activity children had coordinates relative to parent
+		    activityJSON.put("x", parentActivity.getXcoord() + activity.getXcoord());
+		    activityJSON.put("y", parentActivity.getYcoord() + activity.getYcoord());
 		} else {
-		    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
-			    monitorUserId);
-		    if (monitorUrl != null) {
-			// whole activity monitor URL
-			activityJSON.put("url", monitorUrl);
-		    }
+		    activityJSON.put("x", activity.getXcoord());
+		    activityJSON.put("y", activity.getYcoord());
 		}
+
+		String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
+			monitorUserId);
+		if (monitorUrl != null) {
+		    // whole activity monitor URL
+		    activityJSON.put("url", monitorUrl);
+		}
+
 		activitiesMap.put(activityId, activityJSON);
 	    }
 	}
@@ -1053,15 +1077,21 @@ public class MonitoringAction extends LamsDispatchAction {
 			&& ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId,
 				currentActivity))) {
 		    JSONObject learnerJSON = WebUtil.userToJSON(learner);
-		    Long currentActivityId = currentActivity.getActivityId();
 
+		    // assign learners to child activity or parent branching/options with sequences?
 		    Activity parentActivity = currentActivity.getParentActivity();
-		    Long targetActivityId = (branchingActivityId != null) || (parentActivity == null)
+		    Long targetActivityId = (branchingActivityId != null)
+			    || (parentActivity == null)
 			    || (parentActivity.getParentActivity() == null)
-			    || !parentActivity.getParentActivity().isBranchingActivity() ? currentActivity
+			    || !(parentActivity.getParentActivity().isBranchingActivity() || parentActivity
+				    .getParentActivity().isOptionsWithSequencesActivity()) ? currentActivity
 			    .getActivityId() : parentActivity.getParentActivity().getActivityId();
 
 		    JSONObject targetActivityJSON = activitiesMap.get(targetActivityId);
+		    if (Boolean.TRUE.equals(JsonUtil.opt(targetActivityJSON, "flaFormat"))) {
+			// for new format, we always set learners to child activity, not parent
+			targetActivityJSON = activitiesMap.get(currentActivity.getActivityId());
+		    }
 		    targetActivityJSON.append("learners", learnerJSON);
 		}
 	    }

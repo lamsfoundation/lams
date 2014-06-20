@@ -805,6 +805,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	return getActivityTypeId().intValue() == Activity.OPTIONS_ACTIVITY_TYPE
 		|| getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE;
     }
+    
+    public boolean isOptionsWithSequencesActivity() {
+	return getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE;
+    }
 
     public boolean isComplexActivity() {
 	return getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE

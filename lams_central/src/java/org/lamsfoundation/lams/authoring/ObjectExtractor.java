@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
@@ -2021,8 +2022,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (defaultActivityMapUIID != null) {
 	    defaultActivityMap.put(defaultActivityMapUIID, activity);
 	}
-
-	if (activity instanceof OptionsActivity) {
+	if (activity instanceof OptionsWithSequencesActivity) {
+	    buildOptionsWithSequencesActivity((OptionsWithSequencesActivity) activity, activityDetails);
+	} else if (activity instanceof OptionsActivity) {
 	    buildOptionsActivity((OptionsActivity) activity, activityDetails);
 	} else if (activity instanceof ParallelActivity) {
 	    buildParallelActivity((ParallelActivity) activity);
@@ -2148,6 +2150,16 @@ public class ObjectExtractor implements IObjectExtractor {
 	optionsActivity.setMinNumberOfOptions((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MIN_OPTIONS));
 	optionsActivity.setOptionsInstructions((String) JsonUtil.opt(activityDetails,
 		AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
+    }
+
+    private void buildOptionsWithSequencesActivity(OptionsWithSequencesActivity optionsActivity,
+	    JSONObject activityDetails) throws JSONException {
+	buildOptionsActivity(optionsActivity, activityDetails);
+
+	optionsActivity.setStartXcoord(getCoord(activityDetails, AuthoringJsonTags.START_XCOORD));
+	optionsActivity.setStartYcoord(getCoord(activityDetails, AuthoringJsonTags.START_YCOORD));
+	optionsActivity.setEndXcoord(getCoord(activityDetails, AuthoringJsonTags.END_XCOORD));
+	optionsActivity.setEndYcoord(getCoord(activityDetails, AuthoringJsonTags.END_YCOORD));
     }
 
     private void buildParallelActivity(ParallelActivity activity) {
@@ -2984,18 +2996,20 @@ public class ObjectExtractor implements IObjectExtractor {
 			conditionDetails.getInt(AuthoringJsonTags.ORDER_ID),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME),
-			conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE),
-			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE),
-			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE),
-			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+			conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE), (String) JsonUtil.opt(
+				conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE), (String) JsonUtil.opt(
+				conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE), (String) JsonUtil.opt(
+				conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 	    } else {
 		condition.setConditionUIID(conditionUIID);
 		condition.setDisplayName(conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME));
 		condition.setEndValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE));
-		condition.setExactMatchValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+		condition.setExactMatchValue((String) JsonUtil.opt(conditionDetails,
+			AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 		condition.setName(conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME));
 		condition.setOrderId(conditionDetails.getInt(AuthoringJsonTags.ORDER_ID));
-		condition.setStartValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE));
+		condition.setStartValue((String) JsonUtil
+			.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE));
 		condition.setType(conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE));
 	    }
 	}

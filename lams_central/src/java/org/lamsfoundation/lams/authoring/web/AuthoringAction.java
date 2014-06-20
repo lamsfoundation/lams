@@ -23,8 +23,12 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.authoring.web;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -66,6 +71,8 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -124,28 +131,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute("access", gson.toJson(accessList));
 	return mapping.findForward("openAutoring");
     }
-    
 
     public ActionForward generateSVG(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
 
 	return mapping.findForward("svgGenerator");
-    }
-    
-    public ActionForward exportSequence(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String type = request.getParameter("type");
-	
-	if ("image".equalsIgnoreCase(type)){
-	    String image = request.getParameter("image");
-	    String name = request.getParameter("name");
-	    name =  FileUtil.encodeFilenameForDownload(request, name);
-	    response.setContentType("application/x-download");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + name);
-	}
-	
-	return null;
     }
 
     /**
@@ -510,6 +501,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		useCriticalError ? FlashMessage.CRITICAL_ERROR : FlashMessage.ERROR);
     }
 
+    /**
+     * Stores Learning Desing created in Flashless Authoring.
+     */
     public ActionForward saveLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, UserException, WorkspaceFolderException, IOException,
 	    ObjectExtractorException, ParseException {
@@ -547,6 +541,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    /**
+     * Gets a list of recently used Learning Designs for currently logged in user.
+     */
     public ActionForward getLearningDesignAccess(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	Integer userId = getUserId();
@@ -559,6 +556,68 @@ public class AuthoringAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(gson.toJson(accessList));
 	return null;
+    }
+
+    /**
+     * Stores the binary code of an Learning Design thumbnail, created in Flashless Authoring.
+     */
+    public ActionForward saveLearningDesignImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	String extension = request.getParameter("extension");
+	String image = request.getParameter("image");
+	AuthoringAction.saveLearningDesignImage(learningDesignID, extension, image);
+
+	return null;
+    }
+
+    /**
+     * Stores the binary code of an Learning Design thumbnail, created in Flashless Authoring.
+     */
+    private static void saveLearningDesignImage(long learningDesignID, String extension, String image) {
+	if (StringUtils.isBlank(image) || (!"SVG".equalsIgnoreCase(extension) && !"PNG".equalsIgnoreCase(extension))) {
+	    return;
+	}
+
+	// prepare the dir and the file
+	File thumbnailDirectory = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER);
+	if (!thumbnailDirectory.exists()) {
+	    thumbnailDirectory.mkdirs();
+	}
+
+	String absoluteFilePath = FileUtil.getFullPath(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
+		learningDesignID + "." + extension.toLowerCase());
+
+	// write out the content
+	FileOutputStream fos = null;
+	try {
+	    fos = new FileOutputStream(absoluteFilePath);
+	    if (extension.equalsIgnoreCase("png")) {
+		// if it comes from Flashless Authoring, it can have a prefix we need to remove
+		if (image.contains("base64")) {
+		    image = image.substring(image.indexOf(",") + 1);
+		}
+		byte[] bytes = DatatypeConverter.parseBase64Binary(image);
+		fos.write(bytes);
+	    } else {
+		// encoding is important, especially for Raphael-generated SVGs
+		Writer writer = new OutputStreamWriter(fos, "UTF8");
+		writer.write(image);
+		writer.close();
+	    }
+	} catch (IOException e) {
+	    AuthoringAction.log.error("Error while writing " + extension.toUpperCase() + " thumbnail of LD "
+		    + learningDesignID + ".", e);
+	} finally {
+	    if (fos != null) {
+		try {
+		    fos.close();
+		} catch (IOException e) {
+		    AuthoringAction.log.error("Error while closing stream to " + extension.toUpperCase()
+			    + " thumbnail of LD " + learningDesignID);
+		}
+	    }
+	}
     }
 
     /**

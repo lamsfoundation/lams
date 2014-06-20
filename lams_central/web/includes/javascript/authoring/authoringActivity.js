@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * This file contains methods for Activity definition and manipulation on canvas.
  */
 
@@ -359,12 +359,12 @@ ActivityDraw = {
 		
 		// create activity SVG elements
 		paper.setStart();
-		var shape = paper.path(Raphael.format('M {0} {1} l-8 8 v14 l8 8 h14 l8 -8 v-14 l-8 -8 z', x + 8, y))
+		var shape = paper.path(Raphael.format('M {0} {1} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z', x + 9, y))
 						 .attr({
 							 'fill' : layout.colors.gate
 						 });
 		
-		paper.text(x + 15, y + 14, LABELS.GATE_ACTIVITY_LABEL)
+		paper.text(x + 17, y + 16, LABELS.GATE_ACTIVITY_LABEL)
 			 .attr(layout.defaultTextAttributes)
 		     .attr('stroke', layout.colors.gateText);
 		
@@ -423,7 +423,7 @@ ActivityDraw = {
 		
 		if (this.childActivityDefs && this.childActivityDefs.length > 0) {
 			// draw one by one, vertically
-			var activityY = y + containerActivityPadding + 10,
+			var activityY = y + layout.conf.containerActivityPadding + 10,
 				allElements = paper.set(),
 				optionalActivity = this,
 				box = this.items.shape.getBBox();
@@ -431,9 +431,9 @@ ActivityDraw = {
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
 				var childBox = this.items.shape.getBBox();
-				this.draw(x + Math.max(containerActivityPadding, (box.width - childBox.width)/2), activityY);
+				this.draw(x + Math.max(layout.conf.containerActivityPadding, (box.width - childBox.width)/2), activityY);
 				childBox = this.items.shape.getBBox();
-				activityY = childBox.y2 + containerActivityChildrenPadding;
+				activityY = childBox.y2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
 			});
 			// area containing all drawn child activities
@@ -445,8 +445,8 @@ ActivityDraw = {
 							  layout.colors.optionalActivity);
 		} else {
 			this.drawContainer(x, y,
-							   x + containerActivityEmptyWidth,
-							   y + containerActivityEmptyHeight,
+							   x + layout.conf.containerActivityEmptyWidth,
+							   y + layout.conf.containerActivityEmptyHeight,
 							   layout.colors.optionalActivity);
 		}
 		
@@ -525,7 +525,6 @@ ActivityDraw = {
 						 .attr({
 							'fill' : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 });
-
 		this.items.shape = shape;
 		this.items.push(shape);
 		

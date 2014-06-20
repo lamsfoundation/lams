@@ -312,6 +312,19 @@
 			    
 			    <subclass name="org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity" discriminator-value="13">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+					
+					<property name="startXcoord" type="java.lang.Integer" column="start_xcoord" length="11" >
+				       <meta attribute="field-description">@hibernate.property column="start_xcoord" length="11" </meta>    
+	 			    </property>
+				    <property name="startYcoord" type="java.lang.Integer" column="start_ycoord" length="11">
+				       <meta attribute="field-description">@hibernate.property column="start_ycoord" length="11"</meta>    
+				    </property>
+		  			<property name="endXcoord" type="java.lang.Integer" column="end_xcoord" length="11" >
+				       <meta attribute="field-description">@hibernate.property column="end_xcoord" length="11" </meta>    
+	 			    </property>
+				    <property name="endYcoord" type="java.lang.Integer" column="end_ycoord" length="11">
+				       <meta attribute="field-description">@hibernate.property column="end_ycoord" length="11"</meta>    
+				    </property>
 				</subclass>
 			    
 			</subclass>

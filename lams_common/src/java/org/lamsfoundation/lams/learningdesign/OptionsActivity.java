@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -45,24 +44,6 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     /** nullable persistent field */
     private String optionsInstructions;
 
-    /** full constructor */
-    public OptionsActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
-	    Activity defaultActivity, Integer maxNumberOfOptions, Integer minNumberOfOptions,
-	    String options_instructions, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
-		branchActivityEntries);
-	this.maxNumberOfOptions = maxNumberOfOptions;
-	this.minNumberOfOptions = minNumberOfOptions;
-	this.optionsInstructions = options_instructions;
-	super.activityStrategy = new OptionsActivityStrategy(this);
-    }
-
     /** default constructor */
     public OptionsActivity() {
 	super.activityStrategy = new OptionsActivityStrategy(this);
@@ -80,6 +61,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 	super.activityStrategy = new OptionsActivityStrategy(this);
     }
 
+    @Override
     public Activity createCopy(int uiidOffset) {
 	OptionsActivity newOptionsActivity = new OptionsActivity();
 	copyToNewComplexActivity(newOptionsActivity, uiidOffset);
@@ -92,9 +74,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 	return newOptionsActivity;
     }
 
-    /**
-     * @hibernate.property column="max_number_of_options" length="5"
-     */
+
     public Integer getMaxNumberOfOptions() {
 	return this.maxNumberOfOptions;
     }
@@ -111,9 +91,6 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 	this.maxNumberOfOptions = maxNumberOfOptions;
     }
 
-    /**
-     * @hibernate.property column="min_number_of_options" length="5"
-     */
     public Integer getMinNumberOfOptions() {
 	return this.minNumberOfOptions;
     }
@@ -129,6 +106,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 	this.minNumberOfOptions = minNumberOfOptions;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
@@ -144,6 +122,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }

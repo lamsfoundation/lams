@@ -96,11 +96,6 @@ var MenuLib = {
 			layout.exportLDDialog.dialog('close');
 		});
 		layout.dialogs.push(layout.exportLDDialog);
-		
-		
-		if (!layout.conf.supportsDownloadAttribute) {
-			$('.exportImageButton').attr('title', LABELS.DOWNLOAD_NOT_SUPPORTED);
-		}
 	},
 	
 	
@@ -347,26 +342,39 @@ var MenuLib = {
 	 * Creates a PNG image out of current SVG contents.
 	 */
 	exportPNG : function(download){
-		var crop = MenuLib.getCanvasCrop();
-		if (crop.x >= crop.x2) {
-			return;
+		ActivityLib.removeSelectEffect();
+		
+		var imageCode = null;
+		if (!download || layout.conf.supportsDownloadAttribute) {
+			var crop = MenuLib.getCanvasCrop();
+			if (crop.x >= crop.x2) {
+				return;
+			}
+			
+			var ctx = crop.workspace.getContext('2d'),
+			w = crop.x2 - crop.x,
+			h = crop.y2 - crop.y,
+			cut = ctx.getImageData(crop.x, crop.y, w, h);
+	
+			crop.workspace.width = w;
+			crop.workspace.height = h;
+			ctx.putImageData(cut, 0, 0);
+			
+			imageCode = crop.workspace.toDataURL("image/png");
 		}
-		
-		var ctx = crop.workspace.getContext('2d'),
-		w = crop.x2 - crop.x,
-		h = crop.y2 - crop.y,
-		cut = ctx.getImageData(crop.x, crop.y, w, h);
-
-		crop.workspace.width = w;
-		crop.workspace.height = h;
-		ctx.putImageData(cut, 0, 0);
-		
-		var imageCode = crop.workspace.toDataURL("image/png");
 		if (download) {
-			$('a', layout.exportImageDialog).attr({
-				'href'	   : imageCode,
-				'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
-			});
+			var anchor = $('a', layout.exportImageDialog);
+			if (layout.conf.supportsDownloadAttribute) {
+				anchor.attr({
+					'href'	   : imageCode,
+					'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
+				});
+			} else {
+				anchor.attr({
+					'href'	   : LD_THUMBNAIL_URL_BASE + layout.ld.learningDesignID 
+								 + '&svgFormat=2&download=true&_=' + new Date().getTime()
+				});
+			}
 			layout.exportImageDialog.dialog('open');
 		} else {
 			return imageCode;
@@ -378,62 +386,83 @@ var MenuLib = {
 	 * Creates a SVG image out of current SVG contents.
 	 */
 	exportSVG : function(download){
-		var crop = MenuLib.getCanvasCrop();
-		if (crop.x >= crop.x2) {
-			return;
+		ActivityLib.removeSelectEffect();
+		
+		var imageCode = null;
+		if (!download || layout.conf.supportsDownloadAttribute) {
+			var crop = MenuLib.getCanvasCrop();
+			if (crop.x >= crop.x2) {
+				return;
+			}
+			
+			// replace image links with PNG code
+			var iconLibrary = {};
+			crop.canvasClone.find('image').each(function(){
+				var attributeName = 'xlink:href',
+					iconLink = $(this).attr(attributeName);
+				if (!iconLink) {
+					attributeName = 'href',
+					iconLink = $(this).attr(attributeName);
+				}
+				
+				var iconCode = iconLibrary[iconLink];
+				if (!iconCode) {
+					$.ajax({
+						url : iconLink,
+						async: false,
+						dataType : 'text',
+						success : function(response) {
+							iconCode = iconLibrary[iconLink] = response;
+						}
+					});
+				}
+				if (!iconCode) {
+					return true;
+				}
+				
+				canvg(crop.workspace, iconCode);
+				$(this).attr(attributeName, crop.workspace.toDataURL("image/png"));
+			});
+			
+			
+			
+			// set viewBox so content is nicely aligned
+			var width = crop.x2 - crop.x + 2,
+				height = crop.y2 - crop.y + 2,
+				svg = $('svg', crop.canvasClone).attr({
+					'width'               : width,
+					'height'              : height
+				})[0];
+			
+			// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
+			svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
+			svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
+			
+			// reset any cursor=pointer styles
+			$('*[style*="cursor"]', svg).css('cursor', 'default');
+			
+			
+			imageCode = crop.canvasClone.html();
+			// otherwise there will be syntax erros in IE11
+			imageCode = imageCode.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
+			imageCode = imageCode.replace(/xmlns:NS1=\"\"/, '');
+			imageCode = imageCode.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, 'xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"');
+			imageCode = imageCode.replace(/xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\" xlink:href/g, 'xlink:href');
 		}
 		
-		// replace image links with PNG code
-		var iconLibrary = {};
-		crop.canvasClone.find('image').each(function(){
-			var attributeName = 'xlink:href',
-				iconLink = $(this).attr(attributeName);
-			if (!iconLink) {
-				attributeName = 'href',
-				iconLink = $(this).attr(attributeName);
-			}
-			
-			var iconCode = iconLibrary[iconLink];
-			if (!iconCode) {
-				$.ajax({
-					url : iconLink,
-					async: false,
-					dataType : 'text',
-					success : function(response) {
-						iconCode = iconLibrary[iconLink] = response;
-					}
+		if (download) {
+			var anchor = $('a', layout.exportImageDialog);
+			if (layout.conf.supportsDownloadAttribute) {
+				anchor.attr({
+					'href'	   : 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(imageCode),
+					'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.svg'
+				});
+			} else {
+				anchor.attr({
+					'href'	   : LD_THUMBNAIL_URL_BASE + layout.ld.learningDesignID
+								 + '&svgFormat=1&download=true&_=' + new Date().getTime()
 				});
 			}
-			if (!iconCode) {
-				return true;
-			}
-			
-			canvg(crop.workspace, iconCode);
-			$(this).attr(attributeName, crop.workspace.toDataURL("image/png"));
-		});
-		
-		
-		// set viewBox so content is nicely aligned
-		var width = crop.x2 - crop.x + 2,
-			height = crop.y2 - crop.y + 2,
-			svg = $('svg', crop.canvasClone).attr({
-				'width'               : width,
-				'height'              : height
-			})[0];
-		
-		// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
-		svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
-		svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
-		
-		// reset any cursor=pointer styles
-		$('*[style*="cursor"]', svg).css('cursor', 'default');
-		
-		var imageCode = crop.canvasClone.html();
-		if (download) {
-			$('a', layout.exportImageDialog).attr({
-				'href'	   : 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(imageCode),
-				'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.svg'
-			});
 			layout.exportImageDialog.dialog('open');
 		} else {
 			return imageCode;
@@ -557,11 +586,14 @@ var MenuLib = {
 				}
 				var body = $('body', importWindow.document).html(),
 					match = regEx.exec(body);
-				// check if ID was found and it's not the same as previously
+				// check if ID was found and it's not the same as previously set
 				if (match && match[1] != currentLearningDesignID) {
 					currentLearningDesignID = match[1];
 					// load the imported LD
 					GeneralLib.openLearningDesign(currentLearningDesignID);
+					
+					// generate images of the imported LD
+					GeneralLib.saveLearningDesignImages();
 				}
 			}, 1000);
 	},
@@ -571,8 +603,7 @@ var MenuLib = {
 	 * Loads Learning Design Tree from DB
 	 */
 	loadLearningDesignTree : function(){
-		var dialog = $('#ldStoreDialog'),
-			tree = dialog.dialog('option', 'ldTree'),
+		var tree = layout.ldStoreDialog.dialog('option', 'ldTree'),
 			rootNode = tree.getRoot();
 		// remove existing folders
 		$.each(rootNode.children, function(){
@@ -593,13 +624,13 @@ var MenuLib = {
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.
 	 */
 	openLearningDesign : function(){
-		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
-		dialog.dialog('option', {
-			'title'  : LABELS.OPEN_DIALOG_TITLE,
-			'buttons' : dialog.dialog('option', 'buttonsLoad'),
+		layout.ldStoreDialog.dialog('option', {
+			'title'  			  : LABELS.OPEN_DIALOG_TITLE,
+			'learningDesignTitle' : null,
+			'buttons' 			  : layout.ldStoreDialog.dialog('option', 'buttonsLoad'),
 			// it informs widgets that it is load dialog
-			'dialogClass': 'ldStoreDialogLoad'
+			'dialogClass'		  : 'ldStoreDialogLoad'
 		})			   
 		.dialog('open');
 		
@@ -715,13 +746,13 @@ var MenuLib = {
 			return;
 		}
 		
-		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
-		dialog.dialog('option', {
-			'title'  : LABELS.SAVE_DIALOG_TITLE,
-			'buttons' : dialog.dialog('option', 'buttonsSave'),
+		layout.ldStoreDialog.dialog('option', {
+			'title'				  : LABELS.SAVE_DIALOG_TITLE,
+			'learningDesignTitle' : layout.ld.title,
+			'buttons'			  : layout.ldStoreDialog.dialog('option', 'buttonsSave'),
 			// it informs widgets that it is saved dialog
-			'dialogClass': 'ldStoreDialogSave'
+			'dialogClass'		  : 'ldStoreDialogSave'
 		})			   
 		.dialog('open');
 		

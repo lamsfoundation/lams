@@ -92,7 +92,7 @@ var DecorationDefs = {
 				}
 				
 				// the rectangle
-				this.items.shape = paper.path('M {0} {1} L {2} {1} L {2} {3} L {0} {3} z', x, y, x2, y2)
+				this.items.shape = paper.path('M {0} {1} H {2} V {3} H {0} z', x, y, x2, y2)
 						 				.attr('fill', color)
 										.toBack();
 				this.items.push(this.items.shape);

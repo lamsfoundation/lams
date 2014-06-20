@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -409,6 +410,7 @@ public class HomeAction extends DispatchAction {
 	Integer format = WebUtil.readIntParam(req, CentralConstants.PARAM_SVG_FORMAT, true);
 	format = format == null ? SVGGenerator.OUTPUT_FORMAT_PNG : format;
 	Long branchingActivityId = WebUtil.readLongParam(req, "branchingActivityID", true);
+	boolean download = WebUtil.readBooleanParam(req, "download", false);
 	String imagePath = null;
 	if (branchingActivityId == null) {
 	    imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId, format);
@@ -416,7 +418,17 @@ public class HomeAction extends DispatchAction {
 	    imagePath = getLearningDesignService().createBranchingSVG(branchingActivityId, format);
 	}
 
-	res.setContentType(format == SVGGenerator.OUTPUT_FORMAT_PNG ? "image/png" : "image/svg+xml");
+	// should the image be downloaded or a part of page?
+	if (download) {
+	    String name = getLearningDesignService().getLearningDesignDTO(learningDesignId,
+		    getUser().getLocaleLanguage()).getTitle();
+	    name += "." + (format == SVGGenerator.OUTPUT_FORMAT_PNG ? "png" : "svg");
+	    name = FileUtil.encodeFilenameForDownload(req, name);
+	    res.setContentType("application/x-download");
+	    res.setHeader("Content-Disposition", "attachment;filename=" + name);
+	} else {
+	    res.setContentType(format == SVGGenerator.OUTPUT_FORMAT_PNG ? "image/png" : "image/svg+xml");
+	}
 	OutputStream output = res.getOutputStream();
 	FileInputStream input = new FileInputStream(imagePath);
 	IOUtils.copy(input, output);

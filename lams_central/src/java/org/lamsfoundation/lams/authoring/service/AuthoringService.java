@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.authoring.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
@@ -495,8 +497,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		    learningDesignID).serializeMessage());
 	}
 
-	boolean learningDesignAvailable = design.getEditOverrideUser() == null || design.getEditOverrideLock() == null
-		|| design.getEditOverrideUser().getUserId().equals(userID) || !design.getEditOverrideLock();
+	boolean learningDesignAvailable = (design.getEditOverrideUser() == null)
+		|| (design.getEditOverrideLock() == null) || design.getEditOverrideUser().getUserId().equals(userID)
+		|| !design.getEditOverrideLock();
 
 	if (learningDesignAvailable) {
 	    if (design.getLessons().isEmpty()) {
@@ -541,7 +544,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
 
 	// check if system gate already exists
-	if (lastReadOnlyActivity == null || !lastReadOnlyActivity.isGateActivity()
+	if ((lastReadOnlyActivity == null) || !lastReadOnlyActivity.isGateActivity()
 		|| !((GateActivity) lastReadOnlyActivity).isSystemGate()) {
 	    // add new System Gate after last read-only Activity
 	    addSystemGateAfterActivity(lastReadOnlyActivity, design);
@@ -920,6 +923,15 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	updateEvaluations(newActivities);
 
+	try {
+	    AuthoringService.copyLearningDesignImage(originalLearningDesign.getLearningDesignId(),
+		    newLearningDesign.getLearningDesignId(), "svg");
+	    AuthoringService.copyLearningDesignImage(originalLearningDesign.getLearningDesignId(),
+		    newLearningDesign.getLearningDesignId(), "png");
+	} catch (IOException e) {
+	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
+		    e);
+	}
 	return newLearningDesign;
     }
 
@@ -2021,6 +2033,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return authorUrl;
     }
 
+    @Override
     public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
 	for (LearningDesignAccess access : accessList) {
@@ -2031,11 +2044,25 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return accessList;
     }
 
+    @Override
     public void storeLearningDesignAccess(Long learningDesignId, Integer userId) {
 	LearningDesignAccess access = new LearningDesignAccess();
 	access.setLearningDesignId(learningDesignId);
 	access.setUserId(userId);
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
+    }
+
+    /**
+     * Copies LD thumbnail, SVG or PNG.
+     */
+    private static void copyLearningDesignImage(long originalLearningDesignID, long newLearningDesignID,
+	    String extension) throws IOException {
+	String fullExtension = "." + extension;
+	File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, originalLearningDesignID + fullExtension);
+	if (image.canRead()) {
+	    FileUtils.copyFile(image, new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID
+		    + fullExtension), false);
+	}
     }
 }

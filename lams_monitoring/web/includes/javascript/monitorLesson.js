@@ -816,7 +816,13 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
-				if (activity.url || activity.isBranching) {
+				if (activity.url || (activity.isBranching && !activity.flaFormat)) {
+					// find the activity in SVG
+					var coord = getActivityCoordinates(activity);
+					if (!coord || !coord.elem) {
+						return;
+					}
+					
 					var dblClickFunction = 
 						// different behaviour for regular/branching activities
 						activity.isBranching ? 
@@ -827,19 +833,17 @@ function updateSequenceTab() {
 							openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
 						};
 					// find activity group, if it is not hidden
-					$('g#' + activity.id, sequenceCanvas)
-						.css('cursor', 'pointer')
-						.dblclick(dblClickFunction)
-						// double tap detection on mobile devices
-						.tap(function(event){
-						    var currentTime = new Date().getTime(),
-						    	tapLength = currentTime - lastTap;
-						    if (tapLength < tapTimeout && tapLength > 0) {
-						        event.preventDefault();
-						        dblClickFunction();
-						    }
-						    lastTap = currentTime;
-						});
+					coord.elem.css('cursor', 'pointer')
+							  // double tap detection on mobile devices; it works also for click
+							  .tap(function(event){
+								  var currentTime = new Date().getTime(),
+								  	  tapLength = currentTime - lastTap;
+								  if (tapLength < tapTimeout && tapLength > 0) {
+									  event.preventDefault();
+									  dblClickFunction();
+								  }
+								  lastTap = currentTime;
+							  });
 				}
 			});	
 			
@@ -969,58 +973,50 @@ function addActivityIcons(activity) {
 	if (!activity.learners && !activity.requiresAttention) {
 		return;
 	}
-	var isGate = false,
-		actX = null,
-		actY = null,
-		activityGroup = $('g#' + activity.id, sequenceCanvas),
-		activityShape = $('rect[id="act' + activity.id + '"]', activityGroup);
-	if (activityShape.length == 0){
-		// is it Gate activity?
-		activityShape = $('polygon', activityGroup);
-		if (activityShape.length > 0){
-			isGate = true;
-			var polygonPoints = activityShape.attr('points').split(' ');
-			var polygonStartPoints = polygonPoints[4].split(',');
-			actX = +polygonStartPoints[0];
-			actY = +polygonStartPoints[1] - 10;
-		} else {
-			// unknown or invisible shape (System Gate?)
-			return;
-		}
-	} else {
-		actX = +activityShape.attr('x') + 1;
-		actY = +activityShape.attr('y') + 1;
+	
+	// fint the activity in SVG
+	var coord = getActivityCoordinates(activity);
+	if (!coord) {
+		return;
 	}
 	
 	// add group of users icon
-	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width')),
-		actBottomBorder = actY + (isGate? 50 : +activityShape.attr('height'));
+	var activityGroup = $('g#' + activity.id, sequenceCanvas),
+		// in old SVG format, add to a group; in new, go straight for the SVG root element
+		appendTarget = (activityGroup.length > 0 ? activityGroup : $('svg', sequenceCanvas))[0],
+		// branching and gates require extra adjustments
+		isNewBranching =  [10,11,12,13].indexOf(activity.type) > -1 && activity.flaFormat,
+		isGate = [3,4,5,14].indexOf(activity.type) > -1;
+	
 	if (activity.learners){
 		var	groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
 		// if icons do not fit in shape anymore, show a group icon
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
-			'x'          : actRightBorder - 19,
-			'y'          : actY + 1,
+			'x'          : isNewBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
+			'y'          : isNewBranching ? coord.y - 12 : coord.y + 1,
 			'height'     : 16,
 			'width'      : 16,
-			'xlink:href' : LAMS_URL + 'images/icons/group.png'
-		}, null, activityGroup[0]);
+			'xlink:href' : LAMS_URL + 'images/icons/group.png',
+			'style'		 : 'cursor : pointer'
+		}, null, appendTarget);
 		appendXMLElement('title', null, groupTitle, element);
 		// add a small number telling how many learners are in the group
 		element = appendXMLElement('text', {
 			'id'         : 'act' + activity.id + 'learnerGroupText',
-			'x'          : actRightBorder - 10,
-			'y'          : actY + 24,
+			'x'          : isNewBranching ? coord.x + 9  : (isGate ? coord.x + 17 : coord.x2 - 9),
+			'y'          : isNewBranching ? coord.y + 12 : coord.y + 25,
 			'text-anchor': 'middle',
 			'font-family': 'Verdana',
-			'font-size'  : 8
-		}, activity.learners.length, activityGroup[0]);
+			'font-size'  : 8,
+			'style'		 : 'cursor : pointer'
+		}, activity.learners.length, appendTarget);
 		appendXMLElement('title', null, groupTitle, element);
 	
 		var actTooltip = LABELS.LEARNER_GROUP_LIST_TITLE;
-		// draw single user icons for the first few
-		if (!isGate) {
+		// draw single icons for the first few learners;
+		// don't do it for gate and optional activities, and new branching/optional sequences format
+		if ([3,4,5,7,13,14].indexOf(activity.type) == -1 && !activity.flaFormat) {
 			$.each(activity.learners, function(learnerIndex, learner){
 				var learnerDisplayName = getLearnerDisplayName(learner);
 				actTooltip += '\n' + learnerDisplayName;
@@ -1028,29 +1024,32 @@ function addActivityIcons(activity) {
 				if (learnerIndex < 7) {
 					element = appendXMLElement('image', {
 						'id'         : 'act' + activity.id + 'learner' + learner.id,
-						'x'          :  actX + learnerIndex*15,
-						'y'          :  actY,
+						'x'          : coord.x + learnerIndex*15 + 1,
+						// a bit lower for Optional Activity
+						'y'          : coord.y,
 						'height'     : 16,
 						'width'      : 16,
-						'xlink:href' : LAMS_URL + 'images/icons/user.png'
-					}, null, activityGroup[0]);
+						'xlink:href' : LAMS_URL + 'images/icons/user.png',
+						'style'		 : 'cursor : pointer'
+					}, null, appendTarget);
 					appendXMLElement('title', null, learnerDisplayName, element);
 				}
 			});
 		}
 		
-		appendXMLElement('title', null, actTooltip, activityGroup[0]);
+		appendXMLElement('title', null, actTooltip, appendTarget);
 	} 
 
 	if (activity.requiresAttention) {
 		var element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'attention',
-			'x'          : actRightBorder - 19,
-			'y'          : actBottomBorder - 19,
+			'x'          : isNewBranching ? coord.x + 14 : coord.x2 - 19,
+			'y'          : isNewBranching ? coord.y + 6  : coord.y2 - 19,
 			'height'     : 16,
 			'width'      : 16,
-			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png'
-		}, null, activityGroup[0]);
+			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png',
+			'style'		 : 'cursor : pointer'
+		}, null, appendTarget);
 		appendXMLElement('title', null, LABELS.CONTRIBUTE_ATTENTION, element);
 	}
 }
@@ -1063,18 +1062,13 @@ function addActivityIconsHandlers(activity) {
 	if (!activity.learners && !activity.requiresAttention) {
 		return;
 	}
-	
-	var activityGroup = $('g#' + activity.id, sequenceCanvas);
-	if (activityGroup.length == 0) {
-		// the activity is probably hidden (branching child, system gate)
-		return;
-	}
+
 	// gate activity does not allows users' view
-	var usersViewable = $('polygon', activityGroup).length == 0;
+	var usersViewable = [3,4,5,14].indexOf(activity.type) == -1;
 	
 	if (activity.learners){
 		$.each(activity.learners, function(learnerIndex, learner){
-			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]', activityGroup)
+			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]', sequenceCanvas)
 							  .css('cursor', 'pointer')
 							  // drag learners to force complete activities
 							  .draggable({
@@ -1109,21 +1103,15 @@ function addActivityIconsHandlers(activity) {
 		});
 		
 		
-		var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
-		// 0 is for no group icon, 2 is for icon + digits
-		if (learnerGroupIcon.length == 2) {
-			var activityName = $('text[id^="TextElement"]', activityGroup).text();
-			learnerGroupIcon.dblclick(function(event){
-				 // double click on learner icon to see activity from his perspective
-				event.stopPropagation();
-				showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
-			});
-		}
+		$('*[id^="act' + activity.id + 'learnerGroup"]', sequenceCanvas).dblclick(function(event){
+			 // double click on learner group icon to see list of learners
+			event.stopPropagation();
+			showLearnerGroupDialog(activity.id, activity.title, activity.learners, true, usersViewable);
+		});
 	}
 	
 	if (activity.requiresAttention){
-		var attentionIcon = $('*[id^="act' + activity.id + 'attention"]', activityGroup);
-		attentionIcon.click(function(event){
+		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
 			$('#tabs').tabs('select', 0);     
@@ -1188,6 +1176,67 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, learners, true, false);
 		}).appendTo(iconsContainer);
 	}
+}
+
+
+/**
+ * Extracts activity using SVG attributes.
+ */
+function getActivityCoordinates(activity){
+	// special processing for gates
+	if ([3,4,5,14].indexOf(activity.type) > -1) {
+		return {
+			'x'  : activity.x,
+			'y'  : activity.y - 18,
+			'x2' : activity.x + 39,
+			'y2' : activity.y + 40
+		}
+	}
+	
+	// special processing for new format of branching and optional sequences
+	if ([10,11,12,13].indexOf(activity.type) > -1 && activity.flaFormat) {
+		return {
+			'x'  : activity.x,
+			'y'  : activity.y
+		}
+	}
+	
+	// get either rectangle from old Batik SVG format
+	// or path from new Flashless Authoring format (IE and other browsers format paths differently)
+	var elem = $('rect[x="'    + activity.x + '.0"][y="' + activity.y + '.0"], ' + 
+				 'rect[x="'    + activity.x + '"][y="'   + activity.y + '"], ' + 
+				 'path[d^="M'  + activity.x + ',' 	     + activity.y +'"], ' + 
+				 'path[d^="M ' + activity.x + ' '        + activity.y +'"]',
+				 sequenceCanvas);
+	if (elem.length == 0) {
+		return;
+	}
+	
+	// if it's a rectangle, it has these attributes
+	var width = elem.attr('width'),
+		height = elem.attr('height');
+	if (width) {
+		return {
+			'elem' : elem,
+			'x'    : activity.x,
+			'y'    : activity.y,
+			'x2'   : activity.x + +width,
+			'y2'   : activity.y + +height
+		}
+	} else {
+		// extract width and height from path M<x>,<y>H<width>V<height>... or M <x> <y> H <width> V <height>...
+		var match = /H\s?(\d+)\s?V\s?(\d+)/i.exec(elem.attr('d'));
+		if (match) {
+			return {
+				'elem' : elem,
+				'x'    : activity.x,
+				'y'    : activity.y + 1,
+				'x2'   : +match[1],
+				'y2'   : +match[2]
+			}
+		}
+	}
+
 }
 
 

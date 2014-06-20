@@ -23,13 +23,58 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
-/**
- * The OptionsWithSequencesActivity was created to allow Flash to know whether or
- * not to expect sequences. The progress engine treads OptionsWithSequencesActivity
- * and OptionsActivity exactly the same.
- * 
- *  @hibernate.class 
- */
-public class OptionsWithSequencesActivity extends OptionsActivity {
 
+public class OptionsWithSequencesActivity extends OptionsActivity {
+    private Integer startXcoord;
+    private Integer startYcoord;
+    private Integer endXcoord;
+    private Integer endYcoord;
+
+    @Override
+    public Activity createCopy(int uiidOffset) {
+	OptionsWithSequencesActivity newOptionsActivity = new OptionsWithSequencesActivity();
+	copyToNewComplexActivity(newOptionsActivity, uiidOffset);
+
+	newOptionsActivity.setMaxNumberOfOptions(this.getMaxNumberOfOptions());
+	newOptionsActivity.setMinNumberOfOptions(this.getMinNumberOfOptions());
+	newOptionsActivity.setOptionsInstructions(this.getOptionsInstructions());
+	newOptionsActivity.startXcoord = this.startXcoord;
+	newOptionsActivity.startYcoord = this.startYcoord;
+	newOptionsActivity.endXcoord = this.endXcoord;
+	newOptionsActivity.endYcoord = this.endYcoord;
+
+	return newOptionsActivity;
+    }
+
+    public Integer getEndXcoord() {
+	return endXcoord;
+    }
+
+    public void setEndXcoord(Integer endXcoord) {
+	this.endXcoord = endXcoord;
+    }
+
+    public Integer getEndYcoord() {
+	return endYcoord;
+    }
+
+    public void setEndYcoord(Integer endYcoord) {
+	this.endYcoord = endYcoord;
+    }
+
+    public Integer getStartXcoord() {
+	return startXcoord;
+    }
+
+    public void setStartXcoord(Integer startXcoord) {
+	this.startXcoord = startXcoord;
+    }
+
+    public Integer getStartYcoord() {
+	return startYcoord;
+    }
+
+    public void setStartYcoord(Integer startYcoord) {
+	this.startYcoord = startYcoord;
+    }
 }

@@ -515,10 +515,10 @@ GeneralInitLib = {
 					}
 				});
 			}
-		}],
+		}];
 	    
 		// initalise Learning Design load/save dialog
-		ldStoreDialog = $('#ldStoreDialog').dialog({
+		layout.ldStoreDialog = $('#ldStoreDialog').dialog({
 			'autoOpen'      : false,
 			'position'      : {
 				'my' : 'left top',
@@ -541,7 +541,8 @@ GeneralInitLib = {
 			            			learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
 			            		
 			            		if (!learningDesignID) {
-			            			learningDesignID = +$('#ldStoreDialogAccessCell > div.selected').attr('learningDesignId');
+			            			learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', this)
+			            							   .attr('learningDesignId');
 			            		}
 			            		
 			            		// no LD was chosen
@@ -585,7 +586,7 @@ GeneralInitLib = {
 				            			folderID = folderNode.data.folderID;
 				            		} else {
 				            			// get data from "recently used sequences" list
-				            			var selectedAccess = $('#ldStoreDialogAccessCell > div.selected');
+				            			var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', this);
 				            			// if title was altered, do not consider this an overwrite
 				            			if (selectedAccess.length > 0 && title == selectedAccess.text()) {
 				            				learningDesignID = +selectedAccess.attr('learningDesignId');
@@ -640,7 +641,7 @@ GeneralInitLib = {
 				$('#leftDialogButtonContainer').remove();
 				var nameContainer = $('#ldStoreDialogNameContainer'),
 					leftButtonContainer = $('<div />').attr('id','leftDialogButtonContainer');
-				$('input', nameContainer).val(null);
+				$('input', nameContainer).val($(this).dialog('option', 'learningDesignTitle'));
 				$(this).siblings('.ui-dialog-buttonpane').append(leftButtonContainer).append(nameContainer);
 				$('#ldStoreDialogNameField', nameContainer).focus();
 
@@ -654,11 +655,11 @@ GeneralInitLib = {
 			}
 		});
 		
-		layout.dialogs.push(ldStoreDialog);
+		layout.dialogs.push(layout.ldStoreDialog);
 		
-		$('#ldScreenshotAuthor', ldStoreDialog).load(function(){
+		$('#ldScreenshotAuthor', layout.ldStoreDialog).load(function(){
 			// hide "loading" animation
-			$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
+			$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).css('display', 'none');
 			// show the thumbnail
 			$(this).css('display', 'inline');
 		});
@@ -667,7 +668,7 @@ GeneralInitLib = {
 		YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
 		var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
 		// store the tree in the dialog's data
-		ldStoreDialog.dialog('option', 'ldTree', tree);
+		layout.ldStoreDialog.dialog('option', 'ldTree', tree);
 		// make folder contents load dynamically on open
 		tree.setDynamicLoad(function(node, callback){
 			// load subfolder contents
@@ -684,8 +685,7 @@ GeneralInitLib = {
 		});
 		tree.singleNodeHighlight = true;
 		tree.subscribe('clickEvent', function(event){
-			var dialog = $(this.getEl()).closest('.ui-dialog'),
-				isSaveDialog = dialog.hasClass('ldStoreDialogSave');
+			var isSaveDialog = layout.ldStoreDialog.hasClass('ldStoreDialogSave');
 		
 			$('.leftDialogButton')
 			   .attr('disabled', event.node.highlightState > 0 ? 'disabled' : null)
@@ -1097,6 +1097,7 @@ GeneralLib = {
 		// get LD details
 		$.ajax({
 			cache : false,
+			async : false,
 			url : LAMS_URL + "authoring/author.do",
 			dataType : 'json',
 			data : {
@@ -1263,12 +1264,14 @@ GeneralLib = {
 						case 11: var branchingType = branchingType || 'group';
 						case 12: var branchingType = branchingType || 'tool';
 						case 13:
-							// draw both edge points straight away and mark the whole canvas for auto reaarange
-							arrangeNeeded = true;
+							// draw both edge points straight away and mark the whole canvas for auto reaarange,
+							// re-arrange only if it is old SVG being converted into new one
+							arrangeNeeded |= activityData.xCoord && activityData.yCoord;
 							var branchingType = branchingType || 'optional',
 								branchingEdge = new ActivityDefs.BranchingEdgeActivity(activityData.activityID,
 										activityData.activityUIID,
-										0, 0, 
+										arrangeNeeded ? 0 : activityData.startXCoord,
+										arrangeNeeded ? 0 : activityData.startYCoord,
 										activityData.activityTitle,
 										branchingType);
 							layout.activities.push(branchingEdge);
@@ -1276,7 +1279,10 @@ GeneralLib = {
 							activityData.activity = branchingEdge;
 							
 							branchingEdge = new ActivityDefs.BranchingEdgeActivity(
-									null, null, 0, 0, null, null, branchingEdge.branchingActivity);
+									null, null,
+									arrangeNeeded ? 0 : activityData.endXCoord,
+									arrangeNeeded ? 0 : activityData.endYCoord,
+									null, null, branchingEdge.branchingActivity);
 							layout.activities.push(branchingEdge);
 							
 							branchingEdge.branchingActivity.defaultActivityUIID = activityData.defaultActivityUIID;
@@ -1873,7 +1879,7 @@ GeneralLib = {
 				x -= activityBox.x;
 				y -= activityBox.y;
 			}
-			
+						
 			// add activity
 			activities.push({
 				'activityID' 			 : activity.id,
@@ -1891,6 +1897,14 @@ GeneralLib = {
 				'libraryActivityUIImage' : iconPath,
 				'xCoord' 				 : x,
 				'yCoord' 				 : y,
+				'startXCoord'			 : activity instanceof ActivityDefs.BranchingActivity ?
+												parseInt(activity.start.items.shape.getBBox().x) : null,
+				'startYCoord'			 : activity instanceof ActivityDefs.BranchingActivity ?
+												parseInt(activity.start.items.shape.getBBox().y) : null,
+				'endXCoord'			 	 : activity instanceof ActivityDefs.BranchingActivity ?
+												parseInt(activity.end.items.shape.getBBox().x) : null,
+				'endYCoord'			 	 : activity instanceof ActivityDefs.BranchingActivity ?
+												parseInt(activity.end.items.shape.getBBox().y) : null,
 				'activityTitle' 		 : activity.title,
 				'description'			 : activity.description,
 				'activityCategoryID' 	 : activityCategoryID,
@@ -1901,8 +1915,8 @@ GeneralLib = {
 											activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 				'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
 				'gateActivityLevelID'    : activity instanceof ActivityDefs.GateActivity ? 1 : null,
-				'minOptions'			 : activity.minOptions,
-				'maxOptions'			 : activity.maxOptions,
+				'minOptions'			 : activity.minOptions || null,
+				'maxOptions'			 : activity.maxOptions || null,
 				'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 				
@@ -2095,6 +2109,8 @@ GeneralLib = {
 						});
 					});
 					
+					GeneralLib.saveLearningDesignImages();
+					
 					if (response.validation.length == 0) {
 						alert(LABELS.SAVE_SUCCESSFUL);
 					}
@@ -2111,6 +2127,33 @@ GeneralLib = {
 		});
 		
 		return result;
+	},
+	
+	
+	/**
+	 * Stores SVG and PNG LD thumbnails on server.
+	 */
+	saveLearningDesignImages : function() {
+		$.ajax({
+			type : 'POST',
+			url : LAMS_URL + 'authoring/author.do',
+			data : {
+				'method' : 'saveLearningDesignImage',
+				'learningDesignID' : layout.ld.learningDesignID,
+				'extension' : 'SVG',
+				'image' : MenuLib.exportSVG()
+			}
+		});
+		$.ajax({
+			type : 'POST',
+			url : LAMS_URL + 'authoring/author.do',
+			data : {
+				'method' : 'saveLearningDesignImage',
+				'learningDesignID' : layout.ld.learningDesignID,
+				'extension' : 'PNG',
+				'image' : MenuLib.exportPNG()
+			}
+		});
 	},
 	
 
@@ -2139,7 +2182,9 @@ GeneralLib = {
 			$('#ldDescriptionFieldModified').text('*');
 		}
 		
-		if (layout.conf.supportsDownloadAttribute && activitiesExist) {
+		// if the browser does not support HTML5 "download" attribute,
+		// the image can only be received from the LD saved on the server
+		if ((!modified || layout.conf.supportsDownloadAttribute) && activitiesExist) {
 			$('.exportImageButton').attr('disabled', null)
 			  					   .css('opacity', 1);
 			enableExportButton = true;
@@ -2166,10 +2211,9 @@ GeneralLib = {
 		// display "loading" animation and finally LD thumbnail
 		$('.ldChoiceDependentCanvasElement').css('display', 'none');
 		if (learningDesignID) {
-			var dialogContent = $('#ldStoreDialog');
-			$('#ldScreenshotLoading', dialogContent).css('display', 'inline');
+			$('#ldScreenshotLoading', layout.ldStoreDialog).css('display', 'inline');
 			// get the image of the chosen LD and prevent caching
-			$('#ldScreenshotAuthor', dialogContent)
+			$('#ldScreenshotAuthor', layout.ldStoreDialog)
 				.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_=' + new Date().getTime())
 				.css({
 				'width'  : 'auto',
@@ -2180,7 +2224,7 @@ GeneralLib = {
 				$('#ldStoreDialogNameField').val(title).focus();
 			}
 			
-			var tree =  $('#ldStoreDialog').dialog('option', 'ldTree'),
+			var tree =  layout.ldStoreDialog.dialog('option', 'ldTree'),
 				ldNode = tree.getHighlightedNode();
 				// no LD was chosen
 			if (ldNode && learningDesignID != ldNode.data.learningDesignId) {
@@ -2188,7 +2232,7 @@ GeneralLib = {
 			}
 		}
 		
-		$('#ldStoreDialogAccessCell > div.access', dialogContent).each(function(){
+		$('#ldStoreDialogAccessCell > div.access', layout.ldStoreDialog).each(function(){
 			var access = $(this);
 			if (+access.attr('learningDesignId') == learningDesignID){
 				access.addClass('selected');
@@ -2232,7 +2276,7 @@ GeneralLib = {
 		}
 		
 		if (access) {
-			var accessCell = $('#ldStoreDialogAccessCell');
+			var accessCell = $('#ldStoreDialogAccessCell', layout.ldStoreDialog);
 			accessCell.children('div.access').remove();
 			$.each(access, function(){
 				$('<div />').addClass('access')
@@ -2248,8 +2292,7 @@ GeneralLib = {
 									return;
 								}
 								
-								var	dialog = accessEntry.closest('.ui-dialog'),
-									isSaveDialog = dialog.hasClass('ldStoreDialogSave'),
+								var	isSaveDialog = layout.ldStoreDialog.hasClass('ldStoreDialogSave'),
 									learningDesignID = +accessEntry.attr('learningDesignId'),
 									title = isSaveDialog ? accessEntry.text() : null;
 									

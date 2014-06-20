@@ -86,8 +86,8 @@ public abstract class LearningDesignProcessor {
 		    .warn("Parsing activity method handleActivity got a null activity. Learning design was "
 			    + getDesign());
 	} else {
-	    if (LearningDesignProcessor.log.isDebugEnabled()) {
-		LearningDesignProcessor.log.debug("Processing activity " + activity.getActivityId() + " "
+	    if (LearningDesignProcessor.log.isTraceEnabled()) {
+		LearningDesignProcessor.log.trace("Processing activity " + activity.getActivityId() + " "
 			+ activity.getTitle());
 	    }
 	    if (activity.isComplexActivity()) {
