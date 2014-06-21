@@ -2643,7 +2643,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    }
 			}
 			if (found) {
-			    activity.setLibraryActivityID(library.getLearningLibraryId());
+			    activity.setLearningLibraryID(library.getLearningLibraryId());
 			    return;
 			}
 		    }
