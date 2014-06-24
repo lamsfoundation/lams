@@ -459,59 +459,6 @@ public class FileUtil {
 	return pathfile;
     }
 
-    public static void copyFile(File in, File out) throws Exception {
-	FileChannel sourceChannel = new FileInputStream(in).getChannel();
-	FileChannel destinationChannel = new FileOutputStream(out).getChannel();
-	sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
-	sourceChannel.close();
-	destinationChannel.close();
-    }
-
-    /**
-     * Copies a file using the provided input stream.
-     * 
-     * @param inputStream
-     * @param targetFile
-     * @return size of copied file
-     * @throws IOException
-     */
-    public static long copyFile(InputStream inputStream, File targetFile) throws IOException {
-	long result = 0;
-	FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
-	byte[] data = new byte[FileUtil.FILE_COPY_BUFFER_SIZE];
-	int read = 0;
-	do {
-	    read = inputStream.read(data);
-	    if (read > 0) {
-		fileOutputStream.write(data, 0, read);
-		result += read;
-	    }
-	} while (read > 0);
-	fileOutputStream.close();
-	inputStream.close();
-	return result;
-    }
-
-    /**
-     * Copies a file to the given outputStream.
-     */
-    public static long copyFile(File sourceFile, OutputStream outputStream) throws IOException {
-	long result = 0;
-	FileInputStream fileInputStream = new FileInputStream(sourceFile);
-	byte[] data = new byte[FileUtil.FILE_COPY_BUFFER_SIZE];
-	int read = 0;
-	do {
-	    read = fileInputStream.read(data);
-	    if (read > 0) {
-		outputStream.write(data, 0, read);
-		result += read;
-	    }
-	} while (read > 0);
-	outputStream.close();
-	fileInputStream.close();
-	return result;
-    }
-
     /**
      * get file extension name from a String, such as from "textabc.doc", return "doc" fileName also can contain
      * directory infomation.

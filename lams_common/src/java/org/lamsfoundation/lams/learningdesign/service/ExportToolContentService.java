@@ -737,7 +737,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// copy XSLT file to contentDir, so that the XSLT document() function
 	// does not need absolute path file.
 	File xslt = new File(FileUtil.getFullPath(xsltDir, "ims.xslt"));
-	FileUtil.copyFile(xsltIn, xslt);
+	FileUtils.copyFile(xsltIn, xslt);
 
 	// copy schema files to content folder
 	String path = FileUtil.getFileDirectory(xsltIn.getCanonicalPath());
@@ -749,10 +749,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	File imsldaTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_A));
 	File imsldbTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_B));
 	File imsldcTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_C));
-	FileUtil.copyFile(imscpSrc, imscpTar);
-	FileUtil.copyFile(imsldaSrc, imsldaTar);
-	FileUtil.copyFile(imsldbSrc, imsldbTar);
-	FileUtil.copyFile(imsldcSrc, imsldcTar);
+	FileUtils.copyFile(imscpSrc, imscpTar);
+	FileUtils.copyFile(imsldaSrc, imsldaTar);
+	FileUtils.copyFile(imsldbSrc, imsldbTar);
+	FileUtils.copyFile(imsldcSrc, imsldcTar);
 
 	// create resources.xml file
 	Document resourcesDom = new Document();
