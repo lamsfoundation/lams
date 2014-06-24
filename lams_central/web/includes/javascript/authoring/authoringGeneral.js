@@ -1886,7 +1886,7 @@ GeneralLib = {
 				'activityUIID' 			 : activity.uiid,
 				'toolID' 				 : activity.toolID,
 				'learningLibraryID' 	 : activity.learningLibraryID,
-				'toolContentID' 	 	 : activity.toolContentID || activity.toolID,
+				'toolContentID' 	 	 : activity.toolContentID,
 				'stopAfterActivity' 	 : false,
 				'groupingSupportType' 	 : 2,
 				'applyGrouping' 		 : isGrouped,

@@ -86,10 +86,12 @@ import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
@@ -135,6 +137,7 @@ public class ObjectExtractor implements IObjectExtractor {
     protected IGroupDAO groupDAO = null;
     protected IToolSessionDAO toolSessionDAO = null;
     protected IBranchActivityEntryDAO branchActivityEntryDAO = null;
+    protected ILamsCoreToolService lamsCoreToolService = null;
 
     private Integer mode = null;
 
@@ -185,25 +188,6 @@ public class ObjectExtractor implements IObjectExtractor {
 
     /** Constructor to be used if Spring method injection is used */
     public ObjectExtractor() {
-	modificationDate = new Date();
-    }
-
-    /** Constructor to be used if Spring method injection is not used */
-    public ObjectExtractor(IBaseDAO baseDAO, ILearningDesignDAO learningDesignDAO, IActivityDAO activityDAO,
-	    ILearningLibraryDAO learningLibraryDAO, ILicenseDAO licenseDAO, IGroupingDAO groupingDAO, IToolDAO toolDAO,
-	    ISystemToolDAO systemToolDAO, IGroupDAO groupDAO, ITransitionDAO transitionDAO,
-	    IToolSessionDAO toolSessionDAO) {
-	this.baseDAO = baseDAO;
-	this.learningDesignDAO = learningDesignDAO;
-	this.activityDAO = activityDAO;
-	this.learningLibraryDAO = learningLibraryDAO;
-	this.licenseDAO = licenseDAO;
-	this.groupingDAO = groupingDAO;
-	this.toolDAO = toolDAO;
-	this.systemToolDAO = systemToolDAO;
-	this.groupDAO = groupDAO;
-	this.transitionDAO = transitionDAO;
-	this.toolSessionDAO = toolSessionDAO;
 	modificationDate = new Date();
     }
 
@@ -326,6 +310,14 @@ public class ObjectExtractor implements IObjectExtractor {
 
     public void setBranchActivityEntryDAO(IBranchActivityEntryDAO branchActivityEntryDAO) {
 	this.branchActivityEntryDAO = branchActivityEntryDAO;
+    }
+
+    public ILamsCoreToolService getLamsCoreToolService() {
+	return lamsCoreToolService;
+    }
+
+    public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
+	this.lamsCoreToolService = lamsCoreToolService;
     }
 
     /*
@@ -1117,7 +1109,6 @@ public class ObjectExtractor implements IObjectExtractor {
 		Hashtable activityDetails = (Hashtable) iterator.next();
 		Activity activity = extractActivityObject(activityDetails);
 		activityDAO.insertOrUpdate(activity);
-
 		// if its a tool activity, extract evaluation details
 		if (activity.isToolActivity()) {
 		    extractEvaluationObject(activityDetails, (ToolActivity) activity);
@@ -2171,28 +2162,41 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void buildToolActivity(ToolActivity toolActivity, Hashtable activityDetails)
 	    throws WDDXProcessorConversionException {
+	Tool tool = toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_ID));
+	toolActivity.setTool(tool);
+	
+	// copy content if its the default one
+	Long toolContentId = WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_CONTENT_ID);
+	if (toolContentId.equals(tool.getDefaultToolContentId())) {
+	    if (toolActivity.getToolContentId() == null
+		    || toolActivity.getToolContentId().equals(tool.getDefaultToolContentId())) {
+		toolContentId = getLamsCoreToolService().notifyToolToCopyContent(toolActivity, null);
+	    } else {
+		toolContentId = toolActivity.getToolContentId();
+	    }
+	}
 	if (log.isDebugEnabled()) {
-	    log.debug("In tool activity UUID" + activityDetails.get(WDDXTAGS.ACTIVITY_UIID) + " tool content id="
-		    + activityDetails.get(WDDXTAGS.TOOL_CONTENT_ID));
+	    log.debug("In tool activity UUID" + activityDetails.get(WDDXTAGS.ACTIVITY_UIID) + " tool content id "
+		    + toolContentId);
 	}
-	if (keyExists(activityDetails, WDDXTAGS.TOOL_CONTENT_ID)) {
-	    toolActivity.setToolContentId(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_CONTENT_ID));
-	}
-
-	if (keyExists(activityDetails, WDDXTAGS.TOOL_ID)) {
-	    Tool tool = toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_ID));
-	    toolActivity.setTool(tool);
-	}
+	toolActivity.setToolContentId(toolContentId);
     }
 
     private void buildToolActivity(ToolActivity toolActivity, JSONObject activityDetails) throws JSONException {
-	if (log.isDebugEnabled()) {
-	    log.debug("In tool activity UUID " + JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_UIID)
-		    + " tool content id " + JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID));
-	}
-	toolActivity.setToolContentId(JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID));
 	Tool tool = toolDAO.getToolByID(JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_ID));
 	toolActivity.setTool(tool);
+	
+	// copy content if its the default one
+	Long toolContentId = JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID);
+	if (toolContentId == null || toolContentId.equals(tool.getDefaultToolContentId())) {
+	    if (toolActivity.getToolContentId() == null
+		    || toolActivity.getToolContentId().equals(tool.getDefaultToolContentId())) {
+		toolContentId = getLamsCoreToolService().notifyToolToCopyContent(toolActivity, null);
+	    } else {
+		toolContentId = toolActivity.getToolContentId();
+	    }
+	}
+	toolActivity.setToolContentId(toolContentId);
     }
 
     private void buildGateActivity(Object activity, Hashtable activityDetails) throws WDDXProcessorConversionException {
