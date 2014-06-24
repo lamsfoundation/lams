@@ -281,21 +281,39 @@
 				</div>
 			</td>
 			<td id="canvasContainerCell">
-				<div id="ldDescriptionDiv"
-					 title="Click to show the sequence description">
-					<div id="ldDescriptionTitleContainer" onClick="javascript:MenuLib.toggleDescriptionDiv()">
+				<div id="ldDescriptionDiv">
+					<div id="ldDescriptionTitleContainer" title="Click to show the sequence description"
+						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle">Untitled</span>
 						<span id="ldDescriptionFieldModified"></span>
 						<span id="ldDescriptionHideTip">▼</span>
 					</div>
 					<div id="ldDescriptionDetails">
-						<div id="ldDescriptionLabelDescription">Description:
-						
-						</div>
+						<div class="ldDescriptionLabel">Description:</div>
 						<div id="ldDescriptionEditorContainer">
 							<lams:CKEditor id="ldDescriptionFieldDescription" value=""
 								   height="300px"
 								   contentFolderID="${contentFolderID}"/>
+						</div>
+						
+						<div class="ldDescriptionLabel">License:</div>
+						<select id="ldDescriptionLicenseSelect">
+							<option value="0" selected="selected">No license currently selected. Please select one.</option>
+							<c:forEach var="license" items="${licenses}">
+								<option value="<c:out value='${license.licenseID}' escapeXml='true' />"
+										pictureURL="<c:out value='${license.pictureURL}' escapeXml='true' />"
+										url="<c:out value='${license.url}' escapeXml='true' />"
+								>
+									<c:out value='${license.name}' escapeXml='true' />
+								</option>
+							</c:forEach>
+						</select>
+						<img id="ldDescriptionLicenseImage" />
+						<input id="ldDescriptionLicenseButton" class="button"
+							   type="button" value="View" />
+						<div id="ldDescriptionLicenseTextContainer">
+							<div class="ldDescriptionLabel">Additional license information:</div>
+							<textarea id="ldDescriptionLicenseText" rows="5"></textarea>
 						</div>
 					</div>
 				</div>

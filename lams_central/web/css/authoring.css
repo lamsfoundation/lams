@@ -344,14 +344,13 @@ td#canvasContainerCell {
 }
 
 #ldDescriptionDiv {
-	margin-right: 15px;
 	background-color: rgb(219, 230, 252);
-	text-align: center;
 	z-index: 1099;
 }
 
 #ldDescriptionDiv #ldDescriptionTitleContainer {
 	padding: 2px 0 0 0;
+	text-align: center;
 	font-family: "Lucida Console", Monaco, monospace;
 	font-size: 12px;
 	cursor: pointer;
@@ -363,18 +362,37 @@ td#canvasContainerCell {
 }
 
 #ldDescriptionDiv #ldDescriptionDetails {
+	padding: 0 0 5px 10px;
 	display: none;
 }
 
-#ldDescriptionDiv #ldDescriptionLabelDescription {
+#ldDescriptionDiv .ldDescriptionLabel {
 	font-family: "Lucida Console", Monaco, monospace;
-	text-align: left;
 	font-size: 12px;
 }
 
 #ldDescriptionDiv #ldDescriptionEditorContainer {
-	margin-top: -15px;
+	margin: -15px 0 15px 0;
 }
+
+#ldDescriptionDiv #ldDescriptionLicenseTextContainer,
+#ldDescriptionDiv #ldDescriptionLicenseImage,
+#ldDescriptionDiv #ldDescriptionLicenseButton {
+	display: none;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseImage {
+	vertical-align: text-bottom;
+	padding: 0 10px;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseTextContainer {
+	padding-top: 10px;
+}
+
+#ldDescriptionDiv #ldDescriptionLicenseText {
+	width: 99%;
+} 
 
 #canvas {
 	overflow: auto;

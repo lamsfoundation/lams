@@ -723,6 +723,31 @@ GeneralInitLib = {
 		
 		layout.dialogs.push(layout.infoDialog);
 		
+		// license widgets init
+		$('#ldDescriptionLicenseSelect').change(function(){
+			var option = $('option:selected', this);
+			if (option.val() == "0") {
+				$('#ldDescriptionLicenseTextContainer, #ldDescriptionLicenseImage, #ldDescriptionLicenseButton').hide();
+			} else {
+				if (option.attr('url')) {
+					$('#ldDescriptionLicenseTextContainer').hide();
+					$('#ldDescriptionLicenseImage').attr('src', option.attr('pictureURL')).show();
+					$('#ldDescriptionLicenseButton').show();
+				} else {
+					$('#ldDescriptionLicenseTextContainer').show();
+					$('#ldDescriptionLicenseImage, #ldDescriptionLicenseButton').hide();
+				}
+			}
+		});
+		$('#ldDescriptionLicenseButton').click(function(){
+			var option = $('#ldDescriptionLicenseSelect option:selected'),
+				url = option.attr('url');
+			if (url) {
+				 var win = window.open(url, '_blank');
+				 win.focus();
+			}
+		});
+		
 		window.onbeforeunload = function(){
 			if (layout.modified &&
 				(layout.activities.length > 0
@@ -1070,6 +1095,8 @@ GeneralLib = {
 			if (!isReadOnlyMode) {
 				$('#ldDescriptionFieldTitle').text('Untitled');
 				CKEDITOR.instances['ldDescriptionFieldDescription'].setData(null);
+				$('#ldDescriptionLicenseSelect').val(0);
+				$('#ldDescriptionLicenseText').text('');
 				GeneralLib.setModified(true);
 			}
 			
@@ -1127,6 +1154,10 @@ GeneralLib = {
 				if (!isReadOnlyMode) {
 					$('#ldDescriptionFieldTitle').html(GeneralLib.escapeHtml(ld.title));
 					CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
+					if (ld.licenseID) {
+						$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
+						$('#ldDescriptionLicenseText').text(ld.licenseText);
+					}
 				}
 				
 				var arrangeNeeded = false,
@@ -1974,7 +2005,6 @@ GeneralLib = {
 			});
 		});
 
-		
 		// serialise the sequence
 		var ld = {
 			// it is null if it is a new sequence
@@ -1994,7 +2024,10 @@ GeneralLib = {
 								   && layout.ld.learningDesignID != learningDesignID
 								   ? 1 : 0,
 			'originalLearningDesignID' : null,
-			
+			'licenseID'			 : $('#ldDescriptionLicenseSelect').val(),
+			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"
+								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
+								   ? null : $('#ldDescriptionLicenseText').val(),
 			'activities'		 : activities,
 			'transitions'		 : transitions,
 			'groupings'			 : groupings,
@@ -2003,10 +2036,7 @@ GeneralLib = {
 			
 			'helpText'           : null,
 			'duration'			 : null,
-			'licenseID'			 : null,
-			'licenseText'   	 : null
 		};
-		
 		// get LD details
 		$.ajax({
 			type  : 'POST',

@@ -129,6 +129,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
 	request.setAttribute("access", gson.toJson(accessList));
+	
+	request.setAttribute("licenses", getAuthoringService().getAvailableLicenses());
+	
 	return mapping.findForward("openAutoring");
     }
 
