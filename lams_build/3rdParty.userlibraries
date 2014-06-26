@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <eclipse-userlibraries version="2">
-    <library name="3rdParty" systemlibrary="false">
-        <archive path="/lams_build/lib/apache-poi/poi-3.9-20121203.jar"/>
-        <archive path="/lams_build/lib/apache-poi/poi-ooxml-3.9-20121203.jar"/>
-        <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.9-20121203.jar"/>
+    <library name="3rdParty" systemlibrary="false"> 
+        <archive path="/lams_build/lib/apache-poi/poi-3.10-FINAL-20140208.jar"/>
+        <archive path="/lams_build/lib/apache-poi/poi-ooxml-3.10-FINAL-20140208.jar"/>
+        <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.3.0.jar"/>
         <archive javadoc="http://www.jarvana.com/jarvana/inspect/org/masukomi/aspirin/0.10.01/aspirin-0.10.01-javadoc.jar/" path="/lams_build/lib/aspirin/aspirin.jar" source="/3rdParty_sources/aspirin"/>
         <archive path="/lams_build/lib/autopatch/tk-autopatch-1.2.0-b2-cvs.jar"/>
