@@ -1,3 +1,43 @@
+table.forum th {
+	font-size: inherit;
+	border-left: none;
+}
+table.forum {
+	background:none; 
+	border: 1px solid #cacdd1; 
+	padding-top:0px; 
+	margin-bottom: 10px;
+	border-spacing: 0px;
+    border-collapse: separate;
+}
+table.forum.question-summary-table {
+	width: 83%; 
+	padding: 0px 15px 0px; 
+	font-style: italic; 
+	color:#47bc23; 
+	border: none;
+}
+table.forum.question-summary-table th{
+	padding-top:0px; 
+}
+table.forum.question-summary-table th:first-child{
+	width: 30px; 
+	border-left: none; 
+	padding-left:0px; 
+	text-align: center;
+}
+table.forum.question-summary-table td{
+	padding-left: 15px; 
+	vertical-align: middle; 
+	background: none; 
+}
+table.forum.question-summary-table td:first-child{
+	padding-left: 10px;
+}
+table.forum.question-summary-table tr:last-child td{
+	border-bottom: none;
+}
+
 .innerforms {
 	border: 0px;
 	font-size: small;
@@ -31,3 +71,73 @@ img.validationWarning, div.errors img.icon, div.messages img.icon {
 div.message img.icon {
     vertical-align: middle;
 }
+
+div.growlUI { 
+	background: url(check48.png) no-repeat 10px 10px 
+}
+div.growlUI h1, div.growlUI h2 {
+	color: white; 
+	padding: 5px 5px 5px 0px; 
+	text-align: center;
+}
+
+table.alternative-color td.question-numbers {
+	padding: 15px 15px 15px; 
+	width: 10px; 
+	font-weight: bold;
+}
+table.question-table {
+	padding-bottom: 10px; 
+	border-spacing: 0; 
+	border-collapse: separate;
+}
+table.question-table td {
+	vertical-align:middle; 
+	background:none; 
+	border-bottom:0px;
+}
+.question-table .has-radio-button {
+	padding:5px 0px 2px 15px; 
+	width: 5px;
+}
+.question-table .complete-item-gif {
+	padding:5px 0px 2px 15px; 
+	width: 7px;
+}
+.question-table .complete-item-gif img {
+	border:1px;
+}
+.question-type {
+	padding: 10px 15px 7px; 
+	font-style: italic;
+}
+.question-table .question-feedback, div.question-feedback {
+	padding: 10px 15px 0px; 
+	font-style: italic; 
+	color:#47bc23;
+}
+.question-table .question-option {
+	padding:5px 10px 2px;
+}
+.question-table .reg-padding {
+	padding:5px 0px 2px 15px;
+}
+#quesion-summary-title {
+	padding: 2px 15px 10px; 
+	font-style: italic; 
+	color:#47bc23;
+}
+
+
+#pager {
+	text-align: center; 
+	padding-top: 60px;
+}
+#pager a{
+	margin-left: 10px; 
+	font-size: 130%;
+}
+.color-red {
+	color: red;
+}
+

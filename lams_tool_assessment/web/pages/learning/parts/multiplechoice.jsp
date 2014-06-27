@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div style="padding: 10px 15px 7px; font-style: italic">
+<div class="question-type">
 	<c:choose>
 		<c:when test="${question.multipleAnswersAllowed}">
 			<fmt:message key="label.learning.choose.at.least.one.answer" />
@@ -11,23 +11,23 @@
 	</c:choose>
 </div>
 
-<table cellspacing="0" style="padding-bottom: 10px;">
+<table class="question-table">
 	<c:forEach var="option" items="${question.options}">
 		<tr>
 			<c:if test="${finishedLock}">
-				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
+				<td class="complete-item-gif">
 				
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
+						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
 					</c:if>
 						
-				</td>		
+				</td>
 			</c:if>
 			
-			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
+			<td class="has-radio-button">
 				<c:choose>
 					<c:when test="${question.multipleAnswersAllowed}">
 						<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" styleClass="noBorder"
@@ -44,7 +44,7 @@
 				</c:choose>
 			</td>
 			
-			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
+			<td class="question-option">
 				<c:out value="${option.optionString}" escapeXml="false" />
 			</td>
 			
@@ -59,7 +59,7 @@
         			</c:otherwise>
         		</c:choose>
 
-				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; font-style: italic; color:${color};" width="30%">
+				<td style="padding:5px 10px 2px; font-style: italic; color:${color}; width=30%;">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		
 			</c:if>
@@ -71,17 +71,17 @@
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<c:choose>
 		<c:when test="${question.mark == question.defaultGrade}">
-			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
+			<div class="question-feedback">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
 		<c:when test="${question.mark > 0}">
-			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
+			<div class="question-feedback">
 				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
 		<c:when test="${question.mark <= 0}">
-			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
+			<div class="question-feedback">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
 			</div>
 		</c:when>		

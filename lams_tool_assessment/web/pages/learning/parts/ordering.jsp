@@ -7,20 +7,20 @@
 </c:if>
 
 <div id="orderingArea${question.uid}">
-	<div style="padding: 10px 15px 7px; font-style: italic">
+	<div class="question-type">
 		<fmt:message key="label.learning.ordering.sort.answers" />
 	</div>
 	
-	<table cellspacing="0" style="padding-bottom: 10px;">
+	<table class="question-table">
 		<c:forEach var="option" items="${question.options}" varStatus="ordStatus">
 			<tr>
-				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; ">
+				<td class="reg-padding">
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
 				
 				<c:if test="${(mode != 'teacher') || !hasEditRight}">
-					<td width="20px" style="padding:5px 0px 2px 15px; vertical-align:middle; text-align: center; background:none; border-bottom:0px;">
+					<td style="width text-align: center; width: 20px;" class="reg-padding">
 						<c:if test="${not ordStatus.first and !finishedLock}">
 							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 								border="0" title="<fmt:message key="label.authoring.basic.up"/>"
@@ -50,7 +50,7 @@
 	</table>	
 	
 	<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-		<div style="padding: 10px 15px 0px; font-style: italic; color:#47bc23;">
+		<div class="question-feedback">
 			<c:choose>
 				<c:when	test="${question.mark > 0}">
 					<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />

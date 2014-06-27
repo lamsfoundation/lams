@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div style="padding: 10px 15px 7px; font-style: italic">
+<div class="question-type">
 	<fmt:message key="label.learning.short.answer.answer" />
 </div>
 
-<table cellspacing="0" style="padding-bottom: 10px;">
+<table class="question-table">
 	<tr>
-		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
+		<td class="reg-padding">
 			<c:choose>
 				<c:when test="${question.allowRichEditor && !finishedLock && hasEditRight}">
 					<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
@@ -20,6 +20,6 @@
 			</c:choose>
 		</td>
 	</tr>
-</table>		
+</table>
 
 <%@ include file="markandpenaltyarea.jsp"%>

@@ -34,6 +34,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.export.web.action.Bundler;
+import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
@@ -77,6 +78,7 @@ public class AssessmentBundler extends Bundler {
 	for (String directoryName : directoriesNames) {
 	    directories.add(outputDirectory + File.separator + "javascript" + File.separator + directoryName);
 	}
+	directories.add(outputDirectory + File.separator + "css");
 	this.createDirectories(directories);
 
 	String[] imageNames = new String[] { "ui-bg_flat_0_aaaaaa_40x100.png", "ui-bg_flat_55_fbec88_40x100.png",
@@ -112,6 +114,10 @@ public class AssessmentBundler extends Bundler {
 	urlToConnectTo = getServerUrl() + "css" + URL_SEPARATOR + "jquery.jqGrid.css";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.css", cookies); 
+	
+	urlToConnectTo = getAssessmentToolUrlDir() + "css" + URL_SEPARATOR + "assessment.css";
+	directoryToStoreFile = outputDirectory + File.separator + "css";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "assessment.css", cookies); 
 
     }
     
@@ -127,6 +133,11 @@ public class AssessmentBundler extends Bundler {
 	    }
 	    return serverUrl;
 	}
+    }
+    
+    private String getAssessmentToolUrlDir() {
+	String toolFolder = getServerUrl() + "tool" + URL_SEPARATOR + AssessmentConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
+	return toolFolder;
     }
 
 }

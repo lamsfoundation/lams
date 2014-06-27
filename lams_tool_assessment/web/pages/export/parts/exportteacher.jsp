@@ -12,6 +12,7 @@
 		
 		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery-ui-redmond-theme.css" />
 		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery.jqGrid.css" />
+		<link rel="stylesheet" type="text/css" href="./css/assessment.css" />
 		<script type="text/javascript" src="./javascript/jquery.js"></script>
 		<script type="text/javascript" src="./javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.js"></script>
@@ -163,7 +164,7 @@
 			
 			<div style="margin-left: 30px;">
 			<c:forEach var="questionSummary" items="${questionSummaryList}">
-				<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px; width: 640px;" cellspacing="0">
+				<table class="forum" style="width: 640px;">
 					<tr>
 						<th style="width: 180px; border-left: none; padding-top:0px; " >
 							<fmt:message key="label.monitoring.question.summary.title" />

@@ -1,7 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -36,12 +35,6 @@
 	<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}"/>
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
-	<style media="screen,projection" type="text/css">
-		div.growlUI { background: url(check48.png) no-repeat 10px 10px }
-		div.growlUI h1, div.growlUI h2 {
-			color: white; padding: 5px 5px 5px 0px; text-align: center;
-		}
-	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>

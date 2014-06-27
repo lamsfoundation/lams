@@ -136,7 +136,7 @@
 			<br><br>		
 			<%@ include file="/common/messages.jsp"%>
 			
-			<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
+			<table class="forum">
 				<tr>
 					<th style="width: 180px; border-left: none; padding-top:0px; " >
 						<fmt:message key="label.monitoring.user.summary.user.name" />

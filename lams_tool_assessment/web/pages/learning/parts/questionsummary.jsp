@@ -1,23 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${finishedLock && (fn:length(question.questionResults) > 1) && assessment.allowHistoryResponses}">
-	<div style="padding: 2px 15px 10px; font-style: italic; color:#47bc23;">
+	<div id="quesion-summary-title">
 		<fmt:message key="label.learning.question.summary.history.responces" />
 	</div>
 
-	<table class="forum" style="background:none; margin-bottom:60px; margin-bottom: 10px; width: 83%; padding: 0px 15px 0px; font-style: italic; color:#47bc23; border-bottom: none;" cellspacing="0" >
+	<table class="forum question-summary-table">
 		<tr>
-			<th style="width: 30px; border-left: none; padding-top:0px; padding-left:0px; text-align: center;" >
+			<th>
 				#
 			</th>		
-			<th style="width: 120px; padding-top:0px; " >
+			<th style="width: 120px;" >
 				<fmt:message key="label.learning.summary.completed.on" />
 			</th>
-			<th style="padding-top:0px; " >
+			<th>
 				<fmt:message key="label.learning.question.summary.response" />
 			</th>
 			<c:if test="${assessment.allowGradesAfterAttempt}">			
-				<th style="width: 70px; padding-top:0px; " >
+				<th style="width: 70px;" >
 					<fmt:message key="label.learning.question.summary.grade" />
 				</th>	
 			</c:if>		
@@ -26,18 +26,15 @@
 			<c:set var="questionResult" value="${item[0]}" />
 			<c:set var="currentAssessmentResult" value="${item[1]}" />
 			<tr>
-				<td style="padding-left: 15px; vertical-align: middle; background: none; 
-						<c:if test='${status.last}'>border-bottom: none;</c:if>	" >
+				<td>
 					${status.index + 1} 
 				</td>
-				<td style="padding-left: 15px; vertical-align: middle; background: none;
-						<c:if test='${status.last}'>border-bottom: none;</c:if>	" >
+				<td>
 					<div>
 						${currentAssessmentResult.finishDate} 
 					</div>
 				</td>					
-				<td style="vertical-align: middle; background: none;
-						<c:if test='${status.last}'>border-bottom: none;</c:if>	" >
+				<td>
 					<c:choose>
 						<c:when test="${question.type == 1}">
 							<c:forEach var="option" items="${question.options}">
@@ -101,16 +98,14 @@
 					</c:choose>
 				</td>
 				<c:if test="${assessment.allowGradesAfterAttempt}">
-					<td style="padding-left: 0px; vertical-align: middle; background: none;
-							<c:if test='${status.last}'>border-bottom: none;</c:if>	" >
+					<td style="padding-left: 0px;" >
 						<div style="text-align: center;">
 							<fmt:formatNumber value="${questionResult.mark}" maxFractionDigits="3"/>
 						</div>
 					</td>
 				</c:if>		
 			</tr>
-		</c:forEach>	
-	
+		</c:forEach>
 
 	</table>
 </c:if>							

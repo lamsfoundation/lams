@@ -3,13 +3,13 @@
 <c:if test="${finishedLock}">
 
 	<c:if test="${assessment.allowQuestionFeedback && (question.generalFeedback != null)}">
-		<div style="padding: 10px 15px 0px; font-style: italic; color:#47bc23;">
+		<div class="question-feedback">
 			<c:out value="${question.generalFeedback}" escapeXml="false" />
 		</div>
 	</c:if>
 	
 	<c:if test="${assessment.allowGradesAfterAttempt}">
-		<div style="padding: 10px 15px 10px; font-style: italic; color:#47bc23;">
+		<div class="question-feedback" style="padding-bottom: 10px;">
 			<fmt:message key="label.learning.marks" >
 				<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
 				<fmt:param>${question.defaultGrade}</fmt:param>

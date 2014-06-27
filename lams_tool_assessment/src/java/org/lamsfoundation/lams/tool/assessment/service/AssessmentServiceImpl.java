@@ -473,7 +473,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	AssessmentQuestionResult questionAnswer = null;
 	// get questionResult from DB instance of AssessmentResult
 	for (AssessmentQuestionResult dbQuestionAnswer : assessmentResult.getQuestionResults()) {
-	    if (question.equals(dbQuestionAnswer.getAssessmentQuestion())) {
+	    if (question.getUid().equals(dbQuestionAnswer.getAssessmentQuestion().getUid())) {
 		questionAnswer = dbQuestionAnswer;
 	    }
 	}
@@ -483,6 +483,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    questionAnswer = new AssessmentQuestionResult();
 	    questionAnswer.setAssessmentQuestion(question);
 	    questionAnswer.setAssessmentResult(assessmentResult);
+	    assessmentResult.getQuestionResults().add(questionAnswer);
 	    
 	    Set<AssessmentOptionAnswer> optionAnswers = questionAnswer.getOptionAnswers();
 	    for (AssessmentQuestionOption option : question.getOptions()) {

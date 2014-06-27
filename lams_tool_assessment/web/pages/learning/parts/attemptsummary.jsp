@@ -1,7 +1,7 @@
 <c:if test="${finishedLock}">
-	<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
+	<table class="forum">
 		<tr>
-			<th style="width: 130px; border-left: none; padding-top:0px; " >
+			<th style="width: 130px;">
 				<fmt:message key="label.learning.summary.started.on" />
 			</th>
 			<td >
@@ -10,7 +10,7 @@
 		</tr>
 		
 		<tr>
-			<th style="width: 130px;" >
+			<th>
 				<fmt:message key="label.learning.summary.completed.on" />
 			</th>
 			<td>
@@ -18,7 +18,7 @@
 			</td>
 		</tr>
 		<tr>
-			<th style="width: 130px;" >
+			<th>
 				<fmt:message key="label.learning.summary.time.taken" />
 			</th>
 			<td>
@@ -28,7 +28,7 @@
 		</tr>
 		<c:if test="${assessment.allowGradesAfterAttempt}">
 			<tr>
-				<th style="width: 130px;" >
+				<th>
 					<fmt:message key="label.learning.summary.grade" />
 				</th>
 				<td>
@@ -40,7 +40,7 @@
 		</c:if>
 		<c:if test="${assessment.allowOverallFeedbackAfterQuestion && (result.overallFeedback != null)}">
 			<tr>
-				<th style="width: 130px;" >
+				<th>
 					<fmt:message key="label.learning.summary.feedback" />
 				</th>
 				<td>

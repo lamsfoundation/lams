@@ -1,28 +1,28 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div style="padding: 10px 15px 7px; font-style: italic">
+<div class="question-type">
 	<fmt:message key="label.learning.matching.pairs.pick.up" />
 </div>
 
-<table cellspacing="0" style="padding-bottom: 10px;">
+<table class="question-table">
 	<c:forEach var="option" items="${question.options}">
 		<tr>
 			<c:if test="${finishedLock}">
-				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
+				<td class="complete-item-gif">
 				
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
+						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
 					</c:if>
 						
 				</td>		
 			</c:if>			
-			<td style="padding:5px 15px 2px; vertical-align:middle; background:none; border-bottom:0px; width: 40%;">
+			<td style="padding:5px 15px 2px; width: 40%;">
 				<c:out value="${option.question}" escapeXml="false" />
 			</td>
-			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; ">
+			<td class="question-option">
 				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${finishedLock || !hasEditRight}">
 					<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
 					<c:forEach var="selectOption" items="${question.matchingPairOptions}">
