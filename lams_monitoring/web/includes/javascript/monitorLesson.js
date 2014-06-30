@@ -823,18 +823,31 @@ function updateSequenceTab() {
 						return;
 					}
 					
-					var dblClickFunction = 
-						// different behaviour for regular/branching activities
-						activity.isBranching ? 
-						function(){ showBranchingSequence(activity.id); }
-						:
-						function(){
-							// double click on activity shape to open Monitoring for this activity
-							openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
-						};
+					var activityElems = [coord.elem],
+						dblClickFunction = 
+							// different behaviour for regular/branching activities
+							activity.isBranching ? 
+							function(){ showBranchingSequence(activity.id); }
+							:
+							function(){  
+								// double click on activity shape to open Monitoring for this activity
+								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
+							};
+							
+					// find the activity image, but skip learner and attention icons
+					$('image:not([id^="act"])', sequenceCanvas).each(function(){
+						var image = $(this),
+							x = +image.attr('x'),
+							y = +image.attr('y');
+						if (x > coord.x && x < coord.x2 && y > coord.y && y < coord.y2) {
+							activityElems.push(image);
+						}
+					});
+					
 					// find activity group, if it is not hidden
-					coord.elem.css('cursor', 'pointer')
-							  // double tap detection on mobile devices; it works also for click
+					$.each(activityElems, function(){
+						$(this).css('cursor', 'pointer')
+							  // double tap detection on mobile devices; it works also for mouse clicks
 							  .tap(function(event){
 								  var currentTime = new Date().getTime(),
 								  	  tapLength = currentTime - lastTap;
@@ -844,6 +857,7 @@ function updateSequenceTab() {
 								  }
 								  lastTap = currentTime;
 							  });
+					});
 				}
 			});	
 			
