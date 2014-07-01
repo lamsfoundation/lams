@@ -14,7 +14,7 @@ var DecorationDefs = {
 		this.id = +id || null;
 		this.uiid = +uiid || (layout.ld ? ++layout.ld.maxUIID : null);
 		this.title = title;
-		this.childActivityDefs = [];
+		this.childActivities = [];
 		
 		this.drawContainer = DecorationDefs.methods.container.draw;
 		this.fit = DecorationDefs.methods.container.fit;
@@ -46,7 +46,7 @@ var DecorationDefs = {
 	Region : function(id, uiid, x, y, x2, y2, title, color) {
 		DecorationDefs.Container.call(this, id, uiid, title);
 		// we don't use it for region
-		this.childActivityDefs = null;
+		this.childActivities = null;
 		
 		this.draw = DecorationDefs.methods.region.draw;
 		
@@ -63,9 +63,9 @@ var DecorationDefs = {
 			
 			draw : function(x, y, x2, y2, color){
 				// check for new coordinates or just take them from the existing shape
-				var box = this.items ? this.items.shape.getBBox() : null,
-					x = x   ? x : box.x,
-					y = y   ? y : box.y,
+				var box = this.items   ? this.items.shape.getBBox() : null,
+					x = x != undefined ? x : box.x,
+					y = y != undefined ? y : box.y,
 					// take into account minimal size of rectangle
 					x2 = x2 ? Math.max(x2, x + layout.conf.regionEmptyWidth) : x + box.width,
 					y2 = y2 ? Math.max(y2, y + layout.conf.regionEmptyHeight) : y + box.height,
@@ -97,7 +97,12 @@ var DecorationDefs = {
 										.toBack();
 				this.items.push(this.items.shape);
 				
-				if (!isReadOnlyMode){
+				if (isReadOnlyMode){
+					if (activitiesOnlySelectable) {
+						this.items.shape.attr('cursor', 'pointer');
+						this.items.click(HandlerLib.itemClickHandler);
+					}
+				} else {
 					this.items.shape.attr('cursor', 'pointer');
 					this.items.mousedown(HandlerDecorationLib.containerMousedownHandler)
 							  .click(HandlerLib.itemClickHandler);
@@ -109,15 +114,15 @@ var DecorationDefs = {
 			 * Adjust the annotation so it envelops its child activities and nothing more.
 			 */
 			fit : function() {
-				var childActivityDefs = DecorationLib.getChildActivityDefs(this.items.shape);
-				if (childActivityDefs.length == 0) {
+				var childActivities = DecorationLib.getChildActivities(this.items.shape);
+				if (childActivities.length == 0) {
 					return;
 				}
 	
 				ActivityLib.removeSelectEffect(this);
 				
 				var allElements = paper.set();
-				$.each(childActivityDefs, function(){
+				$.each(childActivities, function(){
 					allElements.push(this.items.shape);
 				});
 				// big rectangle enveloping all child activities
@@ -242,7 +247,7 @@ DecorationLib = {
 	/**
 	 * Get activities enveloped by given container
 	 */
-	getChildActivityDefs : function(shape){
+	getChildActivities : function(shape){
 		var result = [];
 		$.each(layout.activities, function(){
 			if (shape != this.items.shape) {
@@ -259,7 +264,7 @@ DecorationLib = {
 		var parentObject = shape.data('parentObject');
 		// store the result in the shape's object
 		if (parentObject && !(parentObject instanceof DecorationDefs.Region)) {
-			parentObject.childActivityDefs = result;
+			parentObject.childActivities = result;
 		}
 		return result;
 	},

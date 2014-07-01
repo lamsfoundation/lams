@@ -134,14 +134,20 @@ div#ldStoreDialog td#ldStoreDialogCanvasCell {
 
 div#ldStoreDialog div#ldStoreDialogCanvasDiv {
 	overflow: auto;
-	height: 665px;
+	/* height: 665px; */
 }
 
 div#ldStoreDialog img#ldScreenshotLoading  {
 	padding-top: 200px;
 }
 
-.ldStoreDialogLoad .ldStoreDialogSaveOnly {
+div#ldStoreDialog #ldStoreDialogImportPartFrame {
+	border: none;
+	width: 99%;
+}
+
+.ldStoreDialogLoad .ldStoreDialogSaveOnly,
+.ldStoreDialogImportPart .ldStoreDialogSaveOnly {
 	display: none;
 }
 

@@ -417,8 +417,8 @@ var PropertyDefs = {
 		var activity = this,
 			content = activity.propertiesContent;
 
-		activity.minOptions = Math.min(activity.minOptions, activity.childActivityDefs.length);
-		activity.maxOptions = Math.min(activity.maxOptions, activity.childActivityDefs.length);
+		activity.minOptions = Math.min(activity.minOptions, activity.childActivities.length);
+		activity.maxOptions = Math.min(activity.maxOptions, activity.childActivities.length);
 		
 		if (!content) {
 			// first run, create the content
@@ -449,7 +449,7 @@ var PropertyDefs = {
 			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
 			  .on('spinchange', function(){
 				  var value = +$(this).val();
-				  activity.minOptions = Math.min(value, activity.childActivityDefs.length);
+				  activity.minOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.minOptions) {
 					  $(this, content).spinner('value', activity.minOptions);
 				  }
@@ -463,7 +463,7 @@ var PropertyDefs = {
 			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
 			  .on('spinchange', function(){
 				  var value = +$(this).val();
-				  activity.maxOptions = Math.min(value, activity.childActivityDefs.length);
+				  activity.maxOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.maxOptions) {
 					  $(this, content).spinner('value', activity.maxOptions);
 				  }
@@ -471,11 +471,11 @@ var PropertyDefs = {
 		}
 		
 		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minOptions)
-																.spinner('option', 'max', activity.childActivityDefs.length);
+																.spinner('option', 'max', activity.childActivities.length);
 		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxOptions)
 																.spinner('option', {
 																	'min' : activity.minOptions,
-																	'max' : activity.childActivityDefs.length
+																	'max' : activity.childActivities.length
 																});
 	},
 

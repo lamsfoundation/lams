@@ -63,10 +63,10 @@ var HandlerLib = {
 				
 			// hide child activities while moving the parent around
 			if (sticky) {
-				$.each(parentObject.childActivityDefs, function(){
+				$.each(parentObject.childActivities, function(){
 					this.items.hide();
-					if (this.childActivityDefs) {
-						$.each(this.childActivityDefs, function() {
+					if (this.childActivities) {
+						$.each(this.childActivities, function() {
 							this.items.hide();
 						});
 					}
@@ -163,7 +163,15 @@ var HandlerLib = {
 		var parentObject = this.data('parentObject');
 		// inform that user wants to select, not drag the activity
 		parentObject.items.clicked = true;
-		if (parentObject != layout.selectedObject) {
+		
+		// if it's "import part" allow multiple selection of activities
+		if (activitiesOnlySelectable) {
+			if (parentObject.items.selectEffect) {
+				ActivityLib.removeSelectEffect(parentObject);
+			} else {
+				ActivityLib.addSelectEffect(parentObject);	
+			}
+		} else if (parentObject != layout.selectedObject) {
 			HandlerLib.canvasClickHandler(event);
 			ActivityLib.addSelectEffect(parentObject, true);
 		}
@@ -364,9 +372,9 @@ HandlerDecorationLib = {
 						  });
 		
 		// immediatelly show which activities will be enveloped
-		var childActivityDefs = DecorationLib.getChildActivityDefs(data.shape);
+		var childActivities = DecorationLib.getChildActivities(data.shape);
 		$.each(layout.activities, function(){
-			if (!this.parentActivity && $.inArray(this, childActivityDefs) > -1){
+			if (!this.parentActivity && $.inArray(this, childActivities) > -1){
 				ActivityLib.addSelectEffect(this, false);
 			} else {
 				ActivityLib.removeSelectEffect(this);

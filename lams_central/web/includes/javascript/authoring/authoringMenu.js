@@ -304,11 +304,10 @@ var MenuLib = {
 			
 			var startActivity = null,
 				targetElement = paper.getElementByPoint(event.pageX, event.pageY);
-			
 			if (targetElement) {
 				startActivity = targetElement.data('parentObject');
 				if (startActivity) {
-					HandlerPropertyLib.approachPropertiesDialogHandler(startActivity, null, event.pageX, event.pageY);
+					HandlerTransitionLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
 				}
 			}
 		});
@@ -396,34 +395,46 @@ var MenuLib = {
 			}
 			
 			// replace image links with PNG code
-			var iconLibrary = {};
 			crop.canvasClone.find('image').each(function(){
-				var attributeName = 'xlink:href',
-					iconLink = $(this).attr(attributeName);
-				if (!iconLink) {
+				var image = $(this),
+					attributeName = 'xlink:href',
+					iconPath = image.attr(attributeName);
+				if (!iconPath) {
 					attributeName = 'href',
-					iconLink = $(this).attr(attributeName);
+					iconPath = image.attr(attributeName);
 				}
 				
-				var iconCode = iconLibrary[iconLink];
-				if (!iconCode) {
-					$.ajax({
-						url : iconLink,
-						async: false,
-						dataType : 'text',
-						success : function(response) {
-							iconCode = iconLibrary[iconLink] = response;
-						}
-					});
-				}
-				if (!iconCode) {
-					return true;
-				}
-				
-				canvg(crop.workspace, iconCode);
-				$(this).attr(attributeName, crop.workspace.toDataURL("image/png"));
-			});
+				var iconCode = null, 
+					extensionIndex = iconPath.indexOf('.svg');
 			
+				if (extensionIndex > -1) {
+					var pngPath = iconPath.substring(0, extensionIndex) + '.png';
+					// PNG images got precached when dropping tools on canvas
+					iconCode = layout.iconLib[pngPath];
+					
+					if (!iconCode) {
+						// no precached PNG image, generate one from SVG
+						$.ajax({
+							url : iconPath,
+							async: false,
+							dataType : 'text',
+							success : function(response) {
+								var workspace = $('<canvas />')[0];
+								workspace.width = image.width();
+								workspace.height = image.height();
+								canvg(workspace, response);
+								iconCode = layout.iconLib[pngPath] = workspace.toDataURL('image/png');
+							}
+						});
+					}
+				} else {
+					iconCode = layout.iconLib[iconPath];
+				}
+				 
+				if (iconCode) {
+					image.attr(attributeName, iconCode);
+				}
+			});
 			
 			
 			// set viewBox so content is nicely aligned
@@ -600,6 +611,24 @@ var MenuLib = {
 	
 	
 	/**
+	 * Opens "Import activities" dialog where an user can choose activities from an existing Learning Design. 
+	 */
+	importPartLearningDesign : function(){
+		// remove the directory tree, if it remained for last dialog opening
+		layout.ldStoreDialog.dialog('option', {
+			'title'  			  : LABELS.IMPORT_PART_DIALOG_TITLE,
+			'learningDesignTitle' : null,
+			'buttons' 			  : layout.ldStoreDialog.dialog('option', 'buttonsImportPart'),
+			// it informs widgets that it is the import part dialog
+			'dialogClass'		  : 'ldStoreDialogImportPart'
+		})			   
+		.dialog('open');
+		
+		MenuLib.loadLearningDesignTree();
+	},
+	
+	
+	/**
 	 * Loads Learning Design Tree from DB
 	 */
 	loadLearningDesignTree : function(){
@@ -631,7 +660,7 @@ var MenuLib = {
 			'buttons' 			  : layout.ldStoreDialog.dialog('option', 'buttonsLoad'),
 			// it informs widgets that it is load dialog
 			'dialogClass'		  : 'ldStoreDialogLoad'
-		})			   
+		})	   
 		.dialog('open');
 		
 		MenuLib.loadLearningDesignTree();

@@ -180,7 +180,7 @@ var ActivityDefs = {
 	/**
 	 * Constructor for a Parallel (double) Activity
 	 */
-	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivityDefs){
+	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivities){
 		DecorationDefs.Container.call(this, id, uiid, title);
 		
 		this.id = +id || null;
@@ -190,8 +190,8 @@ var ActivityDefs = {
 			'from' : [],
 			'to'   : []
 		};
-		if (childActivityDefs){
-			this.childActivityDefs = childActivityDefs;
+		if (childActivities){
+			this.childActivities = childActivities;
 		}
 		
 		if (!isReadOnlyMode){
@@ -299,7 +299,7 @@ ActivityDraw = {
 	/**
 	 * Draws a Floating (support) Activity container
 	 */
-	floatingActivity : function(x, y, ignoredParam1, ignoredParam2, childActivityDefs) {
+	floatingActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
 			x = this.items.shape.getBBox().x;
@@ -307,17 +307,17 @@ ActivityDraw = {
 		}
 		
 		// either check what children are on canvas or use the priovided parameter
-		if (childActivityDefs) {
-			this.childActivityDefs = childActivityDefs;
+		if (childActivities) {
+			this.childActivities = childActivities;
 		}
 		
-		if (this.childActivityDefs && this.childActivityDefs.length > 0) {
+		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, horizontally
 			var activityX = x + layout.conf.containerActivityPadding,
 				allElements = paper.set(),
 				floatingActivity = this,
 				box = this.items.shape.getBBox();
-			$.each(this.childActivityDefs, function(orderID){
+			$.each(this.childActivities, function(orderID){
 				this.parentActivity = floatingActivity;
 				this.orderID = orderID;
 				var childBox = this.items.shape.getBBox();
@@ -409,7 +409,7 @@ ActivityDraw = {
 	/**
 	 * Draws an Optional Activity container
 	 */
-	optionalActivity : function(x, y, ignoredParam1, ignoredParam2, childActivityDefs) {
+	optionalActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
 			x = this.items.shape.getBBox().x;
@@ -417,17 +417,17 @@ ActivityDraw = {
 		}
 		
 		// either check what children are on canvas or use the priovided parameter
-		if (childActivityDefs) {
-			this.childActivityDefs = childActivityDefs;
+		if (childActivities) {
+			this.childActivities = childActivities;
 		}
 		
-		if (this.childActivityDefs && this.childActivityDefs.length > 0) {
+		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
 				allElements = paper.set(),
 				optionalActivity = this,
 				box = this.items.shape.getBBox();
-			$.each(this.childActivityDefs, function(orderID){
+			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
 				var childBox = this.items.shape.getBBox();
@@ -469,12 +469,12 @@ ActivityDraw = {
 			y = this.items.shape.getBBox().y;
 		}
 		
-		if (this.childActivityDefs && this.childActivityDefs.length > 0) {
+		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
 				allElements = paper.set(),
 				optionalActivity = this;
-			$.each(this.childActivityDefs, function(orderID){
+			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
 				this.draw(x + layout.conf.containerActivityPadding, activityY);
@@ -606,7 +606,14 @@ ActivityLib = {
 	activityHandlersInit : function(activity) {
 		activity.items.data('parentObject', activity);
 		
-		if (!isReadOnlyMode) {
+		if (isReadOnlyMode) {
+			if (activitiesOnlySelectable) {
+				activity.items.click(HandlerLib.itemClickHandler)
+							  .attr({
+								  'cursor' : 'pointer'
+							  });
+			}
+		} else {
 			// set all the handlers
 			activity.items.mousedown(HandlerActivityLib.activityMousedownHandler)
 						  .click(HandlerLib.itemClickHandler)
@@ -728,11 +735,11 @@ ActivityLib = {
 				object.items.selectEffect = true;
 				
 				// also select encapsulated activities
-				var childActivityDefs = DecorationLib.getChildActivityDefs(object.items.shape);
-				if (childActivityDefs.length > 0) {
+				var childActivities = DecorationLib.getChildActivities(object.items.shape);
+				if (childActivities.length > 0) {
 					object.items.fitButton.show();
 					
-					$.each(childActivityDefs, function(){
+					$.each(childActivities, function(){
 						if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)) {
 							ActivityLib.addSelectEffect(this, false);
 						}
@@ -763,6 +770,33 @@ ActivityLib = {
 						'stroke-dasharray' : '-'
 					});
 				object.items.push(object.items.selectEffect);
+				
+				// if it's "import part" select children activities
+				if (activitiesOnlySelectable) {
+					if (object instanceof ActivityDefs.BranchingEdgeActivity) {
+						if (object.isStart){
+							ActivityLib.addSelectEffect(object.branchingActivity.end);
+							
+							$.each(object.branchingActivity.branches, function(){
+								var transition = this.transitionFrom;
+								while (transition) {
+									var activity = transition.toActivity;
+									if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+										return true;
+									}
+									ActivityLib.addSelectEffect(activity);
+									transition = activity.transitions.from.length > 0 ? activity.transitions.from[0] : null;
+								}
+							});
+						} else {
+							ActivityLib.addSelectEffect(object.branchingActivity.start);
+						}
+					} else if (object instanceof DecorationDefs.Container){
+						$.each(object.childActivities, function(){
+							ActivityLib.addSelectEffect(this);
+						});
+					}
+				}
 			}
 			
 			// make it officially marked?
@@ -844,7 +878,6 @@ ActivityLib = {
 			}
 		}
 		
-		
 		if (transition) {
 			ActivityLib.removeTransition(transition, redraw);
 		}
@@ -913,8 +946,8 @@ ActivityLib = {
 		if (!(activity instanceof ActivityDefs.OptionalActivity || activity instanceof ActivityDefs.FloatingActivity)) {
 			// check if it was removed from an Optional or Floating Activity
 			if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
-				var childActivityDefs = DecorationLib.getChildActivityDefs(activity.parentActivity.items.shape);
-				if ($.inArray(activity, childActivityDefs) == -1) {
+				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
+				if ($.inArray(activity, childActivities) == -1) {
 					activity.parentActivity.draw();
 					ActivityLib.redrawTransitions(activity.parentActivity);
 					activity.parentActivity = null;
@@ -935,7 +968,7 @@ ActivityLib = {
 				});
 			}
 			if (container) {
-				if ($.inArray(activity, container.childActivityDefs) == -1) {
+				if ($.inArray(activity, container.childActivities) == -1) {
 					$.each(activity.transitions.from, function(){
 						ActivityLib.removeTransition(this);
 					});
@@ -946,8 +979,8 @@ ActivityLib = {
 					// for properties dialog to reload
 					ActivityLib.removeSelectEffect(container);
 					
-					container.childActivityDefs.push(activity);
-					container.draw(null, null, null, null, childActivityDefs);
+					container.childActivities.push(activity);
+					container.draw(null, null, null, null, childActivities);
 					ActivityLib.redrawTransitions(container);
 				}
 			}
@@ -1066,12 +1099,12 @@ ActivityLib = {
 		
 		// remove the activity from parent activity
 		if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
-			activity.parentActivity.childActivityDefs.splice(activity.parentActivity.childActivityDefs.indexOf(activity), 1);
+			activity.parentActivity.childActivities.splice(activity.parentActivity.childActivities.indexOf(activity), 1);
 		}
 		
 		// remove child activities
 		if (activity instanceof DecorationDefs.Container) {
-			$.each(activity.childActivityDefs, function(){
+			$.each(activity.childActivities, function(){
 				ActivityLib.removeActivity(this);
 			});
 		}
@@ -1092,7 +1125,9 @@ ActivityLib = {
 		}
 		
 		if (object) {
-			if (object.items.selectEffect) {
+			var selectEffect = object.items.selectEffect;
+			if (selectEffect) {
+				object.items.selectEffect = null;
 				// different effects for different types of objects
 				if (object instanceof DecorationDefs.Region) {
 					object.items.shape.attr({
@@ -1102,21 +1137,59 @@ ActivityLib = {
 					object.items.fitButton.hide();
 					object.items.resizeButton.hide();
 					
-					var childActivityDefs = DecorationLib.getChildActivityDefs(object.items.shape);
-					$.each(childActivityDefs, function(){
+					var childActivities = DecorationLib.getChildActivities(object.items.shape);
+					$.each(childActivities, function(){
 						ActivityLib.removeSelectEffect(this);
 					});
 				} else if (object instanceof ActivityDefs.Transition) {
 					// just redraw the transition, it's easier
 					object.draw();
 				} else {
-					object.items.selectEffect.remove();
+					selectEffect.remove();
+					
+					// if it's "import part" do special processing for branching
+					if (activitiesOnlySelectable) {
+						if (object instanceof ActivityDefs.BranchingEdgeActivity) {
+							if (object.isStart) {
+								ActivityLib.removeSelectEffect(object.branchingActivity.end);
+								
+								// deselect all children in branches
+								$.each(object.branchingActivity.branches, function(){
+									var transition = this.transitionFrom;
+									while (transition) {
+										var activity = transition.toActivity;
+										if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+											return true;
+										}
+										ActivityLib.removeSelectEffect(activity);
+										transition = activity.transitions.from.length > 0 ? activity.transitions.from[0] : null;
+									}
+								});
+							} else {
+								ActivityLib.removeSelectEffect(object.branchingActivity.start);
+							}
+						}
+
+						// deselect Parallel Activity children
+						$.each(layout.activities, function(){
+							if (this instanceof ActivityDefs.ParallelActivity && this.childActivities.indexOf(object) > -1){
+								ActivityLib.removeSelectEffect(this);
+								$.each(this.childActivities, function(){
+									if (this != object) {
+										this.items.selectEffect.remove();
+										this.items.selectEffect = null;
+									}
+								});
+							}
+						});
+					}
 				}
-				object.items.selectEffect = null;
 			}
 			
-			// no selected activity = no properties dialog
-			layout.propertiesDialog.dialog('close');
+			if (layout.propertiesDialog) {
+				// no selected activity = no properties dialog
+				layout.propertiesDialog.dialog('close');
+			}
 			layout.selectedObject = null;
 		}
 	},

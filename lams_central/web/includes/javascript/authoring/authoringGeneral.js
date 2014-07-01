@@ -44,6 +44,8 @@ var paper = null,
 		'modified'   : false,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
+		// stores precached tool images so they can be used in exported SVG
+		'iconLib' : {},
 		// icons for special activities
 		'toolMetadata': {
 			'gate'     : {		
@@ -53,6 +55,7 @@ var paper = null,
 				'iconPath' : '../images/grouping.gif'
 			}
 		},
+		
 		// graphics contants
 		'conf' : {
 			'arrangeHorizontalSpace'           : 200,
@@ -151,17 +154,6 @@ GeneralInitLib = {
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
 			
-			
-			if (/\.svg$/i.test(iconPath)){
-				$.ajax({
-					url : iconPath,
-					dataType : 'text',
-					success : function(response) {
-						layout.toolMetadata[learningLibraryID].iconCode = response.substring(response.indexOf('<svg'));
-					}
-				});
-			}
-			
 			if (!isReadOnlyMode) {
 				// if a tool's name is too long and gets broken into two lines
 				// make some adjustments to layout
@@ -214,11 +206,14 @@ GeneralInitLib = {
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
-							eventY = translatedEvent[1];
-					    
+							eventY = translatedEvent[1],
+							iconPath = layout.toolMetadata[learningLibraryID],
+							pngPath = iconPath && /\.svg$/i.test(iconPath)
+								? iconPath.substring(0, iconPath.indexOf('.svg')) + '.png' : iconPath;
+										    
 					    if (activityCategoryID == 5) {
 					    	// construct child activities out of previously referenced HTML templates
-					    	var childActivityDefs = [];
+					    	var childActivities = [];
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
 					    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
 					    			childToolID = +$(this).attr('toolId'),
@@ -227,10 +222,10 @@ GeneralInitLib = {
 					    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
 					    		
 					    		layout.activities.push(childActivity);
-					    		childActivityDefs.push(childActivity);
+					    		childActivities.push(childActivity);
 					    	});
 					    	
-					    	activity = new ActivityDefs.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivityDefs);
+					    	activity = new ActivityDefs.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivities);
 					    } else {
 					    	activity = new ActivityDefs.ToolActivity(null, null, null, toolID, learningLibraryID, null, x, y, label);
 					    }
@@ -238,6 +233,20 @@ GeneralInitLib = {
 						layout.activities.push(activity);
 						HandlerLib.dropObject(activity);
 						ActivityLib.dropActivity(activity, eventX, eventY);
+						
+						// precache PNG icons for SVG export
+						if (pngPath && !layout.iconLib[pngPath]) {
+							var ajax = new XMLHttpRequest();
+							ajax.open("GET", pngPath, true);
+							ajax.responseType = "arraybuffer";
+							ajax.onload = function() {
+								if (ajax.response) {
+					                layout.iconLib[pngPath] =
+					                	'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, new Uint8Array(ajax.response)));
+								}
+				            };
+				            ajax.send(null);
+						}
 				   }
 			});
 		}
@@ -635,6 +644,77 @@ GeneralInitLib = {
 								}
 				             }
 			]),
+			
+			'buttonsImportPart' : sharedButtons.concat([
+     			             {
+     			            	'id'	 : 'importPartLdStoreButton',
+     			            	'class'  : 'defaultFocus',
+     			            	'text'   : LABELS.IMPORT_BUTTON,
+     			            	'click'  : function() {
+     			            		var dialog = $(this),
+     			            			frameActivities = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout.activities,
+     			            			selectedActivities = [],
+     			            			addActivities = [];
+     			            		
+     			            		$.each(frameActivities, function(){
+     			            			if (this.items.selectEffect) {
+     			            				selectedActivities.push(this);
+     			            				dialog.dialog('option', 'importActivity')(this, addActivities);
+     			            			}
+     			            		});
+     			            		
+     			            		if (selectedActivities.length == 0) {
+     			            			alert('Click on activities to select them for import');
+     			            			return;
+     			            		}
+     			            		
+     			            		// add child activities to containers (Optional/Parallel/Floating)
+     			            		if (addActivities.length > 0) {
+	     			            		$.each(addActivities, function(){
+	     			            			var activity = this;
+	     			            			if (activity.childActivities) {
+	     			            				$.each(selectedActivities, function(){
+		     			            				if (this.uiid == activity.uiid) {
+		     			            					$.each(this.childActivities, function(){
+		     			            						var childActivity = this;
+		     			            						$.each(addActivities, function(){
+		     			            							if (this.uiid == childActivity.uiid) {
+		     			            								if (!activity.childActivities) {
+		     			            									activity.childActivities = [];
+		     			            								}
+		     			            								activity.childActivities.push(this);
+		     			            								// container will expand to its child activities
+		     			            								activity.draw(0, 0);
+		     			            							}
+		     			            						});
+		     			            					});
+		     			            				}
+		     			            			});
+	     			            			}
+	     			            		});
+     			            			
+	     			            		// put UIID specific to current LD
+	     			            		$.each(addActivities, function(){
+	     			            			if (this instanceof ActivityDefs.BranchingEdgeActivity) {
+	     			            				if (this.isStart) {
+	     			            					this.branchingActivity.uiid = ++layout.ld.maxUIID;
+	     			            				}
+	     			            			} else {
+	     			            				this.uiid = ++layout.ld.maxUIID;
+	     			            			}
+	     			            		});
+	     			            		
+	     			            		// arrange just the new activities
+	     			            		GeneralLib.arrangeActivities(addActivities);
+	     			            		
+	     			            		layout.activities = layout.activities.concat(addActivities);
+     			            		}
+     			            		
+     			            		dialog.dialog('close');
+     							}
+     			           }
+     		]),
+			             			
 			'open' : function(){
 				GeneralLib.showLearningDesignThumbnail();
 				
@@ -652,16 +732,128 @@ GeneralInitLib = {
 				$('.defaultFocus').focus();
 				
 				$(this).dialog('option', 'copiedResource', null);
+			},
+			
+			/**
+			 * Extracts a selected activity from another LD.
+			 */
+			'importActivity' : function(activity, addActivities) {
+				$.each(addActivities, function(){
+					if (this.uiid == activity.uiid) {
+						return;
+					}
+				});
+				
+				// activities in the another LD have different clousures, so they can not be imported directly
+				// they need to be recreated from a scratch with current LD being their context
+				var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
+	     			frameActivities = frameWindow.layout.activities,
+	     			frameActivityDefs = frameWindow.ActivityDefs,
+	     			// the local activity
+	     			addActivity = null;
+
+				if (activity instanceof frameActivityDefs.BranchingEdgeActivity) {
+					// add both branching edges right away
+					if (activity.isStart) {
+						var branchingActivity = activity.branchingActivity,
+							branchingEdge = addActivity = new ActivityDefs.BranchingEdgeActivity(
+								null, branchingActivity.uiid, 0, 0, branchingActivity.title, branchingActivity.branchingType);
+						
+						branchingEdge = new ActivityDefs.BranchingEdgeActivity(
+								null, null, 0, 0, null, null, branchingEdge.branchingActivity);
+						addActivities.push(branchingEdge);
+						
+						if (branchingActivity.branchingType == 'optional'){
+							branchingEdge.branchingActivity.minOptions = branchingActivity.minOptions;
+							branchingEdge.branchingActivity.maxOptions = branchingActivity.maxOptions;
+						}
+					}
+				} else if (activity instanceof frameActivityDefs.FloatingActivity) {
+					if (layout.floatingActivity) {
+						return;
+					}
+					addActivity = new ActivityDefs.FloatingActivity(null, activity.uiid, 0, 0);
+				} else if (activity instanceof frameActivityDefs.GateActivity) {
+					addActivity = new ActivityDefs.GateActivity(
+							null, activity.uiid, 0, 0, activity.title, activity.description, activity.gateType,
+							activity.startTimeoffset, activity.gateActivityCompletionBased
+							);
+				} else if (activity instanceof frameActivityDefs.GroupingActivity) {
+					addActivity = new ActivityDefs.GroupingActivity(
+							null, activity.uiid, 0, 0, activity.title, null, null, activity.groupingType, activity.groupDivide,
+							activity.groupCount, activity.learnerCount, activity.equalSizes, activity.viewLearners, null
+							);
+				} else if (activity instanceof frameActivityDefs.OptionalActivity) {
+					addActivity = new ActivityDefs.OptionalActivity(
+							null, activity.uiid, 0, 0, activity.title, activity.minOptions, activity.maxOptions
+							);
+				} else if (activity instanceof frameActivityDefs.ParallelActivity) {
+					addActivity = new ActivityDefs.ParallelActivity(
+							null, activity.uiid, activity.learningLibraryID, 0, 0, activity.title
+							);
+				} else if (activity instanceof frameActivityDefs.ToolActivity) {
+					addActivity = new ActivityDefs.ToolActivity(
+							null, activity.uiid, null, activity.toolID, activity.learningLibraryID, null, 0, 0, activity.title
+							);
+				}
+				
+				// recreate the transitions
+				if (addActivity) {
+					if (activity.transitions) {
+						$.each(activity.transitions.from, function(){
+							var transition = this;
+							$.each(addActivities, function(){
+								// special processing for transitions from/to branching edges
+								var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
+								 		 ? this.branchingActivity.uiid : this.uiid,
+									toUiid = transition.toActivity instanceof frameActivityDefs.BranchingEdgeActivity
+										   ? transition.toActivity.branchingActivity.uiid : transition.toActivity.uiid;
+								// isStart can be undefined, true or false
+								if (uiid == toUiid && this.isStart == transition.toActivity.isStart) {
+									ActivityLib.addTransition(addActivity, this, true, null, null,
+															  transition.branch ? transition.branch.title : null);
+									return false;
+								}
+							});
+						});
+						
+						$.each(activity.transitions.to, function(){
+							var transition = this;
+							$.each(addActivities, function(){
+								var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
+										 ? this.branchingActivity.uiid : this.uiid,
+									fromUiid = transition.fromActivity instanceof frameActivityDefs.BranchingEdgeActivity
+										 ? transition.fromActivity.branchingActivity.uiid : transition.fromActivity.uiid;
+								if (uiid == fromUiid && this.isStart == transition.fromActivity.isStart) {
+									ActivityLib.addTransition(this, addActivity, true, null, null,
+															  transition.branch ? transition.branch.title : null);
+									return false;
+								}
+							});
+						});
+					}
+
+					addActivities.push(addActivity);
+				}
 			}
 		});
 		
 		layout.dialogs.push(layout.ldStoreDialog);
 		
+		
 		$('#ldScreenshotAuthor', layout.ldStoreDialog).load(function(){
 			// hide "loading" animation
-			$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).css('display', 'none');
+			$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).hide();
 			// show the thumbnail
-			$(this).css('display', 'inline');
+			$(this).show();
+		});
+
+		$('#ldStoreDialogImportPartFrame').load(function() {
+			if (!$(this).attr('src')){
+				return;
+			}
+			
+		    $(this).css('visibility', 'visible').height(+$(this).contents().find('svg').attr('height') + 20);
 		});
 		
 		// there should be no focus, just highlight
@@ -685,14 +877,14 @@ GeneralInitLib = {
 		});
 		tree.singleNodeHighlight = true;
 		tree.subscribe('clickEvent', function(event){
-			var isSaveDialog = layout.ldStoreDialog.hasClass('ldStoreDialogSave');
+			var isSaveDialog = layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogSave');
 		
 			$('.leftDialogButton')
 			   .attr('disabled', event.node.highlightState > 0 ? 'disabled' : null)
 			   .button('option', 'disabled', event.node.highlightState > 0);
 
 			if (!isSaveDialog && !event.node.data.learningDesignId){
-				// it is a folder in load sequence dialog, hightlight but stop processing
+				// it is a folder in load sequence dialog, highlight but stop processing
 				return true;
 			}
 			
@@ -714,12 +906,14 @@ GeneralInitLib = {
 			'hide'       : 'fold',
 			'draggable'  : false,
 			'dialogClass': 'dialog-no-title',
-			'position'   : {
+			'defaultPosition' : {
 							my: "right top",
 						    at: "right top+5px",
 						    of: '#canvas'
 					      }
 		});
+		
+		layout.infoDialog.dialog('option', 'position', layout.infoDialog.dialog('option', 'defaultPosition'));
 		
 		layout.dialogs.push(layout.infoDialog);
 		
@@ -774,14 +968,18 @@ GeneralLib = {
 	/**
 	 * Sorts activities on canvas.
 	 */
-	arrangeActivities : function(){
-		if ((layout.regions.length > 0 || layout.labels.length > 0)
-			&& !isReadOnlyMode && !confirm(LABELS.ARRANGE_CONFIRM)) {
+	arrangeActivities : function(activities){
+		// when importing parts of another LD, activities get appended and only they get sorted
+		var append = activities,
+			activities = activities || layout.activities;
+		
+		if (activities.length == 0) {
+			// no activities, nothing to do
 			return;
 		}
-
-		if (layout.activities.length == 0) {
-			// no activities, nothing to do
+		
+		if (!append && (layout.regions.length > 0 || layout.labels.length > 0)
+			&& !isReadOnlyMode && !confirm(LABELS.ARRANGE_CONFIRM)) {
 			return;
 		}
 		
@@ -790,11 +988,20 @@ GeneralLib = {
 			HandlerLib.resetCanvasMode(true);
 		}
 		
+		var row = 0;
+		if (append) {
+			// find the lowest existing activity and append the new activities beneath
+			$.each(layout.activities, function(){
+				row = Math.max(row,
+						Math.ceil((this.items.getBBox().y2 - layout.conf.arrangeVerticalPadding)
+								/ layout.conf.arrangeVerticalSpace));
+			});
+		}
+		
 		// activities are arranged in a grid
-		var row = 0,
+		var column = 0,
 			// for special cases when row needs to shifted more
 			forceRowY = null,
-			column = 0,
 			// check how many columns current paper can hold
 			maxColumns = Math.floor((paper.width - layout.conf.arrangeHorizontalPadding)
 					                 / layout.conf.arrangeHorizontalSpace),
@@ -805,7 +1012,7 @@ GeneralLib = {
 			// just to speed up processing when there are only activities with no transitions left
 			onlyDetachedLeft = false;
 	
-		$.each(layout.activities, function(){
+		$.each(activities, function(){
 			if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)){
 				activitiesCopy.push(this);
 			}
@@ -813,7 +1020,7 @@ GeneralLib = {
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
 		// find the longes branch to find the new paper size
-		$.each(layout.activities, function(){
+		$.each(activities, function(){
 			if (this instanceof ActivityDefs.BranchingEdgeActivity && this.isStart) {
 				// refresh branching metadata
 				ActivityLib.updateBranchesLength(this.branchingActivity);
@@ -826,8 +1033,8 @@ GeneralLib = {
 		});
 		
 		// check how many child activities are in Floating Activity, if any
-		if (layout.floatingActivity && layout.floatingActivity.childActivityDefs.length > subsequenceMaxLength) {
-				subsequenceMaxLength = childActivityDefs.length;
+		if (layout.floatingActivity && layout.floatingActivity.childActivities.length > subsequenceMaxLength) {
+				subsequenceMaxLength = childActivities.length;
 		}
 		
 		// resize paper horizontally, if needed
@@ -956,7 +1163,7 @@ GeneralLib = {
 					
 					// learn where a tall Optional Activity has its end
 					// and later start drawing activities lower than in the next row
-					if (activity instanceof DecorationDefs.Container && activity.childActivityDefs.length > 1) {
+					if (activity instanceof DecorationDefs.Container && activity.childActivities.length > 1) {
 						var activityEndY = activity.items.shape.getBBox().y2;
 						if (!forceRowY || activityEndY > forceRowY) {
 							forceRowY = activityEndY;
@@ -1043,7 +1250,7 @@ GeneralLib = {
 		}
 		
 		// redraw transitions one by one
-		$.each(layout.activities, function(){
+		$.each(activities, function(){
 			$.each(this.transitions.from.slice(), function(){
 				ActivityLib.addTransition(this.fromActivity, this.toActivity, true);
 			});
@@ -1437,10 +1644,10 @@ GeneralLib = {
 						
 						if (layout.floatingActivity && layout.floatingActivity.id == activityData.parentActivityID) {
 							// add a Tool Activity as a Floating Activity element
-							if (!layout.floatingActivity.childActivityDefs) {
-								layout.floatingActivity.childActivityDefs = [];
+							if (!layout.floatingActivity.childActivities) {
+								layout.floatingActivity.childActivities = [];
 							}
-							layout.floatingActivity.childActivityDefs.push(activity);
+							layout.floatingActivity.childActivities.push(activity);
 							activity.parentActivity = layout.floatingActivity;
 							if (!arrangeNeeded){
 								// if no auto re-arrange will be done, just redraw the container with its child activities 
@@ -1455,10 +1662,10 @@ GeneralLib = {
 										&& (this instanceof ActivityDefs.ParallelActivity
 											|| this instanceof ActivityDefs.OptionalActivity)) {
 									// add a Tool Activity as a Optional/Parallel Activity element
-									if (!this.childActivityDefs) {
-										this.childActivityDefs = [];
+									if (!this.childActivities) {
+										this.childActivities = [];
 									}
-									this.childActivityDefs.push(activity);
+									this.childActivities.push(activity);
 									activity.parentActivity = this;
 									if (!arrangeNeeded) {
 										// if no auto re-arrange will be done, just redraw the container with its child activities
@@ -1614,11 +1821,11 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					var dialog = layout.infoDialog.html(LABELS.SEQUENCE_NOT_VALID);
-					dialog.dialog('open');
+					layout.infoDialog.text(LABELS.SEQUENCE_NOT_VALID)
+									 .dialog('open');
 					
 					setTimeout(function(){
-						dialog.text('').dialog('close');
+						layout.infoDialog.text('').dialog('close');
 					}, 5000);
 				}
 			}
@@ -2239,16 +2446,27 @@ GeneralLib = {
 	 */
 	showLearningDesignThumbnail : function(learningDesignID, title) {
 		// display "loading" animation and finally LD thumbnail
-		$('.ldChoiceDependentCanvasElement').css('display', 'none');
+		$('.ldChoiceDependentCanvasElement').hide();
+		// the "import part" frame can't use "display:none" CSS attribute as its JS won't execute right
+		$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).css('visibility', 'hidden');
+		
 		if (learningDesignID) {
-			$('#ldScreenshotLoading', layout.ldStoreDialog).css('display', 'inline');
-			// get the image of the chosen LD and prevent caching
-			$('#ldScreenshotAuthor', layout.ldStoreDialog)
-				.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_=' + new Date().getTime())
-				.css({
-				'width'  : 'auto',
-				'height' : 'auto'
-			});
+			if (layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogImportPart')) {
+				// get read-only Authoring of the chosen LD and prevent caching
+				$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).attr('src',
+				  LAMS_URL + 'authoring/author.do?method=generateSVG&selectable=true&learningDesignID='
+				  		   + learningDesignID + '&_=' + new Date().getTime());
+			} else {
+				$('#ldScreenshotLoading', layout.ldStoreDialog).show();
+				// get the image of the chosen LD and prevent caching
+				$('#ldScreenshotAuthor', layout.ldStoreDialog)
+					.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_=' + new Date().getTime())
+					.css({
+						'width'  : 'auto',
+						'height' : 'auto'
+					});
+			}
+			
 			if (title) {
 				// copy title of the highligthed sequence to title field
 				$('#ldStoreDialogNameField').val(title).focus();
@@ -2322,7 +2540,7 @@ GeneralLib = {
 									return;
 								}
 								
-								var	isSaveDialog = layout.ldStoreDialog.hasClass('ldStoreDialogSave'),
+								var	isSaveDialog = layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogSave'),
 									learningDesignID = +accessEntry.attr('learningDesignId'),
 									title = isSaveDialog ? accessEntry.text() : null;
 									

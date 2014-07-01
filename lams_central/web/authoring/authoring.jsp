@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>Flashless Authoring</title>
+	<title><fmt:message key="authoring.fla.page.title" /></title>
 	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
@@ -40,117 +40,118 @@
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
 			LABELS = {
 				// ActivityLib
-				DEFAULT_GROUPING_TITLE : 'Grouping',
-				DEFAULT_GROUP_PREFIX : 'Group ',
-				DEFAULT_BRANCHING_TITLE :'Branching',
-				DEFAULT_BRANCH_PREFIX : 'Branch ',
-				DEFAULT_OPTIONAL_ACTIVITY_TITLE : 'Optional Activity',
-				SUPPORT_ACTIVITY_TITLE : 'Support Activity',
-				GATE_ACTIVITY_LABEL : 'STOP',
-				BRANCHING_START_SUFFIX : 'start',
-				BRANCHING_END_SUFFIX : 'end',
-				REMOVE_ACTIVITY_CONFIRM : 'Are you sure you want to remove the whole branching activity?',
-				BRANCHING_CREATE_CONFIRM : 'Transition from this activity already exists.\nDo you want to create branching here?',
-				TRANSITION_TO_EXISTS_ERROR : 'Transition to this activity already exists',
+				DEFAULT_GROUPING_TITLE : '<fmt:message key="authoring.fla.default.group.title" />',
+				DEFAULT_GROUP_PREFIX : '<fmt:message key="authoring.fla.default.group.prefix" />',
+				DEFAULT_BRANCHING_TITLE : '<fmt:message key="authoring.fla.default.branching.title" />',
+				DEFAULT_BRANCH_PREFIX : '<fmt:message key="authoring.fla.default.branch.prefix" />',
+				DEFAULT_OPTIONAL_ACTIVITY_TITLE : '<fmt:message key="authoring.fla.default.optional.activity.title" />',
+				SUPPORT_ACTIVITY_TITLE : '<fmt:message key="authoring.fla.support.activity.title" />',
+				GATE_ACTIVITY_LABEL : '<fmt:message key="authoring.fla.gate.activity.label" />',
+				BRANCHING_START_SUFFIX : '<fmt:message key="authoring.fla.branching.start.suffix" />',
+				BRANCHING_END_SUFFIX : '<fmt:message key="authoring.fla.branching.end.suffix" />',
+				REMOVE_ACTIVITY_CONFIRM : '<fmt:message key="authoring.fla.remove.activity.confirm" />',
+				BRANCHING_CREATE_CONFIRM : '<fmt:message key="authoring.fla.branching.create.confirm" />',
+				TRANSITION_TO_EXISTS_ERROR : '<fmt:message key="authoring.fla.transition.to.exists.error" />',
 				
 				// DecorationLib
-				DEFAULT_ANNOTATION_LABEL_TITLE : 'Label',
-				REGION_FIT_BUTTON_TOOLTIP : 'Fit',
+				DEFAULT_ANNOTATION_LABEL_TITLE : '<fmt:message key="authoring.fla.default.annotation.label.title" />',
+				REGION_FIT_BUTTON_TOOLTIP : '<fmt:message key="authoring.fla.region.fit.button.tooltip" />',
 				
 				// General
-				NEW_FOLDER_BUTTON : 'New',
-				COPY_BUTTON : 'Copy',
-				PASTE_BUTTON : 'Paste',
-				DELETE_BUTTON : 'Delete',
-				RENAME_BUTTON : 'Rename',
-				OPEN_BUTTON : 'Open',
-				SAVE_BUTTON : 'Save',
-				FOLDER : 'folder',
-				SEQUENCE : 'sequence',
-				SEQUENCE_NOT_VALID : 'The sequence is not valid.<br />It needs to be corrected before it can be used in lessons.',
-				SEQUENCE_VALIDATION_ISSUES : 'While saving the sequence there were following validation issues:',
-				SAVE_SUCCESSFUL : 'Congratulations! Your design is valid and has been saved.',
-				NAVIGATE_AWAY_CONFIRM : 'Your design is not saved.\nAny changes you made since you last saved will be lost.',
-				DELETE_NODE_CONFIRM : 'Are you sure you want to delete this ',
-				SEQUENCE_OVERWRITE_CONFIRM : 'Are you sure you want to overwrite the existing sequence?',
-				NEW_FOLDER_TITLE_PROMPT : 'Please enter the name for a new folder',
-				RENAME_TITLE_PROMPT : 'Please enter the new name for ',
-				SAVE_SEQUENCE_TITLE_PROMPT : 'Please enter a title for the sequence',
-				FOLDER_NOT_SELECTED_ERROR : 'Please choose a folder',
-				TITLE_VALIDATION_ERROR : 'The title can not contain any of these characters < > ^ * @ % $',
-				FOLDER_EXISTS_ERROR : 'A folder with this name already exists.',
-				SEQUENCE_EXISTS_ERROR : 'A sequence with this name already exists.',
-				SEQUENCE_SAVE_ERROR : 'Error while loading sequence',
-				SEQUENCE_NOT_SELECTED_ERROR : 'Please choose a sequence',
-				SEQUENCE_LOAD_ERROR : 'Error while loading the sequence',
+				NEW_FOLDER_BUTTON : '<fmt:message key="authoring.fla.new.folder.button" />',
+				COPY_BUTTON : '<fmt:message key="authoring.fla.copy.button" />',
+				PASTE_BUTTON : '<fmt:message key="authoring.fla.paste.button" />',
+				DELETE_BUTTON : '<fmt:message key="authoring.fla.delete.button" />',
+				RENAME_BUTTON : '<fmt:message key="authoring.fla.rename.button" />',
+				OPEN_BUTTON : '<fmt:message key="authoring.fla.open.button" />',
+				SAVE_BUTTON : '<fmt:message key="authoring.fla.save.button" />',
+				IMPORT_BUTTON : '<fmt:message key="authoring.fla.import.button" />',
+				FOLDER : '<fmt:message key="authoring.fla.folder" />',
+				SEQUENCE : '<fmt:message key="authoring.fla.sequence" />',
+				SEQUENCE_NOT_VALID : '<fmt:message key="authoring.fla.sequence.not.valid" />',
+				SEQUENCE_VALIDATION_ISSUES : '<fmt:message key="authoring.fla.sequence.validation.issues" />',
+				SAVE_SUCCESSFUL : '<fmt:message key="authoring.fla.save.successful" />',
+				NAVIGATE_AWAY_CONFIRM : '<fmt:message key="authoring.fla.navigate.away.confirm" />',
+				DELETE_NODE_CONFIRM : '<fmt:message key="authoring.fla.delete.node.confirm" />',
+				SEQUENCE_OVERWRITE_CONFIRM : '<fmt:message key="authoring.fla.sequence.overwrite.confirm" />',
+				NEW_FOLDER_TITLE_PROMPT : '<fmt:message key="authoring.fla.new.folder.title.prompt" />',
+				RENAME_TITLE_PROMPT : '<fmt:message key="authoring.fla.rename.title.prompt" />',
+				SAVE_SEQUENCE_TITLE_PROMPT : '<fmt:message key="authoring.fla.save.sequence.title.prompt" />',
+				IMPORT_PART_CHOOSE_PROMPT : '<fmt:message key="authoring.fla.import.part.choose.prompt" />',
+				FOLDER_NOT_SELECTED_ERROR : '<fmt:message key="authoring.fla.folder.not.selected.error" />',
+				TITLE_VALIDATION_ERROR : '<fmt:message key="authoring.fla.title.validation.error" />',
+				FOLDER_EXISTS_ERROR : '<fmt:message key="authoring.fla.folder.exists.error" />',
+				SEQUENCE_EXISTS_ERROR : '<fmt:message key="authoring.fla.sequence.exists.error" />',
+				SEQUENCE_SAVE_ERROR : '<fmt:message key="authoring.fla.sequence.save.error" />',
+				SEQUENCE_NOT_SELECTED_ERROR : '<fmt:message key="authoring.fla.sequence.not.selected.error" />',
+				SEQUENCE_LOAD_ERROR : '<fmt:message key="authoring.fla.sequence.load.error" />',
 				
 				// HandlerLib
-				TRANSITION_FROM_EXISTS_ERROR : 'Transition from this activity already exists',
+				TRANSITION_FROM_EXISTS_ERROR : '<fmt:message key="authoring.fla.transition.from.exists.error" />',
 				
 				// MenuLib
-				EXPORT_IMAGE_DIALOG_TITLE : 'Image export',
-				EXPORT_SEQUENCE_DIALOG_TITLE : 'Sequence export',
-				ACTIVITY_COPY_TITLE_PREFIX : 'Copy [0] of ',
-				PREVIEW_LESSON_DEFAULT_TITLE : 'Preview',
-				SAVE_DIALOG_TITLE : 'Save sequence',
-				OPEN_DIALOG_TITLE : 'Open sequence',
+				EXPORT_IMAGE_DIALOG_TITLE : '<fmt:message key="authoring.fla.export.image.dialog.title" />',
+				EXPORT_SEQUENCE_DIALOG_TITLE : '<fmt:message key="authoring.fla.export.sequence.dialog.title" />',
+				ACTIVITY_COPY_TITLE_PREFIX : '<fmt:message key="authoring.fla.activity.copy.title.prefix" />',
+				PREVIEW_LESSON_DEFAULT_TITLE : '<fmt:message key="authoring.fla.preview.lesson.default.title" />',
+				SAVE_DIALOG_TITLE : '<fmt:message key="authoring.fla.save.dialog.title" />',
+				OPEN_DIALOG_TITLE : '<fmt:message key="authoring.fla.open.dialog.title" />',
+				IMPORT_PART_DIALOG_TITLE : '<fmt:message key="authoring.fla.import.part.dialog.title" />',
 				RUN_SEQUENCES_FOLDER : '<fmt:message key="label.tab.lesson.sequence.folder" />',
-				ARRANGE_CONFIRM : 'There are annotations on the canvas.\n'
-	   				+ 'They will be not arranged automatically, you will have to adjust them manually later.\n'
-	   				+ 'Do you want to continue?',
-				CLEAR_CANVAS_CONFIRM : 'Are you sure you want to remove all existing elements?',
-				BRANCHING_START_PLACE_PROMPT : 'Place the branching point',
-				BRANCHING_END_PLACE_PROMPT : 'Place the converge point',
-				ANNOTATION_REGION_PLACE_PROMPT : 'Click and hold to start drawing an annotation region',
-				ANNOTATION_LABEL_PLACE_PROMPT : 'Click to add an annotation label',
-				OPTIONAL_ACTIVITY_PLACE_PROMPT : 'Click to add an optional activity container.',
-				SUPPORT_ACTIVITY_PLACE_PROMPT : 'Click to add a support activity container.',
-				TRANSITION_PLACE_PROMPT : 'Click on an activity',
-				PASTE_ERROR : 'Sorry, you can not paste this type of activity',
-				PREVIEW_ERROR : 'Error while initialising lesson for preview',
+				ARRANGE_CONFIRM : '<fmt:message key="authoring.fla.arrange.confirm" />',
+				CLEAR_CANVAS_CONFIRM : '<fmt:message key="authoring.fla.clear.canvas.confirm" />',
+				BRANCHING_START_PLACE_PROMPT : '<fmt:message key="authoring.fla.range.condition.description" />',
+				BRANCHING_END_PLACE_PROMPT : '<fmt:message key="authoring.fla.branching.end.place.prompt" />',
+				ANNOTATION_REGION_PLACE_PROMPT : '<fmt:message key="authoring.fla.annotation.region.place.prompt" />',
+				ANNOTATION_LABEL_PLACE_PROMPT : '<fmt:message key="authoring.fla.annotation.label.place.prompt" />',
+				OPTIONAL_ACTIVITY_PLACE_PROMPT : '<fmt:message key="authoring.fla.optional.activity.place.prompt" />',
+				SUPPORT_ACTIVITY_PLACE_PROMPT : '<fmt:message key="authoring.fla.support.activity.place.prompt" />',
+				TRANSITION_PLACE_PROMPT : '<fmt:message key="authoring.fla.transition.place.prompt" />',
+				PASTE_ERROR : '<fmt:message key="authoring.fla.paste.error" />',
+				PREVIEW_ERROR : '<fmt:message key="authoring.fla.preview.error" />',
 				
 				// PropertyLib
-				OK_BUTTON : 'OK',
-				CANCEL_BUTTON : 'Cancel',
-				CLEAR_ALL_BUTTON : 'Clear all',
-				REFRESH_BUTTON : 'Refresh',
-				REMOVE_CONDITION_BUTTON : 'Remove',
-				PROPERTIES_DIALOG_TITLE : 'Properties',
-				GROUP_NAMING_DIALOG_TITLE : 'Group Naming',
-				GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : 'Match Groups to Branches',
-				BRANCH_MAPPING_GROUPS_HEADER : 'Groups',
-				BRANCH_MAPPING_GROUP_HEADER : 'Group',
-				CONDITIONS_DIALOG_TITLE : 'Select Output Conditions for Input',
-				BRANCH_MAPPING_CONDITIONS_HEADER : 'Conditions',
-				BRANCH_MAPPING_CONDITION_HEADER : 'Condition',
-				BRANCH_MAPPING_GATE_HEADER : 'Gate',
-				BRANCH_MAPPING_BRANCHES_HEADER : 'Branches',
-				BRANCH_MAPPING_BRANCH_HEADER : 'Branch',
-				GATE_STATE_MAPPING_DIALOG_TITLE : 'Map gate conditions',
-				BRANCH_MAPPING_DIALOG_TITLE : 'Match conditions to branches',
-				GATE_STATE_OPEN : 'open',
-				GATE_STATE_CLOSED : 'closed',
-				BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ' (default)',
-				COMPLEX_OUTPUT_SUFFIX : ' (user defined)',
-				RANGE_OUTPUT_SUFFIX : ' (range)',
-				RANGE_CONDITION_DESCRIPTION : 'Range [0] to [1]',
-				EXACT_CONDITION_DESCRIPTION : 'Exact value of ',
-				LESS_CONDITION_DESCRIPTION : 'Less than or eq ',
-				GREATER_CONDITION_DESCRIPTION : 'Greater than or eq ',
-				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : 'Untitled ',
-				CLEAR_ALL_CONFIRM : 'There are conditions linked to an existing branch.\nDo you wish to remove them?',
-				REMOVE_CONDITION_CONFIRM : 'This condition is linked to an existing branch.\nDo you wish to remove it?',
-				REFRESH_CONDITIONS_CONFIRM : 'You are about to update your conditions for the selected output definition.\n'
-										   + 'This will clear all links to existing branches.\nDo you wish to continue?',
-				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : 'All remaining conditions will be mapped to the selected gate\'s closed state',
-				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : 'All remaining conditions will be mapped to the default branch',
-				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : 'All remaining groups will be mapped to the default branch',
-				RANGE_CONDITION_ADD_START_ERROR : 'The start value can not be within the range of an existing condition',
-				RANGE_CONDITION_ADD_END_ERROR : 'The end value can not be within the range of an existing condition',
-				GROUP_TITLE_VALIDATION_ERORR : 'Group name can not contain any of these characters < > ^ * @ % $'
+				OK_BUTTON : '<fmt:message key="authoring.fla.ok.button" />',
+				CANCEL_BUTTON : '<fmt:message key="authoring.fla.cancel.button" />',
+				CLEAR_ALL_BUTTON : '<fmt:message key="authoring.fla.clear.all.button" />',
+				REFRESH_BUTTON : '<fmt:message key="authoring.fla.refresh.button" />',
+				REMOVE_CONDITION_BUTTON : '<fmt:message key="authoring.fla.remove.condition.button" />',
+				PROPERTIES_DIALOG_TITLE : '<fmt:message key="authoring.fla.properties.dialog.title" />',
+				GROUP_NAMING_DIALOG_TITLE : '<fmt:message key="authoring.fla.group.naming.dialog.title" />',
+				GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : '<fmt:message key="authoring.fla.groups.to.branches.match.dialog_title" />',
+				BRANCH_MAPPING_GROUPS_HEADER : '<fmt:message key="authoring.fla.branch.mapping.groups.header" />',
+				BRANCH_MAPPING_GROUP_HEADER : '<fmt:message key="authoring.fla.branch.mapping.group.header" />',
+				CONDITIONS_DIALOG_TITLE : '<fmt:message key="authoring.fla.conditions.dialog.title" />',
+				BRANCH_MAPPING_CONDITIONS_HEADER : '<fmt:message key="authoring.fla.branch.mapping.conditions.header" />',
+				BRANCH_MAPPING_CONDITION_HEADER : '<fmt:message key="authoring.fla.branch.mapping.condition.header" />',
+				BRANCH_MAPPING_GATE_HEADER : '<fmt:message key="authoring.fla.branch.mapping.gate.header" />',
+				BRANCH_MAPPING_BRANCHES_HEADER : '<fmt:message key="authoring.fla.branch.mapping.branches.header" />',
+				BRANCH_MAPPING_BRANCH_HEADER : '<fmt:message key="authoring.fla.branch.mapping.branch.header" />',
+				GATE_STATE_MAPPING_DIALOG_TITLE : '<fmt:message key="authoring.fla.gate.state.mapping.dialog.title" />',
+				BRANCH_MAPPING_DIALOG_TITLE : '<fmt:message key="authoring.fla.branch.mapping.dialog.title" />',
+				GATE_STATE_OPEN : '<fmt:message key="authoring.fla.gate.state.open" />',
+				GATE_STATE_CLOSED : '<fmt:message key="authoring.fla.gate.state.closed" />',
+				BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : '<fmt:message key="authoring.fla.branch.mapping.default.branch.suffix" />',
+				COMPLEX_OUTPUT_SUFFIX : '<fmt:message key="authoring.fla.complex.output.suffix" />',
+				RANGE_OUTPUT_SUFFIX : '<fmt:message key="authoring.fla.range.output.suffix" />',
+				RANGE_CONDITION_DESCRIPTION : '<fmt:message key="authoring.fla.range.condition.description" />',
+				EXACT_CONDITION_DESCRIPTION : '<fmt:message key="authoring.fla.exact.condition.description" />',
+				LESS_CONDITION_DESCRIPTION : '<fmt:message key="authoring.fla.less.condition.description" />',
+				GREATER_CONDITION_DESCRIPTION : '<fmt:message key="authoring.fla.greater.condition.description" />',
+				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<fmt:message key="authoring.fla.default.range.condition.title.prefix" />',
+				CLEAR_ALL_CONFIRM : '<fmt:message key="authoring.fla.clear.all.confirm" />',
+				REMOVE_CONDITION_CONFIRM : '<fmt:message key="authoring.fla.remove.condition.confirm" />',
+				REFRESH_CONDITIONS_CONFIRM : '<fmt:message key="authoring.fla.refresh.conditions.confirm" />',
+				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : '<fmt:message key="authoring.fla.conditions.to.default.gate.state.confirm" />',
+				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : '<fmt:message key="authoring.fla.conditions.to.default.branch.confirm" />',
+				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : '<fmt:message key="authoring.fla.groups.to.default.branch.confirm" />',
+				RANGE_CONDITION_ADD_START_ERROR : '<fmt:message key="authoring.fla.range.condition.add.start.error" />',
+				RANGE_CONDITION_ADD_END_ERROR : '<fmt:message key="authoring.fla.range.condition.add.end.error" />',
+				GROUP_TITLE_VALIDATION_ERORR : '<fmt:message key="authoring.fla.group.title.validation.erorr" />',
 			},
 			
 			isReadOnlyMode = false,
+			activitiesOnlySelectable = false,
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
 			initAccess = ${access};
@@ -159,95 +160,96 @@
 <body onresize="javascript:GeneralLib.resizePaper()">
 	<div id="toolbar" class="ui-corner-all">
 		<div class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
-			New
+			<fmt:message key="authoring.fla.page.menu.new" />
 		</div>
 		<div>
 			<div class="split-ui-button">
 				<div onClick="javascript:MenuLib.openLearningDesign()">
-					<span>Open</span>
+					<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.importLearningDesign()">Import</li>
+				<li onClick="javascript:MenuLib.importLearningDesign()"><fmt:message key="authoring.fla.page.menu.import" /></li>
+				<li onClick="javascript:MenuLib.importPartLearningDesign()"><fmt:message key="authoring.fla.page.menu.import.part" /></li>
 			</ul>
 		</div>
 		<div>
 			<div class="split-ui-button">
 				<div onClick="javascript:MenuLib.saveLearningDesign()">
-					<span>Save</span>
+					<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as</li>
-				<li id="exportButton">Export<span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
+				<li onClick="javascript:MenuLib.saveLearningDesign(true)"><fmt:message key="authoring.fla.page.menu.saveas" /></li>
+				<li id="exportButton"><fmt:message key="authoring.fla.page.menu.export" /><span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
 					<ul>
 						<li class="exportSequenceButton"
 							title="Standard LAMS ZIP format"
-							onClick="javascript:MenuLib.exportLearningDesign(1)">Sequence LAMS</li>
+							onClick="javascript:MenuLib.exportLearningDesign(1)"><fmt:message key="authoring.fla.page.menu.export.lams" /></li>
 						<li class="exportSequenceButton"
-							title="IMS Learning Design Level A Format (This format cannot be reimported back into LAMS. Export only!)"
-							onClick="javascript:MenuLib.exportLearningDesign(2)">Sequence IMS</li>
-						<li class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)">Image PNG</li>
-						<li class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)">Image SVG</li>
+							title="<fmt:message key='authoring.fla.page.menu.export.ims.tooltip' />"
+							onClick="javascript:MenuLib.exportLearningDesign(2)"><fmt:message key="authoring.fla.page.menu.export.ims" /></li>
+						<li class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)"><fmt:message key="authoring.fla.page.menu.export.png" /></li>
+						<li class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)"><fmt:message key="authoring.fla.page.menu.export.svg" /></li>
 					</ul>
 				</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
-			Copy
+			<fmt:message key="authoring.fla.page.menu.copy" />
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
-			Paste
+			<fmt:message key="authoring.fla.page.menu.paste" />
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.addTransition()">
-			Transition
+			<fmt:message key="authoring.fla.page.menu.transition" />
 		</div>
 		<div>
 			<div class="split-ui-button">
 				<div>
-					<span>Optional</span>
+					<span><fmt:message key="authoring.fla.page.menu.optional" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addOptionalActivity()">Activity</li>
-				<li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()">Support</li>
+				<li onClick="javascript:MenuLib.addOptionalActivity()"><fmt:message key="authoring.fla.page.menu.optional.activity" /></li>
+				<li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><fmt:message key="authoring.fla.page.menu.optional.support" /></li>
 			</ul>
 		</div>
 		<div>
 			<div class="split-ui-button">
 				<div>
-					<span>Flow</span>
+					<span><fmt:message key="authoring.fla.page.menu.flow" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addGate()">Gate</li>
-				<li onClick="javascript:MenuLib.addBranching()">Branch</li>
+				<li onClick="javascript:MenuLib.addGate()"><fmt:message key="authoring.fla.page.menu.flow.gate" /></li>
+				<li onClick="javascript:MenuLib.addBranching()"><fmt:message key="authoring.fla.page.menu.flow.branch" /></li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
-			Group
+			<fmt:message key="authoring.fla.page.menu.group" />
 		</div>
 		<div>
 			<div class="split-ui-button">
 				<div>
-					<span>Annotate</span>
+					<span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addAnnotationLabel()">Label</li>
-				<li onClick="javascript:MenuLib.addAnnotationRegion()">Region</li>
+				<li onClick="javascript:MenuLib.addAnnotationLabel()"><fmt:message key="authoring.fla.page.menu.annotate.label" /></li>
+				<li onClick="javascript:MenuLib.addAnnotationRegion()"><fmt:message key="authoring.fla.page.menu.annotate.region" /></li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:GeneralLib.arrangeActivities()">
-			Arrange
+			<fmt:message key="authoring.fla.page.menu.arrange" />
 		</div>
 		<div id="previewButton" class="ui-button" onClick="javascript:MenuLib.openPreview()">
-			Preview
+			<fmt:message key="authoring.fla.page.menu.preview" />
 		</div>
 		<!-- 
 		<div id="zoomButton" class="ui-button" onClick="javascript:MenuLib.zoom()">
@@ -284,21 +286,21 @@
 				<div id="ldDescriptionDiv">
 					<div id="ldDescriptionTitleContainer" title="Click to show the sequence description"
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
-						<span id="ldDescriptionFieldTitle">Untitled</span>
+						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
 						<span id="ldDescriptionHideTip">▼</span>
 					</div>
 					<div id="ldDescriptionDetails">
-						<div class="ldDescriptionLabel">Description:</div>
+						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.description" /></div>
 						<div id="ldDescriptionEditorContainer">
 							<lams:CKEditor id="ldDescriptionFieldDescription" value=""
 								   height="300px"
 								   contentFolderID="${contentFolderID}"/>
 						</div>
 						
-						<div class="ldDescriptionLabel">License:</div>
+						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license" /></div>
 						<select id="ldDescriptionLicenseSelect">
-							<option value="0" selected="selected">No license currently selected. Please select one.</option>
+							<option value="0" selected="selected"><fmt:message key="authoring.fla.page.ld.license.none" /></option>
 							<c:forEach var="license" items="${licenses}">
 								<option value="<c:out value='${license.licenseID}' escapeXml='true' />"
 										pictureURL="<c:out value='${license.pictureURL}' escapeXml='true' />"
@@ -312,7 +314,7 @@
 						<input id="ldDescriptionLicenseButton" class="button"
 							   type="button" value="View" />
 						<div id="ldDescriptionLicenseTextContainer">
-							<div class="ldDescriptionLabel">Additional license information:</div>
+							<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license.info" /></div>
 							<textarea id="ldDescriptionLicenseText" rows="5"></textarea>
 						</div>
 					</div>
@@ -336,18 +338,19 @@
 			    		<img id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement" />
 		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement"
 		    			     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+		    			<iframe id="ldStoreDialogImportPartFrame"></iframe>
 			    	</div>
 				</td>
 			</tr>
 			<tr>
 				<td id="ldStoreDialogAccessCell" >
-					<div id="ldStoreDialogAccessTitle">Recently used sequences</div>
+					<div id="ldStoreDialogAccessTitle"><fmt:message key="authoring.fla.page.dialog.access" /></div>
 				</td>
 			</tr>
 		</table>
-		<%-- This will be moved to dialog's button pane --%>
+		<%-- This will be moved to dialog's button pane using JS --%>
 		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-			<span>Title:</span><input id="ldStoreDialogNameField" type="text"/>
+			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" type="text"/>
 		</div>
 	</div>
 	
@@ -361,7 +364,7 @@
 				<td></td>
 				<td rowspan="2"></td>
 				<td colspan="2" class="branchMappingLabelCell">
-					Mappings
+					<fmt:message key="authoring.fla.page.dialog.mappings" />
 				</td>
 			</tr>
 			<tr>
@@ -390,7 +393,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -398,7 +401,7 @@
 			</tr>
 			<tr>
 				<td>
-					Default?
+					<fmt:message key="authoring.fla.page.prop.default" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldDefault" type="checkbox"></input>
@@ -411,7 +414,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -419,7 +422,7 @@
 			</tr>
 			<tr>
 				<td>
-					Grouping:
+					<fmt:message key="authoring.fla.page.prop.grouping" />
 				</td>
 				<td>
 					  <select class="propertiesContentFieldGrouping"></select>
@@ -433,7 +436,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -441,19 +444,19 @@
 			</tr>
 			<tr>
 				<td>
-					Grouping type:
+					<fmt:message key="authoring.fla.page.prop.grouping.type" />
 				</td>
 				<td>
 					 <select class="propertiesContentFieldGroupingType">
-					 	<option value="random">Random</option>
-					 	<option value="monitor">Choose in Monitor</option>
-					 	<option value="learner">Learner's choice</option>
+					 	<option value="random"><fmt:message key="authoring.fla.page.prop.grouping.type.random" /></option>
+					 	<option value="monitor"><fmt:message key="authoring.fla.page.prop.grouping.type.monitor" /></option>
+					 	<option value="learner"><fmt:message key="authoring.fla.page.prop.grouping.type.learner" /></option>
 					 </select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					Number of groups:
+					<fmt:message key="authoring.fla.page.prop.groups.number" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldGroupCountEnable" type="radio"
@@ -463,7 +466,7 @@
 			</tr>
 			<tr>
 				<td>
-					Number of learners:
+					<fmt:message key="authoring.fla.page.prop.groups.learners" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldLearnerCountEnable" type="radio"
@@ -473,7 +476,7 @@
 			</tr>
 			<tr>
 				<td>
-					Equal group sizes?
+					<fmt:message key="authoring.fla.page.prop.groups.equal" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldEqualSizes" type="checkbox"></input>
@@ -481,7 +484,7 @@
 			</tr>
 			<tr>
 				<td>
-					View learners before selection?
+					<fmt:message key="authoring.fla.page.prop.groups.view.learners" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldViewLearners" type="checkbox"></input>
@@ -489,7 +492,7 @@
 			</tr>
 			<tr>
 				<td colspan="2">
-					<div class="propertiesContentFieldNameGroups">Name Groups</div>
+					<div class="propertiesContentFieldNameGroups"><fmt:message key="authoring.fla.page.prop.groups.name" /></div>
 				</td>
 			</tr>
 		</table>
@@ -500,7 +503,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td colspan="3">
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -508,7 +511,7 @@
 			</tr>
 			<tr>
 				<td>
-					Description:
+					<fmt:message key="authoring.fla.page.prop.description" />
 				</td>
 				<td colspan="3">
 					 <textarea class="propertiesContentFieldDescription"></textarea>
@@ -516,20 +519,20 @@
 			</tr>
 			<tr>
 				<td>
-					Type:
+					<fmt:message key="authoring.fla.page.prop.gate.type" />
 				</td>
 				<td colspan="3">
 					 <select class="propertiesContentFieldGateType">
-					 	<option value="condition">Condition</option>
-					 	<option value="sync">Synchronise</option>
-					 	<option value="schedule">Schedule</option>
-					 	<option value="permission">Permission</option>
+					 	<option value="condition"><fmt:message key="authoring.fla.page.prop.gate.type.condition" /></option>
+					 	<option value="sync"><fmt:message key="authoring.fla.page.prop.gate.type.sync" /></option>
+					 	<option value="schedule"><fmt:message key="authoring.fla.page.prop.gate.type.schedule" /></option>
+					 	<option value="permission"><fmt:message key="authoring.fla.page.prop.gate.type.permission" /></option>
 					 </select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					Input (Tool):
+					<fmt:message key="authoring.fla.page.prop.input" />
 				</td>
 				<td>
 					  <select class="propertiesContentFieldInput"></select>
@@ -537,21 +540,21 @@
 			</tr>
 			<tr class="propertiesContentRowGateSchedule">
 				<td>
-					Delay:
+					<fmt:message key="authoring.fla.page.prop.gate.delay" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetDay spinner" type="text"></input> days
+					<input class="propertiesContentFieldOffsetDay spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.days" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetHour spinner" type="text"></input> hours
+					<input class="propertiesContentFieldOffsetHour spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.hours" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetMinute spinner" type="text"></input> minutes
+					<input class="propertiesContentFieldOffsetMinute spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.minutes" />
 				</td>
 			</tr>
 			<tr class="propertiesContentRowGateSchedule">
 				<td colspan="3">
-					Since learner finished previous activity?
+					<fmt:message key="authoring.fla.page.prop.gate.activity.finish.based" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox"></input>
@@ -559,12 +562,12 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<div class="propertiesContentFieldCreateConditions">Create conditions</div>
+					<div class="propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<div class="propertiesContentFieldMatchConditions">Map gate conditions</div>
+					<div class="propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></div>
 				</td>
 			</tr>
 		</table>
@@ -575,7 +578,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -583,51 +586,51 @@
 			</tr>
 			<tr>
 				<td>
-					Branching type:
+					<fmt:message key="authoring.fla.page.prop.branching.type" />
 				</td>
 				<td>
 					 <select class="propertiesContentFieldBranchingType">
-					 	<option value="chosen">Instructor's choice</option>
-					 	<option value="group">Group-based</option>
-					 	<option value="tool">Learner's output</option>
-					 	<option value="optional">Learner's choice</option>
+					 	<option value="chosen"><fmt:message key="authoring.fla.page.prop.branching.type.chose" /></option>
+					 	<option value="group"><fmt:message key="authoring.fla.page.prop.branching.type.group" /></option>
+					 	<option value="tool"><fmt:message key="authoring.fla.page.prop.branching.type.tool" /></option>
+					 	<option value="optional"><fmt:message key="authoring.fla.page.prop.branching.type.optional" /></option>
 					 </select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					Grouping:
+					<fmt:message key="authoring.fla.page.prop.grouping" />
 				</td>
 				<td>
-					  <select class="propertiesContentFieldGrouping"></select>
+					<select class="propertiesContentFieldGrouping"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					Input (Tool):
+					<fmt:message key="authoring.fla.page.prop.input" />
 				</td>
 				<td>
-					  <select class="propertiesContentFieldInput"></select>
+					<select class="propertiesContentFieldInput"></select>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<div class="propertiesContentFieldCreateConditions">Create conditions</div>
+					<div class="propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<div class="propertiesContentFieldMatchConditions">Match conditions to branches</div>
+					<div class="propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.branching.conditions.match" /></div>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
+					<div class="propertiesContentFieldMatchGroups"><fmt:message key="authoring.fla.page.prop.branching.groups.match" /></div>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					Min sequences:
+					<fmt:message key="authoring.fla.page.prop.branching.sequences.min" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="text"></input>
@@ -635,7 +638,7 @@
 			</tr>
 			<tr>
 				<td>
-					Max sequences:
+					<fmt:message key="authoring.fla.page.prop.branching.sequences.max" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="text"></input>
@@ -649,7 +652,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -657,7 +660,7 @@
 			</tr>
 			<tr>
 				<td>
-					Grouping:
+					<fmt:message key="authoring.fla.page.prop.grouping" />
 				</td>
 				<td>
 					  <select class="propertiesContentFieldGrouping"></select>
@@ -671,7 +674,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -679,7 +682,7 @@
 			</tr>
 			<tr>
 				<td>
-					Min activities:
+					<fmt:message key="authoring.fla.page.prop.optional.activities.min" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldOptionalActivityMin spinner" type="text"></input>
@@ -687,7 +690,7 @@
 			</tr>
 			<tr>
 				<td>
-					Max activities:
+					<fmt:message key="authoring.fla.page.prop.optional.activities.max" />
 				</td>
 				<td>
 					<input class="propertiesContentFieldOptionalActivityMax spinner" type="text"></input>
@@ -701,7 +704,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -709,7 +712,7 @@
 			</tr>
 			<tr>
 				<td>
-					Color:
+					<fmt:message key="authoring.fla.page.prop.color" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldColor" type="text"></input>
@@ -723,7 +726,7 @@
 		<table>
 			<tr>
 				<td>
-					Title:
+					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
 					 <input class="propertiesContentFieldTitle" type="text"></input>
@@ -736,29 +739,30 @@
 	<!-- TOOL OUTPUT CONDITIONS DIALOG -->
 	<div id="outputConditionsDialog" class="dialogContainer">
 		 <select id="outputSelect">
-		 	<option value="none">[ Choose Output ]</option>
+		 	<option value="none"><fmt:message key="authoring.fla.page.dialog.cond.output.choose" /></option>
 		 </select>
 		 <select id="rangeOptionSelect" class="outputSelectDependent">
-		 	<option value="none" selected="selected">[ Options ]</option>
-		 	<option value="greater">Greater than or equal to</option>
-		 	<option value="less">Less than or equal to</option>
-		 	<option value="range">Range</option>
+		 	<option value="none" selected="selected"><fmt:message key="authoring.fla.page.dialog.cond.options.choose" /></option>
+		 	<option value="greater"><fmt:message key="authoring.fla.page.dialog.cond.greater" /></option>
+		 	<option value="less"><fmt:message key="authoring.fla.page.dialog.cond.less" /></option>
+		 	<option value="range"><fmt:message key="authoring.fla.page.dialog.cond.range" /></option>
 		 </select>
 		 <div id="rangeAddDiv" class="outputSelectDependent">
 			 <input id="singleRangeSpinner" class="outputSelectDependent spinner" />
 			 <div id="multiRangeDiv" class="outputSelectDependent">
-			 	From: <input id="multiRangeFromSpinner" class="spinner" /> To: <input id="multiRangeToSpinner" class="spinner" />
+			 	<fmt:message key="authoring.fla.page.dialog.cond.range.from" /> <input id="multiRangeFromSpinner" class="spinner" />
+			 	<fmt:message key="authoring.fla.page.dialog.cond.range.to" /> <input id="multiRangeToSpinner" class="spinner" />
 			 </div>
-			 <span id="rangeAddButton">Add</span>
+			 <span id="rangeAddButton"><fmt:message key="authoring.fla.page.dialog.cond.add" /></span>
 		 </div>
 		 <div id="complexConditions" class="outputSelectDependent">
-		 	<div>Name:</div>
+		 	<div><fmt:message key="authoring.fla.page.dialog.cond.name" /></div>
 		 	<ul></ul>
 		 </div>
 		 <table id="rangeConditions" class="outputSelectDependent">
 		 	<tr id="rangeConditionsHeaderRow">
-		 		<th>Name</th>
-		 		<th>Condition</th>
+		 		<th><fmt:message key="authoring.fla.page.dialog.cond.list.name" /></th>
+		 		<th><fmt:message key="authoring.fla.page.dialog.cond.list.condition" /></th>
 		 	</tr>
 		 </table>
 	</div>
@@ -766,13 +770,13 @@
 	
 	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
 	<div id="exportImageDialog" class="dialogContainer exportDialog">
-		<a href="#">Click here to download the image.</a>
+		<a href="#"><fmt:message key="authoring.fla.page.download.image" /></a>
 	</div>
 	
 	
 	<!-- EXPORT LEARNING DESIGN DIALOG -->
 	<div id="exportLDDialog" class="dialogContainer exportDialog">
-		<span>Please wait for the download.<br />Close the dialog when the download is finished.</span>
+		<span><fmt:message key="authoring.fla.page.download.wait" /><br /><fmt:message key="authoring.fla.page.download.close" /></span>
 		<iframe></iframe>
 	</div>
 </body>

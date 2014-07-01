@@ -7,32 +7,36 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>SVG Generator</title>
+	<title><fmt:message key="authoring.fla.page.svg.generator.title" /></title>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
+	<c:if test="${param.selectable}">
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
+	</c:if>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LABELS = {
 				// ActivityLib
-				DEFAULT_GROUPING_TITLE : 'Grouping',
-				DEFAULT_GROUP_PREFIX : 'Group ',
-				DEFAULT_BRANCHING_TITLE :'Branching',
-				DEFAULT_BRANCH_PREFIX : 'Branch ',
-				DEFAULT_OPTIONAL_ACTIVITY_TITLE : 'Optional Activity',
-				SUPPORT_ACTIVITY_TITLE : 'Support Activity',
-				GATE_ACTIVITY_LABEL : 'STOP',
-				BRANCHING_START_SUFFIX : 'start',
-				BRANCHING_END_SUFFIX : 'end',
+DEFAULT_GROUPING_TITLE : '<fmt:message key="authoring.fla.default.group.title" />',
+				DEFAULT_GROUP_PREFIX : '<fmt:message key="authoring.fla.default.group.prefix" />',
+				DEFAULT_BRANCHING_TITLE : '<fmt:message key="authoring.fla.default.branching.title" />',
+				DEFAULT_BRANCH_PREFIX : '<fmt:message key="authoring.fla.default.branch.prefix" />',
+				DEFAULT_OPTIONAL_ACTIVITY_TITLE : '<fmt:message key="authoring.fla.default.optional.activity.title" />',
+				SUPPORT_ACTIVITY_TITLE : '<fmt:message key="authoring.fla.support.activity.title" />',
+				GATE_ACTIVITY_LABEL : '<fmt:message key="authoring.fla.gate.activity.label" />',
+				BRANCHING_START_SUFFIX : '<fmt:message key="authoring.fla.branching.start.suffix" />',
+				BRANCHING_END_SUFFIX : '<fmt:message key="authoring.fla.branching.end.suffix" />',
 				
 				// DecorationLib
-				DEFAULT_ANNOTATION_LABEL_TITLE : 'Label'
+				DEFAULT_ANNOTATION_LABEL_TITLE : '<fmt:message key="authoring.fla.default.annotation.label.title" />'
 			},
 			
 			isReadOnlyMode = true,
+			activitiesOnlySelectable = ${param.selectable eq 'true'},
 			initLearningDesignID = '${param.learningDesignID}';
 	</script>
 </lams:head>
