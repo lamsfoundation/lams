@@ -32,42 +32,35 @@ import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
-
 /**
  * 
  * @author Mitchell Seaton
  * 
  */
-public class ConfigurationDAO extends BaseDAO implements IConfigurationDAO
-{
-	private static final String LOAD_CONFIG_ITEM_BY_KEY = "from configuration in class " + ConfigurationItem.class.getName() 
-		+ " where configuration.key=:key";
-	
-	
+public class ConfigurationDAO extends BaseDAO implements IConfigurationDAO {
+    private static final String LOAD_CONFIG_ITEM_BY_KEY = "from configuration in class "
+	    + ConfigurationItem.class.getName() + " where configuration.key=:key";
+
     /**
      * @see org.lamsfoundation.lams.config.dao.IConfigurationlDAO#getAllItems()
      */
-   
-    public List getAllItems(){    	
-    	return super.findAll(ConfigurationItem.class);
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ConfigurationItem> getAllItems() {
+	return super.findAll(ConfigurationItem.class);
     }
-    
+
     /**
      * @see org.lamsfoundation.lams.config.dao.IConfigurationlDAO#getConfigItemByKey()
      */
-    
-    public ConfigurationItem getConfigItemByKey(final String configKey)
-    {
-        return (ConfigurationItem) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY)
-                               .setString("key",configKey)
-                               .uniqueResult();
-             }
-         });
+    @Override
+    public ConfigurationItem getConfigItemByKey(final String configKey) {
+	return (ConfigurationItem) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(ConfigurationDAO.LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+			.uniqueResult();
+	    }
+	});
     }
-
-
 }

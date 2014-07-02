@@ -21,20 +21,18 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.config.dao;
+package org.lamsfoundation.lams.util;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.config.ConfigurationItem;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * 
- * @author Mitchell Seaton
- * 
+ * Refreshes configuration cache.
  */
-public interface IConfigurationDAO {
-
-    public List<ConfigurationItem> getAllItems();
-
-    public ConfigurationItem getConfigItemByKey(final String configKey);
+public class ConfigurationRefreshCacheJob extends QuartzJobBean {
+    @Override
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+	Configuration.refreshCache();
+    }
 }

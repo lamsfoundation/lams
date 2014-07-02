@@ -289,6 +289,7 @@
 		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
 		<property name="registrationDAO"><ref bean="registrationDAO" /></property>
 		<property name="messageService"><ref bean="commonMessageService" /></property>
+		<property name="scheduler"><ref bean="scheduler" /></property>
 	</bean>
 	
 	<!-- auditing service -->

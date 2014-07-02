@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.events;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 import org.quartz.JobExecutionContext;
@@ -16,6 +17,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * 
  */
 public class ResendMessagesJob extends QuartzJobBean {
+    protected static final Logger log = Logger.getLogger(ResendMessagesJob.class);
+    
     /**
      * Period after which the thread gives up on attempting to resend messages. Currently - 2 days.
      */
@@ -69,7 +72,8 @@ public class ResendMessagesJob extends QuartzJobBean {
 		ResendMessagesJob.notificationService.saveEvent(event);
 	    }
 	} catch (Exception e) {
-	    throw new JobExecutionException(e.getMessage());
+	    log.error("Error while resending messages", e);
+	    throw new JobExecutionException("Error while resending messages");
 	}
     }
 }

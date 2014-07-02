@@ -285,4 +285,7 @@ public class ConfigurationKeys {
     // CNG-26 Add to lams_configuration and set to false
     // if you don't want imported LD to have _<timestamp>_<seq_number> appended
     public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
+    
+    // LDEV-3254
+    public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefresInterval";
 }

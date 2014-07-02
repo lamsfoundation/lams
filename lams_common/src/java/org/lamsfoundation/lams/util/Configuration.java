@@ -39,6 +39,10 @@ import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
 import org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -50,85 +54,99 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class Configuration implements InitializingBean {
 
-    protected Logger log = Logger.getLogger(Configuration.class);
+    protected static Logger log = Logger.getLogger(Configuration.class);
 
     public static String CONFIGURATION_HELP_PAGE = "LAMS+Configuration";
-
-    private static Map items = null;
-
-    protected ConfigurationDAO configurationDAO;
-    
-    protected static RegistrationDAO registrationDAO;
-    
-    protected MessageService messageService;
-    
     public static final int ITEMS_ALL = 1;
-    
     public static final int ITEMS_NON_LDAP = 2;
-    
     public static final int ITEMS_ONLY_LDAP = 3;
 
-    /**
-     * @param configurationDAO
-     *            The configurationDAO to set.
-     */
-    public void setConfigurationDAO(ConfigurationDAO configurationDAO) {
-	this.configurationDAO = configurationDAO;
-    }
+    private static Map<String, ConfigurationItem> items = null;
 
-    public void afterPropertiesSet() {
-	if (items != null) {
-	    return;
-	}
+    protected static ConfigurationDAO configurationDAO;
+    protected static RegistrationDAO registrationDAO;
+    protected static MessageService messageService;
+    protected static Scheduler scheduler;
 
-	Map itemsmap = Collections.synchronizedMap(new LinkedHashMap());
-
-	try {
-	    List mapitems = getAllItems();
-
-	    if (mapitems.size() > 0) {
-		Iterator it = mapitems.iterator();
-		while (it.hasNext()) {
-		    ConfigurationItem item = (ConfigurationItem) it.next();
-
-		    // init ssl truststore path and password
-		    if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PATH)) {
-			setSystemProperty(item.getKey(), item.getValue());
-		    } else if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PASSWORD)) {
-			setSystemProperty(item.getKey(), item.getValue());
-		    }
-
-		    itemsmap.put(item.getKey(), item);
-		}
+    public static String get(String key) {
+	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
+	    if (Configuration.getItemValue(Configuration.items.get(key)) != null) {
+		return Configuration.getItemValue(Configuration.items.get(key));
 	    }
-
-	    items = itemsmap;
-
-	} catch (Exception e) {
-	    log.error("Exception has occurred: ", e);
 	}
-    }
-
-    public List getAllItems() {
-	return configurationDAO.getAllItems();
-    }
-
-    public static Map getAll() {
-	return items;
-    }
-
-    public ConfigurationItem getConfigItemByKey(String key) {
-	if ((items != null) && (items.get(key) != null))
-	    if (items.get(key) != null)
-		return (ConfigurationItem) items.get(key);
 	return null;
+    }
+
+    public static Map<String, ConfigurationItem> getAll() {
+	return Configuration.items;
+    }
+
+    public static boolean getAsBoolean(String key) {
+	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
+	    if (Configuration.getItemValue(Configuration.items.get(key)) != null) {
+		return new Boolean(Configuration.getItemValue(Configuration.items.get(key))).booleanValue();
+	    }
+	}
+	return false;
+    }
+
+    public static int getAsInt(String key) {
+	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
+	    // could throw NumberFormatException which is a RuntimeException
+	    if (Configuration.getItemValue(Configuration.items.get(key)) != null) {
+		return new Integer(Configuration.getItemValue(Configuration.items.get(key))).intValue();
+	    }
+	}
+	return -1;
     }
 
     public static String getItemValue(Object obj) {
 	ConfigurationItem item = (ConfigurationItem) obj;
-	if (item.getValue() != null)
+	if (item.getValue() != null) {
 	    return item.getValue().trim();
+	}
 	return null;
+    }
+
+    public static Registration getRegistration() {
+	return Configuration.registrationDAO.get();
+    }
+
+    public static void refreshCache() {
+	Map<String, ConfigurationItem> itemMap = Collections
+		.synchronizedMap(new LinkedHashMap<String, ConfigurationItem>());
+
+	try {
+	    List<ConfigurationItem> itemList = Configuration.getAllItems();
+
+	    if (itemList.size() > 0) {
+		Iterator<ConfigurationItem> itemIterator = itemList.iterator();
+		while (itemIterator.hasNext()) {
+		    ConfigurationItem item = itemIterator.next();
+
+		    // init ssl truststore path and password
+		    if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PATH)) {
+			Configuration.setSystemProperty(item.getKey(), item.getValue());
+		    } else if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PASSWORD)) {
+			Configuration.setSystemProperty(item.getKey(), item.getValue());
+		    }
+
+		    itemMap.put(item.getKey(), item);
+		}
+	    }
+
+	    Configuration.items = itemMap;
+	    if (Configuration.log.isDebugEnabled()) {
+		Configuration.log.debug("Configuration cache refreshed");
+	    }
+
+	} catch (Exception e) {
+	    Configuration.log.error("Exception while refreshing Configuration cache", e);
+	}
+    }
+
+    public static void saveOrUpdateRegistration(Registration reg) {
+	Configuration.registrationDAO.saveOrUpdate(reg);
     }
 
     public static void setItemValue(Object obj, String value) {
@@ -136,64 +154,21 @@ public class Configuration implements InitializingBean {
 	item.setValue(value);
     }
 
-    public static String get(String key) {
-	if ((items != null) && (items.get(key) != null))
-	    if (getItemValue(items.get(key)) != null)
-		return getItemValue(items.get(key));
-	return null;
-    }
-
-    public static int getAsInt(String key) {
-	if ((items != null) && (items.get(key) != null))
-	    // could throw NumberFormatException which is a RuntimeException
-	    if (getItemValue(items.get(key)) != null)
-		return new Integer(getItemValue(items.get(key))).intValue();
-	return -1;
-    }
-
-    public static boolean getAsBoolean(String key) {
-	if ((items != null) && (items.get(key) != null))
-	    if (getItemValue(items.get(key)) != null)
-		return new Boolean(getItemValue(items.get(key))).booleanValue();
-	return false;
-    }
-
     public static void updateItem(String key, String value) {
-	if (value != null)
+	if (value != null) {
 	    value = value.trim();
-	if (items.containsKey(key))
-	    setItemValue(items.get(key), value);
-    }
-
-    public void persistUpdate() {
-	// update ssl truststore path and password
-	setSystemProperty(ConfigurationKeys.TRUSTSTORE_PATH, get(ConfigurationKeys.TRUSTSTORE_PATH));
-	setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD, get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
-	updatePublicFolderName();
-	configurationDAO.insertOrUpdateAll(items.values());
-    }
-
-    private void updatePublicFolderName() {
-	// LDEV-2430 update public folder name according to default server locale
-	WorkspaceFolder publicFolder = null;
-	List list = configurationDAO.findByProperty(WorkspaceFolder.class, "workspaceFolderType",
-		WorkspaceFolder.PUBLIC_SEQUENCES);
-
-	if (list != null && list.size() > 0) {
-	    publicFolder = (WorkspaceFolder) list.get(0);
-	    String[] langCountry = LanguageUtil.getDefaultLangCountry();
-	    Locale locale = new Locale(langCountry[0], langCountry[1]);
-	    publicFolder.setName(messageService.getMessageSource().getMessage("public.folder.name", null, locale));
-	    configurationDAO.update(publicFolder);
+	}
+	if (Configuration.items.containsKey(key)) {
+	    Configuration.setItemValue(Configuration.items.get(key), value);
 	}
     }
 
-    public String toString() {
-	return "Configuration items:" + (items != null ? items.toString() : "none");
+    private static List<ConfigurationItem> getAllItems() {
+	return Configuration.configurationDAO.getAllItems();
     }
 
     // update jvm system property
-    private void setSystemProperty(String key, String value) {
+    private static void setSystemProperty(String key, String value) {
 	if (StringUtils.isBlank(key)) {
 	    // use default
 	    System.clearProperty(key);
@@ -201,21 +176,65 @@ public class Configuration implements InitializingBean {
 	    System.setProperty(key, value);
 	}
     }
-    
+
+    @Override
+    public void afterPropertiesSet() {
+	if (Configuration.items != null) {
+	    return;
+	}
+	Configuration.refreshCache();
+	if (Configuration.items == null) {
+	    return;
+	}
+
+	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
+	Long refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null : Long
+		.valueOf(refreshCacheIntervalString);
+	if ((refreshCacheInterval != null) && (refreshCacheInterval > 0)) {
+	    SimpleTrigger trigger = new SimpleTrigger("configurationCacheRefreshTrigger", null);
+	    trigger.setVolatility(true);
+	    trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+	    trigger.setRepeatInterval(Long.valueOf(refreshCacheInterval) * 60 * 1000);
+
+	    JobDetail jobDetail = new JobDetail("configurationCacheRefresh", null, ConfigurationRefreshCacheJob.class);
+	    // do not store in DB as the job will be recreated after LAMS restart anyway
+	    jobDetail.setVolatility(true);
+
+	    try {
+		Configuration.scheduler.scheduleJob(jobDetail, trigger);
+	    } catch (SchedulerException e) {
+		Configuration.log
+			.error("Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
+				e);
+	    }
+	}
+    }
+
+    /**
+     * Get contents of lams_configuration and group them using header names as key. Includes ldap items.
+     * 
+     * @return
+     */
+    public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems() {
+	return arrangeItems(Configuration.ITEMS_ALL);
+    }
+
     /**
      * Get contents of lams_configuration and group them using header names as key.
-     * @param filter ITEMS_ALL: include all items; ITEMS_NON_LDAP: include non-ldap items only; 
-     * ITEMS_ONLY_LDAP: include ldap-only items.
+     * 
+     * @param filter
+     *            ITEMS_ALL: include all items; ITEMS_NON_LDAP: include non-ldap items only; ITEMS_ONLY_LDAP: include
+     *            ldap-only items.
      * @return
      */
     public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems(int filter) {
-	List originalList = getAllItems();
+	List<ConfigurationItem> originalList = Configuration.getAllItems();
 	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<String, ArrayList<ConfigurationItem>>();
 
 	for (int i = 0; i < originalList.size(); i++) {
-	    ConfigurationItem item = (ConfigurationItem) originalList.get(i);
+	    ConfigurationItem item = originalList.get(i);
 	    String header = item.getHeaderName();
-	    
+
 	    switch (filter) {
 	    case ITEMS_ALL:
 		// all items included
@@ -235,7 +254,7 @@ public class Configuration implements InitializingBean {
 	    default:
 		break;
 	    }
-	    
+
 	    if (!groupedList.containsKey(header)) {
 		groupedList.put(header, new ArrayList<ConfigurationItem>());
 	    }
@@ -243,40 +262,76 @@ public class Configuration implements InitializingBean {
 	    currentList.add(item);
 	    groupedList.put(header, currentList);
 	}
-	
+
 	return groupedList;
     }
-    
-    /**
-     * Get contents of lams_configuration and group them using header names as key.  Includes ldap
-     * items.
-     * @return
-     */
-    public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems() {
-	return arrangeItems(ITEMS_ALL);
-    }
-    
-    public static void saveOrUpdateRegistration(Registration reg){
-	registrationDAO.saveOrUpdate(reg);
-    }
-    
-    public static Registration getRegistration(){
-	return registrationDAO.get();
-    }
 
-    public RegistrationDAO getRegistrationDAO() {
-        return registrationDAO;
-    }
-
-    public void setRegistrationDAO(RegistrationDAO registrationDAO) {
-        this.registrationDAO = registrationDAO;
+    public ConfigurationItem getConfigItemByKey(String key) {
+	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
+	    if (Configuration.items.get(key) != null) {
+		return Configuration.items.get(key);
+	    }
+	}
+	return null;
     }
 
     public MessageService getMessageService() {
-        return messageService;
+	return Configuration.messageService;
+    }
+
+    public RegistrationDAO getRegistrationDAO() {
+	return Configuration.registrationDAO;
+    }
+
+    public void persistUpdate() {
+	// update ssl truststore path and password
+	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PATH,
+		Configuration.get(ConfigurationKeys.TRUSTSTORE_PATH));
+	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD,
+		Configuration.get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
+	updatePublicFolderName();
+	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
+    }
+
+    /**
+     * @param configurationDAO
+     *            The configurationDAO to set.
+     */
+    public void setConfigurationDAO(ConfigurationDAO configurationDAO) {
+	Configuration.configurationDAO = configurationDAO;
     }
 
     public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+	Configuration.messageService = messageService;
+    }
+
+    public void setRegistrationDAO(RegistrationDAO registrationDAO) {
+	Configuration.registrationDAO = registrationDAO;
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+	Configuration.scheduler = scheduler;
+    }
+
+    @Override
+    public String toString() {
+	return "Configuration items:" + (Configuration.items != null ? Configuration.items.toString() : "none");
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updatePublicFolderName() {
+	// LDEV-2430 update public folder name according to default server locale
+	WorkspaceFolder publicFolder = null;
+	List<WorkspaceFolder> list = Configuration.configurationDAO.findByProperty(WorkspaceFolder.class,
+		"workspaceFolderType", WorkspaceFolder.PUBLIC_SEQUENCES);
+
+	if ((list != null) && (list.size() > 0)) {
+	    publicFolder = list.get(0);
+	    String[] langCountry = LanguageUtil.getDefaultLangCountry();
+	    Locale locale = new Locale(langCountry[0], langCountry[1]);
+	    publicFolder.setName(Configuration.messageService.getMessageSource().getMessage("public.folder.name", null,
+		    locale));
+	    Configuration.configurationDAO.update(publicFolder);
+	}
     }
 }
