@@ -262,7 +262,7 @@
 			    		<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
 			    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
 			    				<span class="thumb-wrap">
-							        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/version/100001/width/100!/height/68!" height="68" width="100" alt="Video">
+							        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/width/100!/height/68!" height="68" width="100" alt="Video">
 							        <em></em>
 							        <span class="duration">
 							        	<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
