@@ -22,7 +22,7 @@
 					</c:set>
 				
 					<a href="${previewUrl}" class="thickbox" title="<fmt:message key="label.item.preview" />">
-						<img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${item.entryId}/version/100001/width/96!/height/54" height="54" width="96" alt="Video">
+						<img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${item.entryId}/width/96!/height/54" height="54" width="96" alt="Video">
 					</a>
 				</td>
 				
