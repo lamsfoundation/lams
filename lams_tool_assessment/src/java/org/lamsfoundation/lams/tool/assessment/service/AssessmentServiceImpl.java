@@ -483,7 +483,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    questionAnswer = new AssessmentQuestionResult();
 	    questionAnswer.setAssessmentQuestion(question);
 	    questionAnswer.setAssessmentResult(assessmentResult);
-	    assessmentResult.getQuestionResults().add(questionAnswer);
 	    
 	    Set<AssessmentOptionAnswer> optionAnswers = questionAnswer.getOptionAnswers();
 	    for (AssessmentQuestionOption option : question.getOptions()) {
@@ -658,6 +657,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, userId);
+    }
+    
+    @Override
+    public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
+	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
+	assessmentQuestionDao.evict(result);
+	return getLastFinishedAssessmentResult(assessmentUid, userId);
     }
 
     @Override

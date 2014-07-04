@@ -715,7 +715,8 @@ public class LearningAction extends Action {
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastFinishedAssessmentResult(assessment.getUid(), userId);
+	//release object from the cache (it's required when we have modified result object in the same request) 
+	AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
 	
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
