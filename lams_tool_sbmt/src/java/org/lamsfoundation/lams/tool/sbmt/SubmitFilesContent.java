@@ -281,7 +281,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="created_by" cascade="none"
+     * @hibernate.many-to-one column="created_by" cascade="save-update"
      * 
      * @return
      */
