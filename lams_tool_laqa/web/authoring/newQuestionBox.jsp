@@ -97,7 +97,7 @@
                             var obj = document.getElementById("newQuestion");
                             obj.value += aMenu.options[aMenu.selectedIndex].text;
                             var oEditor = CKEDITOR.instances["newQuestion"];
-                            oEditor.InsertHtml(aMenu.options[aMenu.selectedIndex].text);
+                            oEditor.insertHtml(aMenu.options[aMenu.selectedIndex].text);
                         } 
                     }
                 
