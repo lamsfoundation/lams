@@ -41,10 +41,12 @@ public class ToolContentVersionFilter {
 
     private List<RemovedField> removedFieldList;
     private List<AddedField> addedFieldList;
+    private List<RenamedField> renamedFieldList;
 
     public ToolContentVersionFilter() {
 	removedFieldList = new ArrayList<RemovedField>();
 	addedFieldList = new ArrayList<AddedField>();
+	renamedFieldList = new ArrayList<RenamedField>();
     }
 
     // container class for removed class
@@ -69,7 +71,19 @@ public class ToolContentVersionFilter {
 	    fieldname = fieldname2;
 	    defaultValue = defaultValue2;
 	}
+    }
+    
+    // container class for renamed class
+    class RenamedField {
+	public Class ownerClass;
+	public String oldFieldname;
+	public String newFieldname;
 
+	public RenamedField(Class ownerClass2, String oldFieldname2, String newFieldname2) {
+	    ownerClass = ownerClass2;
+	    oldFieldname = oldFieldname2;
+	    newFieldname = newFieldname2;
+	}
     }
 
     /**
@@ -92,6 +106,17 @@ public class ToolContentVersionFilter {
      */
     public void addField(Class ownerClass, String fieldname, Object defaultValue) {
 	addedFieldList.add(new AddedField(ownerClass, fieldname, defaultValue));
+    }
+    
+    /**
+     * When a field is renamed in tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
+     * methods.
+     * 
+     * @param ownerClass
+     * @param fieldname
+     */
+    public void renameField(Class ownerClass, String oldFieldname, String newFieldname) {
+	renamedFieldList.add(new RenamedField(ownerClass, oldFieldname, newFieldname));
     }
 
     /**
@@ -142,6 +167,24 @@ public class ToolContentVersionFilter {
 
 		ToolContentVersionFilter.log.debug("Field " + added.fieldname + " in class "
 			+ added.ownerClass.getName() + " is add by value " + added.defaultValue);
+	    }
+	}
+	
+	// rename all marked fields for this class
+	for (RenamedField renamed : renamedFieldList) {
+	    if (StringUtils.equals(root.getName(), renamed.ownerClass.getName())) {
+		for (Object child : root.getChildren()) {
+		    if (child instanceof Element) {
+			Element ele = (Element) child;
+
+			if (StringUtils.equals(ele.getName(), renamed.oldFieldname)) {
+			    ele.setName(renamed.newFieldname);
+			    ToolContentVersionFilter.log.debug("Field " + renamed.oldFieldname + " in class "
+				    + renamed.ownerClass.getName() + " is renamed to " + renamed.newFieldname);
+			}
+		    }
+		}
+
 	    }
 	}
 

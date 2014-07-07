@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 
 /**
  * Import filter class for different version of Assessment content.
@@ -46,5 +47,12 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
      */
     public void up20140102To20140428() {
 	this.removeField(Assessment.class, "contentInUse");
+    }
+    
+    /**
+     * Import 20140102 version content to 20140428 version tool server.
+     */    
+    public void up20140428To20140707() {
+	this.renameField(AssessmentQuestion.class, "questionOptions", "options");
     }
 }
