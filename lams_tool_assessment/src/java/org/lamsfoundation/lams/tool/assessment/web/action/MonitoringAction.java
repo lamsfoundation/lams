@@ -139,12 +139,30 @@ public class MonitoringAction extends Action {
 	    // Add reflectList to sessionMap
 	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}
+	
+	//create list of questions to display in question drop down menu
+	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
+	boolean hasRandomQuestion = false;
+	for (QuestionReference reference : (Set<QuestionReference>)assessment.getQuestionReferences()) {
+	    hasRandomQuestion |= reference.isRandomQuestion();
+	}
+	//in case there is at least one random question - we need to show all questions in a drop down select
+	if (hasRandomQuestion) {
+	    questionList.addAll(assessment.getQuestions());
+	
+	//show only questions from question list otherwise
+	} else {
+	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+		questionList.add(reference.getQuestion());
+	    }
+	}
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, questionList);
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 		AttributeNames.PARAM_CONTENT_FOLDER_ID));

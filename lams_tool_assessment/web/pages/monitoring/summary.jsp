@@ -3,7 +3,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
-<c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -13,7 +12,6 @@
 				datatype: "local",
 				height: 'auto',
 				width: 630,
-				shrinkToFit: ${isShrinkToFit},
 				
 			   	colNames:['#',
 						'userId',
@@ -255,7 +253,7 @@
 
 			<select id="questionUid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    			<c:forEach var="question" items="${assessment.questions}">
+    			<c:forEach var="question" items="${sessionMap.questionList}">
 					<option value="${question.uid}"><c:out value="${question.title}" escapeXml="true"/></option>
 			   	</c:forEach>
 			</select>
