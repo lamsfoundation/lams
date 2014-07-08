@@ -394,6 +394,9 @@ public class LearningAction extends Action {
 
 	Survey survey = service.getSurveyBySessionId(sessionId);
 	if (survey.isNotifyTeachersOnAnswerSumbit()) {
+	    if (surveyLearner == null) {
+		surveyLearner = getCurrentUser(service, sessionId);
+	    }
 	    service.notifyTeachersOnAnswerSumbit(sessionId, surveyLearner);
 	}
 	
