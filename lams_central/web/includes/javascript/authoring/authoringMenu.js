@@ -414,6 +414,8 @@ var MenuLib = {
 					
 					if (!iconCode) {
 						// no precached PNG image, generate one from SVG
+						// the PNG image can not be fetched using Ajax(!):
+						// it can be done only asynchronously or the binary stream has to be converted to text 
 						$.ajax({
 							url : iconPath,
 							async: false,

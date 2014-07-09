@@ -730,20 +730,22 @@ ActivityLib = {
 					'stroke'           : layout.colors.selectEffect,
 					'stroke-dasharray' : '-'
 				});
-				object.items.resizeButton.show();
-				object.items.resizeButton.toFront();
 				object.items.selectEffect = true;
 				
-				// also select encapsulated activities
-				var childActivities = DecorationLib.getChildActivities(object.items.shape);
-				if (childActivities.length > 0) {
-					object.items.fitButton.show();
-					
-					$.each(childActivities, function(){
-						if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)) {
-							ActivityLib.addSelectEffect(this, false);
-						}
-					});
+				if (!isReadOnlyMode) {
+					object.items.resizeButton.show();
+					object.items.resizeButton.toFront();
+					// also select encapsulated activities
+					var childActivities = DecorationLib.getChildActivities(object.items.shape);
+					if (childActivities.length > 0) {
+						object.items.fitButton.show();
+						
+						$.each(childActivities, function(){
+							if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)) {
+								ActivityLib.addSelectEffect(this, false);
+							}
+						});
+					}
 				}
 			} else if (object instanceof ActivityDefs.Transition) {
 				// show only if Transition is selectable, i.e. is a branch, has a title

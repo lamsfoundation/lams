@@ -155,13 +155,13 @@ var DecorationDefs = {
 				this.items.shape = paper.text(x, y, this.title)
 										.attr(layout.defaultTextAttributes)
 										.attr('text-anchor', 'start');
-				if (!isReadOnlyMode){
-					this.items.shape.attr('cursor', 'pointer');
-					this.items.shape.mousedown(HandlerDecorationLib.labelMousedownHandler)
-									.click(HandlerLib.itemClickHandler);
-				}
-										
 				this.items.push(this.items.shape);
+				
+				this.items.shape.attr('cursor', 'pointer');
+				this.items.click(HandlerLib.itemClickHandler);
+				if (!isReadOnlyMode){
+					this.items.shape.mousedown(HandlerDecorationLib.labelMousedownHandler);
+				}
 				
 				this.items.data('parentObject', this);
 			}

@@ -566,6 +566,9 @@ GeneralInitLib = {
 			             }
 			]),
 			
+			/**
+			 * Button for saving the current design.
+			 */
 			'buttonsSave' : sharedButtons.concat([
 				             {
 				            	'class'  : 'defaultFocus',
@@ -645,6 +648,10 @@ GeneralInitLib = {
 				             }
 			]),
 			
+			
+			/**'
+			 * Button for importing activities from an existing LD.
+			 */
 			'buttonsImportPart' : sharedButtons.concat([
      			             {
      			            	'id'	 : 'importPartLdStoreButton',
@@ -652,18 +659,28 @@ GeneralInitLib = {
      			            	'text'   : LABELS.IMPORT_BUTTON,
      			            	'click'  : function() {
      			            		var dialog = $(this),
-     			            			frameActivities = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout.activities,
+     			            			frameLayout = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout,
      			            			selectedActivities = [],
-     			            			addActivities = [];
+     			            			addActivities = [],
+     			            			selectedAnnotations = [];
+     			            			
      			            		
-     			            		$.each(frameActivities, function(){
+     			            		$.each(frameLayout.activities, function(){
      			            			if (this.items.selectEffect) {
      			            				selectedActivities.push(this);
      			            				dialog.dialog('option', 'importActivity')(this, addActivities);
      			            			}
      			            		});
+     			            		$.each(frameLayout.regions.concat(frameLayout.labels), function(){
+     			            			if (this.items.selectEffect) {
+     			            				selectedAnnotations.push(this);
+     			            				// unlike importActivity(), this method already takes care of UIIDs
+     			            				// and adding new items to collections
+     			            				dialog.dialog('option', 'importAnnotation')(this);
+     			            			}
+     			            		});
      			            		
-     			            		if (selectedActivities.length == 0) {
+     			            		if (addActivities.length == 0 && selectedAnnotations.length == 0) {
      			            			alert('Click on activities to select them for import');
      			            			return;
      			            		}
@@ -709,7 +726,7 @@ GeneralInitLib = {
 	     			            		
 	     			            		layout.activities = layout.activities.concat(addActivities);
      			            		}
-     			            		
+     	
      			            		dialog.dialog('close');
      							}
      			           }
@@ -834,6 +851,24 @@ GeneralInitLib = {
 					}
 
 					addActivities.push(addActivity);
+				}
+			},
+			
+			/**
+			 * Extracts a selected annotation from another LD.
+			 */
+			'importAnnotation' : function(annotation) {
+				// annotations in the another LD have different clousures, so they can not be imported directly
+				// they need to be recreated from a scratch with current LD being their context
+				var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
+	     			frameDecorationDefs = frameWindow.DecorationDefs,
+	     			box = annotation.items.shape.getBBox();
+
+				// there are no transitions or child/parent relations, so they can be directly recreated
+				if (annotation instanceof frameDecorationDefs.Region) {
+					DecorationLib.addRegion(box.x, box.y, box.x2, box.y2, annotation.title, annotation.items.shape.attr('fill'));
+				} else if (annotation instanceof frameDecorationDefs.Label) {
+					DecorationLib.addLabel(box.x, box.y, annotation.title);
 				}
 			}
 		});
@@ -1803,10 +1838,10 @@ GeneralLib = {
 				$.each(ld.annotations, function(){
 					var isRegion = this.endXcoord;
 					if (isRegion) {
-						DecorationDefs.addRegion(this.xcoord, this.ycoord, this.endXcoord, this.endYcoord,
+						DecorationLib.addRegion(this.xcoord, this.ycoord, this.endXcoord, this.endYcoord,
 												this. title, this.color);
 					} else {
-						DecorationDefs.addLabel(this.xcoord, this.ycoord, this.title);
+						DecorationLib.addLabel(this.xcoord, this.ycoord, this.title);
 					}
 				});
 				
@@ -2201,14 +2236,14 @@ GeneralLib = {
 				isRegion = this instanceof DecorationDefs.Region;
 			
 			annotations.push({
-				'id'		: this.id,
+				'id'			 : this.id,
 				'annotationUIID' : this.uiid,
-				'title' 	: this.title,
-				'xCoord'    : box.x,
-				'yCoord'    : box.y,
-				'endXCoord' : isRegion ? box.x2 : null,
-				'endYCoord' : isRegion ? box.y2 : null,
-				'color'	    : isRegion ? this.items.shape.attr('fill') : null
+				'title' 		 : this.title,
+				'xCoord'    	 : parseInt(box.x),
+				'yCoord'    	 : parseInt(box.y),
+				'endXCoord' 	 : isRegion ? parseInt(box.x2) : null,
+				'endYCoord' 	 : isRegion ? parseInt(box.y2) : null,
+				'color'	    	 : isRegion ? this.items.shape.attr('fill') : null
 			});
 		});
 
