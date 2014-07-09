@@ -140,6 +140,11 @@
 				</div>
 				<html:text property="penaltyFactor" styleClass="shortInputText" />
 				
+				<div class="field-name space-top" >
+					<fmt:message key="label.authoring.answer.required" />
+				</div>
+				<html:checkbox property="answerRequired" styleClass="noBorder" />
+				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
@@ -150,7 +155,7 @@
 				<div class="field-name space-top" >
 					<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 				</div>
-				<html:checkbox property="shuffle" styleId="shuffleTheChoices" styleClass="noBorder" />
+				<html:checkbox property="shuffle" styleClass="noBorder" />
 				
 				<br><br>
 				<input type="hidden" name="fake" id="fake">

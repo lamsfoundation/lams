@@ -3,6 +3,9 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
+-- LDEV-3265 Ability to set questions required to be answered
+ALTER TABLE tl_laasse10_assessment_question ADD COLUMN answer_required TINYINT(1) NOT NULL DEFAULT 1;
+
 -- LDEV-3263 Add support for renaming field names on sequence import
 UPDATE lams_tool SET tool_version='20140707' WHERE tool_signature='laasse10';
 

@@ -104,6 +104,11 @@
 				<html:text property="defaultGrade" styleClass="shortInputText"/>
 				
 				<div class="field-name space-top" >
+					<fmt:message key="label.authoring.answer.required" />
+				</div>
+				<html:checkbox property="answerRequired" styleClass="noBorder" />
+				
+				<div class="field-name space-top" >
 					<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
 				</div>
 				<html:checkbox property="allowRichEditor" styleClass="noBorder" />

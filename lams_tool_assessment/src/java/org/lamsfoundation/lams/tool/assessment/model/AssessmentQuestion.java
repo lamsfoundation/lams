@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * @author Andrey Balan
  * 
  * @hibernate.class table="tl_laasse10_assessment_question"
- * 
  */
 public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
@@ -62,6 +61,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private int defaultGrade;
     
     private float penaltyFactor;
+    
+    private boolean answerRequired;
     
     private String generalFeedback;
     
@@ -293,6 +294,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     public void setPenaltyFactor(float penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
+    }
+    
+    /**
+     * @hibernate.property column="answer_required"
+     * @return
+     */
+    public boolean isAnswerRequired() {
+	return answerRequired;
+    }
+
+    public void setAnswerRequired(boolean answerRequired) {
+	this.answerRequired = answerRequired;
     }
 
     /**

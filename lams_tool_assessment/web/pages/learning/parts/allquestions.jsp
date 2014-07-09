@@ -9,11 +9,17 @@
 					</td>
 				</c:if>
 						
-				<td style="padding-left: 0px;">
+				<td style="padding-left: 0px;" id="question-area-${status.index}">
 					<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
 							
 					<div class="field-name" style="padding: 10px 15px 15px;">
+						<c:if test="${question.answerRequired}">
+							<span style="float: left; padding-right: 5px;">
+								<img title="* <fmt:message key="label.authoring.answer.required"/>" alt="<fmt:message key="label.authoring.answer.required"/>" src="${ctxPath}/includes/images/req.gif" />
+							</span>
+						</c:if>
 						${question.question}
+						
 					</div>
 							
 					<c:choose>

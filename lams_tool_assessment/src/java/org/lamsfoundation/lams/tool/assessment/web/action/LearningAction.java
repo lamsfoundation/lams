@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.RequiredQuestionsDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
@@ -402,7 +403,14 @@ public class LearningAction extends Action {
 		    request.getParameter(AssessmentConstants.PARAM_SECONDS_LEFT));
 	}
 	
-	int pageNumber = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
+	//get pageNumber as request parameter in normal case and as attribute in case of submitAll returned it back
+	int pageNumber;
+	if ((request.getAttribute(AssessmentConstants.ATTR_PAGE_NUMBER) == null)) {
+	    pageNumber = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
+	} else {
+	    pageNumber = (Integer) request.getAttribute(AssessmentConstants.ATTR_PAGE_NUMBER);
+	}
+	
 	int questionNumberingOffset = 0;
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	for (int i = 0; i < pageNumber-1; i++) {
@@ -423,8 +431,20 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request);
+	
+	//check all required questions got answered
+	RequiredQuestionsDTO requiredQuestionsDTO = checkAllRequiredQuestionsAnswered(sessionMap);
+	//if not then forward to nextPage()
+	if (requiredQuestionsDTO.isRequiredAnswerMissed()) {
+	    request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, requiredQuestionsDTO.getPageNumber());
+	    request.setAttribute(AssessmentConstants.ATTR_REQUIRED_QUESTIONS_DTO, requiredQuestionsDTO);
+	    
+	    return nextPage(mapping, form, request, response);
+	}
+	
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, false);
 	
@@ -704,6 +724,73 @@ public class LearningAction extends Action {
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    }
 	}
+    }
+    
+    /**
+     * Get back user answers from request and store it into sessionMap.
+     * 
+     * @param request
+     */
+    private RequiredQuestionsDTO checkAllRequiredQuestionsAnswered(SessionMap<String, Object> sessionMap){
+
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	
+	//array of missing required questions
+	List<Integer> missingRequiredQuestions = new ArrayList<Integer>();
+
+	//iterate through all pages to find first that contains missing required questions
+	int pageCount;
+	for (pageCount = 0; pageCount < pagedQuestions.size(); pageCount++) {
+	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
+	    
+	    int questionCount = 0;
+	    for (AssessmentQuestion question : questionsForOnePage) {
+		if (question.isAnswerRequired()) {
+
+		    boolean isAnswered = false;
+
+		    int questionType = question.getType();
+		    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+
+			for (AssessmentQuestionOption option : question.getOptions()) {
+			    isAnswered |= option.getAnswerBoolean();
+			}
+
+		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+			for (AssessmentQuestionOption option : question.getOptions()) {
+			    isAnswered |= option.getAnswerInt() != 0;
+			}
+
+		    } else if ((questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
+			    || (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
+			    || (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)
+			    || (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
+			isAnswered |= StringUtils.isNotBlank(question.getAnswerString());
+
+		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+			isAnswered = true;
+		    }
+
+		    // required question was not answered, so store its sequence id
+		    if (!isAnswered) {
+			missingRequiredQuestions.add(questionCount);
+		    }
+
+		}
+
+		questionCount++;
+	    }
+	    
+	    if (!missingRequiredQuestions.isEmpty()) {
+		break;
+	    }
+	}
+
+	RequiredQuestionsDTO requiredQuestionsDTO = new RequiredQuestionsDTO();
+	requiredQuestionsDTO.setRequiredAnswerMissed(!missingRequiredQuestions.isEmpty());
+	requiredQuestionsDTO.setPageNumber(pageCount + 1);
+	requiredQuestionsDTO.setMissingRequiredQuestions(missingRequiredQuestions);
+	return requiredQuestionsDTO;
     }
     
     /**

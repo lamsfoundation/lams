@@ -84,7 +84,7 @@
 		    <div class="error" style="display:none;">
 		      	<img src="${ctxPath}/includes/images/warning.gif" alt="Warning!" width="24" height="24" style="float:left; margin: -5px 10px 0px 0px; " />
 		      	<span></span>.<br clear="all"/>
-		    </div>			
+		    </div>
 			
 			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -120,6 +120,11 @@
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
 				<html:text property="penaltyFactor" styleClass="shortInputText"/>
+				
+				<div class="field-name space-top" >
+					<fmt:message key="label.authoring.answer.required" />
+				</div>
+				<html:checkbox property="answerRequired" styleClass="noBorder" />
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />

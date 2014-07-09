@@ -10,6 +10,7 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
+	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -127,14 +128,33 @@
 	        );
 		</c:if>
 		
+		//check if we came back due to missing required question's answer
+		$(document).ready(function(){
+			if (${requiredQuestionsDTO != null}) {
+				validateAnswers();
+			}
+		});
+		
 		function finishSession(){
+			if (!validateAnswers()) {
+				return;
+			}
+			
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 		function continueReflect(){
+			if (!validateAnswers()) {
+				return;
+			}
+			
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function nextPage(pageNumber){
+			if (!validateAnswers()) {
+				return;
+			}
+			
 			var secondsLeft = 0;
 			if (${not finishedLock && assessment.timeLimit > 0}) {
 				var times = $("#countdown").countdown('getTimes'); 
@@ -145,8 +165,17 @@
         	myForm.submit();
 		}
 		function submitAll(){
+			if (!validateAnswers()) {
+				return;
+			}
+			
+			var secondsLeft = 0;
+			if (${not finishedLock && assessment.timeLimit > 0}) {
+				var times = $("#countdown").countdown('getTimes'); 
+				secondsLeft = times[4]*3600 + times[5]*60 + times[6];
+			}
         	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>");
+        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&secondsLeft=" + secondsLeft);
         	myForm.submit();
 		}	
 		function resubmit(){
@@ -199,6 +228,89 @@
 	       	});
 		}
 		
+		function validateAnswers() {
+
+			if (${finishedLock || !hasEditRight}) {
+				return true;
+			}
+			
+			var missingRequiredQuestions = [];
+			
+			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
+				<c:if test="${question.answerRequired}">
+					<c:choose>
+						<c:when test="${question.type == 1}">
+							//multiplechoice
+							if ($("input[name^=question${status.index}]:checked").length == 0) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+						
+						<c:when test="${question.type == 2}">
+							//matchingpairs
+							
+	    					var eachSelectHasBeenAnswered = true;
+	    					$("select[name^=question${status.index}_]").each(function() {
+	    						eachSelectHasBeenAnswered &= this.value != -1;
+	    					});
+	    					
+							if (!eachSelectHasBeenAnswered) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+
+						</c:when>
+						
+						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor)}">
+							//shortanswer or numerical or essay without ckeditor
+							var inputText = $("input[name=question${status.index}]")[0];
+							if($.trim(inputText.value).length == 0) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+							
+						<c:when test="${question.type == 5}">
+							//truefalse
+							if ($("input[name=question${status.index}]:checked").length == 0) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+							
+						<c:when test="${question.type == 6 && question.allowRichEditor}">
+							//essay with ckeditor
+							var ckeditorData = CKEDITOR.instances["question${status.index}"].getData();
+							//can't be null and empty value
+							if((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) {
+								missingRequiredQuestions.push("${status.index}");
+							}
+						</c:when>
+							
+						<c:when test="${question.type == 7}">
+							//ordering - do nothing
+						</c:when>
+					</c:choose>
+				</c:if>
+			</c:forEach>
+			
+			//return true in case all required questions were answered, false otherwise
+			if (missingRequiredQuestions.length == 0) {
+				return true;
+				
+			} else {
+				//remove .warning-answer-required from all questions
+				$('[id^=question-area-]').removeClass('warning-answer-required');
+				
+				//add .warning-answer-required class to those needs to be filled
+				for (i = 0; i < missingRequiredQuestions.length; i++) {
+				    $("#question-area-" + missingRequiredQuestions[i]).addClass('warning-answer-required');
+				}
+				
+				//show alert message as well
+				$("#warning-answers-required").show();
+				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
+				return false;
+			}
+		}
+		
     </script>
 </lams:head>
 <body class="stripes">
@@ -237,6 +349,10 @@
 				<c:out value="${assessment.instructions}" escapeXml="false"/>
 			</p>
 		</c:if>
+		
+		<div class="info" id="warning-answers-required">
+			<fmt:message key="warn.answers.required" />
+		</div>
 		
 		<div id="question" style="display:none; cursor: default"> 
 	        <h1 style="padding: 30 10 50">

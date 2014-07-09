@@ -46,6 +46,7 @@ public class AssessmentQuestionForm extends ActionForm {
     private String question;
     private String defaultGrade;
     private String penaltyFactor;
+    private boolean answerRequired;
     private String generalFeedback;
     private String feedback;
     private boolean multipleAnswersAllowed;
@@ -127,6 +128,14 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setPenaltyFactor(String penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
+    }
+    
+    public boolean isAnswerRequired() {
+	return answerRequired;
+    }
+
+    public void setAnswerRequired(boolean answerRequired) {
+	this.answerRequired = answerRequired;
     }
 
     public String getGeneralFeedback() {

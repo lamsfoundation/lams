@@ -50,9 +50,10 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
     }
     
     /**
-     * Import 20140102 version content to 20140428 version tool server.
+     * Import 20140428 version content to 20140707 version tool server.
      */    
     public void up20140428To20140707() {
 	this.renameField(AssessmentQuestion.class, "questionOptions", "options");
+	this.addField(AssessmentQuestion.class, "answerRequired", true);
     }
 }

@@ -141,3 +141,12 @@ table.question-table td {
 	color: red;
 }
 
+.warning-answer-required {
+	background-color: bisque !important;
+	background-image: none !important;
+	border-bottom: 1px solid white !important;
+}
+
+#warning-answers-required {
+	display: none;
+}

@@ -465,6 +465,7 @@ public class AuthoringAction extends Action {
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0");
+	questionForm.setAnswerRequired(true);
 
 	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
@@ -1662,6 +1663,7 @@ public class AuthoringAction extends Action {
 	form.setQuestion(question.getQuestion());
 	form.setDefaultGrade(String.valueOf(question.getDefaultGrade()));
 	form.setPenaltyFactor(String.valueOf(question.getPenaltyFactor()));
+	form.setAnswerRequired(question.isAnswerRequired());
 	form.setGeneralFeedback(question.getGeneralFeedback());
 	form.setFeedback(question.getFeedback());
 	form.setMultipleAnswersAllowed(question.isMultipleAnswersAllowed());
@@ -1733,6 +1735,7 @@ public class AuthoringAction extends Action {
 
 	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());
+	question.setAnswerRequired(questionForm.isAnswerRequired());
 
 	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());

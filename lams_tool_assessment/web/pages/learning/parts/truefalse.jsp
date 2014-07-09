@@ -59,7 +59,7 @@
 			<td class="has-radio-button">
 				<input type="radio" name="question${status.index}" value="${false}" styleClass="noBorder"
 	 				<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
-					<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>					 
+					<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
 				/>
 			</td>
 			<td class="question-option">
@@ -69,14 +69,14 @@
 
 </table>	
 
-<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
+<c:if test="${finishedLock && assessment.allowQuestionFeedback && (question.answerString != null)}">
 	<c:choose>
-		<c:when test="${question.answerBoolean and (question.answerString != null)}">
+		<c:when test="${question.answerBoolean}">
 			<div class="question-feedback">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
-		<c:when test="${!question.answerBoolean and (question.answerString != null)}">
+		<c:when test="${!question.answerBoolean}">
 			<div class="question-feedback">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
 			</div>

@@ -33,7 +33,7 @@
 						<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" styleClass="noBorder"
 	 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 							<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
-						/>			
+						/>
 					</c:when>
 					<c:otherwise>
 						<input type="radio" name="question${status.index}" value="${option.sequenceId}" styleClass="noBorder"
@@ -69,23 +69,19 @@
 </table>	
 
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-	<c:choose>
-		<c:when test="${question.mark == question.defaultGrade}">
-			<div class="question-feedback">
+	<div class="question-feedback">
+		<c:choose>
+			<c:when test="${question.mark == question.defaultGrade}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
-			</div>
-		</c:when>
-		<c:when test="${question.mark > 0}">
-			<div class="question-feedback">
+			</c:when>
+			<c:when test="${question.mark > 0}">
 				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
-			</div>
-		</c:when>
-		<c:when test="${question.mark <= 0}">
-			<div class="question-feedback">
+			</c:when>
+			<c:when test="${question.mark <= 0}">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
-			</div>
-		</c:when>		
-	</c:choose>
+			</c:when>		
+		</c:choose>
+	</div>
 </c:if>
 
 <%@ include file="markandpenaltyarea.jsp"%>
