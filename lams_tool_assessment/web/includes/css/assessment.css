@@ -1,3 +1,9 @@
+.field-name input[type=checkbox] {
+	vertical-align: bottom;
+	margin-right: 4px;
+	border: none;
+} 
+
 table.forum th {
 	font-size: inherit;
 	border-left: none;

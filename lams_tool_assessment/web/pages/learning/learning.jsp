@@ -130,7 +130,7 @@
 		
 		//check if we came back due to missing required question's answer
 		$(document).ready(function(){
-			if (${requiredQuestionsDTO != null}) {
+			if (${isRequiredAnswerMissed == true}) {
 				validateAnswers();
 			}
 		});

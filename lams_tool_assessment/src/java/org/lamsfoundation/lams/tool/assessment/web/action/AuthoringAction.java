@@ -465,7 +465,7 @@ public class AuthoringAction extends Action {
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0");
-	questionForm.setAnswerRequired(true);
+	questionForm.setAnswerRequired(false);
 
 	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
@@ -916,7 +916,7 @@ public class AuthoringAction extends Action {
 	    question.setFeedback(assessmentQuestion.getGeneralFeedback());
 	    question.setAnswers(answers);
 
-	    questions.add(assessmentQuestion.getSequenceId() - 1, question);
+	    questions.add(question);
 	}
 
 	String title = request.getParameter("title");

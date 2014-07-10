@@ -54,13 +54,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.RequiredQuestionsDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
@@ -75,7 +73,6 @@ import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationExce
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -436,11 +433,11 @@ public class LearningAction extends Action {
 	storeUserAnswersIntoSessionMap(request);
 	
 	//check all required questions got answered
-	RequiredQuestionsDTO requiredQuestionsDTO = checkAllRequiredQuestionsAnswered(sessionMap);
-	//if not then forward to nextPage()
-	if (requiredQuestionsDTO.isRequiredAnswerMissed()) {
-	    request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, requiredQuestionsDTO.getPageNumber());
-	    request.setAttribute(AssessmentConstants.ATTR_REQUIRED_QUESTIONS_DTO, requiredQuestionsDTO);
+	int pageNumberWithUnasweredQuestions = checkAllRequiredQuestionsAnswered(sessionMap);
+	//if some were not then forward to nextPage()
+	if (pageNumberWithUnasweredQuestions != 0) {
+	    request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberWithUnasweredQuestions);
+	    request.setAttribute(AssessmentConstants.ATTR_IS_REQUIRED_ANSWER_MISSED, true);
 	    
 	    return nextPage(mapping, form, request, response);
 	}
@@ -727,16 +724,17 @@ public class LearningAction extends Action {
     }
     
     /**
-     * Get back user answers from request and store it into sessionMap.
+     * Checks whether all questions set as requiring an answer was answered.
      * 
-     * @param request
+     * @param sessionMap
+     * @return 0 if all required questions were answered, or number of a page that contains unanswered question
      */
-    private RequiredQuestionsDTO checkAllRequiredQuestionsAnswered(SessionMap<String, Object> sessionMap){
+    private int checkAllRequiredQuestionsAnswered(SessionMap<String, Object> sessionMap){
 
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	
 	//array of missing required questions
-	List<Integer> missingRequiredQuestions = new ArrayList<Integer>();
+	boolean isAllQuestionsAnswered = true;
 
 	//iterate through all pages to find first that contains missing required questions
 	int pageCount;
@@ -771,9 +769,10 @@ public class LearningAction extends Action {
 			isAnswered = true;
 		    }
 
-		    // required question was not answered, so store its sequence id
+		    // check all questions were answered
 		    if (!isAnswered) {
-			missingRequiredQuestions.add(questionCount);
+			isAllQuestionsAnswered = false;
+			break;
 		    }
 
 		}
@@ -781,16 +780,13 @@ public class LearningAction extends Action {
 		questionCount++;
 	    }
 	    
-	    if (!missingRequiredQuestions.isEmpty()) {
-		break;
+	    //if found un-answered question, stop here
+	    if (!isAllQuestionsAnswered) {
+		return pageCount + 1;
 	    }
 	}
 
-	RequiredQuestionsDTO requiredQuestionsDTO = new RequiredQuestionsDTO();
-	requiredQuestionsDTO.setRequiredAnswerMissed(!missingRequiredQuestions.isEmpty());
-	requiredQuestionsDTO.setPageNumber(pageCount + 1);
-	requiredQuestionsDTO.setMissingRequiredQuestions(missingRequiredQuestions);
-	return requiredQuestionsDTO;
+	return 0;
     }
     
     /**
