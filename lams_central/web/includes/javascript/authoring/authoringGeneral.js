@@ -207,7 +207,7 @@ GeneralInitLib = {
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
 							eventY = translatedEvent[1],
-							iconPath = layout.toolMetadata[learningLibraryID],
+							iconPath = layout.toolMetadata[learningLibraryID].iconPath,
 							pngPath = iconPath && /\.svg$/i.test(iconPath)
 								? iconPath.substring(0, iconPath.indexOf('.svg')) + '.png' : iconPath;
 										    
