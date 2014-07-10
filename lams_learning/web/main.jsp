@@ -136,7 +136,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			</tr>
 			<tr>
 				<td id="exportButtonCell">
-					<c:if test="${portfolioEnabled}">
+					<c:if test="${param.portfolioEnabled}">
 						<input onClick="javascript:exportPortfolio()" type="button" class="button progressButton" value='<fmt:message key="button.export" />' />
 					</c:if>
 				</td>
