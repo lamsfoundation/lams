@@ -2,7 +2,20 @@
 	vertical-align: bottom;
 	margin-right: 4px;
 	border: none;
-} 
+}
+
+.field-name a {
+	color: #0087e5;
+}
+
+.field-name img {
+	margin-left: -4px;
+}
+
+#overall-feedback {
+	margin-left: 23px; 
+	margin-top: 10px;
+}
 
 table.forum th {
 	font-size: inherit;
@@ -154,5 +167,9 @@ table.question-table td {
 }
 
 #warning-answers-required {
+	display: none;
+}
+
+.hidden {
 	display: none;
 }

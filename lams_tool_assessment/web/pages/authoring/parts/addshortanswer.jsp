@@ -157,11 +157,17 @@
 				</div>
 				
 				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.general.feedback" />
+					<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('general-feedback');" />
+
+					<a href="javascript:toggleVisibility('general-feedback');" >
+						<fmt:message key="label.authoring.basic.general.feedback" />
+					</a>
 				</div>
-				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}">
-				</lams:CKEditor>
+				<div id="general-feedback" class="hidden">
+					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+						contentFolderID="${formBean.contentFolderID}">
+					</lams:CKEditor>
+				</div>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.short.answer.case.sensitivity" />

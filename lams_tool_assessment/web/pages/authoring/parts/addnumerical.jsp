@@ -33,7 +33,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-  	    <script><!--
+  	    <script>
 			$(document).ready(function(){
 				var optionValidator = $("#optionForm").validate();				
 				var unitValidator = $("#unitForm").validate();
@@ -153,8 +153,7 @@
     			self.parent.refreshThickbox()
     			self.parent.tb_remove();
     		}    
-  		--></script>
-		
+  		</script>
 		
 	</lams:head>
 	
@@ -210,13 +209,17 @@
 				</div>
 				
 				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.general.feedback" />
+					<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('general-feedback');" />
+
+					<a href="javascript:toggleVisibility('general-feedback');" >
+						<fmt:message key="label.authoring.basic.general.feedback" />
+					</a>
 				</div>
-				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}">
-				</lams:CKEditor>
-				
-				<br><br>
+				<div id="general-feedback" class="hidden">
+					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+						contentFolderID="${formBean.contentFolderID}">
+					</lams:CKEditor>
+				</div>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.numerical.answers" />

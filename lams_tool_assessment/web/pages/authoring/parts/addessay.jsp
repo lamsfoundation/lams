@@ -12,7 +12,8 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-  	    <script><!--
+  	    <script>
+	    
 			$(document).ready(function(){
 		    	$("#assessmentQuestionForm").validate({
 		    		rules: {
@@ -61,8 +62,7 @@
     			self.parent.refreshThickbox();
     			self.parent.tb_remove();
     		}    
-  		--></script>
-		
+  		</script>
 		
 	</lams:head>
 	
@@ -114,15 +114,22 @@
 				</div>
 					
 				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.general.feedback" />
+					<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('general-feedback');" />
+
+					<a href="javascript:toggleVisibility('general-feedback');" >
+						<fmt:message key="label.authoring.basic.general.feedback" />
+					</a>
 				</div>
-				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}">
-				</lams:CKEditor>				
+				
+				<div id="general-feedback" class="hidden">
+					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+						contentFolderID="${formBean.contentFolderID}">
+					</lams:CKEditor>
+				</div>
 
 			</html:form>
 
-			<br /><br /><br />
+			<br><br>
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" onmousedown="self.focus();" class="button-add-item">
 					<fmt:message key="label.authoring.essay.add.essay" /> 
