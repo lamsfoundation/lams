@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +48,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -123,42 +124,14 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
     }
 
-    // name comparators
     private static final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
 	@Override
 	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
-	    if ((o1 == null) && (o2 == null)) {
-		return 0;
-	    }
-	    if (o1 == null) {
-		return -1;
-	    }
-	    if (o2 == null) {
-		return 1;
-	    }
-	    if (o1.getName() == null) {
-		return o2.getName() == null ? 0 : -1;
-	    }
-	    return o1.getName().compareTo(o2.getName());
-	}
-    };
+	    String grp1Name = o1 != null ? o1.getName() : "";
+	    String grp2Name = o2 != null ? o2.getName() : "";
 
-    private static final Comparator<Group> GROUP_COMPARATOR = new Comparator<Group>() {
-	@Override
-	public int compare(Group o1, Group o2) {
-	    if ((o1 == null) && (o2 == null)) {
-		return 0;
-	    }
-	    if (o1 == null) {
-		return -1;
-	    }
-	    if (o2 == null) {
-		return 1;
-	    }
-	    if (o1.getGroupName() == null) {
-		return o2.getGroupName() == null ? 0 : -1;
-	    }
-	    return o1.getGroupName().compareTo(o2.getGroupName());
+	    AlphanumComparator comparator = new AlphanumComparator();
+	    return comparator.compare(grp1Name, grp2Name);
 	}
     };
 
@@ -226,7 +199,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    HttpServletResponse response) throws JSONException {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
-	Long lessonId =  WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Lesson lesson = null;
 	if (organisationId == null) {
 	    // read organisation ID from lesson
@@ -442,8 +415,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	if (groups != null) {
 	    // sort groups by their name
 	    List<Group> groupList = new LinkedList<Group>(groups);
-	    Collections.sort(groupList, OrganisationGroupAction.GROUP_COMPARATOR);
-
+	    Collections.sort(groupList, new GroupComparator());
 	    for (Group group : groupList) {
 		JSONObject groupJSON = new JSONObject();
 		groupJSON.put("name", group.getGroupName());
@@ -528,7 +500,7 @@ public class OrganisationGroupAction extends DispatchAction {
     @SuppressWarnings("unchecked")
     private boolean isDefaultChosenGrouping(Grouping grouping) {
 	Set<Group> groups = grouping.getGroups();
-	if (groups == null || grouping.getMaxNumberOfGroups() == null
+	if ((groups == null) || (grouping.getMaxNumberOfGroups() == null)
 		|| !grouping.getMaxNumberOfGroups().equals(groups.size())) {
 	    return false;
 	}
