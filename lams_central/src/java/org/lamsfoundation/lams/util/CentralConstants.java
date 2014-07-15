@@ -186,4 +186,10 @@ public class CentralConstants {
     public static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
 
     public static final String HEADER_CONTENT_ATTACHMENT = "attachment;filename=";
+
+    public static final String PARAM_LEARNER_EXPORT_PORTFOLIO_ENABLE = "learnerEnableExport";
+
+    public static final String PARAM_LEARNER_PRESENCE_ENABLE = "learnerSeeOnline";
+
+    public static final String PARAM_LEARNER_IM_ENABLE = "learnerInstantMessaging";
 }
