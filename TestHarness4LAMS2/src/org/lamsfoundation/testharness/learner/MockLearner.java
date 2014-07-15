@@ -80,6 +80,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_FINISH_SUBSTRING = "/lams/tool/lascrt11/learning/finish.do";
     private static final String SCRATCHIE_RESULTS_SUBSTRING = "/lams/tool/lascrt11/learning/showResults.do";
     private static final String SCRATCHIE_REFLECTION_SUBSTRING = "/lams/tool/lascrt11/learning/newReflection.do";
+    private static final String SCRATCHIE_LEARNING_SUBSTRING = "/lams/tool/lascrt11/pages/learning/learning.jsp";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
     private static final String SCRATCHIE_FINISH_AVAILABLE = "return finish()";
     private static final String SCRATCHIE_REFLECTION_AVAILABLE = "return continueReflect()";
@@ -448,6 +449,11 @@ public class MockLearner extends MockUser implements Runnable {
 	if (asText.contains(MockLearner.SCRATCHIE_FINISH_SUBSTRING)
 		|| asText.contains(MockLearner.SCRATCHIE_RESULTS_SUBSTRING)) {
 	    return handleToolScratchie(resp);
+	}
+	if (asText.contains(MockLearner.SCRATCHIE_LEARNING_SUBSTRING)) {
+	    // Scratchie start page
+	    String url = MockLearner.findURLInLocationHref(resp, MockLearner.SCRATCHIE_LEARNING_SUBSTRING);
+	    return (WebResponse) new Call(wc, test, username + " starts Scratchie", url).execute();
 	}
 
 	Matcher m = MockLearner.SHARE_RESOURCES_REDIRECT_PATTERN.matcher(asText);

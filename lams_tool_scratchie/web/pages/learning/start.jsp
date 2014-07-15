@@ -6,7 +6,7 @@
 <html>
 	<body class="stripes">
 		<script type="text/javascript">
-			document.location = "<c:url value="/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}"/>"
+			document.location.href = "<c:url value="/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}"/>"
 		</script>
 	</body>
 </html>
