@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -83,22 +84,6 @@ public class LessonManagerServlet extends HttpServlet {
     private static ILamsCoreToolService toolService = null;
 
     private static IUserManagementService userManagementService = null;
-
-    /**
-     * Constructor of the object.
-     */
-    public LessonManagerServlet() {
-	super();
-    }
-
-    /**
-     * Destruction of the servlet. <br>
-     */
-    @Override
-    public void destroy() {
-	super.destroy(); // Just puts "destroy" string in log
-	// Put your code here
-    }
 
     /**
      * The doGet method of the servlet. <br>
@@ -148,6 +133,13 @@ public class LessonManagerServlet extends HttpServlet {
 	String lastNames = request.getParameter("lastNames");
 	String emails = request.getParameter("emails");
 
+	// optional parameters for lesson initialisation
+	boolean exportPortfolioEnable = WebUtil.readBooleanParam(request,
+		CentralConstants.PARAM_LEARNER_EXPORT_PORTFOLIO_ENABLE, false);
+	boolean presenceEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_PRESENCE_ENABLE,
+		false);
+	boolean imEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_IM_ENABLE, false);
+
 	Long ldId = null;
 	Long lsId = null;
 	try {
@@ -166,7 +158,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, lang, customCSV);
+			country, lang, customCSV, exportPortfolioEnable, presenceEnable, imEnable);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -174,7 +166,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = startPreview(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, lang, customCSV);
+			country, lang, customCSV, presenceEnable, imEnable);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -182,7 +174,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			startDate, country, lang, customCSV);
+			startDate, country, lang, customCSV, exportPortfolioEnable, presenceEnable, imEnable);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -306,8 +298,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
-	    throws RemoteException {
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
+	    boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -319,8 +311,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
-		    organisation.getOrganisationId(), user.getUserId(), customCSV, false, false, true, false, false,
-		    true, false, false, null, null);
+		    organisation.getOrganisationId(), user.getUserId(), customCSV, false, false, exportPortfolioEnable,
+		    presenceEnable, imEnable, true, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
@@ -336,7 +328,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     public Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
-	    String customCSV) throws RemoteException {
+	    String customCSV, boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable)
+	    throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -346,7 +339,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId, orgMap
 		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
-		    true, false, false, true, false, false, null, null);
+		    exportPortfolioEnable, presenceEnable, imEnable, true, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
@@ -359,6 +352,7 @@ public class LessonManagerServlet extends HttpServlet {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     public Element getAllStudentProgress(Document document, String serverId, String datetime, String hashValue,
 	    String username, long lsId, String courseID) throws RemoteException {
 	try {
@@ -373,9 +367,9 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (lesson != null) {
 
 		int activitiesTotal = lesson.getLearningDesign().getActivities().size();
-		Iterator iterator = lesson.getLearnerProgresses().iterator();
+		Iterator<LearnerProgress> iterator = lesson.getLearnerProgresses().iterator();
 		while (iterator.hasNext()) {
-		    LearnerProgress learnProg = (LearnerProgress) iterator.next();
+		    LearnerProgress learnProg = iterator.next();
 		    LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();
 
 		    // get the username with the integration prefix removed
@@ -501,8 +495,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
-	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
-	    throws RemoteException {
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
+	    boolean presenceEnable, boolean imEnable) throws RemoteException {
 
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
@@ -514,7 +508,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLessonForPreview(title, desc, ldId,
-		    userId, customCSV, false, false, false);
+		    userId, customCSV, presenceEnable, imEnable, false);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.monitoringService.createPreviewClassForLesson(userId, lesson.getLessonId());
 
@@ -528,6 +522,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     }
 
+    @SuppressWarnings("unchecked")
     public Long importLearningDesign(HttpServletRequest request, HttpServletResponse response, String filePath,
 	    String username, String serverId, String customCSV) throws RemoteException {
 
@@ -913,6 +908,7 @@ public class LessonManagerServlet extends HttpServlet {
      * Returns lesson tool activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
      * solves problem with first activity unable to cast to ToolActivity.
      */
+    @SuppressWarnings("unchecked")
     private Set<ToolActivity> getLessonActivities(Lesson lesson) {
 	Set<Activity> activities = new TreeSet<Activity>();
 	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
