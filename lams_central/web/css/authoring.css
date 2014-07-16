@@ -320,7 +320,13 @@ td#templateContainerCell {
 	vertical-align: top;
 }
 
-div#templateContainer {
+td#templateContainerCell select {
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+div.templateContainer {
+	display: none;
 	height: 740px;
 	overflow: auto;
 	border: black thin solid;

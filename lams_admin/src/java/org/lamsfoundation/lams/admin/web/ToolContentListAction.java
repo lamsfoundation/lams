@@ -23,11 +23,13 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -60,6 +67,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/toolcontentlist" scope="request" validate="false"
  * 
  * @struts:action-forward name="toolcontentlist" path=".toolcontentlist"
+ * @struts:action-forward name="groups" path="/toolcontent/learningLibraryGroup.jsp"
  * @struts.action-forward name="error" path=".error"
  */
 public class ToolContentListAction extends Action {
@@ -75,10 +83,13 @@ public class ToolContentListAction extends Action {
     private static final String ATTRIBUTE_DATABASE_VERSIONS = "dbVersions";
 
     private static final String FORWARD_SUCCESS = "toolcontentlist";
+    private static final String FORWARD_GROUPS = "groups";
     private static final String FORWARD_ERROR = "error";
 
     private static final String ACTION_ENABLE = "enable";
     private static final String ACTION_DISABLE = "disable";
+    private static final String ACTION_OPEN_GROUPS = "openLearningLibraryGroups";
+    private static final String ACTION_SAVE_GROUPS = "saveLearningLibraryGroups";
 
     private static final String QUERY_DATABASE_VERSIONS = "select system_name, patch_level from patches";
 
@@ -86,10 +97,10 @@ public class ToolContentListAction extends Action {
     private static IUserManagementService userManagementService;
     private static DataSource dataSource;
 
+    @SuppressWarnings("unchecked")
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
 	// check permission
 	if (!(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN))) {
 	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_NAME, "ToolContentListAction");
@@ -99,7 +110,7 @@ public class ToolContentListAction extends Action {
 			    "error.authorisation"));
 	    return mapping.findForward(ToolContentListAction.FORWARD_ERROR);
 	}
-	
+
 	// not just display, but enable/disable a learning library
 	String param = request.getParameter(ToolContentListAction.PARAM_ACTION);
 	if (StringUtils.equals(param, ToolContentListAction.ACTION_ENABLE)) {
@@ -108,14 +119,17 @@ public class ToolContentListAction extends Action {
 	    } else {
 		return mapping.findForward(ToolContentListAction.FORWARD_ERROR);
 	    }
-	} else {
-	    if (StringUtils.equals(param, ToolContentListAction.ACTION_DISABLE)) {
-		if (checkPriviledge(request)) {
-		    disableLibrary(mapping, form, request, response);
-		} else {
-		    return mapping.findForward(ToolContentListAction.FORWARD_ERROR);
-		}
+	} else if (StringUtils.equals(param, ToolContentListAction.ACTION_DISABLE)) {
+	    if (checkPriviledge(request)) {
+		disableLibrary(mapping, form, request, response);
+	    } else {
+		return mapping.findForward(ToolContentListAction.FORWARD_ERROR);
 	    }
+	} else if (StringUtils.equals(param, ToolContentListAction.ACTION_OPEN_GROUPS)) {
+	    return openLearningLibraryGroups(mapping, form, request, response);
+	} else if (StringUtils.equals(param, ToolContentListAction.ACTION_SAVE_GROUPS)) {
+	    saveLearningLibraryGroups(mapping, form, request, response);
+	    return null;
 	}
 
 	// get learning library dtos and their validity
@@ -150,6 +164,7 @@ public class ToolContentListAction extends Action {
     }
 
     // returns full list of learning libraries, valid or not
+    @SuppressWarnings("unchecked")
     private ArrayList<LibraryActivityDTO> filterMultipleToolEntries(List<LearningLibraryDTO> learningLibraryDTOs,
 	    HashMap<Long, Boolean> learningLibraryValidity) {
 	ArrayList<LibraryActivityDTO> activeTools = new ArrayList<LibraryActivityDTO>();
@@ -218,6 +233,73 @@ public class ToolContentListAction extends Action {
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, true);
 
+    }
+
+    /**
+     * Loads groups and libraries and displays the management dialog.
+     */
+    private ActionForward openLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	// build full list of available learning libraries
+	List<LearningLibraryDTO> learningLibraries = getLearningDesignService().getAllLearningLibraryDetails(
+		getUserLanguage());
+	JSONArray learningLibrariesJSON = new JSONArray();
+	for (LearningLibraryDTO learningLibrary : learningLibraries) {
+	    JSONObject learningLibraryJSON = new JSONObject();
+	    learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryID());
+	    learningLibraryJSON.put("title", learningLibrary.getTitle());
+	    learningLibrariesJSON.put(learningLibraryJSON);
+	}
+	request.setAttribute("learningLibraries", learningLibrariesJSON.toString());
+
+	// build list of existing groups
+	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
+	JSONArray groupsJSON = new JSONArray();
+	for (LearningLibraryGroup group : groups) {
+	    JSONObject groupJSON = new JSONObject();
+	    groupJSON.put("groupId", group.getGroupId());
+	    groupJSON.put("name", group.getName());
+	    for (LearningLibrary learningLibrary : group.getLearningLibraries()) {
+		JSONObject learningLibraryJSON = new JSONObject();
+		learningLibraryJSON.put("learningLibraryId", learningLibrary.getLearningLibraryId());
+		learningLibraryJSON.put("title", learningLibrary.getTitle());
+		groupJSON.append("learningLibraries", learningLibraryJSON);
+	    }
+	    groupsJSON.put(groupJSON);
+	}
+	request.setAttribute("groups", groupsJSON.toString());
+
+	return mapping.findForward(ToolContentListAction.FORWARD_GROUPS);
+    }
+
+    
+    private void saveLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	// extract groups from JSON and persist them
+	JSONArray groupsJSON = new JSONArray(request.getParameter("groups"));
+	List<LearningLibraryGroup> groups = new ArrayList<LearningLibraryGroup>(groupsJSON.length());
+
+	for (int groupIndex = 0; groupIndex < groupsJSON.length(); groupIndex++) {
+	    LearningLibraryGroup group = new LearningLibraryGroup();
+	    groups.add(group);
+
+	    JSONObject groupJSON = groupsJSON.getJSONObject(groupIndex);
+	    long groupId = groupJSON.optLong("groupId");
+	    if (groupId > 0) {
+		group.setGroupId(groupId);
+	    }
+	    group.setName(groupJSON.getString("name"));
+
+	    group.setLearningLibraries(new HashSet<LearningLibrary>());
+	    JSONArray learningLibrariesJSON = groupJSON.getJSONArray("learningLibraries");
+	    for (int learningLibraryIndex = 0; learningLibraryIndex < learningLibrariesJSON.length(); learningLibraryIndex++) {
+		long learningLibraryId = learningLibrariesJSON.getLong(learningLibraryIndex);
+		LearningLibrary learningLibrary = getLearningDesignService().getLearningLibrary(learningLibraryId);
+		group.getLearningLibraries().add(learningLibrary);
+	    }
+	}
+	
+	getLearningDesignService().saveLearningLibraryGroups(groups);
     }
 
     private ILearningDesignService getLearningDesignService() {

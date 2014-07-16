@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
+import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -71,8 +73,6 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -120,18 +120,31 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     public ActionForward openAuthoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
+	    HttpServletResponse response) throws IOException, JSONException {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
+	
+	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
+	// build list of existing learning library groups
+	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
+	JSONArray groupsJSON = new JSONArray();
+	for (LearningLibraryGroup group : groups) {
+	    JSONObject groupJSON = new JSONObject();
+	    groupJSON.put("name", group.getName());
+	    for (LearningLibrary learningLibrary : group.getLearningLibraries()) {
+		groupJSON.append("learningLibraries", learningLibrary.getLearningLibraryId());
+	    }
+	    groupsJSON.put(groupJSON);
+	}
+	request.setAttribute("learningLibraryGroups", groupsJSON.toString());
 
 	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(getUserId());
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
 	request.setAttribute("access", gson.toJson(accessList));
-	
+
 	request.setAttribute("licenses", getAuthoringService().getAvailableLicenses());
-	
+
 	return mapping.findForward("openAutoring");
     }
 

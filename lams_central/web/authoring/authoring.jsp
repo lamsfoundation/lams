@@ -154,6 +154,7 @@
 			activitiesOnlySelectable = false,
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
+			learningLibraryGroups = ${learningLibraryGroups},
 			initAccess = ${access};
 	</script>
 </lams:head>
@@ -261,7 +262,10 @@
 	<table id="authoringTable">
 		<tr>
 			<td id="templateContainerCell">
-				<div id="templateContainer">
+				<select>
+					<option><fmt:message key="authoring.fla.tool.groups.all" /></option>
+				</select>
+				<div class="templateContainer">
 					<c:forEach var="tool" items="${tools}">
 						<div
 							 toolId="${tool.toolId}"

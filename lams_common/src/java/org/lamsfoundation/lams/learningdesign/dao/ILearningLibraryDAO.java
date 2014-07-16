@@ -27,21 +27,24 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 
 /**
  * @author Manpreet Minhas
  */
 public interface ILearningLibraryDAO extends IBaseDAO {
-	
-	public LearningLibrary getLearningLibraryById(Long learningLibraryId);
-	/** 
-	 * Get all valid learning libraries, it eaquals getAllLearningLibraries(true);
-	 */
-	public List getAllLearningLibraries();
-	/**
-	 * Get all learning libraries whatever the library is valid or invalid. 
-	 * @return
-	 */
-	public List getAllLearningLibraries(boolean valid);
 
+    public LearningLibrary getLearningLibraryById(Long learningLibraryId);
+
+    /**
+     * Get all valid learning libraries, it eaquals getAllLearningLibraries(true);
+     */
+    public List<LearningLibrary> getAllLearningLibraries();
+
+    /**
+     * Get all learning libraries whatever the library is valid or invalid.
+     */
+    public List<LearningLibrary> getAllLearningLibraries(boolean valid);
+
+    public List<LearningLibraryGroup> getLearningLibraryGroups();
 }

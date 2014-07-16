@@ -15,7 +15,7 @@ $(document).ready(function(){
 
 
 /**
- * Add a group and fills it with given users.
+ * Add a group and fills it with given learning libraries;
  */
 function addGroup(groupData) {
 	var group = $('#groupTemplate').clone()
@@ -68,6 +68,9 @@ function fillGroup(learningLibraries, container) {
 }
 
 
+/**
+ * Constructs a single learning library label with events. 
+ */
 function createLearningLibraryDiv(learningLibraryId, title) {
 	return $('<div />').attr('learningLibraryId', learningLibraryId)
 	.addClass('draggableLearningLibrary')
@@ -134,8 +137,10 @@ function transferLearningLibraries(fromContainer, toContainer) {
 	var selectedLearningLibraries =  $('.draggableLearningLibrarySelected', fromContainer);
 	if (selectedLearningLibraries.length > 0){
 		if (toContainer.parent().attr('id') == 'learningLibraryCell'){
+			// just remove the selected items as they already exist in the full learning library list
 			selectedLearningLibraries.remove();
 		} else {
+			// find out which learning libraries are already there and do not move them
 			var filteredLearningLibraries = [],
 				existingLearningLibraries = $('.draggableLearningLibrary', toContainer),
 				isAdd = fromContainer.parent().attr('id') == 'learningLibraryCell';
@@ -149,6 +154,8 @@ function transferLearningLibraries(fromContainer, toContainer) {
 				});
 				if (selectedLearningLibrary) {
 					if (isAdd) {
+						// the selected items were pulled out from the full library list,
+						// so do not remove them from the source container
 						selectedLearningLibrary = createLearningLibraryDiv(selectedLearningLibrary.attr('learningLibraryId'),
 								selectedLearningLibrary.text());
 					}
@@ -179,6 +186,7 @@ function colorDraggableLearningLibraries(container) {
 	});
 }
 
+
 /**
  * Remove a group from the page.
  */
@@ -189,6 +197,9 @@ function removeGroup(container) {
 }
 
 
+/**
+ * Save groups and let parent window that it can close the dialog
+ */
 function saveGroups(){
 	var groups = [],
 		result = false;
@@ -198,7 +209,7 @@ function saveGroups(){
 			learningLibraryIds = [],
 			name =  $('input', this).val();
 		if (!name || name.trim() == '') {
-			alert('A group name can not be blank');
+			alert(LABELS.GROUP_NAME_VALIDATION_ERROR);
 			groups = null;
 			return false;
 		}
@@ -228,7 +239,7 @@ function saveGroups(){
 				result = true;
 			},
 			'error'	  : function(){
-				alert('Error while saving groups');
+				alert(LABELS.SAVE_ERROR);
 			}
 		});
 	}

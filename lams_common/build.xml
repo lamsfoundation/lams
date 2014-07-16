@@ -28,6 +28,7 @@
 		<include name="**/Competence.java" />
 		<include name="**/ActivityEvaluation.java" />
 		<include name="**/CompetenceMapping.java" />
+		<include name="**/LearningLibraryGroup.java" />
 		<!-- Notebook -->
 		<include name="**/NotebookEntry.java" />
 		<!-- Presence Chat -->

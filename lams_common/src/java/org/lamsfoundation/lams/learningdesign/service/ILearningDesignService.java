@@ -25,12 +25,15 @@ package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.batik.transcoder.TranscoderException;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -79,6 +82,15 @@ public interface ILearningDesignService {
     public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)
 	    throws IOException;
 
+    public LearningLibrary getLearningLibrary(Long learningLibraryId);
+    
+    /**
+     * Gets all existing learning library groups.
+     */
+    public List<LearningLibraryGroup> getLearningLibraryGroups();
+    
+    public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
+    
     /**
      * Set valid flag to learning library.
      * 

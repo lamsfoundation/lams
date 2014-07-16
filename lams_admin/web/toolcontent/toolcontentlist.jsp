@@ -1,5 +1,40 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#toolGroupsDialog').dialog({
+			'autoOpen' : false,
+			'modal'	   : true,
+			'draggable': false,
+			'width'	   : 900,
+			'height'   : 700,
+			'title'	   : '<fmt:message key="tool.groups.dialog.title" />',
+			'open' 	   : function(){
+				$('#toolGroupsFrame', this).attr('src', 'toolcontentlist.do?action=openLearningLibraryGroups');
+			},
+			'beforeClose'	   : function(){
+				$('#toolGroupsFrame', this).attr('src', null);
+			}
+		});
+
+		$('div.ui-dialog-titlebar').prepend($('.customDialogButton'));
+	});
+
+	function openToolGroups(){
+		$('#toolGroupsDialog').dialog('open');
+	}
+	
+	function saveToolGroups(){
+		var result = $('#toolGroupsFrame')[0].contentWindow.saveGroups();
+		if (result) {
+			$('#toolGroupsDialog').dialog('close');
+		}
+	}
+</script>
+
+
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <h1><fmt:message key="sysadmin.tool.management" /></h1>
 
@@ -11,6 +46,16 @@
 <p>
 	<fmt:message key="msg.edit.tool.content.3" />
 </p>
+
+<a href="javascript:openToolGroups()" class="button" style="float:right; margin: 10px 0"
+   title="<fmt:message key='tool.groups.open.button.tooltip' />"><fmt:message key="tool.groups.open.button" /></a>
+<div id="toolGroupsDialog" style="display: none">
+	<a class="customDialogButton" href="javascript:saveToolGroups()" style="right: 50px;">
+		<fmt:message key="admin.save" />
+	</a>
+	<iframe id="toolGroupsFrame" style="border: none; width: 100%; height: 100%"></iframe>
+</div>
+
 
 <c:set var="displayToolManagement" value="false" />
 <logic:iterate id="dto" name="toolLibrary">

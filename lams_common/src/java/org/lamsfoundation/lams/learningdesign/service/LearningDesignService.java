@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
@@ -184,13 +186,54 @@ public class LearningDesignService implements ILearningDesignService {
     }
 
     @Override
+    public LearningLibrary getLearningLibrary(Long learningLibraryId) {
+	return (LearningLibrary) learningDesignDAO.find(LearningLibrary.class, learningLibraryId);
+    }
+
+    @Override
+    public List<LearningLibraryGroup> getLearningLibraryGroups() {
+	return learningLibraryDAO.getLearningLibraryGroups();
+    }
+
+    @Override
+    public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups) {
+	// find out which groups do not exist anymore and get rid of them
+	Collection<LearningLibraryGroup> existingGroups = learningLibraryDAO.getLearningLibraryGroups();
+	Collection<LearningLibraryGroup> removeGroups = new HashSet<LearningLibraryGroup>(existingGroups);
+	removeGroups.removeAll(groups);
+	existingGroups.removeAll(removeGroups);
+	learningLibraryDAO.deleteAll(removeGroups);
+
+	// find out which groups are new and which ones need to be updated
+	for (LearningLibraryGroup group : groups) {
+	    boolean found = false;
+	    for (LearningLibraryGroup existingGroup : existingGroups) {
+		if (existingGroup.equals(group)) {
+		    existingGroup.setName(group.getName());
+		    existingGroup.setLearningLibraries(group.getLearningLibraries());
+		    learningLibraryDAO.update(existingGroup);
+
+		    found = true;
+		    break;
+		}
+	    }
+
+	    if (!found) {
+		learningDesignDAO.insert(group);
+	    }
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)
 	    throws IOException {
-	Iterator iterator = learningLibraryDAO.getAllLearningLibraries(valid).iterator();
+	Iterator<LearningLibrary> iterator = learningLibraryDAO.getAllLearningLibraries(valid).iterator();
 	ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
 	while (iterator.hasNext()) {
-	    LearningLibrary learningLibrary = (LearningLibrary) iterator.next();
-	    List templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
+	    LearningLibrary learningLibrary = iterator.next();
+	    List<Activity> templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary
+		    .getLearningLibraryId());
 
 	    if ((templateActivities != null) & (templateActivities.size() == 0)) {
 		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId()
@@ -204,11 +247,11 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 	return libraries;
     }
-    
-    
+
     /**
      * Gets basic information on available tools.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException {
 	User user = (User) learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
@@ -274,8 +317,8 @@ public class LearningDesignService implements ILearningDesignService {
 	return createDesignSVG(learningDesignId, null, imageFormat);
     }
 
-    private void internationaliseActivities(Collection activities) {
-	Iterator iter = activities.iterator();
+    private void internationaliseActivities(Collection<LibraryActivityDTO> activities) {
+	Iterator<LibraryActivityDTO> iter = activities.iterator();
 	Locale locale = LocaleContextHolder.getLocale();
 
 	if (log.isDebugEnabled()) {
@@ -285,7 +328,7 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 
 	while (iter.hasNext()) {
-	    LibraryActivityDTO activity = (LibraryActivityDTO) iter.next();
+	    LibraryActivityDTO activity = iter.next();
 	    // update the activity fields
 	    String languageFilename = activity.getLanguageFile();
 	    if (languageFilename != null) {

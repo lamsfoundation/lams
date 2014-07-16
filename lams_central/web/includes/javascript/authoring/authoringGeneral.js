@@ -125,6 +125,7 @@ GeneralInitLib = {
 	 * Draw boxes with Tool Activity templates in the panel on the left.
 	 */
 	initTemplates : function(){
+		// store some template data in JS structures
 		$('.template').each(function(){
 			var learningLibraryID = +$(this).attr('learningLibraryId'),
 				activityCategoryID = +$(this).attr('activityCategoryId'),
@@ -161,7 +162,48 @@ GeneralInitLib = {
 				if (toolName.text().length > 12){
 					toolName.css('padding-top', '8px');
 				}
+			}
+		});
+		
+		if (!isReadOnlyMode){
+			// create list of learning libraries for each group
+			var templateContainerCell = $('#templateContainerCell'),
+				learningLibraryGroupSelect = $('select', templateContainerCell),
+				allGroup = $('option', learningLibraryGroupSelect),
+				allTemplates = $('#templateContainerCell .templateContainer').show();
+		
+			learningLibraryGroupSelect.change(function(){
+				$('.templateContainer').hide();
+				// show DIV with the selected learning libraries group
+				$('option:selected', this).data('templates').show();
+			});
+			allGroup.data('templates', allTemplates);
+			
+			$.each(learningLibraryGroups, function(){
+				var templates = allTemplates.clone().appendTo(templateContainerCell),
+					learningLibraries = this.learningLibraries;
+				// cloned everything, now remove ones that are not in the list
+				$('.template', templates).each(function(){
+					var learningLibraryId = $(this).attr('learningLibraryId'),
+						found = false;
+					$.each(learningLibraries, function(){
+						if (learningLibraryId == this) {
+							found = true;
+							return false;
+						}
+					});
+					
+					if (!found) {
+						$(this).remove();
+					}
+				});
 				
+				$('<option />').text(this.name)
+							   .data('templates', templates)
+							   .appendTo(learningLibraryGroupSelect);
+			});
+			
+			$('.template').each(function(){
 				// allow dragging a template to canvas
 				$(this).draggable({
 					'containment' : '#authoringTable',
@@ -184,10 +226,9 @@ GeneralInitLib = {
 						return helper;
 					}
 				});
-			}
-		});
-		
-		if (!isReadOnlyMode) {
+			});
+
+			
 			// allow dropping templates to canvas
 			canvas.droppable({
 				   'tolerance'   : 'touch',
