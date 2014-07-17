@@ -27,190 +27,195 @@ package org.lamsfoundation.lams.tool.notebook.model;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * 
- * Caches the user details. This allows the tool to be more efficient at
- * displaying user names but means that when people's names change, they won't
- * change in the "old" tool data.
+ * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
+ * people's names change, they won't change in the "old" tool data.
  * 
  * @hibernate.class table="tl_lantbk11_user"
  */
-
 public class NotebookUser implements java.io.Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3701664859818409197L;
+    private static final long serialVersionUID = -3701664859818409197L;
 
-	// Fields
-	private Long uid;
+    // Fields
+    private Long uid;
 
-	private Long userId;
+    private Long userId;
 
-	private String lastName;
+    private String lastName;
 
-	private String firstName;
+    private String firstName;
 
-	private String loginName;
+    private String loginName;
 
-	private NotebookSession notebookSession;
-	
-	private boolean finishedActivity;
-	
-	private Long entryUID;
+    private NotebookSession notebookSession;
 
-	// Constructors
+    private boolean finishedActivity;
 
-	/** default constructor */
-	public NotebookUser() {
-	}
+    private Long entryUID;
+    
+    private String teachersComment;
 
-	public NotebookUser(UserDTO user, NotebookSession notebookSession) {
-		this.userId = new Long(user.getUserID().intValue());
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.loginName = user.getLogin();
-		this.notebookSession = notebookSession;
-		this.finishedActivity = false;
-	}
+    // Constructors
 
-	/** full constructor */
-	public NotebookUser(Long userId, String lastName, String firstName,
-			NotebookSession notebookSession) {
-		this.userId = userId;
-		this.lastName = lastName;
-		this.firstName = firstName;
-		this.notebookSession = notebookSession;
-	}
+    /** default constructor */
+    public NotebookUser() {
+    }
 
-	// Property accessors
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 */
-	public Long getUid() {
-		return this.uid;
-	}
+    public NotebookUser(UserDTO user, NotebookSession notebookSession) {
+	this.userId = new Long(user.getUserID().intValue());
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.loginName = user.getLogin();
+	this.notebookSession = notebookSession;
+	this.finishedActivity = false;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    /** full constructor */
+    public NotebookUser(Long userId, String lastName, String firstName, NotebookSession notebookSession) {
+	this.userId = userId;
+	this.lastName = lastName;
+	this.firstName = firstName;
+	this.notebookSession = notebookSession;
+    }
 
-	/**
-	 * @hibernate.property column="user_id" length="20"
-	 * 
-	 */
-	public Long getUserId() {
-		return this.userId;
-	}
+    // Property accessors
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     */
+    public Long getUid() {
+	return this.uid;
+    }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-	/**
-	 * @hibernate.property column="last_name" length="255"
-	 * 
-	 */
-	public String getLastName() {
-		return this.lastName;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	
-	/**
-	 * @hibernate.property column="login_name" length="255"
-	 * 
-	 */
-	public String getLoginName() {
-		return loginName;
-	}
+    /**
+     * @hibernate.property column="user_id" length="20"
+     * 
+     */
+    public Long getUserId() {
+	return this.userId;
+    }
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
 
-	/**
-	 * @hibernate.property column="first_name" length="255"
-	 * 
-	 */
-	public String getFirstName() {
-		return this.firstName;
-	}
+    /**
+     * @hibernate.property column="last_name" length="255"
+     * 
+     */
+    public String getLastName() {
+	return this.lastName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	
-	/**
-	 * @hibernate.property column="finishedActivity" 
-	 */
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
-	
-	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="notebook_session_uid"
-	 * 
-	 */
-	public NotebookSession getNotebookSession() {
-		return this.notebookSession;
-	}
+    /**
+     * @hibernate.property column="login_name" length="255"
+     * 
+     */
+    public String getLoginName() {
+	return loginName;
+    }
 
-	public void setNotebookSession(NotebookSession notebookSession) {
-		this.notebookSession = notebookSession;
-	}
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
 
-	/**
-	 * @hibernate.property column="entry_uid"
-	 */
-	public Long getEntryUID() {
-		return entryUID;
-	}
+    /**
+     * @hibernate.property column="first_name" length="255"
+     * 
+     */
+    public String getFirstName() {
+	return this.firstName;
+    }
 
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
-	}
-	
-	/**
-	 * toString
-	 * 
-	 * @return String
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-		buffer.append(getClass().getName()).append("@").append(
-				Integer.toHexString(hashCode())).append(" [");
-		buffer.append("userId").append("='").append(getUserId()).append("' ");
-		buffer.append("]");
+    /**
+     * @hibernate.property column="finishedActivity"
+     */
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
 
-		return buffer.toString();
-	}
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof NotebookUser))
-			return false;
-		NotebookUser castOther = (NotebookUser) other;
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="notebook_session_uid"
+     * 
+     */
+    public NotebookSession getNotebookSession() {
+	return this.notebookSession;
+    }
 
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
-	}
+    public void setNotebookSession(NotebookSession notebookSession) {
+	this.notebookSession = notebookSession;
+    }
 
-	public int hashCode() {
-		int result = 17;
-		result = 37 * result
-				+ (getUid() == null ? 0 : this.getUid().hashCode());
-		return result;
-	}
+    /**
+     * @hibernate.property column="entry_uid"
+     */
+    public Long getEntryUID() {
+	return entryUID;
+    }
+
+    public void setEntryUID(Long entryUID) {
+	this.entryUID = entryUID;
+    }
+    
+    /**
+     * @hibernate.property column="teachers_comment" length="65535"
+     * 
+     */
+    public String getTeachersComment() {
+	return teachersComment;
+    }
+
+    public void setTeachersComment(String teachersComment) {
+	this.teachersComment = teachersComment;
+    }
+
+    /**
+     * toString
+     * 
+     * @return String
+     */
+    public String toString() {
+	StringBuffer buffer = new StringBuffer();
+
+	buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
+	buffer.append("userId").append("='").append(getUserId()).append("' ");
+	buffer.append("]");
+
+	return buffer.toString();
+    }
+
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof NotebookUser))
+	    return false;
+	NotebookUser castOther = (NotebookUser) other;
+
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
+		.getUid().equals(castOther.getUid())));
+    }
+
+    public int hashCode() {
+	int result = 17;
+	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
+	return result;
+    }
 }

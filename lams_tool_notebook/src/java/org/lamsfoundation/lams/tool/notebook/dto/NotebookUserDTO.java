@@ -25,107 +25,124 @@
 
 package org.lamsfoundation.lams.tool.notebook.dto;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 
-public class NotebookUserDTO implements Comparable{
-	
-	public Long uid;
-	
-	public String loginName;
-	
-	public String firstName;
-	
-	public String lastName;
-	
-	public boolean finishedActivity;
-	
-	public NotebookEntryDTO entryDTO;
+public class NotebookUserDTO implements Comparable {
 
-	public Long entryUID;
-	
-	public NotebookUserDTO(NotebookUser user, NotebookEntry entry) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-		this.entryUID = user.getEntryUID();
-		this.entryDTO = new NotebookEntryDTO(entry);
-	}
-	
-	public NotebookUserDTO(NotebookUser user) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-		this.entryUID = user.getEntryUID();		
-	}
+    private Long uid;
 
-	public int compareTo(Object o) {
-		int returnValue;
-		NotebookUserDTO toUser = (NotebookUserDTO)o;
-		returnValue = this.lastName.compareTo(toUser.lastName);
-		if (returnValue == 0) {
-			returnValue = this.uid.compareTo(toUser.uid);			
-		}
-		return returnValue;		
-	}
+    private String loginName;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    private String firstName;
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    private String lastName;
 
-	public String getLastName() {
-		return lastName;
-	}
+    private boolean finishedActivity;
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    private NotebookEntryDTO entryDTO;
 
-	public String getLoginName() {
-		return loginName;
-	}
+    private Long entryUID;
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    private String teachersComment;
 
-	public Long getUid() {
-		return uid;
+    public NotebookUserDTO(NotebookUser user, NotebookEntry entry) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+	this.entryUID = user.getEntryUID();
+	if (user.getTeachersComment() != null) {
+	    this.teachersComment = StringEscapeUtils.escapeJavaScript(user.getTeachersComment());
 	}
+	this.entryDTO = new NotebookEntryDTO(entry);
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
+    public NotebookUserDTO(NotebookUser user) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+	this.entryUID = user.getEntryUID();
+	if (user.getTeachersComment() != null) {
+	    this.teachersComment = StringEscapeUtils.escapeJavaScript(user.getTeachersComment());
 	}
+    }
 
-	public NotebookEntryDTO getEntryDTO() {
-		return entryDTO;
+    public int compareTo(Object o) {
+	int returnValue;
+	NotebookUserDTO toUser = (NotebookUserDTO) o;
+	returnValue = this.lastName.compareTo(toUser.lastName);
+	if (returnValue == 0) {
+	    returnValue = this.uid.compareTo(toUser.uid);
 	}
+	return returnValue;
+    }
 
-	public void setEntryDTO(NotebookEntryDTO entryDTO) {
-		this.entryDTO = entryDTO;
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public Long getEntryUID() {
-		return entryUID;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
-	}
+    public String getLastName() {
+	return lastName;
+    }
 
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
+    public String getLoginName() {
+	return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    public NotebookEntryDTO getEntryDTO() {
+	return entryDTO;
+    }
+
+    public void setEntryDTO(NotebookEntryDTO entryDTO) {
+	this.entryDTO = entryDTO;
+    }
+
+    public Long getEntryUID() {
+	return entryUID;
+    }
+
+    public void setEntryUID(Long entryUID) {
+	this.entryUID = entryUID;
+    }
+
+    public String getTeachersComment() {
+	return teachersComment;
+    }
+
+    public void setTeachersComment(String teachersComment) {
+	this.teachersComment = teachersComment;
+    }
+
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
+
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 }

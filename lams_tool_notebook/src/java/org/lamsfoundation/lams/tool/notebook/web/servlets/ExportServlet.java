@@ -151,7 +151,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		NotebookDTO notebookDTO = new NotebookDTO(notebook);
 		
 		// add the notebookEntry for each user in each session
-		
 		for (NotebookSessionDTO session : notebookDTO.getSessionDTOs()) {
 			for (NotebookUserDTO user : session.getUserDTOs()) {
 				NotebookEntry entry = notebookService.getEntry(user.getEntryUID());

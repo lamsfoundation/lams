@@ -24,18 +24,20 @@
 
 package org.lamsfoundation.lams.tool.notebook.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 
 /**
- * DAO for accessing the NotebookSession objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the NotebookSession objects - interface defining methods to be implemented by the Hibernate or
+ * other implementation.
  */
-public interface INotebookSessionDAO extends IBaseDAO{
+public interface INotebookSessionDAO extends IBaseDAO {
 
-	void saveOrUpdate(NotebookSession session);
+    void saveOrUpdate(NotebookSession session);
 
-	NotebookSession getBySessionId(Long toolSessionId);
+    NotebookSession getBySessionId(Long toolSessionId);
 
-	void deleteBySessionID(Long toolSessionID);
+    void deleteBySessionID(Long toolSessionID);
 }

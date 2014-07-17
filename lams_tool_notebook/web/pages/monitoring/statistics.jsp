@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="dto" value="${notebookDTO}" />
-<c:forEach var="session" items="${dto.sessionDTOs}">
+<c:forEach var="session" items="${notebookDTO.sessionDTOs}">
 
 	<table>
 		<tr>

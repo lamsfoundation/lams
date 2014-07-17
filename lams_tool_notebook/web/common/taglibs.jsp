@@ -2,6 +2,7 @@
 
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>

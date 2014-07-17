@@ -35,27 +35,28 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
  */
 public class NotebookSessionDAO extends BaseDAO implements INotebookSessionDAO {
 
-	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
-			+ NotebookSession.class.getName() + " where session_id=?";
+    public static final String FIND_BY_SESSION_ID = "from " + NotebookSession.class.getName() + " where session_id=?";
 
-	public void saveOrUpdate(NotebookSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
-	}
+    @Override
+    public void saveOrUpdate(NotebookSession session) {
+	this.getHibernateTemplate().saveOrUpdate(session);
+	this.getHibernateTemplate().flush();
+    }
 
-	public NotebookSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
-				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
-		if (list == null || list.isEmpty())
-			return null;
-		return (NotebookSession) list.get(0);
-	}
+    @Override
+    public NotebookSession getBySessionId(Long toolSessionId) {
+	List list = this.getHibernateTemplate().find(FIND_BY_SESSION_ID, toolSessionId);
+	if (list == null || list.isEmpty())
+	    return null;
+	return (NotebookSession) list.get(0);
+    }
 
-	public void deleteBySessionID(Long toolSessionID) {
-		NotebookSession session = getBySessionId(toolSessionID);
-		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
-		}
+    @Override
+    public void deleteBySessionID(Long toolSessionID) {
+	NotebookSession session = getBySessionId(toolSessionID);
+	if (session != null) {
+	    this.getHibernateTemplate().delete(session);
+	    this.getHibernateTemplate().flush();
 	}
+    }
 }
