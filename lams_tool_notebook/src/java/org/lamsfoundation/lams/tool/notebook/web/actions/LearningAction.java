@@ -144,6 +144,9 @@ public class LearningAction extends LamsDispatchAction {
 	if (nbEntry != null) {
 	    learningForm.setEntryText(nbEntry.getEntry());
 	}
+	
+	// get teacher's comment if available
+	request.setAttribute("teachersComment", notebookUser.getTeachersComment());
 
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (notebook.isLockOnFinished() && notebookUser.isFinishedActivity())) {

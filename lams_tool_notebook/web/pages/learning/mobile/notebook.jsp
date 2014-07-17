@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-<!--
 	var mode = "${mode}";
 
 	function disableFinishButton() {
@@ -36,11 +35,11 @@
 			}
 		}
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
--->
+	
+	function submitForm(methodName){
+		var f = document.getElementById('messageForm');
+		f.submit();
+	}
 </script>
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
@@ -91,8 +90,15 @@
 				<lams:out value="${lrnForm.entryText}" />
 			</c:otherwise>
 		</c:choose>
-
-	
+		
+		<c:if test="${not empty teachersComment}">
+			<br><br>
+			<h3>
+				<fmt:message key="label.learning.comment" />
+			</h3>
+			<lams:out value="${teachersComment}" escapeHtml="true"/>
+		</c:if>
+		
 	</div>
 
 	<div data-role="footer" data-theme="b" class="ui-bar">

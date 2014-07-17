@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-<!--
 	var mode = "${mode}";
 
 	function disableFinishButton() {
@@ -36,11 +35,11 @@
 			}
 		}
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
--->
+	
+	function submitForm(methodName){
+		var f = document.getElementById('messageForm');
+		f.submit();
+	}
 </script>
 
 <div id="content">
@@ -75,14 +74,12 @@
 
 	&nbsp;
 
-	<html:form action="/learning" method="post"
-		onsubmit="return validateForm();" styleId="messageForm">
+	<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="messageForm">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="contentEditable" value="${contentEditable}" />
 		
-		<c:set var="lrnForm"
-			value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 		<c:choose>
 			<c:when test="${contentEditable}">
@@ -94,8 +91,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<html:textarea cols="60" rows="8" property="entryText"
-							styleClass="text-area"></html:textarea>
+						<html:textarea cols="60" rows="8" property="entryText"styleClass="text-area"/>
 					</c:otherwise>
 				</c:choose>
 			</c:when>
@@ -104,6 +100,14 @@
 				<lams:out value="${lrnForm.entryText}" />
 			</c:otherwise>
 		</c:choose>
+		
+		<c:if test="${not empty teachersComment}">
+			<br><br>
+			<h3>
+				<fmt:message key="label.learning.comment" />
+			</h3>
+			<lams:out value="${teachersComment}" escapeHtml="true"/>
+		</c:if>
 		
 		<div class="space-bottom-top align-right">
 			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
