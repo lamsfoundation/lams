@@ -33,18 +33,18 @@
 			</div>
 			
 			<html:text tabindex="2" property="description" styleClass="text-area" maxlength="255"/>
-			
-			<div class="space-bottom-top">
-				<a href="#" onclick="document.getElementById('resourceItemForm').submit()"
-					class="button"> <fmt:message key="button.upload" /> 
-				</a>
-			</div>
 						
 			<div class="space-top">
 				<html:checkbox property="openUrlNewWindow" styleId="open-file-in-new-window" styleClass="noBorder" />
 				<label for="open-file-in-new-window">
 					<fmt:message key="open.file.in.new.window" />
 				</label>
+			</div>
+			
+			<div class="space-bottom-top">
+				<a href="#" onclick="document.getElementById('resourceItemForm').submit()"
+					class="button"> <fmt:message key="button.upload" /> 
+				</a>
 			</div>
 
 		</html:form>
