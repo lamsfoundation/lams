@@ -147,6 +147,11 @@
 			parameter="openUrlPopup">
 			<forward name="success" path="/pages/itemreview/openurl.jsp" />
 		</action>
+		<action path="/openFilePopup"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.ViewItemAction"
+			parameter="openFilePopup">
+			<forward name="success" path="/pages/itemreview/openurl.jsp" />
+		</action>
 		
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"

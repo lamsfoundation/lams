@@ -45,6 +45,13 @@
 				</div>
 				
 				<html:text tabindex="2" property="description" styleClass="text-area" maxlength="255"/>
+				
+				<div class="space-top">
+					<html:checkbox property="openUrlNewWindow" styleId="open-file-in-new-window" styleClass="noBorder" />
+					<label for="open-file-in-new-window">
+						<fmt:message key="open.file.in.new.window" />
+					</label>
+				</div>
 					
 				<div class="big-space-top">
 					<button onclick="document.getElementById('resourceItemForm').submit(); return false;" data-theme="b" >

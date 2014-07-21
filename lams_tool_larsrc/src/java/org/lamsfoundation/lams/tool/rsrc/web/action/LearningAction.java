@@ -359,6 +359,8 @@ public class LearningAction extends Action {
 		LearningAction.log.error("Failed upload Resource File " + e.toString());
 		return mapping.findForward(ResourceConstants.ERROR);
 	    }
+	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
+	    
 	} else if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(itemForm.getUrl());
 	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());

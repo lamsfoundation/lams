@@ -1172,6 +1172,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 			item.setType(ResourceConstants.RESOURCE_TYPE_WEBSITE);
 		    } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(resourceType)) {
 			item.setType(ResourceConstants.RESOURCE_TYPE_FILE);
+			item.setOpenUrlNewWindow(false);
 		    } else {
 			throw new ToolException("Invalid shared resources type. Type was " + resourceType);
 		    }

@@ -873,6 +873,8 @@ public class AuthoringAction extends Action {
 
 	if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(itemForm.getUrl());
+	}
+	if (type == ResourceConstants.RESOURCE_TYPE_URL || type == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 	}
 	// if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE

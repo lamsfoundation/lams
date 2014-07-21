@@ -8,26 +8,23 @@
 		<lams:css style="tabbed"/>
 
 		<script type="text/javascript">
-	   <%-- user for  rsrcresourceitem.js --%>
-	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
-	</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		   <%-- user for  rsrcresourceitem.js --%>
+		   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
+	       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 	</lams:head>
 	<body>
 
 		<!-- Basic Info Form-->
 
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post"
-			styleId="resourceItemForm" enctype="multipart/form-data">
+		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm" enctype="multipart/form-data">
 			<input type="hidden" name="instructionList" id="instructionList" />
 			<html:hidden property="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="2" />
 			<html:hidden property="itemIndex" />
-
 
 			<h2 class="no-space-left">
 				<fmt:message key="label.authoring.basic.add.file" />
@@ -42,11 +39,16 @@
 			<div class="field-name space-top">
 				<fmt:message key="label.authoring.basic.resource.file.input" />
 			</div>
-			<c:set var="itemAttachment"
-				value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<div id="itemAttachmentArea">
 				<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
+			</div>
+			
+			<div class="space-top">
+				<html:checkbox property="openUrlNewWindow" styleId="open-file-in-new-window" styleClass="noBorder" />
+				<label for="open-file-in-new-window">
+					<fmt:message key="open.file.in.new.window" />
+				</label>
 			</div>
 
 		</html:form>

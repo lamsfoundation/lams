@@ -7,14 +7,12 @@
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
 		<script type="text/javascript">
-	   <%-- user for  rsrcresourceitem.js --%>
-	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
-       
-	</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		   <%-- user for  rsrcresourceitem.js --%>
+		   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
+	       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 
 	</lams:head>
 	<body class="tabpart">

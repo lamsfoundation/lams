@@ -8,11 +8,10 @@
 		<lams:css style="tabbed" />
 		<%-- user for  rsrcresourceitem.js --%>
 		<script type="text/javascript">
-	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-	</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+			var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
+    		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 	</lams:head>
 	<body class="tabpart">
 
@@ -41,9 +40,7 @@
 			<html:text property="url" size="55" />
 
 			<div class="space-top">
-				<html:checkbox property="openUrlNewWindow"
-					styleId="openUrlNewWindow" styleClass="noBorder">
-				</html:checkbox>
+				<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="noBorder" />
 				<label for="openUrlNewWindow">
 					<fmt:message key="open.in.new.window" />
 				</label>
