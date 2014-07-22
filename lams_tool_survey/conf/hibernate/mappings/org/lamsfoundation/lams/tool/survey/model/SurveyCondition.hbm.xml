@@ -18,7 +18,7 @@
 	            table="tl_lasurv11_condition_questions"
 	            lazy="false"
 	            inverse="false"
-	            cascade="save-update"
+	            cascade="none"
 	            sort="unsorted"
 	            order-by="question_uid asc"
 	            
