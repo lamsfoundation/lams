@@ -279,14 +279,7 @@ public class ViewItemAction extends Action {
 	    boolean wikipediaInURL = matcher.find();
 
 	    if (item.isOpenUrlNewWindow() || wikipediaInURL) {
-		if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-		    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
-			    + ResourceConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
-			    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-		} else {
-		    url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
-			    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-		}
+		url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
 	    } else {
 		url = ResourceWebUtils.protocol(item.getUrl());
 	    }
@@ -294,8 +287,7 @@ public class ViewItemAction extends Action {
 
 	case ResourceConstants.RESOURCE_TYPE_FILE:
 	    if (item.isOpenUrlNewWindow()) {
-		url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
-			+ ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+		url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
 	    } else {
 		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
 	    }
@@ -309,6 +301,29 @@ public class ViewItemAction extends Action {
 	    url = "/pages/learningobj/mainframe.jsp?sessionMapID=" + sessionMapID;
 	    break;
 	}
+	return url;
+    }
+    
+    /**
+     * Creates url for opening in a new window depending whether it's authoring environment or not.
+     * 
+     * @param item
+     * @param sessionMapID
+     * @param mode
+     * @param itemIdx
+     * @return
+     */
+    private String constructUrlOpenInNewWindow(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
+	String url;
+	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
+	    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
+		    + ResourceConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
+		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+	} else {
+	    url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
+		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+	}
+	
 	return url;
     }
 
