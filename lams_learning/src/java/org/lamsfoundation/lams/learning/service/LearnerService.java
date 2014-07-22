@@ -1511,14 +1511,16 @@ public class LearnerService implements ICoreLearnerService {
 			Lesson lesson = getLessonByActivity(activity);
 			LearnerProgress learnerProgress = getProgress(learnerId, lesson.getLessonId());
 
-			int completedSubactivities = 0;
-			for (Activity subactivity : (Set<Activity>) parentOptionsActivity.getActivities()) {
-			    if (LearnerProgress.ACTIVITY_COMPLETED == learnerProgress.getProgressState(subactivity)) {
-				completedSubactivities++;
+			if (learnerProgress != null) {
+			    int completedSubactivities = 0;
+			    for (Activity subactivity : (Set<Activity>) parentOptionsActivity.getActivities()) {
+				if (LearnerProgress.ACTIVITY_COMPLETED == learnerProgress.getProgressState(subactivity)) {
+				    completedSubactivities++;
+				}
 			    }
-			}
 
-			isLast = completedSubactivities == parentOptionsActivity.getMaxNumberOfOptionsNotNull() - 1;
+			    isLast = completedSubactivities == parentOptionsActivity.getMaxNumberOfOptionsNotNull() - 1;
+			}
 		    }
 		} else if (parentActivity.isBranchingActivity() || parentActivity.isParallelActivity()) {
 		    isLast = parentPosition.getLast() && isActivityLast(activity);
