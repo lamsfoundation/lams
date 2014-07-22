@@ -190,7 +190,7 @@ public class EadventureCondition implements Cloneable{
 	 * 
 	 * @hibernate.set lazy="true"
 	 *                inverse="false"
-	 *                cascade="all"
+	 *                cascade="none"
      * 				  order-by = "sequence_id"
      * @hibernate.collection-key column="condition_uid"
      * @hibernate.collection-one-to-many  class="org.eucm.lams.tool.eadventure.model.EadventureExpression"
