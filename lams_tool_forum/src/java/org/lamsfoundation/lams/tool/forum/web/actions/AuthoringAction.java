@@ -935,20 +935,29 @@ public class AuthoringAction extends Action {
 	    forum.setInstructions(plannerForm.getInstructions());
 
 	    int topicIndex = 0;
+	    int sequenceId = 1;
+	    Date currentDate = new Date();
 	    String topic = null;
 	    String subject = null;
 	    Message message = null;
 	    List<Message> newTopics = new LinkedList<Message>();
 	    Set<Message> forumTopics = new TreeSet<Message>(new MessageComparator());
-	    forumTopics.addAll(forum.getMessages());
+	    for (Message existingMessage : forum.getMessages()) {
+		if (existingMessage.getIsAuthored() && existingMessage.getToolSession() == null){
+		    forumTopics.add(existingMessage);
+		}
+	    }
 	    Iterator<Message> forumTopicIterator = forumTopics.iterator();
 	    Pattern regexPattern = Pattern.compile(ForumConstants.WORD_REGEX, ForumConstants.PATTERN_MATCHING_OPTIONS);
 
 	    Matcher matcher = null;
-
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    ForumUser forumUser = getForumManager().getUserByID(new Long(user.getUserID().intValue()));
+	    
 	    do {
 		topic = plannerForm.getTopic(topicIndex);
-		subject = WebUtil.removeHTMLtags(topic);
+		subject = WebUtil.removeHTMLtags(topic).trim();
 
 		// Getting 3 first words from body and making the subject out of it
 		if (StringUtils.isBlank(subject)) {
@@ -968,47 +977,31 @@ public class AuthoringAction extends Action {
 
 		if (StringUtils.isEmpty(topic)) {
 		    plannerForm.removeTopic(topicIndex);
+		} else if (forumTopicIterator.hasNext()) {
+		    message = forumTopicIterator.next();
+		    message.setUpdated(currentDate);
+		    message.setSubject(subject);
+		    message.setBody(topic);
+		    message.setSequenceId(sequenceId++);
 		} else {
-		    if (forumTopicIterator.hasNext()) {
-			message = forumTopicIterator.next();
-			message.setUpdated(new Date());
-			message.setSubject(subject);
-			message.setBody(topic);
-		    } else {
-			message = new Message();
-			message.setIsAuthored(true);
-			Date currentDate = new Date();
-			message.setCreated(currentDate);
-			message.setUpdated(currentDate);
-			message.setLastReplyDate(currentDate);
+		    message = new Message();
+		    message.setIsAuthored(true);
+		    message.setCreated(currentDate);
+		    message.setUpdated(currentDate);
+		    message.setLastReplyDate(currentDate);
+		    message.setCreatedBy(forumUser);
+		    message.setModifiedBy(forumUser);
+		    message.setSubject(subject);
+		    message.setBody(topic);
+		    message.setSequenceId(sequenceId++);
 
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			ForumUser forumUser = getForumManager().getUserByID(new Long(user.getUserID().intValue()));
-			message.setCreatedBy(forumUser);
-			message.setModifiedBy(forumUser);
-
-			message.setSubject(subject);
-			message.setBody(topic);
-
-			int maxSeq = 1;
-			SortedSet<Message> allTopics = new TreeSet<Message>(new MessageComparator()); 
-			allTopics.addAll(forum.getMessages());
-			allTopics.addAll(newTopics);
-			if (allTopics.size() > 0) {
-			    Message last = allTopics.last();
-			    maxSeq = last.getSequenceId() + 1;
-			}
-			message.setSequenceId(maxSeq);				
-
-			newTopics.add(message);
-			message.setForum(forum);
-			getForumManager().createRootTopic(forum.getUid(), null, message);
-		    }
-		    topicIndex++;
+		    newTopics.add(message);
+		    message.setForum(forum);
+		    getForumManager().createRootTopic(forum.getUid(), null, message);
 		}
-
+		topicIndex++;
 	    } while (topic != null);
+	    
 	    while (forumTopicIterator.hasNext()) {
 		message = forumTopicIterator.next();
 		forumTopicIterator.remove();

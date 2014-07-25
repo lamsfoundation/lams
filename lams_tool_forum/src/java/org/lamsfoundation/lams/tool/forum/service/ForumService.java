@@ -750,7 +750,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    while (iter.hasNext()) {
 		Message msg = (Message) iter.next();
 		// set this message forum Uid as toContent
-		if (!msg.getIsAuthored()) {
+		if (!msg.getIsAuthored() || msg.getToolSession() != null) {
 		    continue;
 		}
 		msg.setReplyNumber(0);
@@ -875,11 +875,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Set<Message> items = toolContentObj.getMessages();
 	Set<Message> authorItems = new HashSet<Message>();
 	for (Message item : items) {
-	    if (item.getIsAuthored()) {
+	    if (item.getIsAuthored() && item.getToolSession() == null) {
 		authorItems.add(item);
 		item.setCreatedBy(null);
 		item.setModifiedBy(null);
-		item.setToolSession(null);
 		item.setForum(null);
 		item.setReport(null);
 		item.setReplyNumber(0);

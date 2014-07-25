@@ -321,7 +321,7 @@ public class Forum implements Cloneable {
      * 
      * @return
      */
-    public Set getMessages() {
+    public Set<Message> getMessages() {
 	return messages;
     }
 

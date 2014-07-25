@@ -233,7 +233,7 @@ public class ForumOutputFactory extends OutputFactory {
 	
 	Set<Message> messages = new HashSet<Message>();
 	for (Message message : (Set<Message>) forum.getMessages()) {
-	    if (message.getIsAuthored()) {
+	    if (message.getIsAuthored() && message.getToolSession() == null) {
 		messages.add(message);
 		break;
 	    }
