@@ -938,11 +938,16 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    // save all authoring message one by one.
 	    // reset all resourceItem createBy user
 	    Set<Message> items = toolContentObj.getMessages();
+	    int sequenceId = 1;
 	    for (Message item : items) {
 		item.setCreatedBy(user);
 		item.setIsAuthored(true);
 		item.setForum(toolContentObj);
 		item.setSessionClones(new HashSet());
+		// very old LDs did not have sequence IDs in Message and the default value is 0
+		if (item.getSequenceId() == 0) {
+		    item.setSequenceId(sequenceId++);
+		}
 		createRootTopic(toolContentObj.getUid(), (ForumToolSession) null, item);
 	    }
 	} catch (ImportToolContentException e) {
