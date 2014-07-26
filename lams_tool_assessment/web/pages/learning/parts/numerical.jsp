@@ -20,7 +20,7 @@
 		</c:if>		
 		<td class="reg-padding">
 			<input type="text" name="question${status.index}" value="<c:out value='${question.answerString}' />" styleClass="noBorder" size="70"
-				<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
+				<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 			/>	
 		</td>
 	</tr>

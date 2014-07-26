@@ -4,13 +4,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
+		<link href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
 		<%@ include file="/common/header.jsp"%>
 		<link href="<html:rewrite page='/includes/css/addQuestion.css'/>" rel="stylesheet" type="text/css">
 		
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	    <script>
 	    
@@ -56,7 +58,34 @@
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
 		    		}
 		  		});
+		    	
+		    	//spinner
+		    	var maximumWordsSpinner = $( "#max-words-limit" ).spinner({ 
+		    		min: 0,
+		    		disabled: ($( "#max-words-limit" ).val() == 0)
+		    	});
+		    	$("#max-words-limit-checkbox").click(function() {
+		    		if ( maximumWordsSpinner.spinner( "option", "disabled" ) ) {
+		    			 maximumWordsSpinner.spinner( "enable" );
+		    		} else {
+		    			maximumWordsSpinner.spinner( "disable" );
+		    		}
+		        });
+		    	
+		    	//spinner
+		    	var minimumWordsSpinner = $( "#min-words-limit" ).spinner({ 
+		    		min: 0,
+		    		disabled: ($( "#min-words-limit" ).val() == 0)
+		    	});
+		    	$("#min-words-limit-checkbox").click(function() {
+		    		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
+		    			minimumWordsSpinner.spinner( "enable" );
+		    		} else {
+		    			minimumWordsSpinner.spinner( "disable" );
+		    		}
+		        });
 			});
+			
     		// post-submit callback 
     		function afterRatingSubmit(responseText, statusText)  { 
     			self.parent.refreshThickbox();
@@ -93,8 +122,7 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
-				<lams:CKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}">
+				<lams:CKEditor id="question" value="${formBean.question}" contentFolderID="${formBean.contentFolderID}">
 				</lams:CKEditor>
 	
 				<div class="field-name space-top">
@@ -104,13 +132,37 @@
 				<html:text property="defaultGrade" styleClass="shortInputText"/>
 				
 				<div class="field-name space-top" >
-					<html:checkbox property="answerRequired"/>
-					<fmt:message key="label.authoring.answer.required" />
+					<html:checkbox property="answerRequired" styleId="answer-required"/>
+					<label for="answer-required">
+						<fmt:message key="label.authoring.answer.required" />
+					</label>
 				</div>
 				
 				<div class="field-name space-top" >
-					<html:checkbox property="allowRichEditor" />
-					<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
+					<html:checkbox property="allowRichEditor" styleId="allow-rich-editor"/>
+					<label for="allow-rich-editor">
+						<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
+					</label>
+				</div>
+				
+				<div class="field-name space-top" >
+					<input type="checkbox" id="max-words-limit-checkbox" name="noname"
+						<c:if test="${formBean.maxWordsLimit != 0}">checked="checked"</c:if>
+					/>
+					<label for="max-words-limit-checkbox" class="word-limit-label">
+						<fmt:message key="label.maximum.number.words" />
+					</label>
+					<html:text property="maxWordsLimit" styleId="max-words-limit"/>
+				</div>
+				
+				<div class="field-name space-top" >
+					<input type="checkbox" id="min-words-limit-checkbox" name="noname"
+						<c:if test="${formBean.minWordsLimit != 0}">checked="checked"</c:if>
+					/>
+					<label for="min-words-limit-checkbox" class="word-limit-label">
+						<fmt:message key="label.minimum.number.words" />
+					</label>
+					<html:text property="minWordsLimit" styleId="min-words-limit"/>
 				</div>
 					
 				<div class="field-name space-top">
@@ -122,8 +174,7 @@
 				</div>
 				
 				<div id="general-feedback" class="hidden">
-					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-						contentFolderID="${formBean.contentFolderID}">
+					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}">
 					</lams:CKEditor>
 				</div>
 

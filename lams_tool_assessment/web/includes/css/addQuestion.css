@@ -1,9 +1,34 @@
-label { width: 10em; float: left; }
-label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;}
-em { font-weight: bold; padding-right: 1em; vertical-align: top; }
-input.error { border: 2px solid red;}
-#content {width: 91%; margin-bottom: 10px;}
-table.alternative-color td {padding-left: 0;}
-input[type=text].shortInputText {width:10%;}
-input[type=text] {width:98%;}
-textarea {width:98%;}
+label.error { 
+	float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;
+}
+em { 
+	font-weight: bold; padding-right: 1em; vertical-align: top; 
+}
+input.error { 
+	border: 2px solid red;
+}
+#content {
+	width: 91%; margin-bottom: 10px;
+}
+table.alternative-color td {
+	padding-left: 0;
+}
+input[type=text].shortInputText {
+	width:10%;
+}
+input[type=text] {
+	width:98%;
+}
+textarea {
+	width:98%;
+}
+
+.word-limit-label {
+	margin-right: 7px;
+}
+
+#max-words-limit-checkbox, #min-words-limit-checkbox {
+	vertical-align: sub;
+}
+
+

@@ -433,11 +433,11 @@ public class LearningAction extends Action {
 	storeUserAnswersIntoSessionMap(request);
 	
 	//check all required questions got answered
-	int pageNumberWithUnasweredQuestions = checkAllRequiredQuestionsAnswered(sessionMap);
+	int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
 	//if some were not then forward to nextPage()
 	if (pageNumberWithUnasweredQuestions != 0) {
 	    request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberWithUnasweredQuestions);
-	    request.setAttribute(AssessmentConstants.ATTR_IS_REQUIRED_ANSWER_MISSED, true);
+	    request.setAttribute(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, true);
 	    
 	    return nextPage(mapping, form, request, response);
 	}
@@ -724,24 +724,24 @@ public class LearningAction extends Action {
     }
     
     /**
-     * Checks whether all questions set as requiring an answer was answered.
+     * Checks whether all required questions were answered and all essay question with min words limit have fullfilled that.
      * 
      * @param sessionMap
-     * @return 0 if all required questions were answered, or number of a page that contains unanswered question
+     * @return 0 if all questions were answered OK, or a number of the first page that contains questions with issues
      */
-    private int checkAllRequiredQuestionsAnswered(SessionMap<String, Object> sessionMap){
+    private int validateAnswers(SessionMap<String, Object> sessionMap){
 
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	
 	//array of missing required questions
 	boolean isAllQuestionsAnswered = true;
+	boolean isAllQuestionsReachedMinWordsLimit = true;
 
 	//iterate through all pages to find first that contains missing required questions
 	int pageCount;
 	for (pageCount = 0; pageCount < pagedQuestions.size(); pageCount++) {
 	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
 	    
-	    int questionCount = 0;
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		if (question.isAnswerRequired()) {
 
@@ -776,12 +776,30 @@ public class LearningAction extends Action {
 		    }
 
 		}
+		
+		if ((question.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY)
+			&& (question.getMinWordsLimit() > 0)) {
 
-		questionCount++;
+		    String answer = new String(question.getAnswerString());
+		    
+		    // HTML tags stripping
+		    if (question.isAllowRichEditor()) {
+			answer = WebUtil.removeHTMLtags(answer); // answer.replaceAll("/<\/?[a-z][^>]*>/gi", '');
+		    }
+		    
+		   int wordCount = (answer.length() == 0) ? 0 : answer.replaceAll("[\'\";:,\\.\\?\\-!]+", "").split("\\S+").length;//.match(/\S+/g) || []) ;
+
+		    // check min words limit is reached
+		    if (wordCount < question.getMinWordsLimit()) {
+			isAllQuestionsReachedMinWordsLimit = false;
+			break;
+		    }
+
+		}
 	    }
 	    
-	    //if found un-answered question, stop here
-	    if (!isAllQuestionsAnswered) {
+	    //if found answers required to be fixed by learners, stop here
+	    if (!isAllQuestionsAnswered || !isAllQuestionsReachedMinWordsLimit) {
 		return pageCount + 1;
 	    }
 	}

@@ -147,7 +147,6 @@ table.question-table td {
 	color:#47bc23;
 }
 
-
 #pager {
 	text-align: center; 
 	padding-top: 60px;
@@ -166,10 +165,13 @@ table.question-table td {
 	border-bottom: 1px solid white !important;
 }
 
-#warning-answers-required {
+#warning-answers-required, #warning-max-words-limit, #warning-min-words-limit, .hidden {
 	display: none;
 }
 
-.hidden {
-	display: none;
+.reg-padding .info {
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 80%;
 }

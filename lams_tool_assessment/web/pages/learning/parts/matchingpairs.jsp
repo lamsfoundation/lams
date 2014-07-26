@@ -23,7 +23,7 @@
 				<c:out value="${option.question}" escapeXml="false" />
 			</td>
 			<td class="question-option">
-				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${finishedLock || !hasEditRight}">
+				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${isEditingDisabled}">
 					<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
 					<c:forEach var="selectOption" items="${question.matchingPairOptions}">
 						<html:option value="${selectOption.uid}">${selectOption.optionString}</html:option>

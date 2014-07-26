@@ -1674,6 +1674,8 @@ public class AuthoringAction extends Action {
 	form.setCaseSensitive(question.isCaseSensitive());
 	form.setCorrectAnswer(question.getCorrectAnswer());
 	form.setAllowRichEditor(question.isAllowRichEditor());
+	form.setMaxWordsLimit(question.getMaxWordsLimit());
+	form.setMinWordsLimit(question.getMinWordsLimit());
 	if (questionIdx >= 0) {
 	    form.setQuestionIndex(new Integer(questionIdx).toString());
 	}
@@ -1759,6 +1761,8 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
 	    question.setAllowRichEditor(questionForm.isAllowRichEditor());
+	    question.setMaxWordsLimit(questionForm.getMaxWordsLimit());
+	    question.setMinWordsLimit(questionForm.getMinWordsLimit());
 	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());

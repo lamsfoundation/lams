@@ -57,6 +57,8 @@ public class AssessmentQuestionForm extends ActionForm {
     private boolean caseSensitive;
     private boolean correctAnswer;
     private boolean allowRichEditor;
+    private int maxWordsLimit;
+    private int minWordsLimit;
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -216,6 +218,22 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
+    }
+    
+    public int getMaxWordsLimit() {
+	return maxWordsLimit;
+    }
+
+    public void setMaxWordsLimit(int maxWordsLimit) {
+	this.maxWordsLimit = maxWordsLimit;
+    }
+    
+    public int getMinWordsLimit() {
+	return minWordsLimit;
+    }
+
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
     }
 
 }

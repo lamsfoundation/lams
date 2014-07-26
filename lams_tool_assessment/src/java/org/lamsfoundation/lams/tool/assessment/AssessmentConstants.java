@@ -201,7 +201,7 @@ public class AssessmentConstants {
     
     public static final String ATTR_IS_USER_FAILED = "isUserFailed";
     
-    public static final String ATTR_IS_REQUIRED_ANSWER_MISSED = "isRequiredAnswerMissed";
+    public static final String ATTR_IS_ANSWERS_VALIDATION_FAILED = "isAnswersValidationFailed";
     
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
     

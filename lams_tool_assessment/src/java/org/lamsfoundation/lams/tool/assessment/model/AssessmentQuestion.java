@@ -92,6 +92,11 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private Set<AssessmentUnit> units;
     
+    //only for essay type of question
+    private int maxWordsLimit;
+    //only for essay type of question
+    private int minWordsLimit;
+    
     // DTO fields:
     private String answerString;
     
@@ -489,6 +494,42 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
      */
     public void setUnits(Set<AssessmentUnit> units) {
 	this.units = units;
+    }
+    
+    /**
+     * maxWordsLimit set in author. Used only for essay type of questions
+     * 
+     * @hibernate.property column="max_words_limit"
+     * 
+     * @return
+     */
+    public int getMaxWordsLimit() {
+	return maxWordsLimit;
+    }
+
+    /**
+     * @param maxWordsLimit set in author. Used only for essay type of questions
+     */
+    public void setMaxWordsLimit(int maxWordsLimit) {
+	this.maxWordsLimit = maxWordsLimit;
+    }
+    
+    /**
+     * minWordsLimit set in author. Used only for essay type of questions
+     * 
+     * @hibernate.property column="min_words_limit"
+     * 
+     * @return
+     */
+    public int getMinWordsLimit() {
+	return minWordsLimit;
+    }
+
+    /**
+     * @param minWordsLimit set in author. Used only for essay type of questions
+     */
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
     }
     
     public String getAnswerString() {

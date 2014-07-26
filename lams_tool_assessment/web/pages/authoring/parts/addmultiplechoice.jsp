@@ -160,8 +160,10 @@
 				<html:text property="penaltyFactor" styleClass="shortInputText" />
 				
 				<div class="field-name space-top" >
-					<html:checkbox property="answerRequired" />
-					<fmt:message key="label.authoring.answer.required" />
+					<html:checkbox property="answerRequired" styleId="answer-required"/>
+					<label for="answer-required">
+						<fmt:message key="label.authoring.answer.required" />
+					</label>
 				</div>
 				
 				<div class="field-name space-top">
@@ -186,8 +188,10 @@
 				</html:select>
 	
 				<div class="field-name space-top" >
-					<html:checkbox property="shuffle" />
-					<fmt:message key="label.authoring.basic.shuffle.the.choices" />
+					<html:checkbox property="shuffle" styleId="shuffle"/>
+					<label for="shuffle">
+						<fmt:message key="label.authoring.basic.shuffle.the.choices" />
+					</label>
 				</div>
 				
 				<div class="field-name space-top">

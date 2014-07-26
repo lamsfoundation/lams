@@ -29,7 +29,7 @@
 			<td class="has-radio-button">
 				<input type="radio" name="question${status.index}" value="${true}" styleClass="noBorder"
 	 				<c:if test="${question.answerBoolean}">checked="checked"</c:if>
-					<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>					 
+					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>					 
 				/>
 			</td>
 			<td class="question-option">
@@ -59,7 +59,7 @@
 			<td class="has-radio-button">
 				<input type="radio" name="question${status.index}" value="${false}" styleClass="noBorder"
 	 				<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
-					<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
+					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 				/>
 			</td>
 			<td class="question-option">

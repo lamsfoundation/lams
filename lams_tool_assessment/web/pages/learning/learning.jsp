@@ -34,6 +34,7 @@
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 	<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}"/>
+	<c:set var="isEditingDisabled" value="${finishedLock || !hasEditRight}"/>
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 
@@ -98,7 +99,7 @@
 		</c:if>
 		
 		//autosave feature
-		<c:if test="${hasEditRight && !finishedLock && (mode != 'teacher')}">
+		<c:if test="${!isEditingDisabled && (mode != 'teacher')}">
 			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(
 				function(){
@@ -128,9 +129,9 @@
 	        );
 		</c:if>
 		
-		//check if we came back due to missing required question's answer
+		//check if we came back due to failed answers' validation (missing required question's answer or min words limit not reached)
 		$(document).ready(function(){
-			if (${isRequiredAnswerMissed == true}) {
+			if (${isAnswersValidationFailed == true}) {
 				validateAnswers();
 			}
 		});
@@ -230,11 +231,13 @@
 		
 		function validateAnswers() {
 
-			if (${finishedLock || !hasEditRight}) {
+			if (${isEditingDisabled}) {
 				return true;
 			}
 			
 			var missingRequiredQuestions = [];
+			var minWordsLimitNotReachedQuestions = [];
+			var maxWordsLimitExceededQuestions = [];
 			
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 				<c:if test="${question.answerRequired}">
@@ -289,28 +292,83 @@
 						</c:when>
 					</c:choose>
 				</c:if>
+				
+				//essay question which has max words limit
+				<c:if test="${question.type == 6 && question.maxWordsLimit != 0}">
+					var wordCount${status.index} = $('#word-count${status.index}').text();
+					//max words limit is exceeded
+					if(wordCount${status.index} > ${question.maxWordsLimit}) {
+						maxWordsLimitExceededQuestions.push("${status.index}");
+					}
+				</c:if>
+				
+				//essay question which has min words limit
+				<c:if test="${question.type == 6 && question.minWordsLimit != 0}">
+					var wordCount${status.index} = $('#word-count${status.index}').text();
+					//min words limit is not reached
+					if(wordCount${status.index} < ${question.minWordsLimit}) {
+						minWordsLimitNotReachedQuestions.push("${status.index}");
+					}
+				</c:if>
 			</c:forEach>
 			
 			//return true in case all required questions were answered, false otherwise
-			if (missingRequiredQuestions.length == 0) {
+			if (missingRequiredQuestions.length == 0 && minWordsLimitNotReachedQuestions.length == 0 
+					&& maxWordsLimitExceededQuestions.length == 0) {
 				return true;
 				
 			} else {
 				//remove .warning-answer-required from all questions
 				$('[id^=question-area-]').removeClass('warning-answer-required');
+				$('#warning-answers-required').hide();
+				$('#warning-min-words-limit').hide();
+				$('#warning-max-words-limit').hide();
 				
-				//add .warning-answer-required class to those needs to be filled
-				for (i = 0; i < missingRequiredQuestions.length; i++) {
-				    $("#question-area-" + missingRequiredQuestions[i]).addClass('warning-answer-required');
+				if (missingRequiredQuestions.length != 0) {
+					//add .warning-answer-required class to those needs to be filled
+					for (i = 0; i < missingRequiredQuestions.length; i++) {
+					    $("#question-area-" + missingRequiredQuestions[i]).addClass('warning-answer-required');
+					}
+					//show alert message as well
+					$("#warning-answers-required").show();
+					
 				}
 				
-				//show alert message as well
-				$("#warning-answers-required").show();
+				if (maxWordsLimitExceededQuestions.length != 0) {
+					//add .warning-answer-required class to those needs to be filled
+					for (i = 0; i < maxWordsLimitExceededQuestions.length; i++) {
+					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('warning-answer-required');
+					}
+					//show alert message as well
+					$("#warning-max-words-limit").show();		
+				}
+				
+				if (minWordsLimitNotReachedQuestions.length != 0) {
+					//add .warning-answer-required class to those needs to be filled
+					for (i = 0; i < minWordsLimitNotReachedQuestions.length; i++) {
+					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).addClass('warning-answer-required');
+					}
+					//show alert message as well
+					$("#warning-min-words-limit").show();		
+				}
+				
 				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
+				
 				return false;
 			}
 		}
-		
+
+		function getNumberOfWords(value, isRemoveHtmlTags) {
+			
+		    //HTML tags stripping 
+			if (isRemoveHtmlTags) {
+				value = value.replace(/&nbsp;/g, '').replace(/<\/?[a-z][^>]*>/gi, '');
+			}
+			value = value.trim();
+			
+		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
+		    return wordCount;
+		}
     </script>
 </lams:head>
 <body class="stripes">
@@ -350,8 +408,16 @@
 			</p>
 		</c:if>
 		
-		<div class="info" id="warning-answers-required">
+		<div class="warning" id="warning-answers-required">
 			<fmt:message key="warn.answers.required" />
+		</div>
+		
+		<div class="warning" id="warning-max-words-limit">
+			<fmt:message key="warn.answers.exceed.max.words.limit" />
+		</div>
+	
+		<div class="warning" id="warning-min-words-limit">
+			<fmt:message key="warn.answers.doesnt.reach.min.words.limit" />
 		</div>
 		
 		<div id="question" style="display:none; cursor: default"> 
