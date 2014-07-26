@@ -957,12 +957,13 @@ public class AuthoringAction extends Action {
 	    
 	    do {
 		topic = plannerForm.getTopic(topicIndex);
-		subject = WebUtil.removeHTMLtags(topic).trim();
+		subject = WebUtil.removeHTMLtags(topic);
 
 		// Getting 3 first words from body and making the subject out of it
 		if (StringUtils.isBlank(subject)) {
 		    subject = null;
 		} else {
+		    subject = subject.trim();
 		    matcher = regexPattern.matcher(subject);
 		    int currentEnd = subject.length();
 		    for (short wordIndex = 0; wordIndex < ForumConstants.SUBJECT_WORD_COUNT; wordIndex++) {
@@ -975,7 +976,7 @@ public class AuthoringAction extends Action {
 		    subject = subject.substring(0, currentEnd).concat("...");
 		}
 
-		if (StringUtils.isEmpty(topic)) {
+		if (StringUtils.isEmpty(subject)) {
 		    plannerForm.removeTopic(topicIndex);
 		} else if (forumTopicIterator.hasNext()) {
 		    message = forumTopicIterator.next();
