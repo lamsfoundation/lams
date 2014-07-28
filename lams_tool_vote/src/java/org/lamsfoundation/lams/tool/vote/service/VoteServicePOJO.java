@@ -386,7 +386,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
 		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
 		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
-			    .get(mapIndex) : 0;
+			    .get(mapIndex) : 0L;
 		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
 
 		    allSessionsVotesCount += votesCount;
@@ -399,7 +399,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		if (voteContent.isAllowText()) {
 		    Long votesCount = sessionDTO.getMapStandardUserCount().get(mapIndex);
 		    Long oldTotalVotesCount = (totalMapStandardUserCount.get(mapIndex) != null) ? totalMapStandardUserCount
-			    .get(mapIndex) : 0;
+			    .get(mapIndex) : 0L;
 		    totalMapStandardUserCount.put(mapIndex, oldTotalVotesCount + votesCount);
 
 		    allSessionsVotesCount += votesCount;
