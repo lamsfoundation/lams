@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:List right="5" left="5" top="5" bottom="58"></mx:List>
-	<mx:TextArea left="5" right="5" bottom="5" height="50"/>
-</mx:Canvas>

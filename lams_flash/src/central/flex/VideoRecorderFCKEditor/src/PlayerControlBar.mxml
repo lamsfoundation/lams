@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mx:ControlBar xmlns:mx="http://www.adobe.com/2006/mxml" height="38" y="248" creationPolicy="all">
-	<mx:Button label="&gt;" width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" fontWeight="bold" id="playButton"/>
-	<mx:HSlider width="100%" id="seekSlider" />
-	<mx:Label text="0:00 / 0:00" width="70" textAlign="center" id="timerLabel"/>
-</mx:ControlBar>

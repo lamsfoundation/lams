@@ -1,4 +1,0 @@
-Implementation-Title: LAMS - Moodle Quiz Tool
-Implementation-Version: 2.1
-Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
-Class-Path: ./lams.jar ./lams-tool-mdquiz10.jar ./lams-contentrepository.jar ./lams-learning.jar

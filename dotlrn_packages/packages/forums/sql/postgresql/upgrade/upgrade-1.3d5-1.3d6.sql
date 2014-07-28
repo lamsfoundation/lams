@@ -1,1 +1,0 @@
-\i ../forums-reading-info-create.sql

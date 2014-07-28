@@ -1,4 +1,0 @@
-Implementation-Title: LAMS - svggenerator
-Implementation-Version: 2.3.4
-Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
-Class-Path: 

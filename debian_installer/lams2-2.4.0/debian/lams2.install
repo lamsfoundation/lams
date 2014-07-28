@@ -1,7 +1,0 @@
-lams.ear	/usr/share/jboss-5.1/server/default/deploy/
-lams.sql	/usr/share/lams2/
-ROOT.war	/usr/share/lams2
-lib	/usr/share/lams2
-bbb-deploy	/usr/share/lams2/
-imscc-deploy	/usr/share/lams2/
-wookie-deploy	/usr/share/lams2/
