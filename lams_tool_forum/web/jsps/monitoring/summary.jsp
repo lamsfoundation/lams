@@ -12,6 +12,12 @@
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<style media="screen,projection" type="text/css">
+	#message-area {
+		margin-bottom: 20px;
+		display: none;
+	}
+</style>
 
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -36,15 +42,16 @@
 	function releaseMarks(sessionId){
 		var url = "<c:url value="/monitoring/releaseMark.do"/>";
 		
-		$("#messageArea_Busy").show();
-		$("#messageArea").load(
+		$("#message-area-busy").show();
+		$("#message-area").load(
 			url,
 			{
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
 			function() {
-				$("#messageArea_Busy").hide();
+				$("#message-area").show("slow").effect("highlight", {}, 2000);;
+				$("#message-area-busy").hide();
 			}
 		);
 	}
@@ -60,12 +67,17 @@
 <c:forEach var="element" items="${sessionUserMap}">
 	<c:set var="toolSessionDto" value="${element.key}" />
 	<c:set var="userlist" value="${element.value}" />
+	
+	<!--For release marks feature-->
+	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
+	<div id="message-area"></div>
 
 	<c:if test="${isGroupedActivity}">	
-	  <h2>
- 	    <fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
-					</h2>
-        </c:if>
+		<h2>
+			<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
+		</h2>
+	</c:if>
+        
 	<table cellpadding="0" class="small-space-top alternative-color">
 		<c:forEach var="user" items="${userlist}" varStatus="status">
 			<c:if test="${status.first}">
