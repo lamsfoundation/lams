@@ -165,7 +165,7 @@ table.question-table td {
 	border-bottom: 1px solid white !important;
 }
 
-#warning-answers-required, #warning-max-words-limit, #warning-min-words-limit, .hidden {
+#warning-answers-required, #warning-words-limit, .hidden {
 	display: none;
 }
 

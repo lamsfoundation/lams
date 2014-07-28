@@ -63,21 +63,32 @@
 	<c:if test="${isWordsLimitEnabled}">
 		<tr>
 			<td class="reg-padding">
-				<c:if test="${question.maxWordsLimit != 0}">
-					<div class="info">
-						<fmt:message key="label.info.maximum.number.words" >
-							<fmt:param>${question.maxWordsLimit}</fmt:param>
-						</fmt:message>					
-					</div>
-				</c:if>
-				
-				<c:if test="${question.minWordsLimit != 0}">
-					<div class="info">
-						<fmt:message key="label.info.minimum.number.words" >
-							<fmt:param>${question.minWordsLimit}</fmt:param>
-						</fmt:message>					
-					</div>
-				</c:if>
+
+                                <c:choose>
+                                  <c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
+                                        <div class="info">
+                                                <fmt:message key="label.info.max.and.min.number.words" >
+                                                        <fmt:param>${question.minWordsLimit}</fmt:param>
+                                                        <fmt:param>${question.maxWordsLimit}</fmt:param>
+                                                </fmt:message>
+                                        </div>
+                                   </c:when>
+                                  <c:when test="${question.maxWordsLimit != 0}">
+                                        <div class="info">
+                                                <fmt:message key="label.info.maximum.number.words" >
+                                                        <fmt:param>${question.maxWordsLimit}</fmt:param>
+                                                </fmt:message>
+                                        </div>
+                                   </c:when>
+                                   <c:when test="${question.minWordsLimit != 0}">
+                                        <div class="info">
+                                                <fmt:message key="label.info.minimum.number.words" >
+                                                        <fmt:param>${question.minWordsLimit}</fmt:param>
+                                                </fmt:message>
+                                        </div>
+                                   </c:when>
+
+                                </c:choose>
 			</td>
 		</tr>
 	</c:if>

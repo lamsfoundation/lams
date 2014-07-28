@@ -321,8 +321,7 @@
 				//remove .warning-answer-required from all questions
 				$('[id^=question-area-]').removeClass('warning-answer-required');
 				$('#warning-answers-required').hide();
-				$('#warning-min-words-limit').hide();
-				$('#warning-max-words-limit').hide();
+				$('#warning-words-limit').hide();
 				
 				if (missingRequiredQuestions.length != 0) {
 					//add .warning-answer-required class to those needs to be filled
@@ -340,7 +339,7 @@
 					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('warning-answer-required');
 					}
 					//show alert message as well
-					$("#warning-max-words-limit").show();		
+					$("#warning-words-limit").show();		
 				}
 				
 				if (minWordsLimitNotReachedQuestions.length != 0) {
@@ -349,7 +348,7 @@
 					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).addClass('warning-answer-required');
 					}
 					//show alert message as well
-					$("#warning-min-words-limit").show();		
+					$("#warning-words-limit").show();		
 				}
 				
 				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
@@ -412,12 +411,8 @@
 			<fmt:message key="warn.answers.required" />
 		</div>
 		
-		<div class="warning" id="warning-max-words-limit">
-			<fmt:message key="warn.answers.exceed.max.words.limit" />
-		</div>
-	
-		<div class="warning" id="warning-min-words-limit">
-			<fmt:message key="warn.answers.doesnt.reach.min.words.limit" />
+		<div class="warning" id="warning-words-limit">
+			<fmt:message key="warn.answers.word.requirements.limit" />
 		</div>
 		
 		<div id="question" style="display:none; cursor: default"> 
