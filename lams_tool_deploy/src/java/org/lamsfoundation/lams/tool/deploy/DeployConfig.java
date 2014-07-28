@@ -77,6 +77,10 @@ public abstract class DeployConfig {
     protected transient boolean generateForInstallers = false;
     protected transient  String outputPath = null;
     
+    protected DeployConfig(){
+	
+    }
+    
  
     /**
      * Holds value of property toolVersion.

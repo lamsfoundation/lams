@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,6 +62,10 @@ public class DeployToolConfig extends DeployConfig {
     private static final String MIN_SERVER_VERSION_NUMBER= "minServerVersionNumber";
     private static final String GENERATE_XML_FOR_INSTALLERS = "generateForInstallers";
     protected static final String LANGUAGE_FILES= "languageFiles";
+    
+    public DeployToolConfig(){
+	super();
+    }
     
    
   

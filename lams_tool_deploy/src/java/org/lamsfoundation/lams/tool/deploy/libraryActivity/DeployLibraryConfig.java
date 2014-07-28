@@ -53,6 +53,9 @@ public class DeployLibraryConfig extends DeployConfig {
        
     private ArrayList learningLibraryList; 
     
+    public DeployLibraryConfig(){
+	super();
+    }
     
     public DeployLibraryConfig(String outputPath)
     {       
