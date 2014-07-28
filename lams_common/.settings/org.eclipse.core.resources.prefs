@@ -1,7 +1,0 @@
-#Thu Jun 28 20:29:31 CEST 2012
-eclipse.preferences.version=1
-encoding//db/sql/insert_lams_unix_config_data.sql=UTF-8
-encoding//db/sql/insert_lams_windows_config_data.sql=UTF-8
-encoding//db/sql/insert_types_data.sql=UTF-8
-encoding//src/java/org/lamsfoundation/lams/dbupdates/patch02040009.sql=UTF-8
-encoding//src/java/org/lamsfoundation/lams/dbupdates/patch02040012.sql=UTF-8
