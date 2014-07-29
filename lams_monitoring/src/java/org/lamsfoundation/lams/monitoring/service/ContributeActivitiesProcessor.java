@@ -98,8 +98,9 @@ public class ContributeActivitiesProcessor extends LearningDesignProcessor {
 	ContributeActivityDTO dto = null;
 	// always attempt to get a dto, as some branching activities require contribution.
 	dto = ContributeDTOFactory.getContributeActivityDTO(lessonID, activity, toolService, currentActivityList);
-
-	currentActivityList = (Vector<ContributeActivityDTO>) activityListStack.pop();
+	Vector<ContributeActivityDTO> topActivityList = (Vector<ContributeActivityDTO>) activityListStack.pop();
+	topActivityList.addAll(currentActivityList);
+	currentActivityList = topActivityList;
 	if (dto != null) {
 	    currentActivityList.add(dto);
 	}

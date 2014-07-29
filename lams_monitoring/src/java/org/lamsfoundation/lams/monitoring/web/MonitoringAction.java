@@ -1100,7 +1100,25 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
+	// remove "attention required" marker for hidden activities in Flash Authoring
 	if (contributeActivities != null) {
+	    Iterator<ContributeActivityDTO> activityIterator = contributeActivities.iterator();
+	    while (activityIterator.hasNext()) {
+		ContributeActivityDTO contributeActivityDTO = activityIterator.next();
+		Activity contributeActivity = monitoringService.getActivityById(contributeActivityDTO.getActivityID());
+		Activity topParentActivity = contributeActivity.getParentActivity() == null ? null : contributeActivity
+			.getParentActivity().getParentActivity();
+
+		if ((branchingActivityId == null)
+			&& (topParentActivity != null)
+			&& (topParentActivity.isBranchingActivity() || topParentActivity
+				.isOptionsWithSequencesActivity())) {
+		    JSONObject topContributeActivityJSON = activitiesMap.get(topParentActivity.getActivityId());
+		    if (!Boolean.TRUE.equals(JsonUtil.opt(topContributeActivityJSON, "flaFormat"))) {
+			activityIterator.remove();
+		    }
+		}
+	    }
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
 	}
