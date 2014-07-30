@@ -162,12 +162,12 @@
 		</html:form>
 	
 		<ul data-role="listview" data-theme="c" id="qaQuestions" style="padding-top: 0;">
-			<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+			<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}" varStatus="status">
 				<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}" />
 
 				<li>
 					<p class="space-top">
-						<strong> <fmt:message key="label.question" /> : </strong>
+						<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
 						<c:out value="${currentDto.question}" escapeXml="false" />
 					</p>
 
@@ -200,12 +200,12 @@
 			</h2>
 					
 			<ul data-role="listview" data-theme="c" id="qaAnswers">
-				<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+				<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}" varStatus="status">
 					<c:set var="currentQuestionId" scope="request"	value="${currentDto.questionUid}" />
 			
 					<li>
 						<p class="space-top">
-							<strong> <fmt:message key="label.question" /> : </strong>
+							<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
 							<c:out value="${currentDto.question}" escapeXml="false" />
 						</p>
 							

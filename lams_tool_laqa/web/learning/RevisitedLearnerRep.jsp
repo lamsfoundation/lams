@@ -134,12 +134,12 @@
 			<fmt:message key="label.learnerReport" />
 		</h2>
 
-		<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+		<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}" varStatus="status">
 			<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}" />
 
 			<div class="shading-bg">
 				<p>
-					<strong> <fmt:message key="label.question" /> : </strong>
+					<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
 					<c:out value="${currentDto.question}" escapeXml="false" />
 				</p>
 
@@ -182,11 +182,11 @@
 				<fmt:message key="label.other.answers" />
 			</h2>
 	
-			<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
+			<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}" varStatus="status">
 				<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}" />
 			
 				<p>
-					<strong> <fmt:message key="label.question" /> : </strong>
+					<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
 					<c:out value="${currentDto.question}" escapeXml="false" />
 				</p>
 						
