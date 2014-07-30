@@ -26,7 +26,7 @@
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/lib/javassist.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/javassist/main/javassist-3.18.1-GA.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/lib/endorsed/xercesImpl.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jstl.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jbossweb.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
