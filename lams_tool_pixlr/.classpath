@@ -19,4 +19,4 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="output" path="bin"/>
-<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/></classpath>
+<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.0.Final.jar"/></classpath>

@@ -14,6 +14,6 @@
 			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/3.3/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.0.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

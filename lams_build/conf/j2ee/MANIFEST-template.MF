@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Implementation-Title: @product@
+Implementation-Title: LAMS
 Implementation-Version: @version@
 Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)

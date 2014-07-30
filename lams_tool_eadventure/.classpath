@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="src" path="/lams_gradebook"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.0.Final.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
 		<attributes>
 			<attribute name="javadoc_location" value="http://docs.oracle.com/cd/E17802_01/products/products/servlet/2.5/docs/servlet-2_5-mr2/"/>
