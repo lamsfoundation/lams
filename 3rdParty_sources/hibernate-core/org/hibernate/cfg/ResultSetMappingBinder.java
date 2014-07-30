@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,36 +20,35 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.cfg;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.dom4j.Element;
 import org.hibernate.LockMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.query.sql.NativeSQLQueryCollectionReturn;
 import org.hibernate.engine.ResultSetMappingDefinition;
-import org.hibernate.engine.query.sql.NativeSQLQueryJoinReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryRootReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryScalarReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryCollectionReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryJoinReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryRootReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryScalarReturn;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Value;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.ToOne;
+import org.hibernate.mapping.Value;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
-import org.hibernate.util.ArrayHelper;
-import org.hibernate.util.CollectionHelper;
-import org.hibernate.util.StringHelper;
+
+import org.dom4j.Element;
 
 /**
  * @author Emmanuel Bernard
@@ -81,7 +80,7 @@ public abstract class ResultSetMappingBinder {
 				String typeFromXML = HbmBinder.getTypeFromXML( returnElem );
 				Type type = null;
 				if(typeFromXML!=null) {
-					type = TypeFactory.heuristicType( typeFromXML );
+					type = mappings.getTypeResolver().heuristicType( typeFromXML );
 					if ( type == null ) {
 						throw new MappingException( "could not determine type " + type );
 					}
@@ -103,7 +102,7 @@ public abstract class ResultSetMappingBinder {
 
 	private static NativeSQLQueryRootReturn bindReturn(Element returnElem, Mappings mappings, int elementCount) {
 		String alias = returnElem.attributeValue( "alias" );
-		if( StringHelper.isEmpty(alias)) {
+		if( StringHelper.isEmpty( alias )) {
 			alias = "alias_" + elementCount; // hack/workaround as sqlquery impl depend on having a key.
 		}
 
@@ -185,7 +184,7 @@ public abstract class ResultSetMappingBinder {
 		Element discriminatorResult = returnElement.element("return-discriminator");
 		if(discriminatorResult!=null) {
 			ArrayList resultColumns = getResultColumns(discriminatorResult);
-			propertyresults.put("class", ArrayHelper.toStringArray(resultColumns) );
+			propertyresults.put("class", ArrayHelper.toStringArray( resultColumns ) );
 		}
 		Iterator iterator = returnElement.elementIterator("return-property");
 		List properties = new ArrayList();
@@ -311,7 +310,7 @@ public abstract class ResultSetMappingBinder {
 			//          }
 			//      }
 			// but I am not clear enough on the intended purpose of this code block, especially
-			// in relation to the "Reorder properties" code block above... 
+			// in relation to the "Reorder properties" code block above...
 //			String key = StringHelper.root( name );
 			String key = name;
 			ArrayList intermediateResults = (ArrayList) propertyresults.get( key );
@@ -331,7 +330,7 @@ public abstract class ResultSetMappingBinder {
 				entry.setValue( list.toArray( new String[ list.size() ] ) );
 			}
 		}
-		return propertyresults.isEmpty() ? CollectionHelper.EMPTY_MAP : propertyresults;
+		return propertyresults.isEmpty() ? Collections.EMPTY_MAP : propertyresults;
 	}
 
 	private static int getIndexOfFirstMatchingProperty(List propertyNames, String follower) {
@@ -376,11 +375,29 @@ public abstract class ResultSetMappingBinder {
 		else if ( "upgrade-nowait".equals( lockMode ) ) {
 			return LockMode.UPGRADE_NOWAIT;
 		}
+		else if ( "upgrade-skiplocked".equals( lockMode )) {
+			return LockMode.UPGRADE_SKIPLOCKED;
+		}
 		else if ( "write".equals( lockMode ) ) {
 			return LockMode.WRITE;
 		}
 		else if ( "force".equals( lockMode ) ) {
 			return LockMode.FORCE;
+		}
+		else if ( "optimistic".equals( lockMode ) ) {
+			return LockMode.OPTIMISTIC;
+		}
+		else if ( "optimistic_force_increment".equals( lockMode ) ) {
+			return LockMode.OPTIMISTIC_FORCE_INCREMENT;
+		}
+		else if ( "pessimistic_read".equals( lockMode ) ) {
+			return LockMode.PESSIMISTIC_READ;
+		}
+		else if ( "pessimistic_write".equals( lockMode ) ) {
+			return LockMode.PESSIMISTIC_WRITE;
+		}
+		else if ( "pessimistic_force_increment".equals( lockMode ) ) {
+			return LockMode.PESSIMISTIC_FORCE_INCREMENT;
 		}
 		else {
 			throw new MappingException( "unknown lockmode" );

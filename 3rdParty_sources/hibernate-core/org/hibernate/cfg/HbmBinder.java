@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,33 +20,33 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.cfg;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
 import org.hibernate.CacheMode;
 import org.hibernate.EntityMode;
 import org.hibernate.FetchMode;
 import org.hibernate.FlushMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.FilterDefinition;
-import org.hibernate.engine.NamedQueryDefinition;
-import org.hibernate.engine.Versioning;
-import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
+import org.hibernate.engine.OptimisticLockStyle;
+import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
+import org.hibernate.engine.spi.FilterDefinition;
+import org.hibernate.engine.spi.NamedQueryDefinition;
+import org.hibernate.engine.spi.NamedQueryDefinitionBuilder;
 import org.hibernate.id.PersistentIdentifierGenerator;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.JoinedIterator;
+import org.hibernate.internal.util.xml.XmlDocument;
+import org.hibernate.loader.PropertyPath;
 import org.hibernate.mapping.Any;
 import org.hibernate.mapping.Array;
 import org.hibernate.mapping.AuxiliaryDatabaseObject;
@@ -55,7 +55,9 @@ import org.hibernate.mapping.Bag;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
+import org.hibernate.mapping.Constraint;
 import org.hibernate.mapping.DependantValue;
+import org.hibernate.mapping.FetchProfile;
 import org.hibernate.mapping.Fetchable;
 import org.hibernate.mapping.Filterable;
 import org.hibernate.mapping.Formula;
@@ -70,12 +72,12 @@ import org.hibernate.mapping.List;
 import org.hibernate.mapping.ManyToOne;
 import org.hibernate.mapping.Map;
 import org.hibernate.mapping.MetaAttribute;
+import org.hibernate.mapping.MetadataSource;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.OneToOne;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.PrimitiveArray;
 import org.hibernate.mapping.Property;
-import org.hibernate.mapping.PropertyGeneration;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.Set;
@@ -89,16 +91,18 @@ import org.hibernate.mapping.TypeDef;
 import org.hibernate.mapping.UnionSubclass;
 import org.hibernate.mapping.UniqueKey;
 import org.hibernate.mapping.Value;
-import org.hibernate.persister.entity.JoinedSubclassEntityPersister;
-import org.hibernate.persister.entity.SingleTableEntityPersister;
-import org.hibernate.persister.entity.UnionSubclassEntityPersister;
+import org.hibernate.tuple.GeneratedValueGeneration;
+import org.hibernate.tuple.GenerationTiming;
+import org.hibernate.type.BasicType;
 import org.hibernate.type.DiscriminatorType;
 import org.hibernate.type.ForeignKeyDirection;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
-import org.hibernate.util.JoinedIterator;
-import org.hibernate.util.ReflectHelper;
-import org.hibernate.util.StringHelper;
+
+import org.jboss.logging.Logger;
+
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 /**
  * Walks an XML mapping document and produces the Hibernate configuration-time metamodel (the
@@ -108,7 +112,7 @@ import org.hibernate.util.StringHelper;
  */
 public final class HbmBinder {
 
-	private static final Logger log = LoggerFactory.getLogger( HbmBinder.class );
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, HbmBinder.class.getName());
 
 	/**
 	 * Private constructor to disallow instantiation.
@@ -120,43 +124,50 @@ public final class HbmBinder {
 	 * The main contract into the hbm.xml-based binder. Performs necessary binding operations
 	 * represented by the given DOM.
 	 *
-	 * @param doc The DOM to be parsed and bound.
+	 * @param metadataXml The DOM to be parsed and bound.
 	 * @param mappings Current bind state.
 	 * @param inheritedMetas Any inherited meta-tag information.
+	 * @param entityNames Any state
+	 *
 	 * @throws MappingException
 	 */
-	public static void bindRoot(Document doc, Mappings mappings, java.util.Map inheritedMetas)
-			throws MappingException {
+	public static void bindRoot(
+			XmlDocument metadataXml,
+			Mappings mappings,
+			java.util.Map inheritedMetas,
+			java.util.Set<String> entityNames) throws MappingException {
 
-		java.util.List names = HbmBinder.getExtendsNeeded( doc, mappings );
+		final Document doc = metadataXml.getDocumentTree();
+		final Element hibernateMappingElement = doc.getRootElement();
+
+		java.util.List<String> names = HbmBinder.getExtendsNeeded( metadataXml, mappings );
 		if ( !names.isEmpty() ) {
 			// classes mentioned in extends not available - so put it in queue
-			Element hmNode = doc.getRootElement();
-			Attribute packNode = hmNode.attribute( "package" );
-			String packageName = null;
-			if ( packNode != null ) {
-				packageName = packNode.getValue();
-			}
-			Iterator itr = names.iterator();
-			while ( itr.hasNext() ) {
-				String extendsName = (String) itr.next();
-				mappings.addToExtendsQueue( new ExtendsQueueEntry( extendsName, packageName, doc ) );
+			Attribute packageAttribute = hibernateMappingElement.attribute( "package" );
+			String packageName = packageAttribute == null ? null : packageAttribute.getValue();
+			for ( String name : names ) {
+				mappings.addToExtendsQueue( new ExtendsQueueEntry( name, packageName, metadataXml, entityNames ) );
 			}
 			return;
 		}
 
-		Element hmNode = doc.getRootElement();
 		// get meta's from <hibernate-mapping>
-		inheritedMetas = getMetas( hmNode, inheritedMetas, true );
-		extractRootAttributes( hmNode, mappings );
+		inheritedMetas = getMetas( hibernateMappingElement, inheritedMetas, true );
+		extractRootAttributes( hibernateMappingElement, mappings );
 
-		Iterator rootChildren = hmNode.elementIterator();
+		Iterator rootChildren = hibernateMappingElement.elementIterator();
 		while ( rootChildren.hasNext() ) {
 			final Element element = (Element) rootChildren.next();
 			final String elementName = element.getName();
 
 			if ( "filter-def".equals( elementName ) ) {
 				parseFilterDef( element, mappings );
+			}
+			else if ( "fetch-profile".equals( elementName ) ) {
+				parseFetchProfile( element, mappings, null );
+			}
+			else if ( "identifier-generator".equals( elementName ) ) {
+				parseIdentifierGeneratorRegistration( element, mappings );
 			}
 			else if ( "typedef".equals( elementName ) ) {
 				bindTypeDef( element, mappings );
@@ -196,13 +207,33 @@ public final class HbmBinder {
 		}
 	}
 
+	private static void parseIdentifierGeneratorRegistration(Element element, Mappings mappings) {
+		String strategy = element.attributeValue( "name" );
+		if ( StringHelper.isEmpty( strategy ) ) {
+			throw new MappingException( "'name' attribute expected for identifier-generator elements" );
+		}
+		String generatorClassName = element.attributeValue( "class" );
+		if ( StringHelper.isEmpty( generatorClassName ) ) {
+			throw new MappingException( "'class' attribute expected for identifier-generator [identifier-generator@name=" + strategy + "]" );
+		}
+
+		try {
+			Class generatorClass = ReflectHelper.classForName( generatorClassName );
+			mappings.getIdentifierGeneratorFactory().register( strategy, generatorClass );
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new MappingException( "Unable to locate identifier-generator class [name=" + strategy + ", class=" + generatorClassName + "]" );
+		}
+
+	}
+
 	private static void bindImport(Element importNode, Mappings mappings) {
 		String className = getClassName( importNode.attribute( "class" ), mappings );
 		Attribute renameNode = importNode.attribute( "rename" );
 		String rename = ( renameNode == null ) ?
 						StringHelper.unqualify( className ) :
 						renameNode.getValue();
-		log.debug( "Import: " + rename + " -> " + className );
+		LOG.debugf( "Import: %s -> %s", rename, className );
 		mappings.addImport( className, rename );
 	}
 
@@ -280,7 +311,7 @@ public final class HbmBinder {
 	}
 
 	/**
-	 * Responsible for perfoming the bind operation related to an &lt;class/&gt; mapping element.
+	 * Responsible for performing the bind operation related to an &lt;class/&gt; mapping element.
 	 *
 	 * @param node The DOM Element for the &lt;class/&gt; element.
 	 * @param rootClass The mapping instance to which to bind the information.
@@ -314,15 +345,14 @@ public final class HbmBinder {
 				catalog,
 				getClassTableName( entity, node, schema, catalog, null, mappings ),
 				getSubselect( node ),
-		        entity.isAbstract() != null && entity.isAbstract().booleanValue()
+		        entity.isAbstract() != null && entity.isAbstract()
 			);
 		entity.setTable( table );
 		bindComment(table, node);
 
-		log.info(
-				"Mapping class: " + entity.getEntityName() +
-				" -> " + entity.getTable().getName()
-			);
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debugf( "Mapping class: %s -> %s", entity.getEntityName(), entity.getTable().getName() );
+		}
 
 		// MUTABLE
 		Attribute mutableNode = node.attribute( "mutable" );
@@ -385,7 +415,7 @@ public final class HbmBinder {
 			java.util.Map inheritedMetas) throws MappingException {
 		String propertyName = idNode.attributeValue( "name" );
 
-		SimpleValue id = new SimpleValue( entity.getTable() );
+		SimpleValue id = new SimpleValue( mappings, entity.getTable() );
 		entity.setIdentifier( id );
 
 		// if ( propertyName == null || entity.getPojoRepresentation() == null ) {
@@ -428,6 +458,7 @@ public final class HbmBinder {
 			prop.setValue( id );
 			bindProperty( idNode, prop, mappings, inheritedMetas );
 			entity.setIdentifierProperty( prop );
+			entity.setDeclaredIdentifierProperty( prop );
 		}
 
 		// TODO:
@@ -441,7 +472,7 @@ public final class HbmBinder {
 	private static void bindCompositeId(Element idNode, RootClass entity, Mappings mappings,
 			java.util.Map inheritedMetas) throws MappingException {
 		String propertyName = idNode.attributeValue( "name" );
-		Component id = new Component( entity );
+		Component id = new Component( mappings, entity );
 		entity.setIdentifier( id );
 		bindCompositeId( idNode, id, entity, propertyName, mappings, inheritedMetas );
 		if ( propertyName == null ) {
@@ -461,6 +492,7 @@ public final class HbmBinder {
 			prop.setValue( id );
 			bindProperty( idNode, prop, mappings, inheritedMetas );
 			entity.setIdentifierProperty( prop );
+			entity.setDeclaredIdentifierProperty( prop );
 		}
 
 		makeIdentifier( idNode, id, mappings );
@@ -471,7 +503,7 @@ public final class HbmBinder {
 			String name, RootClass entity, java.util.Map inheritedMetas) {
 
 		String propertyName = subnode.attributeValue( "name" );
-		SimpleValue val = new SimpleValue( table );
+		SimpleValue val = new SimpleValue( mappings, table );
 		bindSimpleValue( subnode, val, false, propertyName, mappings );
 		if ( !val.isTypeSpecified() ) {
 			// this is either a <version/> tag with no type attribute,
@@ -494,8 +526,10 @@ public final class HbmBinder {
 		// for version properties marked as being generated, make sure they are "always"
 		// generated; aka, "insert" is invalid; this is dis-allowed by the DTD,
 		// but just to make sure...
-		if ( prop.getGeneration() == PropertyGeneration.INSERT ) {
-			throw new MappingException( "'generated' attribute cannot be 'insert' for versioning property" );
+		if ( prop.getValueGenerationStrategy() != null ) {
+			if ( prop.getValueGenerationStrategy().getGenerationTiming() == GenerationTiming.INSERT ) {
+				throw new MappingException( "'generated' attribute cannot be 'insert' for versioning property" );
+			}
 		}
 		makeVersion( subnode, val );
 		entity.setVersion( prop );
@@ -504,7 +538,7 @@ public final class HbmBinder {
 
 	private static void bindDiscriminatorProperty(Table table, RootClass entity, Element subnode,
 			Mappings mappings) {
-		SimpleValue discrim = new SimpleValue( table );
+		SimpleValue discrim = new SimpleValue( mappings, table );
 		entity.setDiscriminator( discrim );
 		bindSimpleValue(
 				subnode,
@@ -518,10 +552,14 @@ public final class HbmBinder {
 			// ( (Column) discrim.getColumnIterator().next() ).setType(type);
 		}
 		entity.setPolymorphic( true );
-		if ( "true".equals( subnode.attributeValue( "force" ) ) )
-			entity.setForceDiscriminator( true );
-		if ( "false".equals( subnode.attributeValue( "insert" ) ) )
+		final String explicitForceValue = subnode.attributeValue( "force" );
+		boolean forceDiscriminatorInSelects = explicitForceValue == null
+				? mappings.forceDiscriminatorInSelectsByDefault()
+				: "true".equals( explicitForceValue );
+		entity.setForceDiscriminator( forceDiscriminatorInSelects );
+		if ( "false".equals( subnode.attributeValue( "insert" ) ) ) {
 			entity.setDiscriminatorInsertable( false );
+		}
 	}
 
 	public static void bindClass(Element node, PersistentClass persistentClass, Mappings mappings,
@@ -541,13 +579,19 @@ public final class HbmBinder {
 			throw new MappingException( "Unable to determine entity name" );
 		}
 		persistentClass.setEntityName( entityName );
+		persistentClass.setJpaEntityName( StringHelper.unqualify( entityName ) );
 
 		bindPojoRepresentation( node, persistentClass, mappings, inheritedMetas );
 		bindDom4jRepresentation( node, persistentClass, mappings, inheritedMetas );
 		bindMapRepresentation( node, persistentClass, mappings, inheritedMetas );
 
-		bindPersistentClassCommonValues( node, persistentClass, mappings, inheritedMetas );
+		Iterator itr = node.elementIterator( "fetch-profile" );
+		while ( itr.hasNext() ) {
+			final Element profileElement = ( Element ) itr.next();
+			parseFetchProfile( profileElement, mappings, entityName );
+		}
 
+		bindPersistentClassCommonValues( node, persistentClass, mappings, inheritedMetas );
 	}
 
 	private static void bindPojoRepresentation(Element node, PersistentClass entity,
@@ -578,10 +622,10 @@ public final class HbmBinder {
 		if (nodeName==null) nodeName = StringHelper.unqualify( entity.getEntityName() );
 		entity.setNodeName(nodeName);
 
-		Element tuplizer = locateTuplizerDefinition( node, EntityMode.DOM4J );
-		if ( tuplizer != null ) {
-			entity.addTuplizer( EntityMode.DOM4J, tuplizer.attributeValue( "class" ) );
-		}
+//		Element tuplizer = locateTuplizerDefinition( node, EntityMode.DOM4J );
+//		if ( tuplizer != null ) {
+//			entity.addTuplizer( EntityMode.DOM4J, tuplizer.attributeValue( "class" ) );
+//		}
 	}
 
 	private static void bindMapRepresentation(Element node, PersistentClass entity,
@@ -649,7 +693,7 @@ public final class HbmBinder {
 
 		// OPTIMISTIC LOCK MODE
 		Attribute olNode = node.attribute( "optimistic-lock" );
-		entity.setOptimisticLockMode( getOptimisticLockMode( olNode ) );
+		entity.setOptimisticLockStyle( getOptimisticLockStyle( olNode ) );
 
 		entity.setMetaAttributes( getMetas( node, inheritedMetas ) );
 
@@ -657,8 +701,10 @@ public final class HbmBinder {
 		Attribute persisterNode = node.attribute( "persister" );
 		if ( persisterNode != null ) {
 			try {
-				entity.setEntityPersisterClass( ReflectHelper.classForName( persisterNode
-					.getValue() ) );
+				entity.setEntityPersisterClass( ReflectHelper.classForName(
+						persisterNode
+								.getValue()
+				) );
 			}
 			catch (ClassNotFoundException cnfe) {
 				throw new MappingException( "Could not find persister class: "
@@ -780,7 +826,7 @@ public final class HbmBinder {
 			// NONE might be a better option moving forward in the case of callable
 			return ExecuteUpdateResultCheckStyle.COUNT;
 		}
-		return ExecuteUpdateResultCheckStyle.parse( attr.getValue() );
+		return ExecuteUpdateResultCheckStyle.fromExternalName( attr.getValue() );
 	}
 
 	public static void bindUnionSubclass(Element node, UnionSubclass unionSubclass,
@@ -788,11 +834,6 @@ public final class HbmBinder {
 
 		bindClass( node, unionSubclass, mappings, inheritedMetas );
 		inheritedMetas = getMetas( node, inheritedMetas, true ); // get meta's from <subclass>
-
-		if ( unionSubclass.getEntityPersisterClass() == null ) {
-			unionSubclass.getRootClass().setEntityPersisterClass(
-				UnionSubclassEntityPersister.class );
-		}
 
 		Attribute schemaNode = node.attribute( "schema" );
 		String schema = schemaNode == null ?
@@ -807,16 +848,15 @@ public final class HbmBinder {
 				schema,
 				catalog,
 				getClassTableName(unionSubclass, node, schema, catalog, denormalizedSuperTable, mappings ),
-		        unionSubclass.isAbstract() != null && unionSubclass.isAbstract().booleanValue(),
+		        unionSubclass.isAbstract() != null && unionSubclass.isAbstract(),
 				getSubselect( node ),
 				denormalizedSuperTable
 			);
 		unionSubclass.setTable( mytable );
 
-		log.info(
-				"Mapping union-subclass: " + unionSubclass.getEntityName() +
-				" -> " + unionSubclass.getTable().getName()
-			);
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debugf( "Mapping union-subclass: %s -> %s", unionSubclass.getEntityName(), unionSubclass.getTable().getName() );
+		}
 
 		createClassProperties( node, unionSubclass, mappings, inheritedMetas );
 
@@ -828,24 +868,21 @@ public final class HbmBinder {
 		bindClass( node, subclass, mappings, inheritedMetas );
 		inheritedMetas = getMetas( node, inheritedMetas, true ); // get meta's from <subclass>
 
-		if ( subclass.getEntityPersisterClass() == null ) {
-			subclass.getRootClass()
-					.setEntityPersisterClass( SingleTableEntityPersister.class );
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debugf( "Mapping subclass: %s -> %s", subclass.getEntityName(), subclass.getTable().getName() );
 		}
-
-		log.info(
-				"Mapping subclass: " + subclass.getEntityName() +
-				" -> " + subclass.getTable().getName()
-			);
 
 		// properties
 		createClassProperties( node, subclass, mappings, inheritedMetas );
 	}
 
 	private static String getClassTableName(
-			PersistentClass model, Element node, String schema, String catalog, Table denormalizedSuperTable,
-			Mappings mappings
-	) {
+			PersistentClass model,
+			Element node,
+			String schema,
+			String catalog,
+			Table denormalizedSuperTable,
+			Mappings mappings) {
 		Attribute tableNameNode = node.attribute( "table" );
 		String logicalTableName;
 		String physicalTableName;
@@ -869,11 +906,6 @@ public final class HbmBinder {
 																	// <joined-subclass>
 
 		// joined subclasses
-		if ( joinedSubclass.getEntityPersisterClass() == null ) {
-			joinedSubclass.getRootClass()
-				.setEntityPersisterClass( JoinedSubclassEntityPersister.class );
-		}
-
 		Attribute schemaNode = node.attribute( "schema" );
 		String schema = schemaNode == null ?
 				mappings.getSchemaName() : schemaNode.getValue();
@@ -892,14 +924,13 @@ public final class HbmBinder {
 		joinedSubclass.setTable( mytable );
 		bindComment(mytable, node);
 
-		log.info(
-				"Mapping joined-subclass: " + joinedSubclass.getEntityName() +
-				" -> " + joinedSubclass.getTable().getName()
-			);
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debugf( "Mapping joined-subclass: %s -> %s", joinedSubclass.getEntityName(), joinedSubclass.getTable().getName() );
+		}
 
 		// KEY
 		Element keyNode = node.element( "key" );
-		SimpleValue key = new DependantValue( mytable, joinedSubclass.getIdentifier() );
+		SimpleValue key = new DependantValue( mappings, mytable, joinedSubclass.getIdentifier() );
 		joinedSubclass.setKey( key );
 		key.setCascadeDeleteEnabled( "cascade".equals( keyNode.attributeValue( "on-delete" ) ) );
 		bindSimpleValue( keyNode, key, false, joinedSubclass.getEntityName(), mappings );
@@ -957,14 +988,13 @@ public final class HbmBinder {
 			join.setOptional( "true".equals( nullNode.getValue() ) );
 		}
 
-		log.info(
-				"Mapping class join: " + persistentClass.getEntityName() +
-				" -> " + join.getTable().getName()
-			);
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debugf( "Mapping class join: %s -> %s", persistentClass.getEntityName(), join.getTable().getName() );
+		}
 
 		// KEY
 		Element keyNode = node.element( "key" );
-		SimpleValue key = new DependantValue( table, persistentClass.getIdentifier() );
+		SimpleValue key = new DependantValue( mappings, table, persistentClass.getIdentifier() );
 		join.setKey( key );
 		key.setCascadeDeleteEnabled( "cascade".equals( keyNode.attributeValue( "on-delete" ) ) );
 		bindSimpleValue( keyNode, key, false, persistentClass.getEntityName(), mappings );
@@ -982,20 +1012,20 @@ public final class HbmBinder {
 
 			Value value = null;
 			if ( "many-to-one".equals( name ) ) {
-				value = new ManyToOne( table );
+				value = new ManyToOne( mappings, table );
 				bindManyToOne( subnode, (ManyToOne) value, propertyName, true, mappings );
 			}
 			else if ( "any".equals( name ) ) {
-				value = new Any( table );
+				value = new Any( mappings, table );
 				bindAny( subnode, (Any) value, true, mappings );
 			}
 			else if ( "property".equals( name ) ) {
-				value = new SimpleValue( table );
+				value = new SimpleValue( mappings, table );
 				bindSimpleValue( subnode, (SimpleValue) value, true, propertyName, mappings );
 			}
 			else if ( "component".equals( name ) || "dynamic-component".equals( name ) ) {
 				String subpath = StringHelper.qualify( path, propertyName );
-				value = new Component( join );
+				value = new Component( mappings, join );
 				bindComponent(
 						subnode,
 						(Component) value,
@@ -1033,20 +1063,22 @@ public final class HbmBinder {
 		// COLUMN(S)
 		Attribute columnAttribute = node.attribute( "column" );
 		if ( columnAttribute == null ) {
-			Iterator iter = node.elementIterator();
+			Iterator itr = node.elementIterator();
 			int count = 0;
-			while ( iter.hasNext() ) {
-				Element columnElement = (Element) iter.next();
+			while ( itr.hasNext() ) {
+				Element columnElement = (Element) itr.next();
 				if ( columnElement.getName().equals( "column" ) ) {
 					Column column = new Column();
 					column.setValue( simpleValue );
 					column.setTypeIndex( count++ );
 					bindColumn( columnElement, column, isNullable );
+					String columnName = columnElement.attributeValue( "name" );
 					String logicalColumnName = mappings.getNamingStrategy().logicalColumnName(
-							columnElement.attributeValue( "name" ), propertyPath
+							columnName, propertyPath
 					);
-					column.setName( mappings.getNamingStrategy().columnName(
-						logicalColumnName ) );
+					columnName = mappings.getNamingStrategy().columnName( columnName );
+					columnName = quoteIdentifier( columnName, mappings );
+					column.setName( columnName );
 					if ( table != null ) {
 						table.addColumn( column ); // table=null -> an association
 						                           // - fill it in later
@@ -1069,6 +1101,16 @@ public final class HbmBinder {
 					simpleValue.addFormula( formula );
 				}
 			}
+
+			// todo : another GoodThing would be to go back after all parsing and see if all the columns
+			// (and no formulas) are contained in a defined unique key that only contains these columns.
+			// That too would mark this as a logical one-to-one
+			final Attribute uniqueAttribute = node.attribute( "unique" );
+			if ( uniqueAttribute != null
+					&& "true".equals( uniqueAttribute.getValue() )
+					&& ManyToOne.class.isInstance( simpleValue ) ) {
+				( (ManyToOne) simpleValue ).markAsLogicalOneToOne();
+			}
 		}
 		else {
 			if ( node.elementIterator( "column" ).hasNext() ) {
@@ -1083,10 +1125,16 @@ public final class HbmBinder {
 			Column column = new Column();
 			column.setValue( simpleValue );
 			bindColumn( node, column, isNullable );
+			if ( column.isUnique() && ManyToOne.class.isInstance( simpleValue ) ) {
+				( (ManyToOne) simpleValue ).markAsLogicalOneToOne();
+			}
+			String columnName = columnAttribute.getValue();
 			String logicalColumnName = mappings.getNamingStrategy().logicalColumnName(
-					columnAttribute.getValue(), propertyPath
+					columnName, propertyPath
 			);
-			column.setName( mappings.getNamingStrategy().columnName( logicalColumnName ) );
+			columnName = mappings.getNamingStrategy().columnName( columnName );
+			columnName = quoteIdentifier( columnName, mappings );
+			column.setName( columnName );
 			if ( table != null ) {
 				table.addColumn( column ); // table=null -> an association - fill
 				                           // it in later
@@ -1102,12 +1150,14 @@ public final class HbmBinder {
 			Column column = new Column();
 			column.setValue( simpleValue );
 			bindColumn( node, column, isNullable );
-			column.setName( mappings.getNamingStrategy().propertyToColumnName( propertyPath ) );
+			String columnName = mappings.getNamingStrategy().propertyToColumnName( propertyPath );
+			columnName = quoteIdentifier( columnName, mappings );
+			column.setName( columnName );
 			String logicalName = mappings.getNamingStrategy().logicalColumnName( null, propertyPath );
 			mappings.addColumnBinding( logicalName, column, table );
 			/* TODO: joinKeyColumnName & foreignKeyColumnName should be called either here or at a
 			 * slightly higer level in the stack (to get all the information we need)
-			 * Right now HbmBinder does not support the
+			 * Right now HbmMetadataSourceProcessorImpl does not support the
 			 */
 			simpleValue.getTable().addColumn( column );
 			simpleValue.addColumn( column );
@@ -1153,8 +1203,12 @@ public final class HbmBinder {
 		Properties parameters = new Properties();
 
 		Attribute typeNode = node.attribute( "type" );
-		if ( typeNode == null ) typeNode = node.attribute( "id-type" ); // for an any
-		if ( typeNode != null ) typeName = typeNode.getValue();
+        if ( typeNode == null ) {
+            typeNode = node.attribute( "id-type" ); // for an any
+        }
+        else {
+            typeName = typeNode.getValue();
+        }
 
 		Element typeChild = node.element( "type" );
 		if ( typeName == null && typeChild != null ) {
@@ -1170,6 +1224,11 @@ public final class HbmBinder {
 			}
 		}
 
+		resolveAndBindTypeDef(simpleValue, mappings, typeName, parameters);
+	}
+
+	private static void resolveAndBindTypeDef(SimpleValue simpleValue,
+			Mappings mappings, String typeName, Properties parameters) {
 		TypeDef typeDef = mappings.getTypeDef( typeName );
 		if ( typeDef != null ) {
 			typeName = typeDef.getTypeClass();
@@ -1179,6 +1238,19 @@ public final class HbmBinder {
 			allParameters.putAll( typeDef.getParameters() );
 			allParameters.putAll( parameters );
 			parameters = allParameters;
+		}else if (typeName!=null && !mappings.isInSecondPass()){
+			BasicType basicType=mappings.getTypeResolver().basic(typeName);
+			if (basicType==null) {
+				/*
+				 * If the referenced typeName isn't a basic-type, it's probably a typedef defined 
+				 * in a mapping file not read yet.
+				 * It should be solved by deferring the resolution and binding of this type until 
+				 * all mapping files are read - the second passes.
+				 * Fixes issue HHH-7300
+				 */
+				SecondPass resolveUserTypeMappingSecondPass=new ResolveUserTypeMappingSecondPass(simpleValue,typeName,mappings,parameters);
+				mappings.addSecondPass(resolveUserTypeMappingSecondPass);
+			}
 		}
 
 		if ( !parameters.isEmpty() ) simpleValue.setTypeParameters( parameters );
@@ -1229,46 +1301,51 @@ public final class HbmBinder {
 
 		Attribute generatedNode = node.attribute( "generated" );
         String generationName = generatedNode == null ? null : generatedNode.getValue();
-        PropertyGeneration generation = PropertyGeneration.parse( generationName );
-		property.setGeneration( generation );
 
-        if ( generation == PropertyGeneration.ALWAYS || generation == PropertyGeneration.INSERT ) {
-	        // generated properties can *never* be insertable...
-	        if ( property.isInsertable() ) {
-		        if ( insertNode == null ) {
-			        // insertable simply because that is the user did not specify
-			        // anything; just override it
+		// Handle generated properties.
+		GenerationTiming generationTiming = GenerationTiming.parseFromName( generationName );
+		if ( generationTiming == GenerationTiming.ALWAYS || generationTiming == GenerationTiming.INSERT ) {
+			// we had generation specified...
+			//   	HBM only supports "database generated values"
+			property.setValueGenerationStrategy( new GeneratedValueGeneration( generationTiming ) );
+
+			// generated properties can *never* be insertable...
+			if ( property.isInsertable() ) {
+				if ( insertNode == null ) {
+					// insertable simply because that is the user did not specify
+					// anything; just override it
 					property.setInsertable( false );
-		        }
-		        else {
-			        // the user specifically supplied insert="true",
-			        // which constitutes an illegal combo
+				}
+				else {
+					// the user specifically supplied insert="true",
+					// which constitutes an illegal combo
 					throw new MappingException(
-							"cannot specify both insert=\"true\" and generated=\"" + generation.getName() +
-							"\" for property: " +
-							propName
+							"cannot specify both insert=\"true\" and generated=\"" + generationTiming.name().toLowerCase() +
+									"\" for property: " +
+									propName
 					);
-		        }
-	        }
+				}
+			}
 
-	        // properties generated on update can never be updateable...
-	        if ( property.isUpdateable() && generation == PropertyGeneration.ALWAYS ) {
-		        if ( updateNode == null ) {
-			        // updateable only because the user did not specify 
-			        // anything; just override it
-			        property.setUpdateable( false );
-		        }
-		        else {
-			        // the user specifically supplied update="true",
-			        // which constitutes an illegal combo
+			// properties generated on update can never be updateable...
+			if ( property.isUpdateable() && generationTiming == GenerationTiming.ALWAYS ) {
+				if ( updateNode == null ) {
+					// updateable only because the user did not specify
+					// anything; just override it
+					property.setUpdateable( false );
+				}
+				else {
+					// the user specifically supplied update="true",
+					// which constitutes an illegal combo
 					throw new MappingException(
-							"cannot specify both update=\"true\" and generated=\"" + generation.getName() +
-							"\" for property: " +
-							propName
+							"cannot specify both update=\"true\" and generated=\"" + generationTiming.name().toLowerCase() +
+									"\" for property: " +
+									propName
 					);
-		        }
-	        }
-        }
+				}
+			}
+		}
+
 
 		boolean isLazyable = "property".equals( node.getName() ) ||
 				"component".equals( node.getName() ) ||
@@ -1280,13 +1357,13 @@ public final class HbmBinder {
 			property.setLazy( lazyNode != null && "true".equals( lazyNode.getValue() ) );
 		}
 
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			String msg = "Mapped property: " + property.getName();
 			String columns = columns( property.getValue() );
 			if ( columns.length() > 0 ) msg += " -> " + columns;
 			// TODO: this fails if we run with debug on!
 			// if ( model.getType()!=null ) msg += ", type: " + model.getType().getName();
-			log.debug( msg );
+			LOG.debug( msg );
 		}
 
 		property.setMetaAttributes( getMetas( node, inheritedMetas ) );
@@ -1294,7 +1371,7 @@ public final class HbmBinder {
 	}
 
 	private static String columns(Value val) {
-		StringBuffer columns = new StringBuffer();
+		StringBuilder columns = new StringBuilder();
 		Iterator iter = val.getColumnIterator();
 		while ( iter.hasNext() ) {
 			columns.append( ( (Selectable) iter.next() ).getText() );
@@ -1327,12 +1404,7 @@ public final class HbmBinder {
 
 		Attribute orderNode = node.attribute( "order-by" );
 		if ( orderNode != null ) {
-			if ( Environment.jvmSupportsLinkedHashCollections() || ( collection instanceof Bag ) ) {
-				collection.setOrderBy( orderNode.getValue() );
-			}
-			else {
-				log.warn( "Attribute \"order-by\" ignored in JDK1.3 or less" );
-			}
+			collection.setOrderBy( orderNode.getValue() );
 		}
 		Attribute whereNode = node.attribute( "where" );
 		if ( whereNode != null ) {
@@ -1347,6 +1419,12 @@ public final class HbmBinder {
 		if ( nodeName == null ) nodeName = node.attributeValue( "name" );
 		collection.setNodeName( nodeName );
 		String embed = node.attributeValue( "embed-xml" );
+		// sometimes embed is set to the default value when not specified in the mapping,
+		// so can't seem to determine if an attribute was explicitly set;
+		// log a warning if embed has a value different from the default.
+		if ( !StringHelper.isEmpty( embed ) &&  !"true".equals( embed ) ) {
+			LOG.embedXmlAttributesNoLongerSupported();
+		}
 		collection.setEmbedded( embed==null || "true".equals(embed) );
 
 
@@ -1394,7 +1472,7 @@ public final class HbmBinder {
 
 		Element oneToManyNode = node.element( "one-to-many" );
 		if ( oneToManyNode != null ) {
-			OneToMany oneToMany = new OneToMany( collection.getOwner() );
+			OneToMany oneToMany = new OneToMany( mappings, collection.getOwner() );
 			collection.setElement( oneToMany );
 			bindOneToMany( oneToManyNode, oneToMany, mappings );
 			// we have to set up the table later!! yuck
@@ -1419,6 +1497,9 @@ public final class HbmBinder {
 						null,
 						path
 				);
+				if ( ownerTable.isQuoted() ) {
+					tableName = StringHelper.quote( tableName );
+				}
 			}
 			Attribute schemaNode = node.attribute( "schema" );
 			String schema = schemaNode == null ?
@@ -1438,10 +1519,9 @@ public final class HbmBinder {
 			collection.setCollectionTable( table );
 			bindComment(table, node);
 
-			log.info(
-					"Mapping collection: " + collection.getRole() +
-					" -> " + collection.getCollectionTable().getName()
-				);
+			if ( LOG.isDebugEnabled() ) {
+				LOG.debugf( "Mapping collection: %s -> %s", collection.getRole(), collection.getCollectionTable().getName() );
+			}
 		}
 
 		// SORT
@@ -1527,11 +1607,11 @@ public final class HbmBinder {
 	) {
 		if ( "no-proxy".equals( node.attributeValue( "lazy" ) ) ) {
 			fetchable.setUnwrapProxy(true);
-			fetchable.setLazy(true);
+			fetchable.setLazy( true );
 			//TODO: better to degrade to lazy="false" if uninstrumented
 		}
 		else {
-			initLaziness(node, fetchable, mappings, "proxy", defaultLazy);
+			initLaziness( node, fetchable, mappings, "proxy", defaultLazy );
 		}
 	}
 
@@ -1564,10 +1644,17 @@ public final class HbmBinder {
 		if ( ukName != null ) {
 			manyToOne.setReferencedPropertyName( ukName.getValue() );
 		}
+		manyToOne.setReferenceToPrimaryKey( manyToOne.getReferencedPropertyName() == null );
 
 		manyToOne.setReferencedEntityName( getEntityName( node, mappings ) );
 
 		String embed = node.attributeValue( "embed-xml" );
+		// sometimes embed is set to the default value when not specified in the mapping,
+		// so can't seem to determine if an attribute was explicitly set;
+		// log a warning if embed has a value different from the default.
+		if ( !StringHelper.isEmpty( embed ) &&  !"true".equals( embed ) ) {
+			LOG.embedXmlAttributesNoLongerSupported();
+		}
 		manyToOne.setEmbedded( embed == null || "true".equals( embed ) );
 
 		String notFound = node.attributeValue( "not-found" );
@@ -1582,13 +1669,13 @@ public final class HbmBinder {
 		Attribute fkNode = node.attribute( "foreign-key" );
 		if ( fkNode != null ) manyToOne.setForeignKeyName( fkNode.getValue() );
 
-		validateCascade( node, path );
-	}
-
-	private static void validateCascade(Element node, String path) {
 		String cascade = node.attributeValue( "cascade" );
 		if ( cascade != null && cascade.indexOf( "delete-orphan" ) >= 0 ) {
-			throw new MappingException( "single-valued associations do not support orphan delete: " + path );
+			if ( !manyToOne.isLogicalOneToOne() ) {
+				throw new MappingException(
+						"many-to-one attribute [" + path + "] does not support orphan delete as it is not unique"
+				);
+			}
 		}
 	}
 
@@ -1602,7 +1689,7 @@ public final class HbmBinder {
 			Iterator iter = node.elementIterator( "meta-value" );
 			if ( iter.hasNext() ) {
 				HashMap values = new HashMap();
-				org.hibernate.type.Type metaType = TypeFactory.heuristicType( any.getMetaType() );
+				org.hibernate.type.Type metaType = mappings.getTypeResolver().heuristicType( any.getMetaType() );
 				while ( iter.hasNext() ) {
 					Element metaValue = (Element) iter.next();
 					try {
@@ -1643,19 +1730,34 @@ public final class HbmBinder {
 		initOuterJoinFetchSetting( node, oneToOne );
 		initLaziness( node, oneToOne, mappings, true );
 
-		oneToOne.setEmbedded( "true".equals( node.attributeValue( "embed-xml" ) ) );
+		String embed = node.attributeValue( "embed-xml" );
+		// sometimes embed is set to the default value when not specified in the mapping,
+		// so can't seem to determine if an attribute was explicitly set;
+		// log a warning if embed has a value different from the default.
+		if ( !StringHelper.isEmpty( embed ) &&  !"true".equals( embed ) ) {
+			LOG.embedXmlAttributesNoLongerSupported();
+		}
+		oneToOne.setEmbedded( "true".equals( embed ) );
 
 		Attribute fkNode = node.attribute( "foreign-key" );
 		if ( fkNode != null ) oneToOne.setForeignKeyName( fkNode.getValue() );
 
 		Attribute ukName = node.attribute( "property-ref" );
 		if ( ukName != null ) oneToOne.setReferencedPropertyName( ukName.getValue() );
+		oneToOne.setReferenceToPrimaryKey( oneToOne.getReferencedPropertyName() == null );
 
 		oneToOne.setPropertyName( node.attributeValue( "name" ) );
 
 		oneToOne.setReferencedEntityName( getEntityName( node, mappings ) );
 
-		validateCascade( node, path );
+		String cascade = node.attributeValue( "cascade" );
+		if ( cascade != null && cascade.indexOf( "delete-orphan" ) >= 0 ) {
+			if ( oneToOne.isConstrained() ) {
+				throw new MappingException(
+						"one-to-one attribute [" + path + "] does not support orphan delete as it is constrained"
+				);
+			}
+		}
 	}
 
 	public static void bindOneToMany(Element node, OneToMany oneToMany, Mappings mappings)
@@ -1664,6 +1766,12 @@ public final class HbmBinder {
 		oneToMany.setReferencedEntityName( getEntityName( node, mappings ) );
 
 		String embed = node.attributeValue( "embed-xml" );
+		// sometimes embed is set to the default value when not specified in the mapping,
+		// so can't seem to determine if an attribute was explicitly set;
+		// log a warning if embed has a value different from the default.
+		if ( !StringHelper.isEmpty( embed ) &&  !"true".equals( embed ) ) {
+			LOG.embedXmlAttributesNoLongerSupported();
+		}
 		oneToMany.setEmbedded( embed == null || "true".equals( embed ) );
 
 		String notFound = node.attributeValue( "not-found" );
@@ -1671,7 +1779,7 @@ public final class HbmBinder {
 
 	}
 
-	public static void bindColumn(Element node, Column column, boolean isNullable) {
+	public static void bindColumn(Element node, Column column, boolean isNullable) throws MappingException {
 		Attribute lengthNode = node.attribute( "length" );
 		if ( lengthNode != null ) column.setLength( Integer.parseInt( lengthNode.getValue() ) );
 		Attribute scalNode = node.attribute( "scale" );
@@ -1690,6 +1798,13 @@ public final class HbmBinder {
 
 		Attribute typeNode = node.attribute( "sql-type" );
 		if ( typeNode != null ) column.setSqlType( typeNode.getValue() );
+
+		String customWrite = node.attributeValue( "write" );
+		if(customWrite != null && !customWrite.matches("[^?]*\\?[^?]*")) {
+			throw new MappingException("write expression must contain exactly one value placeholder ('?') character");
+		}
+		column.setCustomWrite( customWrite );
+		column.setCustomRead( node.attributeValue( "read" ) );
 
 		Element comment = node.element("comment");
 		if (comment!=null) column.setComment( comment.getTextTrim() );
@@ -1729,7 +1844,7 @@ public final class HbmBinder {
 				mappings,
 				inheritedMetas,
 				false
-			);
+		);
 	}
 
 	public static void bindCompositeId(Element node, Component component,
@@ -1760,7 +1875,7 @@ public final class HbmBinder {
 			if ( propertyName!=null ) {
 				throw new MappingException("cannot combine mapped=\"true\" with specified name");
 			}
-			Component mapper = new Component(persistentClass);
+			Component mapper = new Component( mappings, persistentClass );
 			bindComponent(
 					node,
 					mapper,
@@ -1775,7 +1890,7 @@ public final class HbmBinder {
 				);
 			persistentClass.setIdentifierMapper(mapper);
 			Property property = new Property();
-			property.setName("_identifierMapper");
+			property.setName( PropertyPath.IDENTIFIER_MAPPER_PROPERTY );
 			property.setNodeName("id");
 			property.setUpdateable(false);
 			property.setInsertable(false);
@@ -1861,7 +1976,7 @@ public final class HbmBinder {
 				value = collection;
 			}
 			else if ( "many-to-one".equals( name ) || "key-many-to-one".equals( name ) ) {
-				value = new ManyToOne( component.getTable() );
+				value = new ManyToOne( mappings, component.getTable() );
 				String relativePath;
 				if (isEmbedded) {
 					relativePath = propertyName;
@@ -1872,7 +1987,7 @@ public final class HbmBinder {
 				bindManyToOne( subnode, (ManyToOne) value, relativePath, isNullable, mappings );
 			}
 			else if ( "one-to-one".equals( name ) ) {
-				value = new OneToOne( component.getTable(), component.getOwner() );
+				value = new OneToOne( mappings, component.getTable(), component.getOwner() );
 				String relativePath;
 				if (isEmbedded) {
 					relativePath = propertyName;
@@ -1883,11 +1998,11 @@ public final class HbmBinder {
 				bindOneToOne( subnode, (OneToOne) value, relativePath, isNullable, mappings );
 			}
 			else if ( "any".equals( name ) ) {
-				value = new Any( component.getTable() );
+				value = new Any( mappings, component.getTable() );
 				bindAny( subnode, (Any) value, isNullable, mappings );
 			}
 			else if ( "property".equals( name ) || "key-property".equals( name ) ) {
-				value = new SimpleValue( component.getTable() );
+				value = new SimpleValue( mappings, component.getTable() );
 				String relativePath;
 				if (isEmbedded) {
 					relativePath = propertyName;
@@ -1900,7 +2015,7 @@ public final class HbmBinder {
 			else if ( "component".equals( name )
 				|| "dynamic-component".equals( name )
 				|| "nested-composite-element".equals( name ) ) {
-				value = new Component( component ); // a nested composite element
+				value = new Component( mappings, component ); // a nested composite element
 				bindComponent(
 						subnode,
 						(Component) value,
@@ -1980,21 +2095,41 @@ public final class HbmBinder {
 				}
 			}
 			else {
-				// use old (HB 2.1) defaults if outer-join is specified
-				String eoj = jfNode.getValue();
-				if ( "auto".equals( eoj ) ) {
-					fetchStyle = FetchMode.DEFAULT;
+				if ( "many-to-many".equals( node.getName() ) ) {
+					//NOTE <many-to-many outer-join="..." is deprecated.:
+					// Default to join and non-lazy for the "second join"
+					// of the many-to-many
+					LOG.deprecatedManyToManyOuterJoin();
+					lazy = false;
+					fetchStyle = FetchMode.JOIN;
 				}
 				else {
-					boolean join = "true".equals( eoj );
-					fetchStyle = join ? FetchMode.JOIN : FetchMode.SELECT;
+					// use old (HB 2.1) defaults if outer-join is specified
+					String eoj = jfNode.getValue();
+					if ( "auto".equals( eoj ) ) {
+						fetchStyle = FetchMode.DEFAULT;
+					}
+					else {
+						boolean join = "true".equals( eoj );
+						fetchStyle = join ? FetchMode.JOIN : FetchMode.SELECT;
+					}
 				}
 			}
 		}
 		else {
-			boolean join = "join".equals( fetchNode.getValue() );
-			//lazy = !join;
-			fetchStyle = join ? FetchMode.JOIN : FetchMode.SELECT;
+			if ( "many-to-many".equals( node.getName() ) ) {
+				//NOTE <many-to-many fetch="..." is deprecated.:
+				// Default to join and non-lazy for the "second join"
+				// of the many-to-many
+				LOG.deprecatedManyToManyFetch();
+				lazy = false;
+				fetchStyle = FetchMode.JOIN;
+			}
+			else {
+				boolean join = "join".equals( fetchNode.getValue() );
+				//lazy = !join;
+				fetchStyle = join ? FetchMode.JOIN : FetchMode.SELECT;
+			}
 		}
 		model.setFetchMode( fetchStyle );
 		model.setLazy(lazy);
@@ -2005,15 +2140,24 @@ public final class HbmBinder {
 		// GENERATOR
 		Element subnode = node.element( "generator" );
 		if ( subnode != null ) {
-			model.setIdentifierGeneratorStrategy( subnode.attributeValue( "class" ) );
+			final String generatorClass = subnode.attributeValue( "class" );
+			model.setIdentifierGeneratorStrategy( generatorClass );
 
 			Properties params = new Properties();
+			// YUCK!  but cannot think of a clean way to do this given the string-config based scheme
+			params.put( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER, mappings.getObjectNameNormalizer() );
 
 			if ( mappings.getSchemaName() != null ) {
-				params.setProperty( PersistentIdentifierGenerator.SCHEMA, mappings.getSchemaName() );
+				params.setProperty(
+						PersistentIdentifierGenerator.SCHEMA,
+						mappings.getObjectNameNormalizer().normalizeIdentifierQuoting( mappings.getSchemaName() )
+				);
 			}
 			if ( mappings.getCatalogName() != null ) {
-				params.setProperty( PersistentIdentifierGenerator.CATALOG, mappings.getCatalogName() );
+				params.setProperty(
+						PersistentIdentifierGenerator.CATALOG,
+						mappings.getObjectNameNormalizer().normalizeIdentifierQuoting( mappings.getCatalogName() )
+				);
 			}
 
 			Iterator iter = subnode.elementIterator( "param" );
@@ -2086,26 +2230,26 @@ public final class HbmBinder {
 				value = collection;
 			}
 			else if ( "many-to-one".equals( name ) ) {
-				value = new ManyToOne( table );
+				value = new ManyToOne( mappings, table );
 				bindManyToOne( subnode, (ManyToOne) value, propertyName, nullable, mappings );
 			}
 			else if ( "any".equals( name ) ) {
-				value = new Any( table );
+				value = new Any( mappings, table );
 				bindAny( subnode, (Any) value, nullable, mappings );
 			}
 			else if ( "one-to-one".equals( name ) ) {
-				value = new OneToOne( table, persistentClass );
+				value = new OneToOne( mappings, table, persistentClass );
 				bindOneToOne( subnode, (OneToOne) value, propertyName, true, mappings );
 			}
 			else if ( "property".equals( name ) ) {
-				value = new SimpleValue( table );
+				value = new SimpleValue( mappings, table );
 				bindSimpleValue( subnode, (SimpleValue) value, nullable, propertyName, mappings );
 			}
 			else if ( "component".equals( name )
 				|| "dynamic-component".equals( name )
 				|| "properties".equals( name ) ) {
 				String subpath = StringHelper.qualify( entityName, propertyName );
-				value = new Component( persistentClass );
+				value = new Component( mappings, persistentClass );
 
 				bindComponent(
 						subnode,
@@ -2140,7 +2284,6 @@ public final class HbmBinder {
 			}
 			else if ( "natural-id".equals( name ) ) {
 				UniqueKey uk = new UniqueKey();
-				uk.setName("_UniqueKey");
 				uk.setTable(table);
 				//by default, natural-ids are "immutable" (constant)
 				boolean mutableId = "true".equals( subnode.attributeValue("mutable") );
@@ -2154,6 +2297,8 @@ public final class HbmBinder {
 						false,
 						true
 					);
+				uk.setName( Constraint.generateName( uk.generatedConstraintNamePrefix(),
+						table, uk.getColumns() ) );
 				table.addUniqueKey(uk);
 			}
 			else if ( "query".equals(name) ) {
@@ -2167,12 +2312,24 @@ public final class HbmBinder {
 			}
 
 			if ( value != null ) {
-				Property property = createProperty( value, propertyName, persistentClass
-					.getClassName(), subnode, mappings, inheritedMetas );
-				if ( !mutable ) property.setUpdateable(false);
-				if ( naturalId ) property.setNaturalIdentifier(true);
+				final Property property = createProperty(
+						value,
+						propertyName,
+						persistentClass.getClassName(),
+						subnode,
+						mappings,
+						inheritedMetas
+				);
+				if ( !mutable ) {
+					property.setUpdateable(false);
+				}
+				if ( naturalId ) {
+					property.setNaturalIdentifier( true );
+				}
 				persistentClass.addProperty( property );
-				if ( uniqueKey!=null ) uniqueKey.addColumns( property.getColumnIterator() );
+				if ( uniqueKey!=null ) {
+					uniqueKey.addColumns( property.getColumnIterator() );
+				}
 			}
 
 		}
@@ -2200,6 +2357,7 @@ public final class HbmBinder {
 			if ( propertyRef != null ) {
 				mappings.addUniquePropertyReference( toOne.getReferencedEntityName(), propertyRef );
 			}
+			toOne.setCascadeDeleteEnabled( "cascade".equals( subnode.attributeValue( "on-delete" ) ) );
 		}
 		else if ( value instanceof Collection ) {
 			Collection coll = (Collection) value;
@@ -2251,14 +2409,14 @@ public final class HbmBinder {
 
 		Element subnode = node.element( "list-index" );
 		if ( subnode == null ) subnode = node.element( "index" );
-		SimpleValue iv = new SimpleValue( list.getCollectionTable() );
+		SimpleValue iv = new SimpleValue( mappings, list.getCollectionTable() );
 		bindSimpleValue(
 				subnode,
 				iv,
 				list.isOneToMany(),
 				IndexedCollection.DEFAULT_INDEX_COLUMN_NAME,
 				mappings
-			);
+		);
 		iv.setTypeName( "integer" );
 		list.setIndex( iv );
 		String baseIndex = subnode.attributeValue( "base" );
@@ -2288,7 +2446,7 @@ public final class HbmBinder {
 		bindCollectionSecondPass( node, collection, persistentClasses, mappings, inheritedMetas );
 
 		Element subnode = node.element( "collection-id" );
-		SimpleValue id = new SimpleValue( collection.getCollectionTable() );
+		SimpleValue id = new SimpleValue( mappings, collection.getCollectionTable() );
 		bindSimpleValue(
 				subnode,
 				id,
@@ -2315,7 +2473,7 @@ public final class HbmBinder {
 			String name = subnode.getName();
 
 			if ( "index".equals( name ) || "map-key".equals( name ) ) {
-				SimpleValue value = new SimpleValue( map.getCollectionTable() );
+				SimpleValue value = new SimpleValue( mappings, map.getCollectionTable() );
 				bindSimpleValue(
 						subnode,
 						value,
@@ -2331,7 +2489,7 @@ public final class HbmBinder {
 				map.setIndexNodeName( subnode.attributeValue("node") );
 			}
 			else if ( "index-many-to-many".equals( name ) || "map-key-many-to-many".equals( name ) ) {
-				ManyToOne mto = new ManyToOne( map.getCollectionTable() );
+				ManyToOne mto = new ManyToOne( mappings, map.getCollectionTable() );
 				bindManyToOne(
 						subnode,
 						mto,
@@ -2343,7 +2501,7 @@ public final class HbmBinder {
 
 			}
 			else if ( "composite-index".equals( name ) || "composite-map-key".equals( name ) ) {
-				Component component = new Component( map );
+				Component component = new Component( mappings, map );
 				bindComposite(
 						subnode,
 						component,
@@ -2355,7 +2513,7 @@ public final class HbmBinder {
 				map.setIndex( component );
 			}
 			else if ( "index-many-to-any".equals( name ) ) {
-				Any any = new Any( map.getCollectionTable() );
+				Any any = new Any( mappings, map.getCollectionTable() );
 				bindAny( subnode, any, map.isOneToMany(), mappings );
 				map.setIndex( any );
 			}
@@ -2401,10 +2559,9 @@ public final class HbmBinder {
 			oneToMany.setAssociatedClass( persistentClass );
 			collection.setCollectionTable( persistentClass.getTable() );
 
-			log.info(
-					"Mapping collection: " + collection.getRole() +
-					" -> " + collection.getCollectionTable().getName()
-				);
+			if ( LOG.isDebugEnabled() ) {
+				LOG.debugf( "Mapping collection: %s -> %s", collection.getRole(), collection.getCollectionTable().getName() );
+			}
 		}
 
 		// CHECK
@@ -2428,7 +2585,7 @@ public final class HbmBinder {
 				else {
 					keyVal = (KeyValue) collection.getOwner().getRecursiveProperty( propRef ).getValue();
 				}
-				SimpleValue key = new DependantValue( collection.getCollectionTable(), keyVal );
+				SimpleValue key = new DependantValue( mappings, collection.getCollectionTable(), keyVal );
 				key.setCascadeDeleteEnabled( "cascade"
 					.equals( subnode.attributeValue( "on-delete" ) ) );
 				bindSimpleValue(
@@ -2449,7 +2606,7 @@ public final class HbmBinder {
 
 			}
 			else if ( "element".equals( name ) ) {
-				SimpleValue elt = new SimpleValue( collection.getCollectionTable() );
+				SimpleValue elt = new SimpleValue( mappings, collection.getCollectionTable() );
 				collection.setElement( elt );
 				bindSimpleValue(
 						subnode,
@@ -2460,7 +2617,7 @@ public final class HbmBinder {
 					);
 			}
 			else if ( "many-to-many".equals( name ) ) {
-				ManyToOne element = new ManyToOne( collection.getCollectionTable() );
+				ManyToOne element = new ManyToOne( mappings, collection.getCollectionTable() );
 				collection.setElement( element );
 				bindManyToOne(
 						subnode,
@@ -2472,7 +2629,7 @@ public final class HbmBinder {
 				bindManyToManySubelements( collection, subnode, mappings );
 			}
 			else if ( "composite-element".equals( name ) ) {
-				Component element = new Component( collection );
+				Component element = new Component( mappings, collection );
 				collection.setElement( element );
 				bindComposite(
 						subnode,
@@ -2484,7 +2641,7 @@ public final class HbmBinder {
 					);
 			}
 			else if ( "many-to-any".equals( name ) ) {
-				Any element = new Any( collection.getCollectionTable() );
+				Any element = new Any( mappings, collection.getCollectionTable() );
 				collection.setElement( element );
 				bindAny( subnode, element, true, mappings );
 			}
@@ -2539,6 +2696,7 @@ public final class HbmBinder {
 			        "not valid within collection using join fetching [" + collection.getRole() + "]"
 				);
 		}
+		final boolean debugEnabled = LOG.isDebugEnabled();
 		while ( filters.hasNext() ) {
 			final Element filterElement = ( Element ) filters.next();
 			final String name = filterElement.attributeValue( "name" );
@@ -2550,36 +2708,18 @@ public final class HbmBinder {
 			if ( condition==null) {
 				throw new MappingException("no filter condition found for filter: " + name);
 			}
-			log.debug(
-					"Applying many-to-many filter [" + name +
-					"] as [" + condition +
-					"] to role [" + collection.getRole() + "]"
-				);
-			collection.addManyToManyFilter( name, condition );
-		}
-	}
-
-	public static final FlushMode getFlushMode(String flushMode) {
-		if ( flushMode == null ) {
-			return null;
-		}
-		else if ( "auto".equals( flushMode ) ) {
-			return FlushMode.AUTO;
-		}
-		else if ( "commit".equals( flushMode ) ) {
-			return FlushMode.COMMIT;
-		}
-		else if ( "never".equals( flushMode ) ) {
-			return FlushMode.NEVER;
-		}
-		else if ( "manual".equals( flushMode ) ) {
-			return FlushMode.MANUAL;
-		}
-		else if ( "always".equals( flushMode ) ) {
-			return FlushMode.ALWAYS;
-		}
-		else {
-			throw new MappingException( "unknown flushmode" );
+			Iterator aliasesIterator = filterElement.elementIterator("aliases");
+			java.util.Map<String, String> aliasTables = new HashMap<String, String>();
+			while (aliasesIterator.hasNext()){
+				Element alias = (Element) aliasesIterator.next();
+				aliasTables.put(alias.attributeValue("alias"), alias.attributeValue("table"));
+			}
+			if ( debugEnabled ) {
+				LOG.debugf( "Applying many-to-many filter [%s] as [%s] to role [%s]", name, condition, collection.getRole() );
+			}
+			String autoAliasInjectionText = filterElement.attributeValue("autoAliasInjection");
+			boolean autoAliasInjection = StringHelper.isEmpty(autoAliasInjectionText) ? true : Boolean.parseBoolean(autoAliasInjectionText);
+			collection.addManyToManyFilter(name, condition, autoAliasInjection, aliasTables, null);
 		}
 	}
 
@@ -2587,14 +2727,14 @@ public final class HbmBinder {
 		String queryName = queryElem.attributeValue( "name" );
 		if (path!=null) queryName = path + '.' + queryName;
 		String query = queryElem.getText();
-		log.debug( "Named query: " + queryName + " -> " + query );
+		LOG.debugf( "Named query: %s -> %s", queryName, query );
 
 		boolean cacheable = "true".equals( queryElem.attributeValue( "cacheable" ) );
 		String region = queryElem.attributeValue( "cache-region" );
 		Attribute tAtt = queryElem.attribute( "timeout" );
-		Integer timeout = tAtt == null ? null : new Integer( tAtt.getValue() );
+		Integer timeout = tAtt == null ? null : Integer.valueOf( tAtt.getValue() );
 		Attribute fsAtt = queryElem.attribute( "fetch-size" );
-		Integer fetchSize = fsAtt == null ? null : new Integer( fsAtt.getValue() );
+		Integer fetchSize = fsAtt == null ? null : Integer.valueOf( fsAtt.getValue() );
 		Attribute roAttr = queryElem.attribute( "read-only" );
 		boolean readOnly = roAttr != null && "true".equals( roAttr.getValue() );
 		Attribute cacheModeAtt = queryElem.attribute( "cache-mode" );
@@ -2602,30 +2742,20 @@ public final class HbmBinder {
 		Attribute cmAtt = queryElem.attribute( "comment" );
 		String comment = cmAtt == null ? null : cmAtt.getValue();
 
-		NamedQueryDefinition namedQuery = new NamedQueryDefinition(
-				query,
-				cacheable,
-				region,
-				timeout,
-				fetchSize,
-				getFlushMode( queryElem.attributeValue( "flush-mode" ) ) ,
-				getCacheMode( cacheMode ),
-				readOnly,
-				comment,
-				getParameterTypes(queryElem)
-			);
+		NamedQueryDefinition namedQuery = new NamedQueryDefinitionBuilder().setName( queryName )
+				.setQuery( query )
+				.setCacheable( cacheable )
+				.setCacheRegion( region )
+				.setTimeout( timeout )
+				.setFetchSize( fetchSize )
+				.setFlushMode( FlushMode.interpretExternalSetting( queryElem.attributeValue( "flush-mode" ) ) )
+				.setCacheMode( CacheMode.interpretExternalSetting( cacheMode ) )
+				.setReadOnly( readOnly )
+				.setComment( comment )
+				.setParameterTypes( getParameterTypes( queryElem ) )
+				.createNamedQueryDefinition();
 
-		mappings.addQuery( queryName, namedQuery );
-	}
-
-	public static CacheMode getCacheMode(String cacheMode) {
-		if (cacheMode == null) return null;
-		if ( "get".equals( cacheMode ) ) return CacheMode.GET;
-		if ( "ignore".equals( cacheMode ) ) return CacheMode.IGNORE;
-		if ( "normal".equals( cacheMode ) ) return CacheMode.NORMAL;
-		if ( "put".equals( cacheMode ) ) return CacheMode.PUT;
-		if ( "refresh".equals( cacheMode ) ) return CacheMode.REFRESH;
-		throw new MappingException("Unknown Cache Mode: " + cacheMode);
+		mappings.addQuery( namedQuery.getName(), namedQuery );
 	}
 
 	public static java.util.Map getParameterTypes(Element queryElem) {
@@ -2697,7 +2827,7 @@ public final class HbmBinder {
 					(IdentifierCollection) collection,
 					persistentClasses,
 					mappings,
-					inheritedMetas 
+					inheritedMetas
 				);
 		}
 
@@ -2715,7 +2845,7 @@ public final class HbmBinder {
 					(Map) collection,
 					persistentClasses,
 					mappings,
-					inheritedMetas 
+					inheritedMetas
 				);
 		}
 
@@ -2734,7 +2864,7 @@ public final class HbmBinder {
 		}
 
 	}
-	
+
 	static class ListSecondPass extends CollectionSecondPass {
 		ListSecondPass(Element node, Mappings mappings, List collection, java.util.Map inheritedMetas) {
 			super( node, mappings, collection, inheritedMetas );
@@ -2747,7 +2877,7 @@ public final class HbmBinder {
 					(List) collection,
 					persistentClasses,
 					mappings,
-					inheritedMetas 
+					inheritedMetas
 				);
 		}
 
@@ -2771,7 +2901,7 @@ public final class HbmBinder {
 		private static final CollectionType MAP = new CollectionType( "map" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				Map map = new Map( owner );
+				Map map = new Map( mappings, owner );
 				bindCollection( node, map, owner.getEntityName(), path, mappings, inheritedMetas );
 				return map;
 			}
@@ -2779,7 +2909,7 @@ public final class HbmBinder {
 		private static final CollectionType SET = new CollectionType( "set" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				Set set = new Set( owner );
+				Set set = new Set( mappings, owner );
 				bindCollection( node, set, owner.getEntityName(), path, mappings, inheritedMetas );
 				return set;
 			}
@@ -2787,7 +2917,7 @@ public final class HbmBinder {
 		private static final CollectionType LIST = new CollectionType( "list" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				List list = new List( owner );
+				List list = new List( mappings, owner );
 				bindCollection( node, list, owner.getEntityName(), path, mappings, inheritedMetas );
 				return list;
 			}
@@ -2795,7 +2925,7 @@ public final class HbmBinder {
 		private static final CollectionType BAG = new CollectionType( "bag" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				Bag bag = new Bag( owner );
+				Bag bag = new Bag( mappings, owner );
 				bindCollection( node, bag, owner.getEntityName(), path, mappings, inheritedMetas );
 				return bag;
 			}
@@ -2803,7 +2933,7 @@ public final class HbmBinder {
 		private static final CollectionType IDBAG = new CollectionType( "idbag" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				IdentifierBag bag = new IdentifierBag( owner );
+				IdentifierBag bag = new IdentifierBag( mappings, owner );
 				bindCollection( node, bag, owner.getEntityName(), path, mappings, inheritedMetas );
 				return bag;
 			}
@@ -2811,7 +2941,7 @@ public final class HbmBinder {
 		private static final CollectionType ARRAY = new CollectionType( "array" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				Array array = new Array( owner );
+				Array array = new Array( mappings, owner );
 				bindArray( node, array, owner.getEntityName(), path, mappings, inheritedMetas );
 				return array;
 			}
@@ -2819,7 +2949,7 @@ public final class HbmBinder {
 		private static final CollectionType PRIMITIVE_ARRAY = new CollectionType( "primitive-array" ) {
 			public Collection create(Element node, String path, PersistentClass owner,
 					Mappings mappings, java.util.Map inheritedMetas) throws MappingException {
-				PrimitiveArray array = new PrimitiveArray( owner );
+				PrimitiveArray array = new PrimitiveArray( mappings, owner );
 				bindArray( node, array, owner.getEntityName(), path, mappings, inheritedMetas );
 				return array;
 			}
@@ -2841,21 +2971,23 @@ public final class HbmBinder {
 		}
 	}
 
-	private static int getOptimisticLockMode(Attribute olAtt) throws MappingException {
+	private static OptimisticLockStyle getOptimisticLockStyle(Attribute olAtt) throws MappingException {
+		if ( olAtt == null ) {
+			return OptimisticLockStyle.VERSION;
+		}
 
-		if ( olAtt == null ) return Versioning.OPTIMISTIC_LOCK_VERSION;
-		String olMode = olAtt.getValue();
+		final String olMode = olAtt.getValue();
 		if ( olMode == null || "version".equals( olMode ) ) {
-			return Versioning.OPTIMISTIC_LOCK_VERSION;
+			return OptimisticLockStyle.VERSION;
 		}
 		else if ( "dirty".equals( olMode ) ) {
-			return Versioning.OPTIMISTIC_LOCK_DIRTY;
+			return OptimisticLockStyle.DIRTY;
 		}
 		else if ( "all".equals( olMode ) ) {
-			return Versioning.OPTIMISTIC_LOCK_ALL;
+			return OptimisticLockStyle.ALL;
 		}
 		else if ( "none".equals( olMode ) ) {
-			return Versioning.OPTIMISTIC_LOCK_NONE;
+			return OptimisticLockStyle.NONE;
 		}
 		else {
 			throw new MappingException( "Unsupported optimistic-lock style: " + olMode );
@@ -2877,7 +3009,7 @@ public final class HbmBinder {
 			boolean inheritable = Boolean
 				.valueOf( metaNode.attributeValue( "inherit" ) )
 				.booleanValue();
-			if ( onlyInheritable & !inheritable ) {
+			if ( onlyInheritable && !inheritable ) {
 				continue;
 			}
 			String name = metaNode.attributeValue( "attribute" );
@@ -2887,10 +3019,10 @@ public final class HbmBinder {
 			if ( meta == null  ) {
 				meta = new MetaAttribute( name );
 				map.put( name, meta );
-			} else if (meta == inheritedAttribute) { // overriding inherited meta attribute. HBX-621 & HBX-793			
-				meta = new MetaAttribute( name );				
-				map.put( name, meta );				
-			}			
+			} else if (meta == inheritedAttribute) { // overriding inherited meta attribute. HBX-621 & HBX-793
+				meta = new MetaAttribute( name );
+				map.put( name, meta );
+			}
 			meta.addValue( metaNode.getText() );
 		}
 		return map;
@@ -2920,7 +3052,7 @@ public final class HbmBinder {
 
 	private static void parseFilterDef(Element element, Mappings mappings) {
 		String name = element.attributeValue( "name" );
-		log.debug( "Parsing filter-def [" + name + "]" );
+		LOG.debugf( "Parsing filter-def [%s]", name );
 		String defaultCondition = element.getTextTrim();
 		if ( StringHelper.isEmpty( defaultCondition ) ) {
 			defaultCondition = element.attributeValue( "condition" );
@@ -2931,12 +3063,12 @@ public final class HbmBinder {
 			final Element param = (Element) params.next();
 			final String paramName = param.attributeValue( "name" );
 			final String paramType = param.attributeValue( "type" );
-			log.debug( "adding filter parameter : " + paramName + " -> " + paramType );
-			final Type heuristicType = TypeFactory.heuristicType( paramType );
-			log.debug( "parameter heuristic type : " + heuristicType );
+			LOG.debugf( "Adding filter parameter : %s -> %s", paramName, paramType );
+			final Type heuristicType = mappings.getTypeResolver().heuristicType( paramType );
+			LOG.debugf( "Parameter heuristic type : %s", heuristicType );
 			paramMappings.put( paramName, heuristicType );
 		}
-		log.debug( "Parsed filter-def [" + name + "]" );
+		LOG.debugf( "Parsed filter-def [%s]", name );
 		FilterDefinition def = new FilterDefinition( name, defaultCondition, paramMappings );
 		mappings.addFilterDefinition( def );
 	}
@@ -2950,7 +3082,7 @@ public final class HbmBinder {
 		//TODO: bad implementation, cos it depends upon ordering of mapping doc
 		//      fixing this requires that Collection/PersistentClass gain access
 		//      to the Mappings reference from Configuration (or the filterDefinitions
-		//      map directly) sometime during Configuration.buildSessionFactory
+		//      map directly) sometime during Configuration.build
 		//      (after all the types/filter-defs are known and before building
 		//      persisters).
 		if ( StringHelper.isEmpty(condition) ) {
@@ -2959,8 +3091,35 @@ public final class HbmBinder {
 		if ( condition==null) {
 			throw new MappingException("no filter condition found for filter: " + name);
 		}
-		log.debug( "Applying filter [" + name + "] as [" + condition + "]" );
-		filterable.addFilter( name, condition );
+		Iterator aliasesIterator = filterElement.elementIterator("aliases");
+		java.util.Map<String, String> aliasTables = new HashMap<String, String>();
+		while (aliasesIterator.hasNext()){
+			Element alias = (Element) aliasesIterator.next();
+			aliasTables.put(alias.attributeValue("alias"), alias.attributeValue("table"));
+		}
+		LOG.debugf( "Applying filter [%s] as [%s]", name, condition );
+		String autoAliasInjectionText = filterElement.attributeValue("autoAliasInjection");
+		boolean autoAliasInjection = StringHelper.isEmpty(autoAliasInjectionText) ? true : Boolean.parseBoolean(autoAliasInjectionText);
+		filterable.addFilter(name, condition, autoAliasInjection, aliasTables, null);
+	}
+
+	private static void parseFetchProfile(Element element, Mappings mappings, String containingEntityName) {
+		String profileName = element.attributeValue( "name" );
+		FetchProfile profile = mappings.findOrCreateFetchProfile( profileName, MetadataSource.HBM );
+		Iterator itr = element.elementIterator( "fetch" );
+		while ( itr.hasNext() ) {
+			final Element fetchElement = ( Element ) itr.next();
+			final String association = fetchElement.attributeValue( "association" );
+			final String style = fetchElement.attributeValue( "style" );
+			String entityName = fetchElement.attributeValue( "entity" );
+			if ( entityName == null ) {
+				entityName = containingEntityName;
+			}
+			if ( entityName == null ) {
+				throw new MappingException( "could not determine entity for fetch-profile fetch [" + profileName + "]:[" + association + "]" );
+			}
+			profile.addFetch( entityName, association, style );
+		}
 	}
 
 	private static String getSubselect(Element element) {
@@ -2978,14 +3137,14 @@ public final class HbmBinder {
 	 * For the given document, locate all extends attributes which refer to
 	 * entities (entity-name or class-name) not defined within said document.
 	 *
-	 * @param doc The document to check
+	 * @param metadataXml The document to check
 	 * @param mappings The already processed mappings.
 	 * @return The list of unresolved extends names.
 	 */
-	public static java.util.List getExtendsNeeded(Document doc, Mappings mappings) {
-		java.util.List extendz = new ArrayList();
+	public static java.util.List<String> getExtendsNeeded(XmlDocument metadataXml, Mappings mappings) {
+		java.util.List<String> extendz = new ArrayList<String>();
 		Iterator[] subclasses = new Iterator[3];
-		final Element hmNode = doc.getRootElement();
+		final Element hmNode = metadataXml.getDocumentTree().getRootElement();
 
 		Attribute packNode = hmNode.attribute( "package" );
 		final String packageName = packNode == null ? null : packNode.getValue();
@@ -3019,7 +3178,7 @@ public final class HbmBinder {
 			// extends names which require us to delay processing (i.e.
 			// external to this document and not yet processed) are contained
 			// in the returned result
-			final java.util.Set set = new HashSet( extendz );
+			final java.util.Set<String> set = new HashSet<String>( extendz );
 			EntityElementHandler handler = new EntityElementHandler() {
 				public void handleEntity(String entityName, String className, Mappings mappings) {
 					if ( entityName != null ) {
@@ -3072,8 +3231,36 @@ public final class HbmBinder {
 			recognizeEntities( mappings, element, handler );
 		}
 	}
+	
+	private static String quoteIdentifier(String identifier, Mappings mappings) {
+		return mappings.getObjectNameNormalizer().isUseQuotedIdentifiersGlobally()
+				? StringHelper.quote( identifier ) : identifier;
+	}
 
 	private static interface EntityElementHandler {
 		public void handleEntity(String entityName, String className, Mappings mappings);
+	}
+	
+	private static class ResolveUserTypeMappingSecondPass implements SecondPass{
+
+		private SimpleValue simpleValue;
+		private String typeName;
+		private Mappings mappings;
+		private Properties parameters;
+
+		public ResolveUserTypeMappingSecondPass(SimpleValue simpleValue,
+				String typeName, Mappings mappings, Properties parameters) {
+			this.simpleValue=simpleValue;
+			this.typeName=typeName;
+			this.parameters=parameters;
+			this.mappings=mappings;
+		}
+
+		@Override
+		public void doSecondPass(java.util.Map persistentClasses)
+				throws MappingException {
+			resolveAndBindTypeDef(simpleValue, mappings, typeName, parameters);		
+		}
+		
 	}
 }

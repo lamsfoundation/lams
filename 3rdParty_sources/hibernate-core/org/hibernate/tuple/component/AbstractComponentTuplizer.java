@@ -23,17 +23,16 @@
  *
  */
 package org.hibernate.tuple.component;
-
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
 import org.hibernate.HibernateException;
-import org.hibernate.tuple.Instantiator;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.Property;
 import org.hibernate.property.Getter;
 import org.hibernate.property.Setter;
+import org.hibernate.tuple.Instantiator;
 
 /**
  * Support for tuplizers relating to components.
@@ -42,7 +41,6 @@ import org.hibernate.property.Setter;
  * @author Steve Ebersole
  */
 public abstract class AbstractComponentTuplizer implements ComponentTuplizer {
-
 	protected final Getter[] getters;
 	protected final Setter[] setters;
 	protected final int propertySpan;
@@ -71,15 +69,6 @@ public abstract class AbstractComponentTuplizer implements ComponentTuplizer {
 			i++;
 		}
 		hasCustomAccessors = foundCustomAccessor;
-
-		String[] getterNames = new String[propertySpan];
-		String[] setterNames = new String[propertySpan];
-		Class[] propTypes = new Class[propertySpan];
-		for ( int j = 0; j < propertySpan; j++ ) {
-			getterNames[j] = getters[j].getMethodName();
-			setterNames[j] = setters[j].getMethodName();
-			propTypes[j] = getters[j].getReturnType();
-		}
 		instantiator = buildInstantiator( component );
 	}
 
@@ -128,4 +117,7 @@ public abstract class AbstractComponentTuplizer implements ComponentTuplizer {
 		throw new UnsupportedOperationException();
 	}
 
+	public Getter getGetter(int i) {
+		return getters[i];
+	}
 }

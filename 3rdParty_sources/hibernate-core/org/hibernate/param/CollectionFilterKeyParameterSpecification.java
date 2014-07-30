@@ -23,22 +23,20 @@
  *
  */
 package org.hibernate.param;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
- * A specialized ParameterSpecification impl for dealing with a collection-key
- * as part of a collection filter compilation.
+ * A specialized ParameterSpecification impl for dealing with a collection-key as part of a collection filter
+ * compilation.
  *
  * @author Steve Ebersole
  */
 public class CollectionFilterKeyParameterSpecification implements ParameterSpecification {
-
 	private final String collectionRole;
 	private final Type keyType;
 	private final int queryParameterPosition;
@@ -48,7 +46,7 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 	 *
 	 * @param collectionRole The collection role being filtered.
 	 * @param keyType The mapped collection-key type.
-	 * @param queryParameterPosition The position within {@link org.hibernate.engine.QueryParameters} where
+	 * @param queryParameterPosition The position within {@link org.hibernate.engine.spi.QueryParameters} where
 	 * we can find the appropriate param value to bind.
 	 */
 	public CollectionFilterKeyParameterSpecification(String collectionRole, Type keyType, int queryParameterPosition) {
@@ -57,6 +55,7 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 		this.queryParameterPosition = queryParameterPosition;
 	}
 
+	@Override
 	public int bind(
 			PreparedStatement statement,
 			QueryParameters qp,
@@ -67,14 +66,17 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 		return keyType.getColumnSpan( session.getFactory() );
 	}
 
+	@Override
 	public Type getExpectedType() {
 		return keyType;
 	}
 
+	@Override
 	public void setExpectedType(Type expectedType) {
 		// todo : throw exception?
 	}
 
+	@Override
 	public String renderDisplayInfo() {
 		return "collection-filter-key=" + collectionRole;
 	}

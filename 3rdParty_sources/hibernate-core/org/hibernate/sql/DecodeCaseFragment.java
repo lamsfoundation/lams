@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.sql;
-
 import java.util.Iterator;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class DecodeCaseFragment extends CaseFragment {
 
 	public String toFragmentString() {
 		
-		StringBuffer buf = new StringBuffer( cases.size() * 15 + 10 )
+		StringBuilder buf = new StringBuilder( cases.size() * 15 + 10 )
 			.append("decode(");
 
 		Iterator iter = cases.entrySet().iterator();

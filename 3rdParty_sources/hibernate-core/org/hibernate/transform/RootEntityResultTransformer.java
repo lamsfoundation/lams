@@ -24,8 +24,7 @@
  */
 package org.hibernate.transform;
 
-import java.util.List;
-import java.io.Serializable;
+import org.hibernate.internal.util.collections.ArrayHelper;
 
 /**
  * {@link ResultTransformer} implementation which limits the result tuple
@@ -37,23 +36,40 @@ import java.io.Serializable;
  * @author Gavin King
  * @author Steve Ebersole
  */
-public final class RootEntityResultTransformer extends BasicTransformerAdapter implements Serializable {
+public final class RootEntityResultTransformer extends BasicTransformerAdapter implements TupleSubsetResultTransformer {
 
 	public static final RootEntityResultTransformer INSTANCE = new RootEntityResultTransformer();
 
 	/**
-	 * Instantiate RootEntityResultTransformer.
-	 *
-	 * @deprecated Use the {@link #INSTANCE} reference instead of explicitly creating a new one (to be removed in 3.4).
+	 * Disallow instantiation of RootEntityResultTransformer.
 	 */
-	public RootEntityResultTransformer() {
+	private RootEntityResultTransformer() {
 	}
 
 	/**
 	 * Return just the root entity from the row tuple.
 	 */
-	public Object transformTuple(Object[] tuple, String[] aliases) {
+	@Override
+    public Object transformTuple(Object[] tuple, String[] aliases) {
 		return tuple[ tuple.length-1 ];
+	}
+
+	@Override
+	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
+		return true;
+	}
+
+	@Override
+	public boolean[] includeInTransform(String[] aliases, int tupleLength) {
+		boolean[] includeInTransform;
+		if ( tupleLength == 1 ) {
+			includeInTransform = ArrayHelper.TRUE;
+		}
+		else {
+			includeInTransform = new boolean[tupleLength];
+			includeInTransform[ tupleLength - 1 ] = true;
+		}
+		return includeInTransform;
 	}
 
 	/**
@@ -63,15 +79,5 @@ public final class RootEntityResultTransformer extends BasicTransformerAdapter i
 	 */
 	private Object readResolve() {
 		return INSTANCE;
-	}
-
-	public int hashCode() {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return RootEntityResultTransformer.class.getName().hashCode();
-	}
-
-	public boolean equals(Object other) {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return other != null && RootEntityResultTransformer.class.isInstance( other );
 	}
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,47 +20,45 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.proxy.pojo.javassist;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import org.hibernate.HibernateException;
-import org.hibernate.type.AbstractComponentType;
+import org.hibernate.proxy.AbstractSerializableProxy;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.type.CompositeType;
 
 /**
  * Serializable placeholder for Javassist proxies
  */
-public final class SerializableProxy implements Serializable {
+public final class SerializableProxy extends AbstractSerializableProxy {
 
-	private String entityName;
 	private Class persistentClass;
 	private Class[] interfaces;
-	private Serializable id;
 	private Class getIdentifierMethodClass;
 	private Class setIdentifierMethodClass;
 	private String getIdentifierMethodName;
 	private String setIdentifierMethodName;
 	private Class[] setIdentifierMethodParams;
-	private AbstractComponentType componentIdType;
+	private CompositeType componentIdType;
 
-	public SerializableProxy() {}
+	public SerializableProxy() {
+	}
 
 	public SerializableProxy(
-		final String entityName,
-	    final Class persistentClass,
-	    final Class[] interfaces,
-	    final Serializable id,
-	    final Method getIdentifierMethod,
-	    final Method setIdentifierMethod,
-	    AbstractComponentType componentIdType
-	) {
-		this.entityName = entityName;
+			final String entityName,
+			final Class persistentClass,
+			final Class[] interfaces,
+			final Serializable id,
+			final Boolean readOnly,
+			final Method getIdentifierMethod,
+			final Method setIdentifierMethod,
+			CompositeType componentIdType) {
+		super( entityName, id, readOnly );
 		this.persistentClass = persistentClass;
 		this.interfaces = interfaces;
-		this.id = id;
 		if (getIdentifierMethod!=null) {
 			getIdentifierMethodClass = getIdentifierMethod.getDeclaringClass();
 			getIdentifierMethodName = getIdentifierMethod.getName();
@@ -75,24 +73,25 @@ public final class SerializableProxy implements Serializable {
 
 	private Object readResolve() {
 		try {
-			return JavassistLazyInitializer.getProxy(
-				entityName,
+			HibernateProxy proxy = JavassistLazyInitializer.getProxy(
+				getEntityName(),
 				persistentClass,
 				interfaces,
-				getIdentifierMethodName==null ?
-					null :
-					getIdentifierMethodClass.getDeclaredMethod(getIdentifierMethodName, null),
-				setIdentifierMethodName==null ?
-					null :
-					setIdentifierMethodClass.getDeclaredMethod(setIdentifierMethodName, setIdentifierMethodParams),
-					componentIdType,
-				id,
+				getIdentifierMethodName==null
+						? null
+						: getIdentifierMethodClass.getDeclaredMethod( getIdentifierMethodName, (Class[]) null ),
+				setIdentifierMethodName==null
+						? null 
+						: setIdentifierMethodClass.getDeclaredMethod(setIdentifierMethodName, setIdentifierMethodParams),
+				componentIdType,
+				getId(),
 				null
 			);
+			setReadOnlyBeforeAttachedToSession( ( JavassistLazyInitializer ) proxy.getHibernateLazyInitializer() );
+			return proxy;
 		}
 		catch (NoSuchMethodException nsme) {
-			throw new HibernateException("could not create proxy for entity: " + entityName, nsme);
+			throw new HibernateException("could not create proxy for entity: " + getEntityName(), nsme);
 		}
 	}
-
 }

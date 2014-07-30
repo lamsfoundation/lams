@@ -23,23 +23,28 @@
  *
  */
 package org.hibernate.param;
-
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.type.Type;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.type.Type;
+
 /**
- * Relates to an explicit query positional (or ordinal) parameter.
+ * Parameter bind specification for an explicit  positional (or ordinal) parameter.
  *
  * @author Steve Ebersole
  */
-public class PositionalParameterSpecification extends AbstractExplicitParameterSpecification implements ParameterSpecification {
-
+public class PositionalParameterSpecification extends AbstractExplicitParameterSpecification  {
 	private final int hqlPosition;
 
+	/**
+	 * Constructs a position/ordinal parameter bind specification.
+	 *
+	 * @param sourceLine See {@link #getSourceLine()}
+	 * @param sourceColumn See {@link #getSourceColumn()}
+	 * @param hqlPosition The position in the source query, relative to the other source positional parameters.
+	 */
 	public PositionalParameterSpecification(int sourceLine, int sourceColumn, int hqlPosition) {
 		super( sourceLine, sourceColumn );
 		this.hqlPosition = hqlPosition;
@@ -55,6 +60,7 @@ public class PositionalParameterSpecification extends AbstractExplicitParameterS
 	 *
 	 * @return The number of sql bind positions "eaten" by this bind operation.
 	 */
+	@Override
 	public int bind(PreparedStatement statement, QueryParameters qp, SessionImplementor session, int position) throws SQLException {
 		Type type = qp.getPositionalParameterTypes()[hqlPosition];
 		Object value = qp.getPositionalParameterValues()[hqlPosition];
@@ -63,10 +69,16 @@ public class PositionalParameterSpecification extends AbstractExplicitParameterS
 		return type.getColumnSpan( session.getFactory() );
 	}
 
+	@Override
 	public String renderDisplayInfo() {
 		return "ordinal=" + hqlPosition + ", expectedType=" + getExpectedType();
 	}
 
+	/**
+	 * Getter for property 'hqlPosition'.
+	 *
+	 * @return Value for property 'hqlPosition'.
+	 */
 	public int getHqlPosition() {
 		return hqlPosition;
 	}

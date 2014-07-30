@@ -23,32 +23,26 @@
  *
  */
 package org.hibernate.transform;
-
 import java.util.List;
-import java.io.Serializable;
 
 /**
- * Much like {@link RootEntityResultTransformer}, but we also distinct the entity in the final result.
+ * Much like {@link RootEntityResultTransformer}, but we also distinct
+ * the entity in the final result.
  * <p/>
- * Since this transformer is stateless, all instances would be considered equal.  So for optimization purposes
- * we limit it to a single, singleton {@link #INSTANCE instance} (this is not quite true yet: see deprecation notice
- * on {@link #DistinctRootEntityResultTransformer() constructor}).
+ * Since this transformer is stateless, all instances would be considered equal.
+ * So for optimization purposes we limit it to a single, singleton {@link #INSTANCE instance}.
  *
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class DistinctRootEntityResultTransformer implements ResultTransformer, Serializable {
+public class DistinctRootEntityResultTransformer implements TupleSubsetResultTransformer {
 
 	public static final DistinctRootEntityResultTransformer INSTANCE = new DistinctRootEntityResultTransformer();
 
 	/**
-	 * Instantiate a DistinctRootEntityResultTransformer.
-	 * <p/>
-	 * todo : make private, see deprecation notice
-	 *
-	 * @deprecated Use the {@link #INSTANCE} reference instead of explicitly creating a new one (to be removed in 3.4).
+	 * Disallow instantiation of DistinctRootEntityResultTransformer.
 	 */
-	public DistinctRootEntityResultTransformer() {
+	private DistinctRootEntityResultTransformer() {
 	}
 
 	/**
@@ -58,6 +52,7 @@ public class DistinctRootEntityResultTransformer implements ResultTransformer, S
 	 * @param aliases The tuple aliases
 	 * @return The transformed tuple row.
 	 */
+	@Override
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		return RootEntityResultTransformer.INSTANCE.transformTuple( tuple, aliases );
 	}
@@ -68,8 +63,19 @@ public class DistinctRootEntityResultTransformer implements ResultTransformer, S
 	 * @param list The list to transform.
 	 * @return The transformed List.
 	 */
+	@Override
 	public List transformList(List list) {
 		return DistinctResultTransformer.INSTANCE.transformList( list );
+	}
+
+	@Override
+	public boolean[] includeInTransform(String[] aliases, int tupleLength) {
+		return RootEntityResultTransformer.INSTANCE.includeInTransform( aliases, tupleLength );
+	}
+
+	@Override
+	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
+		return RootEntityResultTransformer.INSTANCE.isTransformedValueATupleElement( null, tupleLength );
 	}
 
 	/**
@@ -81,16 +87,4 @@ public class DistinctRootEntityResultTransformer implements ResultTransformer, S
 		return INSTANCE;
 	}
 
-
-	// all DistinctRootEntityResultTransformer are considered equal ~~~~~~~~~~~
-
-	public int hashCode() {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return DistinctRootEntityResultTransformer.class.getName().hashCode();
-	}
-
-	public boolean equals(Object other) {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return other != null && DistinctRootEntityResultTransformer.class.isInstance( other );
-	}
 }

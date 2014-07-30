@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,11 +20,12 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.cfg;
 
-import org.dom4j.Document;
+import java.util.Set;
+
+import org.hibernate.internal.util.xml.XmlDocument;
 
 /**
  * Represents a mapping queued for delayed processing to await
@@ -35,12 +36,14 @@ import org.dom4j.Document;
 public class ExtendsQueueEntry {
 	private final String explicitName;
 	private final String mappingPackage;
-	private final Document document;
+	private final XmlDocument metadataXml;
+	private final Set<String> entityNames;
 
-	public ExtendsQueueEntry(String explicitName, String mappingPackage, Document document) {
+	public ExtendsQueueEntry(String explicitName, String mappingPackage, XmlDocument metadataXml, Set<String> entityNames) {
 		this.explicitName = explicitName;
 		this.mappingPackage = mappingPackage;
-		this.document = document;
+		this.metadataXml = metadataXml;
+		this.entityNames = entityNames;
 	}
 
 	public String getExplicitName() {
@@ -51,7 +54,11 @@ public class ExtendsQueueEntry {
 		return mappingPackage;
 	}
 
-	public Document getDocument() {
-		return document;
+	public XmlDocument getMetadataXml() {
+		return metadataXml;
+	}
+
+	public Set<String> getEntityNames() {
+		return entityNames;
 	}
 }

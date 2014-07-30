@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.param;
-
 import org.hibernate.type.Type;
 
 /**
@@ -32,28 +31,37 @@ import org.hibernate.type.Type;
  * @author Steve Ebersole
  */
 public abstract class AbstractExplicitParameterSpecification implements ExplicitParameterSpecification {
-
 	private final int sourceLine;
 	private final int sourceColumn;
 	private Type expectedType;
 
+	/**
+	 * Constructs an AbstractExplicitParameterSpecification.
+	 *
+	 * @param sourceLine See {@link #getSourceLine()}
+	 * @param sourceColumn See {@link #getSourceColumn()} 
+	 */
 	protected AbstractExplicitParameterSpecification(int sourceLine, int sourceColumn) {
 		this.sourceLine = sourceLine;
 		this.sourceColumn = sourceColumn;
 	}
 
+	@Override
 	public int getSourceLine() {
 		return sourceLine;
 	}
 
+	@Override
 	public int getSourceColumn() {
 		return sourceColumn;
 	}
 
+	@Override
 	public Type getExpectedType() {
 		return expectedType;
 	}
 
+	@Override
 	public void setExpectedType(Type expectedType) {
 		this.expectedType = expectedType;
 	}

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,11 +20,10 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 /**
  * Thrown when the (illegal) value of a property can not be persisted.
@@ -36,12 +35,18 @@ import org.hibernate.util.StringHelper;
  * @author Gavin King
  */
 public class PropertyValueException extends HibernateException {
-
 	private final String entityName;
 	private final String propertyName;
 
-	public PropertyValueException(String s, String entityName, String propertyName) {
-		super(s);
+	/**
+	 * Constructs a PropertyValueException using the specified information.
+	 *
+	 * @param message A message explaining the exception condition
+	 * @param entityName The name of the entity, containing the property
+	 * @param propertyName The name of the property being accessed.
+	 */
+	public PropertyValueException(String message, String entityName, String propertyName) {
+		super( message );
 		this.entityName = entityName;
 		this.propertyName = propertyName;
 	}
@@ -54,26 +59,8 @@ public class PropertyValueException extends HibernateException {
 		return propertyName;
 	}
 
+	@Override
 	public String getMessage() {
-		return super.getMessage() + ": " +
-			StringHelper.qualify(entityName, propertyName);
-	}
-
-	/**
-	 * Return a well formed property path.
-	 * Basicaly, it will return parent.child
-	 *
-	 * @param parent parent in path
-	 * @param child child in path
-	 * @return parent-child path
-	 */
-	public static String buildPropertyPath(String parent, String child) {
-		return new StringBuffer(parent).append('.').append(child).toString();
+		return super.getMessage() + " : " + StringHelper.qualify( entityName, propertyName );
 	}
 }
-
-
-
-
-
-

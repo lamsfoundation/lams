@@ -23,13 +23,12 @@
  *
  */
 package org.hibernate.param;
-
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.type.Type;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.type.Type;
 
 /**
  * Maintains information relating to parameters which need to get bound into a

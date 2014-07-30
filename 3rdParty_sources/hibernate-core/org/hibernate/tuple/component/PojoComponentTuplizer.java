@@ -23,16 +23,16 @@
  *
  */
 package org.hibernate.tuple.component;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.bytecode.BasicProxyFactory;
-import org.hibernate.bytecode.ReflectionOptimizer;
+import org.hibernate.bytecode.spi.BasicProxyFactory;
+import org.hibernate.bytecode.spi.ReflectionOptimizer;
 import org.hibernate.cfg.Environment;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.Property;
 import org.hibernate.property.BackrefPropertyAccessor;
@@ -42,7 +42,6 @@ import org.hibernate.property.PropertyAccessorFactory;
 import org.hibernate.property.Setter;
 import org.hibernate.tuple.Instantiator;
 import org.hibernate.tuple.PojoInstantiator;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * A {@link ComponentTuplizer} specific to the pojo entity mode.
@@ -51,7 +50,6 @@ import org.hibernate.util.ReflectHelper;
  * @author Steve Ebersole
  */
 public class PojoComponentTuplizer extends AbstractComponentTuplizer {
-
 	private final Class componentClass;
 	private ReflectionOptimizer optimizer;
 	private final Getter parentGetter;
@@ -100,24 +98,23 @@ public class PojoComponentTuplizer extends AbstractComponentTuplizer {
 
 	public Object[] getPropertyValues(Object component) throws HibernateException {
 		if ( component == BackrefPropertyAccessor.UNKNOWN ) {
-			return new Object[ propertySpan ];
+			return new Object[propertySpan];
 		}
-		if ( optimizer != null && optimizer.getAccessOptimizer() != null ) {
+		else if ( optimizer != null && optimizer.getAccessOptimizer() != null ) {
 			return optimizer.getAccessOptimizer().getPropertyValues( component );
 		}
 		else {
-			return super.getPropertyValues(component);
+			return super.getPropertyValues( component );
 		}
 	}
 
 	public void setPropertyValues(Object component, Object[] values) throws HibernateException {
 		if ( optimizer != null && optimizer.getAccessOptimizer() != null ) {
-				optimizer.getAccessOptimizer().setPropertyValues( component, values );
+			optimizer.getAccessOptimizer().setPropertyValues( component, values );
 		}
 		else {
-			super.setPropertyValues(component, values);
+			super.setPropertyValues( component, values );
 		}
-
 	}
 
 	public Object getParent(Object component) {
@@ -125,19 +122,21 @@ public class PojoComponentTuplizer extends AbstractComponentTuplizer {
 	}
 
 	public boolean hasParentProperty() {
-		return parentGetter!=null;
+		return parentGetter != null;
 	}
 
 	public boolean isMethodOf(Method method) {
-		for ( int i=0; i<propertySpan; i++ ) {
+		for ( int i = 0; i < propertySpan; i++ ) {
 			final Method getterMethod = getters[i].getMethod();
-			if ( getterMethod!=null && getterMethod.equals(method) ) return true;
+			if ( getterMethod != null && getterMethod.equals( method ) ) {
+				return true;
+			}
 		}
 		return false;
 	}
 
 	public void setParent(Object component, Object parent, SessionFactoryImplementor factory) {
-		parentSetter.set(component, parent, factory);
+		parentSetter.set( component, parent, factory );
 	}
 
 	protected Instantiator buildInstantiator(Component component) {

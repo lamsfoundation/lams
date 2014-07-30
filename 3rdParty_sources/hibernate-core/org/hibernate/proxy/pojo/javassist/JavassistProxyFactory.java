@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,19 +20,18 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.proxy.pojo.javassist;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.ProxyFactory;
-import org.hibernate.type.AbstractComponentType;
+import org.hibernate.type.CompositeType;
 
 /**
  * A {@link ProxyFactory} implementation for producing Javassist-based proxies.
@@ -47,38 +46,43 @@ public class JavassistProxyFactory implements ProxyFactory, Serializable {
 	private Class[] interfaces;
 	private Method getIdentifierMethod;
 	private Method setIdentifierMethod;
-	private AbstractComponentType componentIdType;
+	private CompositeType componentIdType;
 	private Class factory;
+	private boolean overridesEquals;
 
+	@Override
 	public void postInstantiate(
 			final String entityName,
 			final Class persistentClass,
-	        final Set interfaces,
+			final Set interfaces,
 			final Method getIdentifierMethod,
-	        final Method setIdentifierMethod,
-			AbstractComponentType componentIdType) throws HibernateException {
+			final Method setIdentifierMethod,
+			CompositeType componentIdType) throws HibernateException {
 		this.entityName = entityName;
 		this.persistentClass = persistentClass;
 		this.interfaces = (Class[]) interfaces.toArray(NO_CLASSES);
 		this.getIdentifierMethod = getIdentifierMethod;
 		this.setIdentifierMethod = setIdentifierMethod;
 		this.componentIdType = componentIdType;
-		factory = JavassistLazyInitializer.getProxyFactory( persistentClass, this.interfaces );
+		this.factory = JavassistLazyInitializer.getProxyFactory( persistentClass, this.interfaces );
+		this.overridesEquals = ReflectHelper.overridesEquals(persistentClass);
 	}
 
+	@Override
 	public HibernateProxy getProxy(
 			Serializable id,
-	        SessionImplementor session) throws HibernateException {
+			SessionImplementor session) throws HibernateException {
 		return JavassistLazyInitializer.getProxy(
 				factory,
-		        entityName,
+				entityName,
 				persistentClass,
-		        interfaces,
-		        getIdentifierMethod,
+				interfaces,
+				getIdentifierMethod,
 				setIdentifierMethod,
-		        componentIdType,
-		        id,
-		        session
+				componentIdType,
+				id,
+				session,
+				overridesEquals
 		);
 	}
 

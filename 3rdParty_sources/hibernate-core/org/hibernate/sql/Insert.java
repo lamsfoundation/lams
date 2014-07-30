@@ -23,10 +23,9 @@
  *
  */
 package org.hibernate.sql;
-
 import java.util.Iterator;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.type.LiteralType;
@@ -75,8 +74,17 @@ public class Insert {
 		return this;
 	}
 
-	public Insert addColumn(String columnName, String value) {
-		columns.put(columnName, value);
+	public Insert addColumns(String[] columnNames, boolean[] insertable, String[] valueExpressions) {
+		for ( int i=0; i<columnNames.length; i++ ) {
+			if ( insertable[i] ) {
+				addColumn( columnNames[i], valueExpressions[i] );
+			}
+		}
+		return this;
+	}
+
+	public Insert addColumn(String columnName, String valueExpression) {
+		columns.put(columnName, valueExpression);
 		return this;
 	}
 
@@ -98,7 +106,7 @@ public class Insert {
 	}
 
 	public String toStatementString() {
-		StringBuffer buf = new StringBuffer( columns.size()*15 + tableName.length() + 10 );
+		StringBuilder buf = new StringBuilder( columns.size()*15 + tableName.length() + 10 );
 		if ( comment != null ) {
 			buf.append( "/* " ).append( comment ).append( " */ " );
 		}

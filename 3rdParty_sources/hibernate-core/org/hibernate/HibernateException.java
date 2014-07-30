@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2007,2011, 2013, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,33 +20,46 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
 
-import org.hibernate.exception.NestableRuntimeException;
-
 /**
- * Any exception that occurs inside the persistence layer
- * or JDBC driver. <tt>SQLException</tt>s are always wrapped
- * by instances of <tt>JDBCException</tt>.
- *
+ * The base exception type for Hibernate exceptions.
+ * <p/>
+ * Note that all {@link java.sql.SQLException SQLExceptions} will be wrapped in some form of 
+ * {@link JDBCException}.
+ * 
  * @see JDBCException
+ * 
  * @author Gavin King
  */
-
-public class HibernateException extends NestableRuntimeException {
-
-	public HibernateException(Throwable root) {
-		super(root);
+public class HibernateException extends RuntimeException {
+	/**
+	 * Constructs a HibernateException using the given exception message.
+	 *
+	 * @param message The message explaining the reason for the exception
+	 */
+	public HibernateException(String message) {
+		super( message );
 	}
 
-	public HibernateException(String string, Throwable root) {
-		super(string, root);
+	/**
+	 * Constructs a HibernateException using the given message and underlying cause.
+	 *
+	 * @param cause The underlying cause.
+	 */
+	public HibernateException(Throwable cause) {
+		super( cause );
 	}
 
-	public HibernateException(String s) {
-		super(s);
+	/**
+	 * Constructs a HibernateException using the given message and underlying cause.
+	 *
+	 * @param message The message explaining the reason for the exception.
+	 * @param cause The underlying cause.
+	 */
+	public HibernateException(String message, Throwable cause) {
+		super( message, cause );
 	}
 }
 

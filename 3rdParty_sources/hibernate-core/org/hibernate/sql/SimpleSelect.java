@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.sql;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.dialect.Dialect;
 
 /**
@@ -51,7 +51,7 @@ public class SimpleSelect {
 	private String tableName;
 	private String orderBy;
 	private Dialect dialect;
-	private LockMode lockMode = LockMode.READ;
+	private LockOptions lockOptions = new LockOptions( LockMode.READ);
 	private String comment;
 
 	private List columns = new ArrayList();
@@ -99,8 +99,13 @@ public class SimpleSelect {
 		return this;
 	}
 
+	public SimpleSelect setLockOptions( LockOptions lockOptions ) {
+	   LockOptions.copy(lockOptions, this.lockOptions);
+		return this;
+	}
+
 	public SimpleSelect setLockMode(LockMode lockMode) {
-		this.lockMode = lockMode;
+		this.lockOptions.setLockMode( lockMode );
 		return this;
 	}
 
@@ -142,7 +147,7 @@ public class SimpleSelect {
 	}
 
 	public String toStatementString() {
-		StringBuffer buf = new StringBuffer( 
+		StringBuilder buf = new StringBuilder( 
 				columns.size()*10 + 
 				tableName.length() + 
 				whereTokens.size() * 10 + 
@@ -172,7 +177,7 @@ public class SimpleSelect {
 		}
 		
 		buf.append(" from ")
-			.append( dialect.appendLockHint(lockMode, tableName) );
+			.append( dialect.appendLockHint(lockOptions, tableName) );
 		
 		if ( whereTokens.size() > 0 ) {
 			buf.append(" where ")
@@ -181,15 +186,15 @@ public class SimpleSelect {
 		
 		if (orderBy!=null) buf.append(orderBy);
 		
-		if (lockMode!=null) {
-			buf.append( dialect.getForUpdateString(lockMode) );
+		if (lockOptions!=null) {
+			buf.append( dialect.getForUpdateString(lockOptions) );
 		}
 
 		return dialect.transformSelectString( buf.toString() );
 	}
 
 	public String toWhereClause() {
-		StringBuffer buf = new StringBuffer( whereTokens.size() * 5 );
+		StringBuilder buf = new StringBuilder( whereTokens.size() * 5 );
 		Iterator iter = whereTokens.iterator();
 		while ( iter.hasNext() ) {
 			buf.append( iter.next() );

@@ -23,10 +23,10 @@
  *
  */
 package org.hibernate.sql;
-
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 
 /**
@@ -43,7 +43,7 @@ public class Select {
 	private String orderByClause;
 	private String groupByClause;
 	private String comment;
-	private LockMode lockMode;
+	private LockOptions lockOptions = new LockOptions();
 	public final Dialect dialect;
 
 	private int guesstimatedBufferSize = 20;
@@ -56,7 +56,7 @@ public class Select {
 	 * Construct an SQL <tt>SELECT</tt> statement from the given clauses
 	 */
 	public String toStatementString() {
-		StringBuffer buf = new StringBuffer(guesstimatedBufferSize);
+		StringBuilder buf = new StringBuilder(guesstimatedBufferSize);
 		if ( StringHelper.isNotEmpty(comment) ) {
 			buf.append("/* ").append(comment).append(" */ ");
 		}
@@ -78,7 +78,7 @@ public class Select {
 					buf.append( " and " );
 				}
 			}
-			if ( StringHelper.isNotEmpty(whereClause) ) {
+			if ( StringHelper.isNotEmpty( whereClause ) ) {
 				buf.append(whereClause);
 			}
 		}
@@ -91,8 +91,8 @@ public class Select {
 			buf.append(" order by ").append(orderByClause);
 		}
 		
-		if (lockMode!=null) {
-			buf.append( dialect.getForUpdateString(lockMode) );
+		if (lockOptions.getLockMode()!=LockMode.NONE) {
+			buf.append( dialect.getForUpdateString(lockOptions) );
 		}
 		
 		return dialect.transformSelectString( buf.toString() );
@@ -151,6 +151,11 @@ public class Select {
 		return this;
 	}
 
+	public Select setSelectClause(SelectFragment selectFragment) {
+		setSelectClause( selectFragment.toFragmentString().substring( 2 ) );
+		return this;
+	}
+
 	/**
 	 * Sets the whereClause.
 	 * @param whereClause The whereClause to set
@@ -167,12 +172,41 @@ public class Select {
 		return this;
 	}
 
+	/**
+	 * Get the current lock mode
+	 * @return LockMode
+	 * @deprecated Instead use getLockOptions
+	 */
 	public LockMode getLockMode() {
-		return lockMode;
+		return lockOptions.getLockMode();
 	}
-	
+
+	/**
+	 * Set the lock mode
+	 * @param lockMode
+	 * @return this object
+	 * @deprecated Instead use setLockOptions
+	 */
 	public Select setLockMode(LockMode lockMode) {
-		this.lockMode = lockMode;
+		lockOptions.setLockMode(lockMode);
+		return this;
+	}
+
+	/**
+	 * Get the current lock options
+	 * @return LockOptions
+	 */
+	public LockOptions getLockOptions() {
+		return lockOptions;
+	}
+
+	/**
+	 * Set the lock options
+	 * @param lockOptions
+	 * @return this object
+	 */
+	public Select setLockOptions(LockOptions lockOptions) {
+		LockOptions.copy(lockOptions, this.lockOptions);
 		return this;
 	}
 }

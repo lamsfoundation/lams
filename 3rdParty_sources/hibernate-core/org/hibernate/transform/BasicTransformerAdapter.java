@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.transform;
-
 import java.util.List;
 
 /**
@@ -32,16 +31,10 @@ import java.util.List;
  * @author Steve Ebersole
  */
 public abstract class BasicTransformerAdapter implements ResultTransformer {
-	/**
-	 * {@inheritDoc}
-	 */
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		return tuple;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public List transformList(List list) {
 		return list;
 	}

@@ -23,39 +23,30 @@
  *
  */
 package org.hibernate.transform;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.io.Serializable;
 
 /**
- * {@link ResultTransformer} implementation which builds a map for each "row", made up  of each aliased value
- * where the alias is the map key.
+ * {@link ResultTransformer} implementation which builds a map for each "row",
+ * made up  of each aliased value where the alias is the map key.
  * <p/>
- * Since this transformer is stateless, all instances would be considered equal.  So for optimization purposes
- * we limit it to a single, singleton {@link #INSTANCE instance} (this is not quite true yet, see deprecation notice
- * on {@link #AliasToEntityMapResultTransformer() constructor}).
+ * Since this transformer is stateless, all instances would be considered equal.
+ * So for optimization purposes we limit it to a single, singleton {@link #INSTANCE instance}.
  *
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class AliasToEntityMapResultTransformer extends BasicTransformerAdapter implements Serializable {
+public class AliasToEntityMapResultTransformer extends AliasedTupleSubsetResultTransformer {
 
 	public static final AliasToEntityMapResultTransformer INSTANCE = new AliasToEntityMapResultTransformer();
 
 	/**
-	 * Instantiate AliasToEntityMapResultTransformer.
-	 * <p/>
-	 * todo : make private, see deprecation...
-	 *
-	 * @deprecated Use the {@link #INSTANCE} reference instead of explicitly creating a new one (to be removed in 3.4).
+	 * Disallow instantiation of AliasToEntityMapResultTransformer.
 	 */
-	public AliasToEntityMapResultTransformer() {
+	private AliasToEntityMapResultTransformer() {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		Map result = new HashMap(tuple.length);
 		for ( int i=0; i<tuple.length; i++ ) {
@@ -67,6 +58,11 @@ public class AliasToEntityMapResultTransformer extends BasicTransformerAdapter i
 		return result;
 	}
 
+	@Override
+	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
+		return false;
+	}
+
 	/**
 	 * Serialization hook for ensuring singleton uniqueing.
 	 *
@@ -74,29 +70,5 @@ public class AliasToEntityMapResultTransformer extends BasicTransformerAdapter i
 	 */
 	private Object readResolve() {
 		return INSTANCE;
-	}
-
-
-	// all AliasToEntityMapResultTransformer are considered equal ~~~~~~~~~~~~~
-
-	/**
-	 * All AliasToEntityMapResultTransformer are considered equal
-	 *
-	 * @param other The other instance to check for equality
-	 * @return True if (non-null) other is a instance of AliasToEntityMapResultTransformer.
-	 */
-	public boolean equals(Object other) {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return other != null && AliasToEntityMapResultTransformer.class.isInstance( other );
-	}
-
-	/**
-	 * All AliasToEntityMapResultTransformer are considered equal
-	 *
-	 * @return We simply return the hashCode of the AliasToEntityMapResultTransformer class name string.
-	 */
-	public int hashCode() {
-		// todo : we can remove this once the deprecated ctor can be made private...
-		return getClass().getName().hashCode();
 	}
 }

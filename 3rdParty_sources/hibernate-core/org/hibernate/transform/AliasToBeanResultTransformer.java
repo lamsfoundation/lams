@@ -23,8 +23,7 @@
  *
  */
 package org.hibernate.transform;
-
-import java.util.List;
+import java.util.Arrays;
 
 import org.hibernate.HibernateException;
 import org.hibernate.property.ChainedPropertyAccessor;
@@ -52,42 +51,42 @@ import org.hibernate.property.Setter;
  *
  * @author max
  */
-public class AliasToBeanResultTransformer implements ResultTransformer {
+public class AliasToBeanResultTransformer extends AliasedTupleSubsetResultTransformer {
 
 	// IMPL NOTE : due to the delayed population of setters (setters cached
-	// 		for performance), we really cannot pro0perly define equality for
+	// 		for performance), we really cannot properly define equality for
 	// 		this transformer
 
 	private final Class resultClass;
-	private final PropertyAccessor propertyAccessor;
+	private boolean isInitialized;
+	private String[] aliases;
 	private Setter[] setters;
 
 	public AliasToBeanResultTransformer(Class resultClass) {
 		if ( resultClass == null ) {
 			throw new IllegalArgumentException( "resultClass cannot be null" );
 		}
+		isInitialized = false;
 		this.resultClass = resultClass;
-		propertyAccessor = new ChainedPropertyAccessor(
-				new PropertyAccessor[] {
-						PropertyAccessorFactory.getPropertyAccessor( resultClass, null ),
-						PropertyAccessorFactory.getPropertyAccessor( "field" )
-				}
-		);
 	}
 
+	@Override
+	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
+		return false;
+	}
+
+	@Override
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		Object result;
 
 		try {
-			if ( setters == null ) {
-				setters = new Setter[aliases.length];
-				for ( int i = 0; i < aliases.length; i++ ) {
-					String alias = aliases[i];
-					if ( alias != null ) {
-						setters[i] = propertyAccessor.getSetter( resultClass, alias );
-					}
-				}
+			if ( ! isInitialized ) {
+				initialize( aliases );
 			}
+			else {
+				check( aliases );
+			}
+			
 			result = resultClass.newInstance();
 
 			for ( int i = 0; i < aliases.length; i++ ) {
@@ -106,14 +105,58 @@ public class AliasToBeanResultTransformer implements ResultTransformer {
 		return result;
 	}
 
-	public List transformList(List collection) {
-		return collection;
+	private void initialize(String[] aliases) {
+		PropertyAccessor propertyAccessor = new ChainedPropertyAccessor(
+				new PropertyAccessor[] {
+						PropertyAccessorFactory.getPropertyAccessor( resultClass, null ),
+						PropertyAccessorFactory.getPropertyAccessor( "field" )
+				}
+		);
+		this.aliases = new String[ aliases.length ];
+		setters = new Setter[ aliases.length ];
+		for ( int i = 0; i < aliases.length; i++ ) {
+			String alias = aliases[ i ];
+			if ( alias != null ) {
+				this.aliases[ i ] = alias;
+				setters[ i ] = propertyAccessor.getSetter( resultClass, alias );
+			}
+		}
+		isInitialized = true;
 	}
 
+	private void check(String[] aliases) {
+		if ( ! Arrays.equals( aliases, this.aliases ) ) {
+			throw new IllegalStateException(
+					"aliases are different from what is cached; aliases=" + Arrays.asList( aliases ) +
+							" cached=" + Arrays.asList( this.aliases ) );
+		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		AliasToBeanResultTransformer that = ( AliasToBeanResultTransformer ) o;
+
+		if ( ! resultClass.equals( that.resultClass ) ) {
+			return false;
+		}
+		if ( ! Arrays.equals( aliases, that.aliases ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
 	public int hashCode() {
-		int result;
-		result = resultClass.hashCode();
-		result = 31 * result + propertyAccessor.hashCode();
+		int result = resultClass.hashCode();
+		result = 31 * result + ( aliases != null ? Arrays.hashCode( aliases ) : 0 );
 		return result;
 	}
 }

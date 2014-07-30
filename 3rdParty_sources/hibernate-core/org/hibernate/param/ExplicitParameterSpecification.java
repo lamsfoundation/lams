@@ -24,14 +24,25 @@
  */
 package org.hibernate.param;
 
+
 /**
- * An additional contract for parameters which originate from
- * parameters explicitly encountered in the source statement
+ * An additional contract for parameters which originate from parameters explicitly encountered in the source statement
  * (HQL or native-SQL).
  *
  * @author Steve Ebersole
  */
 public interface ExplicitParameterSpecification extends ParameterSpecification {
+	/**
+	 * Retrieves the line number on which this parameter occurs in the source query.
+	 *
+	 * @return The line number.
+	 */
 	public int getSourceLine();
+
+	/**
+	 * Retrieves the column number (within the {@link #getSourceLine()}) where this parameter occurs.
+	 *
+	 * @return The column number.
+	 */
 	public int getSourceColumn();
 }
