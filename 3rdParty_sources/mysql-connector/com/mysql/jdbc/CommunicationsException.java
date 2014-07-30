@@ -1,30 +1,27 @@
 /*
- Copyright (C) 2002-2007 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
-package com.mysql.jdbc;
 
-import java.net.BindException;
+package com.mysql.jdbc;
 
 import java.sql.SQLException;
 
@@ -40,170 +37,34 @@ import java.sql.SQLException;
  * @version $Id: CommunicationsException.java,v 1.1.2.1 2005/05/13 18:58:37
  *          mmatthews Exp $
  */
-public class CommunicationsException extends SQLException {
+public class CommunicationsException extends SQLException implements StreamingNotifiable {
 
-	private static final long DEFAULT_WAIT_TIMEOUT_SECONDS = 28800;
+	static final long serialVersionUID = 3193864990663398317L;
 
-	private static final int DUE_TO_TIMEOUT_FALSE = 0;
-
-	private static final int DUE_TO_TIMEOUT_MAYBE = 2;
-
-	private static final int DUE_TO_TIMEOUT_TRUE = 1;
-
-	private String exceptionMessage;
+	private String exceptionMessage = null;
 
 	private boolean streamingResultSetInPlay = false;
 	
-	public CommunicationsException(Connection conn, long lastPacketSentTimeMs,
-			Exception underlyingException) {
+	private MySQLConnection conn;
+	private long lastPacketSentTimeMs;
+	private long lastPacketReceivedTimeMs;
+	private Exception underlyingException;
 
-		long serverTimeoutSeconds = 0;
-		boolean isInteractiveClient = false;
-
-		if (conn != null) {
-			isInteractiveClient = conn.getInteractiveClient();
-
-			String serverTimeoutSecondsStr = null;
-
-			if (isInteractiveClient) {
-				serverTimeoutSecondsStr = conn
-						.getServerVariable("interactive_timeout"); //$NON-NLS-1$
-			} else {
-				serverTimeoutSecondsStr = conn
-						.getServerVariable("wait_timeout"); //$NON-NLS-1$
-			}
-
-			if (serverTimeoutSecondsStr != null) {
-				try {
-					serverTimeoutSeconds = Long
-							.parseLong(serverTimeoutSecondsStr);
-				} catch (NumberFormatException nfe) {
-					serverTimeoutSeconds = 0;
-				}
-			}
-		}
-
-		StringBuffer exceptionMessageBuf = new StringBuffer();
-
-		if (lastPacketSentTimeMs == 0) {
-			lastPacketSentTimeMs = System.currentTimeMillis();
-		}
-
-		long timeSinceLastPacket = (System.currentTimeMillis() - lastPacketSentTimeMs) / 1000;
-
-		int dueToTimeout = DUE_TO_TIMEOUT_FALSE;
-
-		StringBuffer timeoutMessageBuf = null;
-
-		if (this.streamingResultSetInPlay) {
-			exceptionMessageBuf.append(Messages
-					.getString("CommunicationsException.ClientWasStreaming")); //$NON-NLS-1$
-		} else {
-				if (serverTimeoutSeconds != 0) {
-				if (timeSinceLastPacket > serverTimeoutSeconds) {
-					dueToTimeout = DUE_TO_TIMEOUT_TRUE;
-	
-					timeoutMessageBuf = new StringBuffer();
-	
-					timeoutMessageBuf.append(Messages
-							.getString("CommunicationsException.2")); //$NON-NLS-1$
-	
-					if (!isInteractiveClient) {
-						timeoutMessageBuf.append(Messages
-								.getString("CommunicationsException.3")); //$NON-NLS-1$
-					} else {
-						timeoutMessageBuf.append(Messages
-								.getString("CommunicationsException.4")); //$NON-NLS-1$
-					}
-	
-				}
-			} else if (timeSinceLastPacket > DEFAULT_WAIT_TIMEOUT_SECONDS) {
-				dueToTimeout = DUE_TO_TIMEOUT_MAYBE;
-	
-				timeoutMessageBuf = new StringBuffer();
-	
-				timeoutMessageBuf.append(Messages
-						.getString("CommunicationsException.5")); //$NON-NLS-1$
-				timeoutMessageBuf.append(Messages
-						.getString("CommunicationsException.6")); //$NON-NLS-1$
-				timeoutMessageBuf.append(Messages
-						.getString("CommunicationsException.7")); //$NON-NLS-1$
-				timeoutMessageBuf.append(Messages
-						.getString("CommunicationsException.8")); //$NON-NLS-1$
-			}
-	
-			if (dueToTimeout == DUE_TO_TIMEOUT_TRUE
-					|| dueToTimeout == DUE_TO_TIMEOUT_MAYBE) {
-	
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.9")); //$NON-NLS-1$
-				exceptionMessageBuf.append(timeSinceLastPacket);
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.10")); //$NON-NLS-1$
-	
-				if (timeoutMessageBuf != null) {
-					exceptionMessageBuf.append(timeoutMessageBuf);
-				}
-	
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.11")); //$NON-NLS-1$
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.12")); //$NON-NLS-1$
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.13")); //$NON-NLS-1$
-	
-			} else {
-				//
-				// Attempt to determine the reason for the underlying exception
-				// (we can only make a best-guess here)
-				//
-	
-				if (underlyingException instanceof BindException) {
-					if (conn.getLocalSocketAddress() != null && 
-							!Util.interfaceExists(conn.getLocalSocketAddress())) {
-						exceptionMessageBuf.append(Messages
-							.getString("CommunicationsException.19a")); //$NON-NLS-1$
-					} else {
-						// too many client connections???
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.14")); //$NON-NLS-1$
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.15")); //$NON-NLS-1$
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.16")); //$NON-NLS-1$
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.17")); //$NON-NLS-1$
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.18")); //$NON-NLS-1$
-						exceptionMessageBuf.append(Messages
-								.getString("CommunicationsException.19")); //$NON-NLS-1$
-					}
-				}
-			}
-		}
+	public CommunicationsException(MySQLConnection conn, long lastPacketSentTimeMs,
+			long lastPacketReceivedTimeMs, Exception underlyingException) {
 		
-		if (exceptionMessageBuf.length() == 0) {
-			// We haven't figured out a good reason, so copy it.
-			exceptionMessageBuf.append(Messages
-					.getString("CommunicationsException.20")); //$NON-NLS-1$
-
-			if (underlyingException != null) {
-				exceptionMessageBuf.append(Messages
-						.getString("CommunicationsException.21")); //$NON-NLS-1$
-				exceptionMessageBuf.append(Util
-						.stackTraceToString(underlyingException));
-			}
-			
-			if (conn != null && conn.getMaintainTimeStats() && 
-					!conn.getParanoid()) {
-				exceptionMessageBuf.append("\n\nLast packet sent to the server was ");
-				exceptionMessageBuf.append(System.currentTimeMillis() - lastPacketSentTimeMs);
-				exceptionMessageBuf.append(" ms ago.");
-			}
+		// store this information for later generation of message
+		this.conn = conn;
+		this.lastPacketReceivedTimeMs = lastPacketReceivedTimeMs;
+		this.lastPacketSentTimeMs = lastPacketSentTimeMs;
+		this.underlyingException = underlyingException;
+		
+		if (underlyingException != null) {
+			initCause(underlyingException);
 		}
-
-		this.exceptionMessage = exceptionMessageBuf.toString();
 	}
+
+	
 
 	/*
 	 * (non-Javadoc)
@@ -211,6 +72,15 @@ public class CommunicationsException extends SQLException {
 	 * @see java.lang.Throwable#getMessage()
 	 */
 	public String getMessage() {
+		// Get the message at last possible moment, but cache it 
+		// and drop references to conn, underlyingException
+		if(this.exceptionMessage == null){
+			this.exceptionMessage = SQLError.createLinkFailureMessageBasedOnHeuristics(this.conn,
+					this.lastPacketSentTimeMs, this.lastPacketReceivedTimeMs, this.underlyingException, 
+					this.streamingResultSetInPlay);
+			this.conn = null;
+			this.underlyingException = null;
+		}
 		return this.exceptionMessage;
 	}
 
@@ -222,8 +92,11 @@ public class CommunicationsException extends SQLException {
 	public String getSQLState() {
 		return SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE;
 	}
-	
-	protected void setWasStreamingResults() {
+
+	/* (non-Javadoc)
+	 * @see com.mysql.jdbc.StreamingNotifiable#setWasStreamingResults()
+	 */
+	public void setWasStreamingResults() {
 		this.streamingResultSetInPlay = true;
 	}
 

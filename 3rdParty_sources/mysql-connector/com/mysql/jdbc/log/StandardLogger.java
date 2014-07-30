@@ -1,33 +1,32 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc.log;
+
+import java.util.Date;
 
 import com.mysql.jdbc.Util;
 import com.mysql.jdbc.profiler.ProfilerEvent;
-
-import java.util.Date;
 
 /**
  * Provides logging facilities for those platforms that don't have built-in
@@ -64,6 +63,11 @@ public class StandardLogger implements Log {
 		this(name, false);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param logLocationInfo
+	 */
 	public StandardLogger(String name, boolean logLocationInfo) {
 		this.logLocationInfo = logLocationInfo;
 	}
@@ -248,7 +252,7 @@ public class StandardLogger implements Log {
 		logInternal(WARN, message, exception);
 	}
 
-	private void logInternal(int level, Object msg, Throwable exception) {
+	protected void logInternal(int level, Object msg, Throwable exception) {
 		StringBuffer msgBuf = new StringBuffer();
 		msgBuf.append(new Date().toString());
 		msgBuf.append(" ");

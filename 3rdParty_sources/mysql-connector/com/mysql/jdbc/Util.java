@@ -1,34 +1,42 @@
 /*
- Copyright (C) 2002-2007 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.TimeZone;
 
 /**
@@ -37,18 +45,66 @@ import java.util.TimeZone;
  * @author Mark Matthews
  */
 public class Util {
+	protected final static Method systemNanoTimeMethod;
 
-	protected static Method systemNanoTimeMethod;
-	    
+	static {
+		Method aMethod;
+		
+		try {
+			aMethod = System.class.getMethod("nanoTime", (Class[])null);
+		} catch (SecurityException e) {
+			aMethod = null;
+		} catch (NoSuchMethodException e) {
+			aMethod = null;
+		}
+		
+		systemNanoTimeMethod = aMethod;
+	}
+
+	public static boolean nanoTimeAvailable() {
+		return systemNanoTimeMethod != null;
+	}
+
+	private static Method CAST_METHOD;
+
+	// cache this ourselves, as the method call is statically-synchronized in
+	// all but JDK6!
+
+	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getDefault();
+
+	static final TimeZone getDefaultTimeZone() {
+		return (TimeZone) DEFAULT_TIMEZONE.clone();
+	}
+
+	class RandStructcture {
+		long maxValue;
+
+		double maxValueDbl;
+
+		long seed1;
+
+		long seed2;
+	}
+
+	private static Util enclosingInstance = new Util();
+
+	private static boolean isJdbc4 = false;
+	
 	private static boolean isColdFusion = false;
 
 	static {
 		try {
-			systemNanoTimeMethod = System.class.getMethod("nanoTime", null);
-		} catch (SecurityException e) {
-			systemNanoTimeMethod = null;
-		} catch (NoSuchMethodException e) {
-			systemNanoTimeMethod = null;
+			CAST_METHOD = Class.class.getMethod("cast",
+					new Class[] { Object.class });
+		} catch (Throwable t) {
+			// ignore - not available in this VM
+		}
+
+		try {
+			Class.forName("java.sql.NClob");
+			isJdbc4 = true;
+		} catch (Throwable t) {
+			isJdbc4 = false;
 		}
 		
 		//
@@ -66,38 +122,20 @@ public class Util {
 			isColdFusion = false;
 		}
 	}
+
+	// ~ Methods
+	// ----------------------------------------------------------------
+
+	public static boolean isJdbc4() {
+		return isJdbc4;
+	}
 	
 	public static boolean isColdFusion() {
 		return isColdFusion;
 	}
-	
-	protected static boolean nanoTimeAvailable() {
-		return systemNanoTimeMethod != null;
-	}
-	
-	// cache this ourselves, as the method call is statically-synchronized in all but JDK6!
-	
-	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getDefault();
-	
-	static final TimeZone getDefaultTimeZone() {
-		return (TimeZone)DEFAULT_TIMEZONE.clone();
-	}
-	
-	class RandStructcture {
-		long maxValue;
-
-		double maxValueDbl;
-
-		long seed1;
-
-		long seed2;
-	}
-
-	
-	private static Util enclosingInstance = new Util();
 
 	// Right from Monty's code
-	static String newCrypt(String password, String seed) {
+	public static String newCrypt(String password, String seed) {
 		byte b;
 		double d;
 
@@ -156,7 +194,7 @@ public class Util {
 		return result;
 	}
 
-	static String oldCrypt(String password, String seed) {
+	public static String oldCrypt(String password, String seed) {
 		long hp;
 		long hm;
 		long s1;
@@ -291,7 +329,7 @@ public class Util {
 				to[i] ^= extra;
 			}
 
-			val = new String(to);
+			val = StringUtils.toString(to);
 		}
 
 		return val;
@@ -337,27 +375,110 @@ public class Util {
 
 		return traceBuf.toString();
 	}
-	
+
+	public static Object getInstance(String className, Class<?>[] argTypes,
+			Object[] args, ExceptionInterceptor exceptionInterceptor) throws SQLException {
+
+		try {
+			return handleNewInstance(Class.forName(className).getConstructor(
+					argTypes), args, exceptionInterceptor);
+		} catch (SecurityException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		} catch (NoSuchMethodException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		} catch (ClassNotFoundException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		}
+	}
+
+	/**
+	 * Handles constructing new instance with the given constructor and wrapping
+	 * (or not, as required) the exceptions that could possibly be generated
+	 */
+	public static final Object handleNewInstance(Constructor<?> ctor, Object[] args, ExceptionInterceptor exceptionInterceptor)
+			throws SQLException {
+		try {
+
+			return ctor.newInstance(args);
+		} catch (IllegalArgumentException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		} catch (InstantiationException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		} catch (IllegalAccessException e) {
+			throw SQLError.createSQLException(
+					"Can't instantiate required class",
+					SQLError.SQL_STATE_GENERAL_ERROR, e, exceptionInterceptor);
+		} catch (InvocationTargetException e) {
+			Throwable target = e.getTargetException();
+
+			if (target instanceof SQLException) {
+				throw (SQLException) target;
+			}
+
+			if (target instanceof ExceptionInInitializerError) {
+				target = ((ExceptionInInitializerError) target).getException();
+			}
+
+			throw SQLError.createSQLException(target.toString(),
+											  SQLError.SQL_STATE_GENERAL_ERROR,
+											  target, exceptionInterceptor);
+		}
+	}
+
 	/**
 	 * Does a network interface exist locally with the given hostname?
 	 * 
-	 * @param hostname the hostname (or IP address in string form) to check
-	 * @return true if it exists, false if no, or unable to determine due to VM version support
-	 *         of java.net.NetworkInterface
+	 * @param hostname
+	 *            the hostname (or IP address in string form) to check
+	 * @return true if it exists, false if no, or unable to determine due to VM
+	 *         version support of java.net.NetworkInterface
 	 */
 	public static boolean interfaceExists(String hostname) {
 		try {
-			Class networkInterfaceClass = Class.forName("java.net.NetworkInterface");
-			return networkInterfaceClass.getMethod("getByName", null).invoke(networkInterfaceClass, new Object[] { hostname }) != null;
+			Class<?> networkInterfaceClass = Class
+					.forName("java.net.NetworkInterface");
+			return networkInterfaceClass.getMethod("getByName", (Class[])null).invoke(
+					networkInterfaceClass, new Object[] { hostname }) != null;
 		} catch (Throwable t) {
 			return false;
 		}
 	}
 
+	/**
+	 * Reflexive access on JDK-1.5's Class.cast() method so we don't have to
+	 * move that out into separate classes built for JDBC-4.0.
+	 * 
+	 * @param invokeOn
+	 * @param toCast
+	 * @return
+	 */
+	public static Object cast(Object invokeOn, Object toCast) {
+		if (CAST_METHOD != null) {
+			try {
+				return CAST_METHOD.invoke(invokeOn, new Object[] { toCast });
+			} catch (Throwable t) {
+				return null;
+			}
+		}
+
+		return null;
+	}
+
 	public static long getCurrentTimeNanosOrMillis() {
 		if (systemNanoTimeMethod != null) {
 			try {
-				return ((Long)systemNanoTimeMethod.invoke(null, null)).longValue();
+				return ((Long) systemNanoTimeMethod.invoke(null, (Object[])null))
+						.longValue();
 			} catch (IllegalArgumentException e) {
 				// ignore - fall through to currentTimeMillis()
 			} catch (IllegalAccessException e) {
@@ -366,7 +487,133 @@ public class Util {
 				// ignore - fall through to currentTimeMillis()
 			}
 		}
-		
+
 		return System.currentTimeMillis();
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void resultSetToMap(Map mappedValues, java.sql.ResultSet rs)
+			throws SQLException {
+		while (rs.next()) {
+			mappedValues.put(rs.getObject(1), rs.getObject(2));
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void resultSetToMap(Map mappedValues, java.sql.ResultSet rs, int key, int value)
+			throws SQLException {
+		while (rs.next()) {
+			mappedValues.put(rs.getObject(key), rs.getObject(value));
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void resultSetToMap(Map mappedValues, java.sql.ResultSet rs, String key, String value)
+			throws SQLException {
+		while (rs.next()) {
+			mappedValues.put(rs.getObject(key), rs.getObject(value));
+		}
+	}
+	
+	public static Map<Object, Object> calculateDifferences(Map<?,?> map1, Map<?,?> map2) {
+		Map<Object, Object> diffMap = new HashMap<Object, Object>();
+
+		for (Map.Entry<?,?> entry : map1.entrySet()) {
+			Object key = entry.getKey();
+
+			Number value1 = null;
+			Number value2 = null;
+
+			if (entry.getValue() instanceof Number) {
+
+				value1 = (Number) entry.getValue();
+				value2 = (Number) map2.get(key);
+			} else {
+				try {
+					value1 = new Double(entry.getValue().toString());
+					value2 = new Double(map2.get(key).toString());
+				} catch (NumberFormatException nfe) {
+					continue;
+				}
+			}
+
+			if (value1.equals(value2)) {
+				continue;
+			}
+			
+			if (value1 instanceof Byte) {
+				diffMap.put(key, Byte.valueOf(
+						(byte) (((Byte) value2).byteValue() - ((Byte) value1)
+								.byteValue())));
+			} else if (value1 instanceof Short) {
+				diffMap.put(key, Short.valueOf((short) (((Short) value2)
+						.shortValue() - ((Short) value1).shortValue())));
+			} else if (value1 instanceof Integer) {
+				diffMap.put(key, Integer.valueOf(
+						(((Integer) value2).intValue() - ((Integer) value1)
+								.intValue())));
+			} else if (value1 instanceof Long) {
+				diffMap.put(key, Long.valueOf(
+						(((Long) value2).longValue() - ((Long) value1)
+								.longValue())));
+			} else if (value1 instanceof Float) {
+				diffMap.put(key, Float.valueOf(((Float) value2).floatValue()
+						- ((Float) value1).floatValue()));
+			} else if (value1 instanceof Double) {
+				diffMap.put(key, Double.valueOf(
+						(((Double) value2).shortValue() - ((Double) value1)
+								.shortValue())));
+			} else if (value1 instanceof BigDecimal) {
+				diffMap.put(key, ((BigDecimal) value2)
+						.subtract((BigDecimal) value1));
+			} else if (value1 instanceof BigInteger) {
+				diffMap.put(key, ((BigInteger) value2)
+						.subtract((BigInteger) value1));
+			}
+		}
+
+		return diffMap;
+	}
+	
+	/**
+	 * Returns initialized instances of classes listed in extensionClassNames.
+	 * There is no need to call Extension.init() method after that if you don't change connection or properties.
+	 * 
+	 * @param conn
+	 * @param props
+	 * @param extensionClassNames
+	 * @param errorMessageKey
+	 * @param exceptionInterceptor
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Extension> loadExtensions(Connection conn,
+			Properties props, String extensionClassNames,
+			String errorMessageKey, ExceptionInterceptor exceptionInterceptor) throws SQLException {
+		List<Extension> extensionList = new LinkedList<Extension>();
+
+		List<String> interceptorsToCreate = StringUtils.split(extensionClassNames, ",", true);
+
+		String className = null;
+
+		try {
+			for (int i = 0, s = interceptorsToCreate.size(); i < s; i++) {
+				className = interceptorsToCreate.get(i);
+				Extension extensionInstance = (Extension) Class.forName(
+						className).newInstance();
+				extensionInstance.init(conn, props);
+
+				extensionList.add(extensionInstance);
+			}
+		} catch (Throwable t) {
+			SQLException sqlEx = SQLError.createSQLException(Messages
+					.getString(errorMessageKey, new Object[] { className }), exceptionInterceptor);
+			sqlEx.initCause(t);
+
+			throw sqlEx;
+		}
+
+		return extensionList;
+	}
+
 }

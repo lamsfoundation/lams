@@ -1,60 +1,59 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
-package com.mysql.jdbc.jdbc2.optional;
 
-import com.mysql.jdbc.ConnectionProperties;
-import com.mysql.jdbc.NonRegisteringDriver;
+package com.mysql.jdbc.jdbc2.optional;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-
 import java.sql.SQLException;
-
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.StringRefAddr;
-
 import javax.sql.DataSource;
+
+import com.mysql.jdbc.ConnectionPropertiesImpl;
+import com.mysql.jdbc.NonRegisteringDriver;
 
 /**
  * A JNDI DataSource for a Mysql JDBC connection
  * 
  * @author Mark Matthews
  */
-public class MysqlDataSource extends ConnectionProperties implements
-		DataSource, Referenceable, Serializable {
+public class MysqlDataSource extends ConnectionPropertiesImpl implements
+		DataSource, Referenceable, Serializable  {
+
+	static final long serialVersionUID = -5515846944416881264L;
+
 	/** The driver to create connections with */
-	protected static com.mysql.jdbc.Driver mysqlDriver = null;
+	protected final static NonRegisteringDriver mysqlDriver;
 
 	static {
 		try {
-			mysqlDriver = (com.mysql.jdbc.Driver) Class.forName(
-					"com.mysql.jdbc.Driver").newInstance();
+			mysqlDriver = new NonRegisteringDriver();
 		} catch (Exception E) {
 			throw new RuntimeException(
 					"Can not load Driver class com.mysql.jdbc.Driver");
@@ -62,7 +61,7 @@ public class MysqlDataSource extends ConnectionProperties implements
 	}
 
 	/** Log stream */
-	protected PrintWriter logWriter = null;
+	protected transient PrintWriter logWriter = null;
 
 	/** Database Name */
 	protected String databaseName = null;
@@ -422,6 +421,31 @@ public class MysqlDataSource extends ConnectionProperties implements
 			jdbcUrlToUse = this.url;
 		}
 
+		//
+		// URL should take precedence over properties
+		//
+		
+		Properties urlProps = mysqlDriver.parseURL(jdbcUrlToUse, null);
+		urlProps.remove(NonRegisteringDriver.DBNAME_PROPERTY_KEY);
+		urlProps.remove(NonRegisteringDriver.HOST_PROPERTY_KEY);
+		urlProps.remove(NonRegisteringDriver.PORT_PROPERTY_KEY);
+		
+		Iterator<Object> keys = urlProps.keySet().iterator();
+		
+		while (keys.hasNext()) {
+			String key = (String)keys.next();
+			
+			props.setProperty(key, urlProps.getProperty(key));
+		}
+		
 		return mysqlDriver.connect(jdbcUrlToUse, props);
 	}
+//
+//	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+//		throw SQLError.notImplemented();
+//	}
+//
+//	public <T> T unwrap(Class<T> iface) throws SQLException {
+//		throw SQLError.notImplemented();
+//	}
 }

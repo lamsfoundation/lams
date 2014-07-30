@@ -1,27 +1,29 @@
 /*
- Copyright (C) 2005 MySQL AB
+  Copyright (c) 2005, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc.jdbc2.optional;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,6 +39,9 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import com.mysql.jdbc.ConnectionImpl;
+import com.mysql.jdbc.StringUtils;
+import com.mysql.jdbc.Util;
 import com.mysql.jdbc.log.Log;
 
 /*
@@ -61,31 +66,67 @@ import com.mysql.jdbc.log.Log;
 public class MysqlXAConnection extends MysqlPooledConnection implements
 		XAConnection, XAResource {
 
-	private com.mysql.jdbc.Connection underlyingConnection;
+	private static final int MAX_COMMAND_LENGTH = 300;
+	
+	private com.mysql.jdbc.ConnectionImpl underlyingConnection;
 
-	private final static Map MYSQL_ERROR_CODES_TO_XA_ERROR_CODES;
+	private final static Map<Integer, Integer> MYSQL_ERROR_CODES_TO_XA_ERROR_CODES;
 
 	private Log log;
 
 	protected boolean logXaCommands;
 	
 	static {
-		HashMap temp = new HashMap();
+		HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
 
-		temp.put(new Integer(1397), new Integer(XAException.XAER_NOTA));
-		temp.put(new Integer(1398), new Integer(XAException.XAER_INVAL));
-		temp.put(new Integer(1399), new Integer(XAException.XAER_RMFAIL));
-		temp.put(new Integer(1400), new Integer(XAException.XAER_OUTSIDE));
-		temp.put(new Integer(1401), new Integer(XAException.XAER_RMERR));
-		temp.put(new Integer(1402), new Integer(XAException.XA_RBROLLBACK));
+		temp.put(Integer.valueOf(1397), Integer.valueOf(XAException.XAER_NOTA));
+		temp.put(Integer.valueOf(1398), Integer.valueOf(XAException.XAER_INVAL));
+		temp.put(Integer.valueOf(1399), Integer.valueOf(XAException.XAER_RMFAIL));
+		temp.put(Integer.valueOf(1400), Integer.valueOf(XAException.XAER_OUTSIDE));
+		temp.put(Integer.valueOf(1401), Integer.valueOf(XAException.XAER_RMERR));
+		temp.put(Integer.valueOf(1402), Integer.valueOf(XAException.XA_RBROLLBACK));
+		temp.put(Integer.valueOf(1440), Integer.valueOf(XAException.XAER_DUPID));
 
 		MYSQL_ERROR_CODES_TO_XA_ERROR_CODES = Collections.unmodifiableMap(temp);
+	}
+	
+	private static final Constructor<?> JDBC_4_XA_CONNECTION_WRAPPER_CTOR;
+
+	static {
+		if (Util.isJdbc4()) {
+			try {
+				JDBC_4_XA_CONNECTION_WRAPPER_CTOR = Class.forName(
+						"com.mysql.jdbc.jdbc2.optional.JDBC4MysqlXAConnection")
+						.getConstructor(
+								new Class[] { ConnectionImpl.class, Boolean.TYPE });
+			} catch (SecurityException e) {
+				throw new RuntimeException(e);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			JDBC_4_XA_CONNECTION_WRAPPER_CTOR = null;
+		}
+	}
+
+	protected static MysqlXAConnection getInstance(ConnectionImpl mysqlConnection, 
+			boolean logXaCommands) throws SQLException {
+		if (!Util.isJdbc4()) {
+			return new MysqlXAConnection(mysqlConnection, logXaCommands);
+		}
+
+		return (MysqlXAConnection) Util.handleNewInstance(
+				JDBC_4_XA_CONNECTION_WRAPPER_CTOR, new Object[] {
+						mysqlConnection,
+						Boolean.valueOf(logXaCommands) }, mysqlConnection.getExceptionInterceptor());
 	}
 
 	/**
 	 * @param connection
 	 */
-	public MysqlXAConnection(com.mysql.jdbc.Connection connection, boolean logXaCommands)
+	public MysqlXAConnection(ConnectionImpl connection, boolean logXaCommands)
 			throws SQLException {
 		super(connection);
 		this.underlyingConnection = connection;
@@ -120,7 +161,6 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             XAER_RMERR and XAER_RMFAIL.
 	 */
 	public int getTransactionTimeout() throws XAException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -146,7 +186,6 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             XAER_RMERR, XAER_RMFAIL, or XAER_INVAL.
 	 */
 	public boolean setTransactionTimeout(int arg0) throws XAException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -218,7 +257,7 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	
 	protected static Xid[] recover(Connection c, int flag) throws XAException {
 		/*
-		    The XA RECOVER statement returns information for those XA transactions on the MySQL server that are in the PREPARED state. (See Section 13.4.7.2, “XA Transaction States”.) The output includes a row for each such XA transaction on the server, regardless of which client started it.
+		    The XA RECOVER statement returns information for those XA transactions on the MySQL server that are in the PREPARED state. (See Section 13.4.7.2, ï¿½XA Transaction Statesï¿½.) The output includes a row for each such XA transaction on the server, regardless of which client started it.
 
 			XA RECOVER output rows look like this (for an example xid value consisting of the parts 'abc', 'def', and 7):
 
@@ -261,7 +300,7 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 		ResultSet rs = null;
 		Statement stmt = null;
 
-		List recoveredXidList = new ArrayList();
+		List<MysqlXid> recoveredXidList = new ArrayList<MysqlXid>();
 
 		try {
 			// TODO: Cache this for lifetime of XAConnection
@@ -343,9 +382,9 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             XAER_PROTO.
 	 */
 	public int prepare(Xid xid) throws XAException {
-		StringBuffer commandBuf = new StringBuffer();
+		StringBuilder commandBuf = new StringBuilder(MAX_COMMAND_LENGTH);
 		commandBuf.append("XA PREPARE ");
-		commandBuf.append(xidToString(xid));
+		appendXid(commandBuf, xid);
 
 		dispatchCommand(commandBuf.toString());
 
@@ -364,7 +403,7 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             XAER_PROTO.
 	 */
 	public void forget(Xid xid) throws XAException {
-		// TODO Auto-generated method stub
+		// mysql doesn't support this
 	}
 
 	/**
@@ -385,9 +424,9 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 * has released all held resources.
 	 */
 	public void rollback(Xid xid) throws XAException {
-		StringBuffer commandBuf = new StringBuffer();
+		StringBuilder commandBuf = new StringBuilder(MAX_COMMAND_LENGTH);
 		commandBuf.append("XA ROLLBACK ");
-		commandBuf.append(xidToString(xid));
+		appendXid(commandBuf, xid);
 
 		try {
 			dispatchCommand(commandBuf.toString());
@@ -424,20 +463,20 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             or XA_RB*.
 	 */
 	public void end(Xid xid, int flags) throws XAException {
-		StringBuffer commandBuf = new StringBuffer();
+		StringBuilder commandBuf = new StringBuilder(MAX_COMMAND_LENGTH);
 		commandBuf.append("XA END ");
-		commandBuf.append(xidToString(xid));
+		appendXid(commandBuf, xid);
 
 		switch (flags) {
-		case TMSUCCESS:
-			break; // no-op
-		case TMSUSPEND:
-			commandBuf.append(" SUSPEND");
-			break;
-		case TMFAIL:
-			break; // no-op
-		default:
-			throw new XAException(XAException.XAER_INVAL);
+			case TMSUCCESS:
+				break; // no-op
+			case TMSUSPEND:
+				commandBuf.append(" SUSPEND");
+				break;
+			case TMFAIL:
+				break; // no-op
+			default:
+				throw new XAException(XAException.XAER_INVAL);
 		}
 
 		dispatchCommand(commandBuf.toString());
@@ -467,26 +506,26 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 *             XAER_INVAL, or XAER_PROTO.
 	 */
 	public void start(Xid xid, int flags) throws XAException {
-		StringBuffer commandBuf = new StringBuffer();
+		StringBuilder commandBuf = new StringBuilder(MAX_COMMAND_LENGTH);
 		commandBuf.append("XA START ");
-		commandBuf.append(xidToString(xid));
+		appendXid(commandBuf, xid);
 
 		switch (flags) {
-		case TMJOIN:
-			commandBuf.append(" JOIN");
-			break;
-		case TMRESUME:
-			commandBuf.append(" RESUME");
-			break;
-		case TMNOFLAGS:
-			// no-op
-			break;
-		default:
-			throw new XAException(XAException.XAER_INVAL);
+			case TMJOIN:
+				commandBuf.append(" JOIN");
+				break;
+			case TMRESUME:
+				commandBuf.append(" RESUME");
+				break;
+			case TMNOFLAGS:
+				// no-op
+				break;
+			default:
+				throw new XAException(XAException.XAER_INVAL);
 		}
 
 		dispatchCommand(commandBuf.toString());
-		
+
 		this.underlyingConnection.setInGlobalTx(true);
 	}
 
@@ -512,9 +551,9 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 	 */
 
 	public void commit(Xid xid, boolean onePhase) throws XAException {
-		StringBuffer commandBuf = new StringBuffer();
+		StringBuilder commandBuf = new StringBuilder(MAX_COMMAND_LENGTH);
 		commandBuf.append("XA COMMIT ");
-		commandBuf.append(xidToString(xid));
+		appendXid(commandBuf, xid);
 
 		if (onePhase) {
 			commandBuf.append(" ONE PHASE");
@@ -537,7 +576,8 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 
 			// TODO: Cache this for lifetime of XAConnection
 			stmt = this.underlyingConnection.createStatement();
-
+			
+			
 			stmt.execute(command);
 
 			ResultSet rs = stmt.getResultSet();
@@ -557,8 +597,8 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 
 	protected static XAException mapXAExceptionFromSQLException(SQLException sqlEx) {
 
-		Integer xaCode = (Integer) MYSQL_ERROR_CODES_TO_XA_ERROR_CODES
-				.get(new Integer(sqlEx.getErrorCode()));
+		Integer xaCode = MYSQL_ERROR_CODES_TO_XA_ERROR_CODES
+				.get(Integer.valueOf(sqlEx.getErrorCode()));
 
 		if (xaCode != null) {
 			return new MysqlXAException(xaCode.intValue(), sqlEx.getMessage(), null);
@@ -568,62 +608,21 @@ public class MysqlXAConnection extends MysqlPooledConnection implements
 		return new MysqlXAException(sqlEx.getMessage(), null);
 	}
 
-	private static String xidToString(Xid xid) {
+	private static void appendXid(StringBuilder builder, Xid xid) {
 		byte[] gtrid = xid.getGlobalTransactionId();
-
 		byte[] btrid = xid.getBranchQualifier();
 
-		int lengthAsString = 6; // for (0x and ,) * 2
-
 		if (gtrid != null) {
-			lengthAsString += (2 * gtrid.length);
+			StringUtils.appendAsHex(builder, gtrid);
 		}
 
+		builder.append(',');
 		if (btrid != null) {
-			lengthAsString += (2 * btrid.length);
+			StringUtils.appendAsHex(builder, btrid);
 		}
 
-		String formatIdInHex = Integer.toHexString(xid.getFormatId());
-
-		lengthAsString += formatIdInHex.length();
-		lengthAsString += 3; // for the '.' after formatId
-
-		StringBuffer asString = new StringBuffer(lengthAsString);
-
-		asString.append("0x");
-
-		if (gtrid != null) {
-			for (int i = 0; i < gtrid.length; i++) {
-				String asHex = Integer.toHexString(gtrid[i] & 0xff);
-
-				if (asHex.length() == 1) {
-					asString.append("0");
-				}
-
-				asString.append(asHex);
-			}
-		}
-
-		asString.append(",");
-
-		if (btrid != null) {
-			asString.append("0x");
-
-			for (int i = 0; i < btrid.length; i++) {
-				String asHex = Integer.toHexString(btrid[i] & 0xff);
-
-				if (asHex.length() == 1) {
-					asString.append("0");
-				}
-
-				asString.append(asHex);
-			}
-		}
-
-		asString.append(",0x");
-		asString.append(formatIdInHex);
-
-		return asString.toString();
+		builder.append(',');
+		StringUtils.appendAsHex(builder, xid.getFormatId());
 	}
 
 	/*

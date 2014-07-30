@@ -1,23 +1,23 @@
 /*
- Copyright (C) 2002-2007 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
 
@@ -25,7 +25,7 @@ package com.mysql.jdbc.profiler;
 
 import java.util.Date;
 
-import com.mysql.jdbc.Util;
+import com.mysql.jdbc.StringUtils;
 
 /**
  * @author mmatthew
@@ -131,11 +131,6 @@ public class ProfilerEvent {
 	protected int eventCreationPointIndex;
 
 	/**
-	 * Where was the event created (as a Throwable)?
-	 */
-	protected Throwable eventCreationPoint;
-
-	/**
 	 * Where was the event created (as a string description of the
 	 * eventCreationPoint)?
 	 */
@@ -175,7 +170,7 @@ public class ProfilerEvent {
 	public ProfilerEvent(byte eventType, String hostName, String catalog,
 			long connectionId, int statementId, int resultSetId,
 			long eventCreationTime, long eventDuration, String durationUnits,
-			String eventCreationPointDesc, Throwable eventCreationPoint,
+			String eventCreationPointDesc, String eventCreationPoint,
 			String message) {
 		this.eventType = eventType;
 		this.connectionId = connectionId;
@@ -184,7 +179,6 @@ public class ProfilerEvent {
 		this.eventCreationTime = eventCreationTime;
 		this.eventDuration = eventDuration;
 		this.durationUnits = durationUnits;
-		this.eventCreationPoint = eventCreationPoint;
 		this.eventCreationPointDesc = eventCreationPointDesc;
 		this.message = message;
 	}
@@ -195,11 +189,6 @@ public class ProfilerEvent {
 	 * @return a description of when this event was created.
 	 */
 	public String getEventCreationPointAsString() {
-		if (this.eventCreationPointDesc == null) {
-			this.eventCreationPointDesc = Util
-					.stackTraceToString(this.eventCreationPoint);
-		}
-
 		return this.eventCreationPointDesc;
 	}
 
@@ -298,7 +287,7 @@ public class ProfilerEvent {
 			pos += eventDurationUnits.length;
 		}
 		
-		int eventCreationPointIndex = readInt(buf, pos);
+		readInt(buf, pos);
 		pos += 4;
 		byte[] eventCreationAsBytes = readBytes(buf, pos);
 		pos += 4;
@@ -316,9 +305,9 @@ public class ProfilerEvent {
 
 		return new ProfilerEvent(eventType, "", "", connectionId, statementId,
 				resultSetId, eventCreationTime, eventDuration,
-				new String(eventDurationUnits, "ISO8859_1"),
-				new String(eventCreationAsBytes, "ISO8859_1"), null,
-				new String(message, "ISO8859_1"));
+				StringUtils.toString(eventDurationUnits, "ISO8859_1"),
+				StringUtils.toString(eventCreationAsBytes, "ISO8859_1"), null,
+				StringUtils.toString(message, "ISO8859_1"));
 	}
 
 	/**
@@ -337,8 +326,8 @@ public class ProfilerEvent {
 		getEventCreationPointAsString();
 
 		if (this.eventCreationPointDesc != null) {
-			eventCreationAsBytes = this.eventCreationPointDesc
-					.getBytes("ISO8859_1");
+			eventCreationAsBytes = StringUtils.getBytes(
+					this.eventCreationPointDesc, "ISO8859_1");
 			len += (4 + eventCreationAsBytes.length);
 		} else {
 			len += 4;
@@ -346,8 +335,8 @@ public class ProfilerEvent {
 
 		byte[] messageAsBytes = null;
 
-		if (messageAsBytes != null) {
-			messageAsBytes = this.message.getBytes("ISO8859_1");
+		if (this.message != null) {
+			messageAsBytes = StringUtils.getBytes(this.message, "ISO8859_1");
 			len += (4 + messageAsBytes.length);
 		} else {
 			len += 4;
@@ -355,11 +344,12 @@ public class ProfilerEvent {
 		
 		byte[] durationUnitsAsBytes = null;
 		
-		if (durationUnits != null) {
-			durationUnitsAsBytes = this.durationUnits.getBytes("ISO8859_1");
+		if (this.durationUnits != null) {
+			durationUnitsAsBytes = StringUtils.getBytes(this.durationUnits, "ISO8859_1");
 			len += (4 + durationUnitsAsBytes.length);
 		} else {
 			len += 4;
+			durationUnitsAsBytes = StringUtils.getBytes("", "ISO8859_1");
 		}
 
 		byte[] buf = new byte[len];
@@ -428,7 +418,7 @@ public class ProfilerEvent {
 	}
 
 	private static long readLong(byte[] buf, int pos) {
-		return (long) (buf[pos++] & 0xff) | ((long) (buf[pos++] & 0xff) << 8)
+		return (buf[pos++] & 0xff) | ((long) (buf[pos++] & 0xff) << 8)
 				| ((long) (buf[pos++] & 0xff) << 16)
 				| ((long) (buf[pos++] & 0xff) << 24)
 				| ((long) (buf[pos++] & 0xff) << 32)
@@ -464,16 +454,6 @@ public class ProfilerEvent {
 	 */
 	public long getConnectionId() {
 		return this.connectionId;
-	}
-
-	/**
-	 * Returns the point (as a Throwable stacktrace) where this event was
-	 * created.
-	 * 
-	 * @return the point where this event was created
-	 */
-	public Throwable getEventCreationPoint() {
-		return this.eventCreationPoint;
 	}
 
 	/**

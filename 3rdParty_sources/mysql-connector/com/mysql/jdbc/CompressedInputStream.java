@@ -1,37 +1,36 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.sql.SQLException;
-
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+import com.mysql.jdbc.log.Log;
+import com.mysql.jdbc.log.NullLogger;
 
 /**
  * Used to de-compress packets from the MySQL server when protocol-level
@@ -46,15 +45,18 @@ class CompressedInputStream extends InputStream {
 	/** The packet data after it has been un-compressed */
 	private byte[] buffer;
 
-	/** The connection that is using us (used to read config values) */
-	private Connection connection;
-
 	/** The stream we are reading from the server */
 	private InputStream in;
 
 	/** The ZIP inflater used to un-compress packets */
 	private Inflater inflater;
 
+	/** Connection property reference */
+	private ConnectionPropertiesImpl.BooleanConnectionProperty traceProtocol;
+
+	/** Connection logger */
+	private Log log;	
+	
 	/**
 	 * The buffer to read packet headers into
 	 */
@@ -72,7 +74,13 @@ class CompressedInputStream extends InputStream {
 	 * @param streamFromServer
 	 */
 	public CompressedInputStream(Connection conn, InputStream streamFromServer) {
-		this.connection = conn;
+		this.traceProtocol = ((ConnectionPropertiesImpl)conn).traceProtocol;
+		try {
+			this.log = conn.getLog();
+		} catch (SQLException e) {
+			this.log = new NullLogger(null);
+		}
+		
 		this.in = streamFromServer;
 		this.inflater = new Inflater();
 	}
@@ -94,7 +102,10 @@ class CompressedInputStream extends InputStream {
 	public void close() throws IOException {
 		this.in.close();
 		this.buffer = null;
+		this.inflater.end();
 		this.inflater = null;
+		this.traceProtocol = null;
+		this.log = null;
 	}
 
 	/**
@@ -121,16 +132,13 @@ class CompressedInputStream extends InputStream {
 				+ (((this.packetHeaderBuffer[5] & 0xff)) << 8)
 				+ (((this.packetHeaderBuffer[6] & 0xff)) << 16);
 
-		if (this.connection.getTraceProtocol()) {
-			try {
-				this.connection.getLog().logTrace(
-						"Reading compressed packet of length "
-								+ compressedPacketLength + " uncompressed to "
-								+ uncompressedLength);
-			} catch (SQLException sqlEx) {
-				throw new IOException(sqlEx.toString()); // should never
-															// happen
-			}
+		boolean doTrace = this.traceProtocol.getValueAsBoolean();
+		
+		if (doTrace) {
+			this.log.logTrace(
+					"Reading compressed packet of length "
+							+ compressedPacketLength + " uncompressed to "
+							+ uncompressedLength);
 		}
 
 		if (uncompressedLength > 0) {
@@ -157,16 +165,9 @@ class CompressedInputStream extends InputStream {
 
 			this.inflater.end();
 		} else {
-			if (this.connection.getTraceProtocol()) {
-				try {
-					this.connection
-							.getLog()
-							.logTrace(
-									"Packet didn't meet compression threshold, not uncompressing...");
-				} catch (SQLException sqlEx) {
-					throw new IOException(sqlEx.toString()); // should never
-																// happen
-				}
+			if (doTrace) {
+				this.log.logTrace(
+						"Packet didn't meet compression threshold, not uncompressing...");
 			}
 
 			//	
@@ -177,27 +178,17 @@ class CompressedInputStream extends InputStream {
 			readFully(uncompressedData, 0, compressedPacketLength);
 		}
 
-		if (this.connection.getTraceProtocol()) {
-			try {
-				this.connection.getLog().logTrace(
+		if (doTrace) {
+			this.log.logTrace(
 						"Uncompressed packet: \n"
 								+ StringUtils.dumpAsHex(uncompressedData,
 										compressedPacketLength));
-			} catch (SQLException sqlEx) {
-				throw new IOException(sqlEx.toString()); // should never
-															// happen
-			}
 		}
 
 		if ((this.buffer != null) && (this.pos < this.buffer.length)) {
-			if (this.connection.getTraceProtocol()) {
-				try {
-					this.connection.getLog().logTrace(
-							"Combining remaining packet with new: ");
-				} catch (SQLException sqlEx) {
-					throw new IOException(sqlEx.toString()); // should never
-																// happen
-				}
+			if (doTrace) {
+				this.log.logTrace(
+						"Combining remaining packet with new: ");
 			}
 
 			int remaining = this.buffer.length - this.pos;

@@ -1,29 +1,29 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,7 +34,7 @@ import java.security.NoSuchAlgorithmException;
  * 
  * @version $Id$
  */
-class Security {
+public class Security {
 	private static final char PVERSION41_CHAR = '*';
 
 	private static final int SHA1_HASH_SIZE = 20;
@@ -231,17 +231,18 @@ class Security {
 	 *            IN Data for encryption
 	 * @param to
 	 *            OUT Encrypt data to the buffer (may be the same)
-	 * @param password
-	 *            IN Password used for encryption (same length)
+	 * @param scramble
+	 *            IN Scramble used for encryption
 	 * @param length
 	 *            IN Length of data to encrypt
 	 */
-	static void passwordCrypt(byte[] from, byte[] to, byte[] password,
+	public static void xorString(byte[] from, byte[] to, byte[] scramble,
 			int length) {
 		int pos = 0;
+		int scrambleLength = scramble.length;
 
-		while ((pos < from.length) && (pos < length)) {
-			to[pos] = (byte) (from[pos] ^ password[pos]);
+		while (pos < length) {
+			to[pos] = (byte) (from[pos] ^ scramble[pos % scrambleLength]);
 			pos++;
 		}
 	}
@@ -274,7 +275,7 @@ class Security {
 			cleansedPassword.append(c);
 		}
 
-		return md.digest(cleansedPassword.toString().getBytes());
+		return md.digest(StringUtils.getBytes(cleansedPassword.toString()));
 	}
 
 	/**
@@ -319,17 +320,20 @@ class Security {
 	// hash_stage1=xor(reply, sha1(public_seed,hash_stage2))
 	// candidate_hash2=sha1(hash_stage1)
 	// check(candidate_hash2==hash_stage2)
-	static byte[] scramble411(String password, String seed)
-			throws NoSuchAlgorithmException {
+	public static byte[] scramble411(String password, String seed, String passwordEncoding)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest md = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
-
-		byte[] passwordHashStage1 = md.digest(password.getBytes());
+		
+		byte[] passwordHashStage1 = md
+				.digest((passwordEncoding == null || passwordEncoding.length() == 0) ? 
+						StringUtils.getBytes(password)
+						: StringUtils.getBytes(password, passwordEncoding));
 		md.reset();
 
 		byte[] passwordHashStage2 = md.digest(passwordHashStage1);
 		md.reset();
 
-		byte[] seedAsBytes = seed.getBytes(); // for debugging
+		byte[] seedAsBytes = StringUtils.getBytes(seed, "ASCII"); // for debugging
 		md.update(seedAsBytes);
 		md.update(passwordHashStage2);
 

@@ -1,27 +1,26 @@
 /*
- Copyright (C) 2005 MySQL AB
+  Copyright (c) 2005, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc.jdbc2.optional;
 
 import java.sql.Connection;
@@ -39,6 +38,8 @@ import javax.sql.XAConnection;
 public class MysqlXADataSource extends MysqlDataSource implements
 		javax.sql.XADataSource {
 
+	static final long serialVersionUID = 7911390333152247455L;
+
 	/**
 	 * @see javax.sql.XADataSource#getXAConnection()
 	 */
@@ -52,10 +53,10 @@ public class MysqlXADataSource extends MysqlDataSource implements
 	/**
 	 * @see javax.sql.XADataSource#getXAConnection(String, String)
 	 */
-	public XAConnection getXAConnection(String user, String password)
+	public XAConnection getXAConnection(String u, String p)
 			throws SQLException {
 
-		Connection conn = getConnection(user, password);
+		Connection conn = getConnection(u, p);
 
 		return wrapConnection(conn);
 	}
@@ -67,9 +68,9 @@ public class MysqlXADataSource extends MysqlDataSource implements
 	private XAConnection wrapConnection(Connection conn) throws SQLException {
 		if (getPinGlobalTxToPhysicalConnection() || 
 				((com.mysql.jdbc.Connection)conn).getPinGlobalTxToPhysicalConnection()) {
-			return new SuspendableXAConnection((com.mysql.jdbc.Connection) conn);
+			return SuspendableXAConnection.getInstance((com.mysql.jdbc.ConnectionImpl) conn);
 		}
 		
-		return new MysqlXAConnection((com.mysql.jdbc.Connection) conn, getLogXaCommands());
+		return MysqlXAConnection.getInstance((com.mysql.jdbc.ConnectionImpl) conn, getLogXaCommands());
 	}
 }

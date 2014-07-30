@@ -1,27 +1,26 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.ByteArrayOutputStream;
@@ -31,12 +30,16 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Various utility methods for converting to/from byte arrays in the platform
@@ -60,6 +63,34 @@ public class StringUtils {
 
 	static final int WILD_COMPARE_NO_MATCH = -1;
 
+	private static final ConcurrentHashMap<String,Charset> charsetsByAlias = 
+	     new ConcurrentHashMap<String,Charset>();
+
+	private static final String platformEncoding = System.getProperty("file.encoding");
+	
+	private static final String VALID_ID_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789$_#@";
+	
+	static Charset findCharset(String alias) throws UnsupportedEncodingException {
+		try {
+			Charset cs = charsetsByAlias.get(alias);
+			
+			if (cs == null) {
+				cs = Charset.forName(alias);
+				charsetsByAlias.putIfAbsent(alias, cs);
+			}
+		
+			return cs;
+			
+			// We re-throw these runtimes for compatibility with java.io
+		} catch (UnsupportedCharsetException uce) {
+			throw new UnsupportedEncodingException(alias);
+		} catch (IllegalCharsetNameException icne) {
+			throw new UnsupportedEncodingException(alias);
+		} catch (IllegalArgumentException iae) {
+			throw new UnsupportedEncodingException(alias);
+		}
+	}
+	
 	static {
 		for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
 			allBytes[i - Byte.MIN_VALUE] = (byte) i;
@@ -99,7 +130,7 @@ public class StringUtils {
 
 		if (toPlainStringMethod != null) {
 			try {
-				return (String) toPlainStringMethod.invoke(decimal, null);
+				return (String) toPlainStringMethod.invoke(decimal, (Object[])null);
 			} catch (InvocationTargetException invokeEx) {
 				// that's okay, we fall-through to decimal.toString()
 			} catch (IllegalAccessException accessEx) {
@@ -120,8 +151,8 @@ public class StringUtils {
 	 * 
 	 * @return ...
 	 */
-	public static final String dumpAsHex(byte[] byteBuffer, int length) {
-		StringBuffer outputBuf = new StringBuffer(length * 4);
+	public static String dumpAsHex(byte[] byteBuffer, int length) {
+		StringBuilder outputBuilder = new StringBuilder(length * 4);
 
 		int p = 0;
 		int rows = length / 8;
@@ -133,26 +164,28 @@ public class StringUtils {
 				String hexVal = Integer.toHexString(byteBuffer[ptemp] & 0xff);
 
 				if (hexVal.length() == 1) {
-					hexVal = "0" + hexVal; //$NON-NLS-1$
+					hexVal = "0" + hexVal;
 				}
 
-				outputBuf.append(hexVal + " "); //$NON-NLS-1$
+				outputBuilder.append(hexVal + " ");
 				ptemp++;
 			}
 
-			outputBuf.append("    "); //$NON-NLS-1$
+			outputBuilder.append("    ");
 
 			for (int j = 0; j < 8; j++) {
-				if ((byteBuffer[p] > 32) && (byteBuffer[p] < 127)) {
-					outputBuf.append((char) byteBuffer[p] + " "); //$NON-NLS-1$
+				int b = 0xff & byteBuffer[p];
+				
+				if (b > 32 && b < 127) {
+					outputBuilder.append((char) b + " ");
 				} else {
-					outputBuf.append(". "); //$NON-NLS-1$
+					outputBuilder.append(". ");
 				}
 
 				p++;
 			}
 
-			outputBuf.append("\n"); //$NON-NLS-1$
+			outputBuilder.append("\n");
 		}
 
 		int n = 0;
@@ -161,30 +194,32 @@ public class StringUtils {
 			String hexVal = Integer.toHexString(byteBuffer[i] & 0xff);
 
 			if (hexVal.length() == 1) {
-				hexVal = "0" + hexVal; //$NON-NLS-1$
+				hexVal = "0" + hexVal;
 			}
 
-			outputBuf.append(hexVal + " "); //$NON-NLS-1$
+			outputBuilder.append(hexVal + " "); 
 			n++;
 		}
 
 		for (int i = n; i < 8; i++) {
-			outputBuf.append("   "); //$NON-NLS-1$
+			outputBuilder.append("   ");
 		}
 
-		outputBuf.append("    "); //$NON-NLS-1$
+		outputBuilder.append("    ");
 
 		for (int i = p; i < length; i++) {
-			if ((byteBuffer[i] > 32) && (byteBuffer[i] < 127)) {
-				outputBuf.append((char) byteBuffer[i] + " "); //$NON-NLS-1$
+			int b = 0xff & byteBuffer[i];
+			
+			if (b > 32 && b < 127) {
+				outputBuilder.append((char) b + " ");
 			} else {
-				outputBuf.append(". "); //$NON-NLS-1$
+				outputBuilder.append(". ");
 			}
 		}
 
-		outputBuf.append("\n"); //$NON-NLS-1$
+		outputBuilder.append("\n");
 
-		return outputBuf.toString();
+		return outputBuilder.toString();
 	}
 
 	private static boolean endsWith(byte[] dataFrom, String suffix) {
@@ -206,17 +241,15 @@ public class StringUtils {
 	 *            the original bytes in SJIS format
 	 * @param origString
 	 *            the string that had .getBytes() called on it
-	 * @param offset
-	 *            where to start converting from
-	 * @param length
-	 *            how many characters to convert.
 	 * 
 	 * @return byte[] with 0x5c escaped
 	 */
-	public static byte[] escapeEasternUnicodeByteStream(byte[] origBytes,
-			String origString, int offset, int length) {
-		if ((origBytes == null) || (origBytes.length == 0)) {
-			return origBytes;
+	public static byte[] escapeEasternUnicodeByteStream(byte[] origBytes, String origString) {
+		if (origBytes == null) {
+			return null;
+		}
+		if (origBytes.length == 0) {
+			return new byte[0];
 		}
 
 		int bytesLen = origBytes.length;
@@ -337,6 +370,24 @@ public class StringUtils {
 		return 0;
 	}
 
+	public static char firstAlphaCharUc(String searchIn, int startAt) {
+		if (searchIn == null) {
+			return 0;
+		}
+
+		int length = searchIn.length();
+
+		for (int i = startAt; i < length; i++) {
+			char c = searchIn.charAt(i);
+
+			if (Character.isLetter(c)) {
+				return Character.toUpperCase(c);
+			}
+		}
+
+		return 0;
+	}
+	
 	/**
 	 * Adds '+' to decimal numbers that are positive (MySQL doesn't understand
 	 * them otherwise
@@ -346,11 +397,11 @@ public class StringUtils {
 	 * 
 	 * @return String the string with a '+' added (if needed)
 	 */
-	public static final String fixDecimalExponent(String dString) {
-		int ePos = dString.indexOf("E"); //$NON-NLS-1$
+	public static String fixDecimalExponent(String dString) {
+		int ePos = dString.indexOf('E');
 
 		if (ePos == -1) {
-			ePos = dString.indexOf("e"); //$NON-NLS-1$
+			ePos = dString.indexOf('e');
 		}
 
 		if (ePos != -1) {
@@ -358,11 +409,11 @@ public class StringUtils {
 				char maybeMinusChar = dString.charAt(ePos + 1);
 
 				if (maybeMinusChar != '-' && maybeMinusChar != '+') {
-					StringBuffer buf = new StringBuffer(dString.length() + 1);
-					buf.append(dString.substring(0, ePos + 1));
-					buf.append('+');
-					buf.append(dString.substring(ePos + 1, dString.length()));
-					dString = buf.toString();
+					StringBuilder strBuilder = new StringBuilder(dString.length() + 1);
+					strBuilder.append(dString.substring(0, ePos + 1));
+					strBuilder.append('+');
+					strBuilder.append(dString.substring(ePos + 1, dString.length()));
+					dString = strBuilder.toString();
 				}
 			}
 		}
@@ -370,260 +421,251 @@ public class StringUtils {
 		return dString;
 	}
 
-	public static final byte[] getBytes(char[] c,
-			SingleByteCharsetConverter converter, String encoding,
-			String serverEncoding, boolean parserKnowsUnicode)
+	/**
+	 * Returns the byte[] representation of the given char[] (re)using the given charset converter, and the given
+	 * encoding.
+	 */
+	public static byte[] getBytes(char[] c, SingleByteCharsetConverter converter, String encoding,
+			String serverEncoding, boolean parserKnowsUnicode, ExceptionInterceptor exceptionInterceptor)
 			throws SQLException {
 		try {
-			byte[] b = null;
+			byte[] b;
 
 			if (converter != null) {
 				b = converter.toBytes(c);
 			} else if (encoding == null) {
-				b = new String(c).getBytes();
+				b = getBytes(c);
 			} else {
-				String s = new String(c);
+				b = getBytes(c, encoding);
 
-				b = s.getBytes(encoding);
-
-				if (!parserKnowsUnicode && (encoding.equalsIgnoreCase("SJIS") //$NON-NLS-1$
-						|| encoding.equalsIgnoreCase("BIG5") //$NON-NLS-1$
-				|| encoding.equalsIgnoreCase("GBK"))) { //$NON-NLS-1$
+				if (!parserKnowsUnicode
+						&& (encoding.equalsIgnoreCase("SJIS") || encoding.equalsIgnoreCase("BIG5") || encoding
+								.equalsIgnoreCase("GBK"))) {
 
 					if (!encoding.equalsIgnoreCase(serverEncoding)) {
-						b = escapeEasternUnicodeByteStream(b, s, 0, s.length());
+						b = escapeEasternUnicodeByteStream(b, new String(c));
 					}
 				}
 			}
 
 			return b;
 		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.5") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.6"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.0") + encoding + Messages.getString("StringUtils.1"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
 		}
 	}
 
-	public static final byte[] getBytes(char[] c,
-			SingleByteCharsetConverter converter, String encoding,
-			String serverEncoding, int offset, int length,
-			boolean parserKnowsUnicode) throws SQLException {
+	/**
+	 * Returns the byte[] representation of subset of the given char[] (re)using the given charset converter, and the
+	 * given encoding.
+	 */
+	public static byte[] getBytes(char[] c, SingleByteCharsetConverter converter, String encoding,
+			String serverEncoding, int offset, int length, boolean parserKnowsUnicode,
+			ExceptionInterceptor exceptionInterceptor) throws SQLException {
 		try {
-			byte[] b = null;
+			byte[] b;
 
 			if (converter != null) {
 				b = converter.toBytes(c, offset, length);
 			} else if (encoding == null) {
-				byte[] temp = new String(c, offset, length).getBytes();
-
-				length = temp.length;
-				
-				b = new byte[length];
-				System.arraycopy(temp, 0, b, 0, length);
+				b = getBytes(c, offset, length);
 			} else {
-				String s = new String(c, offset, length);
+				b = getBytes(c, offset, length, encoding);
 
-				byte[] temp = s.getBytes(encoding);
-
-				length = temp.length;
-				
-				b = new byte[length];
-				System.arraycopy(temp, 0, b, 0, length);
-
-				if (!parserKnowsUnicode && (encoding.equalsIgnoreCase("SJIS") //$NON-NLS-1$
-						|| encoding.equalsIgnoreCase("BIG5") //$NON-NLS-1$
-				|| encoding.equalsIgnoreCase("GBK"))) { //$NON-NLS-1$
+				if (!parserKnowsUnicode
+						&& (encoding.equalsIgnoreCase("SJIS") || encoding.equalsIgnoreCase("BIG5") || encoding
+								.equalsIgnoreCase("GBK"))) {
 
 					if (!encoding.equalsIgnoreCase(serverEncoding)) {
-						b = escapeEasternUnicodeByteStream(b, s, offset, length);
+						b = escapeEasternUnicodeByteStream(b, new String(c, offset, length));
 					}
 				}
 			}
 
 			return b;
 		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.10") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.11"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
-		}
-	}
-
-	public static final byte[] getBytes(char[] c, String encoding,
-			String serverEncoding, boolean parserKnowsUnicode, Connection conn)
-			throws SQLException {
-		try {
-			
-			SingleByteCharsetConverter converter = null;
-			
-			if (conn != null) {
-				converter = conn.getCharsetConverter(encoding);
-			} else {
-				converter = SingleByteCharsetConverter.getInstance(encoding, null);
-			}
-
-			return getBytes(c, converter, encoding, serverEncoding,
-					parserKnowsUnicode);
-		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.0") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.1"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.0") + encoding + Messages.getString("StringUtils.1"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
 		}
 	}
 
 	/**
-	 * Returns the byte[] representation of the given string (re)using the given
-	 * charset converter, and the given encoding.
-	 * 
-	 * @param s
-	 *            the string to convert
-	 * @param converter
-	 *            the converter to reuse
-	 * @param encoding
-	 *            the character encoding to use
-	 * @param serverEncoding
-	 *            DOCUMENT ME!
-	 * @param parserKnowsUnicode
-	 *            DOCUMENT ME!
-	 * 
-	 * @return byte[] representation of the string
-	 * 
-	 * @throws SQLException
-	 *             if an encoding unsupported by the JVM is supplied.
+	 * Returns the byte[] representation of the given char[] (re)using a cached charset converter, and the given
+	 * encoding.
 	 */
-	public static final byte[] getBytes(String s,
-			SingleByteCharsetConverter converter, String encoding,
-			String serverEncoding, boolean parserKnowsUnicode)
+	public static byte[] getBytes(char[] c, String encoding, String serverEncoding, boolean parserKnowsUnicode,
+			MySQLConnection conn, ExceptionInterceptor exceptionInterceptor) throws SQLException {
+		try {
+			SingleByteCharsetConverter converter = conn != null ? conn.getCharsetConverter(encoding)
+					: SingleByteCharsetConverter.getInstance(encoding, null);
+
+			return getBytes(c, converter, encoding, serverEncoding, parserKnowsUnicode, exceptionInterceptor);
+		} catch (UnsupportedEncodingException uee) {
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.0") + encoding + Messages.getString("StringUtils.1"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+		}
+	}
+
+	/**
+	 * Returns the byte[] representation of the given string (re)using the given charset converter, and the given
+	 * encoding.
+	 */
+	public static byte[] getBytes(String s, SingleByteCharsetConverter converter, String encoding,
+			String serverEncoding, boolean parserKnowsUnicode, ExceptionInterceptor exceptionInterceptor)
 			throws SQLException {
 		try {
-			byte[] b = null;
+			byte[] b;
 
 			if (converter != null) {
 				b = converter.toBytes(s);
 			} else if (encoding == null) {
-				b = s.getBytes();
+				b = getBytes(s);
 			} else {
-				b = s.getBytes(encoding);
+				b = getBytes(s, encoding);
 
-				if (!parserKnowsUnicode && (encoding.equalsIgnoreCase("SJIS") //$NON-NLS-1$
-						|| encoding.equalsIgnoreCase("BIG5") //$NON-NLS-1$
-				|| encoding.equalsIgnoreCase("GBK"))) { //$NON-NLS-1$
+				if (!parserKnowsUnicode
+						&& (encoding.equalsIgnoreCase("SJIS") || encoding.equalsIgnoreCase("BIG5") || encoding
+								.equalsIgnoreCase("GBK"))) {
 
 					if (!encoding.equalsIgnoreCase(serverEncoding)) {
-						b = escapeEasternUnicodeByteStream(b, s, 0, s.length());
+						b = escapeEasternUnicodeByteStream(b, s);
 					}
 				}
 			}
 
 			return b;
 		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.5") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.6"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.5") + encoding + Messages.getString("StringUtils.6"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
 		}
 	}
 
 	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param s
-	 *            DOCUMENT ME!
-	 * @param converter
-	 *            DOCUMENT ME!
-	 * @param encoding
-	 *            DOCUMENT ME!
-	 * @param serverEncoding
-	 *            DOCUMENT ME!
-	 * @param offset
-	 *            DOCUMENT ME!
-	 * @param length
-	 *            DOCUMENT ME!
-	 * @param parserKnowsUnicode
-	 *            DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws SQLException
-	 *             DOCUMENT ME!
+	 * Returns the byte[] representation of a substring of the given string (re)using the given charset converter, and
+	 * the given encoding.
 	 */
-	public static final byte[] getBytes(String s,
-			SingleByteCharsetConverter converter, String encoding,
-			String serverEncoding, int offset, int length,
-			boolean parserKnowsUnicode) throws SQLException {
+	public static byte[] getBytes(String s, SingleByteCharsetConverter converter, String encoding,
+			String serverEncoding, int offset, int length, boolean parserKnowsUnicode,
+			ExceptionInterceptor exceptionInterceptor) throws SQLException {
 		try {
-			byte[] b = null;
+			byte[] b;
 
 			if (converter != null) {
 				b = converter.toBytes(s, offset, length);
 			} else if (encoding == null) {
-				byte[] temp = s.substring(offset, offset + length).getBytes();
-
-				length = temp.length;
-				
-				b = new byte[length];
-				System.arraycopy(temp, 0, b, 0, length);
+				b = getBytes(s, offset, length);
 			} else {
+				s = s.substring(offset, offset + length);
+				b = getBytes(s, encoding);
 
-				byte[] temp = s.substring(offset, offset + length)
-					.getBytes(encoding);
-
-				length = temp.length;
-				
-				b = new byte[length];
-				System.arraycopy(temp, 0, b, 0, length);
-
-				if (!parserKnowsUnicode && (encoding.equalsIgnoreCase("SJIS") //$NON-NLS-1$
-						|| encoding.equalsIgnoreCase("BIG5") //$NON-NLS-1$
-				|| encoding.equalsIgnoreCase("GBK"))) { //$NON-NLS-1$
+				if (!parserKnowsUnicode
+						&& (encoding.equalsIgnoreCase("SJIS") || encoding.equalsIgnoreCase("BIG5") || encoding
+								.equalsIgnoreCase("GBK"))) {
 
 					if (!encoding.equalsIgnoreCase(serverEncoding)) {
-						b = escapeEasternUnicodeByteStream(b, s, offset, length);
+						b = escapeEasternUnicodeByteStream(b, s);
 					}
 				}
 			}
 
 			return b;
 		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.10") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.11"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.5") + encoding + Messages.getString("StringUtils.6"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
 		}
 	}
 
 	/**
-	 * Returns the byte[] representation of the given string using given
+	 * Returns the byte[] representation of the given string (re)using a cached charset converter, and the given
 	 * encoding.
-	 * 
-	 * @param s
-	 *            the string to convert
-	 * @param encoding
-	 *            the character encoding to use
-	 * @param parserKnowsUnicode
-	 *            DOCUMENT ME!
-	 * 
-	 * @return byte[] representation of the string
-	 * 
-	 * @throws SQLException
-	 *             if an encoding unsupported by the JVM is supplied.
 	 */
-	public static final byte[] getBytes(String s, String encoding,
-			String serverEncoding, boolean parserKnowsUnicode, Connection conn)
+	public static byte[] getBytes(String s, String encoding, String serverEncoding, boolean parserKnowsUnicode,
+			MySQLConnection conn, ExceptionInterceptor exceptionInterceptor) throws SQLException {
+		try {
+			SingleByteCharsetConverter converter = conn != null ? conn.getCharsetConverter(encoding)
+					: SingleByteCharsetConverter.getInstance(encoding, null);
+
+			return getBytes(s, converter, encoding, serverEncoding, parserKnowsUnicode, exceptionInterceptor);
+		} catch (UnsupportedEncodingException uee) {
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.5") + encoding + Messages.getString("StringUtils.6"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+		}
+	}
+
+	/**
+	 * Returns the byte[] representation of a substring of the given string (re)using a cached charset converter, and
+	 * the given encoding.
+	 */
+	public static final byte[] getBytes(String s, String encoding, String serverEncoding, int offset, int length,
+			boolean parserKnowsUnicode, MySQLConnection conn, ExceptionInterceptor exceptionInterceptor)
 			throws SQLException {
 		try {
-			SingleByteCharsetConverter converter = null;
-			
-			if (conn != null) {
-				converter = conn.getCharsetConverter(encoding);
+			SingleByteCharsetConverter converter = conn != null ? conn.getCharsetConverter(encoding)
+					: SingleByteCharsetConverter.getInstance(encoding, null);
+
+			return getBytes(s, converter, encoding, serverEncoding, offset, length, parserKnowsUnicode,
+					exceptionInterceptor);
+		} catch (UnsupportedEncodingException uee) {
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.5") + encoding + Messages.getString("StringUtils.6"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+		}
+	}
+
+	/**
+	 * Returns the byte[] representation of the given string properly wrapped between the given char delimiters,
+	 * (re)using the given charset converter, and the given encoding.
+	 */
+	public static byte[] getBytesWrapped(String s, char beginWrap, char endWrap, SingleByteCharsetConverter converter,
+			String encoding, String serverEncoding, boolean parserKnowsUnicode,
+			ExceptionInterceptor exceptionInterceptor) throws SQLException {
+		try {
+			byte[] b;
+
+			if (converter != null) {
+				b = converter.toBytesWrapped(s, beginWrap, endWrap);
+			} else if (encoding == null) {
+				StringBuilder strBuilder = new StringBuilder(s.length() + 2);
+				strBuilder.append(beginWrap);
+				strBuilder.append(s);
+				strBuilder.append(endWrap);
+
+				b = getBytes(strBuilder.toString());
 			} else {
-				converter = SingleByteCharsetConverter.getInstance(encoding, null);
+				StringBuilder strBuilder = new StringBuilder(s.length() + 2);
+				strBuilder.append(beginWrap);
+				strBuilder.append(s);
+				strBuilder.append(endWrap);
+
+				s = strBuilder.toString();
+				b = getBytes(s, encoding);
+
+				if (!parserKnowsUnicode
+						&& (encoding.equalsIgnoreCase("SJIS") || encoding.equalsIgnoreCase("BIG5") || encoding
+								.equalsIgnoreCase("GBK"))) {
+
+					if (!encoding.equalsIgnoreCase(serverEncoding)) {
+						b = escapeEasternUnicodeByteStream(b, s);
+					}
+				}
 			}
 
-			return getBytes(s, converter, encoding, serverEncoding,
-					parserKnowsUnicode);
+			return b;
 		} catch (UnsupportedEncodingException uee) {
-			throw SQLError.createSQLException(Messages.getString("StringUtils.0") //$NON-NLS-1$
-					+ encoding + Messages.getString("StringUtils.1"),
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+			throw SQLError.createSQLException(
+					Messages.getString("StringUtils.10") + encoding + Messages.getString("StringUtils.11"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
 		}
+	}
+
+	public static int getInt(byte[] buf) throws NumberFormatException {
+		return getInt(buf, 0, buf.length);
 	}
 
 	public static int getInt(byte[] buf, int offset, int endPos) throws NumberFormatException {
@@ -632,12 +674,12 @@ public class StringUtils {
 		int s = offset;
 
 		/* Skip white space. */
-		while (Character.isWhitespace((char) buf[s]) && (s < endPos)) {
+		while (s < endPos && Character.isWhitespace((char) buf[s])) {
 			++s;
 		}
 
 		if (s == endPos) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Check for a sign. */
@@ -689,33 +731,33 @@ public class StringUtils {
 		}
 
 		if (s == save) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		if (overflow) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Return the result of the appropriate sign. */
 		return (negative ? (-i) : i);
 	}
 	
-	public static int getInt(byte[] buf) throws NumberFormatException {
-		return getInt(buf, 0, buf.length);
-	}
-
 	public static long getLong(byte[] buf) throws NumberFormatException {
+		return getLong(buf, 0, buf.length);
+	}
+	
+	public static long getLong(byte[] buf, int offset, int endpos) throws NumberFormatException {
 		int base = 10;
 
-		int s = 0;
+		int s = offset;
 
 		/* Skip white space. */
-		while (Character.isWhitespace((char) buf[s]) && (s < buf.length)) {
+		while (s < endpos && Character.isWhitespace((char) buf[s])) {
 			++s;
 		}
 
-		if (s == buf.length) {
-			throw new NumberFormatException(new String(buf));
+		if (s == endpos) {
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Check for a sign. */
@@ -741,7 +783,7 @@ public class StringUtils {
 		boolean overflow = false;
 		long i = 0;
 
-		for (; s < buf.length; s++) {
+		for (; s < endpos; s++) {
 			char c = (char) buf[s];
 
 			if (Character.isDigit(c)) {
@@ -766,11 +808,11 @@ public class StringUtils {
 		}
 
 		if (s == save) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		if (overflow) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Return the result of the appropriate sign. */
@@ -778,17 +820,21 @@ public class StringUtils {
 	}
 
 	public static short getShort(byte[] buf) throws NumberFormatException {
+		return getShort(buf, 0, buf.length);
+	}
+	
+	public static short getShort(byte[] buf, int offset, int endpos) throws NumberFormatException {
 		short base = 10;
 
-		int s = 0;
+		int s = offset;
 
 		/* Skip white space. */
-		while (Character.isWhitespace((char) buf[s]) && (s < buf.length)) {
+		while (s < endpos && Character.isWhitespace((char) buf[s])) {
 			++s;
 		}
 
-		if (s == buf.length) {
-			throw new NumberFormatException(new String(buf));
+		if (s == endpos) {
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Check for a sign. */
@@ -814,7 +860,7 @@ public class StringUtils {
 		boolean overflow = false;
 		short i = 0;
 
-		for (; s < buf.length; s++) {
+		for (; s < endpos; s++) {
 			char c = (char) buf[s];
 
 			if (Character.isDigit(c)) {
@@ -839,11 +885,11 @@ public class StringUtils {
 		}
 
 		if (s == save) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		if (overflow) {
-			throw new NumberFormatException(new String(buf));
+			throw new NumberFormatException(StringUtils.toString(buf));
 		}
 
 		/* Return the result of the appropriate sign. */
@@ -861,8 +907,6 @@ public class StringUtils {
 		int stringLength = searchIn.length();
 		int stopSearchingAt = stringLength - patternLength;
 
-		int i = startingPosition;
-
 		if (patternLength == 0) {
 			return -1;
 		}
@@ -872,49 +916,38 @@ public class StringUtils {
 		char firstCharOfPatternUc = Character.toUpperCase(searchFor.charAt(0));
 		char firstCharOfPatternLc = Character.toLowerCase(searchFor.charAt(0));
 
-		lookForFirstChar: while (true) {
-			while ((i < stopSearchingAt)
-					&& (Character.toUpperCase(searchIn.charAt(i)) != firstCharOfPatternUc)
-					&& Character.toLowerCase(searchIn.charAt(i)) != firstCharOfPatternLc) {
-				i++;
-			}
+		// note, this also catches the case where patternLength > stringLength
+        for (int i = startingPosition; i <= stopSearchingAt; i++) {
+            if (isNotEqualIgnoreCharCase(searchIn, firstCharOfPatternUc,
+					firstCharOfPatternLc, i)) {
+            	// find the first occurrence of the first character of searchFor in searchIn
+                while (++i <= stopSearchingAt && (isNotEqualIgnoreCharCase(searchIn, firstCharOfPatternUc,
+						firstCharOfPatternLc, i)));
+            }
 
-			if (i > stopSearchingAt) {
-				return -1;
-			}
+            if (i <= stopSearchingAt /* searchFor might be one character long! */) {
+            	// walk searchIn and searchFor in lock-step starting just past the first match,bail out if not 
+            	// a match, or we've hit the end of searchFor...
+                int j = i + 1;
+                int end = j + patternLength - 1;
+                for (int k = 1; j < end && (Character.toLowerCase(searchIn.charAt(j)) == 
+                	Character.toLowerCase(searchFor.charAt(k)) || Character.toUpperCase(searchIn.charAt(j)) == 
+                    	Character.toUpperCase(searchFor.charAt(k))); j++, k++);
 
-			int j = i + 1;
-			int end = (j + patternLength) - 1;
-
-			int k = 1; // start at second char of pattern
-
-			while (j < end) {
-				int searchInPos = j++;
-				int searchForPos = k++;
-
-				if (Character.toUpperCase(searchIn.charAt(searchInPos)) != Character
-						.toUpperCase(searchFor.charAt(searchForPos))) {
-					i++;
-
-					// start over
-					continue lookForFirstChar;
-				}
-
-				// Georgian and Turkish locales don't have same convention, so
-				// need to check lowercase
-				// too!
-				if (Character.toLowerCase(searchIn.charAt(searchInPos)) != Character
-						.toLowerCase(searchFor.charAt(searchForPos))) {
-					i++;
-
-					// start over
-					continue lookForFirstChar;
-				}
-			}
-
-			return i; // found entire pattern
-		}
+                if (j == end) {
+                    return i;
+                }
+            }
+        }
+        
+        return -1;
 	}
+
+	private final static boolean isNotEqualIgnoreCharCase(String searchIn,
+			char firstCharOfPatternUc, char firstCharOfPatternLc, int i) {
+		return Character.toLowerCase(searchIn.charAt(i)) != firstCharOfPatternLc && Character.toUpperCase(searchIn.charAt(i)) != firstCharOfPatternUc;
+	}
+	
 
 	/**
 	 * DOCUMENT ME!
@@ -935,7 +968,7 @@ public class StringUtils {
 			boolean allowBackslashEscapes) {
 		char contextMarker = Character.MIN_VALUE;
 		boolean escaped = false;
-		int markerTypeFound = -1;
+		int markerTypeFound = 0;
 		int srcLength = src.length();
 		int ind = 0;
 
@@ -944,16 +977,16 @@ public class StringUtils {
 
 			if (allowBackslashEscapes && c == '\\') {
 				escaped = !escaped;
-			} else if (markerTypeFound != -1 && c == markerCloses.charAt(markerTypeFound) && !escaped) {
+			} else if (contextMarker != Character.MIN_VALUE && c == markerCloses.charAt(markerTypeFound) && !escaped) {
 				contextMarker = Character.MIN_VALUE;
-				markerTypeFound = -1;
 			} else if ((ind = marker.indexOf(c)) != -1 && !escaped
 					&& contextMarker == Character.MIN_VALUE) {
 				markerTypeFound = ind;
 				contextMarker = c;
-			} else if (c == target.charAt(0) && !escaped
+			} else if ((Character.toUpperCase(c) == Character.toUpperCase(target.charAt(0)) ||
+					Character.toLowerCase(c) == Character.toLowerCase(target.charAt(0))) && !escaped
 					&& contextMarker == Character.MIN_VALUE) {
-				if (indexOfIgnoreCase(i, src, target) != -1)
+				if (startsWithIgnoreCase(src, i, target))
 					return i;
 			}
 		}
@@ -1008,10 +1041,10 @@ public class StringUtils {
 	 * @throws IllegalArgumentException
 	 *             DOCUMENT ME!
 	 */
-	public static final List split(String stringToSplit, String delimitter,
+	public static final List<String> split(String stringToSplit, String delimitter,
 			boolean trim) {
 		if (stringToSplit == null) {
-			return new ArrayList();
+			return new ArrayList<String>();
 		}
 
 		if (delimitter == null) {
@@ -1021,7 +1054,7 @@ public class StringUtils {
 		StringTokenizer tokenizer = new StringTokenizer(stringToSplit,
 				delimitter, false);
 
-		List splitTokens = new ArrayList(tokenizer.countTokens());
+		List<String> splitTokens = new ArrayList<String>(tokenizer.countTokens());
 
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
@@ -1051,10 +1084,10 @@ public class StringUtils {
 	 * @throws IllegalArgumentException
 	 *             DOCUMENT ME!
 	 */
-	public static final List split(String stringToSplit, String delimiter,
+	public static final List<String> split(String stringToSplit, String delimiter,
 			String markers, String markerCloses, boolean trim) {
 		if (stringToSplit == null) {
-			return new ArrayList();
+			return new ArrayList<String>();
 		}
 
 		if (delimiter == null) {
@@ -1064,7 +1097,7 @@ public class StringUtils {
 		int delimPos = 0;
 		int currentPos = 0;
 
-		List splitTokens = new ArrayList();
+		List<String> splitTokens = new ArrayList<String>();
 
 		while ((delimPos = indexOfIgnoreCaseRespectMarker(currentPos,
 				stringToSplit, delimiter, markers, markerCloses, false)) != -1) {
@@ -1136,7 +1169,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * Determines whether or not the sting 'searchIn' contains the string
+	 * Determines whether or not the string 'searchIn' contains the string
 	 * 'searchFor', disregarding case,leading whitespace and non-alphanumeric
 	 * characters.
 	 * 
@@ -1169,7 +1202,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * Determines whether or not the sting 'searchIn' contains the string
+	 * Determines whether or not the string 'searchIn' contains the string
 	 * 'searchFor', disregarding case and leading whitespace
 	 * 
 	 * @param searchIn
@@ -1185,7 +1218,7 @@ public class StringUtils {
 	}
 	
 	/**
-	 * Determines whether or not the sting 'searchIn' contains the string
+	 * Determines whether or not the string 'searchIn' contains the string
 	 * 'searchFor', disregarding case and leading whitespace
 	 * 
 	 * @param searchIn
@@ -1215,6 +1248,26 @@ public class StringUtils {
 		return startsWithIgnoreCase(searchIn, beginPos, searchFor);
 	}
 
+	/**
+	 * Determines whether or not the string 'searchIn' starts with one of the strings in 'searchFor', disregarding case
+	 * and leading whitespace
+	 * 
+	 * @param searchIn
+	 *            the string to search in
+	 * @param searchFor
+	 *            the string array to search for
+	 * 
+	 * @return the 'searchFor' array index that matched or -1 if none matches
+	 */
+	public static int startsWithIgnoreCaseAndWs(String searchIn, String[] searchFor) {
+		for (int i = 0; i < searchFor.length; i++) {
+			if (startsWithIgnoreCaseAndWs(searchIn, searchFor[i], 0)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	/**
 	 * @param bytesToStrip
 	 * @param prefix
@@ -1431,7 +1484,7 @@ public class StringUtils {
 				: WILD_COMPARE_MATCH_NO_WILD);
 	}
 	
-	static byte[] s2b(String s, Connection conn) throws SQLException {
+	static byte[] s2b(String s, MySQLConnection conn) throws SQLException {
 		if (s == null) {
 			return null;
 		}
@@ -1459,7 +1512,7 @@ public class StringUtils {
 
 		return s.getBytes();
 	}
-
+	
 	public static int lastIndexOf(byte[] s, char c) {
 		if (s == null) {
 			return -1;
@@ -1490,6 +1543,10 @@ public class StringUtils {
 		return -1;
 	}
 	
+	public static boolean isNullOrEmpty(String toTest) {
+		return (toTest == null || toTest.length() == 0);
+	}
+	
 	/**
 	 * Returns the given string, with comments removed
 	 * 
@@ -1518,7 +1575,7 @@ public class StringUtils {
 			return null;
 		}
 
-		StringBuffer buf = new StringBuffer(src.length());
+		StringBuilder strBuilder = new StringBuilder(src.length());
 
 		// It's just more natural to deal with this as a stream
 		// when parsing..This code is currently only called when
@@ -1592,10 +1649,10 @@ public class StringUtils {
 					currentChar = sourceReader.read();
 
 					if (currentChar == -1 || currentChar != '-') {
-						buf.append('-');
+						strBuilder.append('-');
 
 						if (currentChar != -1) {
-							buf.append(currentChar);
+							strBuilder.append(currentChar);
 						}
 
 						continue;
@@ -1609,13 +1666,468 @@ public class StringUtils {
 				}
 
 				if (currentChar != -1) {
-					buf.append((char) currentChar);
+					strBuilder.append((char) currentChar);
 				}
 			}
 		} catch (IOException ioEx) {
 			// we'll never see this from a StringReader
 		}
 
-		return buf.toString();
+		return strBuilder.toString();
 	}
+	
+	/**
+	 * Next two functions are to help DBMD check if 
+	 * the given string is in form of database.name and return it 
+	 * as "database";"name" with comments removed.
+	 * If string is NULL or wildcard (%), returns null and exits.
+	 * 
+	 * First, we sanitize...
+	 * 
+	 * @param src
+	 *            the source string
+	 * @return the input string with all comment-delimited data removed
+	 */
+	public static String sanitizeProcOrFuncName(String src) {
+		if ((src == null) || (src.equals("%"))) {
+			return null;
+		}
+			
+		return src;
+	}
+
+	/**
+	 * Next we check if there is anything to split. If so 
+	 * we return result in form of "database";"name"
+	 * If string is NULL or wildcard (%), returns null and exits.
+	 * 
+	 * @param src
+	 *            the source string
+	 * @param cat
+	 *            Catalog, if available
+	 * @param quotId
+	 *            quoteId as defined on server
+	 * @param isNoBslashEscSet
+	 *            Is our connection in BackSlashEscape mode
+	 * @return the input string with all comment-delimited data removed
+	 */
+	public static List<String> splitDBdotName(String src, String cat, String quotId,
+			boolean isNoBslashEscSet) {
+		if ((src == null) || (src.equals("%"))) {
+			return new ArrayList<String>();
+		}
+		
+		boolean isQuoted = StringUtils.indexOfIgnoreCase(0,src, quotId) > -1;
+		
+		
+		String retval = src;
+		String tmpCat = cat;
+		//I.e., what if database is named `MyDatabase 1.0.0`... thus trueDotIndex
+		int trueDotIndex = -1;
+		if (!" ".equals(quotId)) {
+			//Presumably, if there is a database name attached and it contains dots, then it should
+			//be quoted so we first check for that
+			if (isQuoted) {
+				trueDotIndex = StringUtils.indexOfIgnoreCase(0,
+					retval, quotId + "." + quotId);
+			} else {
+				//NOT quoted, fetch first DOT
+				// ex: cStmt = this.conn.prepareCall("{call bug57022.procbug57022(?, ?)}");
+				trueDotIndex = StringUtils.indexOfIgnoreCase(0,
+						retval, ".");
+			}
+		} else {
+			trueDotIndex = retval.indexOf(".");
+		}
+
+		List<String> retTokens = new ArrayList<String>(2);
+
+		if (trueDotIndex != -1) {
+			//There is a catalog attached
+			if (isQuoted) {
+				tmpCat = StringUtils.toString(StringUtils.stripEnclosure(retval.substring(0, trueDotIndex+1)
+						.getBytes(), quotId, quotId));
+				if (StringUtils.startsWithIgnoreCaseAndWs(tmpCat, quotId)) {
+					tmpCat = tmpCat.substring(1, tmpCat.length() - 1);
+				}
+
+				retval = retval.substring(trueDotIndex + 2);
+				retval = StringUtils.toString(StringUtils.stripEnclosure(retval
+						.getBytes(), quotId, quotId));
+			} else {
+				//NOT quoted, adjust indexOf
+				tmpCat = retval.substring(0, trueDotIndex);
+				retval = retval.substring(trueDotIndex + 1);
+			}
+		} else {
+			//No catalog attached, strip retval and return
+			retval = StringUtils.toString(StringUtils.stripEnclosure(retval
+				.getBytes(), quotId, quotId));
+		}
+		
+		retTokens.add(tmpCat);
+		retTokens.add(retval);
+		return retTokens;
+	}
+	
+	public static final boolean isEmptyOrWhitespaceOnly(String str) {
+		if (str == null || str.length() == 0) {
+			return true;
+		}
+		
+		int length = str.length();
+		
+		for (int i = 0; i < length; i++) {
+			if (!Character.isWhitespace(str.charAt(i))) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public static String escapeQuote(String src, String quotChar) {
+		if (src == null) {
+			return null;
+		}
+
+		src = StringUtils.toString(stripEnclosure(src.getBytes(), quotChar, quotChar));
+
+		int lastNdx = src.indexOf(quotChar);
+		String tmpSrc;
+		String tmpRest;
+
+		tmpSrc = src.substring(0, lastNdx);
+		tmpSrc = tmpSrc + quotChar + quotChar;
+		
+		tmpRest = src.substring(lastNdx+1, src.length());
+		
+		lastNdx = tmpRest.indexOf(quotChar);
+		while (lastNdx > -1) {
+			
+			tmpSrc = tmpSrc + tmpRest.substring(0, lastNdx);
+			tmpSrc = tmpSrc + quotChar + quotChar;
+			tmpRest = tmpRest.substring(lastNdx+1, tmpRest.length());
+			
+			lastNdx = tmpRest.indexOf(quotChar);
+		}
+		
+		tmpSrc = tmpSrc + tmpRest;
+		src = tmpSrc;
+
+		return src;
+	}
+	
+	/**
+	 * Surrounds identifier with quoteChar and duplicates these symbols inside the identifier.
+     * 
+	 * @param quoteChar ` or "
+	 * @param identifier in pedantic mode (connection property pedantic=true) identifier is treated as unquoted
+	 *        (as it is stored in the database) even if it starts and ends with quoteChar;
+	 *        in non-pedantic mode if identifier starts and ends with quoteChar method treats it as already quoted and doesn't modify.
+	 * @param isPedantic are we in pedantic mode
+	 * 
+	 * @return
+	 * With quoteChar="`":<br>
+	 * <li>null -> null</li>
+	 * <li>abc -> `abc`</li>
+	 * <li>ab`c -> `ab``c`</li>
+	 * <li>ab"c -> `ab"c`</li>
+	 * <li>`ab``c` -> `ab``c` in non-pedantic mode or ```ab````c``` in pedantic mode</li>
+	 * With quoteChar="\"":<br>
+	 * <li>null -> null</li>
+	 * <li>abc -> "abc"</li>
+	 * <li>ab`c -> "ab`c"</li>
+	 * <li>ab"c -> "ab""c"</li>
+	 * <li>"ab""c" -> "ab""c" in non-pedantic mode or """ab""""c""" in pedantic mode</li>
+	 */
+	public static String quoteIdentifier(String identifier, String quoteChar, boolean isPedantic) {
+		if (identifier == null) {
+			return null;
+		}
+
+		if (!isPedantic && identifier.startsWith(quoteChar) && identifier.endsWith(quoteChar)) {
+			return identifier;
+		}
+
+		return quoteChar + identifier.replaceAll(quoteChar, quoteChar+quoteChar) + quoteChar;
+	}
+
+	/**
+	 * Surrounds identifier with "`" and duplicates these symbols inside the identifier.
+     * 
+	 * @param identifier in pedantic mode (connection property pedantic=true) identifier is treated as unquoted
+	 *        (as it is stored in the database) even if it starts and ends with "`";
+	 *        in non-pedantic mode if identifier starts and ends with "`" method treats it as already quoted and doesn't modify.
+	 * @param isPedantic are we in pedantic mode
+	 * 
+	 * @return
+	 * <li>null -> null</li>
+	 * <li>abc -> `abc`</li>
+	 * <li>ab`c -> `ab``c`</li>
+	 * <li>ab"c -> `ab"c`</li>
+	 * <li>`ab``c` -> `ab``c` in non-pedantic mode or ```ab````c``` in pedantic mode</li>
+	 */
+	public static String quoteIdentifier(String identifier, boolean isPedantic) {
+		return quoteIdentifier(identifier, "`", isPedantic);
+	}
+
+	/**
+	 * Trims identifier, removes quote chars from first and last positions
+	 * and replaces double occurrences of quote char from entire identifier,
+	 * i.e converts quoted identifier into form as it is stored in database.
+	 * 
+	 * @param identifier
+	 * @param useAnsiQuotedIdentifiers should we check for " quotes too.
+	 * @return
+	 * <li>null -> null</li>
+	 * <li>abc -> abc</li>
+	 * <li>`abc` -> abc</li>
+	 * <li>`ab``c` -> ab`c</li>
+	 * <li>`"ab`c"` -> "ab`c"</li>
+	 * <li>`ab"c` -> ab"c</li>
+	 * <li>"abc" -> abc</li>
+	 * <li>"`ab""c`" -> `ab"c`</li>
+	 * <li>"ab`c" -> ab`c</li>
+	 */
+	public static String unQuoteIdentifier(String identifier, boolean useAnsiQuotedIdentifiers) {
+		if (identifier == null) {
+			return null;
+		}
+		
+		identifier = identifier.trim();
+		
+		String quoteChar = null;
+		
+		// Backquotes are always valid identifier quotes
+		if (identifier.startsWith("`") && identifier.endsWith("`")) {
+			quoteChar = "`";
+		}
+		
+		if (quoteChar== null && useAnsiQuotedIdentifiers) {
+			if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
+				quoteChar = "\"";
+			}
+		}
+		
+		if (quoteChar !=  null) {
+			identifier = identifier.substring(1, (identifier.length() - 1));
+			return identifier.replaceAll(quoteChar+quoteChar, quoteChar);
+		}
+		
+		return identifier;
+	}
+
+	public static int indexOfQuoteDoubleAware(String line, String quoteChar, int startFrom) {
+		int lastIndex = line.length() -1;
+		
+		int beginPos = startFrom;
+		int pos = -1;
+
+		boolean next = true;
+		while (next) {
+			pos = line.indexOf(quoteChar, beginPos);
+			if (pos == -1 || pos == lastIndex || !line.substring(pos+1).startsWith(quoteChar)) {
+				next = false;
+			} else {
+				beginPos = pos + 2;
+			}
+		}
+		
+		return pos;
+	}
+
+	// The following methods all exist because of the Java bug
+	//
+	// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6790402
+	// 
+	// which has been observed by users and reported as MySQL Bug#61105
+	//
+	// We can turn around and replace them with their java.lang.String
+	// equivalents if/when that bug is ever fixed.
+	
+	public static String toString(byte[] value, int offset, int length,
+			String encoding) throws UnsupportedEncodingException {
+		Charset cs = findCharset(encoding);
+
+		return cs.decode(ByteBuffer.wrap(value, offset, length)).toString();
+	}
+
+	public static String toString(byte[] value, String encoding)
+			throws UnsupportedEncodingException {
+		Charset cs = findCharset(encoding);
+
+		return cs.decode(ByteBuffer.wrap(value)).toString();
+	}
+
+	public static String toString(byte[] value, int offset, int length) {
+		try {
+			Charset cs = findCharset(platformEncoding);
+			
+			return cs.decode(ByteBuffer.wrap(value, offset, length)).toString();
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+		
+		return null;
+	}
+
+	public static String toString(byte[] value) {
+		try {
+			Charset cs = findCharset(platformEncoding);
+			
+			return cs.decode(ByteBuffer.wrap(value)).toString();
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+		
+		return null;
+	}
+
+	public static byte[] getBytes(char[] value) {
+		try {
+			return getBytes(value, 0, value.length, platformEncoding);
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+
+		return null;
+	}
+
+	public static byte[] getBytes(char[] value, int offset, int length) {
+		try {
+			return getBytes(value, offset, length, platformEncoding);
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+
+		return null;
+	}
+
+	public static byte[] getBytes(char[] value, String encoding) throws UnsupportedEncodingException {
+		return getBytes(value, 0, value.length, encoding);
+	}
+
+	public static byte[] getBytes(char[] value, int offset, int length, String encoding)
+			throws UnsupportedEncodingException {
+		Charset cs = findCharset(encoding);
+
+		ByteBuffer buf = cs.encode(CharBuffer.wrap(value, offset, length));
+
+		// can't simply .array() this to get the bytes
+		// especially with variable-length charsets the
+		// buffer is sometimes larger than the actual encoded data
+		int encodedLen = buf.limit();
+		byte[] asBytes = new byte[encodedLen];
+		buf.get(asBytes, 0, encodedLen);
+
+		return asBytes;
+	}
+
+	public static byte[] getBytes(String value) {
+		try {
+			return getBytes(value, 0, value.length(), platformEncoding);
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+
+		return null;
+	}
+
+	public static byte[] getBytes(String value, int offset, int length) {
+		try {
+			return getBytes(value, offset, length, platformEncoding);
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+
+		return null;
+	}
+
+	public static byte[] getBytes(String value, String encoding) throws UnsupportedEncodingException {
+		return getBytes(value, 0, value.length(), encoding);
+	}
+
+	public static byte[] getBytes(String value, int offset, int length, String encoding)
+			throws UnsupportedEncodingException {
+		// Some CharsetEncoders (e.g. CP942, CP943, CP948, CP950, CP1381, CP1383, x-COMPOUND_TEXT or ISO-2022-JP) can't
+		// handle correctly when encoding directly from its methods while calling the encoder from String object works
+		// just fine. Most of these problems occur only in Java 1.5.
+		// CharsetEncoder#encode() may be used in Java 1.6+ but only the method that receives a char[] as argument as
+		// the one that receives a String argument doesn't always behaves correctly.
+		if (!Util.isJdbc4()) {
+			if (offset != 0 || length != value.length()) {
+				return value.substring(offset, offset + length).getBytes(encoding);
+			}
+			return value.getBytes(encoding);
+		}
+		
+		Charset cs = findCharset(encoding);
+
+		ByteBuffer buf = cs.encode(CharBuffer.wrap(value.toCharArray(), offset, offset + length));
+
+		// can't simply .array() this to get the bytes
+		// especially with variable-length charsets the
+		// buffer is sometimes larger than the actual encoded data
+		int encodedLen = buf.limit();
+		byte[] asBytes = new byte[encodedLen];
+		buf.get(asBytes, 0, encodedLen);
+
+		return asBytes;
+	}
+	
+	public static final boolean isValidIdChar(char c) {
+		return VALID_ID_CHARS.indexOf(c) != -1;
+	}
+
+	private static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
+			'e', 'f' };
+
+	public static void appendAsHex(StringBuilder builder, byte[] bytes) {
+		builder.append("0x");
+		for (byte b : bytes) {
+			builder.append(HEX_DIGITS[(b >>> 4) & 0xF]).append(HEX_DIGITS[b & 0xF]);
+		}
+	}
+
+	public static void appendAsHex(StringBuilder builder, int value) {
+		if (value == 0) {
+			builder.append("0x0");
+			return;
+		}
+
+		int shift = 32;
+		byte nibble;
+		boolean nonZeroFound = false;
+
+		builder.append("0x");
+		do {
+			shift -= 4;
+			nibble = (byte) ((value >>> shift) & 0xF);
+			if (nonZeroFound) {
+				builder.append(HEX_DIGITS[nibble]);
+			} else if (nibble != 0) {
+				builder.append(HEX_DIGITS[nibble]);
+				nonZeroFound = true;
+			}
+		} while (shift != 0);
+	}
+
+	public static byte[] getBytesNullTerminated(String value) {
+		try {
+			Charset cs = findCharset(platformEncoding);
+			ByteBuffer buf = cs.encode(value);
+			int encodedLen = buf.limit();
+			byte[] asBytes = new byte[encodedLen+1];
+			buf.get(asBytes, 0, encodedLen);
+			asBytes[encodedLen] = 0;
+			
+			return asBytes;
+		} catch (UnsupportedEncodingException e) {
+			// can't happen, emulating new String(byte[])
+		}
+
+		return null;
+	}
+
 }

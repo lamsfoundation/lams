@@ -1,33 +1,33 @@
 /*
- Copyright (C) 2002-2006 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.sql.SQLException;
 
-import com.mysql.jdbc.profiler.ProfileEventSink;
+import com.mysql.jdbc.exceptions.MySQLQueryInterruptedException;
 import com.mysql.jdbc.profiler.ProfilerEvent;
+import com.mysql.jdbc.profiler.ProfilerEventHandler;
 
 /**
  * Allows streaming of MySQL data.
@@ -36,19 +36,10 @@ import com.mysql.jdbc.profiler.ProfilerEvent;
  * @version $Id$
  */
 public class RowDataDynamic implements RowData {
-	// ~ Instance fields
-	// --------------------------------------------------------
-
-	class OperationNotSupportedException extends SQLException {
-		OperationNotSupportedException() {
-			super(
-					Messages.getString("RowDataDynamic.10"), SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
-		}
-	}
 
 	private int columnCount;
 
-	private Field[] fields;
+	private Field[] metadata;
 
 	private int index = -1;
 
@@ -56,28 +47,33 @@ public class RowDataDynamic implements RowData {
 
 	private boolean isAfterEnd = false;
 
-	private boolean isAtEnd = false;
+	private boolean noMoreRows = false;
 
 	private boolean isBinaryEncoded = false;
 
-	private Object[] nextRow;
+	private ResultSetRow nextRow;
 
-	private ResultSet owner;
+	private ResultSetImpl owner;
 
 	private boolean streamerClosed = false;
 	
 	private boolean wasEmpty = false; // we don't know until we attempt to traverse
 
-	// ~ Methods
-	// ----------------------------------------------------------------
+	private boolean useBufferRowExplicit;
 
+	private boolean moreResultsExisted;
+
+	private ExceptionInterceptor exceptionInterceptor;
+
+	private boolean isInterrupted = false;
+	
 	/**
 	 * Creates a new RowDataDynamic object.
 	 * 
 	 * @param io
 	 *            the connection to MySQL that this data is coming from
-	 * @param fields
-	 *            the fields that describe this data
+	 * @param metadata
+	 *            the metadata that describe this data
 	 * @param isBinaryEncoded
 	 *            is this data in native format?
 	 * @param colCount
@@ -90,8 +86,9 @@ public class RowDataDynamic implements RowData {
 		this.io = io;
 		this.columnCount = colCount;
 		this.isBinaryEncoded = isBinaryEncoded;
-		this.fields = fields;
-		nextRecord();
+		this.metadata = fields;
+		this.exceptionInterceptor = this.io.getExceptionInterceptor();
+		this.useBufferRowExplicit = MysqlIO.useBufferRowExplicit(this.metadata);
 	}
 
 	/**
@@ -102,7 +99,7 @@ public class RowDataDynamic implements RowData {
 	 * @throws SQLException
 	 *             if a database error occurs
 	 */
-	public void addRow(byte[][] row) throws SQLException {
+	public void addRow(ResultSetRow row) throws SQLException {
 		notSupported();
 	}
 
@@ -143,61 +140,99 @@ public class RowDataDynamic implements RowData {
 	 *             if a database error occurs
 	 */
 	public void close() throws SQLException {
+		// Belt and suspenders here - if we don't
+		// have a reference to the connection
+		// it's more than likely dead/gone and we
+		// won't be able to consume rows anyway
+
+		Object mutex = this;
+
+		MySQLConnection conn = null;
+
+		if (this.owner != null) {
+			conn = this.owner.connection;
+
+			if (conn != null) {
+				mutex = conn.getConnectionMutex();
+			}
+		}
 
 		boolean hadMore = false;
 		int howMuchMore = 0;
 
-		// drain the rest of the records.
-		while (this.hasNext()) {
-			this.next();
-			hadMore = true;
-			howMuchMore++;
+		synchronized (mutex) {
+			// drain the rest of the records.
+			while (next() != null) {
+				hadMore = true;
+				howMuchMore++;
 
-			if (howMuchMore % 100 == 0) {
-				Thread.yield();
+				if (howMuchMore % 100 == 0) {
+					Thread.yield();
+				}
 			}
-		}
 
-		if (this.owner != null) {
-			Connection conn = this.owner.connection;
+			if (conn != null) {
+				if (!conn.getClobberStreamingResults() && 
+						conn.getNetTimeoutForStreamingResults() > 0) {
+					String oldValue = conn
+					.getServerVariable("net_write_timeout");
 
-			if (conn != null && conn.getUseUsageAdvisor()) {
-				if (hadMore) {
+					if (oldValue == null || oldValue.length() == 0) {
+						oldValue = "60"; // the current default
+					}
 
-					ProfileEventSink eventSink = ProfileEventSink
-							.getInstance(conn);
+					this.io.clearInputStream();
+					
+					java.sql.Statement stmt = null;
+					
+					try {
+						stmt = conn.createStatement();
+						((com.mysql.jdbc.StatementImpl)stmt).executeSimpleNonQuery(conn, "SET net_write_timeout=" + oldValue);
+					} finally {
+						if (stmt != null) {
+							stmt.close();
+						}
+					}
+				}
+				
+				if (conn.getUseUsageAdvisor()) {
+					if (hadMore) {
 
-					eventSink
-							.consumeEvent(new ProfilerEvent(
-									ProfilerEvent.TYPE_WARN,
-									"", //$NON-NLS-1$
-									this.owner.owningStatement == null ? "N/A" : this.owner.owningStatement.currentCatalog, //$NON-NLS-1$
-									this.owner.connectionId,
-									this.owner.owningStatement == null ? -1
-											: this.owner.owningStatement
-													.getId(),
-									-1,
-									System.currentTimeMillis(),
-									0,
-									Constants.MILLIS_I18N,
-									null,
-									null,
-									Messages.getString("RowDataDynamic.2") //$NON-NLS-1$
-											+ howMuchMore
-											+ Messages
-													.getString("RowDataDynamic.3") //$NON-NLS-1$
-											+ Messages
-													.getString("RowDataDynamic.4") //$NON-NLS-1$
-											+ Messages
-													.getString("RowDataDynamic.5") //$NON-NLS-1$
-											+ Messages
-													.getString("RowDataDynamic.6") //$NON-NLS-1$
-											+ this.owner.pointOfOrigin));
+						ProfilerEventHandler eventSink = ProfilerEventHandlerFactory
+						.getInstance(conn);
+
+						eventSink
+						.consumeEvent(new ProfilerEvent(
+								ProfilerEvent.TYPE_WARN,
+								"", //$NON-NLS-1$
+								this.owner.owningStatement == null ? "N/A" : this.owner.owningStatement.currentCatalog, //$NON-NLS-1$
+								this.owner.connectionId,
+								this.owner.owningStatement == null ? -1
+										: this.owner.owningStatement
+												.getId(),
+								-1,
+								System.currentTimeMillis(),
+								0,
+								Constants.MILLIS_I18N,
+								null,
+								null,
+								Messages.getString("RowDataDynamic.2") //$NON-NLS-1$
+										+ howMuchMore
+										+ Messages
+												.getString("RowDataDynamic.3") //$NON-NLS-1$
+										+ Messages
+												.getString("RowDataDynamic.4") //$NON-NLS-1$
+										+ Messages
+												.getString("RowDataDynamic.5") //$NON-NLS-1$
+										+ Messages
+												.getString("RowDataDynamic.6") //$NON-NLS-1$
+										+ this.owner.pointOfOrigin));
+					}
 				}
 			}
 		}
 
-		this.fields = null;
+		this.metadata = null;
 		this.owner = null;
 	}
 
@@ -210,7 +245,7 @@ public class RowDataDynamic implements RowData {
 	 * @throws SQLException
 	 *             if a database error occurs
 	 */
-	public Object[] getAt(int ind) throws SQLException {
+	public ResultSetRow getAt(int ind) throws SQLException {
 		notSupported();
 
 		return null;
@@ -232,7 +267,7 @@ public class RowDataDynamic implements RowData {
 	/**
 	 * @see com.mysql.jdbc.RowData#getOwner()
 	 */
-	public ResultSet getOwner() {
+	public ResultSetInternalMethods getOwner() {
 		return this.owner;
 	}
 
@@ -346,30 +381,41 @@ public class RowDataDynamic implements RowData {
 	 * @throws SQLException
 	 *             if a database error occurs
 	 */
-	public Object[] next() throws SQLException {
-		if (this.index != Integer.MAX_VALUE) {
-			this.index++;
-		}
+	public ResultSetRow next() throws SQLException {
+		
 
-		Object[] ret = this.nextRow;
 		nextRecord();
 
-		return ret;
+		if (this.nextRow == null && !this.streamerClosed && !this.moreResultsExisted) {
+			this.io.closeStreamer(this);
+			this.streamerClosed = true;
+		}
+		
+		if (this.nextRow != null) {
+			if (this.index != Integer.MAX_VALUE) {
+				this.index++;
+			}
+		}
+		
+		return this.nextRow;
 	}
 
 
 	private void nextRecord() throws SQLException {
 
 		try {
-			if (!this.isAtEnd) {
-
-				this.nextRow = this.io.nextRow(this.fields, this.columnCount,
+			if (!this.noMoreRows) {				
+				this.nextRow = isInterrupted ? null :
+						this.io.nextRow(this.metadata, this.columnCount,
 						this.isBinaryEncoded,
-						java.sql.ResultSet.CONCUR_READ_ONLY);
+						java.sql.ResultSet.CONCUR_READ_ONLY, true, 
+						this.useBufferRowExplicit, true, null);
 
 				if (this.nextRow == null) {
-					this.isAtEnd = true;
-					
+					this.noMoreRows = true;
+					this.isAfterEnd = true;
+					this.moreResultsExisted = this.io.tackOnMoreStreamingResults(this.owner);
+
 					if (this.index == -1) {
 						this.wasEmpty = true;
 					}
@@ -377,12 +423,13 @@ public class RowDataDynamic implements RowData {
 			} else {
 				this.isAfterEnd = true;
 			}
-		} catch (CommunicationsException comEx) {
-			// Give a better error message
-			comEx.setWasStreamingResults();
-			
-			throw comEx;
 		} catch (SQLException sqlEx) {
+			if (sqlEx instanceof StreamingNotifiable) {
+				((StreamingNotifiable)sqlEx).setWasStreamingResults();
+			} else if (sqlEx instanceof MySQLQueryInterruptedException) {
+				this.isInterrupted = true;
+			}
+			
 			// don't wrap SQLExceptions
 			throw sqlEx;
 		} catch (Exception ex) {
@@ -392,10 +439,13 @@ public class RowDataDynamic implements RowData {
 			exceptionMessage += Messages.getString("RowDataDynamic.7"); //$NON-NLS-1$
 			exceptionMessage += Util.stackTraceToString(ex);
 
-			throw new java.sql.SQLException(
+			SQLException sqlEx = SQLError.createSQLException(
 					Messages.getString("RowDataDynamic.8") //$NON-NLS-1$
 							+ exceptionType
-							+ Messages.getString("RowDataDynamic.9") + exceptionMessage, SQLError.SQL_STATE_GENERAL_ERROR); //$NON-NLS-1$
+							+ Messages.getString("RowDataDynamic.9") + exceptionMessage, SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor); //$NON-NLS-1$
+			sqlEx.initCause(ex);
+			
+			throw sqlEx;
 		}
 	}
 
@@ -415,9 +465,6 @@ public class RowDataDynamic implements RowData {
 		notSupported();
 	}
 
-	// ~ Inner Classes
-	// ----------------------------------------------------------
-
 	/**
 	 * Moves the current position in the result set to the given row number.
 	 * 
@@ -431,9 +478,9 @@ public class RowDataDynamic implements RowData {
 	}
 
 	/**
-	 * @see com.mysql.jdbc.RowData#setOwner(com.mysql.jdbc.ResultSet)
+	 * @see com.mysql.jdbc.RowData#setOwner(com.mysql.jdbc.ResultSetInternalMethods)
 	 */
-	public void setOwner(ResultSet rs) {
+	public void setOwner(ResultSetImpl rs) {
 		this.owner = rs;
 	}
 
@@ -449,7 +496,8 @@ public class RowDataDynamic implements RowData {
 	public boolean wasEmpty() {
 		return this.wasEmpty;
 	}
-	
-	
 
+	public void setMetadata(Field[] metadata) {
+		this.metadata = metadata;
+	}
 }

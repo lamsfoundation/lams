@@ -1,33 +1,30 @@
 /*
- Copyright (C) 2002-2005 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.UnsupportedEncodingException;
-
 import java.nio.ByteBuffer;
-
 import java.sql.SQLException;
 
 /**
@@ -36,7 +33,7 @@ import java.sql.SQLException;
  * @version $Id$
  * @author Mark Matthews
  */
-class Buffer {
+public class Buffer {
 	static final int MAX_BYTES_TO_DUMP = 512;
 
 	static final int NO_LENGTH_LIMIT = -1;
@@ -51,7 +48,7 @@ class Buffer {
 
 	protected boolean wasMultiPacket = false;
 
-	Buffer(byte[] buf) {
+	public Buffer(byte[] buf) {
 		this.byteBuffer = buf;
 		setBufLength(buf.length);
 	}
@@ -174,14 +171,24 @@ class Buffer {
 
 		this.position += len;
 
-		return (int) len; // this is safe, as this is only
+		return (int) len;
 	}
 
+	public void fastSkipLenByteArray() {
+		long len = this.readFieldLength();
+
+		if (len == NULL_LENGTH || len == 0) {
+			return;
+		}
+		
+		this.position += len;
+	}
+	
 	protected final byte[] getBufferSource() {
 		return this.byteBuffer;
 	}
 
-	int getBufLength() {
+	public int getBufLength() {
 		return this.bufLength;
 	}
 
@@ -235,6 +242,18 @@ class Buffer {
 	// 2000-06-05 Changed
 	final boolean isLastDataPacket() {
 		return ((getBufLength() < 9) && ((this.byteBuffer[0] & 0xff) == 254));
+	}
+
+	final boolean isAuthMethodSwitchRequestPacket() {
+		return ((this.byteBuffer[0] & 0xff) == 254);
+	}
+
+	final boolean isOKPacket() {
+		return ((this.byteBuffer[0] & 0xff) == 0);
+	}
+
+	final boolean isRawPacket() {
+		return ((this.byteBuffer[0] & 0xff) == 1);
 	}
 
 	final long newReadLength() {
@@ -398,7 +417,7 @@ class Buffer {
 	// To avoid alloc'ing a new byte array, we
 	// do this by hand, rather than calling getNullTerminatedBytes()
 	//
-	final String readString() {
+	public final String readString() {
 		int i = this.position;
 		int len = 0;
 		int maxLen = getBufLength();
@@ -408,13 +427,20 @@ class Buffer {
 			i++;
 		}
 
-		String s = new String(this.byteBuffer, this.position, len);
+		String s = StringUtils.toString(this.byteBuffer, this.position, len);
 		this.position += (len + 1); // update cursor
 
 		return s;
 	}
 
-	final String readString(String encoding) throws SQLException {
+	/**
+	 * Read string[NUL]
+	 * @param encoding
+	 * @param exceptionInterceptor
+	 * @return
+	 * @throws SQLException
+	 */
+	final String readString(String encoding, ExceptionInterceptor exceptionInterceptor) throws SQLException {
 		int i = this.position;
 		int len = 0;
 		int maxLen = getBufLength();
@@ -425,16 +451,35 @@ class Buffer {
 		}
 
 		try {
-			return new String(this.byteBuffer, this.position, len, encoding);
+			return StringUtils.toString(this.byteBuffer, this.position, len, encoding);
 		} catch (UnsupportedEncodingException uEE) {
 			throw SQLError.createSQLException(Messages.getString("ByteArrayBuffer.1") //$NON-NLS-1$
-					+ encoding + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+					+ encoding + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor); //$NON-NLS-1$
 		} finally {
 			this.position += (len + 1); // update cursor
 		}
 	}
 
-	void setBufLength(int bufLengthToSet) {
+	/**
+	 * Read string[$len]
+	 */
+	final String readString(String encoding, ExceptionInterceptor exceptionInterceptor, int expectedLength) throws SQLException {
+		if (this.position + expectedLength > getBufLength()) {
+			throw SQLError.createSQLException(Messages.getString("ByteArrayBuffer.2"),
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+		}
+
+		try {
+			return StringUtils.toString(this.byteBuffer, this.position, expectedLength, encoding);
+		} catch (UnsupportedEncodingException uEE) {
+			throw SQLError.createSQLException(Messages.getString("ByteArrayBuffer.1") //$NON-NLS-1$
+					+ encoding + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor); //$NON-NLS-1$
+		} finally {
+			this.position += expectedLength; // update cursor
+		}
+	}
+
+	public void setBufLength(int bufLengthToSet) {
 		this.bufLength = bufLengthToSet;
 	}
 
@@ -485,14 +530,14 @@ class Buffer {
 		return this.wasMultiPacket;
 	}
 
-	final void writeByte(byte b) throws SQLException {
+	public final void writeByte(byte b) throws SQLException {
 		ensureCapacity(1);
 
 		this.byteBuffer[this.position++] = b;
 	}
 
 	// Write a byte array
-	final void writeBytesNoNull(byte[] bytes) throws SQLException {
+	public final void writeBytesNoNull(byte[] bytes) throws SQLException {
 		int len = bytes.length;
 		ensureCapacity(len);
 		System.arraycopy(bytes, 0, this.byteBuffer, this.position, len);
@@ -564,7 +609,7 @@ class Buffer {
 	// encoding
 	final void writeLenString(String s, String encoding, String serverEncoding,
 			SingleByteCharsetConverter converter, boolean parserKnowsUnicode,
-			Connection conn)
+			MySQLConnection conn)
 			throws UnsupportedEncodingException, SQLException {
 		byte[] b = null;
 
@@ -572,7 +617,7 @@ class Buffer {
 			b = converter.toBytes(s);
 		} else {
 			b = StringUtils.getBytes(s, encoding, serverEncoding,
-					parserKnowsUnicode, conn);
+					parserKnowsUnicode, conn, conn.getExceptionInterceptor());
 		}
 
 		int len = b.length;
@@ -617,14 +662,14 @@ class Buffer {
 
 	// Write null-terminated string
 	final void writeString(String s) throws SQLException {
-		ensureCapacity((s.length() * 2) + 1);
+		ensureCapacity((s.length() * 3) + 1);
 		writeStringNoNull(s);
 		this.byteBuffer[this.position++] = 0;
 	}
 	
 	//	 Write null-terminated string in the given encoding
-	final void writeString(String s, String encoding, Connection conn) throws SQLException {
-		ensureCapacity((s.length() * 2) + 1);
+	final void writeString(String s, String encoding, MySQLConnection conn) throws SQLException {
+		ensureCapacity((s.length() * 3) + 1);
 		try {
 			writeStringNoNull(s, encoding, encoding, false, conn);
 		} catch (UnsupportedEncodingException ue) {
@@ -637,8 +682,8 @@ class Buffer {
 	// Write string, with no termination
 	final void writeStringNoNull(String s) throws SQLException {
 		int len = s.length();
-		ensureCapacity(len * 2);
-		System.arraycopy(s.getBytes(), 0, this.byteBuffer, this.position, len);
+		ensureCapacity(len * 3);
+		System.arraycopy(StringUtils.getBytes(s), 0, this.byteBuffer, this.position, len);
 		this.position += len;
 
 		// for (int i = 0; i < len; i++)
@@ -650,10 +695,10 @@ class Buffer {
 	// Write a String using the specified character
 	// encoding
 	final void writeStringNoNull(String s, String encoding,
-			String serverEncoding, boolean parserKnowsUnicode, Connection conn)
+			String serverEncoding, boolean parserKnowsUnicode, MySQLConnection conn)
 			throws UnsupportedEncodingException, SQLException {
 		byte[] b = StringUtils.getBytes(s, encoding, serverEncoding,
-				parserKnowsUnicode, conn);
+				parserKnowsUnicode, conn, conn.getExceptionInterceptor());
 
 		int len = b.length;
 		ensureCapacity(len);

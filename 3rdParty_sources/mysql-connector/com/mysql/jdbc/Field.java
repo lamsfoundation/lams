@@ -1,32 +1,32 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL
- as it is applied to this software. View the full text of the
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Field is a class used to describe fields in a ResultSet
@@ -52,7 +52,7 @@ public class Field {
 
 	private String collationName = null;
 
-	private Connection connection = null;
+	private MySQLConnection connection = null;
 
 	private String databaseName = null;
 
@@ -61,10 +61,10 @@ public class Field {
 	// database name info
 	private int databaseNameStart = -1;
 
-	private int defaultValueLength = -1;
+	protected int defaultValueLength = -1;
 
 	// default value info - from COM_LIST_FIELDS execution
-	private int defaultValueStart = -1;
+	protected int defaultValueStart = -1;
 
 	private String fullName = null;
 
@@ -111,11 +111,13 @@ public class Field {
 	private boolean isSingleBit;
 
 	private int maxBytesPerChar;
+	
+	private final boolean valueNeedsQuoting;
 
 	/**
 	 * Constructor used when communicating with 4.1 and newer servers
 	 */
-	Field(Connection conn, byte[] buffer, int databaseNameStart,
+	Field(MySQLConnection conn, byte[] buffer, int databaseNameStart,
 			int databaseNameLength, int tableNameStart, int tableNameLength,
 			int originalTableNameStart, int originalTableNameLength,
 			int nameStart, int nameLength, int originalColumnNameStart,
@@ -156,18 +158,22 @@ public class Field {
 
         checkForImplicitTemporaryTable();
 		// Re-map to 'real' blob type, if we're a BLOB
-
+        boolean isFromFunction = this.originalTableNameLength == 0;
+        
 		if (this.mysqlType == MysqlDefs.FIELD_TYPE_BLOB) {
-		    boolean isFromFunction = this.originalTableNameLength == 0;
-
 		    if (this.connection != null && this.connection.getBlobsAreStrings() ||
 		            (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction)) {
 		        this.sqlType = Types.VARCHAR;
 		        this.mysqlType = MysqlDefs.FIELD_TYPE_VARCHAR;
 		    } else if (this.charsetIndex == 63 ||
 					!this.connection.versionMeetsMinimum(4, 1, 0)) {
-				setBlobTypeBasedOnLength();
-				this.sqlType = MysqlDefs.mysqlToJavaType(this.mysqlType);
+				if (this.connection.getUseBlobToStoreUTF8OutsideBMP() 
+						&& shouldSetupForUtf8StringInBlob()) {
+					setupForUtf8StringInBlob();
+				} else {
+					setBlobTypeBasedOnLength();
+					this.sqlType = MysqlDefs.mysqlToJavaType(this.mysqlType);
+				}
 			} else {
 				// *TEXT masquerading as blob
 				this.mysqlType = MysqlDefs.FIELD_TYPE_VAR_STRING;
@@ -192,6 +198,12 @@ public class Field {
 			this.charsetName = this.connection
 				.getCharsetNameForIndex(this.charsetIndex);
 
+			// ucs2, utf16, and utf32 cannot be used as a client character set,
+			// but if it was received from server under some circumstances
+			// we can parse them as utf16
+			if ("UnicodeBig".equals(this.charsetName)) {
+				this.charsetName = "UTF-16";
+			}
 
 			// Handle VARBINARY/BINARY (server doesn't have a different type
 			// for this
@@ -202,9 +214,12 @@ public class Field {
 					this.mysqlType == MysqlDefs.FIELD_TYPE_VAR_STRING &&
 					isBinary &&
 					this.charsetIndex == 63) {
-				if (this.isOpaqueBinary()) {
+				if (this.connection != null && (this.connection.getFunctionsNeverReturnBlobs() && isFromFunction)) {
+			        this.sqlType = Types.VARCHAR;
+			        this.mysqlType = MysqlDefs.FIELD_TYPE_VARCHAR;
+				} else if (this.isOpaqueBinary()) {
 					this.sqlType = Types.VARBINARY;
-				}
+				} 
 			}
 
 			if (this.connection.versionMeetsMinimum(4, 1, 0) &&
@@ -279,12 +294,74 @@ public class Field {
 				break;
 			}
 		}
+		this.valueNeedsQuoting = determineNeedsQuoting();
+	}
+
+	private boolean shouldSetupForUtf8StringInBlob() throws SQLException {
+		String includePattern = this.connection
+				.getUtf8OutsideBmpIncludedColumnNamePattern();
+		String excludePattern = this.connection
+				.getUtf8OutsideBmpExcludedColumnNamePattern();
+
+		if (excludePattern != null
+				&& !StringUtils.isEmptyOrWhitespaceOnly(excludePattern)) {
+			try {
+				if (getOriginalName().matches(excludePattern)) {
+					if (includePattern != null
+							&& !StringUtils.isEmptyOrWhitespaceOnly(includePattern)) {
+						try {
+							if (getOriginalName().matches(includePattern)) {
+								return true;
+							}
+						} catch (PatternSyntaxException pse) {
+							SQLException sqlEx = SQLError
+									.createSQLException(
+											"Illegal regex specified for \"utf8OutsideBmpIncludedColumnNamePattern\"",
+											SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.connection.getExceptionInterceptor());
+
+							if (!this.connection.getParanoid()) {
+								sqlEx.initCause(pse);
+							}
+
+							throw sqlEx;
+						}
+					}
+					
+					return false;
+				}
+			} catch (PatternSyntaxException pse) {
+				SQLException sqlEx = SQLError
+						.createSQLException(
+								"Illegal regex specified for \"utf8OutsideBmpExcludedColumnNamePattern\"",
+								SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.connection.getExceptionInterceptor());
+
+				if (!this.connection.getParanoid()) {
+					sqlEx.initCause(pse);
+				}
+
+				throw sqlEx;
+			}
+		}
+
+		return true;
+	}
+
+	private void setupForUtf8StringInBlob() {
+		if (this.length == MysqlDefs.LENGTH_TINYBLOB || this.length == MysqlDefs.LENGTH_BLOB) {
+			this.mysqlType = MysqlDefs.FIELD_TYPE_VARCHAR;
+			this.sqlType = Types.VARCHAR;
+		}  else {
+			this.mysqlType = MysqlDefs.FIELD_TYPE_VAR_STRING;
+			this.sqlType = Types.LONGVARCHAR;
+		}
+		
+		this.charsetIndex = 33;	
 	}
 
 	/**
 	 * Constructor used when communicating with pre 4.1 servers
 	 */
-	Field(Connection conn, byte[] buffer, int nameStart, int nameLength,
+	Field(MySQLConnection conn, byte[] buffer, int nameStart, int nameLength,
 			int tableNameStart, int tableNameLength, int length, int mysqlType,
 			short colFlag, int colDecimals) throws SQLException {
 		this(conn, buffer, -1, -1, tableNameStart, tableNameLength, -1, -1,
@@ -302,8 +379,45 @@ public class Field {
 		this.sqlType = jdbcType;
 		this.colFlag = 0;
 		this.colDecimals = 0;
+		this.valueNeedsQuoting = determineNeedsQuoting();
 	}
-
+	
+	/**
+	 * Used by prepared statements to re-use result set data conversion methods
+	 * when generating bound parmeter retrieval instance for statement
+	 * interceptors.
+	 * 
+	 * @param tableName
+	 *            not used
+	 * @param columnName
+	 *            not used
+	 * @param charsetIndex
+	 *            the MySQL collation/character set index
+	 * @param jdbcType
+	 *            from java.sql.Types
+	 * @param length
+	 *            length in characters or bytes (for BINARY data).
+	 */
+	Field(String tableName, String columnName, int charsetIndex, int jdbcType,
+			int length) {
+		this.tableName = tableName;
+		this.name = columnName;
+		this.length = length;
+		this.sqlType = jdbcType;
+		this.colFlag = 0;
+		this.colDecimals = 0;
+		this.charsetIndex = charsetIndex;
+		this.valueNeedsQuoting = determineNeedsQuoting();
+		
+		switch (this.sqlType) {
+		case Types.BINARY:
+		case Types.VARBINARY:
+			this.colFlag |= 128;
+			this.colFlag |= 16;
+			break;
+		}
+	}
+	
 	private void checkForImplicitTemporaryTable() {
 		this.isImplicitTempTable = this.tableNameLength > 5
 				&& this.buffer[tableNameStart] == (byte) '#'
@@ -322,6 +436,18 @@ public class Field {
 		return this.charsetName;
 	}
 
+	public void setCharacterSet(String javaEncodingName) throws SQLException {
+		this.charsetName = javaEncodingName;
+		try {
+			this.charsetIndex = CharsetMapping
+				.getCharsetIndexForMysqlEncodingName(javaEncodingName);
+		} catch (RuntimeException ex) {
+			SQLException sqlEx = SQLError.createSQLException(ex.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
+			sqlEx.initCause(ex);
+			throw sqlEx;
+		}
+	}
+	
 	public synchronized String getCollation() throws SQLException {
 		if (this.collationName == null) {
 			if (this.connection != null) {
@@ -387,7 +513,13 @@ public class Field {
 							}
 						}
 					} else {
-						this.collationName = CharsetMapping.INDEX_TO_COLLATION[charsetIndex];
+						try {
+							this.collationName = CharsetMapping.INDEX_TO_COLLATION[charsetIndex];
+						} catch (RuntimeException ex) {
+							SQLException sqlEx = SQLError.createSQLException(ex.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
+							sqlEx.initCause(ex);
+							throw sqlEx;
+						}
 					}
 				}
 			}
@@ -395,7 +527,7 @@ public class Field {
 
 		return this.collationName;
 	}
-
+	
 	public String getColumnLabel() throws SQLException {
 		return getName(); // column name if not aliased, alias if used
 	}
@@ -479,9 +611,8 @@ public class Field {
 
 	public synchronized int getMaxBytesPerCharacter() throws SQLException {
 		if (this.maxBytesPerChar == 0) {
-			this.maxBytesPerChar = this.connection.getMaxBytesPerChar(getCharacterSet());
+			this.maxBytesPerChar = this.connection.getMaxBytesPerChar(this.charsetIndex, getCharacterSet());
 		}
-
 		return this.maxBytesPerChar;
 	}
 
@@ -606,17 +737,8 @@ public class Field {
 								stringStart, stringLength);
 					} else {
 						// we have no converter, use JVM converter
-						byte[] stringBytes = new byte[stringLength];
-
-						int endIndex = stringStart + stringLength;
-						int pos = 0;
-
-						for (int i = stringStart; i < endIndex; i++) {
-							stringBytes[pos++] = this.buffer[i];
-						}
-
 						try {
-							stringVal = new String(stringBytes, encoding);
+							stringVal = StringUtils.toString(buffer, stringStart, stringLength, encoding);
 						} catch (UnsupportedEncodingException ue) {
 							throw new RuntimeException(Messages
 									.getString("Field.12") + encoding //$NON-NLS-1$
@@ -794,6 +916,10 @@ public class Field {
 		return ((this.colFlag & 32) > 0);
 	}
 
+	public void setUnsigned() {
+		this.colFlag |= 32;
+	}
+	
 	/**
 	 * DOCUMENT ME!
 	 *
@@ -841,10 +967,12 @@ public class Field {
 	 * @param conn
 	 *            DOCUMENT ME!
 	 */
-	public void setConnection(Connection conn) {
+	public void setConnection(MySQLConnection conn) {
 		this.connection = conn;
 
-		this.charsetName = this.connection.getEncoding();
+		if (this.charsetName == null || this.charsetIndex == 0) {
+			this.charsetName = this.connection.getEncoding();
+		}
 	}
 
 	void setMysqlType(int type) {
@@ -858,31 +986,72 @@ public class Field {
 
 	public String toString() {
 		try {
-			StringBuffer asString = new StringBuffer(128);
+			StringBuffer asString = new StringBuffer();
 			asString.append(super.toString());
-
-			asString.append("\n  catalog: ");
+			asString.append("[");
+			asString.append("catalog=");
 			asString.append(this.getDatabaseName());
-			asString.append("\n  table name: ");
+			asString.append(",tableName=");
 			asString.append(this.getTableName());
-			asString.append("\n  original table name: ");
+			asString.append(",originalTableName=");
 			asString.append(this.getOriginalTableName());
-			asString.append("\n  column name: ");
+			asString.append(",columnName=");
 			asString.append(this.getName());
-			asString.append("\n  original column name: ");
+			asString.append(",originalColumnName=");
 			asString.append(this.getOriginalName());
-			asString.append("\n  MySQL data type: ");
+			asString.append(",mysqlType=");
 			asString.append(getMysqlType());
 			asString.append("(");
 			asString.append(MysqlDefs.typeToName(getMysqlType()));
 			asString.append(")");
-
-			if (this.buffer != null) {
-				asString.append("\n\nData as received from server:\n\n");
-				asString.append(StringUtils.dumpAsHex(this.buffer,
-						this.buffer.length));
+			asString.append(",flags=");
+			
+			if (isAutoIncrement()) {
+				asString.append(" AUTO_INCREMENT");
+			}
+			
+			if (isPrimaryKey()) {
+				asString.append(" PRIMARY_KEY");
+			}
+			
+			if (isUniqueKey()) {
+				asString.append(" UNIQUE_KEY");
+			}
+			
+			if (isBinary()) {
+				asString.append(" BINARY");
+			}
+			
+			if (isBlob()) {
+				asString.append(" BLOB");
+			}
+			
+			if (isMultipleKey()) {
+				asString.append(" MULTI_KEY");
+			}
+			
+			if (isUnsigned()) {
+				asString.append(" UNSIGNED");
+			}
+			
+			if (isZeroFill()) {
+				asString.append(" ZEROFILL");
 			}
 
+			asString.append(", charsetIndex=");
+			asString.append(this.charsetIndex);
+			asString.append(", charsetName=");
+			asString.append(this.charsetName);
+			
+			
+			//if (this.buffer != null) {
+			//	asString.append("\n\nData as received from server:\n\n");
+			//	asString.append(StringUtils.dumpAsHex(this.buffer,
+			//			this.buffer.length));
+			//}
+
+			asString.append("]");
+			
 			return asString.toString();
 		} catch (Throwable t) {
 			return super.toString();
@@ -891,5 +1060,32 @@ public class Field {
 
 	protected boolean isSingleBit() {
 		return this.isSingleBit;
+	}
+
+	protected boolean getvalueNeedsQuoting() {
+		return this.valueNeedsQuoting;
+	}
+
+	private boolean determineNeedsQuoting() {
+		boolean retVal = false;
+		
+		switch (this.sqlType) {
+		case Types.BIGINT:
+		case Types.BIT:
+		case Types.DECIMAL:
+		case Types.DOUBLE:
+		case Types.FLOAT:
+		case Types.INTEGER:
+		case Types.NUMERIC:
+		case Types.REAL:
+		case Types.SMALLINT:
+		case Types.TINYINT:
+			retVal = false;
+			break;
+		default: 
+			retVal = true;
+		}
+		return retVal;
+
 	}
 }

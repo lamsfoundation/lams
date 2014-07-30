@@ -1,27 +1,26 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.BufferedInputStream;
@@ -52,12 +51,12 @@ import java.util.List;
  *          Exp $
  */
 public class BlobFromLocator implements java.sql.Blob {
-	private List primaryKeyColumns = null;
+	private List<String> primaryKeyColumns = null;
 
-	private List primaryKeyValues = null;
+	private List<String> primaryKeyValues = null;
 
 	/** The ResultSet that created this BLOB */
-	private ResultSet creatorResultSet;
+	private ResultSetImpl creatorResultSet;
 
 	private String blobColumnName = null;
 
@@ -69,11 +68,14 @@ public class BlobFromLocator implements java.sql.Blob {
 
 	private String quotedId;
 
+	private ExceptionInterceptor exceptionInterceptor;
+	
 	/**
 	 * Creates an updatable BLOB that can update in-place
 	 */
-	BlobFromLocator(ResultSet creatorResultSetToSet, int blobColumnIndex)
+	BlobFromLocator(ResultSetImpl creatorResultSetToSet, int blobColumnIndex, ExceptionInterceptor exceptionInterceptor)
 			throws SQLException {
+		this.exceptionInterceptor = exceptionInterceptor;
 		this.creatorResultSet = creatorResultSetToSet;
 
 		this.numColsInResultSet = this.creatorResultSet.fields.length;
@@ -81,8 +83,8 @@ public class BlobFromLocator implements java.sql.Blob {
 				.getIdentifierQuoteString();
 
 		if (this.numColsInResultSet > 1) {
-			this.primaryKeyColumns = new ArrayList();
-			this.primaryKeyValues = new ArrayList();
+			this.primaryKeyColumns = new ArrayList<String>();
+			this.primaryKeyValues = new ArrayList<String>();
 
 			for (int i = 0; i < this.numColsInResultSet; i++) {
 				if (this.creatorResultSet.fields[i].isPrimaryKey()) {
@@ -154,7 +156,7 @@ public class BlobFromLocator implements java.sql.Blob {
 	private void notEnoughInformationInQuery() throws SQLException {
 		throw SQLError.createSQLException("Emulated BLOB locators must come from "
 				+ "a ResultSet with only one table selected, and all primary "
-				+ "keys selected", SQLError.SQL_STATE_GENERAL_ERROR);
+				+ "keys selected", SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class BlobFromLocator implements java.sql.Blob {
 	 */
 	public OutputStream setBinaryStream(long indexToWriteAt)
 			throws SQLException {
-		throw new NotImplemented();
+		throw SQLError.notImplemented();
 	}
 
 	/**
@@ -206,12 +208,12 @@ public class BlobFromLocator implements java.sql.Blob {
 		query.append(length);
 		query.append(", ?) WHERE ");
 
-		query.append((String) this.primaryKeyColumns.get(0));
+		query.append(this.primaryKeyColumns.get(0));
 		query.append(" = ?");
 
 		for (int i = 1; i < this.numPrimaryKeys; i++) {
 			query.append(" AND ");
-			query.append((String) this.primaryKeyColumns.get(i));
+			query.append(this.primaryKeyColumns.get(i));
 			query.append(" = ?");
 		}
 
@@ -223,7 +225,7 @@ public class BlobFromLocator implements java.sql.Blob {
 			pStmt.setBytes(1, bytesToWrite);
 
 			for (int i = 0; i < this.numPrimaryKeys; i++) {
-				pStmt.setString(i + 2, (String) this.primaryKeyValues.get(i));
+				pStmt.setString(i + 2, this.primaryKeyValues.get(i));
 			}
 
 			int rowsUpdated = pStmt.executeUpdate();
@@ -231,7 +233,7 @@ public class BlobFromLocator implements java.sql.Blob {
 			if (rowsUpdated != 1) {
 				throw SQLError.createSQLException(
 						"BLOB data not found! Did primary keys change?",
-						SQLError.SQL_STATE_GENERAL_ERROR);
+						SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 			}
 		} finally {
 			if (pStmt != null) {
@@ -290,7 +292,7 @@ public class BlobFromLocator implements java.sql.Blob {
 			}
 		}
 	}
-
+	
 	/**
 	 * Returns the number of bytes in the BLOB value designated by this Blob
 	 * object.
@@ -311,12 +313,12 @@ public class BlobFromLocator implements java.sql.Blob {
 		query.append(this.tableName);
 		query.append(" WHERE ");
 
-		query.append((String) this.primaryKeyColumns.get(0));
+		query.append(this.primaryKeyColumns.get(0));
 		query.append(" = ?");
 
 		for (int i = 1; i < this.numPrimaryKeys; i++) {
 			query.append(" AND ");
-			query.append((String) this.primaryKeyColumns.get(i));
+			query.append(this.primaryKeyColumns.get(i));
 			query.append(" = ?");
 		}
 
@@ -326,7 +328,7 @@ public class BlobFromLocator implements java.sql.Blob {
 					.toString());
 
 			for (int i = 0; i < this.numPrimaryKeys; i++) {
-				pStmt.setString(i + 1, (String) this.primaryKeyValues.get(i));
+				pStmt.setString(i + 1, this.primaryKeyValues.get(i));
 			}
 
 			blobRs = pStmt.executeQuery();
@@ -337,7 +339,7 @@ public class BlobFromLocator implements java.sql.Blob {
 
 			throw SQLError.createSQLException(
 					"BLOB data not found! Did primary keys change?",
-					SQLError.SQL_STATE_GENERAL_ERROR);
+					SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 		} finally {
 			if (blobRs != null) {
 				try {
@@ -396,12 +398,12 @@ public class BlobFromLocator implements java.sql.Blob {
 		query.append(this.tableName);
 		query.append(" WHERE ");
 
-		query.append((String) this.primaryKeyColumns.get(0));
+		query.append(this.primaryKeyColumns.get(0));
 		query.append(" = ?");
 
 		for (int i = 1; i < this.numPrimaryKeys; i++) {
 			query.append(" AND ");
-			query.append((String) this.primaryKeyColumns.get(i));
+			query.append(this.primaryKeyColumns.get(i));
 			query.append(" = ?");
 		}
 
@@ -412,7 +414,7 @@ public class BlobFromLocator implements java.sql.Blob {
 			pStmt.setBytes(1, pattern);
 
 			for (int i = 0; i < this.numPrimaryKeys; i++) {
-				pStmt.setString(i + 2, (String) this.primaryKeyValues.get(i));
+				pStmt.setString(i + 2, this.primaryKeyValues.get(i));
 			}
 
 			blobRs = pStmt.executeQuery();
@@ -423,7 +425,7 @@ public class BlobFromLocator implements java.sql.Blob {
 
 			throw SQLError.createSQLException(
 					"BLOB data not found! Did primary keys change?",
-					SQLError.SQL_STATE_GENERAL_ERROR);
+					SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 		} finally {
 			if (blobRs != null) {
 				try {
@@ -464,12 +466,12 @@ public class BlobFromLocator implements java.sql.Blob {
 		query.append(length);
 		query.append(") WHERE ");
 
-		query.append((String) this.primaryKeyColumns.get(0));
+		query.append(this.primaryKeyColumns.get(0));
 		query.append(" = ?");
 
 		for (int i = 1; i < this.numPrimaryKeys; i++) {
 			query.append(" AND ");
-			query.append((String) this.primaryKeyColumns.get(i));
+			query.append(this.primaryKeyColumns.get(i));
 			query.append(" = ?");
 		}
 
@@ -479,7 +481,7 @@ public class BlobFromLocator implements java.sql.Blob {
 					.toString());
 
 			for (int i = 0; i < this.numPrimaryKeys; i++) {
-				pStmt.setString(i + 1, (String) this.primaryKeyValues.get(i));
+				pStmt.setString(i + 1, this.primaryKeyValues.get(i));
 			}
 
 			int rowsUpdated = pStmt.executeUpdate();
@@ -487,7 +489,7 @@ public class BlobFromLocator implements java.sql.Blob {
 			if (rowsUpdated != 1) {
 				throw SQLError.createSQLException(
 						"BLOB data not found! Did primary keys change?",
-						SQLError.SQL_STATE_GENERAL_ERROR);
+						SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 			}
 		} finally {
 			if (pStmt != null) {
@@ -514,12 +516,12 @@ public class BlobFromLocator implements java.sql.Blob {
 		query.append(this.tableName);
 		query.append(" WHERE ");
 
-		query.append((String) this.primaryKeyColumns.get(0));
+		query.append(this.primaryKeyColumns.get(0));
 		query.append(" = ?");
 
 		for (int i = 1; i < this.numPrimaryKeys; i++) {
 			query.append(" AND ");
-			query.append((String) this.primaryKeyColumns.get(i));
+			query.append(this.primaryKeyColumns.get(i));
 			query.append(" = ?");
 		}
 
@@ -538,18 +540,18 @@ public class BlobFromLocator implements java.sql.Blob {
 			pStmt.setInt(2, length);
 
 			for (int i = 0; i < this.numPrimaryKeys; i++) {
-				pStmt.setString(i + 3, (String) this.primaryKeyValues.get(i));
+				pStmt.setString(i + 3, this.primaryKeyValues.get(i));
 			}
 
 			blobRs = pStmt.executeQuery();
 
 			if (blobRs.next()) {
-				return ((com.mysql.jdbc.ResultSet) blobRs).getBytes(1, true);
+				return ((com.mysql.jdbc.ResultSetImpl) blobRs).getBytes(1, true);
 			}
 
 			throw SQLError.createSQLException(
 					"BLOB data not found! Did primary keys change?",
-					SQLError.SQL_STATE_GENERAL_ERROR);
+					SQLError.SQL_STATE_GENERAL_ERROR, this.exceptionInterceptor);
 		} finally {
 			if (blobRs != null) {
 				try {
@@ -575,6 +577,30 @@ public class BlobFromLocator implements java.sql.Blob {
 			pStmt = createGetBytesStatement();
 		}
 
+		@SuppressWarnings("synthetic-access")
+		LocatorInputStream(long pos, long len) throws SQLException {
+			length = pos + len;
+			currentPositionInBlob = pos;
+			long blobLength = length();
+			
+			if (pos + len > blobLength) {
+				throw SQLError.createSQLException(
+						Messages.getString("Blob.invalidStreamLength", 
+								new Object[] {Long.valueOf(blobLength), Long.valueOf(pos), Long.valueOf(len)}),
+								SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+			}
+			
+			if (pos < 1) {
+				throw SQLError.createSQLException(Messages.getString("Blob.invalidStreamPos"), 
+						SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+			}
+			
+			if (pos > blobLength) {
+				throw SQLError.createSQLException(Messages.getString("Blob.invalidStreamPos"), 
+						SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+			}
+		}
+		
 		public int read() throws IOException {
 			if (currentPositionInBlob + 1 > length) {
 				return -1;
@@ -666,5 +692,15 @@ public class BlobFromLocator implements java.sql.Blob {
 
 			super.close();
 		}
+	}
+
+	public void free() throws SQLException {
+		this.creatorResultSet = null;
+		this.primaryKeyColumns = null;
+		this.primaryKeyValues = null;
+	}
+
+	public InputStream getBinaryStream(long pos, long length) throws SQLException {
+		return new LocatorInputStream(pos, length);
 	}
 }

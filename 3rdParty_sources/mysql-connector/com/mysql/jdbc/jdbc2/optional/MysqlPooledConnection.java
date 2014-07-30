@@ -1,40 +1,42 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
-
- 
  */
+
 package com.mysql.jdbc.jdbc2.optional;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
 import javax.sql.PooledConnection;
 
+import com.mysql.jdbc.ExceptionInterceptor;
 import com.mysql.jdbc.SQLError;
+import com.mysql.jdbc.Util;
 
 /**
  * This class is used to wrap and return a physical connection within a logical
@@ -47,6 +49,37 @@ import com.mysql.jdbc.SQLError;
  */
 public class MysqlPooledConnection implements PooledConnection {
 
+	private static final Constructor<?> JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR;
+
+	static {
+		if (Util.isJdbc4()) {
+			try {
+				JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = Class.forName(
+						"com.mysql.jdbc.jdbc2.optional.JDBC4MysqlPooledConnection")
+						.getConstructor(
+								new Class[] { com.mysql.jdbc.Connection.class });
+			} catch (SecurityException e) {
+				throw new RuntimeException(e);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = null;
+		}
+	}
+
+	protected static MysqlPooledConnection getInstance(com.mysql.jdbc.Connection connection) throws SQLException {
+		if (!Util.isJdbc4()) {
+			return new MysqlPooledConnection(connection);
+		}
+
+		return (MysqlPooledConnection) Util.handleNewInstance(
+				JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR, new Object[] {
+						connection}, connection.getExceptionInterceptor());
+	}
+	
 	/**
 	 * The flag for an exception being thrown.
 	 */
@@ -59,11 +92,13 @@ public class MysqlPooledConnection implements PooledConnection {
 
 	// ~ Instance/static variables .............................................
 
-	private Hashtable eventListeners;
+	private Map<ConnectionEventListener, ConnectionEventListener> connectionEventListeners;
 
 	private Connection logicalHandle;
 
 	private com.mysql.jdbc.Connection physicalConn;
+	
+	private ExceptionInterceptor exceptionInterceptor;
 
 	// ~ Constructors ..........................................................
 
@@ -76,10 +111,9 @@ public class MysqlPooledConnection implements PooledConnection {
 	public MysqlPooledConnection(com.mysql.jdbc.Connection connection) {
 		this.logicalHandle = null;
 		this.physicalConn = connection;
-		this.eventListeners = new Hashtable(10);
+		this.connectionEventListeners = new HashMap<ConnectionEventListener, ConnectionEventListener>();
+		this.exceptionInterceptor = this.physicalConn.getExceptionInterceptor();
 	}
-
-	// ~ Methods ...............................................................
 
 	/**
 	 * Adds ConnectionEventListeners to a hash table to be used for notification
@@ -91,8 +125,8 @@ public class MysqlPooledConnection implements PooledConnection {
 	public synchronized void addConnectionEventListener(
 			ConnectionEventListener connectioneventlistener) {
 
-		if (this.eventListeners != null) {
-			this.eventListeners.put(connectioneventlistener,
+		if (this.connectionEventListeners != null) {
+			this.connectionEventListeners.put(connectioneventlistener,
 					connectioneventlistener);
 		}
 	}
@@ -107,8 +141,8 @@ public class MysqlPooledConnection implements PooledConnection {
 	public synchronized void removeConnectionEventListener(
 			ConnectionEventListener connectioneventlistener) {
 
-		if (this.eventListeners != null) {
-			this.eventListeners.remove(connectioneventlistener);
+		if (this.connectionEventListeners != null) {
+			this.connectionEventListeners.remove(connectioneventlistener);
 		}
 	}
 
@@ -129,8 +163,8 @@ public class MysqlPooledConnection implements PooledConnection {
 		if (this.physicalConn == null) {
 
 			SQLException sqlException = SQLError.createSQLException(
-					"Physical Connection doesn't exist");
-			callListener(CONNECTION_ERROR_EVENT, sqlException);
+					"Physical Connection doesn't exist", this.exceptionInterceptor);
+			callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
 
 			throw sqlException;
 		}
@@ -142,12 +176,14 @@ public class MysqlPooledConnection implements PooledConnection {
 			}
 
 			if (resetServerState) {
-				((com.mysql.jdbc.Connection) this.physicalConn).resetServerState();
+				this.physicalConn.resetServerState();
 			}
 
-			this.logicalHandle = new ConnectionWrapper(this, this.physicalConn, forXa);
+			this.logicalHandle = ConnectionWrapper.getInstance(this, 
+					this.physicalConn, 
+					forXa);
 		} catch (SQLException sqlException) {
-			callListener(CONNECTION_ERROR_EVENT, sqlException);
+			callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
 
 			throw sqlException;
 		}
@@ -165,9 +201,15 @@ public class MysqlPooledConnection implements PooledConnection {
 	public synchronized void close() throws SQLException {
 		if (this.physicalConn != null) {
 			this.physicalConn.close();
+			
+			this.physicalConn = null;
 		}
-
-		this.physicalConn = null;
+		
+		if (this.connectionEventListeners != null) {
+			this.connectionEventListeners.clear();
+			
+			this.connectionEventListeners = null;
+		}
 	}
 
 	/**
@@ -182,31 +224,33 @@ public class MysqlPooledConnection implements PooledConnection {
 	 * @param sqlException
 	 *            the exception being thrown
 	 */
-	protected synchronized void callListener(int eventType,
+	protected synchronized void callConnectionEventListeners(int eventType,
 			SQLException sqlException) {
 
-		if (this.eventListeners == null) {
+		if (this.connectionEventListeners == null) {
 
 			return;
 		}
 
-		Enumeration enumeration = this.eventListeners.keys();
+		Iterator<Map.Entry<ConnectionEventListener, ConnectionEventListener>> iterator = this.connectionEventListeners.entrySet().iterator();
+		
 		ConnectionEvent connectionevent = new ConnectionEvent(this,
 				sqlException);
 
-		while (enumeration.hasMoreElements()) {
+		while (iterator.hasNext()) {
 
-			ConnectionEventListener connectioneventlistener = (ConnectionEventListener) enumeration
-					.nextElement();
-			ConnectionEventListener connectioneventlistener1 = (ConnectionEventListener) this.eventListeners
-					.get(connectioneventlistener);
+			ConnectionEventListener connectioneventlistener = iterator.next().getValue();
 
 			if (eventType == CONNECTION_CLOSED_EVENT) {
-				connectioneventlistener1.connectionClosed(connectionevent);
+				connectioneventlistener.connectionClosed(connectionevent);
 			} else if (eventType == CONNECTION_ERROR_EVENT) {
-				connectioneventlistener1
+				connectioneventlistener
 						.connectionErrorOccurred(connectionevent);
 			}
 		}
+	}
+	
+	protected ExceptionInterceptor getExceptionInterceptor() {
+		return this.exceptionInterceptor;
 	}
 }

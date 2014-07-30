@@ -1,30 +1,29 @@
 /*
- Copyright (C) 2002-2006 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -34,11 +33,13 @@ import java.util.List;
  * @version $Id$
  */
 public class RowDataStatic implements RowData {
+	private Field[] metadata;
+	
 	private int index;
 
-	ResultSet owner;
+	ResultSetImpl owner;
 
-	private List rows;
+	private List<ResultSetRow> rows;
 
 	/**
 	 * Creates a new RowDataStatic object.
@@ -46,7 +47,7 @@ public class RowDataStatic implements RowData {
 	 * @param rows
 	 *            DOCUMENT ME!
 	 */
-	public RowDataStatic(ArrayList rows) {
+	public RowDataStatic(List<ResultSetRow> rows) {
 		this.index = -1;
 		this.rows = rows;
 	}
@@ -57,7 +58,7 @@ public class RowDataStatic implements RowData {
 	 * @param row
 	 *            DOCUMENT ME!
 	 */
-	public void addRow(byte[][] row) {
+	public void addRow(ResultSetRow row) {
 		this.rows.add(row);
 	}
 
@@ -96,12 +97,12 @@ public class RowDataStatic implements RowData {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	public Object[] getAt(int atIndex) {
+	public ResultSetRow getAt(int atIndex) throws SQLException {
 		if ((atIndex < 0) || (atIndex >= this.rows.size())) {
 			return null;
 		}
 
-		return (Object[]) this.rows.get(atIndex);
+		return (this.rows.get(atIndex)).setMetadata(this.metadata);
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class RowDataStatic implements RowData {
 	/**
 	 * @see com.mysql.jdbc.RowData#getOwner()
 	 */
-	public ResultSet getOwner() {
+	public ResultSetInternalMethods getOwner() {
 		return this.owner;
 	}
 
@@ -208,11 +209,13 @@ public class RowDataStatic implements RowData {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	public Object[] next() {
+	public ResultSetRow next() throws SQLException {
 		this.index++;
 
 		if (this.index < this.rows.size()) {
-			return (Object[]) this.rows.get(this.index);
+			ResultSetRow row = this.rows.get(this.index);
+			
+			return row.setMetadata(this.metadata);
 		}
 
 		return null;
@@ -239,9 +242,9 @@ public class RowDataStatic implements RowData {
 	}
 
 	/**
-	 * @see com.mysql.jdbc.RowData#setOwner(com.mysql.jdbc.ResultSet)
+	 * @see com.mysql.jdbc.RowData#setOwner(com.mysql.jdbc.ResultSetInternalMethods)
 	 */
-	public void setOwner(ResultSet rs) {
+	public void setOwner(ResultSetImpl rs) {
 		this.owner = rs;
 	}
 
@@ -256,5 +259,9 @@ public class RowDataStatic implements RowData {
 
 	public boolean wasEmpty() {
 		return (this.rows != null && this.rows.size() == 0);
+	}
+
+	public void setMetadata(Field[] metadata) {
+		this.metadata = metadata;
 	}
 }

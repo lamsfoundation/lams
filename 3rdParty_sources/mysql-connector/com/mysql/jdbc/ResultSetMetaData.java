@@ -1,32 +1,28 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -79,16 +75,21 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
 	Field[] fields;
 	boolean useOldAliasBehavior = false;
+	boolean treatYearAsDate = true;
+
+	private ExceptionInterceptor exceptionInterceptor;
 	
 	/**
-	 * Initialise for a result with a tuple set and a field descriptor set
+	 * Initialize for a result with a tuple set and a field descriptor set
 	 * 
 	 * @param fields
 	 *            the array of field descriptors
 	 */
-	public ResultSetMetaData(Field[] fields, boolean useOldAliasBehavior) {
+	public ResultSetMetaData(Field[] fields, boolean useOldAliasBehavior, boolean treatYearAsDate, ExceptionInterceptor exceptionInterceptor) {
 		this.fields = fields;
 		this.useOldAliasBehavior = useOldAliasBehavior;
+		this.treatYearAsDate = treatYearAsDate;
+		this.exceptionInterceptor = exceptionInterceptor;
 	}
 
 	/**
@@ -129,8 +130,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 		String javaName = null;
 
 		if (mysqlName != null) {
-			javaName = CharsetMapping.getJavaEncodingForMysqlEncoding(
-					mysqlName, null);
+			try {
+				javaName = CharsetMapping.MYSQL_TO_JAVA_CHARSET_MAP.get(mysqlName);
+			} catch (RuntimeException ex) {
+				SQLException sqlEx = SQLError.createSQLException(ex.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
+				sqlEx.initCause(ex);
+				throw sqlEx;
+			}
 		}
 
 		return javaName;
@@ -180,7 +186,7 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 				f.isUnsigned(), 
 				f.getMysqlType(), 
 				f.isBinary() || f.isBlob(),
-				f.isOpaqueBinary()); 
+				f.isOpaqueBinary(), treatYearAsDate); 
 	}
 
 	/**
@@ -247,8 +253,8 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 	public String getColumnName(int column) throws SQLException {
 		if (this.useOldAliasBehavior) {
 			return getField(column).getName();
-		}
-		
+	}
+
 		String name = getField(column).getNameNoAliases();
 		
 		if (name != null && name.length() == 0) {
@@ -376,7 +382,10 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
 		case MysqlDefs.FIELD_TYPE_SET:
 			return "SET"; //$NON-NLS-1$
-
+			
+		case MysqlDefs.FIELD_TYPE_GEOMETRY:
+			return "GEOMETRY"; //$NON-NLS-1$
+			
 		default:
 			return "UNKNOWN"; //$NON-NLS-1$
 		}
@@ -396,7 +405,7 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 	protected Field getField(int columnIndex) throws SQLException {
 		if ((columnIndex < 1) || (columnIndex > this.fields.length)) {
 			throw SQLError.createSQLException(Messages.getString("ResultSetMetaData.46"), //$NON-NLS-1$
-					SQLError.SQL_STATE_INVALID_COLUMN_NUMBER);
+					SQLError.SQL_STATE_INVALID_COLUMN_NUMBER, this.exceptionInterceptor);
 		}
 
 		return this.fields[columnIndex - 1];
@@ -718,65 +727,63 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 
 		return toStringBuf.toString();
 	}
-	
-	static String getClassNameForJavaType(int javaType, 
-			boolean isUnsigned, int mysqlTypeIfKnown, 
-			boolean isBinaryOrBlob,
-			boolean isOpaqueBinary) {
+
+	static String getClassNameForJavaType(int javaType, boolean isUnsigned, int mysqlTypeIfKnown,
+			boolean isBinaryOrBlob, boolean isOpaqueBinary, boolean treatYearAsDate) {
 		switch (javaType) {
 		case Types.BIT:
 		case Types.BOOLEAN:
-			return "java.lang.Boolean"; //$NON-NLS-1$
+			return "java.lang.Boolean";
 
 		case Types.TINYINT:
 
 			if (isUnsigned) {
-				return "java.lang.Integer"; //$NON-NLS-1$
+				return "java.lang.Integer";
 			}
 
-			return "java.lang.Integer"; //$NON-NLS-1$
+			return "java.lang.Integer";
 
 		case Types.SMALLINT:
 
 			if (isUnsigned) {
-				return "java.lang.Integer"; //$NON-NLS-1$
+				return "java.lang.Integer";
 			}
 
-			return "java.lang.Integer"; //$NON-NLS-1$
+			return "java.lang.Integer";
 
 		case Types.INTEGER:
 
 			if (!isUnsigned || 
 					mysqlTypeIfKnown == MysqlDefs.FIELD_TYPE_INT24) {
-				return "java.lang.Integer"; //$NON-NLS-1$
+				return "java.lang.Integer";
 			}
 
-			return "java.lang.Long"; //$NON-NLS-1$
+			return "java.lang.Long";
 
 		case Types.BIGINT:
 
 			if (!isUnsigned) {
-				return "java.lang.Long"; //$NON-NLS-1$
+				return "java.lang.Long";
 			}
 
-			return "java.math.BigInteger"; //$NON-NLS-1$
+			return "java.math.BigInteger";
 
 		case Types.DECIMAL:
 		case Types.NUMERIC:
-			return "java.math.BigDecimal"; //$NON-NLS-1$
+			return "java.math.BigDecimal";
 
 		case Types.REAL:
-			return "java.lang.Float"; //$NON-NLS-1$
+			return "java.lang.Float";
 
 		case Types.FLOAT:
 		case Types.DOUBLE:
-			return "java.lang.Double"; //$NON-NLS-1$
+			return "java.lang.Double";
 
 		case Types.CHAR:
 		case Types.VARCHAR:
 		case Types.LONGVARCHAR:
 			if (!isOpaqueBinary) {
-				return "java.lang.String"; //$NON-NLS-1$
+				return "java.lang.String";
 			}
 
 			return "[B";
@@ -794,16 +801,63 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
 			}
 
 		case Types.DATE:
-			return "java.sql.Date"; //$NON-NLS-1$
+				return (treatYearAsDate || mysqlTypeIfKnown != MysqlDefs.FIELD_TYPE_YEAR) ? "java.sql.Date"
+						: "java.lang.Short";
 
 		case Types.TIME:
-			return "java.sql.Time"; //$NON-NLS-1$
+			return "java.sql.Time";
 
 		case Types.TIMESTAMP:
-			return "java.sql.Timestamp"; //$NON-NLS-1$
+			return "java.sql.Timestamp";
 
 		default:
-			return "java.lang.Object"; //$NON-NLS-1$
+			return "java.lang.Object";
 		}
 	}
+	
+	/**
+     * Returns true if this either implements the interface argument or is directly or indirectly a wrapper
+     * for an object that does. Returns false otherwise. If this implements the interface then return true,
+     * else if this is a wrapper then return the result of recursively calling <code>isWrapperFor</code> on the wrapped
+     * object. If this does not implement the interface and is not a wrapper, return false.
+     * This method should be implemented as a low-cost operation compared to <code>unwrap</code> so that
+     * callers can use this method to avoid expensive <code>unwrap</code> calls that may fail. If this method
+     * returns true then calling <code>unwrap</code> with the same argument should succeed.
+     *
+     * @param interfaces a Class defining an interface.
+     * @return true if this implements the interface or directly or indirectly wraps an object that does.
+     * @throws java.sql.SQLException  if an error occurs while determining whether this is a wrapper
+     * for an object with the given interface.
+     * @since 1.6
+     */
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		// This works for classes that aren't actually wrapping
+		// anything
+		return iface.isInstance(this);
+	}
+
+    /**
+     * Returns an object that implements the given interface to allow access to non-standard methods,
+     * or standard methods not exposed by the proxy.
+     * The result may be either the object found to implement the interface or a proxy for that object.
+     * If the receiver implements the interface then that is the object. If the receiver is a wrapper
+     * and the wrapped object implements the interface then that is the object. Otherwise the object is
+     *  the result of calling <code>unwrap</code> recursively on the wrapped object. If the receiver is not a
+     * wrapper and does not implement the interface, then an <code>SQLException</code> is thrown.
+     *
+     * @param iface A Class defining an interface that the result must implement.
+     * @return an object that implements the interface. May be a proxy for the actual implementing object.
+     * @throws java.sql.SQLException If no object found that implements the interface 
+     * @since 1.6
+     */
+	public Object unwrap(Class<?> iface) throws java.sql.SQLException {
+    	try {
+    		// This works for classes that aren't actually wrapping
+    		// anything
+    		return Util.cast(iface, this);
+        } catch (ClassCastException cce) {
+            throw SQLError.createSQLException("Unable to unwrap to " + iface.toString(), 
+            		SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
+        }
+    }
 }

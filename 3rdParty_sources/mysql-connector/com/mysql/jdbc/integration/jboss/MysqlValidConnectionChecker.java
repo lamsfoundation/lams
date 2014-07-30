@@ -1,36 +1,34 @@
 /*
- Copyright (C) 2002-2006 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
+
  */
 
 package com.mysql.jdbc.integration.jboss;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jboss.resource.adapter.jdbc.ValidConnectionChecker;
-
-import com.mysql.jdbc.SQLError;
 
 /**
  * A more efficient connection checker for JBoss.
@@ -41,31 +39,9 @@ import com.mysql.jdbc.SQLError;
 public final class MysqlValidConnectionChecker implements
 		ValidConnectionChecker, Serializable {
 
-	private static final long serialVersionUID = 3258689922776119348L;
-
-	private Method pingMethod;
-	
-	private Method pingMethodWrapped;
-
-	private final static Object[] NO_ARGS_OBJECT_ARRAY = new Object[0];
+	private static final long serialVersionUID = 8909421133577519177L;
 
 	public MysqlValidConnectionChecker() {
-		try {
-			// Avoid classloader goofiness
-			Class mysqlConnection = Thread.currentThread()
-					.getContextClassLoader().loadClass(
-							"com.mysql.jdbc.Connection");
-
-			pingMethod = mysqlConnection.getMethod("ping", null);
-			
-			Class mysqlConnectionWrapper = Thread.currentThread()
-			.getContextClassLoader().loadClass(
-					"com.mysql.jdbc.jdbc2.optional.ConnectionWrapper");
-			
-			pingMethodWrapped = mysqlConnectionWrapper.getMethod("ping", null);
-		} catch (Exception ex) {
-			// Punt, we'll use 'SELECT 1' to do the check
-		}
 	}
 
 	/*
@@ -74,44 +50,17 @@ public final class MysqlValidConnectionChecker implements
 	 * @see org.jboss.resource.adapter.jdbc.ValidConnectionChecker#isValidConnection(java.sql.Connection)
 	 */
 	public SQLException isValidConnection(Connection conn) {
-		if (conn instanceof com.mysql.jdbc.Connection) {
-			if (pingMethod != null) {
-				try {
-					this.pingMethod.invoke(conn, null);
-	
-					return null;
-				} catch (Exception ex) {
-					if (ex instanceof SQLException) {
-						return (SQLException) ex;
-					}
-	
-					return SQLError.createSQLException("Ping failed: " + ex.toString());
-				}
-			}
-		} else if (conn instanceof com.mysql.jdbc.jdbc2.optional.ConnectionWrapper) {
-			if (pingMethodWrapped != null) {
-				try {
-					this.pingMethodWrapped.invoke(conn, null);
-	
-					return null;
-				} catch (Exception ex) {
-					if (ex instanceof SQLException) {
-						return (SQLException) ex;
-					}
-	
-					return SQLError.createSQLException("Ping failed: " + ex.toString());
-				}
-			}
-		}
 
-		// Punt and use 'SELECT 1'
+		// Use "/* ping */ SELECT 1" which will send
+		// pings across multi-connections too in case the connection
+		// was "wrapped" by Jboss in any way...
 
 		Statement pingStatement = null;
 
 		try {
 			pingStatement = conn.createStatement();
 			
-			pingStatement.executeQuery("SELECT 1").close();
+			pingStatement.executeQuery("/* ping */ SELECT 1").close();
 
 			return null;
 		} catch (SQLException sqlEx) {

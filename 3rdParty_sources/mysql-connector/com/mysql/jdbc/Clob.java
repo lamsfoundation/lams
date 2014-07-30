@@ -1,27 +1,26 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +29,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-
 import java.sql.SQLException;
 
 /**
@@ -41,9 +39,16 @@ import java.sql.SQLException;
  */
 public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	private String charData;
-
-	Clob(String charDataInit) {
+	private ExceptionInterceptor exceptionInterceptor;
+	
+    Clob(ExceptionInterceptor exceptionInterceptor) {
+        this.charData = "";
+        this.exceptionInterceptor = exceptionInterceptor;
+    }
+    
+	Clob(String charDataInit, ExceptionInterceptor exceptionInterceptor) {
 		this.charData = charDataInit;
+		this.exceptionInterceptor = exceptionInterceptor;
 	}
 
 	/**
@@ -51,7 +56,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	 */
 	public InputStream getAsciiStream() throws SQLException {
 		if (this.charData != null) {
-			return new ByteArrayInputStream(this.charData.getBytes());
+			return new ByteArrayInputStream(StringUtils.getBytes(this.charData));
 		}
 
 		return null;
@@ -74,7 +79,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	public String getSubString(long startPos, int length) throws SQLException {
 		if (startPos < 1) {
 			throw SQLError.createSQLException(Messages.getString("Clob.6"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		int adjustedStartPos = (int)startPos - 1;
@@ -83,7 +88,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 		if (this.charData != null) {
 			if (adjustedEndIndex > this.charData.length()) {
 				throw SQLError.createSQLException(Messages.getString("Clob.7"), //$NON-NLS-1$
-						SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+						SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 			}
 
 			return this.charData.substring(adjustedStartPos, 
@@ -119,13 +124,13 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 		if (startPos < 1) {
 			throw SQLError.createSQLException(
 					Messages.getString("Clob.8") //$NON-NLS-1$
-							+ startPos + Messages.getString("Clob.9"), SQLError.SQL_STATE_ILLEGAL_ARGUMENT); //$NON-NLS-1$
+							+ startPos + Messages.getString("Clob.9"), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor); //$NON-NLS-1$
 		}
 
 		if (this.charData != null) {
 			if ((startPos - 1) > this.charData.length()) {
 				throw SQLError.createSQLException(Messages.getString("Clob.10"), //$NON-NLS-1$
-						SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+						SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 			}
 
 			int pos = this.charData.indexOf(stringToFind, (int) (startPos - 1));
@@ -142,14 +147,14 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	public OutputStream setAsciiStream(long indexToWriteAt) throws SQLException {
 		if (indexToWriteAt < 1) {
 			throw SQLError.createSQLException(Messages.getString("Clob.0"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		WatchableOutputStream bytesOut = new WatchableOutputStream();
 		bytesOut.setWatcher(this);
 
 		if (indexToWriteAt > 0) {
-			bytesOut.write(this.charData.getBytes(), 0,
+			bytesOut.write(StringUtils.getBytes(this.charData), 0,
 					(int) (indexToWriteAt - 1));
 		}
 
@@ -162,7 +167,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	public Writer setCharacterStream(long indexToWriteAt) throws SQLException {
 		if (indexToWriteAt < 1) {
 			throw SQLError.createSQLException(Messages.getString("Clob.1"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		WatchableWriter writer = new WatchableWriter();
@@ -184,12 +189,12 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 	public int setString(long pos, String str) throws SQLException {
 		if (pos < 1) {
 			throw SQLError.createSQLException(Messages.getString("Clob.2"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		if (str == null) {
 			throw SQLError.createSQLException(Messages.getString("Clob.3"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		StringBuffer charBuf = new StringBuffer(this.charData);
@@ -212,12 +217,12 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 			throws SQLException {
 		if (pos < 1) {
 			throw SQLError.createSQLException(Messages.getString("Clob.4"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		if (str == null) {
 			throw SQLError.createSQLException(Messages.getString("Clob.5"), //$NON-NLS-1$
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT);
+					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, this.exceptionInterceptor);
 		}
 
 		StringBuffer charBuf = new StringBuffer(this.charData);
@@ -243,7 +248,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 		if (streamSize < this.charData.length()) {
 			try {
 				out.write(StringUtils
-						.getBytes(this.charData, null, null, false, null),
+						.getBytes(this.charData, null, null, false, null, this.exceptionInterceptor),
 						streamSize, this.charData.length() - streamSize);
 			} catch (SQLException ex) {
 				//
@@ -261,7 +266,7 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 			throw SQLError.createSQLException(
 					Messages.getString("Clob.11") //$NON-NLS-1$
 							+ this.charData.length()
-							+ Messages.getString("Clob.12") + length + Messages.getString("Clob.13")); //$NON-NLS-1$ //$NON-NLS-2$
+							+ Messages.getString("Clob.12") + length + Messages.getString("Clob.13"), this.exceptionInterceptor); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		this.charData = this.charData.substring(0, (int) length);
@@ -286,5 +291,13 @@ public class Clob implements java.sql.Clob, OutputStreamWatcher, WriterWatcher {
 		}
 
 		this.charData = out.toString();
+	}
+
+	public void free() throws SQLException {
+		this.charData = null;
+	}
+
+	public Reader getCharacterStream(long pos, long length) throws SQLException {
+		return new StringReader(getSubString(pos, (int)length));
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <eclipse-userlibraries version="2">
-    <library name="3rdParty" systemlibrary="false"> 
+    <library name="3rdParty" systemlibrary="false">
         <archive path="/lams_build/lib/apache-poi/poi-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/apache-poi/poi-ooxml-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
@@ -22,7 +22,6 @@
         <archive path="/lams_build/lib/jakarta-commons/commons-logging.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
         <archive path="/lams_build/lib/jdom/jdom.jar"/>
-        <archive path="/lams_build/lib/mysql/mysql-connector-java-5.0.8-bin.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/reload/reload-diva.jar"/>
         <archive path="/lams_build/lib/reload/reload-jdom.jar"/>
         <archive path="/lams_build/lib/reload/reload-moonunit.jar"/>
@@ -46,5 +45,6 @@
         <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.0.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/xstream/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
+        <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
     </library>
 </eclipse-userlibraries>

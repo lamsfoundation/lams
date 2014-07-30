@@ -1,31 +1,29 @@
 /*
- Copyright (C) 2002-2004 MySQL AB
+  Copyright (c) 2002, 2014, Oracle and/or its affiliates. All rights reserved.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of version 2 of the GNU General Public License as 
- published by the Free Software Foundation.
+  The MySQL Connector/J is licensed under the terms of the GPLv2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
+  There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+  this software, see the FLOSS License Exception
+  <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
- There are special exceptions to the terms and conditions of the GPL 
- as it is applied to this software. View the full text of the 
- exception in file EXCEPTIONS-CONNECTOR-J in the directory of this 
- software distribution.
+  This program is free software; you can redistribute it and/or modify it under the terms
+  of the GNU General Public License as published by the Free Software Foundation; version 2
+  of the License.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+  You should have received a copy of the GNU General Public License along with this
+  program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+  Floor, Boston, MA 02110-1301  USA
 
  */
+
 package com.mysql.jdbc;
 
 import java.sql.Types;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -37,7 +35,7 @@ import java.util.Map;
  * @author Mark Matthews
  * @version $Id$
  */
-final class MysqlDefs {
+public final class MysqlDefs {
 	// ~ Static fields/initializers
 	// ---------------------------------------------
 
@@ -81,7 +79,7 @@ final class MysqlDefs {
 
 	static final int FIELD_TYPE_BIT = 16;
 
-	static final int FIELD_TYPE_BLOB = 252;
+	public static final int FIELD_TYPE_BLOB = 252;
 
 	static final int FIELD_TYPE_DATE = 10;
 
@@ -485,85 +483,85 @@ final class MysqlDefs {
 		}
 	}
 
-	private static Map mysqlToJdbcTypesMap = new HashMap();
+	private static Map<String, Integer> mysqlToJdbcTypesMap = new HashMap<String, Integer>();
 
 	static {
-		mysqlToJdbcTypesMap.put("BIT", new Integer(
+		mysqlToJdbcTypesMap.put("BIT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_BIT)));
 
-		mysqlToJdbcTypesMap.put("TINYINT", new Integer(
+		mysqlToJdbcTypesMap.put("TINYINT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_TINY)));
-		mysqlToJdbcTypesMap.put("SMALLINT", new Integer(
+		mysqlToJdbcTypesMap.put("SMALLINT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_SHORT)));
-		mysqlToJdbcTypesMap.put("MEDIUMINT", new Integer(
+		mysqlToJdbcTypesMap.put("MEDIUMINT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_INT24)));
-		mysqlToJdbcTypesMap.put("INT", new Integer(
+		mysqlToJdbcTypesMap.put("INT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_LONG)));
-		mysqlToJdbcTypesMap.put("INTEGER", new Integer(
+		mysqlToJdbcTypesMap.put("INTEGER", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_LONG)));
-		mysqlToJdbcTypesMap.put("BIGINT", new Integer(
+		mysqlToJdbcTypesMap.put("BIGINT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_LONGLONG)));
-		mysqlToJdbcTypesMap.put("INT24", new Integer(
+		mysqlToJdbcTypesMap.put("INT24", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_INT24)));
-		mysqlToJdbcTypesMap.put("REAL", new Integer(
+		mysqlToJdbcTypesMap.put("REAL", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DOUBLE)));
-		mysqlToJdbcTypesMap.put("FLOAT", new Integer(
+		mysqlToJdbcTypesMap.put("FLOAT", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_FLOAT)));
-		mysqlToJdbcTypesMap.put("DECIMAL", new Integer(
+		mysqlToJdbcTypesMap.put("DECIMAL", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DECIMAL)));
-		mysqlToJdbcTypesMap.put("NUMERIC", new Integer(
+		mysqlToJdbcTypesMap.put("NUMERIC", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DECIMAL)));
-		mysqlToJdbcTypesMap.put("DOUBLE", new Integer(
+		mysqlToJdbcTypesMap.put("DOUBLE", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DOUBLE)));
-		mysqlToJdbcTypesMap.put("CHAR", new Integer(
+		mysqlToJdbcTypesMap.put("CHAR", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_STRING)));
-		mysqlToJdbcTypesMap.put("VARCHAR", new Integer(
+		mysqlToJdbcTypesMap.put("VARCHAR", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_VAR_STRING)));
-		mysqlToJdbcTypesMap.put("DATE", new Integer(
+		mysqlToJdbcTypesMap.put("DATE", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DATE)));
-		mysqlToJdbcTypesMap.put("TIME", new Integer(
+		mysqlToJdbcTypesMap.put("TIME", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_TIME)));
-		mysqlToJdbcTypesMap.put("YEAR", new Integer(
+		mysqlToJdbcTypesMap.put("YEAR", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_YEAR)));
-		mysqlToJdbcTypesMap.put("TIMESTAMP", new Integer(
+		mysqlToJdbcTypesMap.put("TIMESTAMP", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_TIMESTAMP)));
-		mysqlToJdbcTypesMap.put("DATETIME", new Integer(
+		mysqlToJdbcTypesMap.put("DATETIME", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_DATETIME)));
-		mysqlToJdbcTypesMap.put("TINYBLOB", new Integer(java.sql.Types.BINARY));
-		mysqlToJdbcTypesMap.put("BLOB", new Integer(
+		mysqlToJdbcTypesMap.put("TINYBLOB", Integer.valueOf(java.sql.Types.BINARY));
+		mysqlToJdbcTypesMap.put("BLOB", Integer.valueOf(
 				java.sql.Types.LONGVARBINARY));
-		mysqlToJdbcTypesMap.put("MEDIUMBLOB", new Integer(
+		mysqlToJdbcTypesMap.put("MEDIUMBLOB", Integer.valueOf(
 				java.sql.Types.LONGVARBINARY));
-		mysqlToJdbcTypesMap.put("LONGBLOB", new Integer(
+		mysqlToJdbcTypesMap.put("LONGBLOB", Integer.valueOf(
 				java.sql.Types.LONGVARBINARY));
 		mysqlToJdbcTypesMap
-				.put("TINYTEXT", new Integer(java.sql.Types.VARCHAR));
+				.put("TINYTEXT", Integer.valueOf(java.sql.Types.VARCHAR));
 		mysqlToJdbcTypesMap
-				.put("TEXT", new Integer(java.sql.Types.LONGVARCHAR));
-		mysqlToJdbcTypesMap.put("MEDIUMTEXT", new Integer(
+				.put("TEXT", Integer.valueOf(java.sql.Types.LONGVARCHAR));
+		mysqlToJdbcTypesMap.put("MEDIUMTEXT", Integer.valueOf(
 				java.sql.Types.LONGVARCHAR));
-		mysqlToJdbcTypesMap.put("LONGTEXT", new Integer(
+		mysqlToJdbcTypesMap.put("LONGTEXT", Integer.valueOf(
 				java.sql.Types.LONGVARCHAR));
-		mysqlToJdbcTypesMap.put("ENUM", new Integer(
+		mysqlToJdbcTypesMap.put("ENUM", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_ENUM)));
-		mysqlToJdbcTypesMap.put("SET", new Integer(
+		mysqlToJdbcTypesMap.put("SET", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_SET)));
-		mysqlToJdbcTypesMap.put("GEOMETRY", new Integer(
+		mysqlToJdbcTypesMap.put("GEOMETRY", Integer.valueOf(
 				mysqlToJavaType(FIELD_TYPE_GEOMETRY)));
 	}
 
 	static final void appendJdbcTypeMappingQuery(StringBuffer buf, String mysqlTypeColumnName) {
 
 		buf.append("CASE ");
-		Map typesMap = new HashMap();
+		Map<String, Integer> typesMap = new HashMap<String, Integer>();
 		typesMap.putAll(mysqlToJdbcTypesMap);
-		typesMap.put("BINARY", new Integer(Types.BINARY));
-		typesMap.put("VARBINARY", new Integer(Types.VARBINARY));
+		typesMap.put("BINARY", Integer.valueOf(Types.BINARY));
+		typesMap.put("VARBINARY", Integer.valueOf(Types.VARBINARY));
 		
-		Iterator mysqlTypes = typesMap.keySet().iterator();
+		Iterator<String> mysqlTypes = typesMap.keySet().iterator();
 		
 		while (mysqlTypes.hasNext()) {
-			String mysqlTypeName = (String)mysqlTypes.next();
+			String mysqlTypeName = mysqlTypes.next();
 			buf.append(" WHEN ");
 			buf.append(mysqlTypeColumnName);
 			buf.append("='");
