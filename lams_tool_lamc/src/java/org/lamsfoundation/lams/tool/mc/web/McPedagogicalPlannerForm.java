@@ -102,12 +102,12 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setCandidateAnswersString("");
 	} else if (!errors.isEmpty()) {
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
-	    Map<String, String> paramMap = request.getParameterMap();
+	    Map<String, String[]> paramMap = request.getParameterMap();
 	    setCandidateAnswerCount(new ArrayList<Integer>(getQuestionCount()));
 	    for (String key : paramMap.keySet()) {
 		if (key.startsWith(McAppConstants.CANDIDATE_ANSWER_PREFIX)) {
-		    Object param = paramMap.get(key);
-		    String answer = ((String[]) param)[0];
+		    String[] param = paramMap.get(key);
+		    String answer = param[0];
 		    candidateAnswersBuilder.append(key).append('=').append(answer).append('&');
 		}
 	    }
@@ -194,10 +194,10 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public List<McOptionDTO> extractCandidateAnswers(HttpServletRequest request, int questionIndex)
 	    throws UnsupportedEncodingException {
-	Map<String, String> paramMap = request.getParameterMap();
-	Object param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
+	Map<String, String[]> paramMap = request.getParameterMap();
+	String[] param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
 
-	int count = NumberUtils.toInt(((String[]) param)[0]);
+	int count = NumberUtils.toInt(param[0]);
 	int correct = Integer.parseInt(getCorrect(questionIndex - 1));
 	List<McOptionDTO> candidateAnswerList = new ArrayList<McOptionDTO>();
 	for (int index = 1; index <= count; index++) {

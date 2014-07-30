@@ -162,10 +162,10 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
 	int questionDisplayOrder = plannerForm.getQuestionCount().intValue() + 1;
 	plannerForm.setCandidateAnswerCount(new ArrayList<Integer>(plannerForm.getQuestionCount()));
-	Map<String, String> paramMap = request.getParameterMap();
+	Map<String, String[]> paramMap = request.getParameterMap();
 	for (int questionIndex = 1; questionIndex < questionDisplayOrder; questionIndex++) {
-	    Object param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
-	    int count = NumberUtils.stringToInt(((String[]) param)[0]);
+	    String[] param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_COUNT + questionIndex);
+	    int count = NumberUtils.toInt(param[0]);
 	    plannerForm.getCandidateAnswerCount().add(count);
 	}
 	plannerForm.setQuestion(questionDisplayOrder - 1, "");
