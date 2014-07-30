@@ -23,8 +23,8 @@
 			<attribute name="javadoc_location" value="http://javasourcecode.org/html/open-source/quartz/quartz-1.5.2/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/main/slf4j-api-1.7.2.jbossorg-1.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/impl/main/slf4j-jboss-logmanager-1.0.3.GA.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/logging/main/jboss-logging-3.1.4.GA.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/javassist/main/javassist-3.18.1-GA.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/lib/endorsed/xercesImpl.jar"/>
