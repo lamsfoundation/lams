@@ -5,30 +5,28 @@
 	<import file="../lams_build/build_base.xml"/> 
 
 	<!-- Additional properties -->
-	<property file="../lams_build/shared.properties"/>
-	
-	<available file="../${lams_planner}/build.xml" property="planner.available" />
+	<available file="../lams_planner/build.xml" property="planner.available" />
 		
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
 	<target name="_copy-planner" if="planner.available" depends="_copy-language">
 		<echo>Copying Pedagogical Planner files</echo>
-		<ant antfile="../${lams_planner}/build.xml" target="_copy-to-central" />
+		<ant antfile="../lams_planner/build.xml" target="_copy-to-central" />
 	</target>
 	
 	
 	<target name="_copy-war-resources">
 		<!-- Internal target: Adds additional web content to WAR -->
 		<echo>${ant.project.name}: Copying favicon from conf to assembly</echo>
-		<copy todir="${build.war.assembly}">
-			<fileset dir="${conf.dir}/favicon/${conf.application}">
+		<copy todir="${basedir}/build/war/assembly">
+			<fileset dir="${conf.dir}/favicon/lams">
 				<include name="**/*.ico"/>
 			</fileset>
 		</copy>
 		
 		<echo>${ant.project.name}: Copying Flash files from conf to assembly</echo>
-		<copy todir="${build.war.assembly}/flashxml">
-			<fileset dir="${conf.dir}/flashxml/${conf.application}">
+		<copy todir="${basedir}/build/war/assembly/flashxml">
+			<fileset dir="${conf.dir}/flashxml/lams">
 				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
@@ -40,16 +38,16 @@
 		
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
-		<copy todir="${build.lib}/${product}.war">
-			<fileset dir="${build.war.assembly}">
+		<copy todir="${basedir}/build/lib/${product}.war">
+			<fileset dir="${basedir}/build/war/assembly">
 				<include name="**"/>
 			</fileset>
-			<fileset dir="${build.war}">
+			<fileset dir="${basedir}/build/war">
 				<include name="WEB-INF/web.xml"/>
 			</fileset>
 		</copy>
-		<copy todir="${build.lib}/${product}.war/META-INF" verbose="true">
-			<fileset dir="${build}">
+		<copy todir="${basedir}/build/lib/${product}.war/META-INF" verbose="true">
+			<fileset dir="${basedir}/build">
 				<include name="MANIFEST.MF"/>
 			</fileset>
 		</copy>
@@ -59,27 +57,27 @@
 	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
 		<echo>Removing cached files</echo>
 		<delete quiet="true">
-			<fileset dir="${jboss.deploy}/tmp"/>
-			<fileset dir="${jboss.deploy}/work"/>
+			<fileset dir="${jboss.home}server/default/deploy/lams.ear/tmp"/>
+			<fileset dir="${jboss.home}server/default/deploy/lams.ear/work"/>
 		</delete>
 				
 		<echo>${ant.project.name}: Deploying exploded WAR</echo>
-		<copy todir="${jboss.deploy}/${product}.war">
-			<fileset dir="${build.lib}/${product}.war" />
+		<copy todir="${jboss.home}server/default/deploy/lams.ear/${product}.war">
+			<fileset dir="${basedir}/build/lib/${product}.war" />
 		</copy>
 		
 		<echo>${ant.project.name}: Copying language files</echo>
-		<copy todir="${jboss.deploy}/lams-dictionary.jar" overwrite="true">
-		   <fileset dir="${build.lib}/language" />
+		<copy todir="${jboss.home}server/default/deploy/lams.ear/lams-dictionary.jar" overwrite="true">
+		   <fileset dir="${basedir}/build/lib/language" />
 		</copy>
 	</target>
 	
 	
 	<target name="build-tag-library" description="Generates Tag Library from Java source using XDoclet.">
 		<echo>Building LAMS Tag Library using XDoclet</echo>
-		<webdoclet destDir="${conf.webinf.dir}/tlds/lams"
-			       mergeDir="${conf.xdoclet.dir}"
-			       force="${xdoclet.force}">
+		<webdoclet destDir="${conf.web.dir}/WEB-INF/tlds/lams"
+			       mergeDir="${conf.dir}/xdoclet"
+			       >
 			<fileset dir="${src.java.dir}">
 				<include name="**/*.java" />
 				<exclude name="**/*Skeleton.java" />

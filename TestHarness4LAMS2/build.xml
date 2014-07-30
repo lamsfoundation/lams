@@ -7,16 +7,16 @@
 	<property name="lib" value="./lib"/>
 
 	<path id="project.classpath">
-		<pathelement location="${build}" />
-		<fileset dir="${lib}">
+		<pathelement location="${basedir}/build" />
+		<fileset dir="lib">
 			<include name="*.jar" />
 		</fileset>
 		<pathelement location="${java.class.path}" />
 	</path>
 
 	<target name="compile" depends="clean">
-		<javac destdir="${build}" srcdir="${src}"
-        	debug="on" source="1.6" target="1.6" includeantruntime="false" >
+		<javac destdir="${basedir}/build" srcdir="${src}"
+        	debug="on" source="1.8" target="1.8" includeantruntime="false" >
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>
@@ -26,9 +26,9 @@
 	</target>
 
 	<target name="clean">
-		<mkdir dir="${build}"/>
+		<mkdir dir="${basedir}/build"/>
 		<delete includeemptydirs="true">
-			<fileset dir="${build}" includes="**/*"/>
+			<fileset dir="${basedir}/build" includes="**/*"/>
 		</delete>
 	</target>
 

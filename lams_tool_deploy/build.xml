@@ -8,7 +8,7 @@
 	
 	<property name="build.classes.java" value="build/classes" />
 	<property name="build.lib" value="build/lib" />
-	<property name="jar.file" value="${build.lib}/lams-tool-deploy.jar" />
+	<property name="jar.file" value="${basedir}/build/lib/lams-tool-deploy.jar" />
 
 	<property name="src.java.dir" value="src/java" />
 
@@ -19,16 +19,16 @@
         <fileset dir="${lib.dir}">
             <include name="**/*.jar"/>
         </fileset>
-		<fileset dir="${sharedlib}">
+		<fileset dir="../lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${deploy.tool.dir}">
+		<fileset dir="../lams_build/deploy-tool">
 			<include name="commons-*.jar" />
 		</fileset>
 	</path>
 
 	<path id="product.classpath">
-		<pathelement location="${build.classes.java}" />
+		<pathelement location="${basedir}/build/classes/java" />
 		<path refid="libs.classpath" />
 	</path>
 
@@ -39,8 +39,8 @@
 		<delete dir="build" quiet="true" />
 		
 		<echo>${ant.project.name}: Creating build dir structure</echo>
-		<mkdir dir="${build.classes.java}" />
-		<mkdir dir="${build.lib}" />
+		<mkdir dir="${basedir}/build/classes/java" />
+		<mkdir dir="${basedir}/build/lib" />
 	</target>
 
 	
@@ -49,19 +49,19 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-               source="1.6"
-			   target="1.6"
+               source="1.8"
+			   target="1.8"
                debug="${debug}"
 			   includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
-               destdir="${build.classes.java}"
+               destdir="${basedir}/build/classes/java"
 		>
         <compilerarg line="-encoding utf-8"/>
         </javac>
 		
 		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
-	 	<copy todir="${build.classes.java}" overwrite="true">
+	 	<copy todir="${basedir}/build/classes/java" overwrite="true">
 			<fileset dir="${src.java.dir}">
 				<include name="**/*.properties"/>
 			</fileset>
@@ -73,12 +73,12 @@
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
 		<jar jarfile="${jar.file}">
-			<fileset dir="${build.classes.java}" />
+			<fileset dir="${basedir}/build/classes/java" />
 		</jar>
 	</target>
 
 
 	<target name="deploy" depends="_build-jar" description="Builds and copies JAR to lams_build/deploy-tool/lib">
-		<copy todir="${deploy.tool.dir}" file="${jar.file}" />
+		<copy todir="../lams_build/deploy-tool" file="${jar.file}" />
 	</target>
 </project>

@@ -8,20 +8,20 @@
 	<target name="_copy-war-resources">
 		<!-- Internal target: Adds additional web content to WAR -->
 		<echo>${ant.project.name}: Copying additional resources for WAR</echo>
-	 	<copy todir="${build.war}/WEB-INF">
-			<fileset dir="${conf.webinf.dir}">
+	 	<copy todir="${basedir}/build/war/WEB-INF">
+			<fileset dir="${conf.web.dir}/WEB-INF">
 				<include name="*.xml"/>
 			</fileset>
 	 	</copy>
 			
-		<copy todir="${build.war.assembly}/images">
-			<fileset dir="${conf.dir}/${conf.application}">
+		<copy todir="${basedir}/build/war/assembly/images">
+			<fileset dir="${conf.dir}/lams">
 				<include name="*.swf" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${build.war.assembly}">
-			<fileset dir="${conf.dir}/${conf.application}">
+		<copy todir="${basedir}/build/war/assembly">
+			<fileset dir="${conf.dir}/lams">
 				<include name="news.html" />
 			</fileset>
 		</copy>
@@ -33,10 +33,10 @@
 			         _jsp-plaincopy, _jsp-precompile">
 		<!-- Internal target: Creates WAR file. -->	
 		<echo>${ant.project.name}: Building WAR</echo>
-		<war warfile="${build.lib}/${product}.war" 
-  		     webxml="${build.war}/WEB-INF/web.xml"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.war.assembly}">
+		<war warfile="${basedir}/build/lib/${product}.war" 
+  		     webxml="${basedir}/build/war/WEB-INF/web.xml"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/war/assembly">
 				<include name="**" />
 			</fileset>
 		</war>

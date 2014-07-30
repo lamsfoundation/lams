@@ -18,16 +18,16 @@
 	
 	<!-- Set library paths -->
 	<path id="libs.classpath" >
-		<fileset dir="${sharedlib}">
+		<fileset dir="../lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${j2eelibs}">
+		<fileset dir="${jboss.home}/common/lib">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="${jbosslibs}">
+		<fileset dir="${jboss.home}/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${jbossweblibs}">
+		<fileset dir="${jboss.home}server/default/deploy/jbossweb.sar">
 			<include name="*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
@@ -38,7 +38,7 @@
 	
 	<path id="product.classpath">
 		<path refid="libs.classpath"/>
-		<pathelement location="${build.classes.java}"/>
+		<pathelement location="${basedir}/build/classes/java"/>
 	</path>
 	
 	<path id="logging.classpath">
@@ -97,25 +97,25 @@
 	<target name="_clean-dirs">
 		<!-- Internal target: Recreates dirs for compiled output files. -->
 		<echo>${ant.project.name}: Removing cache and build folders</echo>
-		<delete dir="${jboss.server.instance}/tmp" quiet="true" />
-		<delete dir="${jboss.server.instance}/work" quiet="true" />
-		<delete dir="${build}" quiet="true" />
+		<delete dir="${jboss.home}server/default/tmp" quiet="true" />
+		<delete dir="${jboss.home}server/default/work" quiet="true" />
+		<delete dir="${basedir}/build" quiet="true" />
 				
 		<echo>${ant.project.name}: Creating build dir structure</echo>
-		<mkdir dir="${build.classes.java}" />
-		<mkdir dir="${build.lib}" />
-		<mkdir dir="${build.deploy}" />
-		<mkdir dir="${build.deploy.sql}" />
-		<mkdir dir="${build.deploy.language}" />
-		<mkdir dir="${build.war}" />
+		<mkdir dir="${basedir}/build/classes/java" />
+		<mkdir dir="${basedir}/build/lib" />
+		<mkdir dir="${basedir}/build/deploy" />
+		<mkdir dir="${basedir}/build/deploy/sql" />
+		<mkdir dir="${basedir}/build/deploy/language" />
+		<mkdir dir="${basedir}/build/war" />
 	</target>
 	
 	
 	<target name="copy-tags" description="Copies LAMS TLD and TAGs.">
 		<echo>${ant.project.name}: Copying tags from Central</echo>
-   		<copy todir="${conf.webinf.dir}/tlds/lams" 
+   		<copy todir="${conf.web.dir}/WEB-INF/tlds/lams" 
    			  file="${tag.web.dir}/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
-		<copy todir="${conf.webinf.dir}/tags" overwrite="true" verbose="true">
+		<copy todir="${conf.web.dir}/WEB-INF/tags" overwrite="true" verbose="true">
 			<fileset dir="${tag.web.dir}/tags" />
 		</copy>
 	</target>
@@ -126,13 +126,13 @@
 	
 	<target name="_db-script">
 		<!-- Internal target: Runs SQL script given by call parameter. -->
-		<sql driver="${db.driver}"
+		<sql driver="com.mysql.jdbc.Driver"
 		     url="${db.url.build}"
 			 userid="${db.username}"
 			 password="${db.password}"
-			 encoding="${db.encoding}">
+			 encoding="utf8">
 			<classpath>
-				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
+				<fileset dir="../lams_build/lib/wildfly/modules/com/mysql/main" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${sql.script}" />
 		</sql>
@@ -147,18 +147,18 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-	           source="1.6"
-			   target="1.6"
+	           source="1.8"
+			   target="1.8"
                debug="on"
                includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
-               destdir="${build.classes.java}">
+               destdir="${basedir}/build/classes/java">
                <compilerarg line="-encoding utf-8"/>
         </javac>
         
 		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
-	 	<copy todir="${build.classes.java}" overwrite="true">
+	 	<copy todir="${basedir}/build/classes/java" overwrite="true">
 			<fileset dir="${src.java.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.properties"/>
@@ -185,21 +185,21 @@
 		-->
 		<echo>${ant.project.name}: Building XML files using XDoclet</echo>
 
-		<webdoclet destDir="${build.war}/WEB-INF"
-			       mergeDir="${conf.xdoclet.dir}"
-			       force="${xdoclet.force}">
+		<webdoclet destDir="${basedir}/build/war/WEB-INF"
+			       mergeDir="${conf.dir}/xdoclet"
+			       >
 			<fileset dir="${src.java.dir}">
 				<include name="**/*.java" />
 				<exclude name="**/*Skeleton.java" />
 			</fileset>
-			<deploymentdescriptor sessiontimeout="${sessiontimeout}" servletspec="2.4" distributable="false" />
+			<deploymentdescriptor sessiontimeout="120" servletspec="2.4" distributable="false" />
 			<strutsconfigxml version="1.2" validateXML="true" />
 			<strutsdynaformvalidationxml version="1.1.3"  />
 		</webdoclet>
 		
 		<echo>Overwriting generated code with custom files for ${ant.project.name}, if exist</echo>
-	 	<copy todir="${build.war}/WEB-INF" overwrite="true" verbose="true">
-			<fileset dir="${conf.webinf.dir}">
+	 	<copy todir="${basedir}/build/war/WEB-INF" overwrite="true" verbose="true">
+			<fileset dir="${conf.web.dir}/WEB-INF">
 				<include name="web.xml"/>
 				<include name="struts-config.xml"/>
 				<include name="validation.xml"/>
@@ -218,15 +218,15 @@
 		
 		<!-- Generate HBM files if annotations exist -->
 		<echo>${ant.project.name}: Building Hibernate XML files using XDoclet</echo>
-		<hibernatedoclet destdir="${build.classes.java}" excludedtags="@version,@author,@todo" force="true">
+		<hibernatedoclet destdir="${basedir}/build/classes/java" excludedtags="@version,@author,@todo" force="true">
 			<fileset refid="hbm.fileset" />
 			<hibernate version="3.0" />
 		</hibernatedoclet>
 		
 		<!-- Copy remaining HBM non-generated files from conf directory -->
 		<echo>${ant.project.name}: Copying static Hibernate XML files</echo>
-		<copy todir="${build.classes.java}" overwrite="true">
-			<fileset dir="${conf.hibernate.mapping.dir}" erroronmissingdir="false">
+		<copy todir="${basedir}/build/classes/java" overwrite="true">
+			<fileset dir="${conf.dir}/hibernate/mappings" erroronmissingdir="false">
 				<include name="**/*.hbm.xml"/>
 			</fileset>
 		</copy>
@@ -240,8 +240,8 @@
 		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
 		     Required only for base products, not Tools -->
 		<echo>${ant.project.name}: Copying language files to build dir</echo>
-		<copy todir="${build.lib}/language/${product.path.filesystem}">
-			<fileset dir="${conf.language.dir}">
+		<copy todir="${basedir}/build/lib/language/${product.path.filesystem}">
+			<fileset dir="${conf.dir}/language/lams">
 				<include name="**/*.properties"/>
 				<include name="**/*.txt"/>
 			</fileset>
@@ -251,7 +251,7 @@
 	<target name="_build-manifest">
 		<!-- Internal target: Creates a JAR/WAR manifest out of a template. -->
 		<echo>${ant.project.name}: Preparing manifest</echo>
-		<copy tofile="${build}/MANIFEST.MF" verbose="true">
+		<copy tofile="${basedir}/build/MANIFEST.MF" verbose="true">
 			<fileset dir="${base.dir}/conf/j2ee">
 				<include name="MANIFEST-template.MF" />
 			</fileset>
@@ -266,9 +266,9 @@
 	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
-		<jar jarfile="${build.lib}/${product}.jar"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.classes.java}" />
+		<jar jarfile="${basedir}/build/lib/${product}.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java" />
 		</jar>
 	</target>
 
@@ -277,10 +277,10 @@
 		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
-		<war warfile="${build.lib}/${product}.war" 
-  		     webxml="${build.war}/WEB-INF/web.xml"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.war.assembly}">
+		<war warfile="${basedir}/build/lib/${product}.war" 
+  		     webxml="${basedir}/build/war/WEB-INF/web.xml"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/war/assembly">
 				<include name="**" />
 			</fileset>
 		</war>
@@ -296,17 +296,17 @@
 	
 	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">	
 		<echo>${ant.project.name}: Deploying JAR</echo>
-		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" overwrite="true" verbose="true" />
+		<copy file="${basedir}/build/lib/${product}.jar" todir="${jboss.home}server/default/deploy/lams.ear" overwrite="true" verbose="true" />
 	</target>
 	
 	
 	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
 		<echo>${ant.project.name}: Deploying WAR</echo>
-		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" overwrite="true" verbose="true" />
+		<copy file="${basedir}/build/lib/${product}.war" todir="${jboss.home}server/default/deploy/lams.ear" overwrite="true" verbose="true" />
 		
 		<echo>Copying language files for ${ant.project.name}, if exist</echo>
-		<copy todir="${jboss.deploy}/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
-		   <fileset dir="${conf.language.dir}" erroronmissingdir="false">
+		<copy todir="${jboss.home}server/default/deploy/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		   <fileset dir="${conf.dir}/language/lams" erroronmissingdir="false">
 		    <include name="**/*.properties"/>
 		    <include name="**/*.txt"/>
 		   </fileset>
@@ -316,8 +316,8 @@
 	
 	<target name="copy-to-lams-lib" if="product.core" depends="_build-jar"
 		    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
-  		<copy overwrite="yes" todir="${sharedlib}/lams">
-  			<fileset dir="${build.lib}">
+  		<copy overwrite="yes" todir="../lams_build/lib/lams">
+  			<fileset dir="${basedir}/build/lib">
   				<include name="${product}.jar"/>
   			</fileset>
   		</copy>	
@@ -330,12 +330,12 @@
 		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" quiet="true" />
 		<echo>${ant.project.name}: Enable module in EAR config files</echo>
 		<!-- Remove existing entries first, so it is possible to run target multiple times -->
-		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"
+		<replaceregexp file="${jboss.home}server/default/deploy/lams.ear/META-INF/application.xml"
 					   flags="gi"
 		               match="${moduleActivationEntry}" 
 			           replace=""
 		/>
-		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"
+		<replaceregexp file="${jboss.home}server/default/deploy/lams.ear/META-INF/application.xml"
 			 		   flags="i"
 			           match="(${moduleActivationPlaceholder})"
 			           replace="${moduleActivationEntry}    \1"
@@ -346,16 +346,16 @@
 	<!-- Explode WAR                                        				 -->
 	<!-- =================================================================== -->
 	
-	<available property="product.war.exists" file="${jboss.deploy}/${product}.war" type="file" />
+	<available property="product.war.exists" file="${jboss.home}server/default/deploy/lams.ear/${product}.war" type="file" />
 	
 	<target name="explode-war" if="product.war.exists" description="Explodes deployed WAR to folder.">
 		<echo>${ant.project.name}: Renaming existing WAR</echo>
-		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
+		<move tofile="${jboss.home}server/default/deploy/lams.ear/temp-${product}.war" file="${jboss.home}server/default/deploy/lams.ear/${product}.war" />
 		<echo>${ant.project.name}: Exploding WAR to folder</echo>
-		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<unjar src="${jboss.home}server/default/deploy/lams.ear/temp-${product}.war" dest="${jboss.home}server/default/deploy/lams.ear/${product}.war" />
 		<echo>${ant.project.name}: Removing temporary WAR</echo>
 		<delete>
-			<fileset dir="${jboss.deploy}">
+			<fileset dir="${jboss.home}server/default/deploy/lams.ear">
 				<include name="temp-${product}.war" />
 			</fileset>
 		</delete>
@@ -364,7 +364,7 @@
 	
 	<target name="explode-war-synchronize" description="Copies web files into exploded WAR folder.">
 		<echo>Overwriting deployed ${ant.project.name} web files with source files</echo>
-		<copy todir="${jboss.deploy}/${product}.war" verbose="yes">
+		<copy todir="${jboss.home}server/default/deploy/lams.ear/${product}.war" verbose="yes">
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.*" />
 			</fileset>
@@ -374,10 +374,10 @@
 	
 	<target name="explode-war-delete" description="Deletes exploded WAR folder.">
 		<echo>${ant.project.name}: Removing WAR folder</echo>
-		<delete dir="${jboss.deploy}/${product}.war" quiet="true" />
+		<delete dir="${jboss.home}server/default/deploy/lams.ear/${product}.war" quiet="true" />
 
 		<echo>Removing temporary WAR for ${ant.project.name}, if exists</echo>
-		<delete file="${jboss.deploy}/temp-${product}.war" quiet="true" />
+		<delete file="${jboss.home}server/default/deploy/lams.ear/temp-${product}.war" quiet="true" />
 	</target>
 	
 	
@@ -393,7 +393,7 @@
 		<!-- Work on a copy of web files, not originals
              Copy them to build.war directory first for processing -->
 		<echo>${ant.project.name}: Copying web files for building</echo>
-	 	<copy todir="${build.war}" overwrite="true">
+	 	<copy todir="${basedir}/build/war" overwrite="true">
 			<fileset dir="${conf.web.dir}">
 				<include name="**"/>
 				<!-- These were created or copied in _build-webdoclet task -->
@@ -410,10 +410,10 @@
 				<include name="jboss-common-core.jar" />
 				<include name="jboss-logging-spi.jar" />
 			</fileset>
-			<fileset dir="${jboss.ear.deployers}/jbossweb.deployer">
+			<fileset dir="${jboss.home}server/default/deployers/jbossweb.deployer">
 				<include name="*.jar" />
 			</fileset>
-	        <fileset dir="${jboss.ear.deploy}/jbossweb.sar">
+	        <fileset dir="${jboss.home}server/default/deploy/jbossweb.sar">
 	            <include name="jbossweb.jar" />
 	        </fileset>
 		</path>
@@ -425,9 +425,9 @@
 		
 		<!-- Generate Java files and put servlet mappings in web.xml file -->
 		<echo>${ant.project.name}: Generating Java source files from JSP pages</echo>
-		<jasper2 uriroot="${build.war}"
-			webXmlFragment="${build.war}/WEB-INF/generated_web.xml"
-			outputDir="${build.war}/WEB-INF/src"
+		<jasper2 uriroot="${basedir}/build/war"
+			webXmlFragment="${basedir}/build/war/WEB-INF/generated_web.xml"
+			outputDir="${basedir}/build/war/WEB-INF/src"
 			package="${product.path.jsp}"
 			addWebXmlMappings="true"
 			validateXml="false"
@@ -438,16 +438,16 @@
 		<echo>${ant.project.name}: Compiling JSP classes</echo>
 		
 		<!-- Make src folder if it does not exist i.e. no JSPs were compiled in previous step -->
-		<mkdir dir="${build.war}/WEB-INF/src"/>
-		<mkdir dir="${build.war}/WEB-INF/classes"/>
-	    <javac destdir="${build.war}/WEB-INF/classes"
+		<mkdir dir="${basedir}/build/war/WEB-INF/src"/>
+		<mkdir dir="${basedir}/build/war/WEB-INF/classes"/>
+	    <javac destdir="${basedir}/build/war/WEB-INF/classes"
 			   compiler="modern"
-               source="1.6"
-			   target="1.6"
+               source="1.8"
+			   target="1.8"
 	           debug="off"
 			   includeantruntime="false"
 	    	   failonerror="true"
-	           srcdir="${build.war}/WEB-INF/src" 
+	           srcdir="${basedir}/build/war/WEB-INF/src" 
 		  	   excludes="**/*.smap"
 	    	   classpathref="jsp.precompile.classpath">
 	      <compilerarg line="-encoding utf-8"/>
@@ -458,8 +458,8 @@
 		<!-- Prepare files for WAR so copy processing results to assembly dir,
 		     excluding plain JSP and tags -->
 		<echo>${ant.project.name}: Copying compiled and remaining web resources</echo>
-		<copy todir="${build.war.assembly}">
-			<fileset dir="${build.war}">
+		<copy todir="${basedir}/build/war/assembly">
+			<fileset dir="${basedir}/build/war">
 				<include name="**"/>
 				<exclude name="assembly/"/>
 				<exclude name="WEB-INF/src/"/>
@@ -475,7 +475,7 @@
 		</copy>
 		
 		<echo>${ant.project.name}: Copying additional libraries</echo>
-	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" verbose="true">
+	 	<copy todir="${basedir}/build/war/assembly/WEB-INF/lib" flatten="true" verbose="true">
 			<fileset dir="${basedir}/lib" erroronmissingdir="false">
 				<include name="**/*"/>
 			</fileset>
@@ -491,8 +491,8 @@
 
 		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
 		<echo>Copying web resources</echo>
-	 	<copy todir="${build.war.assembly}">
-			<fileset dir="${build.war}">
+	 	<copy todir="${basedir}/build/war/assembly">
+			<fileset dir="${basedir}/build/war">
 				<!-- Some XML files were created or copied in _build-webdoclet task --> 
 				<include name="**"/>
 				<exclude name="assembly/"/>
@@ -508,7 +508,7 @@
 	 	</copy>
 		
 		<echo>${ant.project.name}: Copying additional libraries</echo>
-	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" verbose="true">
+	 	<copy todir="${basedir}/build/war/assembly/WEB-INF/lib" flatten="true" verbose="true">
 			<fileset dir="${basedir}/lib" erroronmissingdir="false">
 				<include name="**/*"/>
 			</fileset>

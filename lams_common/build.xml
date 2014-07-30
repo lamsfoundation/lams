@@ -2,7 +2,7 @@
 
 <project name="LAMS Common" basedir="." default="print-usage">
 	
-	<import file="../lams_build/build_base.xml"/> 
+	<import file="../lams_build/build_base.xml"/>
 
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
 	<fileset id="hbm.fileset" dir="${src.java.dir}"
@@ -44,26 +44,26 @@
 		
 	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
 		<echo>${ant.project.name}: Building main JAR</echo>
-		<jar jarfile="${build.lib}/${product}.jar"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.classes.java}">
+		<jar jarfile="${basedir}/build/lib/${product}.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java">
 				<exclude name="**/LoginRequestValve.class"/>
 				<exclude name="**/SingleSignOn.class"/>
 			</fileset>
 		</jar>
 		
 		<echo>${ant.project.name}: Building Session JAR</echo>
-		<jar jarfile="${build.lib}/lams-session.jar"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.classes.java}">
+		<jar jarfile="${basedir}/build/lib/lams-session.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java">
 				<include name="${product.path.filesystem}/web/session/*"/>
 			</fileset>
 		</jar>
 		
 		<echo>${ant.project.name}: Building Valve JAR</echo>
-		<jar jarfile="${build.lib}/lams-valve.jar"
-			 manifest="${build}/MANIFEST.MF">
-			<fileset dir="${build.classes.java}">
+		<jar jarfile="${basedir}/build/lib/lams-valve.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java">
 				<include name="${product.path.filesystem}/integration/security/LoginRequestValve.class"/>
 				<include name="${product.path.filesystem}/integration/security/SingleSignOn.class"/>
 			</fileset>
@@ -73,8 +73,8 @@
 	
 	<target name="deploy-libraries" depends="_build-jar" description="Deploys library JARs.">
 		<echo>Deploying library JARs</echo>
-		<copy todir="${jboss.server.instance}/lib" overwrite="true" verbose="true">
-			<fileset dir="${build.lib}/">
+		<copy todir="${jboss.home}server/default/lib" overwrite="true" verbose="true">
+			<fileset dir="${basedir}/build/lib/">
 				<include name="lams-session.jar" />
 				<include name="lams-valve.jar" />
 			</fileset>
@@ -87,7 +87,7 @@
 		
 		<echo>Rebuilding LAMS database</echo>
 		<tstamp/>
-		<copy todir="${build.sql}" overwrite="true" verbose="true">
+		<copy todir="${basedir}/build/sql" overwrite="true" verbose="true">
 			<fileset dir="${db.scripts}/">
 				<include name="${lamsconf.table.sql}" />
                 <include name="create_lams_11_db.sql" />
@@ -98,28 +98,28 @@
 	        	<filter token="contentrepository.directory" value="${contentrepository.directory}" />
                 <filter token="temp.directory" value="${contentrepository.base}/temp" />
                 <filter token="dump.directory" value="${contentrepository.base}/dump" />
-	        	<filter token="ear.directory" value="${jboss.deploy}" />
+	        	<filter token="ear.directory" value="${jboss.home}server/default/deploy/lams.ear" />
 	        </filterset>
 		</copy>
 		
 		<echo>Executing SQL scripts</echo>
-		<sql driver="${db.driver}"
+		<sql driver="com.mysql.jdbc.Driver"
 		     url="${db.url.init.build}"
 			 userid="${db.username}"
 			 password="${db.password}"
-			 encoding="${db.encoding}">
+			 encoding="utf8">
 			<classpath>
-				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
+				<fileset dir="../lams_build/lib/wildfly/modules/com/mysql/main" includes="*.jar"/> 
 			</classpath>
 			
-			<transaction src="${build.sql}/create_lams_11_db.sql"/>
+			<transaction src="${basedir}/build/sql/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<!-- Create tables for LAMS and other application's integration -->
 			<transaction src="${db.scripts}/create_integration_tables.sql"/>
-			<transaction src="${db.scripts}/insert_${conf.application}_users.sql"/> 
+			<transaction src="${db.scripts}/insert_lams_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
-			<transaction src="${build.sql}/${lamsconf.table.sql}"/>
+			<transaction src="${basedir}/build/sql/${lamsconf.table.sql}"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 			<!-- Create tables for Core Notebook Service -->
