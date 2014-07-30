@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -33,10 +32,11 @@ import java.util.Arrays;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.EntityKey;
-import org.hibernate.engine.ForeignKeys;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.internal.ForeignKeys;
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -45,27 +45,76 @@ import org.hibernate.persister.entity.EntityPersister;
  * @author Gavin King
  */
 public class ManyToOneType extends EntityType {
-	
 	private final boolean ignoreNotFound;
+	private boolean isLogicalOneToOne;
 
-	public ManyToOneType(String className) {
-		this( className, false );
+	/**
+	 * Creates a many-to-one association type with the given referenced entity.
+	 *
+	 * @param scope The scope for this instance.
+	 * @param referencedEntityName The name iof the referenced entity
+	 */
+	public ManyToOneType(TypeFactory.TypeScope scope, String referencedEntityName) {
+		this( scope, referencedEntityName, false );
 	}
 
-	public ManyToOneType(String className, boolean lazy) {
-		super( className, null, !lazy, true, false );
-		this.ignoreNotFound = false;
+	/**
+	 * Creates a many-to-one association type with the given referenced entity and the
+	 * given laziness characteristic
+	 *
+	 * @param scope The scope for this instance.
+	 * @param referencedEntityName The name iof the referenced entity
+	 * @param lazy Should the association be handled lazily
+	 */
+	public ManyToOneType(TypeFactory.TypeScope scope, String referencedEntityName, boolean lazy) {
+		this( scope, referencedEntityName, true, null, lazy, true, false, false );
 	}
 
+
+	/**
+	 * @deprecated Use {@link #ManyToOneType(TypeFactory.TypeScope, String, boolean, String, boolean, boolean, boolean, boolean ) } instead.
+	 */
+	@Deprecated
 	public ManyToOneType(
-			String entityName,
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
 			String uniqueKeyPropertyName,
 			boolean lazy,
 			boolean unwrapProxy,
 			boolean isEmbeddedInXML,
-			boolean ignoreNotFound) {
-		super( entityName, uniqueKeyPropertyName, !lazy, isEmbeddedInXML, unwrapProxy );
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
+	}
+
+	/**
+	 * @deprecated Use {@link #ManyToOneType(TypeFactory.TypeScope, String, boolean, String, boolean, boolean, boolean, boolean ) } instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public ManyToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
+	}
+
+	public ManyToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		super( scope, referencedEntityName, referenceToPrimaryKey, uniqueKeyPropertyName, !lazy, unwrapProxy );
 		this.ignoreNotFound = ignoreNotFound;
+		this.isLogicalOneToOne = isLogicalOneToOne;
 	}
 
 	protected boolean isNullable() {
@@ -73,16 +122,21 @@ public class ManyToOneType extends EntityType {
 	}
 
 	public boolean isAlwaysDirtyChecked() {
-		// If we have <tt>not-found="ignore"</tt> association mapped to a
-		// formula, we always need to dirty check it, so we can update the
-		// second-level cache
-		return ignoreNotFound;
+		// always need to dirty-check, even when non-updateable;
+		// this ensures that when the association is updated,
+		// the entity containing this association will be updated
+		// in the cache
+		return true;
 	}
 
 	public boolean isOneToOne() {
 		return false;
 	}
-	
+
+	public boolean isLogicalOneToOne() {
+		return isLogicalOneToOne;
+	}
+
 	public int getColumnSpan(Mapping mapping) throws MappingException {
 		// our column span is the number of columns in the PK
 		return getIdentifierOrUniqueKeyType( mapping ).getColumnSpan( mapping );
@@ -90,6 +144,16 @@ public class ManyToOneType extends EntityType {
 
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
 		return getIdentifierOrUniqueKeyType( mapping ).sqlTypes( mapping );
+	}
+
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		return getIdentifierOrUniqueKeyType( mapping ).dictatedSizes( mapping );
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		return getIdentifierOrUniqueKeyType( mapping ).defaultSizes( mapping );
 	}
 
 	public void nullSafeSet(
@@ -123,7 +187,7 @@ public class ManyToOneType extends EntityType {
 		// return the (fully resolved) identifier value, but do not resolve
 		// to the actual referenced entity instance
 		// NOTE: the owner of the association is not really the owner of the id!
-		Serializable id = (Serializable) getIdentifierOrUniqueKeyType( session.getFactory() )
+		final Serializable id = (Serializable) getIdentifierOrUniqueKeyType( session.getFactory() )
 				.nullSafeGet( rs, names, session, null );
 		scheduleBatchLoadIfNeeded( id, session );
 		return id;
@@ -132,21 +196,20 @@ public class ManyToOneType extends EntityType {
 	/**
 	 * Register the entity as batch loadable, if enabled
 	 */
-	private void scheduleBatchLoadIfNeeded(
-			Serializable id,
-			SessionImplementor session) throws MappingException {
+	@SuppressWarnings({ "JavaDoc" })
+	private void scheduleBatchLoadIfNeeded(Serializable id, SessionImplementor session) throws MappingException {
 		//cannot batch fetch by unique key (property-ref associations)
 		if ( uniqueKeyPropertyName == null && id != null ) {
-			EntityPersister persister = session.getFactory().getEntityPersister( getAssociatedEntityName() );
-			EntityKey entityKey = new EntityKey( id, persister, session.getEntityMode() );
-			if ( !session.getPersistenceContext().containsEntity( entityKey ) ) {
-				session.getPersistenceContext()
-						.getBatchFetchQueue()
-						.addBatchLoadableEntityKey( entityKey );
+			final EntityPersister persister = getAssociatedEntityPersister( session.getFactory() );
+			if ( persister.isBatchLoadable() ) {
+				final EntityKey entityKey = session.generateEntityKey( id, persister );
+				if ( !session.getPersistenceContext().containsEntity( entityKey ) ) {
+					session.getPersistenceContext().getBatchFetchQueue().addBatchLoadableEntityKey( entityKey );
+				}
 			}
 		}
 	}
-	
+
 	public boolean useLHSPrimaryKey() {
 		return false;
 	}
@@ -183,9 +246,9 @@ public class ManyToOneType extends EntityType {
 		else {
 			// cache the actual id of the object, not the value of the
 			// property-ref, which might not be initialized
-			Object id = ForeignKeys.getEntityIdentifierIfNotUnsaved( 
-					getAssociatedEntityName(), 
-					value, 
+			Object id = ForeignKeys.getEntityIdentifierIfNotUnsaved(
+					getAssociatedEntityName(),
+					value,
 					session
 			);
 			if ( id == null ) {
@@ -241,7 +304,7 @@ public class ManyToOneType extends EntityType {
 			Object old,
 			Object current,
 			SessionImplementor session) throws HibernateException {
-		if ( isSame( old, current, session.getEntityMode() ) ) {
+		if ( isSame( old, current ) ) {
 			return false;
 		}
 		Object oldid = getIdentifier( old, session );
@@ -258,7 +321,7 @@ public class ManyToOneType extends EntityType {
 			return isDirty( old, current, session );
 		}
 		else {
-			if ( isSame( old, current, session.getEntityMode() ) ) {
+			if ( isSame( old, current ) ) {
 				return false;
 			}
 			Object oldid = getIdentifier( old, session );

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * Copyright (c) 2009 by Red Hat Inc and/or its affiliates or by
+ * third-party contributors as indicated by either @author tags or express
+ * copyright attribution statements applied by the authors.  All
+ * third-party contributions are distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,20 +20,19 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.property;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyAccessException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 
 /**
  * Accesses fields directly.
@@ -45,11 +44,14 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 		private final transient Field field;
 		private final Class clazz;
 		private final String name;
+
 		DirectGetter(Field field, Class clazz, String name) {
 			this.field = field;
 			this.clazz = clazz;
 			this.name = name;
 		}
+
+		@Override
 		public Object get(Object target) throws HibernateException {
 			try {
 				return field.get(target);
@@ -59,16 +61,27 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 			}
 		}
 
+		@Override
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) {
 			return get( target );
 		}
 
+		@Override
+		public Member getMember() {
+			return field;
+		}
+
+		@Override
 		public Method getMethod() {
 			return null;
 		}
+
+		@Override
 		public String getMethodName() {
 			return null;
 		}
+
+		@Override
 		public Class getReturnType() {
 			return field.getType();
 		}
@@ -76,7 +89,8 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 		Object readResolve() {
 			return new DirectGetter( getField(clazz, name), clazz, name );
 		}
-		
+
+		@Override
 		public String toString() {
 			return "DirectGetter(" + clazz.getName() + '.' + name + ')';
 		}
@@ -91,12 +105,18 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 			this.clazz = clazz;
 			this.name = name;
 		}
+
+		@Override
 		public Method getMethod() {
 			return null;
 		}
+
+		@Override
 		public String getMethodName() {
 			return null;
 		}
+
+		@Override
 		public void set(Object target, Object value, SessionFactoryImplementor factory) throws HibernateException {
 			try {
 				field.set(target, value);
@@ -116,6 +136,7 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 			}
 		}
 
+		@Override
 		public String toString() {
 			return "DirectSetter(" + clazz.getName() + '.' + name + ')';
 		}
@@ -136,7 +157,7 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 		catch (NoSuchFieldException nsfe) {
 			field = getField( clazz, clazz.getSuperclass(), name );
 		}
-		if ( !ReflectHelper.isPublic(clazz, field) ) field.setAccessible(true);
+		field.setAccessible(true);
 		return field;
 	}
 
@@ -151,17 +172,17 @@ public class DirectPropertyAccessor implements PropertyAccessor {
 		catch (NoSuchFieldException nsfe) {
 			field = getField( root, clazz.getSuperclass(), name );
 		}
-		if ( !ReflectHelper.isPublic(clazz, field) ) field.setAccessible(true);
+		field.setAccessible(true);
 		return field;
 	}
-	
-	public Getter getGetter(Class theClass, String propertyName)
-		throws PropertyNotFoundException {
+
+	@Override
+	public Getter getGetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		return new DirectGetter( getField(theClass, propertyName), theClass, propertyName );
 	}
 
-	public Setter getSetter(Class theClass, String propertyName)
-		throws PropertyNotFoundException {
+	@Override
+	public Setter getSetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		return new DirectSetter( getField(theClass, propertyName), theClass, propertyName );
 	}
 

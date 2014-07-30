@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,15 +20,14 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.Mapping;
+import org.hibernate.cfg.Mappings;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.Type;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * A simple-point association (ie. a reference to another entity).
@@ -42,9 +41,10 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	private boolean embedded;
 	private boolean lazy = true;
 	protected boolean unwrapProxy;
+	protected boolean referenceToPrimaryKey = true;
 
-	protected ToOne(Table table) {
-		super(table);
+	protected ToOne(Mappings mappings, Table table) {
+		super( mappings, table );
 	}
 
 	public FetchMode getFetchMode() {
@@ -78,7 +78,7 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	public void setTypeUsingReflection(String className, String propertyName)
 	throws MappingException {
 		if (referencedEntityName==null) {
-			referencedEntityName = ReflectHelper.reflectedPropertyClass(className, propertyName).getName();
+			referencedEntityName = ReflectHelper.reflectedPropertyClass( className, propertyName ).getName();
 		}
 	}
 
@@ -89,11 +89,21 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
 	}
-	
+
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public boolean isEmbedded() {
 		return embedded;
 	}
-	
+
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public void setEmbedded(boolean embedded) {
 		this.embedded = embedded;
 	}
@@ -120,12 +130,13 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	public void setUnwrapProxy(boolean unwrapProxy) {
 		this.unwrapProxy = unwrapProxy;
 	}
+
+	public boolean isReferenceToPrimaryKey() {
+		return referenceToPrimaryKey;
+	}
+
+	public void setReferenceToPrimaryKey(boolean referenceToPrimaryKey) {
+		this.referenceToPrimaryKey = referenceToPrimaryKey;
+	}
 	
 }
-
-
-
-
-
-
-

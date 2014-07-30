@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.loader;
-
 import org.hibernate.persister.entity.Loadable;
 
 /**
@@ -58,4 +57,9 @@ public interface EntityAliases {
 	 */
 	public String getRowIdAlias();
 
+	/**
+	 * Returns the suffix used to generate the aliases.
+	 * @return the suffix used to generate the aliases.
+	 */
+	public String getSuffix();
 }

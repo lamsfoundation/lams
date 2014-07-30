@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,11 +20,12 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.id.enhanced;
 
 import java.io.Serializable;
+
+import org.hibernate.id.IntegralDataTypeHolder;
 
 /**
  * Performs optimization on an optimizable identifier generator.  Typically
@@ -43,6 +44,9 @@ public interface Optimizer {
 	/**
 	 * Generate an identifier value accounting for this specific optimization.
 	 *
+	 * All known implementors are synchronized. Consider carefully if a new
+	 * implementation could drop this requirement.
+	 *
 	 * @param callback Callback to access the underlying value source.
 	 * @return The generated identifier value.
 	 */
@@ -51,12 +55,12 @@ public interface Optimizer {
 	/**
 	 * A common means to access the last value obtained from the underlying
 	 * source.  This is intended for testing purposes, since accessing the
-	 * unerlying database source directly is much more difficult.
+	 * underlying database source directly is much more difficult.
 	 *
 	 * @return The last value we obtained from the underlying source;
-	 * -1 indicates we have not yet consulted with the source.
+	 * null indicates we have not yet consulted with the source.
 	 */
-	public long getLastSourceValue();
+	public IntegralDataTypeHolder getLastSourceValue();
 
 	/**
 	 * Retrieves the defined increment size.

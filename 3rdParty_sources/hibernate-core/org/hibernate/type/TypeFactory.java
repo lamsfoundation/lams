@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,279 +20,148 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 
-import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.classic.Lifecycle;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.intercept.LazyPropertyInitializer;
-import org.hibernate.property.BackrefPropertyAccessor;
-import org.hibernate.tuple.StandardProperty;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.tuple.component.ComponentMetamodel;
 import org.hibernate.usertype.CompositeUserType;
-import org.hibernate.usertype.UserType;
 import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.usertype.UserType;
+
+import org.jboss.logging.Logger;
 
 /**
+ * Used internally to build instances of {@link Type}, specifically it builds instances of
+ *
+ *
  * Used internally to obtain instances of <tt>Type</tt>. Applications should use static methods
  * and constants on <tt>org.hibernate.Hibernate</tt>.
  *
- * @see org.hibernate.Hibernate
  * @author Gavin King
+ * @author Steve Ebersole
  */
-public final class TypeFactory {
+@SuppressWarnings({ "unchecked" })
+public final class TypeFactory implements Serializable {
 
-	private static final Map BASIC_TYPES;
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, TypeFactory.class.getName());
 
-	static {
-		HashMap basics = new HashMap();
-		basics.put( boolean.class.getName(), Hibernate.BOOLEAN );
-		basics.put( long.class.getName(), Hibernate.LONG );
-		basics.put( short.class.getName(), Hibernate.SHORT );
-		basics.put( int.class.getName(), Hibernate.INTEGER );
-		basics.put( byte.class.getName(), Hibernate.BYTE );
-		basics.put( float.class.getName(), Hibernate.FLOAT );
-		basics.put( double.class.getName(), Hibernate.DOUBLE );
-		basics.put( char.class.getName(), Hibernate.CHARACTER );
-		basics.put( Hibernate.CHARACTER.getName(), Hibernate.CHARACTER );
-		basics.put( Hibernate.INTEGER.getName(), Hibernate.INTEGER );
-		basics.put( Hibernate.STRING.getName(), Hibernate.STRING );
-		basics.put( Hibernate.DATE.getName(), Hibernate.DATE );
-		basics.put( Hibernate.TIME.getName(), Hibernate.TIME );
-		basics.put( Hibernate.TIMESTAMP.getName(), Hibernate.TIMESTAMP );
-		basics.put( "dbtimestamp", new DbTimestampType() );
-		basics.put( Hibernate.LOCALE.getName(), Hibernate.LOCALE );
-		basics.put( Hibernate.CALENDAR.getName(), Hibernate.CALENDAR );
-		basics.put( Hibernate.CALENDAR_DATE.getName(), Hibernate.CALENDAR_DATE );
-		basics.put( Hibernate.CURRENCY.getName(), Hibernate.CURRENCY );
-		basics.put( Hibernate.TIMEZONE.getName(), Hibernate.TIMEZONE );
-		basics.put( Hibernate.CLASS.getName(), Hibernate.CLASS );
-		basics.put( Hibernate.TRUE_FALSE.getName(), Hibernate.TRUE_FALSE );
-		basics.put( Hibernate.YES_NO.getName(), Hibernate.YES_NO );
-		basics.put( Hibernate.BINARY.getName(), Hibernate.BINARY );
-		basics.put( Hibernate.TEXT.getName(), Hibernate.TEXT );
-		basics.put( Hibernate.BLOB.getName(), Hibernate.BLOB );
-		basics.put( Hibernate.CLOB.getName(), Hibernate.CLOB );
-		basics.put( Hibernate.BIG_DECIMAL.getName(), Hibernate.BIG_DECIMAL );
-		basics.put( Hibernate.BIG_INTEGER.getName(), Hibernate.BIG_INTEGER );
-		basics.put( Hibernate.SERIALIZABLE.getName(), Hibernate.SERIALIZABLE );
-		basics.put( Hibernate.OBJECT.getName(), Hibernate.OBJECT );
-		basics.put( Boolean.class.getName(), Hibernate.BOOLEAN );
-		basics.put( Long.class.getName(), Hibernate.LONG );
-		basics.put( Short.class.getName(), Hibernate.SHORT );
-		basics.put( Integer.class.getName(), Hibernate.INTEGER );
-		basics.put( Byte.class.getName(), Hibernate.BYTE );
-		basics.put( Float.class.getName(), Hibernate.FLOAT );
-		basics.put( Double.class.getName(), Hibernate.DOUBLE );
-		basics.put( Character.class.getName(), Hibernate.CHARACTER );
-		basics.put( String.class.getName(), Hibernate.STRING );
-		basics.put( java.util.Date.class.getName(), Hibernate.TIMESTAMP );
-		basics.put( Time.class.getName(), Hibernate.TIME );
-		basics.put( Timestamp.class.getName(), Hibernate.TIMESTAMP );
-		basics.put( java.sql.Date.class.getName(), Hibernate.DATE );
-		basics.put( BigDecimal.class.getName(), Hibernate.BIG_DECIMAL );
-		basics.put( BigInteger.class.getName(), Hibernate.BIG_INTEGER );
-		basics.put( Locale.class.getName(), Hibernate.LOCALE );
-		basics.put( Calendar.class.getName(), Hibernate.CALENDAR );
-		basics.put( GregorianCalendar.class.getName(), Hibernate.CALENDAR );
-		if ( CurrencyType.CURRENCY_CLASS != null ) {
-			basics.put( CurrencyType.CURRENCY_CLASS.getName(), Hibernate.CURRENCY );
+	private final TypeScopeImpl typeScope = new TypeScopeImpl();
+
+	public static interface TypeScope extends Serializable {
+		public SessionFactoryImplementor resolveFactory();
+	}
+
+	private static class TypeScopeImpl implements TypeFactory.TypeScope {
+		private SessionFactoryImplementor factory;
+
+		public void injectSessionFactory(SessionFactoryImplementor factory) {
+			if ( this.factory != null ) {
+				LOG.scopingTypesToSessionFactoryAfterAlreadyScoped( this.factory, factory );
+			}
+			else {
+				LOG.tracev( "Scoping types to session factory {0}", factory );
+			}
+			this.factory = factory;
 		}
-		basics.put( TimeZone.class.getName(), Hibernate.TIMEZONE );
-		basics.put( Object.class.getName(), Hibernate.OBJECT );
-		basics.put( Class.class.getName(), Hibernate.CLASS );
-		basics.put( byte[].class.getName(), Hibernate.BINARY );
-		basics.put( "byte[]", Hibernate.BINARY );
-		basics.put( Byte[].class.getName(), Hibernate.WRAPPER_BINARY );
-		basics.put( "Byte[]", Hibernate.WRAPPER_BINARY );
-		basics.put( char[].class.getName(), Hibernate.CHAR_ARRAY );
-		basics.put( "char[]", Hibernate.CHAR_ARRAY );
-		basics.put( Character[].class.getName(), Hibernate.CHARACTER_ARRAY );
-		basics.put( "Character[]", Hibernate.CHARACTER_ARRAY );
-		basics.put( Blob.class.getName(), Hibernate.BLOB );
-		basics.put( Clob.class.getName(), Hibernate.CLOB );
-		basics.put( Serializable.class.getName(), Hibernate.SERIALIZABLE );
 
-		Type type = new AdaptedImmutableType(Hibernate.DATE);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.TIME);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.TIMESTAMP);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType( new DbTimestampType() );
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.CALENDAR);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.CALENDAR_DATE);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.SERIALIZABLE);
-		basics.put( type.getName(), type );
-		type = new AdaptedImmutableType(Hibernate.BINARY);
-		basics.put( type.getName(), type );
-
-		BASIC_TYPES = Collections.unmodifiableMap( basics );
-	}
-
-	private TypeFactory() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * A one-to-one association type for the given class
-	 */
-	public static EntityType oneToOne(
-			String persistentClass,
-			ForeignKeyDirection foreignKeyType,
-			String uniqueKeyPropertyName,
-			boolean lazy,
-			boolean unwrapProxy,
-			boolean isEmbeddedInXML,
-			String entityName,
-			String propertyName
-	) {
-		return new OneToOneType(
-				persistentClass,
-				foreignKeyType,
-				uniqueKeyPropertyName,
-				lazy,
-				unwrapProxy,
-				isEmbeddedInXML,
-				entityName,
-				propertyName
-			);
-	}
-
-	/**
-	 * A many-to-one association type for the given class
-	 */
-	public static EntityType manyToOne(String persistentClass) {
-		return new ManyToOneType( persistentClass );
-	}
-
-	/**
-	 * A many-to-one association type for the given class
-	 */
-	public static EntityType manyToOne(String persistentClass, boolean lazy) {
-		return new ManyToOneType( persistentClass, lazy );
-	}
-
-	/**
-	 * A many-to-one association type for the given class
-	 */
-	public static EntityType manyToOne(
-			String persistentClass,
-			String uniqueKeyPropertyName,
-			boolean lazy,
-			boolean unwrapProxy,
-			boolean isEmbeddedInXML,
-			boolean ignoreNotFound
-	) {
-		return new ManyToOneType(
-				persistentClass,
-				uniqueKeyPropertyName,
-				lazy,
-				unwrapProxy,
-				isEmbeddedInXML,
-				ignoreNotFound
-			);
-	}
-
-	/**
-	 * Given the name of a Hibernate basic type, return an instance of
-	 * <tt>org.hibernate.type.Type</tt>.
-	 */
-	public static Type basic(String name) {
-		return (Type) BASIC_TYPES.get( name );
-	}
-
-	/**
-	 * Uses heuristics to deduce a Hibernate type given a string naming the type or Java class.
-	 * Return an instance of <tt>org.hibernate.type.Type</tt>.
-	 */
-	public static Type heuristicType(String typeName) throws MappingException {
-		return heuristicType( typeName, null );
-	}
-
-	/**
-	 * Uses heuristics to deduce a Hibernate type given a string naming the type or Java class.
-	 * Return an instance of <tt>org.hibernate.type.Type</tt>.
-	 */
-	public static Type heuristicType(String typeName, Properties parameters)
-			throws MappingException {
-		Type type = TypeFactory.basic( typeName );
-		if ( type == null ) {
-			Class typeClass;
-			try {
-				typeClass = ReflectHelper.classForName( typeName );
+		public SessionFactoryImplementor resolveFactory() {
+			if ( factory == null ) {
+				throw new HibernateException( "SessionFactory for type scoping not yet known" );
 			}
-			catch (ClassNotFoundException cnfe) {
-				typeClass = null;
-			}
-			if ( typeClass != null ) {
-				if ( Type.class.isAssignableFrom( typeClass ) ) {
-					try {
-						type = (Type) typeClass.newInstance();
-					}
-					catch (Exception e) {
-						throw new MappingException(
-								"Could not instantiate Type: " + typeClass.getName(),
-								e
-							);
-					}
-					injectParameters(type, parameters);
-				}
-				else if ( CompositeUserType.class.isAssignableFrom( typeClass ) ) {
-					type = new CompositeCustomType( typeClass, parameters );
-				}
-				else if ( UserType.class.isAssignableFrom( typeClass ) ) {
-					type = new CustomType( typeClass, parameters );
-				}
-				else if ( Lifecycle.class.isAssignableFrom( typeClass ) ) {
-					type = Hibernate.entity( typeClass );
-				}
-				else if ( Serializable.class.isAssignableFrom( typeClass ) ) {
-					type = Hibernate.serializable( typeClass );
-				}
-			}
+			return factory;
 		}
-		return type;
+	}
 
+	public void injectSessionFactory(SessionFactoryImplementor factory) {
+		typeScope.injectSessionFactory( factory );
+	}
+
+	public SessionFactoryImplementor resolveSessionFactory() {
+		return typeScope.resolveFactory();
+	}
+
+	public Type byClass(Class clazz, Properties parameters) {
+		if ( Type.class.isAssignableFrom( clazz ) ) {
+			return type( clazz, parameters );
+		}
+
+		if ( CompositeUserType.class.isAssignableFrom( clazz ) ) {
+			return customComponent( clazz, parameters );
+		}
+
+		if ( UserType.class.isAssignableFrom( clazz ) ) {
+			return custom( clazz, parameters );
+		}
+
+		if ( Lifecycle.class.isAssignableFrom( clazz ) ) {
+			// not really a many-to-one association *necessarily*
+			return manyToOne( clazz.getName() );
+		}
+
+		if ( Serializable.class.isAssignableFrom( clazz ) ) {
+			return serializable( clazz );
+		}
+
+		return null;
+	}
+
+	public Type type(Class<Type> typeClass, Properties parameters) {
+		try {
+			Type type = typeClass.newInstance();
+			injectParameters( type, parameters );
+			return type;
+		}
+		catch (Exception e) {
+			throw new MappingException( "Could not instantiate Type: " + typeClass.getName(), e );
+		}
+	}
+
+	public static void injectParameters(Object type, Properties parameters) {
+		if ( ParameterizedType.class.isInstance( type ) ) {
+			( (ParameterizedType) type ).setParameterValues(parameters);
+		}
+		else if ( parameters!=null && !parameters.isEmpty() ) {
+			throw new MappingException( "type is not parameterized: " + type.getClass().getName() );
+		}
+	}
+
+	public CompositeCustomType customComponent(Class<CompositeUserType> typeClass, Properties parameters) {
+		return customComponent( typeClass, parameters, typeScope );
 	}
 
 	/**
-	 * The legacy contract.
-	 *
-	 * @deprecated Use {@link #customCollection(String, java.util.Properties, String, String, boolean)} instead
+	 * @deprecated Only for use temporary use by {@link org.hibernate.Hibernate}
 	 */
-	public static CollectionType customCollection(
-			String typeName,
-			String role,
-			String propertyRef,
-			boolean embedded) {
-		return customCollection( typeName, null, role, propertyRef, embedded );
+	@Deprecated
+    @SuppressWarnings({ "JavaDoc" })
+	public static CompositeCustomType customComponent(Class<CompositeUserType> typeClass, Properties parameters, TypeScope scope) {
+		try {
+			CompositeUserType userType = typeClass.newInstance();
+			injectParameters( userType, parameters );
+			return new CompositeCustomType( userType );
+		}
+		catch ( Exception e ) {
+			throw new MappingException( "Unable to instantiate custom type: " + typeClass.getName(), e );
+		}
 	}
 
-	public static CollectionType customCollection(
+	/**
+	 * @deprecated Use {@link #customCollection(String, java.util.Properties, String, String)}
+	 * instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType customCollection(
 			String typeName,
 			Properties typeParameters,
 			String role,
@@ -305,384 +174,351 @@ public final class TypeFactory {
 		catch ( ClassNotFoundException cnfe ) {
 			throw new MappingException( "user collection type class not found: " + typeName, cnfe );
 		}
-		CustomCollectionType result = new CustomCollectionType( typeClass, role, propertyRef, embedded );
+		CustomCollectionType result = new CustomCollectionType( typeScope, typeClass, role, propertyRef, embedded );
 		if ( typeParameters != null ) {
-			TypeFactory.injectParameters( result.getUserType(), typeParameters );
+			injectParameters( result.getUserType(), typeParameters );
 		}
 		return result;
 	}
 
-	// Collection Types:
-
-	public static CollectionType array(String role, String propertyRef, boolean embedded,
-			Class elementClass) {
-		return new ArrayType( role, propertyRef, elementClass, embedded );
-	}
-
-	public static CollectionType list(String role, String propertyRef, boolean embedded) {
-		return new ListType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType bag(String role, String propertyRef, boolean embedded) {
-		return new BagType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType idbag(String role, String propertyRef, boolean embedded) {
-		return new IdentifierBagType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType map(String role, String propertyRef, boolean embedded) {
-		return new MapType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType orderedMap(String role, String propertyRef, boolean embedded) {
-		return new OrderedMapType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType set(String role, String propertyRef, boolean embedded) {
-		return new SetType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType orderedSet(String role, String propertyRef, boolean embedded) {
-		return new OrderedSetType( role, propertyRef, embedded );
-	}
-
-	public static CollectionType sortedMap(String role, String propertyRef, boolean embedded,
-			Comparator comparator) {
-		return new SortedMapType( role, propertyRef, comparator, embedded );
-	}
-
-	public static CollectionType sortedSet(String role, String propertyRef, boolean embedded,
-			Comparator comparator) {
-		return new SortedSetType( role, propertyRef, comparator, embedded );
-	}
-
-	public static void injectParameters(Object type, Properties parameters) {
-		if (type instanceof ParameterizedType) {
-			( (ParameterizedType) type ).setParameterValues(parameters);
+	public CollectionType customCollection(
+			String typeName,
+			Properties typeParameters,
+			String role,
+			String propertyRef) {
+		Class typeClass;
+		try {
+			typeClass = ReflectHelper.classForName( typeName );
 		}
-		else if ( parameters!=null && !parameters.isEmpty() ) {
-			throw new MappingException(
-					"type is not parameterized: " +
-					type.getClass().getName()
-				);
+		catch ( ClassNotFoundException cnfe ) {
+			throw new MappingException( "user collection type class not found: " + typeName, cnfe );
 		}
+		CustomCollectionType result = new CustomCollectionType( typeScope, typeClass, role, propertyRef );
+		if ( typeParameters != null ) {
+			injectParameters( result.getUserType(), typeParameters );
+		}
+		return result;
 	}
 
-
-	// convenience methods relating to operations across arrays of types...
+	public CustomType custom(Class<UserType> typeClass, Properties parameters) {
+		return custom( typeClass, parameters, typeScope );
+	}
 
 	/**
-	 * Deep copy a series of values from one array to another...
-	 *
-	 * @param values The values to copy (the source)
-	 * @param types The value types
-	 * @param copy an array indicating which values to include in the copy
-	 * @param target The array into which to copy the values
-	 * @param session The orginating session
+	 * @deprecated Only for use temporary use by {@link org.hibernate.Hibernate}
 	 */
-	public static void deepCopy(
-			final Object[] values,
-			final Type[] types,
-			final boolean[] copy,
-			final Object[] target,
-			final SessionImplementor session) {
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( copy[i] ) {
-				if ( values[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY
-					|| values[i] == BackrefPropertyAccessor.UNKNOWN ) {
-					target[i] = values[i];
-				}
-				else {
-					target[i] = types[i].deepCopy( values[i], session.getEntityMode(), session
-						.getFactory() );
-				}
-			}
+	@Deprecated
+    public static CustomType custom(Class<UserType> typeClass, Properties parameters, TypeScope scope) {
+		try {
+			UserType userType = typeClass.newInstance();
+			injectParameters( userType, parameters );
+			return new CustomType( userType );
+		}
+		catch ( Exception e ) {
+			throw new MappingException( "Unable to instantiate custom type: " + typeClass.getName(), e );
 		}
 	}
 
 	/**
-	 * Apply the {@link Type#beforeAssemble} operation across a series of values.
+	 * Build a {@link SerializableType} from the given {@link Serializable} class.
 	 *
-	 * @param row The values
-	 * @param types The value types
-	 * @param session The orginating session
+	 * @param serializableClass The {@link Serializable} class.
+	 * @param <T> The actual class type (extends Serializable)
+	 *
+	 * @return The built {@link SerializableType}
 	 */
-	public static void beforeAssemble(
-			final Serializable[] row,
-			final Type[] types,
-			final SessionImplementor session) {
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( row[i] != LazyPropertyInitializer.UNFETCHED_PROPERTY
-				&& row[i] != BackrefPropertyAccessor.UNKNOWN ) {
-				types[i].beforeAssemble( row[i], session );
-			}
-		}
+	public static <T extends Serializable> SerializableType<T> serializable(Class<T> serializableClass) {
+		return new SerializableType<T>( serializableClass );
+	}
+
+
+	// one-to-one type builders ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	/**
+	 * @deprecated Use {@link #oneToOne(String, ForeignKeyDirection, String, boolean, boolean, String, String, boolean)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public EntityType oneToOne(
+			String persistentClass,
+			ForeignKeyDirection foreignKeyType,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean isEmbeddedInXML,
+			String entityName,
+			String propertyName) {
+		return oneToOne( persistentClass, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, entityName,
+				propertyName );
 	}
 
 	/**
-	 * Apply the {@link Type#assemble} operation across a series of values.
-	 *
-	 * @param row The values
-	 * @param types The value types
-	 * @param session The orginating session
-	 * @param owner The entity "owning" the values
-	 * @return The assembled state
+	 * @deprecated Use {@link #oneToOne(String, ForeignKeyDirection, String, boolean, boolean, String, String, boolean)} instead.
 	 */
-	public static Object[] assemble(
-			final Serializable[] row,
-			final Type[] types,
-			final SessionImplementor session,
-			final Object owner) {
-		Object[] assembled = new Object[row.length];
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( row[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY || row[i] == BackrefPropertyAccessor.UNKNOWN ) {
-				assembled[i] = row[i];
-			}
-			else {
-				assembled[i] = types[i].assemble( row[i], session, owner );
-			}
-		}
-		return assembled;
+	@Deprecated
+	public EntityType oneToOne(
+			String persistentClass,
+			ForeignKeyDirection foreignKeyType,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		return oneToOne( persistentClass, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, entityName,
+				propertyName );
+	}
+
+	public EntityType oneToOne(
+			String persistentClass,
+			ForeignKeyDirection foreignKeyType,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		return new OneToOneType( typeScope, persistentClass, foreignKeyType, referenceToPrimaryKey,
+				uniqueKeyPropertyName, lazy, unwrapProxy, entityName, propertyName );
+	}
+	
+	/**
+	 * @deprecated Use {@link #specialOneToOne(String, ForeignKeyDirection, String, boolean, boolean, String, String, boolean)} instead.
+	 */
+	@Deprecated
+	public EntityType specialOneToOne(
+			String persistentClass,
+			ForeignKeyDirection foreignKeyType,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		return specialOneToOne( persistentClass, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy,
+				entityName, propertyName );
+	}
+
+	public EntityType specialOneToOne(
+			String persistentClass,
+			ForeignKeyDirection foreignKeyType,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		return new SpecialOneToOneType( typeScope, persistentClass, foreignKeyType, referenceToPrimaryKey,
+				uniqueKeyPropertyName, lazy, unwrapProxy, entityName, propertyName );
+	}
+
+
+	// many-to-one type builders ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public EntityType manyToOne(String persistentClass) {
+		return new ManyToOneType( typeScope, persistentClass );
+	}
+
+	public EntityType manyToOne(String persistentClass, boolean lazy) {
+		return new ManyToOneType( typeScope, persistentClass, lazy );
 	}
 
 	/**
-	 * Apply the {@link Type#disassemble} operation across a series of values.
-	 *
-	 * @param row The values
-	 * @param types The value types
-	 * @param nonCacheable An array indicating which values to include in the disassemled state
-	 * @param session The orginating session
-	 * @param owner The entity "owning" the values
-	 * @return The disassembled state
+	 * @deprecated Use {@link #manyToOne(String, boolean, String, boolean, boolean, boolean, boolean)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public static Serializable[] disassemble(
-			final Object[] row,
-			final Type[] types,
-			final boolean[] nonCacheable,
-			final SessionImplementor session,
-			final Object owner) {
-		Serializable[] disassembled = new Serializable[row.length];
-		for ( int i = 0; i < row.length; i++ ) {
-			if ( nonCacheable!=null && nonCacheable[i] ) {
-				disassembled[i] = LazyPropertyInitializer.UNFETCHED_PROPERTY;
-			}
-			else if ( row[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY || row[i] == BackrefPropertyAccessor.UNKNOWN ) {
-				disassembled[i] = (Serializable) row[i];
-			}
-			else {
-				disassembled[i] = types[i].disassemble( row[i], session, owner );
-			}
-		}
-		return disassembled;
+	@Deprecated
+	public EntityType manyToOne(
+			String persistentClass,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean isEmbeddedInXML,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		return manyToOne( persistentClass, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound,
+				isLogicalOneToOne );
 	}
 
 	/**
-	 * Apply the {@link Type#replace} operation across a series of values.
-	 *
-	 * @param original The source of the state
-	 * @param target The target into which to replace the source values.
-	 * @param types The value types
-	 * @param session The orginating session
-	 * @param owner The entity "owning" the values
-	 * @param copyCache A map representing a cache of already replaced state
-	 * @return The replaced state
+	 * @deprecated Use {@link #manyToOne(String, boolean, String, boolean, boolean, boolean, boolean)} instead.
 	 */
-	public static Object[] replace(
-			final Object[] original,
-			final Object[] target,
-			final Type[] types,
-			final SessionImplementor session,
-			final Object owner,
-			final Map copyCache) {
-		Object[] copied = new Object[original.length];
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( original[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY
-				|| original[i] == BackrefPropertyAccessor.UNKNOWN ) {
-				copied[i] = target[i];
-			}
-			else {
-				copied[i] = types[i].replace( original[i], target[i], session, owner, copyCache );
-			}
-		}
-		return copied;
+	@Deprecated
+	public EntityType manyToOne(
+			String persistentClass,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		return manyToOne( persistentClass, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound,
+				isLogicalOneToOne );
+	}
+
+	public EntityType manyToOne(
+			String persistentClass,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		return new ManyToOneType(
+				typeScope,
+				persistentClass,
+				referenceToPrimaryKey,
+				uniqueKeyPropertyName,
+				lazy,
+				unwrapProxy,
+				ignoreNotFound,
+				isLogicalOneToOne
+		);
+	}
+
+	// collection type builders ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	/**
+	 * @deprecated Use {@link #array(String, String, Class)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType array(String role, String propertyRef, boolean embedded, Class elementClass) {
+		return new ArrayType( typeScope, role, propertyRef, elementClass, embedded );
+	}
+
+	public CollectionType array(String role, String propertyRef, Class elementClass) {
+		return new ArrayType( typeScope, role, propertyRef, elementClass );
 	}
 
 	/**
-	 * Apply the {@link Type#replace} operation across a series of values.
-	 *
-	 * @param original The source of the state
-	 * @param target The target into which to replace the source values.
-	 * @param types The value types
-	 * @param session The orginating session
-	 * @param owner The entity "owning" the values
-	 * @param copyCache A map representing a cache of already replaced state
-	 * @param foreignKeyDirection FK directionality to be applied to the replacement
-	 * @return The replaced state
+	 * @deprecated Use {@link #list(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public static Object[] replace(
-			final Object[] original,
-			final Object[] target,
-			final Type[] types,
-			final SessionImplementor session,
-			final Object owner,
-			final Map copyCache,
-			final ForeignKeyDirection foreignKeyDirection) {
-		Object[] copied = new Object[original.length];
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( original[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY
-				|| original[i] == BackrefPropertyAccessor.UNKNOWN ) {
-				copied[i] = target[i];
-			}
-			else {
-				copied[i] = types[i].replace( original[i], target[i], session, owner, copyCache, foreignKeyDirection );
-			}
-		}
-		return copied;
+	@Deprecated
+	public CollectionType list(String role, String propertyRef, boolean embedded) {
+		return new ListType( typeScope, role, propertyRef, embedded );
+	}
+
+	public CollectionType list(String role, String propertyRef) {
+		return new ListType( typeScope, role, propertyRef );
 	}
 
 	/**
-	 * Apply the {@link Type#replace} operation across a series of values, as
-	 * long as the corresponding {@link Type} is an association.
-	 * <p/>
-	 * If the corresponding type is a component type, then apply {@link #replaceAssociations}
-	 * accross the component subtypes but do not replace the component value itself.
-	 *
-	 * @param original The source of the state
-	 * @param target The target into which to replace the source values.
-	 * @param types The value types
-	 * @param session The orginating session
-	 * @param owner The entity "owning" the values
-	 * @param copyCache A map representing a cache of already replaced state
-	 * @param foreignKeyDirection FK directionality to be applied to the replacement
-	 * @return The replaced state
+	 * @deprecated Use {@link #bag(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public static Object[] replaceAssociations(
-			final Object[] original,
-			final Object[] target,
-			final Type[] types,
-			final SessionImplementor session,
-			final Object owner,
-			final Map copyCache,
-			final ForeignKeyDirection foreignKeyDirection) {
-		Object[] copied = new Object[original.length];
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( original[i] == LazyPropertyInitializer.UNFETCHED_PROPERTY
-					|| original[i] == BackrefPropertyAccessor.UNKNOWN ) {
-				copied[i] = target[i];
-			}
-			else if ( types[i].isComponentType() ) {
-				// need to extract the component values and check for subtype replacements...
-				AbstractComponentType componentType = ( AbstractComponentType ) types[i];
-				Type[] subtypes = componentType.getSubtypes();
-				Object[] origComponentValues = original[i] == null ? new Object[subtypes.length] : componentType.getPropertyValues( original[i], session );
-				Object[] targetComponentValues = target[i] == null ? new Object[subtypes.length] : componentType.getPropertyValues( target[i], session );
-				replaceAssociations( origComponentValues, targetComponentValues, subtypes, session, null, copyCache, foreignKeyDirection );
-				copied[i] = target[i];
-			}
-			else if ( !types[i].isAssociationType() ) {
-				copied[i] = target[i];
-			}
-			else {
-				copied[i] = types[i].replace( original[i], target[i], session, owner, copyCache, foreignKeyDirection );
-			}
-		}
-		return copied;
+	@Deprecated
+	public CollectionType bag(String role, String propertyRef, boolean embedded) {
+		return new BagType( typeScope, role, propertyRef, embedded );
+	}
+
+	public CollectionType bag(String role, String propertyRef) {
+		return new BagType( typeScope, role, propertyRef );
 	}
 
 	/**
-	 * Determine if any of the given field values are dirty, returning an array containing
-	 * indices of the dirty fields.
-	 * <p/>
-	 * If it is determined that no fields are dirty, null is returned.
-	 *
-	 * @param properties The property definitions
-	 * @param currentState The current state of the entity
-	 * @param previousState The baseline state of the entity
-	 * @param includeColumns Columns to be included in the dirty checking, per property
-	 * @param anyUninitializedProperties Does the entity currently hold any uninitialized property values?
-	 * @param session The session from which the dirty check request originated.
-	 * @return Array containing indices of the dirty properties, or null if no properties considered dirty.
+	 * @deprecated Use {@link #idbag(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public static int[] findDirty(
-			final StandardProperty[] properties,
-			final Object[] currentState,
-			final Object[] previousState,
-			final boolean[][] includeColumns,
-			final boolean anyUninitializedProperties,
-			final SessionImplementor session) {
-		int[] results = null;
-		int count = 0;
-		int span = properties.length;
+	@Deprecated
+	public CollectionType idbag(String role, String propertyRef, boolean embedded) {
+		return new IdentifierBagType( typeScope, role, propertyRef, embedded );
+	}
 
-		for ( int i = 0; i < span; i++ ) {
-			final boolean dirty = currentState[i] != LazyPropertyInitializer.UNFETCHED_PROPERTY
-					&& properties[i].isDirtyCheckable( anyUninitializedProperties )
-					&& properties[i].getType().isDirty( previousState[i], currentState[i], includeColumns[i], session );
-			if ( dirty ) {
-				if ( results == null ) {
-					results = new int[span];
-				}
-				results[count++] = i;
-			}
-		}
-
-		if ( count == 0 ) {
-			return null;
-		}
-		else {
-			int[] trimmed = new int[count];
-			System.arraycopy( results, 0, trimmed, 0, count );
-			return trimmed;
-		}
+	public CollectionType idbag(String role, String propertyRef) {
+		return new IdentifierBagType( typeScope, role, propertyRef );
 	}
 
 	/**
-	 * Determine if any of the given field values are modified, returning an array containing
-	 * indices of the modified fields.
-	 * <p/>
-	 * If it is determined that no fields are dirty, null is returned.
-	 *
-	 * @param properties The property definitions
-	 * @param currentState The current state of the entity
-	 * @param previousState The baseline state of the entity
-	 * @param includeColumns Columns to be included in the mod checking, per property
-	 * @param anyUninitializedProperties Does the entity currently hold any uninitialized property values?
-	 * @param session The session from which the dirty check request originated.
-	 * @return Array containing indices of the modified properties, or null if no properties considered modified.
+	 * @deprecated Use {@link #map(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public static int[] findModified(
-			final StandardProperty[] properties, 
-			final Object[] currentState,
-			final Object[] previousState,
-			final boolean[][] includeColumns,
-			final boolean anyUninitializedProperties,
-			final SessionImplementor session) {
-		int[] results = null;
-		int count = 0;
-		int span = properties.length;
-
-		for ( int i = 0; i < span; i++ ) {
-			final boolean modified = currentState[i]!=LazyPropertyInitializer.UNFETCHED_PROPERTY
-					&& properties[i].isDirtyCheckable(anyUninitializedProperties)
-					&& properties[i].getType().isModified( previousState[i], currentState[i], includeColumns[i], session );
-
-			if ( modified ) {
-				if ( results == null ) {
-					results = new int[span];
-				}
-				results[count++] = i;
-			}
-		}
-
-		if ( count == 0 ) {
-			return null;
-		}
-		else {
-			int[] trimmed = new int[count];
-			System.arraycopy( results, 0, trimmed, 0, count );
-			return trimmed;
-		}
+	@Deprecated
+	public CollectionType map(String role, String propertyRef, boolean embedded) {
+		return new MapType( typeScope, role, propertyRef, embedded );
 	}
 
+	public CollectionType map(String role, String propertyRef) {
+		return new MapType( typeScope, role, propertyRef );
+	}
+
+	/**
+	 * @deprecated Use {@link #orderedMap(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType orderedMap(String role, String propertyRef, boolean embedded) {
+		return new OrderedMapType( typeScope, role, propertyRef, embedded );
+	}
+
+	public CollectionType orderedMap(String role, String propertyRef) {
+		return new OrderedMapType( typeScope, role, propertyRef );
+	}
+
+	/**
+	 * @deprecated Use {@link #sortedMap(String, String, java.util.Comparator)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType sortedMap(String role, String propertyRef, boolean embedded, Comparator comparator) {
+		return new SortedMapType( typeScope, role, propertyRef, comparator, embedded );
+	}
+
+	public CollectionType sortedMap(String role, String propertyRef, Comparator comparator) {
+		return new SortedMapType( typeScope, role, propertyRef, comparator );
+	}
+
+	/**
+	 * @deprecated Use {@link #set(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType set(String role, String propertyRef, boolean embedded) {
+		return new SetType( typeScope, role, propertyRef, embedded );
+	}
+
+	public CollectionType set(String role, String propertyRef) {
+		return new SetType( typeScope, role, propertyRef );
+	}
+
+	/**
+	 * @deprecated Use {@link #orderedSet(String, String)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType orderedSet(String role, String propertyRef, boolean embedded) {
+		return new OrderedSetType( typeScope, role, propertyRef, embedded );
+	}
+
+	public CollectionType orderedSet(String role, String propertyRef) {
+		return new OrderedSetType( typeScope, role, propertyRef );
+	}
+
+	/**
+	 * @deprecated Use {@link #sortedSet(String, String, java.util.Comparator)} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType sortedSet(String role, String propertyRef, boolean embedded, Comparator comparator) {
+		return new SortedSetType( typeScope, role, propertyRef, comparator, embedded );
+	}
+
+	public CollectionType sortedSet(String role, String propertyRef, Comparator comparator) {
+		return new SortedSetType( typeScope, role, propertyRef, comparator );
+	}
+
+	// component type builders ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public ComponentType component(ComponentMetamodel metamodel) {
+		return new ComponentType( typeScope, metamodel );
+	}
+
+	public EmbeddedComponentType embeddedComponent(ComponentMetamodel metamodel) {
+		return new EmbeddedComponentType( typeScope, metamodel );
+	}
+
+
+	// any type builder ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public Type any(Type metaType, Type identifierType) {
+		return new AnyType( typeScope, metaType, identifierType );
+	}
 }

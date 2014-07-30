@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,18 +20,9 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.function;
-
-import org.hibernate.Hibernate;
-import org.hibernate.QueryException;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.type.Type;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.hibernate.type.StandardBasicTypes;
 
 /**
  * A {@link SQLFunction} implementation that emulates the ANSI SQL trim function
@@ -42,129 +33,260 @@ import java.util.ArrayList;
  *
  * @author Steve Ebersole
  */
-public class AnsiTrimEmulationFunction implements SQLFunction {
+public class AnsiTrimEmulationFunction extends AbstractAnsiTrimEmulationFunction {
+	/**
+	 * The default {@code ltrim} function name
+	 */
+	public static final String LTRIM = "ltrim";
 
-	private static final SQLFunction LEADING_SPACE_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "ltrim( ?1 )");
-	private static final SQLFunction TRAILING_SPACE_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "rtrim( ?1 )");
-	private static final SQLFunction BOTH_SPACE_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "ltrim( rtrim( ?1 ) )");
-	private static final SQLFunction BOTH_SPACE_TRIM_FROM = new SQLFunctionTemplate( Hibernate.STRING, "ltrim( rtrim( ?2 ) )");
+	/**
+	 * The default {@code rtrim} function name
+	 */
+	public static final String RTRIM = "rtrim";
 
-	private static final SQLFunction LEADING_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "replace( replace( rtrim( replace( replace( ?1, ' ', '${space}$' ), ?2, ' ' ) ), ' ', ?2 ), '${space}$', ' ' )" );
-	private static final SQLFunction TRAILING_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "replace( replace( ltrim( replace( replace( ?1, ' ', '${space}$' ), ?2, ' ' ) ), ' ', ?2 ), '${space}$', ' ' )" );
-	private static final SQLFunction BOTH_TRIM = new SQLFunctionTemplate( Hibernate.STRING, "replace( replace( ltrim( rtrim( replace( replace( ?1, ' ', '${space}$' ), ?2, ' ' ) ) ), ' ', ?2 ), '${space}$', ' ' )" );
+	/**
+	 * The default {@code replace} function name
+	 */
+	public static final String REPLACE = "replace";
 
-	public Type getReturnType(Type columnType, Mapping mapping) throws QueryException {
-		return Hibernate.STRING;
+	/**
+	 * The placeholder used to represent whitespace
+	 */
+	public static final String SPACE_PLACEHOLDER = "${space}$";
+
+	/**
+	 * The SQLFunctionTemplate pattern for the trimming leading spaces
+	 */
+	public static final String LEADING_SPACE_TRIM_TEMPLATE = LTRIM + "(?1)";
+
+	/**
+	 * The SQLFunctionTemplate pattern for the trimming trailing spaces
+	 */
+	public static final String TRAILING_SPACE_TRIM_TEMPLATE = RTRIM + "(?1)";
+
+	/**
+	 * The SQLFunctionTemplate pattern for the trimming both leading and trailing spaces
+	 */
+	public static final String BOTH_SPACE_TRIM_TEMPLATE = LTRIM + "(" + RTRIM + "(?1))";
+
+	/**
+	 * The SQLFunctionTemplate pattern for the trimming both leading and trailing spaces, with the optional FROM keyword.
+	 * Different because we need to skip the FROM keyword in the SQLFunctionTemplate processing
+	 */
+	public static final String BOTH_SPACE_TRIM_FROM_TEMPLATE = LTRIM + "(" + RTRIM + "(?2))";
+
+	/**
+	 * A template for the series of calls required to trim non-space chars from the beginning of text.
+	 * <p/>
+	 * NOTE : essentially we:<ol>
+	 * <li>replace all space chars with the text '${space}$'</li>
+	 * <li>replace all the actual replacement chars with space chars</li>
+	 * <li>perform left-trimming (that removes any of the space chars we just added which occur at the beginning of the text)</li>
+	 * <li>replace all space chars with the replacement char</li>
+	 * <li>replace all the '${space}$' text with space chars</li>
+	 * </ol>
+	 */
+	public static final String LEADING_TRIM_TEMPLATE =
+			REPLACE + "(" +
+				REPLACE + "(" +
+					LTRIM + "(" +
+						REPLACE + "(" +
+							REPLACE + "(" +
+								"?1," +
+								"' '," +
+								"'" + SPACE_PLACEHOLDER + "'" +
+							")," +
+							"?2," +
+							"' '" +
+						")" +
+					")," +
+					"' '," +
+					"?2" +
+				")," +
+				"'" + SPACE_PLACEHOLDER + "'," +
+				"' '" +
+			")";
+
+	/**
+	 * A template for the series of calls required to trim non-space chars from the end of text.
+	 * <p/>
+	 * NOTE: essentially the same series of calls as outlined in {@link #LEADING_TRIM_TEMPLATE} except that here,
+	 * instead of left-trimming the added spaces, we right-trim them to remove them from the end of the text.
+	 */
+	public static final String TRAILING_TRIM_TEMPLATE =
+			REPLACE + "(" +
+				REPLACE + "(" +
+					RTRIM + "(" +
+						REPLACE + "(" +
+							REPLACE + "(" +
+								"?1," +
+								"' '," +
+								"'" + SPACE_PLACEHOLDER + "'" +
+							")," +
+							"?2," +
+							"' '" +
+						")" +
+					")," +
+					"' '," +
+					"?2" +
+				")," +
+				"'" + SPACE_PLACEHOLDER + "'," +
+				"' '" +
+			")";
+
+	/**
+	 * A template for the series of calls required to trim non-space chars from both the beginning and the end of text.
+	 * <p/>
+	 * NOTE: again, we have a series of calls that is essentially the same as outlined in {@link #LEADING_TRIM_TEMPLATE}
+	 * except that here we perform both left (leading) and right (trailing) trimming.
+	 */
+	public static final String BOTH_TRIM_TEMPLATE =
+			REPLACE + "(" +
+				REPLACE + "(" +
+					LTRIM + "(" +
+						RTRIM + "(" +
+							REPLACE + "(" +
+								REPLACE + "(" +
+									"?1," +
+									"' '," +
+									"'" + SPACE_PLACEHOLDER + "'" +
+								")," +
+								"?2," +
+								"' '" +
+							")" +
+						")" +
+					")," +
+					"' '," +
+					"?2" +
+				")," +
+				"'" + SPACE_PLACEHOLDER + "'," +
+				"' '" +
+			")";
+
+	private final SQLFunction leadingSpaceTrim;
+	private final SQLFunction trailingSpaceTrim;
+	private final SQLFunction bothSpaceTrim;
+	private final SQLFunction bothSpaceTrimFrom;
+
+	private final SQLFunction leadingTrim;
+	private final SQLFunction trailingTrim;
+	private final SQLFunction bothTrim;
+
+	/**
+	 * Constructs a new AnsiTrimEmulationFunction using {@link #LTRIM}, {@link #RTRIM}, and {@link #REPLACE}
+	 * respectively.
+	 *
+	 * @see #AnsiTrimEmulationFunction(String,String,String)
+	 */
+	public AnsiTrimEmulationFunction() {
+		this( LTRIM, RTRIM, REPLACE );
 	}
 
-	public boolean hasArguments() {
-		return true;
+	/**
+	 * Constructs a <tt>trim()</tt> emulation function definition using the specified function calls.
+	 *
+	 * @param ltrimFunctionName The <tt>left trim</tt> function to use.
+	 * @param rtrimFunctionName The <tt>right trim</tt> function to use.
+	 * @param replaceFunctionName The <tt>replace</tt> function to use.
+	 */
+	public AnsiTrimEmulationFunction(String ltrimFunctionName, String rtrimFunctionName, String replaceFunctionName) {
+		leadingSpaceTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				LEADING_SPACE_TRIM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+		);
+
+		trailingSpaceTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				TRAILING_SPACE_TRIM_TEMPLATE.replaceAll( RTRIM, rtrimFunctionName )
+		);
+
+		bothSpaceTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				BOTH_SPACE_TRIM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+						.replaceAll( RTRIM, rtrimFunctionName )
+		);
+
+		bothSpaceTrimFrom = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				BOTH_SPACE_TRIM_FROM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+						.replaceAll( RTRIM, rtrimFunctionName )
+		);
+
+		leadingTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				LEADING_TRIM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+						.replaceAll( RTRIM, rtrimFunctionName )
+						.replaceAll( REPLACE,replaceFunctionName )
+		);
+
+		trailingTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				TRAILING_TRIM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+						.replaceAll( RTRIM, rtrimFunctionName )
+						.replaceAll( REPLACE,replaceFunctionName )
+		);
+
+		bothTrim = new SQLFunctionTemplate(
+				StandardBasicTypes.STRING,
+				BOTH_TRIM_TEMPLATE.replaceAll( LTRIM, ltrimFunctionName )
+						.replaceAll( RTRIM, rtrimFunctionName )
+						.replaceAll( REPLACE,replaceFunctionName )
+		);
 	}
 
-	public boolean hasParenthesesIfNoArguments() {
-		return false;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveBothSpaceTrimFunction() {
+		return bothSpaceTrim;
 	}
 
-	public String render(List args, SessionFactoryImplementor factory) throws QueryException {
-		// according to both the ANSI-SQL and EJB3 specs, trim can either take
-		// exactly one parameter or a variable number of parameters between 1 and 4.
-		// from the SQL spec:
-		//
-		// <trim function> ::=
-		//      TRIM <left paren> <trim operands> <right paren>
-		//
-		// <trim operands> ::=
-		//      [ [ <trim specification> ] [ <trim character> ] FROM ] <trim source>
-		//
-		// <trim specification> ::=
-		//      LEADING
-		//      | TRAILING
-		//      | BOTH
-		//
-		// If only <trim specification> is omitted, BOTH is assumed;
-		// if <trim character> is omitted, space is assumed
-		if ( args.size() == 1 ) {
-			// we have the form: trim(trimSource)
-			//      so we trim leading and trailing spaces
-			return BOTH_SPACE_TRIM.render( args, factory );
-		}
-		else if ( "from".equalsIgnoreCase( ( String ) args.get( 0 ) ) ) {
-			// we have the form: trim(from trimSource).
-			//      This is functionally equivalent to trim(trimSource)
-			return BOTH_SPACE_TRIM_FROM.render( args, factory );
-		}
-		else {
-			// otherwise, a trim-specification and/or a trim-character
-			// have been specified;  we need to decide which options
-			// are present and "do the right thing"
-			boolean leading = true;         // should leading trim-characters be trimmed?
-			boolean trailing = true;        // should trailing trim-characters be trimmed?
-			String trimCharacter = null;    // the trim-character
-			String trimSource = null;       // the trim-source
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveBothSpaceTrimFromFunction() {
+		return bothSpaceTrimFrom;
+	}
 
-			// potentialTrimCharacterArgIndex = 1 assumes that a
-			// trim-specification has been specified.  we handle the
-			// exception to that explicitly
-			int potentialTrimCharacterArgIndex = 1;
-			String firstArg = ( String ) args.get( 0 );
-			if ( "leading".equalsIgnoreCase( firstArg ) ) {
-				trailing = false;
-			}
-			else if ( "trailing".equalsIgnoreCase( firstArg ) ) {
-				leading = false;
-			}
-			else if ( "both".equalsIgnoreCase( firstArg ) ) {
-			}
-			else {
-				potentialTrimCharacterArgIndex = 0;
-			}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveLeadingSpaceTrimFunction() {
+		return leadingSpaceTrim;
+	}
 
-			String potentialTrimCharacter = ( String ) args.get( potentialTrimCharacterArgIndex );
-			if ( "from".equalsIgnoreCase( potentialTrimCharacter ) ) {
-				trimCharacter = "' '";
-				trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 1 );
-			}
-			else if ( potentialTrimCharacterArgIndex + 1 >= args.size() ) {
-				trimCharacter = "' '";
-				trimSource = potentialTrimCharacter;
-			}
-			else {
-				trimCharacter = potentialTrimCharacter;
-				if ( "from".equalsIgnoreCase( ( String ) args.get( potentialTrimCharacterArgIndex + 1 ) ) ) {
-					trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 2 );
-				}
-				else {
-					trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 1 );
-				}
-			}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveTrailingSpaceTrimFunction() {
+		return trailingSpaceTrim;
+	}
 
-			List argsToUse = null;
-			argsToUse = new ArrayList();
-			argsToUse.add( trimSource );
-			argsToUse.add( trimCharacter );
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveBothTrimFunction() {
+		return bothTrim;
+	}
 
-			if ( trimCharacter.equals( "' '" ) ) {
-				if ( leading && trailing ) {
-					return BOTH_SPACE_TRIM.render( argsToUse, factory );
-				}
-				else if ( leading ) {
-					return LEADING_SPACE_TRIM.render( argsToUse, factory );
-				}
-				else {
-					return TRAILING_SPACE_TRIM.render( argsToUse, factory );
-				}
-			}
-			else {
-				if ( leading && trailing ) {
-					return BOTH_TRIM.render( argsToUse, factory );
-				}
-				else if ( leading ) {
-					return LEADING_TRIM.render( argsToUse, factory );
-				}
-				else {
-					return TRAILING_TRIM.render( argsToUse, factory );
-				}
-			}
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveLeadingTrimFunction() {
+		return leadingTrim;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected SQLFunction resolveTrailingTrimFunction() {
+		return trailingTrim;
 	}
 }

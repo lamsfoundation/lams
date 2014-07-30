@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,59 +20,27 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.stat;
 
+import java.io.Serializable;
 
 /**
  * Entity related statistics
- * 
+ *
  * @author Gavin King
  */
-public class EntityStatistics extends CategorizedStatistics {
-	
-	EntityStatistics(String name) {
-		super(name);
-	}
+public interface EntityStatistics extends Serializable {
+	long getDeleteCount();
 
-	long loadCount;
-	long updateCount;
-	long insertCount;
-	long deleteCount;
-	long fetchCount;
-	long optimisticFailureCount;
+	long getInsertCount();
 
-	public long getDeleteCount() {
-		return deleteCount;
-	}
-	public long getInsertCount() {
-		return insertCount;
-	}
-	public long getLoadCount() {
-		return loadCount;
-	}
-	public long getUpdateCount() {
-		return updateCount;
-	}
-	public long getFetchCount() {
-		return fetchCount;
-	}
-	public long getOptimisticFailureCount() {
-		return optimisticFailureCount;
-	}
+	long getLoadCount();
 
-	public String toString() {
-		return new StringBuffer()
-		    .append("EntityStatistics")
-			.append("[loadCount=").append(this.loadCount)
-			.append(",updateCount=").append(this.updateCount)
-			.append(",insertCount=").append(this.insertCount)
-			.append(",deleteCount=").append(this.deleteCount)
-			.append(",fetchCount=").append(this.fetchCount)
-			.append(",optimisticLockFailureCount=").append(this.optimisticFailureCount)
-			.append(']')
-			.toString();
-	}
+	long getUpdateCount();
+
+	long getFetchCount();
+
+	long getOptimisticFailureCount();
 
 }

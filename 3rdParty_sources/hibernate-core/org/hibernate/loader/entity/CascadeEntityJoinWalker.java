@@ -23,43 +23,47 @@
  *
  */
 package org.hibernate.loader.entity;
+import java.util.Collections;
 
 import org.hibernate.FetchMode;
-import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.MappingException;
-import org.hibernate.engine.CascadeStyle;
-import org.hibernate.engine.CascadingAction;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.CascadeStyle;
+import org.hibernate.engine.spi.CascadingAction;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.loader.AbstractEntityJoinWalker;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.type.AssociationType;
-import org.hibernate.util.CollectionHelper;
 
 public class CascadeEntityJoinWalker extends AbstractEntityJoinWalker {
 	
 	private final CascadingAction cascadeAction;
 
-	public CascadeEntityJoinWalker(OuterJoinLoadable persister, CascadingAction action, SessionFactoryImplementor factory) 
+	public CascadeEntityJoinWalker(OuterJoinLoadable persister, CascadingAction action, SessionFactoryImplementor factory)
 	throws MappingException {
-		super( persister, factory, CollectionHelper.EMPTY_MAP );
+		super( persister, factory, LoadQueryInfluencers.NONE );
 		this.cascadeAction = action;
-		StringBuffer whereCondition = whereString( getAlias(), persister.getIdentifierColumnNames(), 1 )
+		StringBuilder whereCondition = whereString( getAlias(), persister.getIdentifierColumnNames(), 1 )
 				//include the discriminator and class-level where, but not filters
-				.append( persister.filterFragment( getAlias(), CollectionHelper.EMPTY_MAP ) );
+				.append( persister.filterFragment( getAlias(), Collections.EMPTY_MAP ) );
 	
-		initAll( whereCondition.toString(), "", LockMode.READ );
+		initAll( whereCondition.toString(), "", LockOptions.READ );
 	}
 
-	protected boolean isJoinedFetchEnabled(AssociationType type, FetchMode config, CascadeStyle cascadeStyle) {
+	@Override
+    protected boolean isJoinedFetchEnabled(AssociationType type, FetchMode config, CascadeStyle cascadeStyle) {
 		return ( type.isEntityType() || type.isCollectionType() ) &&
 				( cascadeStyle==null || cascadeStyle.doCascade(cascadeAction) );
 	}
 
-	protected boolean isTooManyCollections() {
+	@Override
+    protected boolean isTooManyCollections() {
 		return countCollectionPersisters(associations)>0;
 	}
 
-	public String getComment() {
+	@Override
+    public String getComment() {
 		return "load " + getPersister().getEntityName();
 	}
 	

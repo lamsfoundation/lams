@@ -23,12 +23,10 @@
  *
  */
 package org.hibernate.loader.collection;
-
-import java.util.Map;
-
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.loader.JoinWalker;
-import org.hibernate.util.StringHelper;
 
 /**
  * Superclass of walkers for collection initializers
@@ -40,16 +38,16 @@ import org.hibernate.util.StringHelper;
  */
 public abstract class CollectionJoinWalker extends JoinWalker {
 	
-	public CollectionJoinWalker(SessionFactoryImplementor factory, Map enabledFilters) {
-		super( factory, enabledFilters );
+	public CollectionJoinWalker(SessionFactoryImplementor factory, LoadQueryInfluencers loadQueryInfluencers) {
+		super( factory, loadQueryInfluencers );
 	}
 
-	protected StringBuffer whereString(String alias, String[] columnNames, String subselect, int batchSize) {
+	protected StringBuilder whereString(String alias, String[] columnNames, String subselect, int batchSize) {
 		if (subselect==null) {
-			return super.whereString(alias, columnNames, batchSize);
+			return whereString(alias, columnNames, batchSize);
 		}
 		else {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			if (columnNames.length>1) buf.append('(');
 			buf.append( StringHelper.join(", ", StringHelper.qualify(alias, columnNames) ) );
 			if (columnNames.length>1) buf.append(')');

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,52 +20,25 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.stat;
 
+import java.io.Serializable;
+
 /**
  * Collection related statistics
- * 
+ *
  * @author Gavin King
  */
-public class CollectionStatistics extends CategorizedStatistics {
-	
-	CollectionStatistics(String role) {
-		super(role);
-	}
-	
-	long loadCount;
-	long fetchCount;
-	long updateCount;
-	long removeCount;
-	long recreateCount;
-	
-	public long getLoadCount() {
-		return loadCount;
-	}
-	public long getFetchCount() {
-		return fetchCount;
-	}
-	public long getRecreateCount() {
-		return recreateCount;
-	}
-	public long getRemoveCount() {
-		return removeCount;
-	}
-	public long getUpdateCount() {
-		return updateCount;
-	}
+public interface CollectionStatistics extends Serializable {
 
-	public String toString() {
-		return new StringBuffer()
-		    .append("CollectionStatistics")
-			.append("[loadCount=").append(this.loadCount)
-			.append(",fetchCount=").append(this.fetchCount)
-			.append(",recreateCount=").append(this.recreateCount)
-			.append(",removeCount=").append(this.removeCount)
-			.append(",updateCount=").append(this.updateCount)
-			.append(']')
-			.toString();
-	}
+	long getLoadCount();
+
+	long getFetchCount();
+
+	long getRecreateCount();
+
+	long getRemoveCount();
+
+	long getUpdateCount();
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,9 +20,9 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect;
+
 
 /**
  * An SQL dialect for DB2/390. This class provides support for
@@ -31,38 +31,46 @@ package org.hibernate.dialect;
  * @author Kristoffer Dyrkorn
  */
 public class DB2390Dialect extends DB2Dialect {
-
+	@Override
 	public boolean supportsSequences() {
 		return false;
 	}
 
+	@Override
 	public String getIdentitySelectString() {
 		return "select identity_val_local() from sysibm.sysdummy1";
 	}
 
+	@Override
 	public boolean supportsLimit() {
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean supportsLimitOffset() {
 		return false;
 	}
 
-	public String getLimitString(String sql, int offset, int limit) {
-		return new StringBuffer(sql.length() + 40)
-			.append(sql)
-			.append(" fetch first ")
-			.append(limit)
-			.append(" rows only ")
-			.toString();
-	}
-
+	@Override
 	public boolean useMaxForLimit() {
 		return true;
 	}
 
+	@Override
 	public boolean supportsVariableLimit() {
 		return false;
+	}
+
+	@Override
+	public String getLimitString(String sql, int offset, int limit) {
+		if ( offset > 0 ) {
+			throw new UnsupportedOperationException( "query result offset is not supported" );
+		}
+		if ( limit == 0 ) {
+			return sql;
+		}
+		return sql + " fetch first " + limit + " rows only ";
 	}
 
 }

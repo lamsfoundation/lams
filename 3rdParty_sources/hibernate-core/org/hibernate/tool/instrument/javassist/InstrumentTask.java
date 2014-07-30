@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,22 +20,13 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.tool.instrument.javassist;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
-
-import javassist.bytecode.ClassFile;
-
+import org.hibernate.bytecode.buildtime.internal.JavassistInstrumenter;
+import org.hibernate.bytecode.buildtime.spi.Instrumenter;
+import org.hibernate.bytecode.buildtime.spi.Logger;
 import org.hibernate.tool.instrument.BasicInstrumentationTask;
-import org.hibernate.bytecode.util.ClassDescriptor;
-import org.hibernate.bytecode.util.BasicClassFilter;
-import org.hibernate.bytecode.ClassTransformer;
-import org.hibernate.bytecode.javassist.BytecodeProviderImpl;
-import org.hibernate.bytecode.javassist.FieldHandled;
 
 /**
  * An Ant task for instrumenting persistent classes in order to enable
@@ -73,51 +64,8 @@ import org.hibernate.bytecode.javassist.FieldHandled;
  * @author Steve Ebersole
  */
 public class InstrumentTask extends BasicInstrumentationTask {
-
-	private static final BasicClassFilter CLASS_FILTER = new BasicClassFilter();
-
-	private final BytecodeProviderImpl provider = new BytecodeProviderImpl();
-
-	protected ClassDescriptor getClassDescriptor(byte[] bytecode) throws IOException {
-		return new CustomClassDescriptor( bytecode );
+	@Override
+    protected Instrumenter buildInstrumenter(Logger logger, Instrumenter.Options options) {
+		return new JavassistInstrumenter( logger, options );
 	}
-
-	protected ClassTransformer getClassTransformer(ClassDescriptor descriptor) {
-		if ( descriptor.isInstrumented() ) {
-			logger.verbose( "class [" + descriptor.getName() + "] already instrumented" );
-			return null;
-		}
-		else {
-			return provider.getTransformer( CLASS_FILTER, new CustomFieldFilter( descriptor ) );
-		}
-	}
-
-	private static class CustomClassDescriptor implements ClassDescriptor {
-		private final byte[] bytes;
-		private final ClassFile classFile;
-
-		public CustomClassDescriptor(byte[] bytes) throws IOException {
-			this.bytes = bytes;
-			this.classFile = new ClassFile( new DataInputStream( new ByteArrayInputStream( bytes ) ) );
-		}
-
-		public String getName() {
-			return classFile.getName();
-		}
-
-		public boolean isInstrumented() {
-			String[] intfs = classFile.getInterfaces();
-			for ( int i = 0; i < intfs.length; i++ ) {
-				if ( FieldHandled.class.getName().equals( intfs[i] ) ) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public byte[] getBytes() {
-			return bytes;
-		}
-	}
-
 }

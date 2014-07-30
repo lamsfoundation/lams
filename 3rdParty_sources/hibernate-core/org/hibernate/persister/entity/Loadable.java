@@ -23,13 +23,12 @@
  *
  */
 package org.hibernate.persister.entity;
-
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -52,6 +51,11 @@ public interface Loadable extends EntityPersister {
 	 * Get the discriminator type
 	 */
 	public Type getDiscriminatorType();
+
+	/**
+	 * Get the discriminator value
+	 */
+	public Object getDiscriminatorValue();
 
 	/**
 	 * Get the concrete subclass corresponding to the given discriminator
@@ -108,4 +112,26 @@ public interface Loadable extends EntityPersister {
 
 	public boolean isAbstract();
 
+	/**
+	 * Register the name of a fetch profile determined to have an affect on the
+	 * underlying loadable in regards to the fact that the underlying load SQL
+	 * needs to be adjust when the given fetch profile is enabled.
+	 * 
+	 * @param fetchProfileName The name of the profile affecting this.
+	 */
+	public void registerAffectingFetchProfile(String fetchProfileName);
+
+	/**
+	 * Given a column name and the root table alias in use for the entity hierarchy, determine the proper table alias
+	 * for the table in that hierarchy that contains said column.
+	 * <p/>
+	 * NOTE : Generally speaking the column is not validated to exist.  Most implementations simply return the
+	 * root alias; the exception is {@link JoinedSubclassEntityPersister}
+	 *
+	 * @param columnName The column name
+	 * @param rootAlias The hierarchy root alias
+	 *
+	 * @return The proper table alias for qualifying the given column.
+	 */
+	public String getTableAliasForColumn(String columnName, String rootAlias);
 }

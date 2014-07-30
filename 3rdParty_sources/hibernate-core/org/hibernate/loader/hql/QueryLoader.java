@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,13 +20,14 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.loader.hql;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,31 +35,33 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.QueryException;
 import org.hibernate.ScrollableResults;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.event.EventSource;
-import org.hibernate.exception.JDBCExceptionHelper;
-import org.hibernate.hql.HolderInstantiator;
-import org.hibernate.hql.ast.QueryTranslatorImpl;
-import org.hibernate.hql.ast.tree.FromElement;
-import org.hibernate.hql.ast.tree.SelectClause;
-import org.hibernate.hql.ast.tree.QueryNode;
-import org.hibernate.impl.IteratorImpl;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.spi.EventSource;
+import org.hibernate.hql.internal.HolderInstantiator;
+import org.hibernate.hql.internal.ast.QueryTranslatorImpl;
+import org.hibernate.hql.internal.ast.tree.AggregatedSelectExpression;
+import org.hibernate.hql.internal.ast.tree.FromElement;
+import org.hibernate.hql.internal.ast.tree.QueryNode;
+import org.hibernate.hql.internal.ast.tree.SelectClause;
+import org.hibernate.internal.IteratorImpl;
+import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.loader.BasicLoader;
+import org.hibernate.loader.spi.AfterLoadAction;
 import org.hibernate.param.ParameterSpecification;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.Loadable;
-import org.hibernate.persister.entity.Queryable;
 import org.hibernate.persister.entity.Lockable;
+import org.hibernate.persister.entity.Queryable;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-import org.hibernate.util.ArrayHelper;
 
 /**
  * A delegate that implements the Loader part of QueryTranslator.
@@ -85,7 +88,7 @@ public class QueryLoader extends BasicLoader {
 	//private Type[] sqlResultTypes;
 	private Type[] queryReturnTypes;
 
-	private final Map sqlAliasByEntityAlias = new HashMap(8);
+	private final Map<String, String> sqlAliasByEntityAlias = new HashMap<String, String>(8);
 
 	private EntityType[] ownerAssociationTypes;
 	private int[] owners;
@@ -96,7 +99,7 @@ public class QueryLoader extends BasicLoader {
 
 	private int selectLength;
 
-	private ResultTransformer selectNewTransformer;
+	private AggregatedSelectExpression aggregatedSelectExpression;
 	private String[] queryReturnAliases;
 
 	private LockMode[] defaultLockModes;
@@ -128,10 +131,7 @@ public class QueryLoader extends BasicLoader {
 		//sqlResultTypes = selectClause.getSqlResultTypes();
 		queryReturnTypes = selectClause.getQueryReturnTypes();
 
-		selectNewTransformer = HolderInstantiator.createSelectNewTransformer(
-				selectClause.getConstructor(),
-				selectClause.isMap(),
-				selectClause.isList());
+		aggregatedSelectExpression = selectClause.getAggregatedSelectExpression();
 		queryReturnAliases = selectClause.getQueryReturnAliases();
 
 		List collectionFromElements = selectClause.getCollectionFromElements();
@@ -196,24 +196,28 @@ public class QueryLoader extends BasicLoader {
 		}
 
 		//NONE, because its the requested lock mode, not the actual! 
-		defaultLockModes = ArrayHelper.fillArray(LockMode.NONE, size);
-
+		defaultLockModes = ArrayHelper.fillArray( LockMode.NONE, size );
 	}
+
+	public AggregatedSelectExpression getAggregatedSelectExpression() {
+		return aggregatedSelectExpression;
+	}
+
 
 	// -- Loader implementation --
 
 	public final void validateScrollability() throws HibernateException {
 		queryTranslator.validateScrollability();
 	}
-
+	@Override
 	protected boolean needsFetchingScroll() {
 		return queryTranslator.containsCollectionFetches();
 	}
-
+	@Override
 	public Loadable[] getEntityPersisters() {
 		return entityPersisters;
 	}
-
+	@Override
 	public String[] getAliases() {
 		return sqlAliases;
 	}
@@ -221,15 +225,15 @@ public class QueryLoader extends BasicLoader {
 	public String[] getSqlAliasSuffixes() {
 		return sqlAliasSuffixes;
 	}
-
+	@Override
 	public String[] getSuffixes() {
 		return getSqlAliasSuffixes();
 	}
-
+	@Override
 	public String[] getCollectionSuffixes() {
 		return collectionSuffixes;
 	}
-
+	@Override
 	protected String getQueryIdentifier() {
 		return queryTranslator.getQueryIdentifier();
 	}
@@ -237,7 +241,8 @@ public class QueryLoader extends BasicLoader {
 	/**
 	 * The SQL query string to be called.
 	 */
-	protected String getSQLString() {
+	@Override
+	public String getSQLString() {
 		return queryTranslator.getSQLString();
 	}
 
@@ -245,14 +250,15 @@ public class QueryLoader extends BasicLoader {
 	 * An (optional) persister for a collection to be initialized; only collection loaders
 	 * return a non-null value
 	 */
+	@Override
 	protected CollectionPersister[] getCollectionPersisters() {
 		return collectionPersisters;
 	}
-
+	@Override
 	protected int[] getCollectionOwners() {
 		return collectionOwners;
 	}
-
+	@Override
 	protected boolean[] getEntityEagerPropertyFetches() {
 		return entityEagerPropertyFetches;
 	}
@@ -261,61 +267,92 @@ public class QueryLoader extends BasicLoader {
 	 * An array of indexes of the entity that owns a one-to-one association
 	 * to the entity at the given index (-1 if there is no "owner")
 	 */
+	@Override
 	protected int[] getOwners() {
 		return owners;
 	}
-
+	@Override
 	protected EntityType[] getOwnerAssociationTypes() {
 		return ownerAssociationTypes;
 	}
 
 	// -- Loader overrides --
-
+	@Override
 	protected boolean isSubselectLoadingEnabled() {
 		return hasSubselectLoadableCollections();
 	}
 
 	/**
-	 * @param lockModes a collection of lock modes specified dynamically via the Query interface
+	 * @param lockOptions a collection of lock modes specified dynamically via the Query interface
 	 */
-	protected LockMode[] getLockModes(Map lockModes) {
-
-		if ( lockModes==null || lockModes.size()==0 ) {
+	@Override
+	protected LockMode[] getLockModes(LockOptions lockOptions) {
+		if ( lockOptions == null ) {
 			return defaultLockModes;
 		}
-		else {
-			// unfortunately this stuff can't be cached because
-			// it is per-invocation, not constant for the
-			// QueryTranslator instance
 
-			LockMode[] lockModeArray = new LockMode[entityAliases.length];
-			for ( int i = 0; i < entityAliases.length; i++ ) {
-				LockMode lockMode = (LockMode) lockModes.get( entityAliases[i] );
-				if ( lockMode == null ) {
-					//NONE, because its the requested lock mode, not the actual! 
-					lockMode = LockMode.NONE;
-				}
-				lockModeArray[i] = lockMode;
-			}
-			return lockModeArray;
+		if ( lockOptions.getAliasLockCount() == 0
+				&& ( lockOptions.getLockMode() == null || LockMode.NONE.equals( lockOptions.getLockMode() ) ) ) {
+			return defaultLockModes;
 		}
+
+		// unfortunately this stuff can't be cached because
+		// it is per-invocation, not constant for the
+		// QueryTranslator instance
+
+		LockMode[] lockModesArray = new LockMode[entityAliases.length];
+		for ( int i = 0; i < entityAliases.length; i++ ) {
+			LockMode lockMode = lockOptions.getEffectiveLockMode( entityAliases[i] );
+			if ( lockMode == null ) {
+				//NONE, because its the requested lock mode, not the actual!
+				lockMode = LockMode.NONE;
+			}
+			lockModesArray[i] = lockMode;
+		}
+
+		return lockModesArray;
 	}
 
-	protected String applyLocks(String sql, Map lockModes, Dialect dialect) throws QueryException {
-		if ( lockModes == null || lockModes.size() == 0 ) {
-			return sql;
-		}
-
+	@Override
+	protected String applyLocks(
+			String sql,
+			QueryParameters parameters,
+			Dialect dialect,
+			List<AfterLoadAction> afterLoadActions) throws QueryException {
 		// can't cache this stuff either (per-invocation)
 		// we are given a map of user-alias -> lock mode
 		// create a new map of sql-alias -> lock mode
-		final Map aliasedLockModes = new HashMap();
-		final Map keyColumnNames = dialect.forUpdateOfColumns() ? new HashMap() : null;
-		final Iterator iter = lockModes.entrySet().iterator();
-		while ( iter.hasNext() ) {
-			Map.Entry me = ( Map.Entry ) iter.next();
-			final String userAlias = ( String ) me.getKey();
-			final String drivingSqlAlias = ( String ) sqlAliasByEntityAlias.get( userAlias );
+
+		final LockOptions lockOptions = parameters.getLockOptions();
+
+		if ( lockOptions == null ||
+			( lockOptions.getLockMode() == LockMode.NONE && lockOptions.getAliasLockCount() == 0 ) ) {
+			return sql;
+		}
+
+
+		// user is request locking, lets see if we can apply locking directly to the SQL...
+
+		// 		some dialects wont allow locking with paging...
+		if ( shouldUseFollowOnLocking( parameters, dialect, afterLoadActions ) ) {
+			return sql;
+		}
+
+		//		there are other conditions we might want to add here, such as checking the result types etc
+		//		but those are better served after we have redone the SQL generation to use ASTs.
+
+
+		// we need both the set of locks and the columns to reference in locks
+		// as the ultimate output of this section...
+		final LockOptions locks = new LockOptions( lockOptions.getLockMode() );
+		final Map<String, String[]> keyColumnNames = dialect.forUpdateOfColumns() ? new HashMap<String, String[]>() : null;
+
+		locks.setScope( lockOptions.getScope() );
+		locks.setTimeOut( lockOptions.getTimeOut() );
+
+		for ( Map.Entry<String, String> entry : sqlAliasByEntityAlias.entrySet() ) {
+			final String userAlias =  entry.getKey();
+			final String drivingSqlAlias = entry.getValue();
 			if ( drivingSqlAlias == null ) {
 				throw new IllegalArgumentException( "could not locate alias to apply lock mode : " + userAlias );
 			}
@@ -325,56 +362,102 @@ public class QueryLoader extends BasicLoader {
 			// the exception case here is joined-subclass hierarchies where we instead
 			// want to apply the lock against the root table (for all other strategies,
 			// it just happens that driving and root are the same).
-			final QueryNode select = ( QueryNode ) queryTranslator.getSqlAST();
-			final Lockable drivingPersister = ( Lockable ) select.getFromClause().getFromElement( userAlias ).getQueryable();
+			final QueryNode select = (QueryNode) queryTranslator.getSqlAST();
+			final Lockable drivingPersister = (Lockable) select.getFromClause()
+					.findFromElementByUserOrSqlAlias( userAlias, drivingSqlAlias )
+					.getQueryable();
 			final String sqlAlias = drivingPersister.getRootTableAlias( drivingSqlAlias );
-			aliasedLockModes.put( sqlAlias, me.getValue() );
+
+			final LockMode effectiveLockMode = lockOptions.getEffectiveLockMode( userAlias );
+			locks.setAliasSpecificLockMode( sqlAlias, effectiveLockMode );
+
 			if ( keyColumnNames != null ) {
 				keyColumnNames.put( sqlAlias, drivingPersister.getRootTableIdentifierColumnNames() );
 			}
 		}
-		return dialect.applyLocksToSql( sql, aliasedLockModes, keyColumnNames );
-	}
 
+		// apply the collected locks and columns
+		return dialect.applyLocksToSql( sql, locks, keyColumnNames );
+	}
+	@Override
+	protected void applyPostLoadLocks(Object[] row, LockMode[] lockModesArray, SessionImplementor session) {
+		// todo : scalars???
+//		if ( row.length != lockModesArray.length ) {
+//			return;
+//		}
+//
+//		for ( int i = 0; i < lockModesArray.length; i++ ) {
+//			if ( LockMode.OPTIMISTIC_FORCE_INCREMENT.equals( lockModesArray[i] ) ) {
+//				final EntityEntry pcEntry =
+//			}
+//			else if ( LockMode.PESSIMISTIC_FORCE_INCREMENT.equals( lockModesArray[i] ) ) {
+//
+//			}
+//		}
+	}
+	@Override
 	protected boolean upgradeLocks() {
 		return true;
 	}
 
 	private boolean hasSelectNew() {
-		return selectNewTransformer!=null;
+		return aggregatedSelectExpression != null &&  aggregatedSelectExpression.getResultTransformer() != null;
 	}
-
+	@Override
+	protected String[] getResultRowAliases() {
+		return queryReturnAliases;
+	}
+	@Override
+	protected ResultTransformer resolveResultTransformer(ResultTransformer resultTransformer) {
+		final ResultTransformer implicitResultTransformer = aggregatedSelectExpression == null
+				? null
+				: aggregatedSelectExpression.getResultTransformer();
+		return HolderInstantiator.resolveResultTransformer( implicitResultTransformer, resultTransformer );
+	}
+	@Override
+	protected boolean[] includeInResultRow() {
+		boolean[] includeInResultTuple = includeInSelect;
+		if ( hasScalars ) {
+			includeInResultTuple = new boolean[ queryReturnTypes.length ];
+			Arrays.fill( includeInResultTuple, true );
+		}
+		return includeInResultTuple;
+	}
+	@Override
 	protected Object getResultColumnOrRow(Object[] row, ResultTransformer transformer, ResultSet rs, SessionImplementor session)
 			throws SQLException, HibernateException {
 
-		row = toResultRow( row );
+		Object[] resultRow = getResultRow( row, rs, session );
 		boolean hasTransform = hasSelectNew() || transformer!=null;
+		return ( ! hasTransform && resultRow.length == 1 ?
+				resultRow[ 0 ] :
+				resultRow
+		);
+	}
+
+	@Override
+	protected Object[] getResultRow(Object[] row, ResultSet rs, SessionImplementor session)
+			throws SQLException, HibernateException {
+		Object[] resultRow;
 		if ( hasScalars ) {
 			String[][] scalarColumns = scalarColumnNames;
 			int queryCols = queryReturnTypes.length;
-			if ( !hasTransform && queryCols == 1 ) {
-				return queryReturnTypes[0].nullSafeGet( rs, scalarColumns[0], session, null );
+			resultRow = new Object[queryCols];
+			for ( int i = 0; i < queryCols; i++ ) {
+				resultRow[i] = queryReturnTypes[i].nullSafeGet( rs, scalarColumns[i], session, null );
 			}
-			else {
-				row = new Object[queryCols];
-				for ( int i = 0; i < queryCols; i++ ) {
-					row[i] = queryReturnTypes[i].nullSafeGet( rs, scalarColumns[i], session, null );
-				}
-				return row;
-			}
-		}
-		else if ( !hasTransform ) {
-			return row.length == 1 ? row[0] : row;
 		}
 		else {
-			return row;
+			resultRow = toResultRow( row );
 		}
-
+		return resultRow;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
 	protected List getResultList(List results, ResultTransformer resultTransformer) throws QueryException {
 		// meant to handle dynamic instantiation queries...
-		HolderInstantiator holderInstantiator = HolderInstantiator.getHolderInstantiator(selectNewTransformer, resultTransformer, queryReturnAliases);
+		HolderInstantiator holderInstantiator = buildHolderInstantiator( resultTransformer );
 		if ( holderInstantiator.isRequired() ) {
 			for ( int i = 0; i < results.size(); i++ ) {
 				Object[] row = ( Object[] ) results.get( i );
@@ -382,16 +465,28 @@ public class QueryLoader extends BasicLoader {
 				results.set( i, result );
 			}
 
-			if(!hasSelectNew() && resultTransformer!=null) {
+			if ( !hasSelectNew() && resultTransformer != null ) {
 				return resultTransformer.transformList(results);
-			} else {
+			}
+			else {
 				return results;
 			}
-		} else {
+		}
+		else {
 			return results;
 		}
 	}
 
+	private HolderInstantiator buildHolderInstantiator(ResultTransformer queryLocalResultTransformer) {
+		final ResultTransformer implicitResultTransformer = aggregatedSelectExpression == null
+				? null
+				: aggregatedSelectExpression.getResultTransformer();
+		return HolderInstantiator.getHolderInstantiator(
+				implicitResultTransformer,
+				queryLocalResultTransformer,
+				queryReturnAliases
+		);
+	}
 	// --- Query translator methods ---
 
 	public List list(
@@ -418,21 +513,21 @@ public class QueryLoader extends BasicLoader {
 		}
 
 		try {
-
-			final PreparedStatement st = prepareQueryStatement( queryParameters, false, session );
-
-			if(queryParameters.isCallable()) {
+			if ( queryParameters.isCallable() ) {
 				throw new QueryException("iterate() not supported for callable statements");
 			}
-			final ResultSet rs = getResultSet(st, queryParameters.hasAutoDiscoverScalarTypes(), false, queryParameters.getRowSelection(), session);
+			final SqlStatementWrapper wrapper = executeQueryStatement( queryParameters, false, Collections.<AfterLoadAction>emptyList(), session );
+			final ResultSet rs = wrapper.getResultSet();
+			final PreparedStatement st = (PreparedStatement) wrapper.getStatement();
 			final Iterator result = new IteratorImpl(
 					rs,
 			        st,
 			        session,
+			        queryParameters.isReadOnly( session ),
 			        queryReturnTypes,
 			        queryTranslator.getColumnNames(),
-			        HolderInstantiator.getHolderInstantiator(selectNewTransformer, queryParameters.getResultTransformer(), queryReturnAliases)
-				);
+			        buildHolderInstantiator( queryParameters.getResultTransformer() )
+			);
 
 			if ( stats ) {
 				session.getFactory().getStatisticsImplementor().queryExecuted(
@@ -447,8 +542,7 @@ public class QueryLoader extends BasicLoader {
 
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					getFactory().getSQLExceptionConverter(),
+			throw getFactory().getSQLExceptionHelper().convert(
 			        sqle,
 			        "could not execute query using iterate",
 			        getSQLString()
@@ -461,7 +555,12 @@ public class QueryLoader extends BasicLoader {
 			final QueryParameters queryParameters,
 	        final SessionImplementor session) throws HibernateException {
 		checkQuery( queryParameters );
-		return scroll( queryParameters, queryReturnTypes, HolderInstantiator.getHolderInstantiator(selectNewTransformer, queryParameters.getResultTransformer(), queryReturnAliases), session );
+		return scroll( 
+				queryParameters,
+				queryReturnTypes,
+				buildHolderInstantiator( queryParameters.getResultTransformer() ),
+				session
+		);
 	}
 
 	// -- Implementation private methods --
@@ -485,6 +584,7 @@ public class QueryLoader extends BasicLoader {
 	/**
 	 * Returns the locations of all occurrences of the named parameter.
 	 */
+	@Override
 	public int[] getNamedParameterLocs(String name) throws QueryException {
 		return queryTranslator.getParameterTranslations().getNamedParameterSqlLocations( name );
 	}
@@ -492,7 +592,7 @@ public class QueryLoader extends BasicLoader {
 	/**
 	 * We specifically override this method here, because in general we know much more
 	 * about the parameters and their appropriate bind positions here then we do in
-	 * our super because we track them explciitly here through the ParameterSpecification
+	 * our super because we track them explicitly here through the ParameterSpecification
 	 * interface.
 	 *
 	 * @param queryParameters The encapsulation of the parameter values to be bound.
@@ -501,43 +601,17 @@ public class QueryLoader extends BasicLoader {
 	 * @return The number of JDBC bind positions actually bound during this method execution.
 	 * @throws SQLException Indicates problems performing the binding.
 	 */
+	@Override
 	protected int bindParameterValues(
 			final PreparedStatement statement,
 			final QueryParameters queryParameters,
 			final int startIndex,
 			final SessionImplementor session) throws SQLException {
-		int position = bindFilterParameterValues( statement, queryParameters, startIndex, session );
-		List parameterSpecs = queryTranslator.getSqlAST().getWalker().getParameters();
-		Iterator itr = parameterSpecs.iterator();
-		while ( itr.hasNext() ) {
-			ParameterSpecification spec = ( ParameterSpecification ) itr.next();
+		int position = startIndex;
+		List<ParameterSpecification> parameterSpecs = queryTranslator.getCollectedParameterSpecifications();
+		for ( ParameterSpecification spec : parameterSpecs ) {
 			position += spec.bind( statement, queryParameters, session, position );
 		}
 		return position - startIndex;
-	}
-
-	private int bindFilterParameterValues(
-			PreparedStatement st,
-			QueryParameters queryParameters,
-			int position,
-			SessionImplementor session) throws SQLException {
-		// todo : better to handle dynamic filters through implicit DynamicFilterParameterSpecification
-		// see the discussion there in DynamicFilterParameterSpecification's javadocs as to why
-		// it is currently not done that way.
-		int filteredParamCount = queryParameters.getFilteredPositionalParameterTypes() == null
-				? 0
-				: queryParameters.getFilteredPositionalParameterTypes().length;
-		int nonfilteredParamCount = queryParameters.getPositionalParameterTypes() == null
-				? 0
-				: queryParameters.getPositionalParameterTypes().length;
-		int filterParamCount = filteredParamCount - nonfilteredParamCount;
-		for ( int i = 0; i < filterParamCount; i++ ) {
-			Type type = queryParameters.getFilteredPositionalParameterTypes()[i];
-			Object value = queryParameters.getFilteredPositionalParameterValues()[i];
-			type.nullSafeSet( st, value, position, session );
-			position += type.getColumnSpan( getFactory() );
-		}
-
-		return position;
 	}
 }

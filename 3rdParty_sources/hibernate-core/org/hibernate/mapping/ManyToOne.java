@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,40 +20,39 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.MappingException;
+import org.hibernate.cfg.Mappings;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
 
 /**
  * A many-to-one association mapping
  * @author Gavin King
  */
 public class ManyToOne extends ToOne {
-	
 	private boolean ignoreNotFound;
+	private boolean isLogicalOneToOne;
 	
-	public ManyToOne(Table table) {
-		super(table);
+	public ManyToOne(Mappings mappings, Table table) {
+		super( mappings, table );
 	}
 
 	public Type getType() throws MappingException {
-		return TypeFactory.manyToOne( 
-				getReferencedEntityName(), 
+		return getMappings().getTypeResolver().getTypeFactory().manyToOne(
+				getReferencedEntityName(),
+				referenceToPrimaryKey, 
 				getReferencedPropertyName(),
 				isLazy(),
 				isUnwrapProxy(),
-				isEmbedded(),
-				isIgnoreNotFound()
-			);
+				isIgnoreNotFound(),
+				isLogicalOneToOne
+		);
 	}
 
 	public void createForeignKey() throws MappingException {
@@ -110,5 +109,11 @@ public class ManyToOne extends ToOne {
 		this.ignoreNotFound = ignoreNotFound;
 	}
 
-	
+	public void markAsLogicalOneToOne() {
+		this.isLogicalOneToOne = true;
+	}
+
+	public boolean isLogicalOneToOne() {
+		return isLogicalOneToOne;
+	}
 }

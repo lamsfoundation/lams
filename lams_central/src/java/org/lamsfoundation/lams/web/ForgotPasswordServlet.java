@@ -13,10 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -322,7 +322,7 @@ public class ForgotPasswordServlet extends HttpServlet
 		Properties props = new Properties();
 		
 		IdentifierGenerator uuidGen = new UUIDHexGenerator();
-		( (Configurable) uuidGen).configure(Hibernate.STRING, props, null);
+		( (Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
 		
 		return ((String) uuidGen.generate(null, null)).toLowerCase();
 	}

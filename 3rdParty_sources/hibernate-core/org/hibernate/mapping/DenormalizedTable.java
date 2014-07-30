@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,17 +20,14 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import org.hibernate.util.JoinedIterator;
+import org.hibernate.internal.util.collections.JoinedIterator;
 
 /**
  * @author Gavin King
@@ -44,20 +41,23 @@ public class DenormalizedTable extends Table {
 		includedTable.setHasDenormalizedTables();
 	}
 	
-	public void createForeignKeys() {
+	@Override
+    public void createForeignKeys() {
 		includedTable.createForeignKeys();
 		Iterator iter = includedTable.getForeignKeyIterator();
 		while ( iter.hasNext() ) {
 			ForeignKey fk = (ForeignKey) iter.next();
 			createForeignKey( 
-					fk.getName() + Integer.toHexString( getName().hashCode() ), 
+					Constraint.generateName( fk.generatedConstraintNamePrefix(), this, fk.getColumns() ),
 					fk.getColumns(), 
-					fk.getReferencedEntityName() 
+					fk.getReferencedEntityName(),
+					fk.getReferencedColumns()
 				);
 		}
 	}
 
-	public Column getColumn(Column column) {
+	@Override
+    public Column getColumn(Column column) {
 		Column superColumn = super.getColumn( column );
 		if (superColumn != null) {
 			return superColumn;
@@ -67,33 +67,36 @@ public class DenormalizedTable extends Table {
 		}
 	}
 
-	public Iterator getColumnIterator() {
+	@Override
+    public Iterator getColumnIterator() {
 		return new JoinedIterator(
 				includedTable.getColumnIterator(),
 				super.getColumnIterator()
 			);
 	}
 
-	public boolean containsColumn(Column column) {
+	@Override
+    public boolean containsColumn(Column column) {
 		return super.containsColumn(column) || includedTable.containsColumn(column);
 	}
 
-	public PrimaryKey getPrimaryKey() {
+	@Override
+    public PrimaryKey getPrimaryKey() {
 		return includedTable.getPrimaryKey();
 	}
 
-	public Iterator getUniqueKeyIterator() {
-		//wierd implementation because of hacky behavior
-		//of Table.sqlCreateString() which modifies the
-		//list of unique keys by side-effect on some
-		//dialects
-		Map uks = new HashMap();
-		uks.putAll( getUniqueKeys() );
-		uks.putAll( includedTable.getUniqueKeys() );
-		return uks.values().iterator();
+	@Override
+    public Iterator getUniqueKeyIterator() {
+		Iterator iter = includedTable.getUniqueKeyIterator();
+		while ( iter.hasNext() ) {
+			UniqueKey uk = (UniqueKey) iter.next();
+			createUniqueKey( uk.getColumns() );
+		}
+		return getUniqueKeys().values().iterator();
 	}
 
-	public Iterator getIndexIterator() {
+	@Override
+    public Iterator getIndexIterator() {
 		List indexes = new ArrayList();
 		Iterator iter = includedTable.getIndexIterator();
 		while ( iter.hasNext() ) {

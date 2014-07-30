@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,50 +20,49 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect;
-
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.hibernate.Hibernate;
 import org.hibernate.LockMode;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.function.ConditionalParenthesisFunction;
+import org.hibernate.dialect.function.ConvertFunction;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.NvlFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
+import org.hibernate.dialect.function.StandardJDBCEscapeFunction;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
-import org.hibernate.dialect.function.StandardJDBCEscapeFunction;
-import org.hibernate.dialect.function.ConvertFunction;
-import org.hibernate.dialect.function.ConditionalParenthesisFunction;
 import org.hibernate.dialect.lock.LockingStrategy;
+import org.hibernate.dialect.lock.OptimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.OptimisticLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticReadUpdateLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticWriteUpdateLockingStrategy;
 import org.hibernate.dialect.lock.SelectLockingStrategy;
 import org.hibernate.dialect.lock.UpdateLockingStrategy;
-import org.hibernate.exception.CacheSQLStateConverter;
-import org.hibernate.exception.SQLExceptionConverter;
-import org.hibernate.exception.TemplatedViolatedConstraintNameExtracter;
-import org.hibernate.exception.ViolatedConstraintNameExtracter;
+import org.hibernate.exception.internal.CacheSQLExceptionConversionDelegate;
+import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
+import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
+import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
 import org.hibernate.id.IdentityGenerator;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.entity.Lockable;
 import org.hibernate.sql.CacheJoinFragment;
 import org.hibernate.sql.JoinFragment;
-import org.hibernate.util.StringHelper;
+import org.hibernate.type.StandardBasicTypes;
 
 /**
- * Cach&eacute; 2007.1 dialect. This class is required in order to use Hibernate with Intersystems Cach� SQL.<br>
- * <br>
- * Compatible with Cach� 2007.1.
- * <br>
- * <head>
- * <title>Cach&eacute; and Hibernate</title>
- * </head>
- * <body>
- * <h1>Cach&eacute; and Hibernate</h1>
+ * Cach&eacute; 2007.1 dialect.
+ *
+ * This class is required in order to use Hibernate with Intersystems Cach&eacute; SQL.  Compatible with
+ * Cach&eacute; 2007.1.
+ *
  * <h2>PREREQUISITES</h2>
  * These setup instructions assume that both Cach&eacute; and Hibernate are installed and operational.
  * <br>
@@ -141,11 +140,9 @@ import org.hibernate.util.StringHelper;
  * </tr>
  * </table>
  * <p/>
- * <dl>
- * <dt><b>Note 1</b></dt>
- * <dd>Please contact your administrator for the userid and password you should use when attempting access via JDBC.
- * By default, these are chosen to be "_SYSTEM" and "SYS" respectively as noted in the SQL standard.</dd>
- * </dl>
+ * <b>NOTE:</b> Please contact your administrator for the userid and password you should use when
+ *         attempting access via JDBC.  By default, these are chosen to be "_SYSTEM" and "SYS" respectively
+ *         as noted in the SQL standard.
  * <br>
  * <h2>CACH&Eacute; VERSION URL</h2>
  * This is the standard URL for the JDBC driver.
@@ -212,8 +209,8 @@ import org.hibernate.util.StringHelper;
 public class Cache71Dialect extends Dialect {
 
 	/**
-	 * Creates new <code>Cach�71Dialect</code> instance. Sets up the JDBC /
-	 * Cach� type mappings.
+	 * Creates new <code>Cache71Dialect</code> instance. Sets up the JDBC /
+	 * Cach&eacute; type mappings.
 	 */
 	public Cache71Dialect() {
 		super();
@@ -236,16 +233,14 @@ public class Cache71Dialect extends Dialect {
 		registerColumnType( Types.DOUBLE, "double" );
 		registerColumnType( Types.FLOAT, "float" );
 		registerColumnType( Types.INTEGER, "integer" );
-		registerColumnType( Types.LONGVARBINARY, "longvarbinary" );	// binary %Stream
-		registerColumnType( Types.LONGVARCHAR, "longvarchar" );		// character %Stream
+		registerColumnType( Types.LONGVARBINARY, "longvarbinary" );
+		registerColumnType( Types.LONGVARCHAR, "longvarchar" );
 		registerColumnType( Types.NUMERIC, "numeric($p,$s)" );
 		registerColumnType( Types.REAL, "real" );
 		registerColumnType( Types.SMALLINT, "smallint" );
 		registerColumnType( Types.TIMESTAMP, "timestamp" );
 		registerColumnType( Types.TIME, "time" );
 		registerColumnType( Types.TINYINT, "tinyint" );
-		// TBD should this be varbinary($1)?
-		//		registerColumnType(Types.VARBINARY,     "binary($1)");
 		registerColumnType( Types.VARBINARY, "longvarbinary" );
 		registerColumnType( Types.VARCHAR, "varchar($l)" );
 		registerColumnType( Types.BLOB, "longvarbinary" );
@@ -253,162 +248,150 @@ public class Cache71Dialect extends Dialect {
 
 		getDefaultProperties().setProperty( Environment.USE_STREAMS_FOR_BINARY, "false" );
 		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE );
-		//getDefaultProperties().setProperty(Environment.STATEMENT_BATCH_SIZE, NO_BATCH);
 
 		getDefaultProperties().setProperty( Environment.USE_SQL_COMMENTS, "false" );
 
 		registerFunction( "abs", new StandardSQLFunction( "abs" ) );
-		registerFunction( "acos", new StandardJDBCEscapeFunction( "acos", Hibernate.DOUBLE ) );
-		registerFunction( "%alphaup", new StandardSQLFunction( "%alphaup", Hibernate.STRING ) );
-		registerFunction( "ascii", new StandardSQLFunction( "ascii", Hibernate.STRING ) );
-		registerFunction( "asin", new StandardJDBCEscapeFunction( "asin", Hibernate.DOUBLE ) );
-		registerFunction( "atan", new StandardJDBCEscapeFunction( "atan", Hibernate.DOUBLE ) );
-		registerFunction( "bit_length", new SQLFunctionTemplate( Hibernate.INTEGER, "($length(?1)*8)" ) );
-		// hibernate impelemnts cast in Dialect.java
-		registerFunction( "ceiling", new StandardSQLFunction( "ceiling", Hibernate.INTEGER ) );
-		registerFunction( "char", new StandardJDBCEscapeFunction( "char", Hibernate.CHARACTER ) );
-		registerFunction( "character_length", new StandardSQLFunction( "character_length", Hibernate.INTEGER ) );
-		registerFunction( "char_length", new StandardSQLFunction( "char_length", Hibernate.INTEGER ) );
-		registerFunction( "cos", new StandardJDBCEscapeFunction( "cos", Hibernate.DOUBLE ) );
-		registerFunction( "cot", new StandardJDBCEscapeFunction( "cot", Hibernate.DOUBLE ) );
+		registerFunction( "acos", new StandardJDBCEscapeFunction( "acos", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "%alphaup", new StandardSQLFunction( "%alphaup", StandardBasicTypes.STRING ) );
+		registerFunction( "ascii", new StandardSQLFunction( "ascii", StandardBasicTypes.STRING ) );
+		registerFunction( "asin", new StandardJDBCEscapeFunction( "asin", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "atan", new StandardJDBCEscapeFunction( "atan", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "bit_length", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "($length(?1)*8)" ) );
+		registerFunction( "ceiling", new StandardSQLFunction( "ceiling", StandardBasicTypes.INTEGER ) );
+		registerFunction( "char", new StandardJDBCEscapeFunction( "char", StandardBasicTypes.CHARACTER ) );
+		registerFunction( "character_length", new StandardSQLFunction( "character_length", StandardBasicTypes.INTEGER ) );
+		registerFunction( "char_length", new StandardSQLFunction( "char_length", StandardBasicTypes.INTEGER ) );
+		registerFunction( "cos", new StandardJDBCEscapeFunction( "cos", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "cot", new StandardJDBCEscapeFunction( "cot", StandardBasicTypes.DOUBLE ) );
 		registerFunction( "coalesce", new VarArgsSQLFunction( "coalesce(", ",", ")" ) );
-		registerFunction( "concat", new VarArgsSQLFunction( Hibernate.STRING, "", "||", "" ) );
+		registerFunction( "concat", new VarArgsSQLFunction( StandardBasicTypes.STRING, "", "||", "" ) );
 		registerFunction( "convert", new ConvertFunction() );
-		registerFunction( "curdate", new StandardJDBCEscapeFunction( "curdate", Hibernate.DATE ) );
-		registerFunction( "current_date", new NoArgSQLFunction( "current_date", Hibernate.DATE, false ) );
-		registerFunction( "current_time", new NoArgSQLFunction( "current_time", Hibernate.TIME, false ) );
+		registerFunction( "curdate", new StandardJDBCEscapeFunction( "curdate", StandardBasicTypes.DATE ) );
+		registerFunction( "current_date", new NoArgSQLFunction( "current_date", StandardBasicTypes.DATE, false ) );
+		registerFunction( "current_time", new NoArgSQLFunction( "current_time", StandardBasicTypes.TIME, false ) );
 		registerFunction(
-				"current_timestamp", new ConditionalParenthesisFunction( "current_timestamp", Hibernate.TIMESTAMP )
+				"current_timestamp", new ConditionalParenthesisFunction( "current_timestamp", StandardBasicTypes.TIMESTAMP )
 		);
-		registerFunction( "curtime", new StandardJDBCEscapeFunction( "curtime", Hibernate.TIME ) );
-		registerFunction( "database", new StandardJDBCEscapeFunction( "database", Hibernate.STRING ) );
-		registerFunction( "dateadd", new VarArgsSQLFunction( Hibernate.TIMESTAMP, "dateadd(", ",", ")" ) );
-		registerFunction( "datediff", new VarArgsSQLFunction( Hibernate.INTEGER, "datediff(", ",", ")" ) );
-		registerFunction( "datename", new VarArgsSQLFunction( Hibernate.STRING, "datename(", ",", ")" ) );
-		registerFunction( "datepart", new VarArgsSQLFunction( Hibernate.INTEGER, "datepart(", ",", ")" ) );
-		registerFunction( "day", new StandardSQLFunction( "day", Hibernate.INTEGER ) );
-		registerFunction( "dayname", new StandardJDBCEscapeFunction( "dayname", Hibernate.STRING ) );
-		registerFunction( "dayofmonth", new StandardJDBCEscapeFunction( "dayofmonth", Hibernate.INTEGER ) );
-		registerFunction( "dayofweek", new StandardJDBCEscapeFunction( "dayofweek", Hibernate.INTEGER ) );
-		registerFunction( "dayofyear", new StandardJDBCEscapeFunction( "dayofyear", Hibernate.INTEGER ) );
+		registerFunction( "curtime", new StandardJDBCEscapeFunction( "curtime", StandardBasicTypes.TIME ) );
+		registerFunction( "database", new StandardJDBCEscapeFunction( "database", StandardBasicTypes.STRING ) );
+		registerFunction( "dateadd", new VarArgsSQLFunction( StandardBasicTypes.TIMESTAMP, "dateadd(", ",", ")" ) );
+		registerFunction( "datediff", new VarArgsSQLFunction( StandardBasicTypes.INTEGER, "datediff(", ",", ")" ) );
+		registerFunction( "datename", new VarArgsSQLFunction( StandardBasicTypes.STRING, "datename(", ",", ")" ) );
+		registerFunction( "datepart", new VarArgsSQLFunction( StandardBasicTypes.INTEGER, "datepart(", ",", ")" ) );
+		registerFunction( "day", new StandardSQLFunction( "day", StandardBasicTypes.INTEGER ) );
+		registerFunction( "dayname", new StandardJDBCEscapeFunction( "dayname", StandardBasicTypes.STRING ) );
+		registerFunction( "dayofmonth", new StandardJDBCEscapeFunction( "dayofmonth", StandardBasicTypes.INTEGER ) );
+		registerFunction( "dayofweek", new StandardJDBCEscapeFunction( "dayofweek", StandardBasicTypes.INTEGER ) );
+		registerFunction( "dayofyear", new StandardJDBCEscapeFunction( "dayofyear", StandardBasicTypes.INTEGER ) );
 		// is it necessary to register %exact since it can only appear in a where clause?
-		registerFunction( "%exact", new StandardSQLFunction( "%exact", Hibernate.STRING ) );
-		registerFunction( "exp", new StandardJDBCEscapeFunction( "exp", Hibernate.DOUBLE ) );
-		registerFunction( "%external", new StandardSQLFunction( "%external", Hibernate.STRING ) );
-		registerFunction( "$extract", new VarArgsSQLFunction( Hibernate.INTEGER, "$extract(", ",", ")" ) );
-		registerFunction( "$find", new VarArgsSQLFunction( Hibernate.INTEGER, "$find(", ",", ")" ) );
-		registerFunction( "floor", new StandardSQLFunction( "floor", Hibernate.INTEGER ) );
-		registerFunction( "getdate", new StandardSQLFunction( "getdate", Hibernate.TIMESTAMP ) );
-		registerFunction( "hour", new StandardJDBCEscapeFunction( "hour", Hibernate.INTEGER ) );
+		registerFunction( "%exact", new StandardSQLFunction( "%exact", StandardBasicTypes.STRING ) );
+		registerFunction( "exp", new StandardJDBCEscapeFunction( "exp", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "%external", new StandardSQLFunction( "%external", StandardBasicTypes.STRING ) );
+		registerFunction( "$extract", new VarArgsSQLFunction( StandardBasicTypes.INTEGER, "$extract(", ",", ")" ) );
+		registerFunction( "$find", new VarArgsSQLFunction( StandardBasicTypes.INTEGER, "$find(", ",", ")" ) );
+		registerFunction( "floor", new StandardSQLFunction( "floor", StandardBasicTypes.INTEGER ) );
+		registerFunction( "getdate", new StandardSQLFunction( "getdate", StandardBasicTypes.TIMESTAMP ) );
+		registerFunction( "hour", new StandardJDBCEscapeFunction( "hour", StandardBasicTypes.INTEGER ) );
 		registerFunction( "ifnull", new VarArgsSQLFunction( "ifnull(", ",", ")" ) );
 		registerFunction( "%internal", new StandardSQLFunction( "%internal" ) );
 		registerFunction( "isnull", new VarArgsSQLFunction( "isnull(", ",", ")" ) );
-		registerFunction( "isnumeric", new StandardSQLFunction( "isnumeric", Hibernate.INTEGER ) );
-		registerFunction( "lcase", new StandardJDBCEscapeFunction( "lcase", Hibernate.STRING ) );
-		registerFunction( "left", new StandardJDBCEscapeFunction( "left", Hibernate.STRING ) );
-		registerFunction( "len", new StandardSQLFunction( "len", Hibernate.INTEGER ) );
-		registerFunction( "length", new StandardSQLFunction( "length", Hibernate.INTEGER ) );
+		registerFunction( "isnumeric", new StandardSQLFunction( "isnumeric", StandardBasicTypes.INTEGER ) );
+		registerFunction( "lcase", new StandardJDBCEscapeFunction( "lcase", StandardBasicTypes.STRING ) );
+		registerFunction( "left", new StandardJDBCEscapeFunction( "left", StandardBasicTypes.STRING ) );
+		registerFunction( "len", new StandardSQLFunction( "len", StandardBasicTypes.INTEGER ) );
 		registerFunction( "$length", new VarArgsSQLFunction( "$length(", ",", ")" ) );
-		// aggregate functions shouldn't be registered, right?
-		//registerFunction( "list", new StandardSQLFunction("list",Hibernate.STRING) );
-		// stopped on $list
 		registerFunction( "$list", new VarArgsSQLFunction( "$list(", ",", ")" ) );
 		registerFunction( "$listdata", new VarArgsSQLFunction( "$listdata(", ",", ")" ) );
 		registerFunction( "$listfind", new VarArgsSQLFunction( "$listfind(", ",", ")" ) );
 		registerFunction( "$listget", new VarArgsSQLFunction( "$listget(", ",", ")" ) );
-		registerFunction( "$listlength", new StandardSQLFunction( "$listlength", Hibernate.INTEGER ) );
-		registerFunction( "locate", new StandardSQLFunction( "$FIND", Hibernate.INTEGER ) );
-		registerFunction( "log", new StandardJDBCEscapeFunction( "log", Hibernate.DOUBLE ) );
-		registerFunction( "log10", new StandardJDBCEscapeFunction( "log", Hibernate.DOUBLE ) );
+		registerFunction( "$listlength", new StandardSQLFunction( "$listlength", StandardBasicTypes.INTEGER ) );
+		registerFunction( "locate", new StandardSQLFunction( "$FIND", StandardBasicTypes.INTEGER ) );
+		registerFunction( "log", new StandardJDBCEscapeFunction( "log", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "log10", new StandardJDBCEscapeFunction( "log", StandardBasicTypes.DOUBLE ) );
 		registerFunction( "lower", new StandardSQLFunction( "lower" ) );
 		registerFunction( "ltrim", new StandardSQLFunction( "ltrim" ) );
-		registerFunction( "minute", new StandardJDBCEscapeFunction( "minute", Hibernate.INTEGER ) );
-		registerFunction( "mod", new StandardJDBCEscapeFunction( "mod", Hibernate.DOUBLE ) );
-		registerFunction( "month", new StandardJDBCEscapeFunction( "month", Hibernate.INTEGER ) );
-		registerFunction( "monthname", new StandardJDBCEscapeFunction( "monthname", Hibernate.STRING ) );
-		registerFunction( "now", new StandardJDBCEscapeFunction( "monthname", Hibernate.TIMESTAMP ) );
+		registerFunction( "minute", new StandardJDBCEscapeFunction( "minute", StandardBasicTypes.INTEGER ) );
+		registerFunction( "mod", new StandardJDBCEscapeFunction( "mod", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "month", new StandardJDBCEscapeFunction( "month", StandardBasicTypes.INTEGER ) );
+		registerFunction( "monthname", new StandardJDBCEscapeFunction( "monthname", StandardBasicTypes.STRING ) );
+		registerFunction( "now", new StandardJDBCEscapeFunction( "monthname", StandardBasicTypes.TIMESTAMP ) );
 		registerFunction( "nullif", new VarArgsSQLFunction( "nullif(", ",", ")" ) );
 		registerFunction( "nvl", new NvlFunction() );
 		registerFunction( "%odbcin", new StandardSQLFunction( "%odbcin" ) );
 		registerFunction( "%odbcout", new StandardSQLFunction( "%odbcin" ) );
-		registerFunction( "%pattern", new VarArgsSQLFunction( Hibernate.STRING, "", "%pattern", "" ) );
-		registerFunction( "pi", new StandardJDBCEscapeFunction( "pi", Hibernate.DOUBLE ) );
-		registerFunction( "$piece", new VarArgsSQLFunction( Hibernate.STRING, "$piece(", ",", ")" ) );
-		registerFunction( "position", new VarArgsSQLFunction( Hibernate.INTEGER, "position(", " in ", ")" ) );
-		registerFunction( "power", new VarArgsSQLFunction( Hibernate.STRING, "power(", ",", ")" ) );
-		registerFunction( "quarter", new StandardJDBCEscapeFunction( "quarter", Hibernate.INTEGER ) );
-		registerFunction( "repeat", new VarArgsSQLFunction( Hibernate.STRING, "repeat(", ",", ")" ) );
-		registerFunction( "replicate", new VarArgsSQLFunction( Hibernate.STRING, "replicate(", ",", ")" ) );
-		registerFunction( "right", new StandardJDBCEscapeFunction( "right", Hibernate.STRING ) );
-		registerFunction( "round", new VarArgsSQLFunction( Hibernate.FLOAT, "round(", ",", ")" ) );
-		registerFunction( "rtrim", new StandardSQLFunction( "rtrim", Hibernate.STRING ) );
-		registerFunction( "second", new StandardJDBCEscapeFunction( "second", Hibernate.INTEGER ) );
-		registerFunction( "sign", new StandardSQLFunction( "sign", Hibernate.INTEGER ) );
-		registerFunction( "sin", new StandardJDBCEscapeFunction( "sin", Hibernate.DOUBLE ) );
-		registerFunction( "space", new StandardSQLFunction( "space", Hibernate.STRING ) );
-		registerFunction( "%sqlstring", new VarArgsSQLFunction( Hibernate.STRING, "%sqlstring(", ",", ")" ) );
-		registerFunction( "%sqlupper", new VarArgsSQLFunction( Hibernate.STRING, "%sqlupper(", ",", ")" ) );
-		registerFunction( "sqrt", new StandardJDBCEscapeFunction( "SQRT", Hibernate.DOUBLE ) );
-		registerFunction( "%startswith", new VarArgsSQLFunction( Hibernate.STRING, "", "%startswith", "" ) );
+		registerFunction( "%pattern", new VarArgsSQLFunction( StandardBasicTypes.STRING, "", "%pattern", "" ) );
+		registerFunction( "pi", new StandardJDBCEscapeFunction( "pi", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "$piece", new VarArgsSQLFunction( StandardBasicTypes.STRING, "$piece(", ",", ")" ) );
+		registerFunction( "position", new VarArgsSQLFunction( StandardBasicTypes.INTEGER, "position(", " in ", ")" ) );
+		registerFunction( "power", new VarArgsSQLFunction( StandardBasicTypes.STRING, "power(", ",", ")" ) );
+		registerFunction( "quarter", new StandardJDBCEscapeFunction( "quarter", StandardBasicTypes.INTEGER ) );
+		registerFunction( "repeat", new VarArgsSQLFunction( StandardBasicTypes.STRING, "repeat(", ",", ")" ) );
+		registerFunction( "replicate", new VarArgsSQLFunction( StandardBasicTypes.STRING, "replicate(", ",", ")" ) );
+		registerFunction( "right", new StandardJDBCEscapeFunction( "right", StandardBasicTypes.STRING ) );
+		registerFunction( "round", new VarArgsSQLFunction( StandardBasicTypes.FLOAT, "round(", ",", ")" ) );
+		registerFunction( "rtrim", new StandardSQLFunction( "rtrim", StandardBasicTypes.STRING ) );
+		registerFunction( "second", new StandardJDBCEscapeFunction( "second", StandardBasicTypes.INTEGER ) );
+		registerFunction( "sign", new StandardSQLFunction( "sign", StandardBasicTypes.INTEGER ) );
+		registerFunction( "sin", new StandardJDBCEscapeFunction( "sin", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "space", new StandardSQLFunction( "space", StandardBasicTypes.STRING ) );
+		registerFunction( "%sqlstring", new VarArgsSQLFunction( StandardBasicTypes.STRING, "%sqlstring(", ",", ")" ) );
+		registerFunction( "%sqlupper", new VarArgsSQLFunction( StandardBasicTypes.STRING, "%sqlupper(", ",", ")" ) );
+		registerFunction( "sqrt", new StandardJDBCEscapeFunction( "SQRT", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "%startswith", new VarArgsSQLFunction( StandardBasicTypes.STRING, "", "%startswith", "" ) );
 		// below is for Cache' that don't have str in 2007.1 there is str and we register str directly
-		registerFunction( "str", new SQLFunctionTemplate( Hibernate.STRING, "cast(?1 as char varying)" ) );
-		registerFunction( "string", new VarArgsSQLFunction( Hibernate.STRING, "string(", ",", ")" ) );
+		registerFunction( "str", new SQLFunctionTemplate( StandardBasicTypes.STRING, "cast(?1 as char varying)" ) );
+		registerFunction( "string", new VarArgsSQLFunction( StandardBasicTypes.STRING, "string(", ",", ")" ) );
 		// note that %string is deprecated
-		registerFunction( "%string", new VarArgsSQLFunction( Hibernate.STRING, "%string(", ",", ")" ) );
-		registerFunction( "substr", new VarArgsSQLFunction( Hibernate.STRING, "substr(", ",", ")" ) );
-		registerFunction( "substring", new VarArgsSQLFunction( Hibernate.STRING, "substring(", ",", ")" ) );
-		registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", Hibernate.TIMESTAMP, false ) );
-		registerFunction( "tan", new StandardJDBCEscapeFunction( "tan", Hibernate.DOUBLE ) );
-		registerFunction( "timestampadd", new StandardJDBCEscapeFunction( "timestampadd", Hibernate.DOUBLE ) );
-		registerFunction( "timestampdiff", new StandardJDBCEscapeFunction( "timestampdiff", Hibernate.DOUBLE ) );
-		registerFunction( "tochar", new VarArgsSQLFunction( Hibernate.STRING, "tochar(", ",", ")" ) );
-		registerFunction( "to_char", new VarArgsSQLFunction( Hibernate.STRING, "to_char(", ",", ")" ) );
-		registerFunction( "todate", new VarArgsSQLFunction( Hibernate.STRING, "todate(", ",", ")" ) );
-		registerFunction( "to_date", new VarArgsSQLFunction( Hibernate.STRING, "todate(", ",", ")" ) );
+		registerFunction( "%string", new VarArgsSQLFunction( StandardBasicTypes.STRING, "%string(", ",", ")" ) );
+		registerFunction( "substr", new VarArgsSQLFunction( StandardBasicTypes.STRING, "substr(", ",", ")" ) );
+		registerFunction( "substring", new VarArgsSQLFunction( StandardBasicTypes.STRING, "substring(", ",", ")" ) );
+		registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.TIMESTAMP, false ) );
+		registerFunction( "tan", new StandardJDBCEscapeFunction( "tan", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "timestampadd", new StandardJDBCEscapeFunction( "timestampadd", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "timestampdiff", new StandardJDBCEscapeFunction( "timestampdiff", StandardBasicTypes.DOUBLE ) );
+		registerFunction( "tochar", new VarArgsSQLFunction( StandardBasicTypes.STRING, "tochar(", ",", ")" ) );
+		registerFunction( "to_char", new VarArgsSQLFunction( StandardBasicTypes.STRING, "to_char(", ",", ")" ) );
+		registerFunction( "todate", new VarArgsSQLFunction( StandardBasicTypes.STRING, "todate(", ",", ")" ) );
+		registerFunction( "to_date", new VarArgsSQLFunction( StandardBasicTypes.STRING, "todate(", ",", ")" ) );
 		registerFunction( "tonumber", new StandardSQLFunction( "tonumber" ) );
 		registerFunction( "to_number", new StandardSQLFunction( "tonumber" ) );
 		// TRIM(end_keyword string-expression-1 FROM string-expression-2)
 		// use Hibernate implementation "From" is one of the parameters they pass in position ?3
-		//registerFunction( "trim", new SQLFunctionTemplate(Hibernate.STRING, "trim(?1 ?2 from ?3)") );
-		registerFunction( "truncate", new StandardJDBCEscapeFunction( "truncate", Hibernate.STRING ) );
-		registerFunction( "ucase", new StandardJDBCEscapeFunction( "ucase", Hibernate.STRING ) );
+		//registerFunction( "trim", new SQLFunctionTemplate(StandardBasicTypes.STRING, "trim(?1 ?2 from ?3)") );
+		registerFunction( "truncate", new StandardJDBCEscapeFunction( "truncate", StandardBasicTypes.STRING ) );
+		registerFunction( "ucase", new StandardJDBCEscapeFunction( "ucase", StandardBasicTypes.STRING ) );
 		registerFunction( "upper", new StandardSQLFunction( "upper" ) );
 		// %upper is deprecated
 		registerFunction( "%upper", new StandardSQLFunction( "%upper" ) );
-		registerFunction( "user", new StandardJDBCEscapeFunction( "user", Hibernate.STRING ) );
-		registerFunction( "week", new StandardJDBCEscapeFunction( "user", Hibernate.INTEGER ) );
-		registerFunction( "xmlconcat", new VarArgsSQLFunction( Hibernate.STRING, "xmlconcat(", ",", ")" ) );
-		registerFunction( "xmlelement", new VarArgsSQLFunction( Hibernate.STRING, "xmlelement(", ",", ")" ) );
+		registerFunction( "user", new StandardJDBCEscapeFunction( "user", StandardBasicTypes.STRING ) );
+		registerFunction( "week", new StandardJDBCEscapeFunction( "user", StandardBasicTypes.INTEGER ) );
+		registerFunction( "xmlconcat", new VarArgsSQLFunction( StandardBasicTypes.STRING, "xmlconcat(", ",", ")" ) );
+		registerFunction( "xmlelement", new VarArgsSQLFunction( StandardBasicTypes.STRING, "xmlelement(", ",", ")" ) );
 		// xmlforest requires a new kind of function constructor
-		registerFunction( "year", new StandardJDBCEscapeFunction( "year", Hibernate.INTEGER ) );
+		registerFunction( "year", new StandardJDBCEscapeFunction( "year", StandardBasicTypes.INTEGER ) );
 	}
 
 	protected final void register71Functions() {
-		this.registerFunction( "str", new VarArgsSQLFunction( Hibernate.STRING, "str(", ",", ")" ) );
+		this.registerFunction( "str", new VarArgsSQLFunction( StandardBasicTypes.STRING, "str(", ",", ")" ) );
 	}
 
 	// DDL support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public boolean hasAlterTable() {
 		// Does this dialect support the ALTER TABLE syntax?
 		return true;
 	}
 
+	@Override
 	public boolean qualifyIndexName() {
 		// Do we need to qualify index names with the schema name?
 		return false;
 	}
 
-	public boolean supportsUnique() {
-		// Does this dialect support the UNIQUE column syntax?
-		return true;
-	}
-
-	/**
-	 * The syntax used to add a foreign key constraint to a table.
-	 *
-	 * @return String
-	 */
+	@Override
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public String getAddForeignKeyConstraintString(
 			String constraintName,
 			String[] foreignKey,
@@ -416,103 +399,126 @@ public class Cache71Dialect extends Dialect {
 			String[] primaryKey,
 			boolean referencesPrimaryKey) {
 		// The syntax used to add a foreign key constraint to a table.
-		return new StringBuffer( 300 )
+		return new StringBuilder( 300 )
 				.append( " ADD CONSTRAINT " )
 				.append( constraintName )
 				.append( " FOREIGN KEY " )
 				.append( constraintName )
 				.append( " (" )
-				.append( StringHelper.join( ", ", foreignKey ) )	// identifier-commalist
+				.append( StringHelper.join( ", ", foreignKey ) )
 				.append( ") REFERENCES " )
 				.append( referencedTable )
 				.append( " (" )
-				.append( StringHelper.join( ", ", primaryKey ) ) // identifier-commalist
+				.append( StringHelper.join( ", ", primaryKey ) )
 				.append( ") " )
 				.toString();
 	}
 
+	/**
+	 * Does this dialect support check constraints?
+	 *
+	 * @return {@code false} (Cache does not support check constraints)
+	 */
+	@SuppressWarnings("UnusedDeclaration")
 	public boolean supportsCheck() {
-		// Does this dialect support check constraints?
 		return false;
 	}
 
+	@Override
 	public String getAddColumnString() {
 		// The syntax used to add a column to a table
 		return " add column";
 	}
 
+	@Override
 	public String getCascadeConstraintsString() {
 		// Completely optional cascading drop clause.
 		return "";
 	}
 
+	@Override
 	public boolean dropConstraints() {
 		// Do we need to drop constraints before dropping tables in this dialect?
 		return true;
 	}
 
+	@Override
 	public boolean supportsCascadeDelete() {
 		return true;
 	}
 
+	@Override
 	public boolean hasSelfReferentialForeignKeyBug() {
 		return true;
 	}
 
+
 	// temporary table support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public boolean supportsTemporaryTables() {
 		return true;
 	}
 
+	@Override
 	public String generateTemporaryTableName(String baseTableName) {
-		String name = super.generateTemporaryTableName( baseTableName );
+		final String name = super.generateTemporaryTableName( baseTableName );
 		return name.length() > 25 ? name.substring( 1, 25 ) : name;
 	}
 
+	@Override
 	public String getCreateTemporaryTableString() {
 		return "create global temporary table";
 	}
 
+	@Override
 	public Boolean performTemporaryTableDDLInIsolation() {
 		return Boolean.FALSE;
 	}
 
+	@Override
 	public String getCreateTemporaryTablePostfix() {
 		return "";
 	}
 
+	@Override
 	public boolean dropTemporaryTableAfterUse() {
 		return true;
 	}
 
 	// IDENTITY support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public boolean supportsIdentityColumns() {
 		return true;
 	}
 
+	@Override
 	public Class getNativeIdentifierGeneratorClass() {
 		return IdentityGenerator.class;
 	}
 
+	@Override
 	public boolean hasDataTypeInIdentityColumn() {
 		// Whether this dialect has an Identity clause added to the data type or a completely seperate identity
 		// data type
 		return true;
 	}
 
+	@Override
 	public String getIdentityColumnString() throws MappingException {
 		// The keyword used to specify an identity column, if identity column key generation is supported.
 		return "identity";
 	}
 
+	@Override
 	public String getIdentitySelectString() {
 		return "SELECT LAST_IDENTITY() FROM %TSQL_sys.snf";
 	}
 
 	// SEQUENCE support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public boolean supportsSequences() {
 		return false;
 	}
@@ -542,29 +548,31 @@ public class Cache71Dialect extends Dialect {
 
 	// lock acquisition support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	public boolean supportsForUpdate() {
-		// Does this dialect support the FOR UPDATE syntax?
-		return false;
-	}
-
-	public boolean supportsForUpdateOf() {
-		// Does this dialect support FOR UPDATE OF, allowing particular rows to be locked?
-		return false;
-	}
-
-	public boolean supportsForUpdateNowait() {
-		// Does this dialect support the Oracle-style FOR UPDATE NOWAIT syntax?
-		return false;
-	}
-
+	@Override
 	public boolean supportsOuterJoinForUpdate() {
 		return false;
 	}
 
+	@Override
 	public LockingStrategy getLockingStrategy(Lockable lockable, LockMode lockMode) {
 		// InterSystems Cache' does not current support "SELECT ... FOR UPDATE" syntax...
 		// Set your transaction mode to READ_COMMITTED before using
-		if ( lockMode.greaterThan( LockMode.READ ) ) {
+		if ( lockMode==LockMode.PESSIMISTIC_FORCE_INCREMENT) {
+			return new PessimisticForceIncrementLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.PESSIMISTIC_WRITE) {
+			return new PessimisticWriteUpdateLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.PESSIMISTIC_READ) {
+			return new PessimisticReadUpdateLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.OPTIMISTIC) {
+			return new OptimisticLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.OPTIMISTIC_FORCE_INCREMENT) {
+			return new OptimisticForceIncrementLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode.greaterThan( LockMode.READ ) ) {
 			return new UpdateLockingStrategy( lockable, lockMode );
 		}
 		else {
@@ -574,38 +582,50 @@ public class Cache71Dialect extends Dialect {
 
 	// LIMIT support (ala TOP) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean supportsLimit() {
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean supportsLimitOffset() {
 		return false;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean supportsVariableLimit() {
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean bindLimitParametersFirst() {
 		// Does the LIMIT clause come at the start of the SELECT statement, rather than at the end?
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public boolean useMaxForLimit() {
 		// Does the LIMIT clause take a "maximum" row number instead of a total number of returned rows?
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
 	public String getLimitString(String sql, boolean hasOffset) {
 		if ( hasOffset ) {
-			throw new UnsupportedOperationException( "An offset may not be specified to <TOP n> in Cache SQL" );
+			throw new UnsupportedOperationException( "query result offset is not supported" );
 		}
 
 		// This does not support the Cache SQL 'DISTINCT BY (comma-list)' extensions,
 		// but this extension is not supported through Hibernate anyway.
-		int insertionPoint = sql.startsWith( "select distinct" ) ? 15 : 6;
+		final int insertionPoint = sql.startsWith( "select distinct" ) ? 15 : 6;
 
-		return new StringBuffer( sql.length() + 8 )
+		return new StringBuilder( sql.length() + 8 )
 				.append( sql )
 				.insert( insertionPoint, " TOP ? " )
 				.toString();
@@ -613,49 +633,59 @@ public class Cache71Dialect extends Dialect {
 
 	// callable statement support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public int registerResultSetOutParameter(CallableStatement statement, int col) throws SQLException {
 		return col;
 	}
 
+	@Override
 	public ResultSet getResultSet(CallableStatement ps) throws SQLException {
 		ps.execute();
-		return ( ResultSet ) ps.getObject( 1 );
+		return (ResultSet) ps.getObject( 1 );
 	}
 
 	// miscellaneous support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public String getLowercaseFunction() {
 		// The name of the SQL function that transforms a string to lowercase
 		return "lower";
 	}
 
+	@Override
 	public String getNullColumnString() {
 		// The keyword used to specify a nullable column.
 		return " null";
 	}
 
+	@Override
 	public JoinFragment createOuterJoinFragment() {
 		// Create an OuterJoinGenerator for this dialect.
 		return new CacheJoinFragment();
 	}
 
+	@Override
 	public String getNoColumnsInsertString() {
 		// The keyword used to insert a row without specifying
 		// any column values
 		return " default values";
 	}
 
-	public SQLExceptionConverter buildSQLExceptionConverter() {
-		return new CacheSQLStateConverter( EXTRACTER );
+	@Override
+	public SQLExceptionConversionDelegate buildSQLExceptionConversionDelegate() {
+		return new CacheSQLExceptionConversionDelegate( this );
 	}
 
+	@Override
+	public ViolatedConstraintNameExtracter getViolatedConstraintNameExtracter() {
+		return EXTRACTER;
+	}
+
+	/**
+	 * The Cache ViolatedConstraintNameExtracter.
+	 */
 	public static final ViolatedConstraintNameExtracter EXTRACTER = new TemplatedViolatedConstraintNameExtracter() {
-		/**
-		 * Extract the name of the violated constraint from the given SQLException.
-		 *
-		 * @param sqle The exception that was the result of the constraint violation.
-		 * @return The extracted constraint name.
-		 */
+		@Override
 		public String extractConstraintName(SQLException sqle) {
 			return extractUsingTemplate( "constraint (", ") violated", sqle.getMessage() );
 		}
@@ -664,14 +694,17 @@ public class Cache71Dialect extends Dialect {
 
 	// Overridden informational metadata ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@Override
 	public boolean supportsEmptyInList() {
 		return false;
 	}
 
+	@Override
 	public boolean areStringComparisonsCaseInsensitive() {
 		return true;
 	}
 
+	@Override
 	public boolean supportsResultSetPositionQueryMethodsOnForwardOnlyCursor() {
 		return false;
 	}

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,24 +20,23 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.lock;
-
-import org.hibernate.persister.entity.Lockable;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.JDBCException;
-import org.hibernate.LockMode;
-import org.hibernate.sql.SimpleSelect;
-import org.hibernate.pretty.MessageHelper;
-import org.hibernate.exception.JDBCExceptionHelper;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.hibernate.JDBCException;
+import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.persister.entity.Lockable;
+import org.hibernate.pretty.MessageHelper;
+import org.hibernate.sql.SimpleSelect;
 
 /**
  * A locking strategy where the locks are obtained through select statements.
@@ -47,16 +46,11 @@ import java.sql.SQLException;
  *
  * @see org.hibernate.dialect.Dialect#getForUpdateString(org.hibernate.LockMode)
  * @see org.hibernate.dialect.Dialect#appendLockHint(org.hibernate.LockMode, String)
- * @since 3.2
  *
  * @author Steve Ebersole
+ * @since 3.2
  */
-public class SelectLockingStrategy implements LockingStrategy {
-
-	private final Lockable lockable;
-	private final LockMode lockMode;
-	private final String sql;
-
+public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 	/**
 	 * Construct a locking strategy based on SQL SELECT statements.
 	 *
@@ -64,79 +58,73 @@ public class SelectLockingStrategy implements LockingStrategy {
 	 * @param lockMode Indictates the type of lock to be acquired.
 	 */
 	public SelectLockingStrategy(Lockable lockable, LockMode lockMode) {
-		this.lockable = lockable;
-		this.lockMode = lockMode;
-		this.sql = generateLockString();
+		super( lockable, lockMode );
 	}
 
-	/**
-	 * @see LockingStrategy#lock
-	 */
+	@Override
 	public void lock(
-	        Serializable id,
-	        Object version,
-	        Object object,
-	        SessionImplementor session) throws StaleObjectStateException, JDBCException {
-
-		SessionFactoryImplementor factory = session.getFactory();
+			Serializable id,
+			Object version,
+			Object object,
+			int timeout,
+			SessionImplementor session) throws StaleObjectStateException, JDBCException {
+		final String sql = determineSql( timeout );
+		final SessionFactoryImplementor factory = session.getFactory();
 		try {
-			PreparedStatement st = session.getBatcher().prepareSelectStatement( sql );
+			final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 			try {
-				lockable.getIdentifierType().nullSafeSet( st, id, 1, session );
-				if ( lockable.isVersioned() ) {
-					lockable.getVersionType().nullSafeSet(
+				getLockable().getIdentifierType().nullSafeSet( st, id, 1, session );
+				if ( getLockable().isVersioned() ) {
+					getLockable().getVersionType().nullSafeSet(
 							st,
 							version,
-							lockable.getIdentifierType().getColumnSpan( factory ) + 1,
+							getLockable().getIdentifierType().getColumnSpan( factory ) + 1,
 							session
 					);
 				}
 
-				ResultSet rs = st.executeQuery();
+				final ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
 				try {
 					if ( !rs.next() ) {
 						if ( factory.getStatistics().isStatisticsEnabled() ) {
 							factory.getStatisticsImplementor()
-									.optimisticFailure( lockable.getEntityName() );
+									.optimisticFailure( getLockable().getEntityName() );
 						}
-						throw new StaleObjectStateException( lockable.getEntityName(), id );
+						throw new StaleObjectStateException( getLockable().getEntityName(), id );
 					}
 				}
 				finally {
-					rs.close();
+					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
 				}
 			}
 			finally {
-				session.getBatcher().closeStatement( st );
+				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
 			}
 
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
+			throw session.getFactory().getSQLExceptionHelper().convert(
 					sqle,
-					"could not lock: " + MessageHelper.infoString( lockable, id, session.getFactory() ),
+					"could not lock: " + MessageHelper.infoString( getLockable(), id, session.getFactory() ),
 					sql
 				);
 		}
 	}
 
-	protected LockMode getLockMode() {
-		return lockMode;
-	}
-
-	protected String generateLockString() {
-		SessionFactoryImplementor factory = lockable.getFactory();
-		SimpleSelect select = new SimpleSelect( factory.getDialect() )
-				.setLockMode( lockMode )
-				.setTableName( lockable.getRootTableName() )
-				.addColumn( lockable.getRootTableIdentifierColumnNames()[0] )
-				.addCondition( lockable.getRootTableIdentifierColumnNames(), "=?" );
-		if ( lockable.isVersioned() ) {
-			select.addCondition( lockable.getVersionColumnName(), "=?" );
+	protected String generateLockString(int timeout) {
+		final SessionFactoryImplementor factory = getLockable().getFactory();
+		final LockOptions lockOptions = new LockOptions( getLockMode() );
+		lockOptions.setTimeOut( timeout );
+		final SimpleSelect select = new SimpleSelect( factory.getDialect() )
+				.setLockOptions( lockOptions )
+				.setTableName( getLockable().getRootTableName() )
+				.addColumn( getLockable().getRootTableIdentifierColumnNames()[0] )
+				.addCondition( getLockable().getRootTableIdentifierColumnNames(), "=?" );
+		if ( getLockable().isVersioned() ) {
+			select.addCondition( getLockable().getVersionColumnName(), "=?" );
 		}
 		if ( factory.getSettings().isCommentsEnabled() ) {
-			select.setComment( lockMode + " lock " + lockable.getEntityName() );
+			select.setComment( getLockMode() + " lock " + getLockable().getEntityName() );
 		}
 		return select.toStatementString();
 	}

@@ -23,25 +23,22 @@
  *
  */
 package org.hibernate.lob;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 
 /**
- * Exposes a <tt>Reader</tt> as an <tt>InputStream</tt>
- * @author Gavin King
+ * Exposes a {@link java.io.Reader} as an {@link java.io.InputStream}.
+ *
+ * @deprecated Should not be used anymore. 
  */
-public class ReaderInputStream extends InputStream {
-	
-	private Reader reader;
-	
+public class ReaderInputStream extends org.hibernate.engine.jdbc.ReaderInputStream {
+
 	public ReaderInputStream(Reader reader) {
-		this.reader = reader;
+		super(reader);
 	}
-	
+
 	public int read() throws IOException {
-		return reader.read();
+		return super.read();
 	}
-	
+
 }

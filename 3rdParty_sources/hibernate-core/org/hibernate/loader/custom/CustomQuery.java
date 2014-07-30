@@ -23,10 +23,9 @@
  *
  */
 package org.hibernate.loader.custom;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 /**
  * Extension point allowing any SQL query with named and positional parameters
@@ -51,7 +50,7 @@ public interface CustomQuery {
 	 *
 	 * @return The query spaces
 	 */
-	public Set getQuerySpaces();
+	public Set<String> getQuerySpaces();
 
 	/**
 	 * A map representing positions within the supplied {@link #getSQL query} to
@@ -74,5 +73,5 @@ public interface CustomQuery {
 	 *
 	 * @return List of return descriptors.
 	 */
-	public List getCustomQueryReturns();
+	public List<Return> getCustomQueryReturns();
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,17 +20,20 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect;
-
-import org.hibernate.dialect.lock.LockingStrategy;
-import org.hibernate.dialect.lock.UpdateLockingStrategy;
-import org.hibernate.dialect.lock.SelectLockingStrategy;
-import org.hibernate.persister.entity.Lockable;
-import org.hibernate.LockMode;
-
 import java.sql.Types;
+
+import org.hibernate.LockMode;
+import org.hibernate.dialect.lock.LockingStrategy;
+import org.hibernate.dialect.lock.OptimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.OptimisticLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticReadUpdateLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticWriteUpdateLockingStrategy;
+import org.hibernate.dialect.lock.SelectLockingStrategy;
+import org.hibernate.dialect.lock.UpdateLockingStrategy;
+import org.hibernate.persister.entity.Lockable;
 
 /**
  * An SQL Dialect for Frontbase.  Assumes you're using the latest version
@@ -50,6 +53,9 @@ import java.sql.Types;
  */
 public class FrontBaseDialect extends Dialect {
 
+	/**
+	 * Constructs a FrontBaseDialect
+	 */
 	public FrontBaseDialect() {
 		super();
 
@@ -71,40 +77,61 @@ public class FrontBaseDialect extends Dialect {
 		registerColumnType( Types.CLOB, "clob" );
 	}
 
+	@Override
 	public String getAddColumnString() {
 		return "add column";
 	}
 
+	@Override
 	public String getCascadeConstraintsString() {
 		return " cascade";
 	}
 
+	@Override
 	public boolean dropConstraints() {
 		return false;
 	}
 
 	/**
-	 * Does this dialect support the <tt>FOR UPDATE</tt> syntax. No!
-	 *
-	 * @return false always. FrontBase doesn't support this syntax,
-	 * which was dropped with SQL92
+	 * FrontBase doesn't support this syntax, which was dropped with SQL92.
+	 * <p/>
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getForUpdateString() {
 		return "";
 	}
 
-	public String getCurrentTimestampCallString() {
+	@Override
+	public String getCurrentTimestampSelectString() {
 		// TODO : not sure this is correct, could not find docs on how to do this.
 		return "{?= call current_timestamp}";
 	}
 
+	@Override
 	public boolean isCurrentTimestampSelectStringCallable() {
 		return true;
 	}
 
+	@Override
 	public LockingStrategy getLockingStrategy(Lockable lockable, LockMode lockMode) {
 		// Frontbase has no known variation of a "SELECT ... FOR UPDATE" syntax...
-		if ( lockMode.greaterThan( LockMode.READ ) ) {
+		if ( lockMode==LockMode.PESSIMISTIC_FORCE_INCREMENT) {
+			return new PessimisticForceIncrementLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.PESSIMISTIC_WRITE) {
+			return new PessimisticWriteUpdateLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.PESSIMISTIC_READ) {
+			return new PessimisticReadUpdateLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.OPTIMISTIC) {
+			return new OptimisticLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode==LockMode.OPTIMISTIC_FORCE_INCREMENT) {
+			return new OptimisticForceIncrementLockingStrategy( lockable, lockMode);
+		}
+		else if ( lockMode.greaterThan( LockMode.READ ) ) {
 			return new UpdateLockingStrategy( lockable, lockMode );
 		}
 		else {

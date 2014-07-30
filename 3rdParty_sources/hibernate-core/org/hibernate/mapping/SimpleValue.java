@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,43 +20,79 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import javax.persistence.AttributeConverter;
 
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
+import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.cfg.AttributeConverterDefinition;
+import org.hibernate.cfg.Environment;
+import org.hibernate.cfg.Mappings;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
 import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.IdentifierGeneratorFactory;
 import org.hibernate.id.IdentityGenerator;
 import org.hibernate.id.PersistentIdentifierGenerator;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.type.descriptor.converter.AttributeConverterSqlTypeDescriptorAdapter;
+import org.hibernate.type.descriptor.converter.AttributeConverterTypeAdapter;
+import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
+import org.hibernate.type.descriptor.java.JavaTypeDescriptorRegistry;
+import org.hibernate.type.descriptor.sql.JdbcTypeJavaClassMappings;
+import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
+import org.hibernate.type.descriptor.sql.SqlTypeDescriptorRegistry;
+import org.hibernate.usertype.DynamicParameterizedType;
+
+import org.jboss.logging.Logger;
 
 /**
  * Any value that maps to columns.
  * @author Gavin King
  */
 public class SimpleValue implements KeyValue {
+	private static final Logger log = Logger.getLogger( SimpleValue.class );
 
-	private final List columns = new ArrayList();
+	public static final String DEFAULT_ID_GEN_STRATEGY = "assigned";
+
+	private final Mappings mappings;
+
+	private final List<Selectable> columns = new ArrayList<Selectable>();
+
 	private String typeName;
 	private Properties identifierGeneratorProperties;
-	private String identifierGeneratorStrategy = "assigned";
+	private String identifierGeneratorStrategy = DEFAULT_ID_GEN_STRATEGY;
 	private String nullValue;
 	private Table table;
 	private String foreignKeyName;
 	private boolean alternateUniqueKey;
 	private Properties typeParameters;
 	private boolean cascadeDeleteEnabled;
+
+	private AttributeConverterDefinition attributeConverterDefinition;
+	private Type type;
+
+	public SimpleValue(Mappings mappings) {
+		this.mappings = mappings;
+	}
+
+	public SimpleValue(Mappings mappings, Table table) {
+		this( mappings );
+		this.table = table;
+	}
+
+	public Mappings getMappings() {
+		return mappings;
+	}
 
 	public boolean isCascadeDeleteEnabled() {
 		return cascadeDeleteEnabled;
@@ -88,7 +124,7 @@ public class SimpleValue implements KeyValue {
 	public int getColumnSpan() {
 		return columns.size();
 	}
-	public Iterator getColumnIterator() {
+	public Iterator<Selectable> getColumnIterator() {
 		return columns.iterator();
 	}
 	public List getConstraintColumns() {
@@ -103,12 +139,6 @@ public class SimpleValue implements KeyValue {
 	public void setTable(Table table) {
 		this.table = table;
 	}
-	
-	public SimpleValue(Table table) {
-		this.table = table;
-	}
-
-	public SimpleValue() {}
 
 	public void createForeignKey() throws MappingException {}
 
@@ -120,11 +150,11 @@ public class SimpleValue implements KeyValue {
 	}
 
 	public IdentifierGenerator createIdentifierGenerator(
+			IdentifierGeneratorFactory identifierGeneratorFactory,
 			Dialect dialect, 
 			String defaultCatalog, 
 			String defaultSchema, 
-			RootClass rootClass) 
-	throws MappingException {
+			RootClass rootClass) throws MappingException {
 		
 		Properties params = new Properties();
 		
@@ -142,6 +172,7 @@ public class SimpleValue implements KeyValue {
 		//pass the entity-name, if not a collection-id
 		if (rootClass!=null) {
 			params.setProperty( IdentifierGenerator.ENTITY_NAME, rootClass.getEntityName() );
+			params.setProperty( IdentifierGenerator.JPA_ENTITY_NAME, rootClass.getJpaEntityName() );
 		}
 		
 		//init the table here instead of earlier, so that we can get a quoted table name
@@ -155,7 +186,7 @@ public class SimpleValue implements KeyValue {
 		params.setProperty( PersistentIdentifierGenerator.PK, columnName );
 		
 		if (rootClass!=null) {
-			StringBuffer tables = new StringBuffer();
+			StringBuilder tables = new StringBuilder();
 			Iterator iter = rootClass.getIdentityTables().iterator();
 			while ( iter.hasNext() ) {
 				Table table= (Table) iter.next();
@@ -171,13 +202,15 @@ public class SimpleValue implements KeyValue {
 		if (identifierGeneratorProperties!=null) {
 			params.putAll(identifierGeneratorProperties);
 		}
-		
-		return IdentifierGeneratorFactory.create(
-				identifierGeneratorStrategy,
-				getType(),
-				params,
-				dialect
-			);
+
+		// TODO : we should pass along all settings once "config lifecycle" is hashed out...
+		params.put(
+				Environment.PREFER_POOLED_VALUES_LO,
+				mappings.getConfigurationProperties().getProperty( Environment.PREFER_POOLED_VALUES_LO, "false" )
+		);
+
+		identifierGeneratorFactory.setDialect( dialect );
+		return identifierGeneratorFactory.createIdentifierGenerator( identifierGeneratorStrategy, getType(), params );
 		
 	}
 
@@ -210,9 +243,10 @@ public class SimpleValue implements KeyValue {
 		return identifierGeneratorStrategy;
 	}
 	
-	public boolean isIdentityColumn(Dialect dialect) {
-		return IdentifierGeneratorFactory.getIdentifierGeneratorClass(identifierGeneratorStrategy, dialect)
-				.equals(IdentityGenerator.class);
+	public boolean isIdentityColumn(IdentifierGeneratorFactory identifierGeneratorFactory, Dialect dialect) {
+		identifierGeneratorFactory.setDialect( dialect );
+		return identifierGeneratorFactory.getIdentifierGeneratorClass( identifierGeneratorStrategy )
+				.equals( IdentityGenerator.class );
 	}
 
 	/**
@@ -277,30 +311,143 @@ public class SimpleValue implements KeyValue {
 	}
 
 	public Type getType() throws MappingException {
-		if (typeName==null) {
-			throw new MappingException("No type name");
+		if ( type != null ) {
+			return type;
 		}
-		Type result = TypeFactory.heuristicType(typeName, typeParameters);
-		if (result==null) {
+
+		if ( typeName == null ) {
+			throw new MappingException( "No type name" );
+		}
+		if ( typeParameters != null
+				&& Boolean.valueOf( typeParameters.getProperty( DynamicParameterizedType.IS_DYNAMIC ) )
+				&& typeParameters.get( DynamicParameterizedType.PARAMETER_TYPE ) == null ) {
+			createParameterImpl();
+		}
+
+		Type result = mappings.getTypeResolver().heuristicType( typeName, typeParameters );
+		if ( result == null ) {
 			String msg = "Could not determine type for: " + typeName;
-			if(table != null){
+			if ( table != null ) {
 				msg += ", at table: " + table.getName();
 			}
-			if(columns!=null && columns.size()>0) {
+			if ( columns != null && columns.size() > 0 ) {
 				msg += ", for columns: " + columns;
 			}
-			throw new MappingException(msg);
+			throw new MappingException( msg );
 		}
+
 		return result;
 	}
 
 	public void setTypeUsingReflection(String className, String propertyName) throws MappingException {
-		if (typeName==null) {
-			if (className==null) {
-				throw new MappingException("you must specify types for a dynamic entity: " + propertyName);
-			}
-			typeName = ReflectHelper.reflectedPropertyClass(className, propertyName).getName();
+		// NOTE : this is called as the last piece in setting SimpleValue type information, and implementations
+		// rely on that fact, using it as a signal that all information it is going to get is defined at this point...
+
+		if ( typeName != null ) {
+			// assume either (a) explicit type was specified or (b) determine was already performed
+			return;
 		}
+
+		if ( type != null ) {
+			return;
+		}
+
+		if ( attributeConverterDefinition == null ) {
+			// this is here to work like legacy.  This should change when we integrate with metamodel to
+			// look for SqlTypeDescriptor and JavaTypeDescriptor individually and create the BasicType (well, really
+			// keep a registry of [SqlTypeDescriptor,JavaTypeDescriptor] -> BasicType...)
+			if ( className == null ) {
+				throw new MappingException( "you must specify types for a dynamic entity: " + propertyName );
+			}
+			typeName = ReflectHelper.reflectedPropertyClass( className, propertyName ).getName();
+			return;
+		}
+
+		// we had an AttributeConverter...
+		type = buildAttributeConverterTypeAdapter();
+	}
+
+	/**
+	 * Build a Hibernate Type that incorporates the JPA AttributeConverter.  AttributeConverter works totally in
+	 * memory, meaning it converts between one Java representation (the entity attribute representation) and another
+	 * (the value bound into JDBC statements or extracted from results).  However, the Hibernate Type system operates
+	 * at the lower level of actually dealing directly with those JDBC objects.  So even though we have an
+	 * AttributeConverter, we still need to "fill out" the rest of the BasicType data and bridge calls
+	 * to bind/extract through the converter.
+	 * <p/>
+	 * Essentially the idea here is that an intermediate Java type needs to be used.  Let's use an example as a means
+	 * to illustrate...  Consider an {@code AttributeConverter<Integer,String>}.  This tells Hibernate that the domain
+	 * model defines this attribute as an Integer value (the 'entityAttributeJavaType'), but that we need to treat the
+	 * value as a String (the 'databaseColumnJavaType') when dealing with JDBC (aka, the database type is a
+	 * VARCHAR/CHAR):<ul>
+	 *     <li>
+	 *         When binding values to PreparedStatements we need to convert the Integer value from the entity
+	 *         into a String and pass that String to setString.  The conversion is handled by calling
+	 *         {@link AttributeConverter#convertToDatabaseColumn(Object)}
+	 *     </li>
+	 *     <li>
+	 *         When extracting values from ResultSets (or CallableStatement parameters) we need to handle the
+	 *         value via getString, and convert that returned String to an Integer.  That conversion is handled
+	 *         by calling {@link AttributeConverter#convertToEntityAttribute(Object)}
+	 *     </li>
+	 * </ul>
+	 *
+	 * @return The built AttributeConverter -> Type adapter
+	 *
+	 * @todo : ultimately I want to see attributeConverterJavaType and attributeConverterJdbcTypeCode specify-able separately
+	 * then we can "play them against each other" in terms of determining proper typing
+	 *
+	 * @todo : see if we already have previously built a custom on-the-fly BasicType for this AttributeConverter; see note below about caching
+	 */
+	@SuppressWarnings("unchecked")
+	private Type buildAttributeConverterTypeAdapter() {
+		// todo : validate the number of columns present here?
+
+		final Class entityAttributeJavaType = attributeConverterDefinition.getEntityAttributeType();
+		final Class databaseColumnJavaType = attributeConverterDefinition.getDatabaseColumnType();
+
+
+		// resolve the JavaTypeDescriptor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// For the JavaTypeDescriptor portion we simply resolve the "entity attribute representation" part of
+		// the AttributeConverter to resolve the corresponding descriptor.
+		final JavaTypeDescriptor entityAttributeJavaTypeDescriptor = JavaTypeDescriptorRegistry.INSTANCE.getDescriptor( entityAttributeJavaType );
+
+
+		// build the SqlTypeDescriptor adapter ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Going back to the illustration, this should be a SqlTypeDescriptor that handles the Integer <-> String
+		//		conversions.  This is the more complicated piece.  First we need to determine the JDBC type code
+		//		corresponding to the AttributeConverter's declared "databaseColumnJavaType" (how we read that value out
+		// 		of ResultSets).  See JdbcTypeJavaClassMappings for details.  Again, given example, this should return
+		// 		VARCHAR/CHAR
+		final int jdbcTypeCode = JdbcTypeJavaClassMappings.INSTANCE.determineJdbcTypeCodeForJavaClass( databaseColumnJavaType );
+		// find the standard SqlTypeDescriptor for that JDBC type code.
+		final SqlTypeDescriptor sqlTypeDescriptor = SqlTypeDescriptorRegistry.INSTANCE.getDescriptor( jdbcTypeCode );
+		// find the JavaTypeDescriptor representing the "intermediate database type representation".  Back to the
+		// 		illustration, this should be the type descriptor for Strings
+		final JavaTypeDescriptor intermediateJavaTypeDescriptor = JavaTypeDescriptorRegistry.INSTANCE.getDescriptor( databaseColumnJavaType );
+		// and finally construct the adapter, which injects the AttributeConverter calls into the binding/extraction
+		// 		process...
+		final SqlTypeDescriptor sqlTypeDescriptorAdapter = new AttributeConverterSqlTypeDescriptorAdapter(
+				attributeConverterDefinition.getAttributeConverter(),
+				sqlTypeDescriptor,
+				intermediateJavaTypeDescriptor
+		);
+
+		// todo : cache the AttributeConverterTypeAdapter in case that AttributeConverter is applied multiple times.
+
+		final String name = String.format(
+				"BasicType adapter for AttributeConverter<%s,%s>",
+				entityAttributeJavaType.getSimpleName(),
+				databaseColumnJavaType.getSimpleName()
+		);
+		return new AttributeConverterTypeAdapter(
+				name,
+				attributeConverterDefinition.getAttributeConverter(),
+				sqlTypeDescriptorAdapter,
+				entityAttributeJavaType,
+				databaseColumnJavaType,
+				entityAttributeJavaTypeDescriptor
+		);
 	}
 
 	public boolean isTypeSpecified() {
@@ -315,7 +462,8 @@ public class SimpleValue implements KeyValue {
 		return typeParameters;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return getClass().getName() + '(' + columns.toString() + ')';
 	}
 
@@ -336,5 +484,99 @@ public class SimpleValue implements KeyValue {
 	
 	public boolean[] getColumnUpdateability() {
 		return getColumnInsertability();
+	}
+
+	public void setJpaAttributeConverterDefinition(AttributeConverterDefinition attributeConverterDefinition) {
+		this.attributeConverterDefinition = attributeConverterDefinition;
+	}
+
+	private void createParameterImpl() {
+		try {
+			String[] columnsNames = new String[columns.size()];
+			for ( int i = 0; i < columns.size(); i++ ) {
+				columnsNames[i] = ( (Column) columns.get( i ) ).getName();
+			}
+
+			final XProperty xProperty = (XProperty) typeParameters.get( DynamicParameterizedType.XPROPERTY );
+			// todo : not sure this works for handling @MapKeyEnumerated
+			final Annotation[] annotations = xProperty == null
+					? null
+					: xProperty.getAnnotations();
+
+			typeParameters.put(
+					DynamicParameterizedType.PARAMETER_TYPE,
+					new ParameterTypeImpl(
+							ReflectHelper.classForName(
+									typeParameters.getProperty( DynamicParameterizedType.RETURNED_CLASS )
+							),
+							annotations,
+							table.getCatalog(),
+							table.getSchema(),
+							table.getName(),
+							Boolean.valueOf( typeParameters.getProperty( DynamicParameterizedType.IS_PRIMARY_KEY ) ),
+							columnsNames
+					)
+			);
+		}
+		catch ( ClassNotFoundException cnfe ) {
+			throw new MappingException( "Could not create DynamicParameterizedType for type: " + typeName, cnfe );
+		}
+	}
+
+	private final class ParameterTypeImpl implements DynamicParameterizedType.ParameterType {
+
+		private final Class returnedClass;
+		private final Annotation[] annotationsMethod;
+		private final String catalog;
+		private final String schema;
+		private final String table;
+		private final boolean primaryKey;
+		private final String[] columns;
+
+		private ParameterTypeImpl(Class returnedClass, Annotation[] annotationsMethod, String catalog, String schema,
+				String table, boolean primaryKey, String[] columns) {
+			this.returnedClass = returnedClass;
+			this.annotationsMethod = annotationsMethod;
+			this.catalog = catalog;
+			this.schema = schema;
+			this.table = table;
+			this.primaryKey = primaryKey;
+			this.columns = columns;
+		}
+
+		@Override
+		public Class getReturnedClass() {
+			return returnedClass;
+		}
+
+		@Override
+		public Annotation[] getAnnotationsMethod() {
+			return annotationsMethod;
+		}
+
+		@Override
+		public String getCatalog() {
+			return catalog;
+		}
+
+		@Override
+		public String getSchema() {
+			return schema;
+		}
+
+		@Override
+		public String getTable() {
+			return table;
+		}
+
+		@Override
+		public boolean isPrimaryKey() {
+			return primaryKey;
+		}
+
+		@Override
+		public String[] getColumns() {
+			return columns;
+		}
 	}
 }

@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -95,57 +96,32 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 	// There will be better ways to do this, but this will do for starters
 	// until I get more familiar with Spring.
 
+	StringBuffer buf = new StringBuffer(200);
+	buf.append("select count(*) num from lams_cr_credential c");
+	if (workspace != null) {
+	    buf.append(", lams_cr_workspace_credential wc ");
+	}
+	buf.append(" where c.name = \"");
+	buf.append(credential.getName());
+	buf.append("\" and c.password = \"");
+	buf.append(credential.getPassword());
+	buf.append("\"");
+	if (workspace != null) {
+	    buf.append(" and wc.credential_id = c.credential_id ");
+	    buf.append(" and wc.workspace_id = ");
+	    buf.append(workspace.getWorkspaceId());
+	}
+
 	boolean credentialMatched = false;
-
 	Session hibernateSession = getSession();
-	Connection conn = null;
-	PreparedStatement ps = null;
-	try {
-	    conn = hibernateSession.connection();
-
-	    StringBuffer buf = new StringBuffer(200);
-	    buf.append("select count(*) num from lams_cr_credential c");
-	    if (workspace != null) {
-		buf.append(", lams_cr_workspace_credential wc ");
-	    }
-	    buf.append(" where c.name = \"");
-	    buf.append(credential.getName());
-	    buf.append("\" and c.password = \"");
-	    buf.append(credential.getPassword());
-	    buf.append("\"");
-	    if (workspace != null) {
-		buf.append(" and wc.credential_id = c.credential_id ");
-		buf.append(" and wc.workspace_id = ");
-		buf.append(workspace.getWorkspaceId());
-	    }
-
-	    ps = conn.prepareStatement(buf.toString());
-	    ps.execute();
-	    ResultSet rs = ps.getResultSet();
-	    if (rs.next()) {
-		long val = rs.getLong("num");
-		if (val > 0) {
-		    credentialMatched = true;
-		    if (val > 1) {
-			log.warn("More than one credential found for workspace " + workspace.getWorkspaceId()
-				+ " credential name " + credential.getName());
-		    }
-		}
-	    }
-
-	} catch (HibernateException e) {
-	    log.error("Hibernate exception occured during login. ", e);
-	    throw new RepositoryRuntimeException("Unable to login due to internal error.", e);
-	} catch (SQLException se) {
-	    log.error("SQL exception occured during login. ", se);
-	    throw new RepositoryRuntimeException("Unable to login due to internal error.", se);
-	} finally {
-	    if (ps != null) {
-		try {
-		    ps.close();
-		} catch (SQLException se2) {
-		    log.error("SQL exception occured during login, while closing statement. ", se2);
-		    throw new RepositoryRuntimeException("Unable to login due to internal error.", se2);
+	ScrollableResults result = hibernateSession.createSQLQuery(buf.toString()).scroll();
+	if (result.next()) {
+	    long val = result.getLong(0);
+	    if (val > 0) {
+		credentialMatched = true;
+		if (val > 1) {
+		    log.warn("More than one credential found for workspace " + workspace.getWorkspaceId()
+			    + " credential name " + credential.getName());
 		}
 	    }
 	}

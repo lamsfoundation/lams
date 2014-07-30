@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -28,29 +27,30 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.dom4j.Element;
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.collection.PersistentBag;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentElementHolder;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentBag;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 public class BagType extends CollectionType {
 
-	public BagType(String role, String propertyRef, boolean isEmbeddedInXML) {
-		super(role, propertyRef, isEmbeddedInXML);
+	/**
+	 * @deprecated Use {@link #BagType(TypeFactory.TypeScope, String, String )}
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public BagType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
+		super( typeScope, role, propertyRef, isEmbeddedInXML );
+	}
+
+	public BagType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
+		super( typeScope, role, propertyRef );
 	}
 
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key)
 	throws HibernateException {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentElementHolder(session, persister, key);
-		}
-		else {
-			return new PersistentBag(session);
-		}
+		return new PersistentBag(session);
 	}
 
 	public Class getReturnedClass() {
@@ -58,12 +58,7 @@ public class BagType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentElementHolder( session, (Element) collection );
-		}
-		else {
-			return new PersistentBag( session, (Collection) collection );
-		}
+		return new PersistentBag( session, (Collection) collection );
 	}
 
 	public Object instantiate(int anticipatedSize) {

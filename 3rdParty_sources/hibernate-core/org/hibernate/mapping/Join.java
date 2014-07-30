@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,16 +20,14 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.sql.Alias;
-import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
 
 /**
  * @author Gavin King
@@ -39,6 +37,7 @@ public class Join implements Serializable {
 	private static final Alias PK_ALIAS = new Alias(15, "PK");
 
 	private ArrayList properties = new ArrayList();
+	private ArrayList declaredProperties = new ArrayList();
 	private Table table;
 	private KeyValue key;
 	private PersistentClass persistentClass;
@@ -59,8 +58,18 @@ public class Join implements Serializable {
 
 	public void addProperty(Property prop) {
 		properties.add(prop);
+		declaredProperties.add(prop);
 		prop.setPersistentClass( getPersistentClass() );
 	}
+	public void addMappedsuperclassProperty(Property prop) {
+		properties.add(prop);
+		prop.setPersistentClass( getPersistentClass() );
+	}
+
+	public Iterator getDeclaredPropertyIterator() {
+		return declaredProperties.iterator();
+	}
+
 	public boolean containsProperty(Property prop) {
 		return properties.contains(prop);
 	}

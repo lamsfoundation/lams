@@ -25,46 +25,53 @@
 package org.hibernate.loader.custom.sql;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.loader.custom.Return;
-import org.hibernate.loader.custom.ScalarReturn;
-import org.hibernate.loader.custom.RootReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryCollectionReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryConstructorReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryJoinReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryNonScalarReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryRootReturn;
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryScalarReturn;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.loader.BasicLoader;
+import org.hibernate.loader.CollectionAliases;
+import org.hibernate.loader.ColumnEntityAliases;
+import org.hibernate.loader.DefaultEntityAliases;
+import org.hibernate.loader.EntityAliases;
+import org.hibernate.loader.GeneratedCollectionAliases;
+import org.hibernate.loader.custom.CollectionFetchReturn;
 import org.hibernate.loader.custom.CollectionReturn;
 import org.hibernate.loader.custom.ColumnCollectionAliases;
-import org.hibernate.loader.custom.FetchReturn;
-import org.hibernate.loader.custom.CollectionFetchReturn;
-import org.hibernate.loader.custom.NonScalarReturn;
+import org.hibernate.loader.custom.ConstructorReturn;
 import org.hibernate.loader.custom.EntityFetchReturn;
-import org.hibernate.loader.BasicLoader;
-import org.hibernate.loader.EntityAliases;
-import org.hibernate.loader.DefaultEntityAliases;
-import org.hibernate.loader.ColumnEntityAliases;
-import org.hibernate.loader.CollectionAliases;
-import org.hibernate.loader.GeneratedCollectionAliases;
-import org.hibernate.engine.query.sql.NativeSQLQueryReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryCollectionReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryScalarReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryNonScalarReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryJoinReturn;
-import org.hibernate.engine.query.sql.NativeSQLQueryRootReturn;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.loader.custom.FetchReturn;
+import org.hibernate.loader.custom.NonScalarReturn;
+import org.hibernate.loader.custom.Return;
+import org.hibernate.loader.custom.RootReturn;
+import org.hibernate.loader.custom.ScalarReturn;
+import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.SQLLoadableCollection;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.persister.entity.Joinable;
 import org.hibernate.persister.entity.SQLLoadable;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Responsible for processing the series of {@link org.hibernate.engine.query.sql.NativeSQLQueryReturn returns}
- * defined by a {@link org.hibernate.engine.query.sql.NativeSQLQuerySpecification} and
+ * Responsible for processing the series of {@link org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn returns}
+ * defined by a {@link org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification} and
  * breaking them down into a series of {@link Return returns} for use within the
  * {@link org.hibernate.loader.custom.CustomLoader}.
  *
@@ -73,8 +80,7 @@ import org.slf4j.LoggerFactory;
  * @author Steve Ebersole
  */
 public class SQLQueryReturnProcessor {
-
-	public static final Logger log = LoggerFactory.getLogger( SQLQueryReturnProcessor.class );
+    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( SQLQueryReturnProcessor.class );
 
 	private NativeSQLQueryReturn[] queryReturns;
 
@@ -83,10 +89,10 @@ public class SQLQueryReturnProcessor {
 	private final Map alias2Return = new HashMap();
 	private final Map alias2OwnerAlias = new HashMap();
 
-	private final Map alias2Persister = new HashMap();
+	private final Map<String,EntityPersister> alias2Persister = new HashMap<String,EntityPersister>();
 	private final Map alias2Suffix = new HashMap();
 
-	private final Map alias2CollectionPersister = new HashMap();
+	private final Map<String,CollectionPersister> alias2CollectionPersister = new HashMap<String,CollectionPersister>();
 	private final Map alias2CollectionSuffix = new HashMap();
 
 	private final Map entityPropertyResultMaps = new HashMap();
@@ -102,8 +108,8 @@ public class SQLQueryReturnProcessor {
 //	private List collectionPersisters = new ArrayList();
 //	private List collectionResults = new ArrayList();
 
-	private int entitySuffixSeed = 0;
-	private int collectionSuffixSeed = 0;
+	private int entitySuffixSeed;
+	private int collectionSuffixSeed;
 
 
 	public SQLQueryReturnProcessor(NativeSQLQueryReturn[] queryReturns, SessionFactoryImplementor factory) {
@@ -111,29 +117,48 @@ public class SQLQueryReturnProcessor {
 		this.factory = factory;
 	}
 
-	/*package*/ class ResultAliasContext {
+	public class ResultAliasContext {
 		public SQLLoadable getEntityPersister(String alias) {
-			return ( SQLLoadable ) alias2Persister.get( alias );
+			return (SQLLoadable) alias2Persister.get( alias );
 		}
 
 		public SQLLoadableCollection getCollectionPersister(String alias) {
-			return ( SQLLoadableCollection ) alias2CollectionPersister.get( alias );
+			return (SQLLoadableCollection) alias2CollectionPersister.get( alias );
 		}
 
 		public String getEntitySuffix(String alias) {
-			return ( String ) alias2Suffix.get( alias );
+			return (String) alias2Suffix.get( alias );
 		}
 
 		public String getCollectionSuffix(String alias) {
-			return ( String ) alias2CollectionSuffix.get ( alias );
+			return (String) alias2CollectionSuffix.get( alias );
 		}
 
 		public String getOwnerAlias(String alias) {
-			return ( String ) alias2OwnerAlias.get( alias );
+			return (String) alias2OwnerAlias.get( alias );
 		}
 
 		public Map getPropertyResultsMap(String alias) {
 			return internalGetPropertyResultsMap( alias );
+		}
+
+		public String[] collectQuerySpaces() {
+			final HashSet<String> spaces = new HashSet<String>();
+			collectQuerySpaces( spaces );
+			return spaces.toArray( new String[ spaces.size() ] );
+		}
+
+		public void collectQuerySpaces(Collection<String> spaces) {
+			for ( EntityPersister persister : alias2Persister.values() ) {
+				Collections.addAll( spaces, (String[]) persister.getQuerySpaces() );
+			}
+			for ( CollectionPersister persister : alias2CollectionPersister.values() ) {
+				final Type elementType = persister.getElementType();
+				if ( elementType.isEntityType() && ! elementType.isAnyType() ) {
+					final Joinable joinable = ( (EntityType) elementType ).getAssociatedJoinable( factory );
+					Collections.addAll( spaces, (String[]) ( (EntityPersister) joinable ).getQuerySpaces() );
+				}
+			}
 		}
 	}
 
@@ -155,49 +180,49 @@ public class SQLQueryReturnProcessor {
 	public ResultAliasContext process() {
 		// first, break down the returns into maps keyed by alias
 		// so that role returns can be more easily resolved to their owners
-		for ( int i = 0; i < queryReturns.length; i++ ) {
-			if ( queryReturns[i] instanceof NativeSQLQueryNonScalarReturn ) {
-				NativeSQLQueryNonScalarReturn rtn = ( NativeSQLQueryNonScalarReturn ) queryReturns[i];
+		for ( NativeSQLQueryReturn queryReturn : queryReturns ) {
+			if ( queryReturn instanceof NativeSQLQueryNonScalarReturn ) {
+				NativeSQLQueryNonScalarReturn rtn = (NativeSQLQueryNonScalarReturn) queryReturn;
 				alias2Return.put( rtn.getAlias(), rtn );
 				if ( rtn instanceof NativeSQLQueryJoinReturn ) {
-					NativeSQLQueryJoinReturn fetchReturn = ( NativeSQLQueryJoinReturn ) rtn;
+					NativeSQLQueryJoinReturn fetchReturn = (NativeSQLQueryJoinReturn) rtn;
 					alias2OwnerAlias.put( fetchReturn.getAlias(), fetchReturn.getOwnerAlias() );
 				}
 			}
 		}
 
 		// Now, process the returns
-		for ( int i = 0; i < queryReturns.length; i++ ) {
-			processReturn( queryReturns[i] );
+		for ( NativeSQLQueryReturn queryReturn : queryReturns ) {
+			processReturn( queryReturn );
 		}
 
 		return new ResultAliasContext();
 	}
 
-	public List generateCustomReturns(boolean queryHadAliases) {
-		List customReturns = new ArrayList();
-		Map customReturnsByAlias = new HashMap();
-		for ( int i = 0; i < queryReturns.length; i++ ) {
-			if ( queryReturns[i] instanceof NativeSQLQueryScalarReturn ) {
-				NativeSQLQueryScalarReturn rtn = ( NativeSQLQueryScalarReturn ) queryReturns[i];
+	public List<Return> generateCustomReturns(boolean queryHadAliases) {
+		List<Return> customReturns = new ArrayList<Return>();
+		Map<String,Return> customReturnsByAlias = new HashMap<String,Return>();
+		for ( NativeSQLQueryReturn queryReturn : queryReturns ) {
+			if ( queryReturn instanceof NativeSQLQueryScalarReturn ) {
+				NativeSQLQueryScalarReturn rtn = (NativeSQLQueryScalarReturn) queryReturn;
 				customReturns.add( new ScalarReturn( rtn.getType(), rtn.getColumnAlias() ) );
 			}
-			else if ( queryReturns[i] instanceof NativeSQLQueryRootReturn ) {
-				NativeSQLQueryRootReturn rtn = ( NativeSQLQueryRootReturn ) queryReturns[i];
+			else if ( queryReturn instanceof NativeSQLQueryRootReturn ) {
+				NativeSQLQueryRootReturn rtn = (NativeSQLQueryRootReturn) queryReturn;
 				String alias = rtn.getAlias();
 				EntityAliases entityAliases;
 				if ( queryHadAliases || hasPropertyResultMap( alias ) ) {
 					entityAliases = new DefaultEntityAliases(
-							( Map ) entityPropertyResultMaps.get( alias ),
-							( SQLLoadable ) alias2Persister.get( alias ),
-							( String ) alias2Suffix.get( alias )
+							(Map) entityPropertyResultMaps.get( alias ),
+							(SQLLoadable) alias2Persister.get( alias ),
+							(String) alias2Suffix.get( alias )
 					);
 				}
 				else {
 					entityAliases = new ColumnEntityAliases(
-							( Map ) entityPropertyResultMaps.get( alias ),
-							( SQLLoadable ) alias2Persister.get( alias ),
-							( String ) alias2Suffix.get( alias )
+							(Map) entityPropertyResultMaps.get( alias ),
+							(SQLLoadable) alias2Persister.get( alias ),
+							(String) alias2Suffix.get( alias )
 					);
 				}
 				RootReturn customReturn = new RootReturn(
@@ -209,37 +234,37 @@ public class SQLQueryReturnProcessor {
 				customReturns.add( customReturn );
 				customReturnsByAlias.put( rtn.getAlias(), customReturn );
 			}
-			else if ( queryReturns[i] instanceof NativeSQLQueryCollectionReturn ) {
-				NativeSQLQueryCollectionReturn rtn = ( NativeSQLQueryCollectionReturn ) queryReturns[i];
+			else if ( queryReturn instanceof NativeSQLQueryCollectionReturn ) {
+				NativeSQLQueryCollectionReturn rtn = (NativeSQLQueryCollectionReturn) queryReturn;
 				String alias = rtn.getAlias();
-				SQLLoadableCollection persister = ( SQLLoadableCollection ) alias2CollectionPersister.get( alias );
+				SQLLoadableCollection persister = (SQLLoadableCollection) alias2CollectionPersister.get( alias );
 				boolean isEntityElements = persister.getElementType().isEntityType();
 				CollectionAliases collectionAliases;
 				EntityAliases elementEntityAliases = null;
 				if ( queryHadAliases || hasPropertyResultMap( alias ) ) {
 					collectionAliases = new GeneratedCollectionAliases(
-							( Map ) collectionPropertyResultMaps.get( alias ),
-							( SQLLoadableCollection ) alias2CollectionPersister.get( alias ),
-							( String ) alias2CollectionSuffix.get( alias )
+							(Map) collectionPropertyResultMaps.get( alias ),
+							(SQLLoadableCollection) alias2CollectionPersister.get( alias ),
+							(String) alias2CollectionSuffix.get( alias )
 					);
 					if ( isEntityElements ) {
 						elementEntityAliases = new DefaultEntityAliases(
-								( Map ) entityPropertyResultMaps.get( alias ),
-								( SQLLoadable ) alias2Persister.get( alias ),
-								( String ) alias2Suffix.get( alias )
+								(Map) entityPropertyResultMaps.get( alias ),
+								(SQLLoadable) alias2Persister.get( alias ),
+								(String) alias2Suffix.get( alias )
 						);
 					}
 				}
 				else {
 					collectionAliases = new ColumnCollectionAliases(
-							( Map ) collectionPropertyResultMaps.get( alias ),
-							( SQLLoadableCollection ) alias2CollectionPersister.get( alias )
+							(Map) collectionPropertyResultMaps.get( alias ),
+							(SQLLoadableCollection) alias2CollectionPersister.get( alias )
 					);
 					if ( isEntityElements ) {
 						elementEntityAliases = new ColumnEntityAliases(
-								( Map ) entityPropertyResultMaps.get( alias ),
-								( SQLLoadable ) alias2Persister.get( alias ),
-								( String ) alias2Suffix.get( alias )
+								(Map) entityPropertyResultMaps.get( alias ),
+								(SQLLoadable) alias2Persister.get( alias ),
+								(String) alias2Suffix.get( alias )
 						);
 					}
 				}
@@ -248,46 +273,46 @@ public class SQLQueryReturnProcessor {
 						rtn.getOwnerEntityName(),
 						rtn.getOwnerProperty(),
 						collectionAliases,
-				        elementEntityAliases,
+						elementEntityAliases,
 						rtn.getLockMode()
 				);
 				customReturns.add( customReturn );
 				customReturnsByAlias.put( rtn.getAlias(), customReturn );
 			}
-			else if ( queryReturns[i] instanceof NativeSQLQueryJoinReturn ) {
-				NativeSQLQueryJoinReturn rtn = ( NativeSQLQueryJoinReturn ) queryReturns[i];
+			else if ( queryReturn instanceof NativeSQLQueryJoinReturn ) {
+				NativeSQLQueryJoinReturn rtn = (NativeSQLQueryJoinReturn) queryReturn;
 				String alias = rtn.getAlias();
 				FetchReturn customReturn;
-				NonScalarReturn ownerCustomReturn = ( NonScalarReturn ) customReturnsByAlias.get( rtn.getOwnerAlias() );
+				NonScalarReturn ownerCustomReturn = (NonScalarReturn) customReturnsByAlias.get( rtn.getOwnerAlias() );
 				if ( alias2CollectionPersister.containsKey( alias ) ) {
-					SQLLoadableCollection persister = ( SQLLoadableCollection ) alias2CollectionPersister.get( alias );
+					SQLLoadableCollection persister = (SQLLoadableCollection) alias2CollectionPersister.get( alias );
 					boolean isEntityElements = persister.getElementType().isEntityType();
 					CollectionAliases collectionAliases;
 					EntityAliases elementEntityAliases = null;
 					if ( queryHadAliases || hasPropertyResultMap( alias ) ) {
 						collectionAliases = new GeneratedCollectionAliases(
-								( Map ) collectionPropertyResultMaps.get( alias ),
+								(Map) collectionPropertyResultMaps.get( alias ),
 								persister,
-								( String ) alias2CollectionSuffix.get( alias )
+								(String) alias2CollectionSuffix.get( alias )
 						);
 						if ( isEntityElements ) {
 							elementEntityAliases = new DefaultEntityAliases(
-									( Map ) entityPropertyResultMaps.get( alias ),
-									( SQLLoadable ) alias2Persister.get( alias ),
-									( String ) alias2Suffix.get( alias )
+									(Map) entityPropertyResultMaps.get( alias ),
+									(SQLLoadable) alias2Persister.get( alias ),
+									(String) alias2Suffix.get( alias )
 							);
 						}
 					}
 					else {
 						collectionAliases = new ColumnCollectionAliases(
-								( Map ) collectionPropertyResultMaps.get( alias ),
+								(Map) collectionPropertyResultMaps.get( alias ),
 								persister
 						);
 						if ( isEntityElements ) {
 							elementEntityAliases = new ColumnEntityAliases(
-									( Map ) entityPropertyResultMaps.get( alias ),
-									( SQLLoadable ) alias2Persister.get( alias ),
-									( String ) alias2Suffix.get( alias )
+									(Map) entityPropertyResultMaps.get( alias ),
+									(SQLLoadable) alias2Persister.get( alias ),
+									(String) alias2Suffix.get( alias )
 							);
 						}
 					}
@@ -296,7 +321,7 @@ public class SQLQueryReturnProcessor {
 							ownerCustomReturn,
 							rtn.getOwnerProperty(),
 							collectionAliases,
-					        elementEntityAliases,
+							elementEntityAliases,
 							rtn.getLockMode()
 					);
 				}
@@ -304,16 +329,16 @@ public class SQLQueryReturnProcessor {
 					EntityAliases entityAliases;
 					if ( queryHadAliases || hasPropertyResultMap( alias ) ) {
 						entityAliases = new DefaultEntityAliases(
-								( Map ) entityPropertyResultMaps.get( alias ),
-								( SQLLoadable ) alias2Persister.get( alias ),
-								( String ) alias2Suffix.get( alias )
+								(Map) entityPropertyResultMaps.get( alias ),
+								(SQLLoadable) alias2Persister.get( alias ),
+								(String) alias2Suffix.get( alias )
 						);
 					}
 					else {
 						entityAliases = new ColumnEntityAliases(
-								( Map ) entityPropertyResultMaps.get( alias ),
-								( SQLLoadable ) alias2Persister.get( alias ),
-								( String ) alias2Suffix.get( alias )
+								(Map) entityPropertyResultMaps.get( alias ),
+								(SQLLoadable) alias2Persister.get( alias ),
+								(String) alias2Suffix.get( alias )
 						);
 					}
 					customReturn = new EntityFetchReturn(
@@ -326,6 +351,20 @@ public class SQLQueryReturnProcessor {
 				}
 				customReturns.add( customReturn );
 				customReturnsByAlias.put( alias, customReturn );
+			}
+			else if ( NativeSQLQueryConstructorReturn.class.isInstance( queryReturn ) ) {
+				final NativeSQLQueryConstructorReturn constructorReturn = (NativeSQLQueryConstructorReturn) queryReturn;
+				final ScalarReturn[] scalars = new ScalarReturn[ constructorReturn.getColumnReturns().length ];
+				int i = 0;
+				for ( NativeSQLQueryScalarReturn scalarReturn : constructorReturn.getColumnReturns() ) {
+					scalars[i++] = new ScalarReturn( scalarReturn.getType(), scalarReturn.getColumnAlias() );
+				}
+				customReturns.add( new ConstructorReturn( constructorReturn.getTargetClass(), scalars ) );
+			}
+			else {
+				throw new IllegalStateException(
+						"Unrecognized NativeSQLQueryReturn concrete type : " + queryReturn
+				);
 			}
 		}
 		return customReturns;
@@ -355,11 +394,23 @@ public class SQLQueryReturnProcessor {
 			processRootReturn( ( NativeSQLQueryRootReturn ) rtn );
 		}
 		else if ( rtn instanceof NativeSQLQueryCollectionReturn ) {
-			processCollectionReturn( ( NativeSQLQueryCollectionReturn ) rtn );
+			processCollectionReturn( (NativeSQLQueryCollectionReturn) rtn );
 		}
-		else {
+		else if ( NativeSQLQueryJoinReturn.class.isInstance( rtn ) ) {
 			processJoinReturn( ( NativeSQLQueryJoinReturn ) rtn );
 		}
+		else if ( NativeSQLQueryConstructorReturn.class.isInstance(  rtn ) ) {
+			processConstructorReturn( (NativeSQLQueryConstructorReturn) rtn );
+		}
+		else {
+			throw new IllegalStateException(
+					"Unrecognized NativeSQLQueryReturn concrete type encountered : " + rtn
+			);
+		}
+	}
+
+	private void processConstructorReturn(NativeSQLQueryConstructorReturn rtn) {
+		//To change body of created methods use File | Settings | File Templates.
 	}
 
 	private void processScalarReturn(NativeSQLQueryScalarReturn typeReturn) {
@@ -377,14 +428,10 @@ public class SQLQueryReturnProcessor {
 		addPersister( rootReturn.getAlias(), rootReturn.getPropertyResultsMap(), persister );
 	}
 
-	/**
-	 * @param propertyResult
-	 * @param persister
-	 */
 	private void addPersister(String alias, Map propertyResult, SQLLoadable persister) {
 		alias2Persister.put( alias, persister );
 		String suffix = generateEntitySuffix();
-		log.trace( "mapping alias [" + alias + "] to entity-suffix [" + suffix + "]" );
+		LOG.tracev( "Mapping alias [{0}] to entity-suffix [{1}]", alias, suffix );
 		alias2Suffix.put( alias, suffix );
 		entityPropertyResultMaps.put( alias, propertyResult );
 	}
@@ -393,11 +440,11 @@ public class SQLQueryReturnProcessor {
 		SQLLoadableCollection collectionPersister = ( SQLLoadableCollection ) factory.getCollectionPersister( role );
 		alias2CollectionPersister.put( alias, collectionPersister );
 		String suffix = generateCollectionSuffix();
-		log.trace( "mapping alias [" + alias + "] to collection-suffix [" + suffix + "]" );
+		LOG.tracev( "Mapping alias [{0}] to collection-suffix [{1}]", alias, suffix );
 		alias2CollectionSuffix.put( alias, suffix );
 		collectionPropertyResultMaps.put( alias, propertyResults );
 
-		if ( collectionPersister.isOneToMany() ) {
+		if ( collectionPersister.isOneToMany() || collectionPersister.isManyToMany() ) {
 			SQLLoadable persister = ( SQLLoadable ) collectionPersister.getElementPersister();
 			addPersister( alias, filter( propertyResults ), persister );
 		}
@@ -521,5 +568,4 @@ public class SQLQueryReturnProcessor {
 //	public Map getAlias2Return() {
 //		return alias2Return;
 //	}
-
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,33 +20,35 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect;
 
 /**
  * An SQL dialect for Firebird.
+ *
  * @author Reha CENANI
  */
 public class FirebirdDialect extends InterbaseDialect {
-
+	@Override
 	public String getDropSequenceString(String sequenceName) {
 		return "drop generator " + sequenceName;
 	}
 
+	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
-		return new StringBuffer( sql.length()+20 )
-			.append(sql)
-			.insert(6, hasOffset ? " first ? skip ?" : " first ?")
-			.toString();
+		return new StringBuilder( sql.length() + 20 )
+				.append( sql )
+				.insert( 6, hasOffset ? " first ? skip ?" : " first ?" )
+				.toString();
 	}
 
+	@Override
 	public boolean bindLimitParametersFirst() {
 		return true;
 	}
 
+	@Override
 	public boolean bindLimitParametersInReverseOrder() {
 		return true;
 	}
-
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,17 +20,19 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.EntityMode;
-import org.hibernate.util.JoinedIterator;
-import org.hibernate.util.SingletonIterator;
+import org.hibernate.engine.OptimisticLockStyle;
+import org.hibernate.internal.util.collections.JoinedIterator;
+import org.hibernate.internal.util.collections.SingletonIterator;
 
 /**
  * A sublass in a table-per-class-hierarchy mapping
@@ -55,6 +57,11 @@ public class Subclass extends PersistentClass {
 		return subclassId;
 	}
 	
+	@Override
+	public String getNaturalIdCacheRegionName() {
+		return getSuperclass().getNaturalIdCacheRegionName();
+	}
+
 	public String getCacheConcurrencyStrategy() {
 		return getSuperclass().getCacheConcurrencyStrategy();
 	}
@@ -70,6 +77,11 @@ public class Subclass extends PersistentClass {
 	public Property getIdentifierProperty() {
 		return getSuperclass().getIdentifierProperty();
 	}
+
+	public Property getDeclaredIdentifierProperty() {
+		return null;
+	}
+
 	public KeyValue getIdentifier() {
 		return getSuperclass().getIdentifier();
 	}
@@ -93,6 +105,12 @@ public class Subclass extends PersistentClass {
 		super.addProperty(p);
 		getSuperclass().addSubclassProperty(p);
 	}
+
+	public void addMappedsuperclassProperty(Property p) {
+		super.addMappedsuperclassProperty( p );
+		getSuperclass().addSubclassProperty(p);
+	}
+
 	public void addJoin(Join j) {
 		super.addJoin(j);
 		getSuperclass().addSubclassJoin(j);
@@ -135,6 +153,10 @@ public class Subclass extends PersistentClass {
 	}
 	public Property getVersion() {
 		return getSuperclass().getVersion();
+	}
+
+	public Property getDeclaredVersion() {
+		return null;
 	}
 
 	public boolean hasEmbeddedIdentifier() {
@@ -234,8 +256,10 @@ public class Subclass extends PersistentClass {
 		return mv.accept(this);
 	}
 
-	public Map getFilterMap() {
-		return getSuperclass().getFilterMap();
+	public java.util.List getFilters() {
+		java.util.List filters = new ArrayList(super.getFilters());
+		filters.addAll(getSuperclass().getFilters());
+		return filters;
 	}
 
 	public boolean hasSubselectLoadableCollections() {
@@ -272,9 +296,9 @@ public class Subclass extends PersistentClass {
 	public Component getIdentifierMapper() {
 		return superclass.getIdentifierMapper();
 	}
-	
-	public int getOptimisticLockMode() {
-		return superclass.getOptimisticLockMode();
-	}
 
+	@Override
+	public OptimisticLockStyle getOptimisticLockStyle() {
+		return superclass.getOptimisticLockStyle();
+	}
 }

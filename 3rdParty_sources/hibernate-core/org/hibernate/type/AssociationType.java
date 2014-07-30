@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,19 +20,19 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
-import org.hibernate.MappingException;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.persister.entity.Joinable;
-
 import java.util.Map;
+import java.util.Set;
+
+import org.hibernate.MappingException;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.persister.entity.Joinable;
 
 /**
  * A type that represents some kind of association between entities.
- * @see org.hibernate.engine.Cascade
+ * @see org.hibernate.engine.internal.Cascade
  * @author Gavin King
  */
 public interface AssociationType extends Type {
@@ -80,13 +80,24 @@ public interface AssociationType extends Type {
 	 */	
 	public String getOnCondition(String alias, SessionFactoryImplementor factory, Map enabledFilters) 
 	throws MappingException;
+
+	/**
+	 * Get the "filtering" SQL fragment that is applied in the
+	 * SQL on clause, in addition to the usual join condition
+	 */
+	public String getOnCondition(String alias, SessionFactoryImplementor factory, Map enabledFilters, Set<String> treatAsDeclarations);
 	
 	/**
 	 * Do we dirty check this association, even when there are
 	 * no columns to be updated?
 	 */
 	public abstract boolean isAlwaysDirtyChecked();
-	
+
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public boolean isEmbeddedInXML();
 }
 

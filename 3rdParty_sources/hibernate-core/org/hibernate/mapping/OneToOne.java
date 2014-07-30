@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,19 +20,16 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
+import org.hibernate.cfg.Mappings;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.ForeignKeyDirection;
-import org.hibernate.type.SpecialOneToOneType;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
 
 /**
  * A one-to-one association mapping
@@ -46,8 +43,8 @@ public class OneToOne extends ToOne {
 	private String propertyName;
 	private String entityName;
 
-	public OneToOne(Table table, PersistentClass owner) throws MappingException {
-		super(table);
+	public OneToOne(Mappings mappings, Table table, PersistentClass owner) throws MappingException {
+		super( mappings, table );
 		this.identifier = owner.getKey();
 		this.entityName = owner.getEntityName();
 	}
@@ -70,27 +67,28 @@ public class OneToOne extends ToOne {
 	
 	public Type getType() throws MappingException {
 		if ( getColumnIterator().hasNext() ) {
-			return new SpecialOneToOneType(
+			return getMappings().getTypeResolver().getTypeFactory().specialOneToOne(
 					getReferencedEntityName(), 
-					foreignKeyType, 
+					foreignKeyType,
+					referenceToPrimaryKey, 
 					referencedPropertyName,
 					isLazy(),
 					isUnwrapProxy(),
 					entityName,
 					propertyName
-				);
+			);
 		}
 		else {
-			return TypeFactory.oneToOne( 
+			return getMappings().getTypeResolver().getTypeFactory().oneToOne(
 					getReferencedEntityName(), 
-					foreignKeyType, 
+					foreignKeyType,
+					referenceToPrimaryKey, 
 					referencedPropertyName,
 					isLazy(),
 					isUnwrapProxy(),
-					isEmbedded(),
 					entityName,
 					propertyName
-				);
+			);
 		}
 	}
 

@@ -23,10 +23,9 @@
  *
  */
 package org.hibernate.id.insert;
-
-import org.hibernate.engine.SessionImplementor;
-
 import java.io.Serializable;
+
+import org.hibernate.engine.spi.SessionImplementor;
 
 /**
  * Responsible for handling delegation relating to variants in how
@@ -51,9 +50,11 @@ public interface InsertGeneratedIdentifierDelegate {
 	 * Perform the indicated insert SQL statement and determine the identifier value
 	 * generated.
 	 *
+	 *
 	 * @param insertSQL The INSERT statement string
 	 * @param session The session in which we are operating
 	 * @param binder The param binder
+	 * 
 	 * @return The generated identifier value.
 	 */
 	public Serializable performInsert(String insertSQL, SessionImplementor session, Binder binder);

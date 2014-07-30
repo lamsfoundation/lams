@@ -23,16 +23,14 @@
  *
  */
 package org.hibernate.id.insert;
-
-import org.hibernate.exception.JDBCExceptionHelper;
-import org.hibernate.pretty.MessageHelper;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.id.PostInsertIdentityPersister;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.PostInsertIdentityPersister;
+import org.hibernate.pretty.MessageHelper;
 
 /**
  * Abstract InsertGeneratedIdentifierDelegate implementation where the
@@ -48,21 +46,26 @@ public abstract class AbstractSelectingDelegate implements InsertGeneratedIdenti
 		this.persister = persister;
 	}
 
-	public final Serializable performInsert(String insertSQL, SessionImplementor session, Binder binder) {
+	public final Serializable performInsert(
+			String insertSQL,
+			SessionImplementor session,
+			Binder binder) {
 		try {
 			// prepare and execute the insert
-			PreparedStatement insert = session.getBatcher().prepareStatement( insertSQL, false );
+			PreparedStatement insert = session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( insertSQL, PreparedStatement.NO_GENERATED_KEYS );
 			try {
 				binder.bindValues( insert );
-				insert.executeUpdate();
+				session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
 			}
 			finally {
-				session.getBatcher().closeStatement( insert );
+				session.getTransactionCoordinator().getJdbcCoordinator().release( insert );
 			}
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
+			throw session.getFactory().getSQLExceptionHelper().convert(
 			        sqle,
 			        "could not insert: " + MessageHelper.infoString( persister ),
 			        insertSQL
@@ -73,25 +76,27 @@ public abstract class AbstractSelectingDelegate implements InsertGeneratedIdenti
 
 		try {
 			//fetch the generated id in a separate query
-			PreparedStatement idSelect = session.getBatcher().prepareStatement( selectSQL );
+			PreparedStatement idSelect = session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( selectSQL, false );
 			try {
 				bindParameters( session, idSelect, binder.getEntity() );
-				ResultSet rs = idSelect.executeQuery();
+				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( idSelect );
 				try {
 					return getResult( session, rs, binder.getEntity() );
 				}
 				finally {
-					rs.close();
+					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, idSelect );
 				}
 			}
 			finally {
-				session.getBatcher().closeStatement( idSelect );
+				session.getTransactionCoordinator().getJdbcCoordinator().release( idSelect );
 			}
 
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
+			throw session.getFactory().getSQLExceptionHelper().convert(
 			        sqle,
 			        "could not retrieve generated id after insert: " + MessageHelper.infoString( persister ),
 			        insertSQL

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,42 +20,71 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.loader;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.MappingException;
-import org.hibernate.engine.JoinHelper;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.internal.JoinHelper;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.Joinable;
 import org.hibernate.sql.JoinFragment;
+import org.hibernate.sql.JoinType;
 import org.hibernate.type.AssociationType;
 import org.hibernate.type.EntityType;
 
+/**
+ * Part of the Hibernate SQL rendering internals.  This class represents
+ * a joinable association.
+ *
+ * @author Gavin King
+ */
 public final class OuterJoinableAssociation {
+	private final PropertyPath propertyPath;
 	private final AssociationType joinableType;
 	private final Joinable joinable;
 	private final String lhsAlias; // belong to other persister
 	private final String[] lhsColumns; // belong to other persister
 	private final String rhsAlias;
 	private final String[] rhsColumns;
-	private final int joinType;
+	private final JoinType joinType;
 	private final String on;
 	private final Map enabledFilters;
+	private final boolean hasRestriction;
+
+	public static OuterJoinableAssociation createRoot(
+			AssociationType joinableType,
+			String alias,
+			SessionFactoryImplementor factory) {
+		return new OuterJoinableAssociation(
+				new PropertyPath(),
+				joinableType,
+				null,
+				null,
+				alias,
+				JoinType.LEFT_OUTER_JOIN,
+				null,
+				false,
+				factory,
+				Collections.EMPTY_MAP
+		);
+	}
 
 	public OuterJoinableAssociation(
-		AssociationType joinableType,
-		String lhsAlias,
-		String[] lhsColumns,
-		String rhsAlias,
-		int joinType,
-		SessionFactoryImplementor factory,
-		Map enabledFilters)
-	throws MappingException {
+			PropertyPath propertyPath,
+			AssociationType joinableType,
+			String lhsAlias,
+			String[] lhsColumns,
+			String rhsAlias,
+			JoinType joinType,
+			String withClause,
+			boolean hasRestriction,
+			SessionFactoryImplementor factory,
+			Map enabledFilters) throws MappingException {
+		this.propertyPath = propertyPath;
 		this.joinableType = joinableType;
 		this.lhsAlias = lhsAlias;
 		this.lhsColumns = lhsColumns;
@@ -63,15 +92,29 @@ public final class OuterJoinableAssociation {
 		this.joinType = joinType;
 		this.joinable = joinableType.getAssociatedJoinable(factory);
 		this.rhsColumns = JoinHelper.getRHSColumnNames(joinableType, factory);
-		this.on = joinableType.getOnCondition(rhsAlias, factory, enabledFilters);
+		this.on = joinableType.getOnCondition(rhsAlias, factory, enabledFilters)
+			+ ( withClause == null || withClause.trim().length() == 0 ? "" : " and ( " + withClause + " )" );
+		this.hasRestriction = hasRestriction;
 		this.enabledFilters = enabledFilters; // needed later for many-to-many/filter application
 	}
 
-	public int getJoinType() {
+	public PropertyPath getPropertyPath() {
+		return propertyPath;
+	}
+
+	public JoinType getJoinType() {
 		return joinType;
 	}
 
+	public String getLhsAlias() {
+		return lhsAlias;
+	}
+
 	public String getRHSAlias() {
+		return rhsAlias;
+	}
+
+	public String getRhsAlias() {
 		return rhsAlias;
 	}
 
@@ -83,7 +126,6 @@ public final class OuterJoinableAssociation {
 		else {
 			return false;
 		}
-			
 	}
 	
 	public AssociationType getJoinableType() {
@@ -100,6 +142,10 @@ public final class OuterJoinableAssociation {
 
 	public Joinable getJoinable() {
 		return joinable;
+	}
+
+	public boolean hasRestriction() {
+		return hasRestriction;
 	}
 
 	public int getOwner(final List associations) {
@@ -143,12 +189,8 @@ public final class OuterJoinableAssociation {
 	}
 
 	public void validateJoin(String path) throws MappingException {
-		if (
-			rhsColumns==null || 
-			lhsColumns==null ||
-			lhsColumns.length!=rhsColumns.length ||
-			lhsColumns.length==0
-		) {
+		if ( rhsColumns==null || lhsColumns==null
+				|| lhsColumns.length!=rhsColumns.length || lhsColumns.length==0 ) {
 			throw new MappingException("invalid join columns for association: " + path);
 		}
 	}

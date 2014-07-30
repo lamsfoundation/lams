@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,80 +20,63 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.criterion;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents an strategy for matching strings using "like".
  *
- * @see Example#enableLike(MatchMode)
  * @author Gavin King
+ * @see Example#enableLike(MatchMode)
  */
-public abstract class MatchMode implements Serializable {
-	private final String name;
-	private static final Map INSTANCES = new HashMap();
-
-	protected MatchMode(String name) {
-		this.name=name;
-	}
-	public String toString() {
-		return name;
-	}
+public enum MatchMode {
 
 	/**
 	 * Match the entire string to the pattern
 	 */
-	public static final MatchMode EXACT = new MatchMode("EXACT") {
+	EXACT {
+		@Override
 		public String toMatchString(String pattern) {
 			return pattern;
 		}
-	};
+	},
 
 	/**
 	 * Match the start of the string to the pattern
 	 */
-	public static final MatchMode START = new MatchMode("START") {
+	START {
+		@Override
 		public String toMatchString(String pattern) {
 			return pattern + '%';
 		}
-	};
+	},
 
 	/**
 	 * Match the end of the string to the pattern
 	 */
-	public static final MatchMode END = new MatchMode("END") {
+	END {
+		@Override
 		public String toMatchString(String pattern) {
 			return '%' + pattern;
 		}
-	};
+	},
 
 	/**
 	 * Match the pattern anywhere in the string
 	 */
-	public static final MatchMode ANYWHERE = new MatchMode("ANYWHERE") {
+	ANYWHERE {
+		@Override
 		public String toMatchString(String pattern) {
 			return '%' + pattern + '%';
 		}
 	};
 
-	static {
-		INSTANCES.put( EXACT.name, EXACT );
-		INSTANCES.put( END.name, END );
-		INSTANCES.put( START.name, START );
-		INSTANCES.put( ANYWHERE.name, ANYWHERE );
-	}
-
-	private Object readResolve() {
-		return INSTANCES.get(name);
-	}
-
 	/**
-	 * convert the pattern, by appending/prepending "%"
+	 * Convert the pattern, by appending/prepending "%"
+	 *
+	 * @param pattern The pattern for convert according to the mode
+	 *
+	 * @return The converted pattern
 	 */
 	public abstract String toMatchString(String pattern);
 

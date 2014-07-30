@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -28,13 +27,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.TreeMap;
 
-import org.dom4j.Element;
-import org.hibernate.EntityMode;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentElementHolder;
-import org.hibernate.collection.PersistentMapElementHolder;
-import org.hibernate.collection.PersistentSortedMap;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentSortedMap;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 
@@ -42,37 +37,39 @@ public class SortedMapType extends MapType {
 
 	private final Comparator comparator;
 
-	public SortedMapType(String role, String propertyRef, Comparator comparator, boolean isEmbeddedInXML) {
-		super(role, propertyRef, isEmbeddedInXML);
+	/**
+	 * @deprecated Use {@link #SortedMapType(org.hibernate.type.TypeFactory.TypeScope, String, String, java.util.Comparator)}
+	 * instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public SortedMapType(TypeFactory.TypeScope typeScope, String role, String propertyRef, Comparator comparator, boolean isEmbeddedInXML) {
+		super( typeScope, role, propertyRef, isEmbeddedInXML );
+		this.comparator = comparator;
+	}
+
+	public SortedMapType(TypeFactory.TypeScope typeScope, String role, String propertyRef, Comparator comparator) {
+		super( typeScope, role, propertyRef );
 		this.comparator = comparator;
 	}
 
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentMapElementHolder(session, persister, key);
-		}
-		else {
-			PersistentSortedMap map = new PersistentSortedMap(session);
-			map.setComparator(comparator);
-			return map;
-		}
+		PersistentSortedMap map = new PersistentSortedMap(session);
+		map.setComparator(comparator);
+		return map;
 	}
 
 	public Class getReturnedClass() {
 		return java.util.SortedMap.class;
 	}
 
+	@SuppressWarnings( {"unchecked"})
 	public Object instantiate(int anticipatedSize) {
 		return new TreeMap(comparator);
 	}
 	
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentElementHolder( session, (Element) collection );
-		}
-		else {
-			return new PersistentSortedMap( session, (java.util.SortedMap) collection );
-		}
+		return new PersistentSortedMap( session, (java.util.SortedMap) collection );
 	}
 
 }

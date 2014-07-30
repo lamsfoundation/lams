@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * Copyright (c) 2009 by Red Hat Inc and/or its affiliates or by
+ * third-party contributors as indicated by either @author tags or express
+ * copyright attribution statements applied by the authors.  All
+ * third-party contributions are distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,19 +20,17 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.property;
 
 import java.util.Map;
 
-import org.hibernate.MappingException;
 import org.hibernate.EntityMode;
-import org.hibernate.type.Type;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.MappingException;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Property;
-import org.hibernate.util.ReflectHelper;
-import org.hibernate.util.StringHelper;
+import org.hibernate.metamodel.binding.AttributeBinding;
 
 /**
  * A factory for building/retrieving PropertyAccessor instances.
@@ -78,15 +76,34 @@ public final class PropertyAccessorFactory {
 	    else if ( EntityMode.MAP.equals( mode ) ) {
 		    return getDynamicMapPropertyAccessor();
 	    }
-	    else if ( EntityMode.DOM4J.equals( mode ) ) {
-	    	//TODO: passing null here, because this method is not really used for DOM4J at the moment
-	    	//      but it is still a bug, if we don't get rid of this!
-		    return getDom4jPropertyAccessor( property.getAccessorPropertyName( mode ), property.getType(), null );
+	    else {
+		    throw new MappingException( "Unknown entity mode [" + mode + "]" );
+	    }
+	}
+
+	/**
+     * Retrieves a PropertyAccessor instance based on the given property definition and
+     * entity mode.
+     *
+     * @param property The property for which to retrieve an accessor.
+     * @param mode The mode for the resulting entity.
+     * @return An appropriate accessor.
+     * @throws MappingException
+     */
+	public static PropertyAccessor getPropertyAccessor(AttributeBinding property, EntityMode mode) throws MappingException {
+		//TODO: this is temporary in that the end result will probably not take a Property reference per-se.
+	    if ( null == mode || EntityMode.POJO.equals( mode ) ) {
+		    return getPojoPropertyAccessor( property.getPropertyAccessorName() );
+	    }
+	    else if ( EntityMode.MAP.equals( mode ) ) {
+		    return getDynamicMapPropertyAccessor();
 	    }
 	    else {
 		    throw new MappingException( "Unknown entity mode [" + mode + "]" );
 	    }
-	}	/**
+	}
+
+	/**
 	 * Retreives a PropertyAccessor specific for a PojoRepresentation with the given access strategy.
 	 *
 	 * @param pojoAccessorStrategy The access strategy.
@@ -114,17 +131,10 @@ public final class PropertyAccessorFactory {
 		return MAP_ACCESSOR;
 	}
 
-	public static PropertyAccessor getDom4jPropertyAccessor(String nodeName, Type type, SessionFactoryImplementor factory) 
-	throws MappingException {
-		//TODO: need some caching scheme? really comes down to decision 
-		//      regarding amount of state (if any) kept on PropertyAccessors
-		return new Dom4jAccessor( nodeName, type, factory );
-	}
-
 	private static PropertyAccessor resolveCustomAccessor(String accessorName) {
 		Class accessorClass;
 		try {
-			accessorClass = ReflectHelper.classForName(accessorName);
+			accessorClass = ReflectHelper.classForName( accessorName );
 		}
 		catch (ClassNotFoundException cnfe) {
 			throw new MappingException("could not find PropertyAccessor class: " + accessorName, cnfe);
@@ -152,7 +162,7 @@ public final class PropertyAccessorFactory {
 		if ( "map".equals(type) ) return MAP_ACCESSOR;
 		if ( "embedded".equals(type) ) return EMBEDDED_PROPERTY_ACCESSOR;
 		if ( "noop".equals(type)) return NOOP_ACCESSOR;
-		
+
 		return resolveCustomAccessor(type);
 	}
 }

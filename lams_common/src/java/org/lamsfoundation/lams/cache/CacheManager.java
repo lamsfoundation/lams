@@ -234,43 +234,18 @@ public class CacheManager implements ICacheManager {
 
     public Set<String> getCachedClasses() {
 	Set<String> cachedClasses = new TreeSet<String>();
-
-	for (Entry<String, EntityPersister> cacheEntry : ((Map<String, EntityPersister>) getSessionFactory()
+	for (Entry<String, ClassMetadata> cacheEntry : ((Map<String, ClassMetadata>) getSessionFactory()
 		.getAllClassMetadata()).entrySet()) {
-	    if (cacheEntry.getValue().hasCache()) {
-		cachedClasses.add(cacheEntry.getKey());
-	    }
-	}
-
-	for (Entry<String, AbstractCollectionPersister> cacheEntry : ((Map<String, AbstractCollectionPersister>) getSessionFactory()
-		.getAllCollectionMetadata()).entrySet()) {
-	    if (cacheEntry.getValue().hasCache()) {
-		cachedClasses.add(cacheEntry.getKey());
-	    }
+	    cachedClasses.add(cacheEntry.getKey());
 	}
 
 	return cachedClasses;
     }
     
     public void clearCachedClass(String className) {
-	for (Entry<String, EntityPersister> cacheEntry : ((Map<String, EntityPersister>) getSessionFactory()
-		.getAllClassMetadata()).entrySet()) {
-	    if ((className == null || className.equals(cacheEntry.getKey())) && cacheEntry.getValue().hasCache()) {
-		getSessionFactory().evictEntity(cacheEntry.getKey());
-		if (log.isDebugEnabled()) {
-		    log.debug("Evicted entity: " + cacheEntry.getKey());
-		}
-	    }
-	}
-
-	for (Entry<String, AbstractCollectionPersister> cacheEntry : ((Map<String, AbstractCollectionPersister>) getSessionFactory()
-		.getAllCollectionMetadata()).entrySet()) {
-	    if ((className == null || className.equals(cacheEntry.getKey())) && cacheEntry.getValue().hasCache()) {
-		getSessionFactory().evictCollection(cacheEntry.getKey());
-		if (log.isDebugEnabled()) {
-		    log.debug("Evicted collection: " + cacheEntry.getKey());
-		}
-	    }
+	getSessionFactory().getCache().evictEntityRegion(className);
+	if (log.isDebugEnabled()) {
+	    log.debug("Evicted entity region: " + className);
 	}
     }
 

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,19 +20,14 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.id.enhanced;
 
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.hibernate.HibernateException;
-import org.hibernate.util.ReflectHelper;
-import org.hibernate.id.IdentifierGeneratorFactory;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
+import org.jboss.logging.Logger;
 
 /**
  * Factory for {@link Optimizer} instances.
@@ -40,266 +35,132 @@ import org.hibernate.id.IdentifierGeneratorFactory;
  * @author Steve Ebersole
  */
 public class OptimizerFactory {
-	private static final Logger log = LoggerFactory.getLogger( OptimizerFactory.class );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			OptimizerFactory.class.getName()
+	);
 
-	public static final String NONE = "none";
-	public static final String HILO = "hilo";
-	public static final String POOL = "pooled";
+	/**
+	 * Does the given optimizer name represent a pooled strategy?
+	 *
+	 * @param optimizerName The name of the optimizer
+	 *
+	 * @return {@code true} indicates the optimizer is a pooled strategy.
+	 */
+	public static boolean isPooledOptimizer(String optimizerName) {
+		final StandardOptimizerDescriptor standardDescriptor = StandardOptimizerDescriptor.fromExternalName( optimizerName );
+		return standardDescriptor != null && standardDescriptor.isPooled();
+	}
 
-	private static Class[] CTOR_SIG = new Class[] { Class.class, int.class };
+	private static final Class[] CTOR_SIG = new Class[] { Class.class, int.class };
 
+	/**
+	 * Builds an optimizer
+	 *
+	 * @param type The optimizer type, either a short-hand name or the {@link Optimizer} class name.
+	 * @param returnClass The generated value java type
+	 * @param incrementSize The increment size.
+	 *
+	 * @return The built optimizer
+	 *
+	 * @deprecated Use {@link #buildOptimizer(String, Class, int, long)} instead
+	 */
+	@Deprecated
 	public static Optimizer buildOptimizer(String type, Class returnClass, int incrementSize) {
-		String optimizerClassName;
-		if ( NONE.equals( type ) ) {
-			optimizerClassName = NoopOptimizer.class.getName();
-		}
-		else if ( HILO.equals( type ) ) {
-			optimizerClassName = HiLoOptimizer.class.getName();
-		}
-		else if ( POOL.equals( type ) ) {
-			optimizerClassName = PooledOptimizer.class.getName();
+		final Class<? extends Optimizer> optimizerClass;
+
+		final StandardOptimizerDescriptor standardDescriptor = StandardOptimizerDescriptor.fromExternalName( type );
+		if ( standardDescriptor != null ) {
+			optimizerClass = standardDescriptor.getOptimizerClass();
 		}
 		else {
-			optimizerClassName = type;
+			try {
+				optimizerClass = ReflectHelper.classForName( type );
+			}
+			catch( Throwable ignore ) {
+				LOG.unableToLocateCustomOptimizerClass( type );
+				return buildFallbackOptimizer( returnClass, incrementSize );
+			}
 		}
 
 		try {
-			Class optimizerClass = ReflectHelper.classForName( optimizerClassName );
-			Constructor ctor = optimizerClass.getConstructor( CTOR_SIG );
-			return ( Optimizer ) ctor.newInstance( new Object[] { returnClass, new Integer( incrementSize ) } );
+			final Constructor ctor = optimizerClass.getConstructor( CTOR_SIG );
+			return (Optimizer) ctor.newInstance( returnClass, incrementSize );
 		}
 		catch( Throwable ignore ) {
-			// intentionally empty
+			LOG.unableToInstantiateOptimizer( type );
 		}
 
-		// the default...
+		return buildFallbackOptimizer( returnClass, incrementSize );
+	}
+
+	private static Optimizer buildFallbackOptimizer(Class returnClass, int incrementSize) {
 		return new NoopOptimizer( returnClass, incrementSize );
 	}
 
 	/**
-	 * Common support for optimizer implementations.
+	 * Builds an optimizer
+	 *
+	 * @param type The optimizer type, either a short-hand name or the {@link Optimizer} class name.
+	 * @param returnClass The generated value java type
+	 * @param incrementSize The increment size.
+	 * @param explicitInitialValue The user supplied initial-value (-1 indicates the user did not specify).
+	 *
+	 * @return The built optimizer
 	 */
-	public static abstract class OptimizerSupport implements Optimizer {
-		protected final Class returnClass;
-		protected final int incrementSize;
-
-		/**
-		 * Construct an optimizer
-		 *
-		 * @param returnClass The expected id class.
-		 * @param incrementSize The increment size
-		 */
-		protected OptimizerSupport(Class returnClass, int incrementSize) {
-			if ( returnClass == null ) {
-				throw new HibernateException( "return class is required" );
-			}
-			this.returnClass = returnClass;
-			this.incrementSize = incrementSize;
+	public static Optimizer buildOptimizer(String type, Class returnClass, int incrementSize, long explicitInitialValue) {
+		final Optimizer optimizer = buildOptimizer( type, returnClass, incrementSize );
+		if ( InitialValueAwareOptimizer.class.isInstance( optimizer ) ) {
+			( (InitialValueAwareOptimizer) optimizer ).injectInitialValue( explicitInitialValue );
 		}
-
-		/**
-		 * Take the primitive long value and "make" (or wrap) it into the
-		 * {@link #getReturnClass id type}.
-		 *
-		 * @param value The primitive value to make/wrap.
-		 * @return The wrapped value.
-		 */
-		protected final Serializable make(long value) {
-			return IdentifierGeneratorFactory.createNumber( value, returnClass );
-		}
-
-		/**
-		 * Getter for property 'returnClass'.  This is the Java
-		 * class which is used to represent the id (e.g. {@link java.lang.Long}).
-		 *
-		 * @return Value for property 'returnClass'.
-		 */
-		public final Class getReturnClass() {
-			return returnClass;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public final int getIncrementSize() {
-			return incrementSize;
-		}
+		return optimizer;
 	}
 
 	/**
-	 * An optimizer that performs no optimization.  The database is hit for
-	 * every request.
+	 * Deprecated!
+	 *
+	 * @deprecated Use {@link StandardOptimizerDescriptor#getExternalName()} via {@link StandardOptimizerDescriptor#NONE}
 	 */
-	public static class NoopOptimizer extends OptimizerSupport {
-		private long lastSourceValue = -1;
-
-		public NoopOptimizer(Class returnClass, int incrementSize) {
-			super( returnClass, incrementSize );
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public Serializable generate(AccessCallback callback) {
-			if ( lastSourceValue == -1 ) {
-				while( lastSourceValue <= 0 ) {
-					lastSourceValue = callback.getNextValue();
-				}
-			}
-			else {
-				lastSourceValue = callback.getNextValue();
-			}
-			return make( lastSourceValue );
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public long getLastSourceValue() {
-			return lastSourceValue;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public boolean applyIncrementSizeToSourceValues() {
-			return false;
-		}
-	}
+	@Deprecated
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public static final String NONE = StandardOptimizerDescriptor.NONE.getExternalName();
 
 	/**
-	 * Optimizer which applies a 'hilo' algorithm in memory to achieve
-	 * optimization.
+	 * Deprecated!
+	 *
+	 * @deprecated Use {@link StandardOptimizerDescriptor#getExternalName()} via {@link StandardOptimizerDescriptor#HILO}
 	 */
-	public static class HiLoOptimizer extends OptimizerSupport {
-		private long lastSourceValue = -1;
-		private long value;
-		private long hiValue;
-
-		public HiLoOptimizer(Class returnClass, int incrementSize) {
-			super( returnClass, incrementSize );
-			if ( incrementSize < 1 ) {
-				throw new HibernateException( "increment size cannot be less than 1" );
-			}
-			if ( log.isTraceEnabled() ) {
-				log.trace( "creating hilo optimizer with [incrementSize=" + incrementSize + "; returnClass="  + returnClass.getName() + "]" );
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public synchronized Serializable generate(AccessCallback callback) {
-			if ( lastSourceValue < 0 ) {
-				lastSourceValue = callback.getNextValue();
-				while ( lastSourceValue <= 0 ) {
-					lastSourceValue = callback.getNextValue();
-				}
-				hiValue = ( lastSourceValue * incrementSize ) + 1;
-				value = hiValue - incrementSize;
-			}
-			else if ( value >= hiValue ) {
-				lastSourceValue = callback.getNextValue();
-				hiValue = ( lastSourceValue * incrementSize ) + 1;
-			}
-			return make( value++ );
-		}
-
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public long getLastSourceValue() {
-			return lastSourceValue;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public boolean applyIncrementSizeToSourceValues() {
-			return false;
-		}
-
-		/**
-		 * Getter for property 'lastValue'.
-		 *
-		 * @return Value for property 'lastValue'.
-		 */
-		public long getLastValue() {
-			return value - 1;
-		}
-
-		/**
-		 * Getter for property 'hiValue'.
-		 *
-		 * @return Value for property 'hiValue'.
-		 */
-		public long getHiValue() {
-			return hiValue;
-		}
-	}
+	@Deprecated
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public static final String HILO = StandardOptimizerDescriptor.HILO.getExternalName();
 
 	/**
-	 * Optimizer which uses a pool of values, storing the next low value of the
-	 * range in the database.
+	 * Deprecated!
+	 *
+	 * @deprecated Use {@link StandardOptimizerDescriptor#getExternalName()} via {@link StandardOptimizerDescriptor#LEGACY_HILO}
 	 */
-	public static class PooledOptimizer extends OptimizerSupport {
-		private long value;
-		private long hiValue = -1;
+	@Deprecated
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public static final String LEGACY_HILO = "legacy-hilo";
 
-		public PooledOptimizer(Class returnClass, int incrementSize) {
-			super( returnClass, incrementSize );
-			if ( incrementSize < 1 ) {
-				throw new HibernateException( "increment size cannot be less than 1" );
-			}
-			if ( log.isTraceEnabled() ) {
-				log.trace( "creating pooled optimizer with [incrementSize=" + incrementSize + "; returnClass="  + returnClass.getName() + "]" );
-			}
-		}
+	/**
+	 * Deprecated!
+	 *
+	 * @deprecated Use {@link StandardOptimizerDescriptor#getExternalName()} via {@link StandardOptimizerDescriptor#POOLED}
+	 */
+	@Deprecated
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public static final String POOL = "pooled";
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public synchronized Serializable generate(AccessCallback callback) {
-			if ( hiValue < 0 ) {
-				value = callback.getNextValue();
-				if ( value < 1 ) {
-					// unfortunately not really safe to normalize this
-					// to 1 as an initial value like we do the others
-					// because we would not be able to control this if
-					// we are using a sequence...
-					log.info( "pooled optimizer source reported [" + value + "] as the initial value; use of 1 or greater highly recommended" );
-				}
-				hiValue = callback.getNextValue();
-			}
-			else if ( value >= hiValue ) {
-				hiValue = callback.getNextValue();
-				value = hiValue - incrementSize;
-			}
-			return make( value++ );
-		}
+	/**
+	 * Deprecated!
+	 *
+	 * @deprecated Use {@link StandardOptimizerDescriptor#getExternalName()} via {@link StandardOptimizerDescriptor#POOLED_LO}
+	 */
+	@Deprecated
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public static final String POOL_LO = "pooled-lo";
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public long getLastSourceValue() {
-			return hiValue;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public boolean applyIncrementSizeToSourceValues() {
-			return true;
-		}
-
-		/**
-		 * Getter for property 'lastValue'.
-		 *
-		 * @return Value for property 'lastValue'.
-		 */
-		public long getLastValue() {
-			return value - 1;
-		}
+	private OptimizerFactory() {
 	}
 }

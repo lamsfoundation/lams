@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -29,29 +28,30 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.dom4j.Element;
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentMap;
-import org.hibernate.collection.PersistentMapElementHolder;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentMap;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 
 public class MapType extends CollectionType {
 
-	public MapType(String role, String propertyRef, boolean isEmbeddedInXML) {
-		super(role, propertyRef, isEmbeddedInXML);
+	/**
+	 * @deprecated Use {@link #MapType(TypeFactory.TypeScope, String, String ) } instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public MapType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
+		super( typeScope, role, propertyRef, isEmbeddedInXML );
+	}
+
+	public MapType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
+		super( typeScope, role, propertyRef );
 	}
 
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentMapElementHolder(session, persister, key);
-		}
-		else {
-			return new PersistentMap(session);
-		}
+		return new PersistentMap(session);
 	}
 
 	public Class getReturnedClass() {
@@ -63,12 +63,7 @@ public class MapType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentMapElementHolder( session, (Element) collection );
-		}
-		else {
-			return new PersistentMap( session, (java.util.Map) collection );
-		}
+		return new PersistentMap( session, (java.util.Map) collection );
 	}
 	
 	public Object instantiate(int anticipatedSize) {

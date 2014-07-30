@@ -23,13 +23,12 @@
  *
  */
 package org.hibernate.loader.collection;
-
 import java.io.Serializable;
-import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.loader.OuterJoinLoader;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.type.Type;
@@ -45,9 +44,16 @@ public class CollectionLoader extends OuterJoinLoader implements CollectionIniti
 
 	private final QueryableCollection collectionPersister;
 
-	public CollectionLoader(QueryableCollection collectionPersister, SessionFactoryImplementor factory, Map enabledFilters) {
-		super( factory, enabledFilters );
+	public CollectionLoader(
+			QueryableCollection collectionPersister,
+			SessionFactoryImplementor factory,
+			LoadQueryInfluencers loadQueryInfluencers) {
+		super( factory, loadQueryInfluencers );
 		this.collectionPersister = collectionPersister;
+	}
+
+	protected QueryableCollection collectionPersister() {
+		return collectionPersister;
 	}
 
 	protected boolean isSubselectLoadingEnabled() {

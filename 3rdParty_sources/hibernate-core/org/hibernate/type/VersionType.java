@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,26 +20,27 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
 import java.util.Comparator;
 
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 
 /**
- * A <tt>Type</tt> that may be used to version data.
+ * Additional contract for types which may be used to version (and optimistic lock) data.
+ *
  * @author Gavin King
+ * @author Steve Ebersole
  */
-public interface VersionType extends Type {
+public interface VersionType<T> extends Type {
 	/**
 	 * Generate an initial version.
 	 *
 	 * @param session The session from which this request originates.
 	 * @return an instance of the type
 	 */
-	public Object seed(SessionImplementor session);
+	public T seed(SessionImplementor session);
 
 	/**
 	 * Increment the version.
@@ -48,23 +49,14 @@ public interface VersionType extends Type {
 	 * @param current the current version
 	 * @return an instance of the type
 	 */
-	public Object next(Object current, SessionImplementor session);
+	public T next(T current, SessionImplementor session);
 
 	/**
 	 * Get a comparator for version values.
 	 *
 	 * @return The comparator to use to compare different version values.
 	 */
-	public Comparator getComparator();
-
-	/**
-	 * Are the two version values considered equal?
-	 *
-	 * @param x One value to check.
-	 * @param y The other value to check.
-	 * @return true if the values are equal, false otherwise.
-	 */
-	public boolean isEqual(Object x, Object y);
+	public Comparator<T> getComparator();
 }
 
 

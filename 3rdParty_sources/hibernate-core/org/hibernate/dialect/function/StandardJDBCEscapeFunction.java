@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,14 +20,12 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.function;
-
 import java.util.List;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
-import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * Analogous to {@link org.hibernate.dialect.function.StandardSQLFunction}
@@ -37,18 +35,22 @@ import org.hibernate.engine.SessionFactoryImplementor;
  * @author Steve Ebersole
  */
 public class StandardJDBCEscapeFunction extends StandardSQLFunction {
-	public StandardJDBCEscapeFunction(String name) {
-		super( name );
-	}
-
+	/**
+	 * Constructs a StandardJDBCEscapeFunction
+	 *
+	 * @param name The function name
+	 * @param typeValue The function return type
+	 */
 	public StandardJDBCEscapeFunction(String name, Type typeValue) {
 		super( name, typeValue );
 	}
 
-	public String render(List args, SessionFactoryImplementor factory) {
-		return "{fn " + super.render( args, factory ) + "}";
+	@Override
+	public String render(Type argumentType, List args, SessionFactoryImplementor factory) {
+		return "{fn " + super.render( argumentType, args, factory ) + "}";
 	}
 
+	@Override
 	public String toString() {
 		return "{fn " + getName() + "...}";
 	}

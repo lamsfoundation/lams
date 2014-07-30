@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,13 +20,12 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
 import java.io.Serializable;
 
-import org.hibernate.engine.Cascade;
+import org.hibernate.engine.internal.CascadePoint;
 
 /**
  * Represents directionality of the foreign key constraint
@@ -36,18 +35,25 @@ public abstract class ForeignKeyDirection implements Serializable {
 	protected ForeignKeyDirection() {}
 	/**
 	 * Should we cascade at this cascade point?
-	 * @see org.hibernate.engine.Cascade
+	 *
+	 * @param cascadePoint The point at which the cascade is being initiated.
+	 *
+	 * @return {@code true} if cascading should be performed now.
+	 *
+	 * @see org.hibernate.engine.internal.Cascade
 	 */
-	public abstract boolean cascadeNow(int cascadePoint);
+	public abstract boolean cascadeNow(CascadePoint cascadePoint);
 
 	/**
 	 * A foreign key from child to parent
 	 */
 	public static final ForeignKeyDirection FOREIGN_KEY_TO_PARENT = new ForeignKeyDirection() {
-		public boolean cascadeNow(int cascadePoint) {
-			return cascadePoint!=Cascade.BEFORE_INSERT_AFTER_DELETE;
+		@Override
+		public boolean cascadeNow(CascadePoint cascadePoint) {
+			return cascadePoint != CascadePoint.BEFORE_INSERT_AFTER_DELETE;
 		}
 
+		@Override
 		public String toString() {
 			return "toParent";
 		}
@@ -60,10 +66,12 @@ public abstract class ForeignKeyDirection implements Serializable {
 	 * A foreign key from parent to child
 	 */
 	public static final ForeignKeyDirection FOREIGN_KEY_FROM_PARENT = new ForeignKeyDirection() {
-		public boolean cascadeNow(int cascadePoint) {
-			return cascadePoint!=Cascade.AFTER_INSERT_BEFORE_DELETE;
+		@Override
+		public boolean cascadeNow(CascadePoint cascadePoint) {
+			return cascadePoint != CascadePoint.AFTER_INSERT_BEFORE_DELETE;
 		}
 
+		@Override
 		public String toString() {
 			return "fromParent";
 		}

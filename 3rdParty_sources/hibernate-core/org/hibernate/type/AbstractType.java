@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -29,13 +28,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.compare.EqualsHelper;
+import org.hibernate.metamodel.relational.Size;
+
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.hibernate.EntityMode;
-import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.util.EqualsHelper;
 
 /**
  * Abstract superclass of the built in Type hierarchy.
@@ -43,6 +43,8 @@ import org.hibernate.util.EqualsHelper;
  * @author Gavin King
  */
 public abstract class AbstractType implements Type {
+	protected static final Size LEGACY_DICTATED_SIZE = new Size();
+	protected static final Size LEGACY_DEFAULT_SIZE = new Size( 19, 2, 255, Size.LobMultiplier.NONE ); // to match legacy behavior
 
 	public boolean isAssociationType() {
 		return false;
@@ -64,7 +66,7 @@ public abstract class AbstractType implements Type {
 		return false;
 	}
 
-	public int compare(Object x, Object y, EntityMode entityMode) {
+	public int compare(Object x, Object y) {
 		return ( (Comparable) x ).compareTo(y);
 	}
 
@@ -75,23 +77,22 @@ public abstract class AbstractType implements Type {
 			return null;
 		}
 		else {
-			return (Serializable) deepCopy( value, session.getEntityMode(), session.getFactory() );
+			return (Serializable) deepCopy( value, session.getFactory() );
 		}
 	}
 
-	public Object assemble(Serializable cached, SessionImplementor session, Object owner) 
+	public Object assemble(Serializable cached, SessionImplementor session, Object owner)
 	throws HibernateException {
 		if ( cached==null ) {
 			return null;
 		}
 		else {
-			return deepCopy( cached, session.getEntityMode(), session.getFactory() );
+			return deepCopy( cached, session.getFactory() );
 		}
 	}
 
-	public boolean isDirty(Object old, Object current, SessionImplementor session) 
-	throws HibernateException {
-		return !isSame( old, current, session.getEntityMode() );
+	public boolean isDirty(Object old, Object current, SessionImplementor session) throws HibernateException {
+		return !isSame( old, current );
 	}
 
 	public Object hydrate(
@@ -124,24 +125,24 @@ public abstract class AbstractType implements Type {
 		return isDirty(old, current, session);
 	}
 	
-	public boolean isSame(Object x, Object y, EntityMode entityMode) throws HibernateException {
-		return isEqual(x, y, entityMode);
+	public boolean isSame(Object x, Object y) throws HibernateException {
+		return isEqual(x, y );
 	}
 
-	public boolean isEqual(Object x, Object y, EntityMode entityMode) {
+	public boolean isEqual(Object x, Object y) {
 		return EqualsHelper.equals(x, y);
 	}
 	
-	public int getHashCode(Object x, EntityMode entityMode) {
+	public int getHashCode(Object x) {
 		return x.hashCode();
 	}
 
-	public boolean isEqual(Object x, Object y, EntityMode entityMode, SessionFactoryImplementor factory) {
-		return isEqual(x, y, entityMode);
+	public boolean isEqual(Object x, Object y, SessionFactoryImplementor factory) {
+		return isEqual(x, y );
 	}
 	
-	public int getHashCode(Object x, EntityMode entityMode, SessionFactoryImplementor factory) {
-		return getHashCode(x, entityMode);
+	public int getHashCode(Object x, SessionFactoryImplementor factory) {
+		return getHashCode(x );
 	}
 	
 	protected static void replaceNode(Node container, Element value) {

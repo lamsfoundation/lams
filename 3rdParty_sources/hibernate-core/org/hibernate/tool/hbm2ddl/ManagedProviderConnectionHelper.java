@@ -24,13 +24,16 @@
  */
 package org.hibernate.tool.hbm2ddl;
 
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.connection.ConnectionProviderFactory;
-import org.hibernate.util.JDBCExceptionReporter;
-
-import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
+
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
+import org.hibernate.cfg.Environment;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.internal.util.config.ConfigurationHelper;
 
 /**
  * A {@link ConnectionHelper} implementation based on an internally
@@ -40,7 +43,7 @@ import java.sql.SQLException;
  */
 class ManagedProviderConnectionHelper implements ConnectionHelper {
 	private Properties cfgProperties;
-	private ConnectionProvider connectionProvider;
+	private StandardServiceRegistryImpl serviceRegistry;
 	private Connection connection;
 
 	public ManagedProviderConnectionHelper(Properties cfgProperties) {
@@ -48,12 +51,18 @@ class ManagedProviderConnectionHelper implements ConnectionHelper {
 	}
 
 	public void prepare(boolean needsAutoCommit) throws SQLException {
-		connectionProvider = ConnectionProviderFactory.newConnectionProvider( cfgProperties );
-		connection = connectionProvider.getConnection();
-		if ( needsAutoCommit && !connection.getAutoCommit() ) {
+		serviceRegistry = createServiceRegistry( cfgProperties );
+		connection = serviceRegistry.getService( ConnectionProvider.class ).getConnection();
+		if ( needsAutoCommit && ! connection.getAutoCommit() ) {
 			connection.commit();
 			connection.setAutoCommit( true );
 		}
+	}
+
+	private static StandardServiceRegistryImpl createServiceRegistry(Properties properties) {
+		Environment.verifyProperties( properties );
+		ConfigurationHelper.resolvePlaceHolders( properties );
+		return (StandardServiceRegistryImpl) new StandardServiceRegistryBuilder().applySettings( properties ).build();
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -61,15 +70,38 @@ class ManagedProviderConnectionHelper implements ConnectionHelper {
 	}
 
 	public void release() throws SQLException {
+		try {
+			releaseConnection();
+		}
+		finally {
+			releaseServiceRegistry();
+		}
+	}
+
+	private void releaseConnection() throws SQLException {
 		if ( connection != null ) {
 			try {
-				JDBCExceptionReporter.logAndClearWarnings( connection );
-				connectionProvider.closeConnection( connection );
+				new SqlExceptionHelper().logAndClearWarnings( connection );
 			}
 			finally {
-				connectionProvider.close();
+				try  {
+					serviceRegistry.getService( ConnectionProvider.class ).closeConnection( connection );
+				}
+				finally {
+					connection = null;
+				}
 			}
 		}
-		connection = null;
+	}
+
+	private void releaseServiceRegistry() {
+		if ( serviceRegistry != null ) {
+			try {
+				serviceRegistry.destroy();
+			}
+			finally {
+				serviceRegistry = null;
+			}
+		}
 	}
 }

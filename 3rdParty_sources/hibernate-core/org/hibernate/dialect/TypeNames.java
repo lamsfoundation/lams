@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,115 +20,135 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
 
 import org.hibernate.MappingException;
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 /**
- * This class maps a type to names. Associations
- * may be marked with a capacity. Calling the get()
- * method with a type and actual size n will return
- * the associated name with smallest capacity >= n,
+ * This class maps a type to names.  Associations may be marked with a capacity. Calling the get()
+ * method with a type and actual size n will return  the associated name with smallest capacity >= n,
  * if available and an unmarked default type otherwise.
  * Eg, setting
  * <pre>
- *	names.put(type,        "TEXT" );
- *	names.put(type,   255, "VARCHAR($l)" );
- *	names.put(type, 65534, "LONGVARCHAR($l)" );
+ *	names.put( type,        "TEXT" );
+ *	names.put( type,   255, "VARCHAR($l)" );
+ *	names.put( type, 65534, "LONGVARCHAR($l)" );
  * </pre>
  * will give you back the following:
  * <pre>
- *  names.get(type)         // --> "TEXT" (default)
- *  names.get(type,    100) // --> "VARCHAR(100)" (100 is in [0:255])
- *  names.get(type,   1000) // --> "LONGVARCHAR(1000)" (1000 is in [256:65534])
- *  names.get(type, 100000) // --> "TEXT" (default)
+ *  names.get( type )         // --> "TEXT" (default)
+ *  names.get( type,    100 ) // --> "VARCHAR(100)" (100 is in [0:255])
+ *  names.get( type,   1000 ) // --> "LONGVARCHAR(1000)" (1000 is in [256:65534])
+ *  names.get( type, 100000 ) // --> "TEXT" (default)
  * </pre>
  * On the other hand, simply putting
  * <pre>
- *	names.put(type, "VARCHAR($l)" );
+ *	names.put( type, "VARCHAR($l)" );
  * </pre>
  * would result in
  * <pre>
- *  names.get(type)        // --> "VARCHAR($l)" (will cause trouble)
- *  names.get(type, 100)   // --> "VARCHAR(100)"
- *  names.get(type, 10000) // --> "VARCHAR(10000)"
+ *  names.get( type )        // --> "VARCHAR($l)" (will cause trouble)
+ *  names.get( type, 100 )   // --> "VARCHAR(100)"
+ *  names.get( type, 10000 ) // --> "VARCHAR(10000)"
  * </pre>
  *
  * @author Christoph Beck
  */
 public class TypeNames {
+	/**
+	 * Holds default type mappings for a typeCode.  This is the non-sized mapping
+	 */
+	private Map<Integer, String> defaults = new HashMap<Integer, String>();
 
-	private HashMap weighted = new HashMap();
-	private HashMap defaults = new HashMap();
+	/**
+	 * Holds the weighted mappings for a typeCode.  The nested map is a TreeMap to sort its contents
+	 * based on the key (the weighting) to ensure proper iteration ordering during {@link #get(int, long, int, int)}
+	 */
+	private Map<Integer, Map<Long, String>> weighted = new HashMap<Integer, Map<Long, String>>();
 
 	/**
 	 * get default type name for specified type
-	 * @param typecode the type key
+	 *
+	 * @param typeCode the type key
+	 *
 	 * @return the default type name associated with specified key
+	 *
+	 * @throws MappingException Indicates that no registrations were made for that typeCode
 	 */
-	public String get(int typecode) throws MappingException {
-		String result = (String) defaults.get( new Integer(typecode) );
-		if (result==null) throw new MappingException("No Dialect mapping for JDBC type: " + typecode);
+	public String get(int typeCode) throws MappingException {
+		final String result = defaults.get( typeCode );
+		if ( result == null ) {
+			throw new MappingException( "No Dialect mapping for JDBC type: " + typeCode );
+		}
 		return result;
 	}
 
 	/**
 	 * get type name for specified type and size
-	 * @param typecode the type key
+	 *
+	 * @param typeCode the type key
 	 * @param size the SQL length
 	 * @param scale the SQL scale
 	 * @param precision the SQL precision
-	 * @return the associated name with smallest capacity >= size,
-	 * if available and the default type name otherwise
+	 *
+	 * @return the associated name with smallest capacity >= size, if available and the default type name otherwise
+	 *
+	 * @throws MappingException Indicates that no registrations were made for that typeCode
 	 */
-	public String get(int typecode, int size, int precision, int scale) throws MappingException {
-		Map map = (Map) weighted.get( new Integer(typecode) );
-		if ( map!=null && map.size()>0 ) {
+	public String get(int typeCode, long size, int precision, int scale) throws MappingException {
+		final Map<Long, String> map = weighted.get( typeCode );
+		if ( map != null && map.size() > 0 ) {
 			// iterate entries ordered by capacity to find first fit
-			Iterator entries = map.entrySet().iterator();
-			while ( entries.hasNext() ) {
-				Map.Entry entry = (Map.Entry)entries.next();
-				if ( size <= ( (Integer) entry.getKey() ).intValue() ) {
-					return replace( (String) entry.getValue(), size, precision, scale );
+			for ( Map.Entry<Long, String> entry: map.entrySet() ) {
+				if ( size <= entry.getKey() ) {
+					return replace( entry.getValue(), size, precision, scale );
 				}
 			}
 		}
-		return replace( get(typecode), size, precision, scale );
+
+		// if we get here one of 2 things happened:
+		//		1) There was no weighted registration for that typeCode
+		//		2) There was no weighting whose max capacity was big enough to contain size
+		return replace( get( typeCode ), size, precision, scale );
 	}
-	
-	private static String replace(String type, int size, int precision, int scale) {
-		type = StringHelper.replaceOnce(type, "$s", Integer.toString(scale) );
-		type = StringHelper.replaceOnce(type, "$l", Integer.toString(size) );
-		return StringHelper.replaceOnce(type, "$p", Integer.toString(precision) );
+
+	private static String replace(String type, long size, int precision, int scale) {
+		type = StringHelper.replaceOnce( type, "$s", Integer.toString( scale ) );
+		type = StringHelper.replaceOnce( type, "$l", Long.toString( size ) );
+		return StringHelper.replaceOnce( type, "$p", Integer.toString( precision ) );
 	}
 
 	/**
-	 * set a type name for specified type key and capacity
-	 * @param typecode the type key
+	 * Register a weighted typeCode mapping
+	 *
+	 * @param typeCode the JDBC type code
+	 * @param capacity The capacity for this weighting
+	 * @param value The mapping (type name)
 	 */
-	public void put(int typecode, int capacity, String value) {
-		TreeMap map = (TreeMap)weighted.get( new Integer(typecode) );
-		if (map == null) {// add new ordered map
-			map = new TreeMap();
-			weighted.put( new Integer(typecode), map );
+	public void put(int typeCode, long capacity, String value) {
+		Map<Long, String> map = weighted.get( typeCode );
+		if ( map == null ) {
+			// add new ordered map
+			map = new TreeMap<Long, String>();
+			weighted.put( typeCode, map );
 		}
-		map.put(new Integer(capacity), value);
+		map.put( capacity, value );
 	}
 
 	/**
-	 * set a default type name for specified type key
-	 * @param typecode the type key
+	 * Register a default (non-weighted) typeCode mapping
+	 *
+	 * @param typeCode the type key
+	 * @param value The mapping (type name)
 	 */
-	public void put(int typecode, String value) {
-		defaults.put( new Integer(typecode), value );
+	public void put(int typeCode, String value) {
+		defaults.put( typeCode, value );
 	}
 }
 

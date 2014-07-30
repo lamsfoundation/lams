@@ -27,13 +27,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.Properties;
 
@@ -42,10 +40,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
+import org.hibernate.type.StringType;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
@@ -68,8 +66,7 @@ public class FileUtil {
     public static final String LAMS_WWW_DIR = "lams-www.war";
     public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
-    private static final int FILE_COPY_BUFFER_SIZE = 1024;
-    
+
     public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
     public static final String ALLOWED_EXTENSIONS_MEDIA = ".3gp,.avi,.flv,.m4v,.mkv,.mov,.mp3,.mp4,.mpe,.mpeg,.mpg,.mpv,.mts,.m2ts,ogg,.wma,.wmv";
@@ -94,7 +91,7 @@ public class FileUtil {
 	    for (int i = 0; i < files.length; i++) {
 		File file = files[i];
 		if (file.isDirectory()) {
-		    deleteDirectory(file);
+		    FileUtil.deleteDirectory(file);
 		} else if (!file.delete()) {
 		    FileUtil.log.error("Unable to delete file " + file.getName());
 		    retValue = false;
@@ -110,12 +107,12 @@ public class FileUtil {
 
     public static boolean deleteDirectory(String directoryName) throws FileUtilException {
 	boolean isDeleted = false;
-	if (directoryName == null || directoryName.length() == 0) {
+	if ((directoryName == null) || (directoryName.length() == 0)) {
 	    throw new FileUtilException("A directory name must be specified");
 	}
 
 	File dir = new File(directoryName);
-	isDeleted = deleteDirectory(dir);
+	isDeleted = FileUtil.deleteDirectory(dir);
 
 	return isDeleted;
 
@@ -128,11 +125,11 @@ public class FileUtil {
      */
     public static boolean isEmptyDirectory(String directoryName, boolean checkSubdirectories) throws FileUtilException {
 
-	if (directoryName == null || directoryName.length() == 0) {
+	if ((directoryName == null) || (directoryName.length() == 0)) {
 	    throw new FileUtilException("A directory name must be specified");
 	}
 
-	return isEmptyDirectory(new File(directoryName), checkSubdirectories);
+	return FileUtil.isEmptyDirectory(new File(directoryName), checkSubdirectories);
 
     }
 
@@ -146,9 +143,9 @@ public class FileUtil {
 		    return false;
 		} else {
 		    boolean isEmpty = true;
-		    for (int i = 0; i < files.length && isEmpty; i++) {
+		    for (int i = 0; (i < files.length) && isEmpty; i++) {
 			File file = files[i];
-			isEmpty = file.isDirectory() ? isEmptyDirectory(file, true) : false;
+			isEmpty = file.isDirectory() ? FileUtil.isEmptyDirectory(file, true) : false;
 		    }
 		    return isEmpty;
 		}
@@ -174,7 +171,7 @@ public class FileUtil {
      */
     public static String createTempDirectory(String suffix) throws FileUtilException {
 
-	String tempSysDirName = getTempDir();
+	String tempSysDirName = FileUtil.getTempDir();
 	if (tempSysDirName == null) {
 	    throw new FileUtilException(
 		    "No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
@@ -189,16 +186,16 @@ public class FileUtil {
 	    tempSysDirName = javaTemp;
 	}
 
-	String tempDirName = tempSysDirName + File.separator + FileUtil.prefix + generateUniqueContentFolderID() + "_"
-		+ suffix;
+	String tempDirName = tempSysDirName + File.separator + FileUtil.prefix
+		+ FileUtil.generateUniqueContentFolderID() + "_" + suffix;
 	File tempDir = new File(tempDirName);
 
 	// try 100 different variations. If I can't find a unique
 	// one in 100 tries, then give up.
 	int i = 0;
-	while (tempDir.exists() && i < 100) {
-	    tempDirName = tempSysDirName + File.separator + FileUtil.prefix + generateUniqueContentFolderID() + "_"
-		    + suffix;
+	while (tempDir.exists() && (i < 100)) {
+	    tempDirName = tempSysDirName + File.separator + FileUtil.prefix + FileUtil.generateUniqueContentFolderID()
+		    + "_" + suffix;
 	    tempDir = new File(tempDirName);
 	    i++;
 	}
@@ -227,7 +224,7 @@ public class FileUtil {
     public static boolean createDirectory(String directoryName) throws FileUtilException {
 	boolean isCreated = false;
 	// check directoryName to see if its empty or null
-	if (directoryName == null || directoryName.length() == 0) {
+	if ((directoryName == null) || (directoryName.length() == 0)) {
 	    throw new FileUtilException("A directory name must be specified");
 	}
 
@@ -256,25 +253,26 @@ public class FileUtil {
 	boolean isSubDirCreated = false;
 	boolean isParentDirCreated;
 
-	if (parentDirName == null || parentDirName.length() == 0 || subDirName == null || subDirName.length() == 0) {
+	if ((parentDirName == null) || (parentDirName.length() == 0) || (subDirName == null)
+		|| (subDirName.length() == 0)) {
 	    throw new FileUtilException("A parent or subdirectory name must be specified");
 	}
 
 	File parentDir = new File(parentDirName);
 	if (!parentDir.exists()) {
-	    isParentDirCreated = createDirectory(parentDirName);
+	    isParentDirCreated = FileUtil.createDirectory(parentDirName);
 	} else {
 	    isParentDirCreated = true; // parent directory already exists
 	}
 
-	if (trailingForwardSlashPresent(parentDirName)) {
-	    parentDirName = removeTrailingForwardSlash(parentDirName);
+	if (FileUtil.trailingForwardSlashPresent(parentDirName)) {
+	    parentDirName = FileUtil.removeTrailingForwardSlash(parentDirName);
 	}
 
 	// concatenate the two together
 	String combinedDirName = parentDirName + File.separator + subDirName;
 
-	isSubDirCreated = createDirectory(combinedDirName);
+	isSubDirCreated = FileUtil.createDirectory(combinedDirName);
 
 	return isSubDirCreated && isParentDirCreated;
     }
@@ -301,7 +299,7 @@ public class FileUtil {
      */
     public static boolean trailingForwardSlashPresent(String stringToCheck) {
 	int indexOfSlash = stringToCheck.lastIndexOf("/");
-	if (indexOfSlash == stringToCheck.length() - 1) {
+	if (indexOfSlash == (stringToCheck.length() - 1)) {
 	    return true;
 	} else {
 	    return false;
@@ -317,16 +315,16 @@ public class FileUtil {
 	// get dump directory name and make sure directory exists
 	String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
 	if (dumpDirectory == null) {
-	    dumpDirectory = getTempDir();
+	    dumpDirectory = FileUtil.getTempDir();
 	}
-	createDirectory(dumpDirectory);
+	FileUtil.createDirectory(dumpDirectory);
 
 	String dumpFilename = dumpDirectory + File.separator + id + System.currentTimeMillis()
 		+ (extension != null ? "." + extension : "");
 
 	File dumpFile = new File(dumpFilename);
 	int i = 0;
-	while (dumpFile.exists() && i < 100) {
+	while (dumpFile.exists() && (i < 100)) {
 	    dumpFilename = dumpDirectory + File.separator + id + System.currentTimeMillis() + "_" + i
 		    + (extension != null ? "." + extension : "");
 	    dumpFile = new File(dumpFilename);
@@ -359,7 +357,7 @@ public class FileUtil {
      * @throws FileUtilException
      */
     public static String createDumpFile(byte[] data, String id, String extension) throws FileUtilException {
-	String dumpFilename = generateDumpFilename(id, extension);
+	String dumpFilename = FileUtil.generateDumpFilename(id, extension);
 	OutputStream dumpFile = null;
 	try {
 	    dumpFile = new FileOutputStream(dumpFilename);
@@ -445,7 +443,7 @@ public class FileUtil {
 	    fullpath = path + File.separator + file;
 	}
 
-	return makeCanonicalPath(fullpath);
+	return FileUtil.makeCanonicalPath(fullpath);
 
     }
 
@@ -508,7 +506,8 @@ public class FileUtil {
     /**
      * Verify if a file with such extension is allowed to be uploaded.
      * 
-     * @param fileType file type can be of the following values:File, Image, Flash, Media
+     * @param fileType
+     *            file type can be of the following values:File, Image, Flash, Media
      * @param fileName
      */
     public static boolean isExtensionAllowed(String fileType, String fileName) {
@@ -518,16 +517,16 @@ public class FileUtil {
 
 	if ("File".equals(fileType)) {
 	    // executables are not allowed
-	    return !isExecutableFile(fileName);
+	    return !FileUtil.isExecutableFile(fileName);
 
 	} else if ("Image".equals(fileType)) {
-	    allowedExtensions = ALLOWED_EXTENSIONS_IMAGE;
+	    allowedExtensions = FileUtil.ALLOWED_EXTENSIONS_IMAGE;
 
 	} else if ("Flash".equals(fileType)) {
-	    allowedExtensions = ALLOWED_EXTENSIONS_FLASH;
+	    allowedExtensions = FileUtil.ALLOWED_EXTENSIONS_FLASH;
 
 	} else if ("Media".equals(fileType)) {
-	    allowedExtensions = ALLOWED_EXTENSIONS_MEDIA;
+	    allowedExtensions = FileUtil.ALLOWED_EXTENSIONS_MEDIA;
 
 	} else {
 	    // unknown fileType
@@ -540,7 +539,7 @@ public class FileUtil {
 		return true;
 	    }
 	}
-	
+
 	return false;
     }
 
@@ -587,12 +586,12 @@ public class FileUtil {
 	}
 
 	// calculate comparison date
-	long newestDateToKeep = System.currentTimeMillis() - numDays * FileUtil.numMilliSecondsInADay;
+	long newestDateToKeep = System.currentTimeMillis() - (numDays * FileUtil.numMilliSecondsInADay);
 	Date date = new Date(newestDateToKeep);
 	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString()
 		+ " (server time) (" + newestDateToKeep + ")");
 
-	File tempSysDir = new File(getTempDir());
+	File tempSysDir = new File(FileUtil.getTempDir());
 	File candidates[] = tempSysDir.listFiles(new TempDirectoryFilter(newestDateToKeep, FileUtil.log));
 	return candidates;
     }
@@ -612,7 +611,7 @@ public class FileUtil {
 		long totalSize = 0;
 		if (fileList != null) {
 		    for (int i = 0; i < fileList.length; i++) {
-			totalSize += calculateFileSize(fileList[i]);
+			totalSize += FileUtil.calculateFileSize(fileList[i]);
 		    }
 		    return totalSize;
 		} else {
@@ -661,11 +660,11 @@ public class FileUtil {
 	String agent = request.getHeader("USER-AGENT");
 	String filename = null;
 
-	if (null != agent && -1 != agent.indexOf("MSIE")) {
+	if ((null != agent) && (-1 != agent.indexOf("MSIE"))) {
 	    // if MSIE then urlencode it
 	    filename = URLEncoder.encode(unEncodedFilename, FileUtil.ENCODING_UTF_8);
 
-	} else if (null != agent && -1 != agent.indexOf("Mozilla")) {
+	} else if ((null != agent) && (-1 != agent.indexOf("Mozilla"))) {
 	    // if Mozilla then base64 url_safe encoding
 	    filename = MimeUtility.encodeText(unEncodedFilename, FileUtil.ENCODING_UTF_8, "B");
 
@@ -684,36 +683,35 @@ public class FileUtil {
 	Properties props = new Properties();
 
 	IdentifierGenerator uuidGen = new UUIDHexGenerator();
-	((Configurable) uuidGen).configure(Hibernate.STRING, props, null);
+	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
 
 	// lowercase to resolve OS issues
 	newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 
 	return newUniqueContentFolderID;
     }
-    
+
     /**
-     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
-     * It's been used by CKEditor.
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content. It's
+     * been used by CKEditor.
      * 
      * @param toolSessionId
      * @param userId
      * @return
      */
     public static String getLearnerContentFolder(Long lessonId, Long userId) {
-	return LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId + "/" + userId;
+	return FileUtil.LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId + "/" + userId;
     }
-    
+
     /**
-     * Return lesson's content folder which is used for storing user generated content.
-     * It's been used by CKEditor.
+     * Return lesson's content folder which is used for storing user generated content. It's been used by CKEditor.
      * 
      * @param toolSessionId
      * @param userId
      * @return
      */
     public static String getLearnerContentFolder(Long lessonId) {
-	return LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId;
+	return FileUtil.LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId;
     }
 
     /**
@@ -774,9 +772,9 @@ public class FileUtil {
 		} else {
 		    // try removing the field from our XML and retry
 		    String message = ce.getMessage();
-		    String classname = extractValue(message, "required-type");
-		    String fieldname = extractValue(message, "message");
-		    if (fieldname == null || fieldname.equals("")
+		    String classname = FileUtil.extractValue(message, "required-type");
+		    String fieldname = FileUtil.extractValue(message, "message");
+		    if ((fieldname == null) || fieldname.equals("")
 			    || lastFieldRemoved.equals(classname + "." + fieldname)) {
 			// can't retry, so get out of here!
 			break;
@@ -785,7 +783,7 @@ public class FileUtil {
 			    contentFilter = new ToolContentVersionFilter();
 			}
 
-			Class problemClass = getClass(classname);
+			Class problemClass = FileUtil.getClass(classname);
 			if (problemClass == null) {
 			    // can't retry, so get out of here!
 			    break;
@@ -815,7 +813,7 @@ public class FileUtil {
 	    int startIndex = message.indexOf(fieldToLookFor);
 	    if (startIndex > -1) {
 		startIndex = message.indexOf(":", startIndex + 1);
-		if (startIndex > -1 && startIndex + 2 < message.length()) {
+		if ((startIndex > -1) && ((startIndex + 2) < message.length())) {
 		    startIndex = startIndex + 2;
 		    int endIndex = message.indexOf(" ", startIndex);
 		    String value = message.substring(startIndex, endIndex);
@@ -851,7 +849,7 @@ public class FileUtil {
 	if (!tempDir.exists()) {
 	    boolean success = tempDir.mkdirs();
 	    if (!success) {
-		log.error("Could not create temp directory: " + ret);
+		FileUtil.log.error("Could not create temp directory: " + ret);
 		return System.getProperty("java.io.tmpdir");
 	    }
 	}

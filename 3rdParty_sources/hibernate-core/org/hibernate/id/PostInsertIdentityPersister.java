@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.id;
-
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -50,6 +49,8 @@ public interface PostInsertIdentityPersister extends EntityPersister {
 	 * @return The SQL command string
 	 */
 	public String getIdentitySelectString();
+
+	public String[] getIdentifierColumnNames();
 
 	/**
 	 * The names of the primary key columns in the root table.

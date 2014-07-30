@@ -23,13 +23,12 @@
  *
  */
 package org.hibernate.loader.custom;
-
+import org.hibernate.LockMode;
 import org.hibernate.loader.CollectionAliases;
 import org.hibernate.loader.EntityAliases;
-import org.hibernate.LockMode;
 
 /**
- * Spefically a fetch return that refers to a collection association.
+ * Specifically a fetch return that refers to a collection association.
  *
  * @author Steve Ebersole
  */

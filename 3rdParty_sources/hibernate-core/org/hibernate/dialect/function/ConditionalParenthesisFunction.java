@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,13 +20,11 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.function;
-
 import java.util.List;
 
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -36,28 +34,39 @@ import org.hibernate.type.Type;
  * @author Jonathan Levinson
  */
 public class ConditionalParenthesisFunction extends StandardSQLFunction {
-
+	/**
+	 * Constructs a ConditionalParenthesisFunction with the given name
+	 *
+	 * @param name The function name
+	 */
 	public ConditionalParenthesisFunction(String name) {
 		super( name );
 	}
 
+	/**
+	 * Constructs a ConditionalParenthesisFunction with the given name
+	 *
+	 * @param name The function name
+	 * @param type The function return type
+	 */
 	public ConditionalParenthesisFunction(String name, Type type) {
 		super( name, type );
 	}
 
+	@Override
 	public boolean hasParenthesesIfNoArguments() {
 		return false;
 	}
 
-	public String render(List args, SessionFactoryImplementor factory) {
-		final boolean hasArgs = !args.isEmpty();
-		StringBuffer buf = new StringBuffer();
-		buf.append( getName() );
+	@Override
+	public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor sessionFactory) {
+		final boolean hasArgs = !arguments.isEmpty();
+		final StringBuilder buf = new StringBuilder( getName() );
 		if ( hasArgs ) {
 			buf.append( "(" );
-			for ( int i = 0; i < args.size(); i++ ) {
-				buf.append( args.get( i ) );
-				if ( i < args.size() - 1 ) {
+			for ( int i = 0; i < arguments.size(); i++ ) {
+				buf.append( arguments.get( i ) );
+				if ( i < arguments.size() - 1 ) {
 					buf.append( ", " );
 				}
 			}

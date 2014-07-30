@@ -29,14 +29,17 @@ import java.util.Map;
 
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.sql.Template;
-import org.hibernate.type.AbstractComponentType;
 import org.hibernate.type.AssociationType;
+import org.hibernate.type.CompositeType;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-import org.hibernate.util.ArrayHelper;
-import org.hibernate.util.StringHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * Basic implementation of the {@link PropertyMapping} contract.
@@ -45,11 +48,24 @@ import org.hibernate.util.StringHelper;
  */
 public abstract class AbstractPropertyMapping implements PropertyMapping {
 
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class,
+                                                                       AbstractPropertyMapping.class.getName());
+
 	private final Map typesByPropertyPath = new HashMap();
 	private final Map columnsByPropertyPath = new HashMap();
+	private final Map columnReadersByPropertyPath = new HashMap();
+	private final Map columnReaderTemplatesByPropertyPath = new HashMap();
 	private final Map formulaTemplatesByPropertyPath = new HashMap();
 
 	public String[] getIdentifierColumnNames() {
+		throw new UnsupportedOperationException("one-to-one is not supported here");
+	}
+
+	public String[] getIdentifierColumnReaderTemplates() {
+		throw new UnsupportedOperationException("one-to-one is not supported here");
+	}
+
+	public String[] getIdentifierColumnReaders() {
 		throw new UnsupportedOperationException("one-to-one is not supported here");
 	}
 
@@ -81,14 +97,15 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 		if ( columns == null ) {
 			throw propertyException( propertyName );
 		}
-		String[] templates = (String[]) formulaTemplatesByPropertyPath.get(propertyName);
+		String[] formulaTemplates = (String[]) formulaTemplatesByPropertyPath.get(propertyName);
+		String[] columnReaderTemplates = (String[]) columnReaderTemplatesByPropertyPath.get(propertyName);
 		String[] result = new String[columns.length];
 		for ( int i=0; i<columns.length; i++ ) {
-			if ( columns[i]==null ) {
-				result[i] = StringHelper.replace( templates[i], Template.TEMPLATE, alias );
+			if ( columnReaderTemplates[i]==null ) {
+				result[i] = StringHelper.replace( formulaTemplates[i], Template.TEMPLATE, alias );
 			}
 			else {
-				result[i] = StringHelper.qualify( alias, columns[i] );
+				result[i] = StringHelper.replace( columnReaderTemplates[i], Template.TEMPLATE, alias );
 			}
 		}
 		return result;
@@ -99,22 +116,38 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 		if ( columns == null ) {
 			throw propertyException( propertyName );
 		}
-		String[] templates = (String[]) formulaTemplatesByPropertyPath.get(propertyName);
+		String[] formulaTemplates = (String[]) formulaTemplatesByPropertyPath.get(propertyName);
+		String[] columnReaders = (String[]) columnReadersByPropertyPath.get(propertyName);
 		String[] result = new String[columns.length];
 		for ( int i=0; i<columns.length; i++ ) {
-			if ( columns[i]==null ) {
-				result[i] = StringHelper.replace( templates[i], Template.TEMPLATE, "" );
+			if ( columnReaders[i]==null ) {
+				result[i] = StringHelper.replace( formulaTemplates[i], Template.TEMPLATE, "" );
 			}
 			else {
-				result[i] = columns[i];
+				result[i] = columnReaders[i];
 			}
 		}
 		return result;
 	}
 
-	protected void addPropertyPath(String path, Type type, String[] columns, String[] formulaTemplates) {
+	protected void addPropertyPath(
+			String path,
+			Type type,
+			String[] columns,
+			String[] columnReaders,
+			String[] columnReaderTemplates,
+			String[] formulaTemplates) {
+		// TODO : not quite sure yet of the difference, but this is only needed from annotations for @Id @ManyToOne support
+		if ( typesByPropertyPath.containsKey( path ) ) {
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracev( "Skipping duplicate registration of path [{0}], existing type = [{1}], incoming type = [{2}]", path, typesByPropertyPath.get( path ), type );
+			}
+			return;
+		}
 		typesByPropertyPath.put(path, type);
 		columnsByPropertyPath.put(path, columns);
+		columnReadersByPropertyPath.put(path, columnReaders);
+		columnReaderTemplatesByPropertyPath.put(path, columnReaderTemplates);
 		if (formulaTemplates!=null) {
 			formulaTemplatesByPropertyPath.put(path, formulaTemplates);
 		}
@@ -135,6 +168,8 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			final String path,
 			final Type type,
 			String[] columns,
+			String[] columnReaders,
+			String[] columnReaderTemplates,
 			final String[] formulaTemplates,
 			final Mapping factory)
 	throws MappingException {
@@ -150,6 +185,8 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			AssociationType actype = (AssociationType) type;
 			if ( actype.useLHSPrimaryKey() ) {
 				columns = getIdentifierColumnNames();
+				columnReaders = getIdentifierColumnReaders();
+				columnReaderTemplates = getIdentifierColumnReaderTemplates();
 			}
 			else {
 				String foreignKeyProperty = actype.getLHSPropertyName();
@@ -158,27 +195,31 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 					//      referenced property in the mapping file (ok?)
 					columns = (String[]) columnsByPropertyPath.get(foreignKeyProperty);
 					if (columns==null) return; //get em on the second pass!
+					columnReaders = (String[]) columnReadersByPropertyPath.get(foreignKeyProperty);
+					columnReaderTemplates = (String[]) columnReaderTemplatesByPropertyPath.get(foreignKeyProperty);
 				}
 			}
 		}
 
-		if (path!=null) addPropertyPath(path, type, columns, formulaTemplates);
+		if (path!=null) addPropertyPath(path, type, columns, columnReaders, columnReaderTemplates, formulaTemplates);
 
 		if ( type.isComponentType() ) {
-			AbstractComponentType actype = (AbstractComponentType) type;
-			initComponentPropertyPaths( path, actype, columns, formulaTemplates, factory );
+			CompositeType actype = (CompositeType) type;
+			initComponentPropertyPaths( path, actype, columns, columnReaders, columnReaderTemplates, formulaTemplates, factory );
 			if ( actype.isEmbedded() ) {
 				initComponentPropertyPaths(
 						path==null ? null : StringHelper.qualifier(path),
 						actype,
 						columns,
+						columnReaders,
+						columnReaderTemplates,
 						formulaTemplates,
 						factory
 					);
 			}
 		}
 		else if ( type.isEntityType() ) {
-			initIdentifierPropertyPaths( path, (EntityType) type, columns, factory );
+			initIdentifierPropertyPaths( path, (EntityType) type, columns, columnReaders, columnReaderTemplates, factory );
 		}
 	}
 
@@ -186,6 +227,8 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			final String path,
 			final EntityType etype,
 			final String[] columns,
+			final String[] columnReaders,
+			final String[] columnReaderTemplates,
 			final Mapping factory) throws MappingException {
 
 		Type idtype = etype.getIdentifierOrUniqueKeyType( factory );
@@ -195,15 +238,15 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 		if ( etype.isReferenceToPrimaryKey() ) {
 			if ( !hasNonIdentifierPropertyNamedId ) {
 				String idpath1 = extendPath(path, EntityPersister.ENTITY_ID);
-				addPropertyPath(idpath1, idtype, columns, null);
-				initPropertyPaths(idpath1, idtype, columns, null, factory);
+				addPropertyPath(idpath1, idtype, columns, columnReaders, columnReaderTemplates, null);
+				initPropertyPaths(idpath1, idtype, columns, columnReaders, columnReaderTemplates, null, factory);
 			}
 		}
 
 		if (idPropName!=null) {
 			String idpath2 = extendPath(path, idPropName);
-			addPropertyPath(idpath2, idtype, columns, null);
-			initPropertyPaths(idpath2, idtype, columns, null, factory);
+			addPropertyPath(idpath2, idtype, columns, columnReaders, columnReaderTemplates, null);
+			initPropertyPaths(idpath2, idtype, columns, columnReaders, columnReaderTemplates, null, factory);
 		}
 	}
 
@@ -221,10 +264,11 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 
 	protected void initComponentPropertyPaths(
 			final String path,
-			final AbstractComponentType type,
+			final CompositeType type,
 			final String[] columns,
-			String[] formulaTemplates, final Mapping factory)
-	throws MappingException {
+			final String[] columnReaders,
+			final String[] columnReaderTemplates,
+			String[] formulaTemplates, final Mapping factory) throws MappingException {
 
 		Type[] types = type.getSubtypes();
 		String[] properties = type.getPropertyNames();
@@ -234,9 +278,11 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			try {
 				int length = types[i].getColumnSpan(factory);
 				String[] columnSlice = ArrayHelper.slice(columns, begin, length);
+				String[] columnReaderSlice = ArrayHelper.slice(columnReaders, begin, length);
+				String[] columnReaderTemplateSlice = ArrayHelper.slice( columnReaderTemplates, begin, length );
 				String[] formulaSlice = formulaTemplates==null ?
 						null : ArrayHelper.slice(formulaTemplates, begin, length);
-				initPropertyPaths(subpath, types[i], columnSlice, formulaSlice, factory);
+				initPropertyPaths(subpath, types[i], columnSlice, columnReaderSlice, columnReaderTemplateSlice, formulaSlice, factory);
 				begin+=length;
 			}
 			catch (Exception e) {
@@ -246,12 +292,6 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 	}
 
 	private static String extendPath(String path, String property) {
-		if ( path==null || "".equals(path) ) {
-			return property;
-		}
-		else {
-			return StringHelper.qualify(path, property);
-		}
+		return StringHelper.isEmpty( path ) ? property : StringHelper.qualify( path, property );
 	}
-
 }

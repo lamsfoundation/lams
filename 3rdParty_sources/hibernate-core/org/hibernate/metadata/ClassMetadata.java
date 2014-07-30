@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.metadata;
 
@@ -28,8 +27,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.EntityMode;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -38,6 +36,7 @@ import org.hibernate.type.Type;
  * @see org.hibernate.SessionFactory#getClassMetadata(Class)
  * @author Gavin King
  */
+@SuppressWarnings( {"JavaDoc"})
 public interface ClassMetadata {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,7 +136,8 @@ public interface ClassMetadata {
 	/**
 	 * Return the values of the mapped properties of the object
 	 */
-	public Object[] getPropertyValuesToInsert(Object entity, Map mergeMap, SessionImplementor session) 
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public Object[] getPropertyValuesToInsert(Object entity, Map mergeMap, SessionImplementor session)
 	throws HibernateException;
 
 
@@ -148,62 +148,80 @@ public interface ClassMetadata {
 	/**
 	 * The persistent class, or null
 	 */
-	public Class getMappedClass(EntityMode entityMode);
+	public Class getMappedClass();
 
 	/**
 	 * Create a class instance initialized with the given identifier
+	 *
+	 * @param id The identifier value to use (may be null to represent no value)
+	 * @param session The session from which the request originated.
+	 *
+	 * @return The instantiated entity.
 	 */
-	public Object instantiate(Serializable id, EntityMode entityMode) throws HibernateException;
+	public Object instantiate(Serializable id, SessionImplementor session);
 
 	/**
 	 * Get the value of a particular (named) property
 	 */
-	public Object getPropertyValue(Object object, String propertyName, EntityMode entityMode) throws HibernateException;
+	public Object getPropertyValue(Object object, String propertyName) throws HibernateException;
 
 	/**
 	 * Extract the property values from the given entity.
 	 *
 	 * @param entity The entity from which to extract the property values.
-	 * @param entityMode The entity-mode of the given entity
 	 * @return The property values.
 	 * @throws HibernateException
 	 */
-	public Object[] getPropertyValues(Object entity, EntityMode entityMode) throws HibernateException;
+	public Object[] getPropertyValues(Object entity) throws HibernateException;
 
 	/**
 	 * Set the value of a particular (named) property
 	 */
-	public void setPropertyValue(Object object, String propertyName, Object value, EntityMode entityMode) throws HibernateException;
+	public void setPropertyValue(Object object, String propertyName, Object value) throws HibernateException;
 
 	/**
 	 * Set the given values to the mapped properties of the given object
 	 */
-	public void setPropertyValues(Object object, Object[] values, EntityMode entityMode) throws HibernateException;
+	public void setPropertyValues(Object object, Object[] values) throws HibernateException;
 
 	/**
 	 * Get the identifier of an instance (throw an exception if no identifier property)
+	 *
+	 * @deprecated Use {@link #getIdentifier(Object,SessionImplementor)} instead
 	 */
-	public Serializable getIdentifier(Object entity, EntityMode entityMode) throws HibernateException;
+	@SuppressWarnings( {"JavaDoc"})
+	public Serializable getIdentifier(Object object) throws HibernateException;
 
 	/**
-	 * Set the identifier of an instance (or do nothing if no identifier property)
+	 * Get the identifier of an instance (throw an exception if no identifier property)
+	 *
+	 * @param entity The entity for which to get the identifier
+	 * @param session The session from which the request originated
+	 *
+	 * @return The identifier
 	 */
-	public void setIdentifier(Object object, Serializable id, EntityMode entityMode) throws HibernateException;
+	public Serializable getIdentifier(Object entity, SessionImplementor session);
+
+	/**
+	 * Inject the identifier value into the given entity.
+	 *
+	 * @param entity The entity to inject with the identifier value.
+	 * @param id The value to be injected as the identifier.
+	 * @param session The session from which is requests originates
+	 */
+	public void setIdentifier(Object entity, Serializable id, SessionImplementor session);
+
 
 	/**
 	 * Does the class implement the <tt>Lifecycle</tt> interface?
 	 */
-	public boolean implementsLifecycle(EntityMode entityMode);
-
-	/**
-	 * Does the class implement the <tt>Validatable</tt> interface?
-	 */
-	public boolean implementsValidatable(EntityMode entityMode);
+	@SuppressWarnings( {"UnusedDeclaration"})
+	public boolean implementsLifecycle();
 
 	/**
 	 * Get the version number (or timestamp) from the object's version property
 	 * (or return null if not versioned)
 	 */
-	public Object getVersion(Object object, EntityMode entityMode) throws HibernateException;
+	public Object getVersion(Object object) throws HibernateException;
 
 }

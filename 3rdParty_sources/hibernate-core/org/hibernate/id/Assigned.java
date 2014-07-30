@@ -23,14 +23,13 @@
  *
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -47,25 +46,20 @@ public class Assigned implements IdentifierGenerator, Configurable {
 	private String entityName;
 
 	public Serializable generate(SessionImplementor session, Object obj) throws HibernateException {
-		
-		final Serializable id = session.getEntityPersister( entityName, obj ) 
-				//TODO: cache the persister, this shows up in yourkit
-				.getIdentifier( obj, session.getEntityMode() );
-		
-		if (id==null) {
+		//TODO: cache the persister, this shows up in yourkit
+		final Serializable id = session.getEntityPersister( entityName, obj ).getIdentifier( obj, session );
+		if ( id == null ) {
 			throw new IdentifierGenerationException(
-				"ids for this class must be manually assigned before calling save(): " + 
-				entityName
+					"ids for this class must be manually assigned before calling save(): " + entityName
 			);
 		}
 		
 		return id;
 	}
 
-	public void configure(Type type, Properties params, Dialect d)
-	throws MappingException {
+	public void configure(Type type, Properties params, Dialect d) throws MappingException {
 		entityName = params.getProperty(ENTITY_NAME);
-		if (entityName==null) {
+		if ( entityName == null ) {
 			throw new MappingException("no entity name");
 		}
 	}

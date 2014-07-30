@@ -23,12 +23,11 @@
  *
  */
 package org.hibernate.loader;
-
-import java.util.Map;
-
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.type.EntityType;
@@ -47,6 +46,7 @@ public abstract class OuterJoinLoader extends BasicLoader {
 	protected CollectionPersister[] collectionPersisters;
 	protected int[] collectionOwners;
 	protected String[] aliases;
+	private LockOptions lockOptions;
 	protected LockMode[] lockModeArray;
 	protected int[] owners;
 	protected EntityType[] ownerAssociationTypes;
@@ -54,15 +54,17 @@ public abstract class OuterJoinLoader extends BasicLoader {
 	protected String[] suffixes;
 	protected String[] collectionSuffixes;
 
-    private Map enabledFilters;
-    
-    protected final Dialect getDialect() {
+    private LoadQueryInfluencers loadQueryInfluencers;
+
+	protected final Dialect getDialect() {
     	return getFactory().getDialect();
     }
 
-	public OuterJoinLoader(SessionFactoryImplementor factory, Map enabledFilters) {
-		super(factory);
-		this.enabledFilters = enabledFilters;
+	public OuterJoinLoader(
+			SessionFactoryImplementor factory,
+			LoadQueryInfluencers loadQueryInfluencers) {
+		super( factory );
+		this.loadQueryInfluencers = loadQueryInfluencers;
 	}
 
 	protected String[] getSuffixes() {
@@ -73,7 +75,8 @@ public abstract class OuterJoinLoader extends BasicLoader {
 		return collectionSuffixes;
 	}
 
-	protected final String getSQLString() {
+	@Override
+	public final String getSQLString() {
 		return sql;
 	}
 
@@ -89,12 +92,16 @@ public abstract class OuterJoinLoader extends BasicLoader {
 		return ownerAssociationTypes;
 	}
 
-	protected LockMode[] getLockModes(Map lockModes) {
+	protected LockMode[] getLockModes(LockOptions lockOptions) {
 		return lockModeArray;
 	}
-	
-	public Map getEnabledFilters() {
-		return enabledFilters;
+
+	protected LockOptions getLockOptions() {
+		return lockOptions;
+	}
+
+	public LoadQueryInfluencers getLoadQueryInfluencers() {
+		return loadQueryInfluencers;
 	}
 
 	protected final String[] getAliases() {
@@ -113,6 +120,7 @@ public abstract class OuterJoinLoader extends BasicLoader {
 		persisters = walker.getPersisters();
 		collectionPersisters = walker.getCollectionPersisters();
 		ownerAssociationTypes = walker.getOwnerAssociationTypes();
+		lockOptions = walker.getLockModeOptions();
 		lockModeArray = walker.getLockModeArray();
 		suffixes = walker.getSuffixes();
 		collectionSuffixes = walker.getCollectionSuffixes();

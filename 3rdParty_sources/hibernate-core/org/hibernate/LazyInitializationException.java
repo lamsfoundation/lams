@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,16 +20,17 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
 
-import org.slf4j.LoggerFactory;
+import org.hibernate.internal.CoreMessageLogger;
+
+import org.jboss.logging.Logger;
 
 /**
- * Indicates access to unfetched data outside of a session context.
- * For example, when an uninitialized proxy or collection is accessed 
- * after the session was closed.
+ * Indicates an attempt to access not-yet-fetched data outside of a session context.
+ *
+ * For example, when an uninitialized proxy or collection is accessed after the session was closed.
  *
  * @see Hibernate#initialize(java.lang.Object)
  * @see Hibernate#isInitialized(java.lang.Object)
@@ -37,15 +38,19 @@ import org.slf4j.LoggerFactory;
  */
 public class LazyInitializationException extends HibernateException {
 
-	public LazyInitializationException(String msg) {
-		super(msg);
-		LoggerFactory.getLogger( LazyInitializationException.class ).error( msg, this );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			LazyInitializationException.class.getName()
+	);
+
+	/**
+	 * Constructs a LazyInitializationException using the given message.
+	 *
+	 * @param message A message explaining the exception condition
+	 */
+	public LazyInitializationException(String message) {
+		super( message );
+		LOG.trace( message, this );
 	}
 
 }
-
-
-
-
-
-

@@ -23,21 +23,20 @@
  *
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
-import org.hibernate.id.insert.IdentifierGeneratingInsert;
-import org.hibernate.id.insert.AbstractSelectingDelegate;
-import org.hibernate.id.insert.AbstractReturningDelegate;
-import org.hibernate.id.insert.InsertSelectIdentityInsert;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.HibernateException;
 import org.hibernate.AssertionFailure;
+import org.hibernate.HibernateException;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.insert.AbstractReturningDelegate;
+import org.hibernate.id.insert.AbstractSelectingDelegate;
+import org.hibernate.id.insert.IdentifierGeneratingInsert;
+import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
+import org.hibernate.id.insert.InsertSelectIdentityInsert;
 
 /**
  * A generator for use with ANSI-SQL IDENTITY columns used as the primary key.
@@ -87,22 +86,26 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getBatcher().prepareStatement( insertSQL, true );
+			return session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( insertSQL, PreparedStatement.RETURN_GENERATED_KEYS );
 		}
 
-		public Serializable executeAndExtract(PreparedStatement insert) throws SQLException {
-			insert.executeUpdate();
+		public Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
+			session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
 			ResultSet rs = null;
 			try {
 				rs = insert.getGeneratedKeys();
-				return IdentifierGeneratorFactory.getGeneratedIdentity(
+				return IdentifierGeneratorHelper.getGeneratedIdentity(
 						rs,
+						persister.getRootTableKeyColumnNames()[0],
 						persister.getIdentifierType()
 				);
 			}
 			finally {
 				if ( rs != null ) {
-					rs.close();
+					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, insert );
 				}
 			}
 		}
@@ -131,21 +134,23 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getBatcher().prepareStatement( insertSQL, false );
+			return session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( insertSQL, PreparedStatement.NO_GENERATED_KEYS );
 		}
 
-		public Serializable executeAndExtract(PreparedStatement insert) throws SQLException {
-			if ( !insert.execute() ) {
-				while ( !insert.getMoreResults() && insert.getUpdateCount() != -1 ) {
-					// do nothing until we hit the rsult set containing the generated id
-				}
-			}
-			ResultSet rs = insert.getResultSet();
+		public Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
+			ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().execute( insert );
 			try {
-				return IdentifierGeneratorFactory.getGeneratedIdentity( rs, persister.getIdentifierType() );
+				return IdentifierGeneratorHelper.getGeneratedIdentity(
+						rs,
+						persister.getRootTableKeyColumnNames()[0],
+						persister.getIdentifierType()
+				);
 			}
 			finally {
-				rs.close();
+				session.getTransactionCoordinator().getJdbcCoordinator().release( rs, insert );
 			}
 		}
 
@@ -184,7 +189,7 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 				SessionImplementor session,
 		        ResultSet rs,
 		        Object object) throws SQLException {
-			return IdentifierGeneratorFactory.getGeneratedIdentity( rs, persister.getIdentifierType() );
+			return IdentifierGeneratorHelper.getGeneratedIdentity( rs, persister.getRootTableKeyColumnNames()[0], persister.getIdentifierType() );
 		}
 	}
 

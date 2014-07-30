@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,14 +20,13 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.function;
 
 import java.util.List;
 
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -40,7 +39,7 @@ import org.hibernate.type.Type;
  */
 public class StandardSQLFunction implements SQLFunction {
 	private final String name;
-	private final Type type;
+	private final Type registeredType;
 
 	/**
 	 * Construct a standard SQL function definition with a variable return type;
@@ -60,11 +59,11 @@ public class StandardSQLFunction implements SQLFunction {
 	 * Construct a standard SQL function definition with a static return type.
 	 *
 	 * @param name The name of the function.
-	 * @param type The static return type.
+	 * @param registeredType The static return type.
 	 */
-	public StandardSQLFunction(String name, Type type) {
+	public StandardSQLFunction(String name, Type registeredType) {
 		this.name = name;
-		this.type = type;
+		this.registeredType = registeredType;
 	}
 
 	/**
@@ -83,48 +82,40 @@ public class StandardSQLFunction implements SQLFunction {
 	 * not static.
 	 */
 	public Type getType() {
-		return type;
+		return registeredType;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Type getReturnType(Type columnType, Mapping mapping) {
-		// return the concrete type, or the underlying type if a concrete type
-		// was not specified
-		return type == null ? columnType : type;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public boolean hasArguments() {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public boolean hasParenthesesIfNoArguments() {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String render(List args, SessionFactoryImplementor factory) {
-		StringBuffer buf = new StringBuffer();
+	@Override
+	public Type getReturnType(Type firstArgumentType, Mapping mapping) {
+		return registeredType == null ? firstArgumentType : registeredType;
+	}
+
+	@Override
+	public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor sessionFactory) {
+		final StringBuilder buf = new StringBuilder();
 		buf.append( name ).append( '(' );
-		for ( int i = 0; i < args.size(); i++ ) {
-			buf.append( args.get( i ) );
-			if ( i < args.size() - 1 ) {
+		for ( int i = 0; i < arguments.size(); i++ ) {
+			buf.append( arguments.get( i ) );
+			if ( i < arguments.size() - 1 ) {
 				buf.append( ", " );
 			}
 		}
 		return buf.append( ')' ).toString();
 	}
 
+	@Override
 	public String toString() {
 		return name;
 	}
+
 }

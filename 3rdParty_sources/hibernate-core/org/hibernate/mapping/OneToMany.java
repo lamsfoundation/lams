@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,18 +20,16 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.mapping;
-
 import java.util.Iterator;
 
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.Mapping;
+import org.hibernate.cfg.Mappings;
+import org.hibernate.engine.spi.Mapping;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
 
 /**
  * A mapping for a one-to-many association
@@ -39,24 +37,28 @@ import org.hibernate.type.TypeFactory;
  */
 public class OneToMany implements Value {
 
+	private final Mappings mappings;
+	private final Table referencingTable;
+
 	private String referencedEntityName;
-	private Table referencingTable;
 	private PersistentClass associatedClass;
 	private boolean embedded;
 	private boolean ignoreNotFound;
 
 	private EntityType getEntityType() {
-		return TypeFactory.manyToOne(
-				getReferencedEntityName(), 
+		return mappings.getTypeResolver().getTypeFactory().manyToOne(
+				getReferencedEntityName(),
+				true, 
 				null, 
 				false,
 				false,
-				isEmbedded(),
-				isIgnoreNotFound()
+				isIgnoreNotFound(),
+				false
 			);
 	}
 
-	public OneToMany(PersistentClass owner) throws MappingException {
+	public OneToMany(Mappings mappings, PersistentClass owner) throws MappingException {
+		this.mappings = mappings;
 		this.referencingTable = (owner==null) ? null : owner.getTable();
 	}
 
@@ -75,7 +77,7 @@ public class OneToMany implements Value {
 		// no foreign key element of for a one-to-many
 	}
 
-	public Iterator getColumnIterator() {
+	public Iterator<Selectable> getColumnIterator() {
 		return associatedClass.getKey().getColumnIterator();
 	}
 
@@ -148,11 +150,21 @@ public class OneToMany implements Value {
 		//TODO: we could just return all false...
 		throw new UnsupportedOperationException();
 	}
-	
+
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public boolean isEmbedded() {
 		return embedded;
 	}
-	
+
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public void setEmbedded(boolean embedded) {
 		this.embedded = embedded;
 	}

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -30,17 +29,17 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
-import org.hibernate.usertype.UserCollectionType;
 import org.hibernate.usertype.LoggableUserType;
+import org.hibernate.usertype.UserCollectionType;
 
 /**
  * A custom type for mapping user-written classes that implement <tt>PersistentCollection</tt>
  * 
- * @see org.hibernate.collection.PersistentCollection
+ * @see org.hibernate.collection.spi.PersistentCollection
  * @see org.hibernate.usertype.UserCollectionType
  * @author Gavin King
  */
@@ -49,15 +48,39 @@ public class CustomCollectionType extends CollectionType {
 	private final UserCollectionType userType;
 	private final boolean customLogging;
 
-	public CustomCollectionType(Class userTypeClass, String role, String foreignKeyPropertyName, boolean isEmbeddedInXML) {
-		super(role, foreignKeyPropertyName, isEmbeddedInXML);
+	/**
+	 * @deprecated Use {@link #CustomCollectionType(TypeFactory.TypeScope, Class, String, String )} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CustomCollectionType(
+			TypeFactory.TypeScope typeScope,
+			Class userTypeClass,
+			String role,
+			String foreignKeyPropertyName,
+			boolean isEmbeddedInXML) {
+		super( typeScope, role, foreignKeyPropertyName, isEmbeddedInXML );
+		userType = createUserCollectionType( userTypeClass );
+		customLogging = LoggableUserType.class.isAssignableFrom( userTypeClass );
+	}
 
+	public CustomCollectionType(
+			TypeFactory.TypeScope typeScope,
+			Class userTypeClass,
+			String role,
+			String foreignKeyPropertyName) {
+		super( typeScope, role, foreignKeyPropertyName );
+		userType = createUserCollectionType( userTypeClass );
+		customLogging = LoggableUserType.class.isAssignableFrom( userTypeClass );
+	}
+
+	private static UserCollectionType createUserCollectionType(Class userTypeClass) {
 		if ( !UserCollectionType.class.isAssignableFrom( userTypeClass ) ) {
 			throw new MappingException( "Custom type does not implement UserCollectionType: " + userTypeClass.getName() );
 		}
 
 		try {
-			userType = ( UserCollectionType ) userTypeClass.newInstance();
+			return ( UserCollectionType ) userTypeClass.newInstance();
 		}
 		catch ( InstantiationException ie ) {
 			throw new MappingException( "Cannot instantiate custom type: " + userTypeClass.getName() );
@@ -65,8 +88,6 @@ public class CustomCollectionType extends CollectionType {
 		catch ( IllegalAccessException iae ) {
 			throw new MappingException( "IllegalAccessException trying to instantiate custom type: " + userTypeClass.getName() );
 		}
-
-		customLogging = LoggableUserType.class.isAssignableFrom( userTypeClass );
 	}
 
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key)

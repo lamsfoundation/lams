@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,29 +20,30 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.dialect.function;
-
 import java.sql.Types;
 
-import org.hibernate.Hibernate;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 /**
  * Classic AVG sqlfunction that return types as it was done in Hibernate 3.1 
  * 
  * @author Max Rydahl Andersen
- *
  */
 public class ClassicAvgFunction extends StandardSQLFunction {
+	/**
+	 * Constructs a ClassicAvgFunction
+	 */
 	public ClassicAvgFunction() {
 		super( "avg" );
 	}
 
+	@Override
 	public Type getReturnType(Type columnType, Mapping mapping) throws QueryException {
 		int[] sqlTypes;
 		try {
@@ -51,10 +52,14 @@ public class ClassicAvgFunction extends StandardSQLFunction {
 		catch ( MappingException me ) {
 			throw new QueryException( me );
 		}
-		if ( sqlTypes.length != 1 ) throw new QueryException( "multi-column type in avg()" );
-		int sqlType = sqlTypes[0];
+
+		if ( sqlTypes.length != 1 ) {
+			throw new QueryException( "multi-column type in avg()" );
+		}
+
+		final int sqlType = sqlTypes[0];
 		if ( sqlType == Types.INTEGER || sqlType == Types.BIGINT || sqlType == Types.TINYINT ) {
-			return Hibernate.FLOAT;
+			return StandardBasicTypes.FLOAT;
 		}
 		else {
 			return columnType;

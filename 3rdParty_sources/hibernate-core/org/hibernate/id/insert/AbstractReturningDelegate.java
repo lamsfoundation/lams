@@ -23,15 +23,13 @@
  *
  */
 package org.hibernate.id.insert;
-
-import org.hibernate.id.PostInsertIdentityPersister;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.exception.JDBCExceptionHelper;
-import org.hibernate.pretty.MessageHelper;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.PostInsertIdentityPersister;
+import org.hibernate.pretty.MessageHelper;
 
 /**
  * Abstract InsertGeneratedIdentifierDelegate implementation where the
@@ -48,21 +46,23 @@ public abstract class AbstractReturningDelegate implements InsertGeneratedIdenti
 		this.persister = persister;
 	}
 
-	public final Serializable performInsert(String insertSQL, SessionImplementor session, Binder binder) {
+	public final Serializable performInsert(
+			String insertSQL,
+			SessionImplementor session,
+			Binder binder) {
 		try {
 			// prepare and execute the insert
 			PreparedStatement insert = prepare( insertSQL, session );
 			try {
 				binder.bindValues( insert );
-				return executeAndExtract( insert );
+				return executeAndExtract( insert, session );
 			}
 			finally {
 				releaseStatement( insert, session );
 			}
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
+			throw session.getFactory().getSQLExceptionHelper().convert(
 			        sqle,
 			        "could not insert: " + MessageHelper.infoString( persister ),
 			        insertSQL
@@ -76,9 +76,9 @@ public abstract class AbstractReturningDelegate implements InsertGeneratedIdenti
 
 	protected abstract PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException;
 
-	protected abstract Serializable executeAndExtract(PreparedStatement insert) throws SQLException;
+	protected abstract Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException;
 
 	protected void releaseStatement(PreparedStatement insert, SessionImplementor session) throws SQLException {
-		session.getBatcher().closeStatement( insert );
+		session.getTransactionCoordinator().getJdbcCoordinator().release( insert );
 	}
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -30,59 +29,55 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Properties;
 
-import org.dom4j.Element;
-import org.dom4j.Node;
 import org.hibernate.EntityMode;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.CascadeStyle;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.CascadeStyle;
+import org.hibernate.engine.spi.CascadeStyles;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.usertype.CompositeUserType;
+import org.hibernate.usertype.LoggableUserType;
+
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
- * Adapts <tt>CompositeUserType</tt> to <tt>Type</tt> interface
+ * Adapts {@link CompositeUserType} to the {@link Type} interface
+ *
  * @author Gavin King
+ * @author Steve Ebersole
  */
-public class CompositeCustomType extends AbstractType
-	implements AbstractComponentType {
-
+public class CompositeCustomType extends AbstractType implements CompositeType, BasicType {
 	private final CompositeUserType userType;
+	private final String[] registrationKeys;
 	private final String name;
+	private final boolean customLogging;
 
-	public CompositeCustomType(Class userTypeClass, Properties parameters) 
-	throws MappingException {
-		name = userTypeClass.getName();
-
-		if ( !CompositeUserType.class.isAssignableFrom(userTypeClass) ) {
-			throw new MappingException( 
-					"Custom type does not implement CompositeUserType: " + 
-					userTypeClass.getName() 
-				);
-		}
-		
-		try {
-			userType = (CompositeUserType) userTypeClass.newInstance();
-		}
-		catch (InstantiationException ie) {
-			throw new MappingException( 
-					"Cannot instantiate custom type: " + 
-					userTypeClass.getName() 
-				);
-		}
-		catch (IllegalAccessException iae) {
-			throw new MappingException( 
-					"IllegalAccessException trying to instantiate custom type: " + 
-					userTypeClass.getName() 
-				);
-		}
-		TypeFactory.injectParameters(userType, parameters);
+	public CompositeCustomType(CompositeUserType userType) {
+		this( userType, ArrayHelper.EMPTY_STRING_ARRAY );
 	}
-	
+
+	public CompositeCustomType(CompositeUserType userType, String[] registrationKeys) {
+		this.userType = userType;
+		this.name = userType.getClass().getName();
+		this.customLogging = LoggableUserType.class.isInstance( userType );
+		this.registrationKeys = registrationKeys;
+	}
+
+	public String[] getRegistrationKeys() {
+		return registrationKeys;
+	}
+
+	public CompositeUserType getUserType() {
+		return userType;
+	}
+
 	public boolean isMethodOf(Method method) {
 		return false;
 	}
@@ -95,13 +90,11 @@ public class CompositeCustomType extends AbstractType
 		return userType.getPropertyNames();
 	}
 
-	public Object[] getPropertyValues(Object component, SessionImplementor session)
-		throws HibernateException {
-		return getPropertyValues( component, session.getEntityMode() );
+	public Object[] getPropertyValues(Object component, SessionImplementor session) throws HibernateException {
+		return getPropertyValues( component, EntityMode.POJO );
 	}
 
-	public Object[] getPropertyValues(Object component, EntityMode entityMode)
-		throws HibernateException {
+	public Object[] getPropertyValues(Object component, EntityMode entityMode) throws HibernateException {
 
 		int len = getSubtypes().length;
 		Object[] result = new Object[len];
@@ -124,13 +117,12 @@ public class CompositeCustomType extends AbstractType
 		return getPropertyValue(component, i);
 	}
 
-	public Object getPropertyValue(Object component, int i)
-		throws HibernateException {
-		return userType.getPropertyValue(component, i);
+	public Object getPropertyValue(Object component, int i) throws HibernateException {
+		return userType.getPropertyValue( component, i );
 	}
 
 	public CascadeStyle getCascadeStyle(int i) {
-		return CascadeStyle.NONE;
+		return CascadeStyles.NONE;
 	}
 
 	public FetchMode getFetchMode(int i) {
@@ -141,9 +133,9 @@ public class CompositeCustomType extends AbstractType
 		return true;
 	}
 
-	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory) 
+	public Object deepCopy(Object value, SessionFactoryImplementor factory)
 	throws HibernateException {
-		return userType.deepCopy(value);
+		return userType.deepCopy( value );
 	}
 
 	public Object assemble(
@@ -152,14 +144,14 @@ public class CompositeCustomType extends AbstractType
 		Object owner)
 		throws HibernateException {
 
-		return userType.assemble(cached, session, owner);
+		return userType.assemble( cached, session, owner );
 	}
 
 	public Serializable disassemble(Object value, SessionImplementor session, Object owner)
 	throws HibernateException {
 		return userType.disassemble(value, session);
 	}
-	
+
 	public Object replace(
 			Object original, 
 			Object target,
@@ -170,20 +162,20 @@ public class CompositeCustomType extends AbstractType
 		return userType.replace(original, target, session, owner);
 	}
 	
-	public boolean isEqual(Object x, Object y, EntityMode entityMode) 
+	public boolean isEqual(Object x, Object y)
 	throws HibernateException {
 		return userType.equals(x, y);
 	}
 
-	public int getHashCode(Object x, EntityMode entityMode) {
+	public int getHashCode(Object x) {
 		return userType.hashCode(x);
 	}
 	
 	public int getColumnSpan(Mapping mapping) throws MappingException {
 		Type[] types = userType.getPropertyTypes();
 		int n=0;
-		for (int i=0; i<types.length; i++) {
-			n+=types[i].getColumnSpan(mapping);
+		for ( Type type : types ) {
+			n += type.getColumnSpan( mapping );
 		}
 		return n;
 	}
@@ -207,7 +199,7 @@ public class CompositeCustomType extends AbstractType
 		Object owner)
 		throws HibernateException, SQLException {
 
-		return userType.nullSafeGet(rs, new String[] {columnName}, session, owner);
+		return userType.nullSafeGet( rs, new String[] {columnName}, session, owner );
 	}
 
 	public Object nullSafeGet(
@@ -240,24 +232,55 @@ public class CompositeCustomType extends AbstractType
 		throws HibernateException, SQLException {
 
 		userType.nullSafeSet(st, value, index, session);
-
 	}
 
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
-		Type[] types = userType.getPropertyTypes();
 		int[] result = new int[ getColumnSpan(mapping) ];
 		int n=0;
-		for (int i=0; i<types.length; i++) {
-			int[] sqlTypes = types[i].sqlTypes(mapping);
-			for ( int k=0; k<sqlTypes.length; k++ ) result[n++] = sqlTypes[k];
+		for ( Type type : userType.getPropertyTypes() ) {
+			for ( int sqlType : type.sqlTypes( mapping ) ) {
+				result[n++] = sqlType;
+			}
 		}
 		return result;
 	}
-	
-	public String toLoggableString(Object value, SessionFactoryImplementor factory)
-		throws HibernateException {
 
-		return value==null ? "null" : value.toString();
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		//Not called at runtime so doesn't matter if its slow :)
+		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
+		int soFar = 0;
+		for ( Type propertyType : userType.getPropertyTypes() ) {
+			final Size[] propertySizes = propertyType.dictatedSizes( mapping );
+			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
+			soFar += propertySizes.length;
+		}
+		return sizes;
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		//Not called at runtime so doesn't matter if its slow :)
+		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
+		int soFar = 0;
+		for ( Type propertyType : userType.getPropertyTypes() ) {
+			final Size[] propertySizes = propertyType.defaultSizes( mapping );
+			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
+			soFar += propertySizes.length;
+		}
+		return sizes;
+	}
+	
+	public String toLoggableString(Object value, SessionFactoryImplementor factory) throws HibernateException {
+		if ( value == null ) {
+			return "null";
+		}
+		else if ( customLogging ) {
+			return ( (LoggableUserType) userType ).toLoggableString( value, factory );
+		}
+		else {
+			return value.toString();
+		}
 	}
 
 	public boolean[] getPropertyNullability() {
@@ -268,7 +291,7 @@ public class CompositeCustomType extends AbstractType
 		return xml;
 	}
 
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) 
+	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory)
 	throws HibernateException {
 		replaceNode( node, (Element) value );
 	}

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,26 +20,24 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.enhanced.AccessCallback;
+import org.hibernate.id.enhanced.LegacyHiLoAlgorithmOptimizer;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.type.Type;
-import org.hibernate.util.PropertiesHelper;
 
 /**
  * <b>hilo</b><br>
  * <br>
  * An <tt>IdentifierGenerator</tt> that returns a <tt>Long</tt>, constructed using
- * a hi/lo algorithm. The hi value MUST be fetched in a seperate transaction
+ * a hi/lo algorithm. The hi value MUST be fetched in a separate transaction
  * to the <tt>Session</tt> transaction so the generator must be able to obtain
  * a new connection and commit it. Hence this implementation may not
  * be used  when the user is supplying connections. In this
@@ -50,45 +48,54 @@ import org.hibernate.util.PropertiesHelper;
  *
  * @see SequenceHiLoGenerator
  * @author Gavin King
+ * 
+ * @deprecated use {@link SequenceStyleGenerator} instead.
  */
+@Deprecated 
 public class TableHiLoGenerator extends TableGenerator {
-
 	/**
 	 * The max_lo parameter
 	 */
 	public static final String MAX_LO = "max_lo";
 
-	private long hi;
-	private int lo;
+	private LegacyHiLoAlgorithmOptimizer hiloOptimizer;
+
 	private int maxLo;
-	private Class returnClass;
 
-	private static final Logger log = LoggerFactory.getLogger(TableHiLoGenerator.class);
-
+	@Override
 	public void configure(Type type, Properties params, Dialect d) {
-		super.configure(type, params, d);
-		maxLo = PropertiesHelper.getInt(MAX_LO, params, Short.MAX_VALUE);
-		lo = maxLo + 1; // so we "clock over" on the first invocation
-		returnClass = type.getReturnedClass();
+		super.configure( type, params, d );
+		maxLo = ConfigurationHelper.getInt( MAX_LO, params, Short.MAX_VALUE );
+
+		if ( maxLo >= 1 ) {
+			hiloOptimizer = new LegacyHiLoAlgorithmOptimizer( type.getReturnedClass(), maxLo );
+		}
 	}
 
-	public synchronized Serializable generate(SessionImplementor session, Object obj) 
-	throws HibernateException {
-        if (maxLo < 1) {
+	@Override
+	public synchronized Serializable generate(final SessionImplementor session, Object obj) {
+		// maxLo < 1 indicates a hilo generator with no hilo :?
+		if ( maxLo < 1 ) {
 			//keep the behavior consistent even for boundary usages
-			long val = ( (Number) super.generate(session, obj) ).longValue();
-			if (val == 0) val = ( (Number) super.generate(session, obj) ).longValue();
-			return IdentifierGeneratorFactory.createNumber( val, returnClass );
-		}
-		if (lo>maxLo) {
-			long hival = ( (Number) super.generate(session, obj) ).longValue();
-			lo = (hival == 0) ? 1 : 0;
-			hi = hival * (maxLo+1);
-			log.debug("new hi value: " + hival);
+			IntegralDataTypeHolder value = null;
+			while ( value == null || value.lt( 0 ) ) {
+				value = generateHolder( session );
+			}
+			return value.makeValue();
 		}
 
-		return IdentifierGeneratorFactory.createNumber( hi + lo++, returnClass );
+		return hiloOptimizer.generate(
+				new AccessCallback() {
+					public IntegralDataTypeHolder getNextValue() {
+						return generateHolder( session );
+					}
 
+					@Override
+					public String getTenantIdentifier() {
+						return session.getTenantIdentifier();
+					}
+				}
+		);
 	}
 
 }

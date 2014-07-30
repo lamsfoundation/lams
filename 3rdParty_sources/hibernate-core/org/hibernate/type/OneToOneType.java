@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -31,11 +30,12 @@ import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.EntityKey;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.util.ArrayHelper;
 
 /**
  * A one-to-one association to an entity
@@ -46,29 +46,73 @@ public class OneToOneType extends EntityType {
 	private final ForeignKeyDirection foreignKeyType;
 	private final String propertyName;
 	private final String entityName;
-	
+
+	/**
+	 * @deprecated Use {@link #OneToOneType(TypeFactory.TypeScope, String, ForeignKeyDirection, boolean, String, boolean, boolean, String, String)}
+	 *  instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public OneToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			ForeignKeyDirection foreignKeyType,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean isEmbeddedInXML,
+			String entityName,
+			String propertyName) {
+		this( scope, referencedEntityName, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, entityName, propertyName );
+	}
+
+	/**
+	 * @deprecated Use {@link #OneToOneType(TypeFactory.TypeScope, String, ForeignKeyDirection, boolean, String, boolean, boolean, String, String)}
+	 *  instead.
+	 */
+	@Deprecated
+	public OneToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			ForeignKeyDirection foreignKeyType,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		this( scope, referencedEntityName, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, entityName, propertyName );
+	}
+
+	public OneToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			ForeignKeyDirection foreignKeyType,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			String entityName,
+			String propertyName) {
+		super( scope, referencedEntityName, referenceToPrimaryKey, uniqueKeyPropertyName, !lazy, unwrapProxy );
+		this.foreignKeyType = foreignKeyType;
+		this.propertyName = propertyName;
+		this.entityName = entityName;
+	}
+
 	public String getPropertyName() {
 		return propertyName;
 	}
 	
 	public boolean isNull(Object owner, SessionImplementor session) {
-		
 		if ( propertyName != null ) {
-			
-			EntityPersister ownerPersister = session.getFactory()
-					.getEntityPersister(entityName); 
-			Serializable id = session.getContextEntityIdentifier(owner);
-
-			EntityKey entityKey = new EntityKey( id, ownerPersister, session.getEntityMode() );
-			
-			return session.getPersistenceContext()
-					.isPropertyNull( entityKey, getPropertyName() );
-			
+			final EntityPersister ownerPersister = session.getFactory().getEntityPersister( entityName );
+			final Serializable id = session.getContextEntityIdentifier( owner );
+			final EntityKey entityKey = session.generateEntityKey( id, ownerPersister );
+			return session.getPersistenceContext().isPropertyNull( entityKey, getPropertyName() );
 		}
 		else {
 			return false;
 		}
-
 	}
 
 	public int getColumnSpan(Mapping session) throws MappingException {
@@ -79,30 +123,20 @@ public class OneToOneType extends EntityType {
 		return ArrayHelper.EMPTY_INT_ARRAY;
 	}
 
-	public boolean[] toColumnNullness(Object value, Mapping mapping) {
-		return ArrayHelper.EMPTY_BOOLEAN_ARRAY;
+	private static final Size[] SIZES = new Size[0];
+
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		return SIZES;
 	}
 
-	public OneToOneType(
-			String referencedEntityName, 
-			ForeignKeyDirection foreignKeyType, 
-			String uniqueKeyPropertyName,
-			boolean lazy,
-			boolean unwrapProxy,
-			boolean isEmbeddedInXML,
-			String entityName,
-			String propertyName
-	) {
-		super(
-				referencedEntityName, 
-				uniqueKeyPropertyName, 
-				!lazy, 
-				isEmbeddedInXML, 
-				unwrapProxy
-			);
-		this.foreignKeyType = foreignKeyType;
-		this.propertyName = propertyName;
-		this.entityName = entityName;
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		return SIZES;
+	}
+
+	public boolean[] toColumnNullness(Object value, Mapping mapping) {
+		return ArrayHelper.EMPTY_BOOLEAN_ARRAY;
 	}
 
 	public void nullSafeSet(PreparedStatement st, Object value, int index, boolean[] settable, SessionImplementor session) {

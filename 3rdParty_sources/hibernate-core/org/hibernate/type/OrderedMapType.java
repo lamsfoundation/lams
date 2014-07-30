@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,10 +20,8 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
-
 import java.util.LinkedHashMap;
 
 /**
@@ -38,14 +36,21 @@ public class OrderedMapType extends MapType {
 	 * @param role The collection role name.
 	 * @param propertyRef The property ref name.
 	 * @param isEmbeddedInXML Is this collection to embed itself in xml
+	 *
+	 * @deprecated Use {@link #OrderedMapType(TypeFactory.TypeScope, String, String)} instead.
+	 *  instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
-	public OrderedMapType(String role, String propertyRef, boolean isEmbeddedInXML) {
-		super( role, propertyRef, isEmbeddedInXML );
+	@Deprecated
+	public OrderedMapType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
+		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	public OrderedMapType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
+		super( typeScope, role, propertyRef );
+	}
+
+	@Override
 	public Object instantiate(int anticipatedSize) {
 		return anticipatedSize > 0
 				? new LinkedHashMap( anticipatedSize )

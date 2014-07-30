@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2010, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.type;
 
@@ -30,32 +29,43 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.hibernate.EntityMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.CollectionKey;
-import org.hibernate.engine.EntityEntry;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.PersistenceContext;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.CollectionEntry;
+import org.hibernate.engine.spi.CollectionKey;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.MarkerObject;
+import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.internal.util.collections.CollectionHelper;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Joinable;
+import org.hibernate.pretty.MessageHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
-import org.hibernate.util.ArrayHelper;
-import org.hibernate.util.MarkerObject;
+
+import org.jboss.logging.Logger;
+
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * A type that handles Hibernate <tt>PersistentCollection</tt>s (including arrays).
@@ -64,19 +74,36 @@ import org.hibernate.util.MarkerObject;
  */
 public abstract class CollectionType extends AbstractType implements AssociationType {
 
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, CollectionType.class.getName());
+
 	private static final Object NOT_NULL_COLLECTION = new MarkerObject( "NOT NULL COLLECTION" );
 	public static final Object UNFETCHED_COLLECTION = new MarkerObject( "UNFETCHED COLLECTION" );
 
+	private final TypeFactory.TypeScope typeScope;
 	private final String role;
 	private final String foreignKeyPropertyName;
 	private final boolean isEmbeddedInXML;
 
-	public CollectionType(String role, String foreignKeyPropertyName, boolean isEmbeddedInXML) {
+	/**
+	 * @deprecated Use {@link #CollectionType(TypeFactory.TypeScope, String, String)} instead
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public CollectionType(TypeFactory.TypeScope typeScope, String role, String foreignKeyPropertyName, boolean isEmbeddedInXML) {
+		this.typeScope = typeScope;
 		this.role = role;
 		this.foreignKeyPropertyName = foreignKeyPropertyName;
 		this.isEmbeddedInXML = isEmbeddedInXML;
 	}
-	
+
+	public CollectionType(TypeFactory.TypeScope typeScope, String role, String foreignKeyPropertyName) {
+		this.typeScope = typeScope;
+		this.role = role;
+		this.foreignKeyPropertyName = foreignKeyPropertyName;
+		this.isEmbeddedInXML = true;
+	}
+
+	@Override
 	public boolean isEmbeddedInXML() {
 		return isEmbeddedInXML;
 	}
@@ -105,22 +132,26 @@ public abstract class CollectionType extends AbstractType implements Association
 		return false;
 	}
 
+	@Override
 	public boolean isCollectionType() {
 		return true;
 	}
 
-	public final boolean isEqual(Object x, Object y, EntityMode entityMode) {
+	@Override
+	public final boolean isEqual(Object x, Object y) {
 		return x == y
 			|| ( x instanceof PersistentCollection && ( (PersistentCollection) x ).isWrapper( y ) )
 			|| ( y instanceof PersistentCollection && ( (PersistentCollection) y ).isWrapper( x ) );
 	}
 
-	public int compare(Object x, Object y, EntityMode entityMode) {
+	@Override
+	public int compare(Object x, Object y) {
 		return 0; // collections cannot be compared
 	}
 
-	public int getHashCode(Object x, EntityMode entityMode) {
-		throw new UnsupportedOperationException( "cannot perform lookups on collections" );
+	@Override
+	public int getHashCode(Object x) {
+		throw new UnsupportedOperationException( "cannot doAfterTransactionCompletion lookups on collections" );
 	}
 
 	/**
@@ -134,32 +165,49 @@ public abstract class CollectionType extends AbstractType implements Association
 	 */
 	public abstract PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key);
 
+	@Override
 	public Object nullSafeGet(ResultSet rs, String name, SessionImplementor session, Object owner) throws SQLException {
 		return nullSafeGet( rs, new String[] { name }, session, owner );
 	}
 
+	@Override
 	public Object nullSafeGet(ResultSet rs, String[] name, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		return resolve( null, session, owner );
 	}
 
+	@Override
 	public final void nullSafeSet(PreparedStatement st, Object value, int index, boolean[] settable,
 			SessionImplementor session) throws HibernateException, SQLException {
 		//NOOP
 	}
 
+	@Override
 	public void nullSafeSet(PreparedStatement st, Object value, int index,
 			SessionImplementor session) throws HibernateException, SQLException {
 	}
 
+	@Override
 	public int[] sqlTypes(Mapping session) throws MappingException {
 		return ArrayHelper.EMPTY_INT_ARRAY;
 	}
 
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		return new Size[] { LEGACY_DICTATED_SIZE };
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		return new Size[] { LEGACY_DEFAULT_SIZE };
+	}
+
+	@Override
 	public int getColumnSpan(Mapping session) throws MappingException {
 		return 0;
 	}
 
+	@Override
 	public String toLoggableString(Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
 		if ( value == null ) {
@@ -173,29 +221,23 @@ public abstract class CollectionType extends AbstractType implements Association
 		}
 	}
 
-	protected String renderLoggableString(Object value, SessionFactoryImplementor factory)
-			throws HibernateException {
-		if ( Element.class.isInstance( value ) ) {
-			// for DOM4J "collections" only
-			// TODO: it would be better if this was done at the higher level by Printer
-			return ( ( Element ) value ).asXML();
+	protected String renderLoggableString(Object value, SessionFactoryImplementor factory) throws HibernateException {
+		final List<String> list = new ArrayList<String>();
+		Type elemType = getElementType( factory );
+		Iterator itr = getElementsIterator( value );
+		while ( itr.hasNext() ) {
+			list.add( elemType.toLoggableString( itr.next(), factory ) );
 		}
-		else {
-			List list = new ArrayList();
-			Type elemType = getElementType( factory );
-			Iterator iter = getElementsIterator( value );
-			while ( iter.hasNext() ) {
-				list.add( elemType.toLoggableString( iter.next(), factory ) );
-			}
-			return list.toString();
-		}
+		return list.toString();
 	}
 
-	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory)
+	@Override
+	public Object deepCopy(Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
 		return value;
 	}
 
+	@Override
 	public String getName() {
 		return getReturnedClass().getName() + '(' + getRole() + ')';
 	}
@@ -208,22 +250,7 @@ public abstract class CollectionType extends AbstractType implements Association
 	 * @return The iterator.
 	 */
 	public Iterator getElementsIterator(Object collection, SessionImplementor session) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			final SessionFactoryImplementor factory = session.getFactory();
-			final CollectionPersister persister = factory.getCollectionPersister( getRole() );
-			final Type elementType = persister.getElementType();
-			
-			List elements = ( (Element) collection ).elements( persister.getElementNodeName() );
-			ArrayList results = new ArrayList();
-			for ( int i=0; i<elements.size(); i++ ) {
-				Element value = (Element) elements.get(i);
-				results.add( elementType.fromXMLNode( value, factory ) );
-			}
-			return results.iterator();
-		}
-		else {
-			return getElementsIterator(collection);
-		}
+		return getElementsIterator(collection);
 	}
 
 	/**
@@ -236,10 +263,12 @@ public abstract class CollectionType extends AbstractType implements Association
 		return ( (Collection) collection ).iterator();
 	}
 
+	@Override
 	public boolean isMutable() {
 		return false;
 	}
 
+	@Override
 	public Serializable disassemble(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 		//remember the uk value
@@ -259,6 +288,7 @@ public abstract class CollectionType extends AbstractType implements Association
 		}
 	}
 
+	@Override
 	public Object assemble(Serializable cached, SessionImplementor session, Object owner)
 			throws HibernateException {
 		//we must use the "remembered" uk value, since it is 
@@ -296,6 +326,7 @@ public abstract class CollectionType extends AbstractType implements Association
 		return session.getFactory().getCollectionPersister( role );
 	}
 
+	@Override
 	public boolean isDirty(Object old, Object current, SessionImplementor session)
 			throws HibernateException {
 
@@ -308,6 +339,7 @@ public abstract class CollectionType extends AbstractType implements Association
 
 	}
 
+	@Override
 	public boolean isDirty(Object old, Object current, boolean[] checkable, SessionImplementor session)
 			throws HibernateException {
 		return isDirty(old, current, session);
@@ -327,10 +359,12 @@ public abstract class CollectionType extends AbstractType implements Association
 	 * Note: return true because this type is castable to <tt>AssociationType</tt>. Not because
 	 * all collections are associations.
 	 */
+	@Override
 	public boolean isAssociationType() {
 		return true;
 	}
 
+	@Override
 	public ForeignKeyDirection getForeignKeyDirection() {
 		return ForeignKeyDirection.FOREIGN_KEY_TO_PARENT;
 	}
@@ -363,14 +397,14 @@ public abstract class CollectionType extends AbstractType implements Association
 				id = entityEntry.getLoadedValue( foreignKeyPropertyName );
 			}
 			else {
-				id = entityEntry.getPersister().getPropertyValue( owner, foreignKeyPropertyName, session.getEntityMode() );
+				id = entityEntry.getPersister().getPropertyValue( owner, foreignKeyPropertyName );
 			}
 
 			// NOTE VERY HACKISH WORKAROUND!!
 			// TODO: Fix this so it will work for non-POJO entity mode
 			Type keyType = getPersister( session ).getKeyType();
 			if ( !keyType.getReturnedClass().isInstance( id ) ) {
-				id = (Serializable) keyType.semiResolve(
+				id = keyType.semiResolve(
 						entityEntry.getLoadedValue( foreignKeyPropertyName ),
 						session,
 						owner 
@@ -399,11 +433,11 @@ public abstract class CollectionType extends AbstractType implements Association
 			Type keyType = getPersister( session ).getKeyType();
 			EntityPersister ownerPersister = getPersister( session ).getOwnerEntityPersister();
 			// TODO: Fix this so it will work for non-POJO entity mode
-			Class ownerMappedClass = ownerPersister.getMappedClass( session.getEntityMode() );
+			Class ownerMappedClass = ownerPersister.getMappedClass();
 			if ( ownerMappedClass.isAssignableFrom( keyType.getReturnedClass() ) &&
 					keyType.getReturnedClass().isInstance( key ) ) {
 				// the key is the owning entity itself, so get the ID from the key
-				ownerId = ownerPersister.getIdentifier( key, session.getEntityMode() );
+				ownerId = ownerPersister.getIdentifier( key, session );
 			}
 			else {
 				// TODO: check if key contains the owner ID
@@ -412,12 +446,14 @@ public abstract class CollectionType extends AbstractType implements Association
 		return ownerId;
 	}
 
+	@Override
 	public Object hydrate(ResultSet rs, String[] name, SessionImplementor session, Object owner) {
 		// can't just return null here, since that would
 		// cause an owning component to become null
 		return NOT_NULL_COLLECTION;
 	}
 
+	@Override
 	public Object resolve(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 		
@@ -431,6 +467,7 @@ public abstract class CollectionType extends AbstractType implements Association
 			getCollection( key, session, owner );
 	}
 
+	@Override
 	public Object semiResolve(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 		throw new UnsupportedOperationException(
@@ -441,23 +478,28 @@ public abstract class CollectionType extends AbstractType implements Association
 		return false;
 	}
 
+	@Override
 	public boolean useLHSPrimaryKey() {
 		return foreignKeyPropertyName == null;
 	}
 
+	@Override
 	public String getRHSUniqueKeyPropertyName() {
 		return null;
 	}
 
+	@Override
 	public Joinable getAssociatedJoinable(SessionFactoryImplementor factory)
 			throws MappingException {
 		return (Joinable) factory.getCollectionPersister( role );
 	}
 
+	@Override
 	public boolean isModified(Object old, Object current, boolean[] checkable, SessionImplementor session) throws HibernateException {
 		return false;
 	}
 
+	@Override
 	public String getAssociatedEntityName(SessionFactoryImplementor factory)
 			throws MappingException {
 		try {
@@ -516,13 +558,89 @@ public abstract class CollectionType extends AbstractType implements Association
 		// on the target because we simply do not know...
 		if ( original instanceof PersistentCollection ) {
 			if ( result instanceof PersistentCollection ) {
-				if ( ! ( ( PersistentCollection ) original ).isDirty() ) {
-					( ( PersistentCollection ) result ).clearDirty();
+				final PersistentCollection originalPersistentCollection = (PersistentCollection) original;
+				final PersistentCollection resultPersistentCollection = (PersistentCollection) result;
+
+				preserveSnapshot( originalPersistentCollection, resultPersistentCollection, elemType, owner, copyCache, session );
+
+				if ( ! originalPersistentCollection.isDirty() ) {
+					resultPersistentCollection.clearDirty();
 				}
 			}
 		}
 
 		return result;
+	}
+
+	private void preserveSnapshot(
+			PersistentCollection original,
+			PersistentCollection result,
+			Type elemType,
+			Object owner,
+			Map copyCache,
+			SessionImplementor session) {
+		Serializable originalSnapshot = original.getStoredSnapshot();
+		Serializable resultSnapshot = result.getStoredSnapshot();
+		Serializable targetSnapshot;
+
+		if ( originalSnapshot instanceof List ) {
+			targetSnapshot = new ArrayList(
+					( (List) originalSnapshot ).size() );
+			for ( Object obj : (List) originalSnapshot ) {
+				( (List) targetSnapshot ).add( elemType.replace( obj, null, session, owner, copyCache ) );
+			}
+
+		}
+		else if ( originalSnapshot instanceof Map ) {
+			if ( originalSnapshot instanceof SortedMap ) {
+				targetSnapshot = new TreeMap( ( (SortedMap) originalSnapshot ).comparator() );
+			}
+			else {
+				targetSnapshot = new HashMap(
+						CollectionHelper.determineProperSizing( ( (Map) originalSnapshot ).size() ),
+						CollectionHelper.LOAD_FACTOR
+				);
+			}
+
+			for ( Map.Entry<Object, Object> entry : ( (Map<Object, Object>) originalSnapshot ).entrySet() ) {
+				Object key = entry.getKey();
+				Object value = entry.getValue();
+				Object resultSnapshotValue = ( resultSnapshot == null )
+						? null
+						: ( (Map<Object, Object>) resultSnapshot ).get( key );
+
+				Object newValue = elemType.replace( value, resultSnapshotValue, session, owner, copyCache );
+
+				if ( key == value ) {
+					( (Map) targetSnapshot ).put( newValue, newValue );
+
+				}
+				else {
+					( (Map) targetSnapshot ).put( key, newValue );
+				}
+
+			}
+
+		}
+		else if ( originalSnapshot instanceof Object[] ) {
+			Object[] arr = (Object[]) originalSnapshot;
+			for ( int i = 0; i < arr.length; i++ ) {
+				arr[i] = elemType.replace( arr[i], null, session, owner, copyCache );
+			}
+			targetSnapshot = originalSnapshot;
+
+		}
+		else {
+			// retain the same snapshot
+			targetSnapshot = resultSnapshot;
+
+		}
+
+		CollectionEntry ce = session.getPersistenceContext().getCollectionEntry( result );
+		if ( ce != null ) {
+			ce.resetStoredSnapshot( result, targetSnapshot );
+		}
+
 	}
 
 	/**
@@ -549,9 +667,7 @@ public abstract class CollectionType extends AbstractType implements Association
 	 */
 	public abstract Object instantiate(int anticipatedSize);
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Object replace(
 			final Object original,
 			final Object target,
@@ -599,13 +715,24 @@ public abstract class CollectionType extends AbstractType implements Association
 		return factory.getCollectionPersister( getRole() ).getElementType();
 	}
 
+	@Override
 	public String toString() {
 		return getClass().getName() + '(' + getRole() + ')';
 	}
 
+	@Override
 	public String getOnCondition(String alias, SessionFactoryImplementor factory, Map enabledFilters)
 			throws MappingException {
 		return getAssociatedJoinable( factory ).filterFragment( alias, enabledFilters );
+	}
+
+	@Override
+	public String getOnCondition(
+			String alias,
+			SessionFactoryImplementor factory,
+			Map enabledFilters,
+			Set<String> treatAsDeclarations) {
+		return getAssociatedJoinable( factory ).filterFragment( alias, enabledFilters, treatAsDeclarations );
 	}
 
 	/**
@@ -620,12 +747,8 @@ public abstract class CollectionType extends AbstractType implements Association
 
 		CollectionPersister persister = getPersister( session );
 		final PersistenceContext persistenceContext = session.getPersistenceContext();
-		final EntityMode entityMode = session.getEntityMode();
+		final EntityMode entityMode = persister.getOwnerEntityPersister().getEntityMode();
 
-		if (entityMode==EntityMode.DOM4J && !isEmbeddedInXML) {
-			return UNFETCHED_COLLECTION;
-		}
-		
 		// check if collection is currently being loaded
 		PersistentCollection collection = persistenceContext.getLoadContexts().locateLoadingCollection( persister, key );
 		
@@ -637,22 +760,29 @@ public abstract class CollectionType extends AbstractType implements Association
 			if ( collection == null ) {
 				// create a new collection wrapper, to be initialized later
 				collection = instantiate( session, persister, key );
+				
 				collection.setOwner(owner);
 	
 				persistenceContext.addUninitializedCollection( persister, collection, key );
 	
 				// some collections are not lazy:
-				if ( initializeImmediately( entityMode ) ) {
+				if ( initializeImmediately() ) {
 					session.initializeCollection( collection, false );
 				}
 				else if ( !persister.isLazy() ) {
 					persistenceContext.addNonLazyCollection( collection );
 				}
 	
-				if ( hasHolder( entityMode ) ) {
+				if ( hasHolder() ) {
 					session.getPersistenceContext().addCollectionHolder( collection );
 				}
 				
+			}
+			
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracef( "Created collection wrapper: %s",
+						MessageHelper.collectionInfoString( persister, collection,
+								key, session ) );
 			}
 			
 		}
@@ -662,28 +792,32 @@ public abstract class CollectionType extends AbstractType implements Association
 		return collection.getValue();
 	}
 
-	public boolean hasHolder(EntityMode entityMode) {
-		return entityMode == EntityMode.DOM4J;
+	public boolean hasHolder() {
+		return false;
 	}
 
-	protected boolean initializeImmediately(EntityMode entityMode) {
-		return entityMode == EntityMode.DOM4J;
+	protected boolean initializeImmediately() {
+		return false;
 	}
 
+	@Override
 	public String getLHSPropertyName() {
 		return foreignKeyPropertyName;
 	}
 
+	@Override
 	public boolean isXMLElement() {
 		return true;
 	}
 
+	@Override
 	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
 		return xml;
 	}
 
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) 
-	throws HibernateException {
+	@Override
+	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory)
+			throws HibernateException {
 		if ( !isEmbeddedInXML ) {
 			node.detach();
 		}
@@ -697,10 +831,12 @@ public abstract class CollectionType extends AbstractType implements Association
 	 * need to incremement version number of owner and also because of 
 	 * how assemble/disassemble is implemented for uks
 	 */
+	@Override
 	public boolean isAlwaysDirtyChecked() {
 		return true; 
 	}
 
+	@Override
 	public boolean[] toColumnNullness(Object value, Mapping mapping) {
 		return ArrayHelper.EMPTY_BOOLEAN_ARRAY;
 	}
