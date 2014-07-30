@@ -9,9 +9,9 @@
 			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/" />
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_3.1_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
 		<attributes>
-			<attribute name="javadoc_location" value="http://docs.oracle.com/cd/E17802_01/products/products/servlet/2.5/docs/servlet-2_5-mr2/"/>
+			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
