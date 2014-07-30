@@ -98,7 +98,7 @@
 	        	<filter token="contentrepository.directory" value="${contentrepository.directory}" />
                 <filter token="temp.directory" value="${contentrepository.base}/temp" />
                 <filter token="dump.directory" value="${contentrepository.base}/dump" />
-	        	<filter token="ear.directory" value="${jboss.home}server/default/deploy/lams.ear" />
+	        	<filter token="ear.directory" value="${jboss.home}/standalone/deployments/lams.ear" />
 	        </filterset>
 		</copy>
 		
@@ -109,7 +109,7 @@
 			 password="${db.password}"
 			 encoding="utf8">
 			<classpath>
-				<fileset dir="../lams_build/lib/wildfly/modules/com/mysql/main" includes="*.jar"/> 
+				<fileset dir="../lams_build/lib/mysql" includes="*.jar"/> 
 			</classpath>
 			
 			<transaction src="${basedir}/build/sql/create_lams_11_db.sql"/>

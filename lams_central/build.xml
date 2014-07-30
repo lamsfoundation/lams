@@ -57,17 +57,17 @@
 	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
 		<echo>Removing cached files</echo>
 		<delete quiet="true">
-			<fileset dir="${jboss.home}server/default/deploy/lams.ear/tmp"/>
-			<fileset dir="${jboss.home}server/default/deploy/lams.ear/work"/>
+			<fileset dir="${jboss.home}/standalone/deployments/lams.ear/tmp"/>
+			<fileset dir="${jboss.home}/standalone/deployments/lams.ear/work"/>
 		</delete>
 				
 		<echo>${ant.project.name}: Deploying exploded WAR</echo>
-		<copy todir="${jboss.home}server/default/deploy/lams.ear/${product}.war">
+		<copy todir="${jboss.home}/standalone/deployments/lams.ear/${product}.war">
 			<fileset dir="${basedir}/build/lib/${product}.war" />
 		</copy>
 		
 		<echo>${ant.project.name}: Copying language files</echo>
-		<copy todir="${jboss.home}server/default/deploy/lams.ear/lams-dictionary.jar" overwrite="true">
+		<copy todir="${jboss.home}/standalone/deployments/lams.ear/lams-dictionary.jar" overwrite="true">
 		   <fileset dir="${basedir}/build/lib/language" />
 		</copy>
 	</target>

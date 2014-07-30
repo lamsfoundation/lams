@@ -138,18 +138,8 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>
-
                 <datasource enabled="true" jndi-name="java:jboss/datasources/jdbc/lams-ds" jta="true" pool-name="jdbc/lams-ds" spy="false" use-ccm="true" use-java-context="true">
 				    <connection-url>@db.url.run@</connection-url>
-				    <driver-class>@db.driver@</driver-class>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
 				    <connection-property name="useUnicode">true</connection-property>

@@ -38,7 +38,7 @@
 		<!-- Internal target: Recreates dirs for compiled output files. -->
 		<echo>${ant.project.name}: Removing cache and build folders</echo>
 		<delete dir="${jboss.home}server/default/tmp" />
-		<delete dir="${jboss.home}server/default/work" />
+		<!-- <delete dir="${jboss.home}server/default/work" /> -->
 		<delete dir="assembly" />
 		
 		<echo>${ant.project.name}: Creating build dir structure</echo>
@@ -74,7 +74,7 @@
 		<ant antfile="../lams_tool_laqa/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_larsrc/build.xml"        target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_leader/build.xml"        target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_nb/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_nb/build.xml"          	target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_notebook/build.xml"      target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_pixlr/build.xml"         target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_sbmt/build.xml"          target="_clean-dirs" inheritAll="false"/>
@@ -86,7 +86,7 @@
 		<ant antfile="../lams_tool_videorecorder/build.xml" target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="_clean-dirs" inheritAll="false"/>
-        	<ant antfile="../lams_tool_wookie/build.xml"        target="_clean-dirs" inheritAll="false"/>
+       	<ant antfile="../lams_tool_wookie/build.xml"    	target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="_clean-dirs" inheritAll="false"/>
 	</target>
 	
@@ -96,11 +96,11 @@
 
 	
 	<target name="copy-tags" description="Copies lams.tld and LAMS Tags from lams-central to other projects.">
-		<ant antfile="../lams_admin/build.xml"             target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_learning/build.xml"          target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_monitoring/build.xml"        target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_gradebook/build.xml"         target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_www/build.xml"               target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_admin/build.xml"              target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_learning/build.xml"           target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_monitoring/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_gradebook/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_www/build.xml"                target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_assessment/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
@@ -114,7 +114,7 @@
 		<ant antfile="../lams_tool_laqa/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_larsrc/build.xml"        target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_leader/build.xml"        target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_nb/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_nb/build.xml"          	target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_mindmap/build.xml"       target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_notebook/build.xml"      target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_pixlr/build.xml"         target="copy-tags" inheritAll="false"/>
@@ -127,7 +127,7 @@
 		<ant antfile="../lams_tool_videorecorder/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
-        	<ant antfile="../lams_tool_wookie/build.xml"        target="copy-tags" inheritAll="false"/>
+        	<ant antfile="../lams_tool_wookie/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="copy-tags" inheritAll="false"/>
 		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS:
 			  Kaltura and other public and private tools</echo>
@@ -136,7 +136,7 @@
 	
 	<target name="build-db" description="Rebuilds LAMS Database.">
 		<echo>Copying embedded MySQL drivers to library dir, if available</echo>
-		<copy todir="../lams_build/lib/wildfly/modules/com/mysql/main" overwrite="false" verbose="true">
+		<copy todir="../lams_build/lib/mysql" overwrite="false" verbose="true">
 			<fileset dir="../mysql_embedded/connectors" erroronmissingdir="false">
 				<include name="*-driver.jar" />
 				<include name="*-db-files-${osPropertiesName}.jar" />
@@ -189,7 +189,7 @@
 				<include name="fckeditor/*.jar" />
 				<include name="jakarta-commons/*.jar" />
 				<include name="jdom/*.jar" />
-				<include name="mysql/*.jar" />
+				<!-- <include name="mysql/*.jar" /> -->
 				<include name="reload/*.jar" />
 				<include name="spring/*.jar" />
 				<include name="struts/*.jar" />
@@ -265,8 +265,8 @@
 	
 	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
 		<echo>Deploying EAR</echo>
-		<delete dir="${jboss.home}server/default/deploy/lams.ear"/>
-		<copy todir="${jboss.home}server/default/deploy/lams.ear">
+		<delete dir="${jboss.home}/standalone/deployments/lams.ear"/>
+		<copy todir="${jboss.home}/standalone/deployments/lams.ear">
 			<fileset dir="assembly/lams.ear" />
 		</copy>
 	</target>
@@ -305,7 +305,7 @@
 		<ant antfile="../lams_tool_larsrc/build.xml"        target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_leader/build.xml"        target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_mindmap/build.xml"       target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_nb/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_notebook/build.xml"      target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_pixlr/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_sbmt/build.xml"          target="deploy-tool" inheritAll="false" />
@@ -343,7 +343,7 @@
 		<property name="library.assembly"     value="assembly/${library.name}" />
 		<property name="library.basedir"      value="librarypackages/${library.name}" />
 		<property name="library.language.src" value="${library.basedir}/language/lams" />
-		<property name="library.language.dst" value="${jboss.home}server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+		<property name="library.language.dst" value="${jboss.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
 
 		<copy todir="${library.assembly}/sql" overwrite="true" verbose="true">
 			<fileset dir="${library.basedir}">
@@ -369,7 +369,7 @@
 		            <token key="assemblylangdir" value="${library.assembly}/language"/>
 		        </replacetokens>
 	            <replacetokens>
-		             <token key="lamsear" value="${jboss.home}server/default/deploy/lams.ear"/>
+		             <token key="lamsear" value="${jboss.home}/standalone/deployments/lams.ear"/>
 		        </replacetokens>
 	        </filterchain>
 	    </copy>
@@ -429,42 +429,18 @@
 		<!-- Internal target: Deploys third party JARs and cofiguration files -->
 		<echo>${ant.project.name}: Deploying additional JARs and configuration files</echo>
 		
-		<copy todir="${jboss.home}server/default/conf" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
-				<include name="login-config.xml" />
-				<include name="jboss-service.xml" />
+		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
+			<fileset dir="lib/mysql">
+				<include name="mysql-connector-java-*.jar" />
+				<include name="module.xml" />
 			</fileset>
-	        <filterset>
-	                <filter token="confdir" value="${jboss.home}server/default/conf" />
-	        </filterset>
 		</copy>
 		
-		
-		<copy todir="${jboss.home}server/default/conf" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
-				<include name="login-config.xml" />
-				<include name="jboss-service.xml" />
+		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}">
+				<include name="standalone.xml" />
 			</fileset>
 	        <filterset>
-	                <filter token="confdir" value="${jboss.home}server/default/conf" />
-	        </filterset>
-		</copy>
-		
-		<copy todir="${jboss.home}server/default/conf/" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
-				<include name="jboss-log4j.xml" />
-			</fileset>
-			<filterset>
-				<filter token="application" value="lams"/>
-			</filterset>
-		</copy>
-
-		<copy todir="${jboss.home}server/default/deploy" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/service">
-				<include name="mysql*.xml" />
-			</fileset>
-	        <filterset>
-	        	<filter token="db.driver" value="com.mysql.jdbc.Driver"/>
 	        	<filter token="db.url.run" value="${db.url.run}"/>
 	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
@@ -472,19 +448,39 @@
 	        </filterset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/deploy/lams.ear" overwrite="true" verbose="true">
+		<!-- 
+		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
+				<include name="login-config.xml" />
+				<include name="jboss-service.xml" />
+			</fileset>
+	        <filterset>
+	                <filter token="confdir" value="${jboss.home}/standalone/configuration" />
+	        </filterset>
+		</copy>
+		
+		<copy todir="${jboss.home}/standalone/configuration/" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
+				<include name="jboss-log4j.xml" />
+			</fileset>
+			<filterset>
+				<filter token="application" value="lams"/>
+			</filterset>
+		</copy>
+		
+		<copy todir="${jboss.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/service">
 				<include name="treecache.xml" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/deployers/jbossweb.deployer/META-INF" overwrite="true" verbose="true">
+		<copy todir="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/jbossweb">
 				<include name="war-deployers-jboss-beans.xml" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/deploy/jbossweb.sar/" overwrite="true" verbose="true">
+		<copy todir="${jboss.home}/standalone/deployments/jbossweb.sar/" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/jbossweb">
 				<include name="server.xml" />
 				<include name="context.xml" />
@@ -497,7 +493,9 @@
 			</fileset>
 		</copy>
 		
+		
 		<ant antfile="../lams_common/build.xml" target="deploy-libraries" inheritAll="false"/>
+		-->
 	</target>
 	
 	
@@ -512,9 +510,12 @@
 	
 	
 	<target name="slim-jboss" description="Makes a backup and removes unnecessary files from JBoss 5.1; do not run twice!">
+		<!-- Fail until it's ready for WildFly -->
+		<fail />
+		
 		<!-- Backup -->
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/deploy">
-			<fileset dir="${jboss.home}server/default/deploy/">
+			<fileset dir="${jboss.home}/standalone/deployments/">
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
@@ -545,7 +546,7 @@
 		</copy>
 		
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers">
-			<fileset dir="${jboss.home}server/default/deployers">
+			<fileset dir="${jboss.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
 				<include name="jboss-ejb3-endpoint-deployer.jar"/>
 				<include name="ejb-deployer-jboss-beans.xml"/>
@@ -564,12 +565,12 @@
 		</copy>
 		
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer"
-			  file="${jboss.home}server/default/deployers/jbossweb.deployer/web.xml"/>
+			  file="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer/META-INF"
-			  file="${jboss.home}server/default/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+			  file="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
 		
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf">
-			<fileset dir="${jboss.home}server/default/conf">
+			<fileset dir="${jboss.home}/standalone/configuration">
 				<include name="bootstrap.xml"/>
 				<include name="standardjboss.xml"/>
 				<include name="jax-ws-catalog.xml"/>
@@ -578,14 +579,14 @@
 		</copy>
 		
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf/props">
-			<fileset dir="${jboss.home}server/default/conf/props">
+			<fileset dir="${jboss.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
 				<include name="jbossws-*.properties"/>
 			</fileset>
 		</copy>
 		
 		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf/bootstrap">
-			<fileset dir="${jboss.home}server/default/conf/bootstrap">
+			<fileset dir="${jboss.home}/standalone/configuration/bootstrap">
 				<include name="deployers.xml"/>
 			</fileset>
 		</copy>
@@ -654,18 +655,18 @@
 		</copy>
 		
 		<!-- Reconfiguration -->
-		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${jboss.home}server/default/conf/bootstrap.xml"/>
-		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${jboss.home}server/default/conf/standardjboss.xml"/>
-		<copy overwrite="yes" file="conf/slim/deployers.xml" tofile="${jboss.home}server/default/conf/bootstrap/deployers.xml"/>
-		<copy overwrite="yes" file="conf/slim/legacy-invokers-service.xml" tofile="${jboss.home}server/default/deploy/legacy-invokers-service.xml"/>
+		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${jboss.home}/standalone/configuration/bootstrap.xml"/>
+		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${jboss.home}/standalone/configuration/standardjboss.xml"/>
+		<copy overwrite="yes" file="conf/slim/deployers.xml" tofile="${jboss.home}/standalone/configuration/bootstrap/deployers.xml"/>
+		<copy overwrite="yes" file="conf/slim/legacy-invokers-service.xml" tofile="${jboss.home}/standalone/deployments/legacy-invokers-service.xml"/>
 		<copy overwrite="yes" file="conf/slim/war-deployers-jboss-beans.xml"
-			                  tofile="${jboss.home}server/default/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+			                  tofile="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
 		<copy overwrite="yes" file="conf/slim/web.xml"
-				              tofile="${jboss.home}server/default/deployers/jbossweb.deployer/web.xml"/>
+				              tofile="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
 		
 		<!-- Delete files -->
 		<delete includeemptydirs="true" verbose="true">
-		    <fileset dir="${jboss.home}server/default/deploy">
+		    <fileset dir="${jboss.home}/standalone/deployments">
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
@@ -692,7 +693,7 @@
                 <include name="management/"/>
 				<include name="ROOT.war/"/>
 		    </fileset>
-			<fileset dir="${jboss.home}server/default/deployers">
+			<fileset dir="${jboss.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
 				<include name="jboss-ejb3-endpoint-deployer.jar"/>
 				<include name="ejb-deployer-jboss-beans.xml"/>
@@ -708,11 +709,11 @@
 				<include name="xnio.deployer/"/>
 				<include name="webbeans.deployer/"/>
 			</fileset>
-			<fileset dir="${jboss.home}server/default/conf">
+			<fileset dir="${jboss.home}/standalone/configuration">
 				<include name="jax-ws-catalog.xml"/>
 				<include name="chap8.keystore"/>	
 			</fileset>
-			<fileset dir="${jboss.home}server/default/conf/props">
+			<fileset dir="${jboss.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
 				<include name="jbossws-*.properties"/>
 			</fileset>
@@ -772,6 +773,9 @@
 	
 	
 	<target name="slim-jboss-revert" description="Reverts changes made by slim-jboss task">
+		<!-- Fail until it's ready for WildFly -->
+		<fail />
+			
 		<copy overwrite="yes" todir="${jboss.home}" verbose="true">
 			<fileset dir="${jboss.home}server/default/slim-backup/">
 				<include name="*/**"/>
