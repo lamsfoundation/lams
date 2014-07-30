@@ -20,7 +20,7 @@
 	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/logging/main/jboss-logging-3.1.4.GA.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/javassist/main/javassist-3.18.1-GA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
