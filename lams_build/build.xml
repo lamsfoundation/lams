@@ -254,7 +254,7 @@
 		
 		<copy todir="assembly/lams.ear/META-INF" verbose="true">
 			<fileset dir="conf/j2ee">
-				<include name="application_5.xsd" />
+				<!-- <include name="application_5.xsd" /> -->
 				<include name="application.xml" />
 			</fileset>
 		</copy>
@@ -430,9 +430,10 @@
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
 				<include name="mysql-connector-java-*.jar" />
-				<include name="module.xml" />
 			</fileset>
 		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/com/mysql/main/module.xml"
+			  file="lib/mysql/mysql-connector-java.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}">

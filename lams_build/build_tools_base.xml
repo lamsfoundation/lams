@@ -63,12 +63,8 @@
 		<taskdef
 			name="schemaexport" 
 			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
-		>
-			<classpath>
-				<path refid="logging.classpath"/>			
-				<path refid="product.classpath"/>
-			</classpath>
-		</taskdef>
+			classpathref="libs.classpath"
+		/>
 			
 		<echo>${ant.project.name}: Preparing Hibernate connection configuration</echo>
 		<copy todir="${basedir}/build" verbose="true">

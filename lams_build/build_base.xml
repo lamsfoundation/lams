@@ -21,14 +21,24 @@
 		<fileset dir="../lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<fileset dir="${jboss.home}/common/lib">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="${jboss.home}/lib">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${jboss.home}/standalone/deployments/jbossweb.sar">
-			<include name="*.jar" />
+		<!-- Same list as in projects' .classpath file references to WIldFly modules.
+			 They need to be exactly listed as **/*.jar would load other versions of JARs
+			 which are also present in lams_build/lib.
+		-->
+		<fileset dir="${jboss.home}/modules/system/layers/base">
+			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
+			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
+			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
+			<include name="org/jboss/logging/main/jboss-logging-*.jar" />
+			<include name="org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-*.jar" />
+			<include name="org/jboss/logmanager/main/jboss-logmanager-*.jar" />
+			<include name="org/slf4j/main/slf4j-api-*.jar" />
+			<include name="org/slf4j/impl/main/slf4j-jboss-logmanager-*.jar" />
+			<include name="org/javassist/main/javassist-*.jar" />
+			<include name="org/apache/xerces/main/xercesImpl-*.jar" />
+			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
+			<include name="javax/mail/api/main/javax.mail-*.jar" />
+			<include name="org/hibernate/main/hibernate-core-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
@@ -39,16 +49,6 @@
 	<path id="product.classpath">
 		<path refid="libs.classpath"/>
 		<pathelement location="${basedir}/build/classes/java"/>
-	</path>
-	
-	<path id="logging.classpath">
-		<fileset dir="${jboss.home}common/lib">
-			<include name="slf4j-api.jar" />
-			<include name="slf4j-jboss-logging.jar" />
-		</fileset>
-		<fileset dir="${jboss.home}lib">
-			<include name="jboss-logging-spi.jar" />
-		</fileset>
 	</path>
 
 	<fileset id="hbm.fileset" dir="${src.java.dir}"
@@ -403,24 +403,22 @@
 			</fileset>
 	 	</copy>
 		
-		<!-- Define JSP compiler -->
+		<!-- Define JSP compiler
 		<path id="jsp.precompile.classpath">
 			<path refid="product.classpath"/>
-			<fileset dir="${jboss.home}/lib">
-				<include name="jboss-common-core.jar" />
-				<include name="jboss-logging-spi.jar" />
+			<fileset dir="${jboss.home}/modules/system/layers/base">
+				<include name="org/jboss/common-core/main/jboss-common-core-*.jar" />
 			</fileset>
+			
 			<fileset dir="${jboss.home}/standalone/deploymentsers/jbossweb.deployer">
 				<include name="*.jar" />
 			</fileset>
-	        <fileset dir="${jboss.home}/standalone/deployments/jbossweb.sar">
-	            <include name="jbossweb.jar" />
-	        </fileset>
 		</path>
+		 -->
 		
 		<taskdef name="jasper2"
 				 classname="org.apache.jasper.JspC"
-			     classpathref="jsp.precompile.classpath"
+			     classpathref="libs.classpath"
 		/>
 		
 		<!-- Generate Java files and put servlet mappings in web.xml file -->
@@ -449,7 +447,7 @@
 	    	   failonerror="true"
 	           srcdir="${basedir}/build/war/WEB-INF/src" 
 		  	   excludes="**/*.smap"
-	    	   classpathref="jsp.precompile.classpath">
+	    	   classpathref="libs.classpath">
 	      <compilerarg line="-encoding utf-8"/>
 	      <include name="**" />
 	      <exclude name="tags/**" />
