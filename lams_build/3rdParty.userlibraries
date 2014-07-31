@@ -46,5 +46,7 @@
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/xstream/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
+        <archive path="/lams_build/lib/jboss/jbossweb.jar" source="/3rdParty_sources/jbossweb"/>
+        <archive path="/lams_build/lib/quartz/quartz.jar" source="/3rdParty_sources/quartz"/>
     </library>
 </eclipse-userlibraries>

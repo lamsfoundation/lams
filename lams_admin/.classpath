@@ -11,11 +11,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.0.Final.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/quartz">
-		<attributes>
-			<attribute name="javadoc_location" value="http://javasourcecode.org/html/open-source/quartz/quartz-1.5.2/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/mail/api/main/javax.mail-1.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
