@@ -34,7 +34,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -92,6 +93,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
+    
+    private IEventNotificationService eventNotificationService;
+    
+    private MessageService messageService;
 
     private NotebookOutputFactory notebookOutputFactory;
 
@@ -408,13 +413,18 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	saveOrUpdateNotebookUser(notebookUser);
 	return notebookUser;
     }
+    
+    @Override
+    public boolean notifyUser(Integer userId, String comment) {
+	boolean isHtmlFormat = false;
 
-    public IAuditService getAuditService() {
-	return auditService;
+	return eventNotificationService.sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+		getLocalisedMessage("event.teacher.comment.subject", new Object[] {}),
+		getLocalisedMessage("event.teacher.comment.body", new Object[] { comment }), isHtmlFormat);
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    private String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -515,12 +525,28 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	this.exportContentService = exportContentService;
     }
 
+    public IAuditService getAuditService() {
+	return auditService;
+    }
+
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+
     public ICoreNotebookService getCoreNotebookService() {
 	return coreNotebookService;
     }
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
+    
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
     }
 
     public NotebookOutputFactory getNotebookOutputFactory() {
