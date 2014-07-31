@@ -254,7 +254,6 @@
 		
 		<copy todir="assembly/lams.ear/META-INF" verbose="true">
 			<fileset dir="conf/j2ee">
-				<!-- <include name="application_5.xsd" /> -->
 				<include name="application.xml" />
 			</fileset>
 		</copy>
