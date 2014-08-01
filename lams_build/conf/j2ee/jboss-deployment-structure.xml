@@ -43,6 +43,7 @@
       <module name="org.apache.lucene" slot="2.4" />
       <module name="org.quartz" />
       <module name="uk.ac.reload" />
+      <module name="org.springframework" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
