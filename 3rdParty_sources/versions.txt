@@ -15,7 +15,7 @@ Commons HttpClient 3.0
 
 Commons Lang 2.6
 
-Commons IO 2.1
+Commons IO 2.4
 
 gson 2.2.4
 

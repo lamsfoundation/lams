@@ -33,7 +33,6 @@ jakarta-commons   commons-codec-1.3.jar                 1.3                    A
                   commons-discovery-0.2.jar             0.2                    Apache Software License 1.1   Apache Software Foundation       
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
                   commons-httpclient-3.0.jar			3.0					   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
-                  commons-lang.jar                      2.6                    Apache Software License 1.1   Apache Software Foundation       Jakarta Commons Lang
                   commons-logging.jar                   1.0.4                  Apache License 2.0            Apache Software Foundation       
                   commons-validator.jar                 1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
 
