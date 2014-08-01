@@ -527,7 +527,18 @@
 		</copy>
 		<copy tofile="${jboss.home}/modules/system/layers/base/com/flagstone/main/module.xml"
 			  file="lib/flagstone/flagstone.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
+			<fileset dir="lib/fileupload">
+				<include name="commons-fileupload.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
+			  file="lib/fileupload/fileupload.module.xml" overwrite="true" verbose="true" />
 			
+		
 		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
