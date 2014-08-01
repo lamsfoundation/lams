@@ -620,6 +620,16 @@
 		
 		
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/lucene/2.4" overwrite="true" verbose="true">
+			<fileset dir="lib/lucene">
+				<include name="lucene-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/lucene/2.4/module.xml"
+			  file="lib/lucene/lucene.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
 				<include name="mysql-connector-java-*.jar" />
