@@ -15,8 +15,6 @@ autopatch		  tk-autopatch-1.2.0-b2-cvs.jar			1.2.0				   Apache License				 Taci
 
 axis              axis-ant.jar							1.4                    Apache License 2.0      	     Apache							  XML based Web service framework                                                                                          
                   axis.jar								1.4																					                                                                                                               
-                  jaxrpc.jar							1.1                    CDDL 1.0                      Oracle							  Java API for XML-based RPC                                                                        
-                  saaj.jar								1.2                    CDDL 1.1 + GPL 2                                               SOAP with Attachments API for Java                                       
                   wsdl4j-1.5.1.jar                      1.5.1                  Common Public License 1.0     IBM                              JWSDL
 
 batik             batik-1.7.jar                         1.7                    Apache License 2.0            Apache                           toolkit for manipulating images in SVG format
