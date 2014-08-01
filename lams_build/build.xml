@@ -723,6 +723,9 @@
 		<copy tofile="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main/module.xml"
 			  file="lib/xstream/xstream.module.xml" overwrite="true" verbose="true" />
 		
+
+		
+		<ant antfile="../lams_common/build.xml" target="deploy-libraries" inheritAll="false"/>
 		
 		
 		
@@ -783,9 +786,6 @@
 				<include name="*.jar" />
 			</fileset>
 		</copy>
-		
-		
-		<ant antfile="../lams_common/build.xml" target="deploy-libraries" inheritAll="false"/>
 		-->
 	</target>
 	

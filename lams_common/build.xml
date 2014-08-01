@@ -72,13 +72,16 @@
 
 	
 	<target name="deploy-libraries" depends="_build-jar" description="Deploys library JARs.">
-		<echo>Deploying library JARs</echo>
-		<copy todir="${server.home}server/default/lib" overwrite="true" verbose="true">
-			<fileset dir="${basedir}/build/lib/">
-				<include name="lams-session.jar" />
-				<include name="lams-valve.jar" />
-			</fileset>
-		</copy>
+		<echo>Deploying library JARs as WildFly modules</echo>
+		<copy todir="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/session/main" 
+			  file="${basedir}/build/lib/lams-session.jar" overwrite="true" verbose="true" />
+		<copy tofile="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/session/main/module.xml"
+			  file="${basedir}/conf/module_descriptors/session.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/valve/main" 
+			  file="${basedir}/build/lib/lams-valve.jar" overwrite="true" verbose="true" />
+		<copy tofile="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/valve/main/module.xml"
+			  file="${basedir}/conf/module_descriptors/valve.module.xml" overwrite="true" verbose="true" />
 	</target>
 	
 	
