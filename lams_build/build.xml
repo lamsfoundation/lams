@@ -546,6 +546,14 @@
 		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
 			  file="lib/jakarta-commons/httpclient.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-validator.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
+			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
+		
 		
 		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
