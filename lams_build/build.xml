@@ -405,7 +405,7 @@
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
-			  file="lib/mysql/poi.module.xml" overwrite="true" verbose="true" />
+			  file="lib/apache-poi/poi.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
@@ -413,7 +413,7 @@
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
-			  file="lib/pache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
+			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
