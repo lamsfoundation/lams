@@ -531,13 +531,21 @@
 		
 		
 		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
-			<fileset dir="lib/fileupload">
+			<fileset dir="lib/jakarta-commons">
 				<include name="commons-fileupload.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
-			  file="lib/fileupload/fileupload.module.xml" overwrite="true" verbose="true" />
-			
+			  file="lib/jakarta-commons/fileupload.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/httpclient/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-httpclient.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
+			  file="lib/jakarta-commons/httpclient.module.xml" overwrite="true" verbose="true" />
+		
 		
 		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">

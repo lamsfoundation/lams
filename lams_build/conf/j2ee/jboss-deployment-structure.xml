@@ -31,6 +31,7 @@
       <module name="org.apache.commons.codec" />
       <module name="org.apache.commons.pool" />
       <module name="org.apache.commons.fileupload" />
+      <module name="org.apache.commons.httpclient" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
