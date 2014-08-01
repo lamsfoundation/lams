@@ -25,7 +25,6 @@
         <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/xstream/xstream-1.1.3.jar" source="/3rdParty_sources/xstream"/>
-        <archive path="/lams_build/lib/xstream/xom-1.0b3.jar"/>
         <archive path="/lams_build/lib/xstream/xpp3-1.1.3.4d_b4_min.jar"/>
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
