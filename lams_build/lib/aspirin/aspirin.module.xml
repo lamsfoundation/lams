@@ -28,6 +28,6 @@
   </resources>
   <dependencies>
     <module name="org.xbill.dns"/>
-    <module name="org.apache.commons.pool" slot="1.5"/>
+    <module name="org.apache.commons.pool"/>
   </dependencies>
 </module>

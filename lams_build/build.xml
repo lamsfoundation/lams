@@ -452,14 +452,6 @@
 		<copy tofile="${jboss.home}/modules/system/layers/base/org/xbill/dns/main/module.xml"
 			  file="lib/aspirin/dnsjava.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/pool/1.5" overwrite="true" verbose="true">
-			<fileset dir="lib/aspirin">
-				<include name="commons-pool-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/pool/1.5/module.xml"
-			  file="lib/aspirin/commons.module.xml" overwrite="true" verbose="true" />
-		
 		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/aspirin/main" overwrite="true" verbose="true">
 			<fileset dir="lib/aspirin">
 				<include name="aspirin.jar" />
