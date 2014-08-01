@@ -670,6 +670,32 @@
 		
 		
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/oro/main" overwrite="true" verbose="true">
+			<fileset dir="lib/struts">
+				<include name="jakarta-oro.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/oro/main/module.xml"
+			  file="lib/struts/jakarta-oro.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/struts/main" overwrite="true" verbose="true">
+			<fileset dir="lib/struts">
+				<include name="struts.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/struts/main/module.xml"
+			  file="lib/struts/struts.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/strutsel/main" overwrite="true" verbose="true">
+			<fileset dir="lib/struts">
+				<include name="struts-el.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/strutsel/main/module.xml"
+			  file="lib/struts/struts-el.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		
 		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
