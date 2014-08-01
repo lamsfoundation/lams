@@ -189,7 +189,7 @@
 			toolInsertScriptPath="${basedir}/build/deploy/sql/tool_insert.sql" 
 			toolDBVersionScriptPath="${basedir}/build/deploy/sql/db_version_insert.sql"
 			toolApplicationContextPath="/${product.path.filesystem}/${tool.application.context.file}"
-			lamsEarPath="${jboss.home}/standalone/deployments/lams.ear"
+			lamsEarPath="${server.home}/standalone/deployments/lams.ear"
 			toolContext="${toolContext}" 
 			toolWebUri="${product}.war"
 			languageFilesPackage="${product.path.java}">

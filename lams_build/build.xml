@@ -37,8 +37,8 @@
 	<target name="_clean-dirs">
 		<!-- Internal target: Recreates dirs for compiled output files. -->
 		<echo>${ant.project.name}: Removing cache and build folders</echo>
-		<delete dir="${jboss.home}server/default/tmp" />
-		<!-- <delete dir="${jboss.home}server/default/work" /> -->
+		<delete dir="${server.home}server/default/tmp" />
+		<!-- <delete dir="${server.home}server/default/work" /> -->
 		<delete dir="assembly" />
 		
 		<echo>${ant.project.name}: Creating build dir structure</echo>
@@ -235,8 +235,8 @@
 	
 	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
 		<echo>Deploying EAR</echo>
-		<delete dir="${jboss.home}/standalone/deployments/lams.ear"/>
-		<copy todir="${jboss.home}/standalone/deployments/lams.ear">
+		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
+		<copy todir="${server.home}/standalone/deployments/lams.ear">
 			<fileset dir="assembly/lams.ear" />
 		</copy>
 	</target>
@@ -313,7 +313,7 @@
 		<property name="library.assembly"     value="assembly/${library.name}" />
 		<property name="library.basedir"      value="librarypackages/${library.name}" />
 		<property name="library.language.src" value="${library.basedir}/language/lams" />
-		<property name="library.language.dst" value="${jboss.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
 
 		<copy todir="${library.assembly}/sql" overwrite="true" verbose="true">
 			<fileset dir="${library.basedir}">
@@ -339,7 +339,7 @@
 		            <token key="assemblylangdir" value="${library.assembly}/language"/>
 		        </replacetokens>
 	            <replacetokens>
-		             <token key="lamsear" value="${jboss.home}/standalone/deployments/lams.ear"/>
+		             <token key="lamsear" value="${server.home}/standalone/deployments/lams.ear"/>
 		        </replacetokens>
 	        </filterchain>
 	    </copy>
@@ -399,335 +399,335 @@
 		<!-- Internal target: Deploys third party JARs and cofiguration files -->
 		<echo>${ant.project.name}: Deploying libraries as WildFly modules</echo>
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/poi/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/poi/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="poi-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
 			  file="lib/mysql/poi.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="xmlbeans-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
 			  file="lib/pache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/xbill/dns/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/xbill/dns/main" overwrite="true" verbose="true">
 			<fileset dir="lib/aspirin">
 				<include name="dnsjava-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/xbill/dns/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/xbill/dns/main/module.xml"
 			  file="lib/aspirin/dnsjava.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/aspirin/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/aspirin/main" overwrite="true" verbose="true">
 			<fileset dir="lib/aspirin">
 				<include name="aspirin.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/aspirin/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/aspirin/main/module.xml"
 			  file="lib/aspirin/aspirin.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
 			<fileset dir="lib/autopatch">
 				<include name="tk-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main/module.xml"
 			  file="lib/autopatch/autopatch.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
 			<fileset dir="lib/axis">
 				<include name="wsdl4j-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/javax/wsdl4j/api/1.5/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5/module.xml"
 			  file="lib/axis/wsdl4j.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/axis/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/axis/main" overwrite="true" verbose="true">
 			<fileset dir="lib/axis">
 				<include name="axis*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/axis/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/axis/main/module.xml"
 			  file="lib/axis/axis.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
 			<fileset dir="lib/batik">
 				<include name="batik-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
 			  file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/net/sf/cglib/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/net/sf/cglib/main" overwrite="true" verbose="true">
 			<fileset dir="lib/cglib">
 				<include name="cglib_*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/net/sf/cglib/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/net/sf/cglib/main/module.xml"
 			  file="lib/cglib/cglib.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/fckeditor">
 				<include name="fckeditor-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
 			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/com/flagstone/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/flagstone/main" overwrite="true" verbose="true">
 			<fileset dir="lib/flagstone">
 				<include name="*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/flagstone/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/flagstone/main/module.xml"
 			  file="lib/flagstone/flagstone.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-fileupload.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
 			  file="lib/jakarta-commons/fileupload.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/httpclient/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-httpclient.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
 			  file="lib/jakarta-commons/httpclient.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-validator.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
 			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/hibernate/cache/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/hibernate/cache/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jboss">
 				<include name="hibernate-jbosscache*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/hibernate/cache/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/hibernate/cache/main/module.xml"
 			  file="lib/jboss/hibernate-jbosscache.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/jboss/cache/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/jboss/cache/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jboss">
 				<include name="jbosscache-core.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/jboss/cache/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/jboss/cache/main/module.xml"
 			  file="lib/jboss/jbosscache-core.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/jgroups/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/jgroups/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jboss">
 				<include name="jgroups-all.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/jgroups/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/jgroups/main/module.xml"
 			  file="lib/jboss/jgroups.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/jboss/jbossweb/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jboss">
 				<include name="jbossweb.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/jboss/jbossweb/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main/module.xml"
 			  file="lib/jboss/jbossweb.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/jdom/0.7" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/jdom/0.7" overwrite="true" verbose="true">
 			<fileset dir="lib/jdom">
 				<include name="jdom.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/jdom/0.7/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/jdom/0.7/module.xml"
 			  file="lib/jdom/jdom.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/verisign/joid/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/verisign/joid/main" overwrite="true" verbose="true">
 			<fileset dir="lib/joid">
 				<include name="joid.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/verisign/joid/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/verisign/joid/main/module.xml"
 			  file="lib/joid/joid.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
 			<fileset dir="lib/json">
 				<include name="gson-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/google/gson/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/google/gson/main/module.xml"
 			  file="lib/json/gson.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/lucene/2.4" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/lucene/2.4" overwrite="true" verbose="true">
 			<fileset dir="lib/lucene">
 				<include name="lucene-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/lucene/2.4/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/lucene/2.4/module.xml"
 			  file="lib/lucene/lucene.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
 				<include name="mysql-connector-java-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/mysql/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/mysql/main/module.xml"
 			  file="lib/mysql/mysql-connector-java.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/quartz/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/quartz/main" overwrite="true" verbose="true">
 			<fileset dir="lib/quartz">
 				<include name="quartz.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/quartz/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/quartz/main/module.xml"
 			  file="lib/quartz/quartz.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/uk/ac/reload/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/uk/ac/reload/main" overwrite="true" verbose="true">
 			<fileset dir="lib/reload">
 				<include name="reload-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/uk/ac/reload/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/uk/ac/reload/main/module.xml"
 			  file="lib/reload/reload.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/springframework/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/springframework/main" overwrite="true" verbose="true">
 			<fileset dir="lib/spring">
 				<include name="*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/springframework/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/springframework/main/module.xml"
 			  file="lib/spring/spring.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/oro/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/oro/main" overwrite="true" verbose="true">
 			<fileset dir="lib/struts">
 				<include name="jakarta-oro.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/oro/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/oro/main/module.xml"
 			  file="lib/struts/jakarta-oro.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/struts/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/struts/main" overwrite="true" verbose="true">
 			<fileset dir="lib/struts">
 				<include name="struts.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/struts/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/struts/main/module.xml"
 			  file="lib/struts/struts.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/strutsel/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/strutsel/main" overwrite="true" verbose="true">
 			<fileset dir="lib/struts">
 				<include name="struts-el.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/strutsel/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/strutsel/main/module.xml"
 			  file="lib/struts/struts-el.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/tuckey/urlrewrite/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main" overwrite="true" verbose="true">
 			<fileset dir="lib/urlrewritefilter">
 				<include name="urlrewrite-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
 			  file="lib/urlrewritefilter/urlrewrite.module.xml" overwrite="true" verbose="true" />
 			  	
 		
 			  	
-		<copy todir="${jboss.home}/modules/system/layers/base/com/allaire/wddx/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/allaire/wddx/main" overwrite="true" verbose="true">
 			<fileset dir="lib/wddx">
 				<include name="wddx.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/allaire/wddx/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/allaire/wddx/main/module.xml"
 			  file="lib/wddx/wddx.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/xmlcommons/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xml-commons">
 				<include name="xml-apis*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/xmlcommons/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main/module.xml"
 			  file="lib/xml-commons/xmlcommons.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/xmlpull/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/xmlpull/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">
 				<include name="xpp3-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/xmlpull/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/xmlpull/main/module.xml"
 			  file="lib/xstream/xpp.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/org/joda/time/2.1" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/joda/time/2.1" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">
 				<include name="joda-time-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/org/joda/time/2.1/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/joda/time/2.1/module.xml"
 			  file="lib/xstream/joda.module.xml" overwrite="true" verbose="true" />
 		
-		<copy todir="${jboss.home}/modules/system/layers/base/com/thoughtworks/xstream/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">
 				<include name="xstream-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${jboss.home}/modules/system/layers/base/com/thoughtworks/xstream/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main/module.xml"
 			  file="lib/xstream/xstream.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
 		
 		<echo>${ant.project.name}: Deploying configuration files</echo>
-		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}">
 				<include name="standalone.xml" />
 			</fileset>
@@ -740,17 +740,17 @@
 		</copy>
 		
 		<!-- 
-		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
 				<include name="login-config.xml" />
 				<include name="jboss-service.xml" />
 			</fileset>
 	        <filterset>
-	                <filter token="confdir" value="${jboss.home}/standalone/configuration" />
+	                <filter token="confdir" value="${server.home}/standalone/configuration" />
 	        </filterset>
 		</copy>
 		
-		<copy todir="${jboss.home}/standalone/configuration/" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/configuration/" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
 				<include name="jboss-log4j.xml" />
 			</fileset>
@@ -759,26 +759,26 @@
 			</filterset>
 		</copy>
 		
-		<copy todir="${jboss.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/service">
 				<include name="treecache.xml" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/jbossweb">
 				<include name="war-deployers-jboss-beans.xml" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}/standalone/deployments/jbossweb.sar/" overwrite="true" verbose="true">
+		<copy todir="${server.home}/standalone/deployments/jbossweb.sar/" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/jbossweb">
 				<include name="server.xml" />
 				<include name="context.xml" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/lib" overwrite="true">	
+		<copy todir="${server.home}server/default/lib" overwrite="true">	
 			<fileset dir="lib/jboss">
 				<include name="*.jar" />
 			</fileset>
@@ -805,8 +805,8 @@
 		<fail />
 		
 		<!-- Backup -->
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/deploy">
-			<fileset dir="${jboss.home}/standalone/deployments/">
+		<copy todir="${server.home}server/default/slim-backup/server/default/deploy">
+			<fileset dir="${server.home}/standalone/deployments/">
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
@@ -836,8 +836,8 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers">
-			<fileset dir="${jboss.home}/standalone/deploymentsers">
+		<copy todir="${server.home}server/default/slim-backup/server/default/deployers">
+			<fileset dir="${server.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
 				<include name="jboss-ejb3-endpoint-deployer.jar"/>
 				<include name="ejb-deployer-jboss-beans.xml"/>
@@ -855,13 +855,13 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer"
-			  file="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer/META-INF"
-			  file="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+		<copy todir="${server.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer"
+			  file="${server.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
+		<copy todir="${server.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer/META-INF"
+			  file="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf">
-			<fileset dir="${jboss.home}/standalone/configuration">
+		<copy todir="${server.home}server/default/slim-backup/server/default/conf">
+			<fileset dir="${server.home}/standalone/configuration">
 				<include name="bootstrap.xml"/>
 				<include name="standardjboss.xml"/>
 				<include name="jax-ws-catalog.xml"/>
@@ -869,20 +869,20 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf/props">
-			<fileset dir="${jboss.home}/standalone/configuration/props">
+		<copy todir="${server.home}server/default/slim-backup/server/default/conf/props">
+			<fileset dir="${server.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
 				<include name="jbossws-*.properties"/>
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/default/conf/bootstrap">
-			<fileset dir="${jboss.home}/standalone/configuration/bootstrap">
+		<copy todir="${server.home}server/default/slim-backup/server/default/conf/bootstrap">
+			<fileset dir="${server.home}/standalone/configuration/bootstrap">
 				<include name="deployers.xml"/>
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/server/">
+		<copy todir="${server.home}server/default/slim-backup/server/">
 			<fileset dir="${jboss.server}">
 				<include name="all/"/>
 				<include name="minimal"/>
@@ -891,8 +891,8 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/bin/">
-			<fileset dir="${jboss.home}/bin">
+		<copy todir="${server.home}server/default/slim-backup/bin/">
+			<fileset dir="${server.home}/bin">
 				<include name="password_tool.sh"/>
 				<include name="probe*"/>
 				<include name="twiddle*"/>
@@ -900,8 +900,8 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/common/lib/">
-			<fileset dir="${jboss.home}/common/lib">
+		<copy todir="${server.home}server/default/slim-backup/common/lib/">
+			<fileset dir="${server.home}/common/lib">
 				<include name="antlr.jar"/>
 				<include name="autonumber-plugin.jar"/>
 				<include name="bcel.jar"/>
@@ -937,8 +937,8 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.home}server/default/slim-backup/">
-			<fileset dir="${jboss.home}/">
+		<copy todir="${server.home}server/default/slim-backup/">
+			<fileset dir="${server.home}/">
 				<include name="jar-versions.xml"/>
 				<include name="readme.html"/>
 				<include name="docs/"/>
@@ -946,18 +946,18 @@
 		</copy>
 		
 		<!-- Reconfiguration -->
-		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${jboss.home}/standalone/configuration/bootstrap.xml"/>
-		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${jboss.home}/standalone/configuration/standardjboss.xml"/>
-		<copy overwrite="yes" file="conf/slim/deployers.xml" tofile="${jboss.home}/standalone/configuration/bootstrap/deployers.xml"/>
-		<copy overwrite="yes" file="conf/slim/legacy-invokers-service.xml" tofile="${jboss.home}/standalone/deployments/legacy-invokers-service.xml"/>
+		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${server.home}/standalone/configuration/bootstrap.xml"/>
+		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${server.home}/standalone/configuration/standardjboss.xml"/>
+		<copy overwrite="yes" file="conf/slim/deployers.xml" tofile="${server.home}/standalone/configuration/bootstrap/deployers.xml"/>
+		<copy overwrite="yes" file="conf/slim/legacy-invokers-service.xml" tofile="${server.home}/standalone/deployments/legacy-invokers-service.xml"/>
 		<copy overwrite="yes" file="conf/slim/war-deployers-jboss-beans.xml"
-			                  tofile="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+			                  tofile="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
 		<copy overwrite="yes" file="conf/slim/web.xml"
-				              tofile="${jboss.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
+				              tofile="${server.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
 		
 		<!-- Delete files -->
 		<delete includeemptydirs="true" verbose="true">
-		    <fileset dir="${jboss.home}/standalone/deployments">
+		    <fileset dir="${server.home}/standalone/deployments">
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
@@ -984,7 +984,7 @@
                 <include name="management/"/>
 				<include name="ROOT.war/"/>
 		    </fileset>
-			<fileset dir="${jboss.home}/standalone/deploymentsers">
+			<fileset dir="${server.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
 				<include name="jboss-ejb3-endpoint-deployer.jar"/>
 				<include name="ejb-deployer-jboss-beans.xml"/>
@@ -1000,11 +1000,11 @@
 				<include name="xnio.deployer/"/>
 				<include name="webbeans.deployer/"/>
 			</fileset>
-			<fileset dir="${jboss.home}/standalone/configuration">
+			<fileset dir="${server.home}/standalone/configuration">
 				<include name="jax-ws-catalog.xml"/>
 				<include name="chap8.keystore"/>	
 			</fileset>
-			<fileset dir="${jboss.home}/standalone/configuration/props">
+			<fileset dir="${server.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
 				<include name="jbossws-*.properties"/>
 			</fileset>
@@ -1014,13 +1014,13 @@
 				<include name="standard/"/>
 				<include name="web/"/>
 			</fileset>
-		    <fileset dir="${jboss.home}/bin">
+		    <fileset dir="${server.home}/bin">
 				<include name="password_tool.sh"/>
 				<include name="probe*"/>
 				<include name="twiddle*"/>
 				<include name="ws*"/>
 		    </fileset>
-			<fileset dir="${jboss.home}/common/lib">
+			<fileset dir="${server.home}/common/lib">
 				<include name="antlr.jar"/>
 				<include name="autonumber-plugin.jar"/>
 				<include name="bcel.jar"/>
@@ -1054,7 +1054,7 @@
 				<include name="scheduler-*.jar"/>
 				<include name="xnio-api.jar"/>
 			</fileset>
-		    <fileset dir="${jboss.home}">
+		    <fileset dir="${server.home}">
 				<include name="docs/"/>
 				<include name="jar-versions.xml"/>
 				<include name="readme.html"/>
@@ -1067,8 +1067,8 @@
 		<!-- Fail until it's ready for WildFly -->
 		<fail />
 			
-		<copy overwrite="yes" todir="${jboss.home}" verbose="true">
-			<fileset dir="${jboss.home}server/default/slim-backup/">
+		<copy overwrite="yes" todir="${server.home}" verbose="true">
+			<fileset dir="${server.home}server/default/slim-backup/">
 				<include name="*/**"/>
 			</fileset>
 		</copy>

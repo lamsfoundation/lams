@@ -25,7 +25,7 @@
 			 They need to be exactly listed as **/*.jar would load other versions of JARs
 			 that are also present in lams_build/lib.
 		-->
-		<fileset dir="${jboss.home}/modules/system/layers/base">
+		<fileset dir="${server.home}/modules/system/layers/base">
 			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
 			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
 			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
@@ -103,8 +103,8 @@
 	<target name="_clean-dirs">
 		<!-- Internal target: Recreates dirs for compiled output files. -->
 		<echo>${ant.project.name}: Removing cache and build folders</echo>
-		<delete dir="${jboss.home}server/default/tmp" quiet="true" />
-		<delete dir="${jboss.home}server/default/work" quiet="true" />
+		<delete dir="${server.home}server/default/tmp" quiet="true" />
+		<delete dir="${server.home}server/default/work" quiet="true" />
 		<delete dir="${basedir}/build" quiet="true" />
 				
 		<echo>${ant.project.name}: Creating build dir structure</echo>
@@ -302,16 +302,16 @@
 	
 	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">	
 		<echo>${ant.project.name}: Deploying JAR</echo>
-		<copy file="${basedir}/build/lib/${product}.jar" todir="${jboss.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
+		<copy file="${basedir}/build/lib/${product}.jar" todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
 	</target>
 	
 	
 	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
 		<echo>${ant.project.name}: Deploying WAR</echo>
-		<copy file="${basedir}/build/lib/${product}.war" todir="${jboss.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
+		<copy file="${basedir}/build/lib/${product}.war" todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
 		
 		<echo>Copying language files for ${ant.project.name}, if exist</echo>
-		<copy todir="${jboss.home}/standalone/deployments/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		<copy todir="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
 		   <fileset dir="${conf.dir}/language/lams" erroronmissingdir="false">
 		    <include name="**/*.properties"/>
 		    <include name="**/*.txt"/>
@@ -336,12 +336,12 @@
 		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" quiet="true" />
 		<echo>${ant.project.name}: Enable module in EAR config files</echo>
 		<!-- Remove existing entries first, so it is possible to run target multiple times -->
-		<replaceregexp file="${jboss.home}/standalone/deployments/lams.ear/META-INF/application.xml"
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml"
 					   flags="gi"
 		               match="${moduleActivationEntry}" 
 			           replace=""
 		/>
-		<replaceregexp file="${jboss.home}/standalone/deployments/lams.ear/META-INF/application.xml"
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml"
 			 		   flags="i"
 			           match="(${moduleActivationPlaceholder})"
 			           replace="${moduleActivationEntry}    \1"
@@ -352,16 +352,16 @@
 	<!-- Explode WAR                                        				 -->
 	<!-- =================================================================== -->
 	
-	<available property="product.war.exists" file="${jboss.home}/standalone/deployments/lams.ear/${product}.war" type="file" />
+	<available property="product.war.exists" file="${server.home}/standalone/deployments/lams.ear/${product}.war" type="file" />
 	
 	<target name="explode-war" if="product.war.exists" description="Explodes deployed WAR to folder.">
 		<echo>${ant.project.name}: Renaming existing WAR</echo>
-		<move tofile="${jboss.home}/standalone/deployments/lams.ear/temp-${product}.war" file="${jboss.home}/standalone/deployments/lams.ear/${product}.war" />
+		<move tofile="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" file="${server.home}/standalone/deployments/lams.ear/${product}.war" />
 		<echo>${ant.project.name}: Exploding WAR to folder</echo>
-		<unjar src="${jboss.home}/standalone/deployments/lams.ear/temp-${product}.war" dest="${jboss.home}/standalone/deployments/lams.ear/${product}.war" />
+		<unjar src="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" dest="${server.home}/standalone/deployments/lams.ear/${product}.war" />
 		<echo>${ant.project.name}: Removing temporary WAR</echo>
 		<delete>
-			<fileset dir="${jboss.home}/standalone/deployments/lams.ear">
+			<fileset dir="${server.home}/standalone/deployments/lams.ear">
 				<include name="temp-${product}.war" />
 			</fileset>
 		</delete>
@@ -370,7 +370,7 @@
 	
 	<target name="explode-war-synchronize" description="Copies web files into exploded WAR folder.">
 		<echo>Overwriting deployed ${ant.project.name} web files with source files</echo>
-		<copy todir="${jboss.home}/standalone/deployments/lams.ear/${product}.war" verbose="yes">
+		<copy todir="${server.home}/standalone/deployments/lams.ear/${product}.war" verbose="yes">
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.*" />
 			</fileset>
@@ -380,10 +380,10 @@
 	
 	<target name="explode-war-delete" description="Deletes exploded WAR folder.">
 		<echo>${ant.project.name}: Removing WAR folder</echo>
-		<delete dir="${jboss.home}/standalone/deployments/lams.ear/${product}.war" quiet="true" />
+		<delete dir="${server.home}/standalone/deployments/lams.ear/${product}.war" quiet="true" />
 
 		<echo>Removing temporary WAR for ${ant.project.name}, if exists</echo>
-		<delete file="${jboss.home}/standalone/deployments/lams.ear/temp-${product}.war" quiet="true" />
+		<delete file="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" quiet="true" />
 	</target>
 	
 	
@@ -412,11 +412,11 @@
 		<!-- Define JSP compiler
 		<path id="jsp.precompile.classpath">
 			<path refid="product.classpath"/>
-			<fileset dir="${jboss.home}/modules/system/layers/base">
+			<fileset dir="${server.home}/modules/system/layers/base">
 				<include name="org/jboss/common-core/main/jboss-common-core-*.jar" />
 			</fileset>
 			
-			<fileset dir="${jboss.home}/standalone/deploymentsers/jbossweb.deployer">
+			<fileset dir="${server.home}/standalone/deploymentsers/jbossweb.deployer">
 				<include name="*.jar" />
 			</fileset>
 		</path>
