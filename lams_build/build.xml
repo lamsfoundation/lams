@@ -178,33 +178,6 @@
 		<!-- Internal target: Assembles LAMS EAR in exploded form -->
 		<echo>${ant.project.name}: Copying libraries</echo>
 		<copy todir="assembly/lams.ear" flatten="true">
-			<fileset dir="lib">
-				<!--  the desired jars should be nominated explicitly -->
-				<include name="apache-poi/*.jar" />
-				<include name="aspirin/*.jar" />
-				<include name="autopatch/*.jar" />
-				<include name="axis/*.jar" />
-				<include name="batik/*.jar" />
-				<include name="cglib/*.jar" />
-				<include name="fckeditor/*.jar" />
-				<include name="jakarta-commons/*.jar" />
-				<include name="jdom/*.jar" />
-				<!-- <include name="mysql/*.jar" /> -->
-				<include name="reload/*.jar" />
-				<include name="spring/*.jar" />
-				<include name="struts/*.jar" />
-				<include name="wddx/*.jar" />
-				<include name="concurrent/*.jar" />	
-				<include name="xml-commons/*.jar" />
-				<include name="xstream/*.jar" />		
-				<include name="flagstone/*.jar" />
-				<include name="lucene/*.jar" />
-				<include name="excel/*.jar" />
-				<include name="csv/*.jar" />
-				<include name="joid/*.jar" />
-				<include name="urlrewritefilter/*.jar" />
-				<include name="json/*.jar" />
-			</fileset> 
 			<fileset dir="..">
 				<include name="lams_common/build/lib/lams.jar" />
 				<include name="lams_contentrepository/build/lib/*.jar" />
