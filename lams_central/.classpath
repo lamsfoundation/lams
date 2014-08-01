@@ -33,5 +33,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

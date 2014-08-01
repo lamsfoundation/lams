@@ -44,6 +44,7 @@
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-*.jar" /> <!-- Alias for Commons Logging -->
+			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
