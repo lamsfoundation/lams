@@ -46,6 +46,8 @@
       <module name="org.springframework" />
       <module name="org.apache.struts" /> <!-- depends on: antlr, apache oro -->
       <module name="org.apache.strutsel" /> <!-- depends on: struts -->
+      <module name="org.tuckey.urlrewrite" />
+      
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

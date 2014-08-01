@@ -696,7 +696,17 @@
 		
 		
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/tuckey/urlrewrite/main" overwrite="true" verbose="true">
+			<fileset dir="lib/urlrewritefilter">
+				<include name="urlrewrite-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
+			  file="lib/urlrewritefilter/urlrewrite.module.xml" overwrite="true" verbose="true" />
+			  	
 		
+			  	
+			  	
 		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}">
