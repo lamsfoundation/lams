@@ -19,7 +19,7 @@
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	    <script>
 			$(document).ready(function(){
@@ -35,7 +35,7 @@
 		    			      required: true,
 		    			      number: true
 		    			},
-		    			fake: {
+		    			hasOptionFilled: {
 		    				required: function(element) {
 		    					prepareOptionEditorsForAjaxSubmit();	    				
 		    		        	return $("textarea[name^=optionQuestion]:filled").length < 1;
@@ -51,7 +51,8 @@
 		    			penaltyFactor: {
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-		    			}
+		    			},
+		    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
 		    		},
 		    	    invalidHandler: function(form, validator) {
 		    		      var errors = validator.numberOfInvalids();
@@ -166,11 +167,11 @@
 					</label>
 				</div>
 				
-				<input type="hidden" name="fake" id="fake">
+				<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.matching.pairs.matching.pairs" />
 				</div>				
-				<label for="fake" class="error" style="display: none;"><fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/></label>
+				<label for="hasOptionFilled" class="error" style="display: none;"></label>
 			</html:form>
 			
 			<!-- Options -->
