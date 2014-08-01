@@ -610,6 +610,16 @@
 		
 		
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
+			<fileset dir="lib/json">
+				<include name="gson-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/com/google/gson/main/module.xml"
+			  file="lib/json/gson.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
 				<include name="mysql-connector-java-*.jar" />
