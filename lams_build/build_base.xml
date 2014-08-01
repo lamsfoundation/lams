@@ -36,14 +36,15 @@
 			<include name="org/jboss/logmanager/main/jboss-logmanager-*.jar" />
 			<include name="org/slf4j/main/slf4j-api-*.jar" />
 			<include name="org/slf4j/impl/main/slf4j-jboss-logmanager-*.jar" />
+			<include name="org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-*.jar" /> <!-- Alias for Commons Logging -->
 			<include name="org/apache/xerces/main/xercesImpl-*.jar" />
+			<include name="javax/xml/rpc/api/main/jboss-jaxrpc-api*.jar" />
 			<include name="javax/mail/api/main/javax.mail-*.jar" />
 			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
 			<include name="org/apache/commons/beanutils/main/commons-beanutils-*.jar" />
 			<include name="org/apache/commons/collections/main/commons-collections-*.jar" />
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
-			<include name="org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-*.jar" /> <!-- Alias for Commons Logging -->
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
