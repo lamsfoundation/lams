@@ -42,6 +42,7 @@
       <module name="com.google.gson" />
       <module name="org.apache.lucene" slot="2.4" />
       <module name="org.quartz" />
+      <module name="uk.ac.reload" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
