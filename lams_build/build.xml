@@ -590,6 +590,16 @@
 		
 		
 		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/jdom/0.7" overwrite="true" verbose="true">
+			<fileset dir="lib/jdom">
+				<include name="jdom.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/jdom/0.7/module.xml"
+			  file="lib/jdom/jdom.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
 				<include name="mysql-connector-java-*.jar" />
