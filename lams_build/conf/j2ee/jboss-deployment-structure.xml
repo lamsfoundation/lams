@@ -38,7 +38,7 @@
       <module name="org.jgroups" />
       <module name="org.jboss.jbossweb" />
       <module name="org.jdom" slot="0.7" />
-      <module name="org.verisign.joid" slot="0.7" />
+      <module name="org.verisign.joid" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
