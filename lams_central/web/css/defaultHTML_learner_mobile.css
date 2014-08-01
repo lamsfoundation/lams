@@ -202,6 +202,14 @@ label.error {
 	padding:8px 10px 10px;
 }
 
+#errorMessages {
+	padding:8px 10px 10px 40px;
+	margin-top: 25px;
+	background-color: #ffffce;
+	width: 70%;
+	border: 1px solid #C0C0C0;
+}
+
 .ui-finishbtn-right { float: right;padding-right: 40px; min-height: 30px;}
 
 .button-inside {font-size: 16px;}
