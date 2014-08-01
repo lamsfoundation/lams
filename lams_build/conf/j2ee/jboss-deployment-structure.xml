@@ -36,7 +36,7 @@
       <module name="org.hibernate.cache" />
       <module name="org.jboss.cache" />
       <module name="org.jgroups" />
-      
+      <module name="org.jboss.jbossweb" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
