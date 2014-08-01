@@ -9,11 +9,8 @@
         <archive path="/lams_build/lib/autopatch/tk-autopatch-1.2.0-b2-cvs.jar"/>
         <archive path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
-        <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
         <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
-        <archive path="/lams_build/lib/jakarta-commons/commons-beanutils.jar"/>
-        <archive path="/lams_build/lib/jakarta-commons/commons-collections.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-digester.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
         <archive javadoc="http://commons.apache.org/io/api-2.1/" path="/lams_build/lib/jakarta-commons/commons-io-2.1.jar" source="/3rdParty_sources/commons-io"/>

@@ -29,9 +29,7 @@ fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MP
 flagstone		  transform.jar												   BSD							 Flagstone Software Ltd.		  reading and writing Flash 
 				  translate.jar
 
-jakarta-commons   commons-beanutils.jar                 1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Beanutils
-                  commons-codec-1.3.jar                 1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
-                  commons-collections.jar               3.1                    Apache License 2.0            Apache Software Foundation       Commons Collections
+jakarta-commons   commons-codec-1.3.jar                 1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
                   commons-digester.jar                  1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Digester
                   commons-discovery-0.2.jar             0.2                    Apache Software License 1.1   Apache Software Foundation       
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets

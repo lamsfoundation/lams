@@ -254,7 +254,7 @@
 		
 		<copy todir="assembly/lams.ear/META-INF" verbose="true">
 			<fileset dir="conf/j2ee">
-				<include name="application.xml" />
+				<include name="*.xml" />
 			</fileset>
 		</copy>
 	</target>
@@ -424,7 +424,118 @@
 
 	<target name="_deploy-resources">
 		<!-- Internal target: Deploys third party JARs and cofiguration files -->
-		<echo>${ant.project.name}: Deploying additional JARs and configuration files</echo>
+		<echo>${ant.project.name}: Deploying libraries as WildFly modules</echo>
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/poi/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="poi-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+			  file="lib/mysql/poi.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="xmlbeans-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+			  file="lib/pache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/xbill/dns/main" overwrite="true" verbose="true">
+			<fileset dir="lib/aspirin">
+				<include name="dnsjava-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/xbill/dns/main/module.xml"
+			  file="lib/aspirin/dnsjava.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/commons/pool/1.5" overwrite="true" verbose="true">
+			<fileset dir="lib/aspirin">
+				<include name="commons-pool-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/commons/pool/1.5/module.xml"
+			  file="lib/aspirin/commons.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/aspirin/main" overwrite="true" verbose="true">
+			<fileset dir="lib/aspirin">
+				<include name="aspirin.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/aspirin/main/module.xml"
+			  file="lib/aspirin/aspirin.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
+			<fileset dir="lib/autopatch">
+				<include name="tk-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main/module.xml"
+			  file="lib/autopatch/autopatch.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
+			<fileset dir="lib/axis">
+				<include name="wsdl4j-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/javax/wsdl4j/api/1.5/module.xml"
+			  file="lib/axis/wsdl4j.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/axis/main" overwrite="true" verbose="true">
+			<fileset dir="lib/axis">
+				<include name="axis*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/axis/main/module.xml"
+			  file="lib/axis/axis.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
+			<fileset dir="lib/batik">
+				<include name="batik-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
+			  file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/net/sf/cglib/main" overwrite="true" verbose="true">
+			<fileset dir="lib/cglib">
+				<include name="cglib_*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/net/sf/cglib/main/module.xml"
+			  file="lib/cglib/cglib.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
+			<fileset dir="lib/fckeditor">
+				<include name="fckeditor-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
+			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${jboss.home}/modules/system/layers/base/com/flagstone/main" overwrite="true" verbose="true">
+			<fileset dir="lib/flagstone">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${jboss.home}/modules/system/layers/base/com/flagstone/main/module.xml"
+			  file="lib/flagstone/flagstone.module.xml" overwrite="true" verbose="true" />
+			
 		
 		<copy todir="${jboss.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
 			<fileset dir="lib/mysql">
@@ -434,6 +545,8 @@
 		<copy tofile="${jboss.home}/modules/system/layers/base/com/mysql/main/module.xml"
 			  file="lib/mysql/mysql-connector-java.module.xml" overwrite="true" verbose="true" />
 		
+		
+		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<copy todir="${jboss.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}">
 				<include name="standalone.xml" />

@@ -23,22 +23,25 @@
 		</fileset>
 		<!-- Same list as in projects' .classpath file references to WIldFly modules.
 			 They need to be exactly listed as **/*.jar would load other versions of JARs
-			 which are also present in lams_build/lib.
+			 that are also present in lams_build/lib.
 		-->
 		<fileset dir="${jboss.home}/modules/system/layers/base">
 			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
 			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
-			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
+			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
+			<include name="org/javassist/main/javassist-*.jar" />
+			<include name="org/hibernate/main/hibernate-core-*.jar" />
 			<include name="org/jboss/logging/main/jboss-logging-*.jar" />
 			<include name="org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-*.jar" />
 			<include name="org/jboss/logmanager/main/jboss-logmanager-*.jar" />
 			<include name="org/slf4j/main/slf4j-api-*.jar" />
 			<include name="org/slf4j/impl/main/slf4j-jboss-logmanager-*.jar" />
-			<include name="org/javassist/main/javassist-*.jar" />
 			<include name="org/apache/xerces/main/xercesImpl-*.jar" />
-			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
 			<include name="javax/mail/api/main/javax.mail-*.jar" />
-			<include name="org/hibernate/main/hibernate-core-*.jar" />
+			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
+			<include name="org/apache/commons/beanutils/main/commons-beanutils-*.jar" />
+			<include name="org/apache/commons/collections/main/commons-collections-*.jar" />
+			
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
