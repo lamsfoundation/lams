@@ -24,7 +24,7 @@ import java.io.Serializable;
  * wrapped exception. Both the tag and the original exception can be used
  * to determine further processing when this exception is caught.
  *
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class TaggedIOException extends IOExceptionWithCause {
 
@@ -58,8 +58,8 @@ public class TaggedIOException extends IOExceptionWithCause {
      *
      * @param throwable The Throwable object to check
      * @param tag tag object
-     * @return <code>true</code> if the throwable has the specified tag,
-     * otherwise <code>false</code>
+     * @return {@code true} if the throwable has the specified tag,
+     * otherwise {@code false}
      */
     public static boolean isTaggedWith(Throwable throwable, Object tag) {
         return tag != null

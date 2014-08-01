@@ -39,14 +39,8 @@ import java.util.StringTokenizer;
  * <li>Get the free space on a drive
  * </ul>
  *
- * @author Frank W. Zammetti
- * @author Stephen Colebourne
- * @author Thomas Ledoux
- * @author James Urie
- * @author Magnus Grimsell
- * @author Thomas Ledoux
  * @version $Id$
- * @since Commons IO 1.1
+ * @since 1.1
  */
 public class FileSystemUtils {
 
@@ -139,7 +133,7 @@ public class FileSystemUtils {
      * @throws IllegalArgumentException if the path is invalid
      * @throws IllegalStateException if an error occurred in initialisation
      * @throws IOException if an error occurs when finding the free space
-     * @since Commons IO 1.1, enhanced OS support in 1.2 and 1.3
+     * @since 1.1, enhanced OS support in 1.2 and 1.3
      * @deprecated Use freeSpaceKb(String)
      *  Deprecated from 1.3, may be removed in 2.0
      */
@@ -171,7 +165,7 @@ public class FileSystemUtils {
      * @throws IllegalArgumentException if the path is invalid
      * @throws IllegalStateException if an error occurred in initialisation
      * @throws IOException if an error occurs when finding the free space
-     * @since Commons IO 1.2, enhanced OS support in 1.3
+     * @since 1.2, enhanced OS support in 1.3
      */
     public static long freeSpaceKb(String path) throws IOException {
         return freeSpaceKb(path, -1);
@@ -200,7 +194,7 @@ public class FileSystemUtils {
      * @throws IllegalArgumentException if the path is invalid
      * @throws IllegalStateException if an error occurred in initialisation
      * @throws IOException if an error occurs when finding the free space
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static long freeSpaceKb(String path, long timeout) throws IOException {
         return INSTANCE.freeSpaceOS(path, OS, true, timeout);
@@ -216,7 +210,7 @@ public class FileSystemUtils {
      * @return the amount of free drive space on the drive or volume in kilobytes
      * @throws IllegalStateException if an error occurred in initialisation
      * @throws IOException if an error occurs when finding the free space
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static long freeSpaceKb() throws IOException {
         return freeSpaceKb(-1); 
@@ -234,7 +228,7 @@ public class FileSystemUtils {
      * @return the amount of free drive space on the drive or volume in kilobytes
      * @throws IllegalStateException if an error occurred in initialisation
      * @throws IOException if an error occurs when finding the free space
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static long freeSpaceKb(long timeout) throws IOException {
         return freeSpaceKb(new File(".").getAbsolutePath(), timeout); 
@@ -267,7 +261,7 @@ public class FileSystemUtils {
         }
         switch (os) {
             case WINDOWS:
-                return (kb ? freeSpaceWindows(path, timeout) / FileUtils.ONE_KB : freeSpaceWindows(path, timeout));
+                return kb ? freeSpaceWindows(path, timeout) / FileUtils.ONE_KB : freeSpaceWindows(path, timeout);
             case UNIX:
                 return freeSpaceUnix(path, kb, false, timeout);
             case POSIX_UNIX:
@@ -396,7 +390,7 @@ public class FileSystemUtils {
             flags += "P";
         }
         String[] cmdAttribs = 
-            (flags.length() > 1 ? new String[] {DF, flags, path} : new String[] {DF, path});
+            flags.length() > 1 ? new String[] {DF, flags, path} : new String[] {DF, path};
         
         // perform the command, asking for up to 3 lines (header, interesting, overflow)
         List<String> lines = performCommand(cmdAttribs, 3, timeout);
@@ -507,7 +501,7 @@ public class FileSystemUtils {
                         "Command line returned OS error code '" + proc.exitValue() +
                         "' for command " + Arrays.asList(cmdAttribs));
             }
-            if (lines.size() == 0) {
+            if (lines.isEmpty()) {
                 // unknown problem, throw exception
                 throw new IOException(
                         "Command line did not return any info " +

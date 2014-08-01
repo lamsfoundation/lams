@@ -39,8 +39,6 @@ import java.util.List;
  * {@link #exitWhenFinished}, typically in
  * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
  *
- * @author Noel Bergman
- * @author Martin Cooper
  * @version $Id$
  */
 public class FileCleaningTracker {
@@ -160,7 +158,7 @@ public class FileCleaningTracker {
      * Return the file paths that failed to delete.
      *
      * @return the file paths that failed to delete
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public List<String> getDeleteFailures() {
         return deleteFailures;
@@ -258,7 +256,7 @@ public class FileCleaningTracker {
         Tracker(String path, FileDeleteStrategy deleteStrategy, Object marker, ReferenceQueue<? super Object> queue) {
             super(marker, queue);
             this.path = path;
-            this.deleteStrategy = (deleteStrategy == null ? FileDeleteStrategy.NORMAL : deleteStrategy);
+            this.deleteStrategy = deleteStrategy == null ? FileDeleteStrategy.NORMAL : deleteStrategy;
         }
 
         /**
@@ -273,8 +271,8 @@ public class FileCleaningTracker {
         /**
          * Deletes the file associated with this tracker instance.
          *
-         * @return <code>true</code> if the file was deleted successfully;
-         *         <code>false</code> otherwise.
+         * @return {@code true} if the file was deleted successfully;
+         *         {@code false} otherwise.
          */
         public boolean delete() {
             return deleteStrategy.deleteQuietly(new File(path));

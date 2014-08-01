@@ -48,8 +48,8 @@ import java.io.Serializable;
  * }
  * </pre>
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public class EmptyFileFilter extends AbstractFileFilter implements Serializable {
     
@@ -69,16 +69,16 @@ public class EmptyFileFilter extends AbstractFileFilter implements Serializable 
      * Checks to see if the file is empty.
      * 
      * @param file  the file or directory to check
-     * @return <code>true</code> if the file or directory
-     *  is <i>empty</i>, otherwise <code>false</code>.
+     * @return {@code true} if the file or directory
+     *  is <i>empty</i>, otherwise {@code false}.
      */
     @Override
     public boolean accept(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            return (files == null || files.length == 0);
+            return files == null || files.length == 0;
         } else {
-            return (file.length() == 0);
+            return file.length() == 0;
         }
     }
     

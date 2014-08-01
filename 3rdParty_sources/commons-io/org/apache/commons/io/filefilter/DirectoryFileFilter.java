@@ -33,18 +33,16 @@ import java.io.Serializable;
  * }
  * </pre>
  *
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
+ * @since 1.0
+ * @version $Id$
  *
- * @author Stephen Colebourne
- * @author Peter Donald
  * @see FileFilterUtils#directoryFileFilter()
  */
 public class DirectoryFileFilter extends AbstractFileFilter implements Serializable {
 
     /**
      * Singleton instance of directory filter.
-     * @since Commons IO 1.3
+     * @since 1.3
      */
     public static final IOFileFilter DIRECTORY = new DirectoryFileFilter();
     /**

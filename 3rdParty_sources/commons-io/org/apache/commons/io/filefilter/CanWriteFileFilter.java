@@ -49,8 +49,8 @@ import java.io.Serializable;
  * <b>N.B.</b> For read-only files, use 
  *    <code>CanReadFileFilter.READ_ONLY</code>.
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public class CanWriteFileFilter extends AbstractFileFilter implements Serializable {
     
@@ -70,8 +70,8 @@ public class CanWriteFileFilter extends AbstractFileFilter implements Serializab
      * Checks to see if the file can be written to.
      * 
      * @param file  the File to check
-     * @return <code>true</code> if the file can be
-     *  written to, otherwise <code>false</code>.
+     * @return {@code true} if the file can be
+     *  written to, otherwise {@code false}.
      */
     @Override
     public boolean accept(File file) {

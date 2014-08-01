@@ -30,8 +30,7 @@ import org.apache.commons.io.EndianUtils;
  * <p>
  * <b>Origin of code: </b>Avalon Excalibur (IO)
  *
- * @author <a href="mailto:peter@apache.org">Peter Donald</a>
- * @version CVS $Revision$ $Date$
+ * @version CVS $Revision$
  */
 public class SwappedDataInputStream extends ProxyInputStream
     implements DataInput
@@ -56,7 +55,7 @@ public class SwappedDataInputStream extends ProxyInputStream
     public boolean readBoolean()
         throws IOException, EOFException
     {
-        return ( 0 != readByte() );
+        return 0 != readByte();
     }
 
     /**
@@ -137,7 +136,7 @@ public class SwappedDataInputStream extends ProxyInputStream
 
         while( remaining > 0 )
         {
-            int location = offset + ( length - remaining );
+            int location = offset + length - remaining;
             int count = read( data, location, remaining );
 
             if( -1 == count )

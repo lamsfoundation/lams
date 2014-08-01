@@ -44,10 +44,8 @@ import java.util.NoSuchElementException;
  * }
  * </pre>
  *
- * @author Stephen Colebourne
- * @author Sandy McArthur
  * @version $Id$
- * @since Commons IO 1.2
+ * @since 1.2
  */
 public class LineIterator implements Iterator<String> {
 
@@ -83,7 +81,7 @@ public class LineIterator implements Iterator<String> {
      * If there is an <code>IOException</code> then {@link #close()} will
      * be called on this instance.
      *
-     * @return <code>true</code> if the Reader has more lines
+     * @return {@code true} if the Reader has more lines
      * @throws IllegalStateException if an IO exception occurs
      */
     public boolean hasNext() {
@@ -112,7 +110,7 @@ public class LineIterator implements Iterator<String> {
 
     /**
      * Overridable method to validate each line that is returned.
-     *
+     * This implementation always returns true.
      * @param line  the line that is to be validated
      * @return true if valid, false to remove from the iterator
      */

@@ -17,6 +17,7 @@
 package org.apache.commons.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
@@ -76,30 +77,20 @@ import java.util.Stack;
  * <p>
  * Origin of code: Excalibur, Alexandria, Tomcat, Commons-Utils.
  *
- * @author <a href="mailto:burton@relativity.yi.org">Kevin A. Burton</A>
- * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
- * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph.Reck</a>
- * @author <a href="mailto:peter@apache.org">Peter Donald</a>
- * @author <a href="mailto:jefft@apache.org">Jeff Turner</a>
- * @author Matthew Hawthorne
- * @author Martin Cooper
- * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
- * @author Stephen Colebourne
  * @version $Id$
- * @since Commons IO 1.1
+ * @since 1.1
  */
 public class FilenameUtils {
 
     /**
      * The extension separator character.
-     * @since Commons IO 1.4
+     * @since 1.4
      */
     public static final char EXTENSION_SEPARATOR = '.';
 
     /**
      * The extension separator String.
-     * @since Commons IO 1.4
+     * @since 1.4
      */
     public static final String EXTENSION_SEPARATOR_STR = Character.toString(EXTENSION_SEPARATOR);
 
@@ -155,7 +146,7 @@ public class FilenameUtils {
      * @return true if it is a separator character
      */
     private static boolean isSeparator(char ch) {
-        return (ch == UNIX_SEPARATOR) || (ch == WINDOWS_SEPARATOR);
+        return ch == UNIX_SEPARATOR || ch == WINDOWS_SEPARATOR;
     }
 
     //-----------------------------------------------------------------------
@@ -170,7 +161,7 @@ public class FilenameUtils {
      * A double slash will be merged to a single slash (but UNC names are handled).
      * A single dot path segment will be removed.
      * A double dot will cause that path segment and the one before to be removed.
-     * If the double dot has no parent path segment to work with, <code>null</code>
+     * If the double dot has no parent path segment to work with, {@code null}
      * is returned.
      * <p>
      * The output will be the same on both Unix and Windows except
@@ -213,7 +204,7 @@ public class FilenameUtils {
      * A double slash will be merged to a single slash (but UNC names are handled).
      * A single dot path segment will be removed.
      * A double dot will cause that path segment and the one before to be removed.
-     * If the double dot has no parent path segment to work with, <code>null</code>
+     * If the double dot has no parent path segment to work with, {@code null}
      * is returned.
      * <p>
      * The output will be the same on both Unix and Windows except
@@ -241,13 +232,13 @@ public class FilenameUtils {
      * the separator character.
      *
      * @param filename  the filename to normalize, null returns null
-     * @param unixSeparator <code>true</code> if a unix separator should
-     * be used or <code>false</code> if a windows separator should be used.
+     * @param unixSeparator {@code true} if a unix separator should
+     * be used or {@code false} if a windows separator should be used.
      * @return the normalized filename, or null if invalid
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static String normalize(String filename, boolean unixSeparator) {
-        char separator = (unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR);
+        char separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
         return doNormalize(filename, separator, true);
     }
 
@@ -264,7 +255,7 @@ public class FilenameUtils {
      * A double slash will be merged to a single slash (but UNC names are handled).
      * A single dot path segment will be removed.
      * A double dot will cause that path segment and the one before to be removed.
-     * If the double dot has no parent path segment to work with, <code>null</code>
+     * If the double dot has no parent path segment to work with, {@code null}
      * is returned.
      * <p>
      * The output will be the same on both Unix and Windows except
@@ -309,7 +300,7 @@ public class FilenameUtils {
      * A double slash will be merged to a single slash (but UNC names are handled).
      * A single dot path segment will be removed.
      * A double dot will cause that path segment and the one before to be removed.
-     * If the double dot has no parent path segment to work with, <code>null</code>
+     * If the double dot has no parent path segment to work with, {@code null}
      * is returned.
      * <p>
      * The output will be the same on both Unix and Windows including
@@ -335,13 +326,13 @@ public class FilenameUtils {
      * </pre>
      *
      * @param filename  the filename to normalize, null returns null
-     * @param unixSeparator <code>true</code> if a unix separator should
-     * be used or <code>false</code> if a windows separtor should be used.
+     * @param unixSeparator {@code true} if a unix separator should
+     * be used or {@code false} if a windows separtor should be used.
      * @return the normalized filename, or null if invalid
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static String normalizeNoEndSeparator(String filename, boolean unixSeparator) {
-         char separator = (unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR);
+         char separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
         return doNormalize(filename, separator, false);
     }
 
@@ -370,7 +361,7 @@ public class FilenameUtils {
         filename.getChars(0, filename.length(), array, 0);
         
         // fix separators throughout
-        char otherSeparator = (separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR);
+        char otherSeparator = separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR;
         for (int i = 0; i < array.length; i++) {
             if (array[i] == otherSeparator) {
                 array[i] = separator;
@@ -422,14 +413,14 @@ public class FilenameUtils {
                     if (array[j] == separator) {
                         // remove b/../ from a/b/../c
                         System.arraycopy(array, i + 1, array, j + 1, size - i);
-                        size -= (i - j);
+                        size -= i - j;
                         i = j + 1;
                         continue outer;
                     }
                 }
                 // remove a/../ from a/../c
                 System.arraycopy(array, i + 1, array, prefix, size - i);
-                size -= (i + 1 - prefix);
+                size -= i + 1 - prefix;
                 i = prefix + 1;
             }
         }
@@ -508,6 +499,48 @@ public class FilenameUtils {
         } else {
             return normalize(basePath + '/' + fullFilenameToAdd);
         }
+    }
+
+    /**
+     * Determines whether the {@code parent} directory contains the {@code child} element (a file or directory).
+     * <p>
+     * The files names are expected to be normalized.
+     * </p>
+     * 
+     * Edge cases:
+     * <ul>
+     * <li>A {@code directory} must not be null: if null, throw IllegalArgumentException</li>
+     * <li>A directory does not contain itself: return false</li>
+     * <li>A null child file is not contained in any parent: return false</li>
+     * </ul>
+     * 
+     * @param canonicalParent
+     *            the file to consider as the parent.
+     * @param canonicalChild
+     *            the file to consider as the child.
+     * @return true is the candidate leaf is under by the specified composite. False otherwise.
+     * @throws IOException
+     *             if an IO error occurs while checking the files.
+     * @since 2.2
+     * @see FileUtils#directoryContains(File, File)
+     */
+    public static boolean directoryContains(final String canonicalParent, final String canonicalChild)
+            throws IOException {
+
+        // Fail fast against NullPointerException
+        if (canonicalParent == null) {
+            throw new IllegalArgumentException("Directory must not be null");
+        }
+
+        if (canonicalChild == null) {
+            return false;
+        }
+
+        if (IOCase.SYSTEM.checkEquals(canonicalParent, canonicalChild)) {
+            return false;
+        }
+
+        return IOCase.SYSTEM.checkStartsWith(canonicalChild, canonicalParent);
     }
 
     //-----------------------------------------------------------------------
@@ -602,7 +635,7 @@ public class FilenameUtils {
             if (ch0 == '~') {
                 return 2;  // return a length greater than the input
             }
-            return (isSeparator(ch0) ? 1 : 0);
+            return isSeparator(ch0) ? 1 : 0;
         } else {
             if (ch0 == '~') {
                 int posUnix = filename.indexOf(UNIX_SEPARATOR, 1);
@@ -610,8 +643,8 @@ public class FilenameUtils {
                 if (posUnix == -1 && posWin == -1) {
                     return len + 1;  // return a length greater than the input
                 }
-                posUnix = (posUnix == -1 ? posWin : posUnix);
-                posWin = (posWin == -1 ? posUnix : posWin);
+                posUnix = posUnix == -1 ? posWin : posUnix;
+                posWin = posWin == -1 ? posUnix : posWin;
                 return Math.min(posUnix, posWin) + 1;
             }
             char ch1 = filename.charAt(1);
@@ -628,14 +661,14 @@ public class FilenameUtils {
             } else if (isSeparator(ch0) && isSeparator(ch1)) {
                 int posUnix = filename.indexOf(UNIX_SEPARATOR, 2);
                 int posWin = filename.indexOf(WINDOWS_SEPARATOR, 2);
-                if ((posUnix == -1 && posWin == -1) || posUnix == 2 || posWin == 2) {
+                if (posUnix == -1 && posWin == -1 || posUnix == 2 || posWin == 2) {
                     return -1;
                 }
-                posUnix = (posUnix == -1 ? posWin : posUnix);
-                posWin = (posWin == -1 ? posUnix : posWin);
+                posUnix = posUnix == -1 ? posWin : posUnix;
+                posWin = posWin == -1 ? posUnix : posWin;
                 return Math.min(posUnix, posWin) + 1;
             } else {
-                return (isSeparator(ch0) ? 1 : 0);
+                return isSeparator(ch0) ? 1 : 0;
             }
         }
     }
@@ -680,7 +713,7 @@ public class FilenameUtils {
         }
         int extensionPos = filename.lastIndexOf(EXTENSION_SEPARATOR);
         int lastSeparator = indexOfLastSeparator(filename);
-        return (lastSeparator > extensionPos ? -1 : extensionPos);
+        return lastSeparator > extensionPos ? -1 : extensionPos;
     }
 
     //-----------------------------------------------------------------------
@@ -956,8 +989,8 @@ public class FilenameUtils {
      * The output will be the same irrespective of the machine that the code is running on.
      *
      * @param filename the filename to retrieve the extension of.
-     * @return the extension of the file or an empty string if none exists or <code>null</code>
-     * if the filename is <code>null</code>.
+     * @return the extension of the file or an empty string if none exists or {@code null}
+     * if the filename is {@code null}.
      */
     public static String getExtension(String filename) {
         if (filename == null) {
@@ -1074,14 +1107,14 @@ public class FilenameUtils {
      * @param normalized  whether to normalize the filenames
      * @param caseSensitivity  what case sensitivity rule to use, null means case-sensitive
      * @return true if the filenames are equal, null equals null
-     * @since Commons IO 1.3
+     * @since 1.3
      */
     public static boolean equals(
             String filename1, String filename2,
             boolean normalized, IOCase caseSensitivity) {
         
         if (filename1 == null || filename2 == null) {
-            return (filename1 == null && filename2 == null);
+            return filename1 == null && filename2 == null;
         }
         if (normalized) {
             filename1 = normalize(filename1);
@@ -1114,7 +1147,7 @@ public class FilenameUtils {
             return false;
         }
         if (extension == null || extension.length() == 0) {
-            return (indexOfExtension(filename) == -1);
+            return indexOfExtension(filename) == -1;
         }
         String fileExt = getExtension(filename);
         return fileExt.equals(extension);
@@ -1136,7 +1169,7 @@ public class FilenameUtils {
             return false;
         }
         if (extensions == null || extensions.length == 0) {
-            return (indexOfExtension(filename) == -1);
+            return indexOfExtension(filename) == -1;
         }
         String fileExt = getExtension(filename);
         for (String extension : extensions) {
@@ -1163,7 +1196,7 @@ public class FilenameUtils {
             return false;
         }
         if (extensions == null || extensions.isEmpty()) {
-            return (indexOfExtension(filename) == -1);
+            return indexOfExtension(filename) == -1;
         }
         String fileExt = getExtension(filename);
         for (String extension : extensions) {
@@ -1239,7 +1272,7 @@ public class FilenameUtils {
      * @param wildcardMatcher  the wildcard string to match against
      * @param caseSensitivity  what case sensitivity rule to use, null means case-sensitive
      * @return true if the filename matches the wilcard string
-     * @since Commons IO 1.3
+     * @since 1.3
      */
     public static boolean wildcardMatch(String filename, String wildcardMatcher, IOCase caseSensitivity) {
         if (filename == null && wildcardMatcher == null) {
@@ -1350,8 +1383,8 @@ public class FilenameUtils {
                 }
                 if (array[i] == '?') {
                     list.add("?");
-                } else if (list.size() == 0 ||
-                        (i > 0 && list.get(list.size() - 1).equals("*") == false)) {
+                } else if (list.isEmpty() ||
+                        i > 0 && list.get(list.size() - 1).equals("*") == false) {
                     list.add("*");
                 }
             } else {

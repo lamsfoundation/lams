@@ -28,9 +28,8 @@ import java.io.IOException;
  * <p>
  * This class captures the strategy to use and is designed for user subclassing.
  *
- * @author Stephen Colebourne
  * @version $Id$
- * @since Commons IO 1.3
+ * @since 1.3
  */
 public class FileDeleteStrategy {
 
@@ -144,7 +143,7 @@ public class FileDeleteStrategy {
          * if the file exists.
          *
          * @param fileToDelete  the file to delete, not null
-         * @return Always returns <code>true</code>
+         * @return Always returns {@code true}
          * @throws NullPointerException if the file is null
          * @throws IOException if an error occurs during file deletion
          */

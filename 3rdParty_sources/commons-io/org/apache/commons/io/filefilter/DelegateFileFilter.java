@@ -24,10 +24,9 @@ import java.io.Serializable;
 /**
  * This class turns a Java FileFilter or FilenameFilter into an IO FileFilter.
  * 
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
+ * @since 1.0
+ * @version $Id$
  * 
- * @author Stephen Colebourne
  * @see FileFilterUtils#asFileFilter(FileFilter)
  * @see FileFilterUtils#asFileFilter(FilenameFilter)
  */
@@ -102,7 +101,7 @@ public class DelegateFileFilter extends AbstractFileFilter implements Serializab
      */
     @Override
     public String toString() {
-        String delegate = (fileFilter != null ? fileFilter.toString() : filenameFilter.toString()); 
+        String delegate = fileFilter != null ? fileFilter.toString() : filenameFilter.toString(); 
         return super.toString() + "(" + delegate + ")";
     }
     

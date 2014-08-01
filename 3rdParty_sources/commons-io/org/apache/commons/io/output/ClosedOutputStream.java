@@ -25,10 +25,10 @@ import java.io.OutputStream;
  * <p>
  * Typically uses of this class include testing for corner cases in methods
  * that accept an output stream and acting as a sentinel value instead of
- * a <code>null</code> output stream.
+ * a {@code null} output stream.
  *
  * @version $Id$
- * @since Commons IO 1.4
+ * @since 1.4
  */
 public class ClosedOutputStream extends OutputStream {
     

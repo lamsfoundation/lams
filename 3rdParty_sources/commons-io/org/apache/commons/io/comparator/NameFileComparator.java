@@ -46,8 +46,8 @@ import org.apache.commons.io.IOCase;
  * </pre>
  * <p>
  *
- * @version $Revision$ $Date$
- * @since Commons IO 1.4
+ * @version $Id$
+ * @since 1.4
  */
 public class NameFileComparator extends AbstractFileComparator implements Serializable {
 

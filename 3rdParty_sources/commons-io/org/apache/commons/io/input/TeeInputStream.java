@@ -32,7 +32,7 @@ import java.io.OutputStream;
  * stream will also closed.
  *
  * @version $Id$
- * @since Commons IO 1.4
+ * @since 1.4
  */
 public class TeeInputStream extends ProxyInputStream {
 
@@ -64,7 +64,7 @@ public class TeeInputStream extends ProxyInputStream {
      * Creates a TeeInputStream that proxies the given {@link InputStream}
      * and copies all read bytes to the given {@link OutputStream}. The given
      * output stream will be closed when this stream gets closed if the
-     * closeBranch parameter is <code>true</code>.
+     * closeBranch parameter is {@code true}.
      *
      * @param input input stream to be proxied
      * @param branch output stream that will receive a copy of all bytes read

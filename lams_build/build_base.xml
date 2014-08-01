@@ -41,7 +41,7 @@
 			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
 			<include name="org/apache/commons/beanutils/main/commons-beanutils-*.jar" />
 			<include name="org/apache/commons/collections/main/commons-collections-*.jar" />
-			
+			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

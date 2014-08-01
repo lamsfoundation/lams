@@ -49,8 +49,6 @@ import org.apache.commons.io.input.ClosedInputStream;
  * designed to behave exactly like the original. The only exception is the
  * deprecated toString(int) method that has been ignored.
  * 
- * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
- * @author Holger Hoffstatte
  * @version $Id$
  */
 public class ByteArrayOutputStream extends OutputStream {
@@ -184,7 +182,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @return total number of bytes read from the input stream
      *         (and written to this stream)
      * @throws IOException if an I/O error occurs while reading the input stream
-     * @since Commons IO 1.4
+     * @since 1.4
      */
     public synchronized int write(InputStream in) throws IOException {
         int readCount = 0;
@@ -273,7 +271,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @param input Stream to be fully buffered.
      * @return A fully buffered stream.
      * @throws IOException if an I/O error occurs
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     public static InputStream toBufferedInputStream(InputStream input)
             throws IOException {
@@ -290,7 +288,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @return the current contents of this output stream.
      * @see java.io.ByteArrayOutputStream#toByteArray()
      * @see #reset()
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     private InputStream toBufferedInputStream() {
         int remaining = count;

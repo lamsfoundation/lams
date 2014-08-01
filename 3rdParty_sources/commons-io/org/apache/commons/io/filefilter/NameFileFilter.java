@@ -36,13 +36,8 @@ import org.apache.commons.io.IOCase;
  * }
  * </pre>
  *
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
- * 
- * @author Stephen Colebourne
- * @author Federico Barbieri
- * @author Serge Knystautas
- * @author Peter Donald
+ * @since 1.0
+ * @version $Id$
  * @see FileFilterUtils#nameFileFilter(String)
  * @see FileFilterUtils#nameFileFilter(String, IOCase)
  */
@@ -75,7 +70,7 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
             throw new IllegalArgumentException("The wildcard must not be null");
         }
         this.names = new String[] {name};
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     /**
@@ -107,7 +102,7 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
         }
         this.names = new String[names.length];
         System.arraycopy(names, 0, this.names, 0, names.length);
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     /**
@@ -134,7 +129,7 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
             throw new IllegalArgumentException("The list of names must not be null");
         }
         this.names = names.toArray(new String[names.size()]);
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     //-----------------------------------------------------------------------
@@ -158,12 +153,12 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
     /**
      * Checks to see if the filename matches.
      * 
-     * @param file  the File directory
+     * @param dir  the File directory (ignored)
      * @param name  the filename
      * @return true if the filename matches
      */
     @Override
-    public boolean accept(File file, String name) {
+    public boolean accept(File dir, String name) {
         for (String name2 : names) {
             if (caseSensitivity.checkEquals(name, name2)) {
                 return true;

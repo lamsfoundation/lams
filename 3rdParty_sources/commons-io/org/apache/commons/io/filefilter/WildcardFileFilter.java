@@ -45,9 +45,8 @@ import org.apache.commons.io.IOCase;
  * }
  * </pre>
  *
- * @author Jason Anderson
- * @version $Revision$ $Date$
- * @since Commons IO 1.3
+ * @version $Id$
+ * @since 1.3
  */
 public class WildcardFileFilter extends AbstractFileFilter implements Serializable {
 
@@ -78,7 +77,7 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
             throw new IllegalArgumentException("The wildcard must not be null");
         }
         this.wildcards = new String[] { wildcard };
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     /**
@@ -110,7 +109,7 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
         }
         this.wildcards = new String[wildcards.length];
         System.arraycopy(wildcards, 0, this.wildcards, 0, wildcards.length);
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     /**
@@ -137,14 +136,14 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
             throw new IllegalArgumentException("The wildcard list must not be null");
         }
         this.wildcards = wildcards.toArray(new String[wildcards.size()]);
-        this.caseSensitivity = (caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity);
+        this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
     //-----------------------------------------------------------------------
     /**
      * Checks to see if the filename matches one of the wildcards.
      *
-     * @param dir  the file directory
+     * @param dir  the file directory (ignored)
      * @param name  the filename
      * @return true if the filename matches one of the wildcards
      */

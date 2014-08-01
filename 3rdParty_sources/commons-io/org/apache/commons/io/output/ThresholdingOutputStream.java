@@ -34,8 +34,6 @@ import java.io.OutputStream;
  * is actually reached, since it triggers when a pending write operation would
  * cause the threshold to be exceeded.
  *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- *
  * @version $Id$
  */
 public abstract class ThresholdingOutputStream
@@ -196,12 +194,12 @@ public abstract class ThresholdingOutputStream
      * Determines whether or not the configured threshold has been exceeded for
      * this output stream.
      *
-     * @return <code>true</code> if the threshold has been reached;
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the threshold has been reached;
+     *         {@code false} otherwise.
      */
     public boolean isThresholdExceeded()
     {
-        return (written > threshold);
+        return written > threshold;
     }
 
 
@@ -220,7 +218,7 @@ public abstract class ThresholdingOutputStream
      */
     protected void checkThreshold(int count) throws IOException
     {
-        if (!thresholdExceeded && (written + count > threshold))
+        if (!thresholdExceeded && written + count > threshold)
         {
             thresholdExceeded = true;
             thresholdReached();

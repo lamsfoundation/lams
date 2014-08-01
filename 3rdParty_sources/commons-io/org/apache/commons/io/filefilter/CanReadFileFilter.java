@@ -57,8 +57,8 @@ import java.io.Serializable;
  * }
  * </pre>
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public class CanReadFileFilter extends AbstractFileFilter implements Serializable {
     
@@ -82,8 +82,8 @@ public class CanReadFileFilter extends AbstractFileFilter implements Serializabl
      * Checks to see if the file can be read.
      * 
      * @param file  the File to check.
-     * @return <code>true</code> if the file can be
-     *  read, otherwise <code>false</code>.
+     * @return {@code true} if the file can be
+     *  read, otherwise {@code false}.
      */
     @Override
     public boolean accept(File file) {

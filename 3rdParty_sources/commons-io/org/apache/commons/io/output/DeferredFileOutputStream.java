@@ -36,9 +36,6 @@ import org.apache.commons.io.IOUtils;
  * you want to store it in memory (for speed), but if the file is large you want
  * to store it to file (to avoid memory issues).
  *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- * @author gaxzerow
- *
  * @version $Id$
  */
 public class DeferredFileOutputStream
@@ -114,11 +111,11 @@ public class DeferredFileOutputStream
      * @param suffix Suffix to use for the temporary file.
      * @param directory Temporary file directory.
      *
-     * @since Commons IO 1.4
+     * @since 1.4
      */
     public DeferredFileOutputStream(int threshold, String prefix, String suffix, File directory)
     {
-        this(threshold,   null, prefix, suffix, directory);
+        this(threshold, null, prefix, suffix, directory);
         if (prefix == null) {
             throw new IllegalArgumentException("Temporary file prefix is missing");
         }
@@ -192,21 +189,21 @@ public class DeferredFileOutputStream
      * Determines whether or not the data for this output stream has been
      * retained in memory.
      *
-     * @return <code>true</code> if the data is available in memory;
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the data is available in memory;
+     *         {@code false} otherwise.
      */
     public boolean isInMemory()
     {
-        return (!isThresholdExceeded());
+        return !isThresholdExceeded();
     }
 
 
     /**
      * Returns the data for this output stream as an array of bytes, assuming
      * that the data has been retained in memory. If the data was written to
-     * disk, this method returns <code>null</code>.
+     * disk, this method returns {@code null}.
      *
-     * @return The data for this output stream, or <code>null</code> if no such
+     * @return The data for this output stream, or {@code null} if no such
      *         data is available.
      */
     public byte[] getData()
@@ -224,13 +221,13 @@ public class DeferredFileOutputStream
      * the temporary file created or null.
      * <p>
      * If the constructor specifying the file is used then it returns that
-     * same output file, even when threashold has not been reached.
+     * same output file, even when threshold has not been reached.
      * <p>
      * If constructor specifying a temporary file prefix/suffix is used
-     * then the temporary file created once the threashold is reached is returned
-     * If the threshold was not reached then <code>null</code> is returned.
+     * then the temporary file created once the threshold is reached is returned
+     * If the threshold was not reached then {@code null} is returned.
      *
-     * @return The file for this output stream, or <code>null</code> if no such
+     * @return The file for this output stream, or {@code null} if no such
      *         file exists.
      */
     public File getFile()

@@ -24,15 +24,14 @@ import java.util.List;
 
 /**
  * A {@link java.io.FileFilter} providing conditional AND logic across a list of
- * file filters. This filter returns <code>true</code> if all filters in the
- * list return <code>true</code>. Otherwise, it returns <code>false</code>.
+ * file filters. This filter returns {@code true} if all filters in the
+ * list return {@code true}. Otherwise, it returns {@code false}.
  * Checking of the file filter list stops when the first filter returns
- * <code>false</code>.
+ * {@code false}.
  *
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
+ * @since 1.0
+ * @version $Id$
  *
- * @author Steven Caswell
  * @see FileFilterUtils#and(IOFileFilter...)
  */
 public class AndFileFilter
@@ -45,7 +44,7 @@ public class AndFileFilter
     /**
      * Constructs a new instance of <code>AndFileFilter</code>.
      *
-     * @since Commons IO 1.1
+     * @since 1.1
      */
     public AndFileFilter() {
         this.fileFilters = new ArrayList<IOFileFilter>();
@@ -56,7 +55,7 @@ public class AndFileFilter
      * with the specified list of filters.
      *
      * @param fileFilters  a List of IOFileFilter instances, copied, null ignored
-     * @since Commons IO 1.1
+     * @since 1.1
      */
     public AndFileFilter(final List<IOFileFilter> fileFilters) {
         if (fileFilters == null) {
@@ -116,7 +115,7 @@ public class AndFileFilter
      */
     @Override
     public boolean accept(final File file) {
-        if (this.fileFilters.size() == 0) {
+        if (this.fileFilters.isEmpty()) {
             return false;
         }
         for (IOFileFilter fileFilter : fileFilters) {
@@ -132,7 +131,7 @@ public class AndFileFilter
      */
     @Override
     public boolean accept(final File file, final String name) {
-        if (this.fileFilters.size() == 0) {
+        if (this.fileFilters.isEmpty()) {
             return false;
         }
         for (IOFileFilter fileFilter : fileFilters) {

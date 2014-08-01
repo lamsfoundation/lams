@@ -45,8 +45,8 @@ import java.io.Serializable;
  * }
  * </pre>
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public class HiddenFileFilter extends AbstractFileFilter implements Serializable {
     
@@ -66,8 +66,8 @@ public class HiddenFileFilter extends AbstractFileFilter implements Serializable
      * Checks to see if the file is hidden.
      * 
      * @param file  the File to check
-     * @return <code>true</code> if the file is
-     *  <i>hidden</i>, otherwise <code>false</code>.
+     * @return {@code true} if the file is
+     *  <i>hidden</i>, otherwise {@code false}.
      */
     @Override
     public boolean accept(File file) {

@@ -245,8 +245,8 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
  *  }
  * </pre>
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public abstract class DirectoryWalker<T> {
 
@@ -271,7 +271,7 @@ public abstract class DirectoryWalker<T> {
      * <p>
      * The filter controls which files and directories will be navigated to as
      * part of the walk. The {@link FileFilterUtils} class is useful for combining
-     * various filters together. A <code>null</code> filter means that no
+     * various filters together. A {@code null} filter means that no
      * filtering should occur and all files and directories will be visited.
      *
      * @param filter  the filter to apply, null means visit all files
@@ -290,7 +290,7 @@ public abstract class DirectoryWalker<T> {
      * The filters control which files and directories will be navigated to as part
      * of the walk. This constructor uses {@link FileFilterUtils#makeDirectoryOnly(IOFileFilter)}
      * and {@link FileFilterUtils#makeFileOnly(IOFileFilter)} internally to combine the filters.
-     * A <code>null</code> filter means that no filtering should occur.
+     * A {@code null} filter means that no filtering should occur.
      *
      * @param directoryFilter  the filter to apply to directories, null means visit all directories
      * @param fileFilter  the filter to apply to files, null means visit all files
@@ -301,8 +301,8 @@ public abstract class DirectoryWalker<T> {
         if (directoryFilter == null && fileFilter == null) {
             this.filter = null;
         } else {
-            directoryFilter = (directoryFilter != null ? directoryFilter : TrueFileFilter.TRUE);
-            fileFilter = (fileFilter != null ? fileFilter : TrueFileFilter.TRUE);
+            directoryFilter = directoryFilter != null ? directoryFilter : TrueFileFilter.TRUE;
+            fileFilter = fileFilter != null ? fileFilter : TrueFileFilter.TRUE;
             directoryFilter = FileFilterUtils.makeDirectoryOnly(directoryFilter);
             fileFilter = FileFilterUtils.makeFileOnly(fileFilter);
             this.filter = FileFilterUtils.or(directoryFilter, fileFilter);
@@ -354,7 +354,7 @@ public abstract class DirectoryWalker<T> {
             int childDepth = depth + 1;
             if (depthLimit < 0 || childDepth <= depthLimit) {
                 checkIfCancelled(directory, depth, results);
-                File[] childFiles = (filter == null ? directory.listFiles() : directory.listFiles(filter));
+                File[] childFiles = filter == null ? directory.listFiles() : directory.listFiles(filter);
                 childFiles = filterDirectoryContents(directory, depth, childFiles);
                 if (childFiles == null) {
                     handleRestricted(directory, childDepth, results);
@@ -514,7 +514,7 @@ public abstract class DirectoryWalker<T> {
      * @param files the files (possibly filtered) in the directory
      * @return the filtered list of files
      * @throws IOException if an I/O Error occurs
-     * @since Commons IO 2.0
+     * @since 2.0
      */
     protected File[] filterDirectoryContents(File directory, int depth, File[] files) throws IOException {
         return files;

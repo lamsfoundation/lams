@@ -57,8 +57,8 @@ import java.io.InputStream;
  *  }
  * </pre>
  *
- * @since Commons IO 1.3
- * @version $Revision$
+ * @since 1.3
+ * @version $Id$
  */
 public class NullInputStream extends InputStream {
 
@@ -176,9 +176,9 @@ public class NullInputStream extends InputStream {
      *
      * @return Either The byte value returned by <code>processByte()</code>
      * or <code>-1</code> if the end of file has been reached and
-     * <code>throwEofException</code> is set to <code>false</code>.
+     * <code>throwEofException</code> is set to {@code false}.
      * @throws EOFException if the end of file is reached and
-     * <code>throwEofException</code> is set to <code>true</code>.
+     * <code>throwEofException</code> is set to {@code true}.
      * @throws IOException if trying to read past the end of file.
      */
     @Override
@@ -199,9 +199,9 @@ public class NullInputStream extends InputStream {
      * @param bytes The byte array to read into
      * @return The number of bytes read or <code>-1</code>
      * if the end of file has been reached and
-     * <code>throwEofException</code> is set to <code>false</code>.
+     * <code>throwEofException</code> is set to {@code false}.
      * @throws EOFException if the end of file is reached and
-     * <code>throwEofException</code> is set to <code>true</code>.
+     * <code>throwEofException</code> is set to {@code true}.
      * @throws IOException if trying to read past the end of file.
      */
     @Override
@@ -217,9 +217,9 @@ public class NullInputStream extends InputStream {
      * @param length The number of bytes to read.
      * @return The number of bytes read or <code>-1</code>
      * if the end of file has been reached and
-     * <code>throwEofException</code> is set to <code>false</code>.
+     * <code>throwEofException</code> is set to {@code false}.
      * @throws EOFException if the end of file is reached and
-     * <code>throwEofException</code> is set to <code>true</code>.
+     * <code>throwEofException</code> is set to {@code true}.
      * @throws IOException if trying to read past the end of file.
      */
     @Override
@@ -256,7 +256,7 @@ public class NullInputStream extends InputStream {
         if (mark < 0) {
             throw new IOException("No position has been marked");
         }
-        if (position > (mark + readlimit)) {
+        if (position > mark + readlimit) {
             throw new IOException("Marked position [" + mark +
                     "] is no longer valid - passed the read limit [" +
                     readlimit + "]");
@@ -271,9 +271,9 @@ public class NullInputStream extends InputStream {
      * @param numberOfBytes The number of bytes to skip.
      * @return The number of bytes skipped or <code>-1</code>
      * if the end of file has been reached and
-     * <code>throwEofException</code> is set to <code>false</code>.
+     * <code>throwEofException</code> is set to {@code false}.
      * @throws EOFException if the end of file is reached and
-     * <code>throwEofException</code> is set to <code>true</code>.
+     * <code>throwEofException</code> is set to {@code true}.
      * @throws IOException if trying to read past the end of file.
      */
     @Override
@@ -323,9 +323,9 @@ public class NullInputStream extends InputStream {
      * Handle End of File.
      *
      * @return <code>-1</code> if <code>throwEofException</code> is
-     * set to <code>false</code>
+     * set to {@code false}
      * @throws EOFException if <code>throwEofException</code> is set
-     * to <code>true</code>.
+     * to {@code true}.
      */
     private int doEndOfFile() throws EOFException {
         eof = true;

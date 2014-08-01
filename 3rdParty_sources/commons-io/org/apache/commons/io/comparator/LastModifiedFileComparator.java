@@ -42,8 +42,8 @@ import java.util.Comparator;
  * </pre>
  * <p>
  *
- * @version $Revision$ $Date$
- * @since Commons IO 1.4
+ * @version $Id$
+ * @since 1.4
  */
 public class LastModifiedFileComparator extends AbstractFileComparator implements Serializable {
 

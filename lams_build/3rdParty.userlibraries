@@ -12,7 +12,6 @@
         <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
-        <archive javadoc="http://commons.apache.org/io/api-2.1/" path="/lams_build/lib/jakarta-commons/commons-io-2.1.jar" source="/3rdParty_sources/commons-io"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-codec-1.3.jar"/>
         <archive javadoc="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/" path="/lams_build/lib/jakarta-commons/commons-lang.jar" source="/3rdParty_sources/commons-lang"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-logging.jar"/>

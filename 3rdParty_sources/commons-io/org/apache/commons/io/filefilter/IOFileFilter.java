@@ -24,10 +24,8 @@ import java.io.FilenameFilter;
  * An interface which brings the FileFilter and FilenameFilter 
  * interfaces together.
  * 
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
- * 
- * @author Stephen Colebourne
+ * @since 1.0
+ * @version $Id$
  */
 public interface IOFileFilter extends FileFilter, FilenameFilter {
 

@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,10 +59,9 @@ import org.apache.commons.io.ByteOrderMark;
  * Originally developed for <a href="http://rome.dev.java.net">ROME</a> under
  * Apache License 2.0.
  *
- * @author Alejandro Abdelnur
  * @version $Id$
  * @see org.apache.commons.io.output.XmlStreamWriter
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class XmlStreamReader extends Reader {
     private static final int BUFFER_SIZE = 4096;
@@ -74,22 +74,35 @@ public class XmlStreamReader extends Reader {
 
     private static final String UTF_16LE = "UTF-16LE";
 
+    private static final String UTF_32BE = "UTF-32BE";
+
+    private static final String UTF_32LE = "UTF-32LE";
+
     private static final String UTF_16 = "UTF-16";
+
+    private static final String UTF_32 = "UTF-32";
 
     private static final String EBCDIC = "CP1047";
 
     private static final ByteOrderMark[] BOMS = new ByteOrderMark[] {
         ByteOrderMark.UTF_8,
         ByteOrderMark.UTF_16BE,
-        ByteOrderMark.UTF_16LE
+        ByteOrderMark.UTF_16LE,
+        ByteOrderMark.UTF_32BE,
+        ByteOrderMark.UTF_32LE
     };
+    
+    // UTF_16LE and UTF_32LE have the same two starting BOM bytes.
     private static final ByteOrderMark[] XML_GUESS_BYTES = new ByteOrderMark[] {
         new ByteOrderMark(UTF_8,    0x3C, 0x3F, 0x78, 0x6D),
         new ByteOrderMark(UTF_16BE, 0x00, 0x3C, 0x00, 0x3F),
         new ByteOrderMark(UTF_16LE, 0x3C, 0x00, 0x3F, 0x00),
+        new ByteOrderMark(UTF_32BE, 0x00, 0x00, 0x00, 0x3C, 
+                0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6D),
+        new ByteOrderMark(UTF_32LE, 0x3C, 0x00, 0x00, 0x00, 
+                0x3F, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00),
         new ByteOrderMark(EBCDIC,   0x4C, 0x6F, 0xA7, 0x94)
     };
-
 
     private final Reader reader;
 
@@ -477,7 +490,7 @@ public class XmlStreamReader extends Reader {
             encoding = ex.getContentTypeEncoding();
         }
         if (encoding == null) {
-            encoding = (defaultEncoding == null) ? UTF_8 : defaultEncoding;
+            encoding = defaultEncoding == null ? UTF_8 : defaultEncoding;
         }
         return encoding;
     }
@@ -497,7 +510,7 @@ public class XmlStreamReader extends Reader {
         // BOM is Null
         if (bomEnc == null) {
             if (xmlGuessEnc == null || xmlEnc == null) {
-                return (defaultEncoding == null ? UTF_8 : defaultEncoding);
+                return defaultEncoding == null ? UTF_8 : defaultEncoding;
             }
             if (xmlEnc.equals(UTF_16) &&
                (xmlGuessEnc.equals(UTF_16BE) || xmlGuessEnc.equals(UTF_16LE))) {
@@ -526,6 +539,19 @@ public class XmlStreamReader extends Reader {
                 throw new XmlStreamReaderException(msg, bomEnc, xmlGuessEnc, xmlEnc);
             }
             if (xmlEnc != null && !xmlEnc.equals(UTF_16) && !xmlEnc.equals(bomEnc)) {
+                String msg = MessageFormat.format(RAW_EX_1, new Object[] { bomEnc, xmlGuessEnc, xmlEnc });
+                throw new XmlStreamReaderException(msg, bomEnc, xmlGuessEnc, xmlEnc);
+            }
+            return bomEnc;
+        }
+
+        // BOM is UTF-32BE or UTF-32LE
+        if (bomEnc.equals(UTF_32BE) || bomEnc.equals(UTF_32LE)) {
+            if (xmlGuessEnc != null && !xmlGuessEnc.equals(bomEnc)) {
+                String msg = MessageFormat.format(RAW_EX_1, new Object[] { bomEnc, xmlGuessEnc, xmlEnc });
+                throw new XmlStreamReaderException(msg, bomEnc, xmlGuessEnc, xmlEnc);
+            }
+            if (xmlEnc != null && !xmlEnc.equals(UTF_32) && !xmlEnc.equals(bomEnc)) {
                 String msg = MessageFormat.format(RAW_EX_1, new Object[] { bomEnc, xmlGuessEnc, xmlEnc });
                 throw new XmlStreamReaderException(msg, bomEnc, xmlGuessEnc, xmlEnc);
             }
@@ -576,7 +602,7 @@ public class XmlStreamReader extends Reader {
             if (appXml) {
                 return calculateRawEncoding(bomEnc, xmlGuessEnc, xmlEnc);
             } else {
-                return (defaultEncoding == null) ? US_ASCII : defaultEncoding;
+                return defaultEncoding == null ? US_ASCII : defaultEncoding;
             }
         }
 
@@ -592,6 +618,24 @@ public class XmlStreamReader extends Reader {
         // UTF-16 content type encoding
         if (cTEnc.equals(UTF_16)) {
             if (bomEnc != null && bomEnc.startsWith(UTF_16)) {
+                return bomEnc;
+            }
+            String msg = MessageFormat.format(HTTP_EX_2, cTMime, cTEnc, bomEnc, xmlGuessEnc, xmlEnc);
+            throw new XmlStreamReaderException(msg, cTMime, cTEnc, bomEnc, xmlGuessEnc, xmlEnc);
+        }
+
+        // UTF-32BE or UTF-132E content type encoding
+        if (cTEnc.equals(UTF_32BE) || cTEnc.equals(UTF_32LE)) {
+            if (bomEnc != null) {
+                String msg = MessageFormat.format(HTTP_EX_1, cTMime, cTEnc, bomEnc, xmlGuessEnc, xmlEnc);
+                throw new XmlStreamReaderException(msg, cTMime, cTEnc, bomEnc, xmlGuessEnc, xmlEnc);
+            }
+            return cTEnc;
+        }
+
+        // UTF-32 content type encoding
+        if (cTEnc.equals(UTF_32)) {
+            if (bomEnc != null && bomEnc.startsWith(UTF_32)) {
                 return bomEnc;
             }
             String msg = MessageFormat.format(HTTP_EX_2, cTMime, cTEnc, bomEnc, xmlGuessEnc, xmlEnc);
@@ -629,7 +673,7 @@ public class XmlStreamReader extends Reader {
      * httpContentType is NULL.
      *
      * @param httpContentType the HTTP content type
-     * @return The content type encoding
+     * @return The content type encoding (upcased)
      */
     static String getContentTypeEncoding(String httpContentType) {
         String encoding = null;
@@ -638,8 +682,8 @@ public class XmlStreamReader extends Reader {
             if (i > -1) {
                 String postMime = httpContentType.substring(i + 1);
                 Matcher m = CHARSET_PATTERN.matcher(postMime);
-                encoding = (m.find()) ? m.group(1) : null;
-                encoding = (encoding != null) ? encoding.toUpperCase() : null;
+                encoding = m.find() ? m.group(1) : null;
+                encoding = encoding != null ? encoding.toUpperCase(Locale.US) : null;
             }
         }
         return encoding;
@@ -717,7 +761,7 @@ public class XmlStreamReader extends Reader {
                (mime.equals("application/xml") || 
                 mime.equals("application/xml-dtd") ||
                 mime.equals("application/xml-external-parsed-entity") ||
-               (mime.startsWith("application/") && mime.endsWith("+xml")));
+               mime.startsWith("application/") && mime.endsWith("+xml"));
     }
 
     /**
@@ -731,7 +775,7 @@ public class XmlStreamReader extends Reader {
         return mime != null &&
               (mime.equals("text/xml") ||
                mime.equals("text/xml-external-parsed-entity") ||
-              (mime.startsWith("text/") && mime.endsWith("+xml")));
+              mime.startsWith("text/") && mime.endsWith("+xml"));
     }
 
     private static final String RAW_EX_1 =

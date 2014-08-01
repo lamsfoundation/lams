@@ -40,8 +40,8 @@ import java.util.Comparator;
  * </pre>
  * <p>
  *
- * @version $Revision$ $Date$
- * @since Commons IO 2.0
+ * @version $Id$
+ * @since 2.0
  */
 public class DirectoryFileComparator extends AbstractFileComparator implements Serializable {
 
@@ -60,7 +60,7 @@ public class DirectoryFileComparator extends AbstractFileComparator implements S
      * {@link File#compareTo(File)} with file2 as the parameter.
      */
     public int compare(File file1, File file2) {
-        return (getType(file1) - getType(file2));
+        return getType(file1) - getType(file2);
     }
 
     /**

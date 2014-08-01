@@ -37,7 +37,7 @@ import java.io.Serializable;
  * {@link #newChildInstance(File)} to return a new instance of the appropriate type.
  * You may also want to override the {@link #refresh(File)} method.
  * @see FileAlterationObserver
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class FileEntry implements Serializable {
 
@@ -88,7 +88,7 @@ public class FileEntry implements Serializable {
      * and <code>length</code> properties are compared for changes
      *
      * @param file the file instance to compare to
-     * @return <code>true</code> if the file has changed, otherwise <code>false</code>
+     * @return {@code true} if the file has changed, otherwise {@code false}
      */
     public boolean refresh(File file) {
 
@@ -101,15 +101,15 @@ public class FileEntry implements Serializable {
         // refresh the values
         name         = file.getName();
         exists       = file.exists();
-        directory    = (exists ? file.isDirectory() : false);
-        lastModified = (exists ? file.lastModified() : 0);
-        length       = (exists && !directory ? file.length() : 0);
+        directory    = exists ? file.isDirectory() : false;
+        lastModified = exists ? file.lastModified() : 0;
+        length       = exists && !directory ? file.length() : 0;
 
         // Return if there are changes
-        return (exists != origExists ||
+        return exists != origExists ||
                 lastModified != origLastModified ||
                 directory != origDirectory ||
-                length != origLength);
+                length != origLength;
     }
 
     /**

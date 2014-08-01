@@ -28,8 +28,8 @@ import java.io.Writer;
  * For safe usage with multiple {@link Thread}s then
  * <code>java.io.StringWriter</code> should be used.
  *
- * @version $Revision$ $Date$
- * @since Commons IO 2.0
+ * @version $Id$
+ * @since 2.0
  */
 public class StringBuilderWriter extends Writer implements Serializable {
 
@@ -57,7 +57,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
      * @param builder The String builder
      */
     public StringBuilderWriter(StringBuilder builder) {
-        this.builder = (builder != null ? builder : new StringBuilder());
+        this.builder = builder != null ? builder : new StringBuilder();
     }
 
     /**

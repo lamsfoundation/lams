@@ -72,8 +72,7 @@ import java.nio.charset.CodingErrorAction;
  * 
  * @see org.apache.commons.io.output.WriterOutputStream
  * 
- * @author <a href="mailto:veithen@apache.org">Andreas Veithen</a>
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class ReaderInputStream extends InputStream {
     private static final int DEFAULT_BUFFER_SIZE = 1024;
@@ -92,7 +91,7 @@ public class ReaderInputStream extends InputStream {
      * as it is only used to transfer data from the decoder to the
      * buffer provided by the caller.
      */
-    private final ByteBuffer encoderOut = ByteBuffer.allocate(128);
+    private final ByteBuffer encoderOut;
 
     private CoderResult lastCoderResult;
     private boolean endOfInput;
@@ -102,7 +101,7 @@ public class ReaderInputStream extends InputStream {
      * 
      * @param reader the target {@link Reader}
      * @param encoder the charset encoder
-     * @since Commons IO 2.1
+     * @since 2.1
      */
     public ReaderInputStream(Reader reader, CharsetEncoder encoder) {
         this(reader, encoder, DEFAULT_BUFFER_SIZE);
@@ -114,13 +113,15 @@ public class ReaderInputStream extends InputStream {
      * @param reader the target {@link Reader}
      * @param encoder the charset encoder
      * @param bufferSize the size of the input buffer in number of characters
-     * @since Commons IO 2.1
+     * @since 2.1
      */
     public ReaderInputStream(Reader reader, CharsetEncoder encoder, int bufferSize) {
         this.reader = reader;
         this.encoder = encoder;
-        encoderIn = CharBuffer.allocate(bufferSize);
-        encoderIn.flip();
+        this.encoderIn = CharBuffer.allocate(bufferSize);
+        this.encoderIn.flip();
+        this.encoderOut = ByteBuffer.allocate(128);
+        this.encoderOut.flip();
     }
 
     /**
@@ -182,6 +183,32 @@ public class ReaderInputStream extends InputStream {
     }
 
     /**
+     * Fills the internal char buffer from the reader.
+     * 
+     * @throws IOException
+     *             If an I/O error occurs
+     */
+    private void fillBuffer() throws IOException {
+        if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
+            encoderIn.compact();
+            int position = encoderIn.position();
+            // We don't use Reader#read(CharBuffer) here because it is more efficient
+            // to write directly to the underlying char array (the default implementation
+            // copies data to a temporary char array).
+            int c = reader.read(encoderIn.array(), position, encoderIn.remaining());
+            if (c == -1) {
+                endOfInput = true;
+            } else {
+                encoderIn.position(position+c);
+            }
+            encoderIn.flip();
+        }
+        encoderOut.compact();
+        lastCoderResult = encoder.encode(encoderIn, encoderOut, endOfInput);
+        encoderOut.flip();
+    }
+    
+    /**
      * Read the specified number of bytes into an array.
      * 
      * @param b the byte array to read into
@@ -193,33 +220,27 @@ public class ReaderInputStream extends InputStream {
      */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException("Byte array must not be null");
+        }
+        if (len < 0 || off < 0 || (off + len) > b.length) {
+            throw new IndexOutOfBoundsException("Array Size=" + b.length +
+                    ", offset=" + off + ", length=" + len);
+        }
         int read = 0;
+        if (len == 0) {
+            return 0; // Always return 0 if len == 0
+        }
         while (len > 0) {
-            if (encoderOut.position() > 0) {
-                encoderOut.flip();
+            if (encoderOut.hasRemaining()) {
                 int c = Math.min(encoderOut.remaining(), len);
                 encoderOut.get(b, off, c);
                 off += c;
                 len -= c;
                 read += c;
-                encoderOut.compact();
             } else {
-                if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
-                    encoderIn.compact();
-                    int position = encoderIn.position();
-                    // We don't use Reader#read(CharBuffer) here because it is more efficient
-                    // to write directly to the underlying char array (the default implementation
-                    // copies data to a temporary char array).
-                    int c = reader.read(encoderIn.array(), position, encoderIn.remaining());
-                    if (c == -1) {
-                        endOfInput = true;
-                    } else {
-                        encoderIn.position(position+c);
-                    }
-                    encoderIn.flip();
-                }
-                lastCoderResult = encoder.encode(encoderIn, encoderOut, endOfInput);
-                if (endOfInput && encoderOut.position() == 0) {
+                fillBuffer();
+                if (endOfInput && !encoderOut.hasRemaining()) {
                     break;
                 }
             }
@@ -249,8 +270,16 @@ public class ReaderInputStream extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        byte[] b = new byte[1];
-        return read(b) == -1 ? -1 : b[0] & 0xFF;
+        for (;;) {
+            if (encoderOut.hasRemaining()) {
+                return encoderOut.get() & 0xFF;
+            } else {
+                fillBuffer();
+                if (endOfInput && !encoderOut.hasRemaining()) {
+                    return -1;
+                }
+            }
+        }
     }
 
     /**

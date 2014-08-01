@@ -59,7 +59,7 @@ import org.apache.commons.io.TaggedIOException;
  * </pre>
  *
  * @see TaggedIOException
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class TaggedInputStream extends ProxyInputStream {
 
@@ -81,8 +81,8 @@ public class TaggedInputStream extends ProxyInputStream {
      * Tests if the given exception was caused by this stream.
      *
      * @param exception an exception
-     * @return <code>true</code> if the exception was thrown by this stream,
-     *         <code>false</code> otherwise
+     * @return {@code true} if the exception was thrown by this stream,
+     *         {@code false} otherwise
      */
     public boolean isCauseOf(Throwable exception) {
         return TaggedIOException.isTaggedWith(exception, tag);

@@ -33,10 +33,9 @@ import org.apache.commons.io.input.XmlStreamReader;
  * Character stream that handles all the necessary Voodo to figure out the
  * charset encoding of the XML document written to the stream.
  *
- * @author Herve Boutemy
  * @version $Id$
  * @see XmlStreamReader
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class XmlStreamWriter extends Writer {
     private static final int BUFFER_SIZE = 4096;
@@ -70,7 +69,7 @@ public class XmlStreamWriter extends Writer {
      */
     public XmlStreamWriter(OutputStream out, String defaultEncoding) {
         this.out = out;
-        this.defaultEncoding = (defaultEncoding != null ? defaultEncoding : "UTF-8");
+        this.defaultEncoding = defaultEncoding != null ? defaultEncoding : "UTF-8";
     }
 
     /**

@@ -31,7 +31,7 @@ import java.io.InputStream;
  * with a correct content length.
  *
  * @version $Id$
- * @since Commons IO 2.0
+ * @since 2.0
  */
 public class BoundedInputStream extends InputStream {
 
@@ -83,7 +83,7 @@ public class BoundedInputStream extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        if (max>=0 && pos==max) {
+        if (max >= 0 && pos >= max) {
             return -1;
         }
         int result = in.read();
@@ -164,7 +164,7 @@ public class BoundedInputStream extends InputStream {
 
     /**
      * Invokes the delegate's <code>close()</code> method
-     * if {@link #isPropagateClose()} is <code>true</code>.
+     * if {@link #isPropagateClose()} is {@code true}.
      * @throws IOException if an I/O error occurs
      */
     @Override
@@ -207,9 +207,9 @@ public class BoundedInputStream extends InputStream {
      * Indicates whether the {@link #close()} method
      * should propagate to the underling {@link InputStream}.
      *
-     * @return <code>true</code> if calling {@link #close()}
+     * @return {@code true} if calling {@link #close()}
      * propagates to the <code>close()</code> method of the
-     * underlying stream or <code>false</code> if it does not.
+     * underlying stream or {@code false} if it does not.
      */
     public boolean isPropagateClose() {
         return propagateClose;
@@ -219,10 +219,10 @@ public class BoundedInputStream extends InputStream {
      * Set whether the {@link #close()} method
      * should propagate to the underling {@link InputStream}.
      *
-     * @param propagateClose <code>true</code> if calling
+     * @param propagateClose {@code true} if calling
      * {@link #close()} propagates to the <code>close()</code>
      * method of the underlying stream or
-     * <code>false</code> if it does not.
+     * {@code false} if it does not.
      */
     public void setPropagateClose(boolean propagateClose) {
         this.propagateClose = propagateClose;

@@ -20,5 +20,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/beanutils/main/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-io"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

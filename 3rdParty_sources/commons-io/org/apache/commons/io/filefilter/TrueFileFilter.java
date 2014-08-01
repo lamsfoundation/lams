@@ -22,17 +22,15 @@ import java.io.Serializable;
 /**
  * A file filter that always returns true.
  *
- * @since Commons IO 1.0
- * @version $Revision$ $Date$
- *
- * @author Stephen Colebourne
+ * @since 1.0
+ * @version $Id$
  * @see FileFilterUtils#trueFileFilter()
  */
 public class TrueFileFilter implements IOFileFilter, Serializable {
 
     /**
      * Singleton instance of true filter.
-     * @since Commons IO 1.3
+     * @since 1.3
      */
     public static final IOFileFilter TRUE = new TrueFileFilter();
     /**
@@ -52,7 +50,7 @@ public class TrueFileFilter implements IOFileFilter, Serializable {
     /**
      * Returns true.
      *
-     * @param file  the file to check
+     * @param file  the file to check (ignored)
      * @return true
      */
     public boolean accept(File file) {
@@ -62,8 +60,8 @@ public class TrueFileFilter implements IOFileFilter, Serializable {
     /**
      * Returns true.
      *
-     * @param dir  the directory to check
-     * @param name  the filename
+     * @param dir  the directory to check (ignored)
+     * @param name  the filename (ignored)
      * @return true
      */
     public boolean accept(File dir, String name) {
