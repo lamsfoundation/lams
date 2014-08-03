@@ -29,7 +29,12 @@ var currentEdit=null;
 			//open a popup window when the button is clicked
 			if (popupEqnwin==null || popupEqnwin.closed || !popupEqnwin.location) 
 			{
-				var url='http://latex.codecogs.com/editor_json3.php?type=url&editor=CKEditor';
+				// LDEV-3281: fixing protocol
+				var protocol = "http:";
+				if (window.location.protocol == "https:") {
+					var protocol = "https:";
+				}
+				var url=protocol+'//latex.codecogs.com/editor_json3.php?type=url&editor=CKEditor';
 		
 				//if(language!='') url+='&lang='+language;
 				if(latex!==undefined) 
