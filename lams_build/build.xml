@@ -741,6 +741,9 @@
                 <filter token="db.password" value="${db.password}"/>
 	        </filterset>
 		</copy>
+		
+		<!-- Mark EAR for WildFly deployment -->
+		<touch file="${server.home}/standalone/deployments/lams.ear.dodeploy" />
 
 		<!-- 
 		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
