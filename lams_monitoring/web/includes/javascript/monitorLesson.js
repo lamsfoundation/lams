@@ -816,7 +816,8 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
-				if (activity.url || (activity.isBranching && !activity.flaFormat)) {
+				var isBranching = [10,11,12,13].indexOf(activity.type) > -1;
+				if (activity.url || (isBranching && !activity.flaFormat)) {
 					// find the activity in SVG
 					var coord = getActivityCoordinates(activity);
 					if (!coord || !coord.elem) {
@@ -826,7 +827,7 @@ function updateSequenceTab() {
 					var activityElems = [coord.elem],
 						dblClickFunction = 
 							// different behaviour for regular/branching activities
-							activity.isBranching ? 
+							isBranching ? 
 							function(){ showBranchingSequence(activity.id); }
 							:
 							function(){  
