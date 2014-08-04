@@ -193,7 +193,7 @@
   </appender>
  
   <appender name="LAMSFILE" class="org.jboss.logging.appender.RollingFileAppender">
-    <param name="File" value="${jboss.server.home.dir}/log/@application@.log"/>
+    <param name="File" value="${jboss.server.home.dir}/log/lams.log"/>
     <param name="Append" value="true"/>
     <param name="MaxFileSize" value="5MB"/>
     <param name="MaxBackupIndex" value="20"/>

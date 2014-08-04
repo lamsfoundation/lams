@@ -217,7 +217,7 @@
 
 		<echo>Copying EAR configuration files</echo>
 		<copy tofile="assembly/lams.ear/META-INF/MANIFEST.MF" verbose="true">
-			<fileset dir="conf/j2ee">
+			<fileset dir="${conf.dir}/j2ee">
 				<include name="MANIFEST-template.MF" />
 			</fileset>
 	        <filterset>
@@ -226,7 +226,7 @@
 		</copy>
 		
 		<copy todir="assembly/lams.ear/META-INF" verbose="true">
-			<fileset dir="conf/j2ee">
+			<fileset dir="${conf.dir}/j2ee">
 				<include name="*.xml" />
 			</fileset>
 		</copy>
@@ -741,7 +741,7 @@
                 <filter token="db.password" value="${db.password}"/>
 	        </filterset>
 		</copy>
-		
+
 		<!-- 
 		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
@@ -751,15 +751,6 @@
 	        <filterset>
 	                <filter token="confdir" value="${server.home}/standalone/configuration" />
 	        </filterset>
-		</copy>
-		
-		<copy todir="${server.home}/standalone/configuration/" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss">
-				<include name="jboss-log4j.xml" />
-			</fileset>
-			<filterset>
-				<filter token="application" value="lams"/>
-			</filterset>
 		</copy>
 		
 		<copy todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true">
