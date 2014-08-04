@@ -247,7 +247,7 @@
 
   	<tag>
 		<name>STRUTS-textarea</name>
-		<tagclass>org.lamsfoundation.lams.web.tag.MultiLinesTextareaTag</tagclass>
+		<tag-class>org.lamsfoundation.lams.web.tag.MultiLinesTextareaTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute>
 			<name>accesskey</name>
