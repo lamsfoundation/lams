@@ -4,7 +4,8 @@
 	<tr> 
 		<td> 
 			<div align="center" class="heading">
-				<p><fmt:message key="${messageKey}"/>
+				<p>
+					${messageKey}
 				</p>
 			</div>
 		</td>
