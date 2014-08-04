@@ -91,7 +91,10 @@
 	<!-- This directives says that our lams.ear contains JARs
 		 that should be accessible to all modules withing this EAR.
 		 This makes 3rd party modules section obsolete.
-	-->
+		 
+		 Removed for WildFly as 3rd party libs were linked as WildFly modules
+		 and this directive causes deployment errors.
+	
 	<library-directory>.</library-directory>
-	 
+	-->
  </application>
