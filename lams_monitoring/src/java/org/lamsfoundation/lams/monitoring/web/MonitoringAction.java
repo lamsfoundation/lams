@@ -1044,7 +1044,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    activityJSON.put("x", ((OptionsWithSequencesActivity) activity).getStartXcoord());
 		    activityJSON.put("y", ((OptionsWithSequencesActivity) activity).getStartYcoord());
 		} else if ((parentActivity != null)
-			&& (Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId())) {
+			&& (Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId() || Activity.PARALLEL_ACTIVITY_TYPE == parentActivity
+				.getActivityTypeId())) {
 		    // Optional Activity children had coordinates relative to parent
 		    activityJSON.put("x", parentActivity.getXcoord() + activity.getXcoord());
 		    activityJSON.put("y", parentActivity.getYcoord() + activity.getYcoord());
