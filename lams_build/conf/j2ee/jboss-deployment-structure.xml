@@ -1,6 +1,6 @@
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
   <!-- Make sub deployments isolated by default, so they cannot see each others classes without a Class-Path entry -->
-  <ear-subdeployments-isolated>true</ear-subdeployments-isolated>
+  <ear-subdeployments-isolated>false</ear-subdeployments-isolated>
   <deployment>
     <!-- exclude-subsystem prevents a subsystems deployment unit processors running on a deployment -->
     <!-- which gives basically the same effect as removing the subsystem, but it only affects single deployment 
