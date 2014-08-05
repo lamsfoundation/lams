@@ -235,7 +235,9 @@
 	
 	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
 		<echo>Deploying EAR</echo>
-		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
+		<delete>
+			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear*"/>
+		</delete>
 		<copy todir="${server.home}/standalone/deployments/lams.ear">
 			<fileset dir="assembly/lams.ear" />
 		</copy>
