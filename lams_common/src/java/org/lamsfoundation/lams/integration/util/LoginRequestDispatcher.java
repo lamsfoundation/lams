@@ -84,6 +84,10 @@ public class LoginRequestDispatcher {
     public static final String METHOD_MONITOR = "monitor";
 
     public static final String METHOD_LEARNER = "learner";
+    
+    // the same as METHOD_LEARNER but additionally requires hash to contain lsId in order to prevent users tampering
+    // with lesson id parameter
+   public static final String METHOD_LEARNER_STRICT_AUTHENTICATION = "learnerStrictAuth";
 
     public static final String PARAM_LESSON_ID = "lsid";
 
@@ -160,7 +164,7 @@ public class LoginRequestDispatcher {
 	    return request.getContextPath() + URL_MONITOR + lessonId;
 	}
 	/** LEARNER * */
-	else if (METHOD_LEARNER.equals(method) && lessonId != null) {
+	else if ((METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) && lessonId != null) {
 	    String url = request.getContextPath() + URL_LEARNER + lessonId;
 	    if (mode != null) {
 		url += "&" + PARAM_MODE + "=" + mode;
@@ -192,7 +196,7 @@ public class LoginRequestDispatcher {
 	    throw new UserInfoFetchException(error);
 	}
 
-	if (METHOD_LEARNER.equals(method))
+	if (METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method))
 	    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
 	else if (METHOD_MONITOR.equals(method))
 	    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
