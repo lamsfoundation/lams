@@ -61,7 +61,7 @@
 		</c:if>
 			
 		<div class="space-bottom-top align-right">
-			<html:link href="${fn:escapeXml(learnerURL)}" styleClass="button">
+			<html:link href="${lams}home.do?method=learner&lessonID=${lesson.lessonId}&isLessonIntroWatched=true" styleClass="button">
 				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
 			</html:link>
 		</div>

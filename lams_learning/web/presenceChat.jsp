@@ -1,9 +1,9 @@
 <%-- css --%>
 <link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="css/presence.css" />
+<link type="text/css" rel="stylesheet" href="<c:url value="/"/>css/presence.css" />
 
 <%-- javascript --%>
-<script type="text/javascript" src="includes/javascript/presence.js"></script>
+<script type="text/javascript" src="<c:url value="/"/>includes/javascript/presence.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 
 <script type="text/javascript">
@@ -11,10 +11,10 @@
 		
 	var lamsUrl = "<lams:LAMSURL/>";
 	var actionUrl = lamsUrl + "PresenceChat.do";
-	var lessonId = "${param.lessonID}";
-	var presenceEnabled = ${param.presenceEnabledPatch eq 'true'};
-	var presenceShown = ${param.presenceShown eq 'true'};
-	var presenceImEnabled = ${param.presenceImEnabled eq 'true'};
+	var lessonId = "${lessonID}";
+	var presenceEnabled = ${presenceEnabledPatch eq 'true'};
+	var presenceShown = ${presenceShown eq 'true'};
+	var presenceImEnabled = ${presenceImEnabled eq 'true'};
 	<c:set var="displayName">
 		<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>
 	</c:set>
@@ -76,7 +76,7 @@
 <%-- initial html / presence.js adds on html into here --%>
 <div id="presenceChat" class="startHidden">
 	<%-- only pop the message box if im is enabled --%>
-	<c:if test="${param.presenceImEnabled}">
+	<c:if test="${presenceImEnabled}">
 	<div id="presenceChatTabs">
 		<div id="tabWrapper">
 			<div id="leftSliderDiv">
