@@ -26,4 +26,7 @@
   <resources>
     <resource-root path="urlrewrite-3.2.0.jar"/>
   </resources>
+  <dependencies>
+  	<module name="javax.servlet.api" />
+  </dependencies>
 </module>

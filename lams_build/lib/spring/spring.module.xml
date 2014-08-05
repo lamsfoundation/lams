@@ -28,4 +28,9 @@
     <resource-root path="jboss-spring-int-vfs.jar"/>
     <resource-root path="spring.jar"/>
   </resources>
+  <dependencies>
+  	<module name="javax.servlet.api" />
+  	<module name="org.hibernate" />
+  	<module name="org.apache.commons.logging" />
+  </dependencies>
 </module>

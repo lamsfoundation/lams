@@ -26,4 +26,8 @@
   <resources>
     <resource-root path="fckeditor-java-core-2.6.jar"/>
   </resources>
+  <dependencies>
+  	<module name="javax.servlet.api" />
+  	<module name="org.slf4j" />
+  </dependencies>
 </module>

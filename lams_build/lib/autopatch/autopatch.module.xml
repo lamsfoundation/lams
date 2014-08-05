@@ -27,4 +27,8 @@
     <resource-root path="tk-autopatch-1.2.0-b2-cvs.jar"/>
     <resource-root path="tk-discovery-1.0.0.jar"/>
   </resources>
+  <dependencies>
+  	<module name="javax.servlet.api" />
+    <module name="org.apache.commons.logging" />
+  </dependencies>
 </module>

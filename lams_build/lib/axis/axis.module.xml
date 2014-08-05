@@ -28,7 +28,9 @@
     <resource-root path="axis-ant.jar"/>
   </resources>
   <dependencies>
+  	<module name="javax.servlet.api" />
     <module name="javax.xml.rpc.api"/> <!-- Depends on Saaj -->
     <module name="javax.wsdl4j.api" slot="1.5"/>
+    <module name="org.apache.commons.logging" />
   </dependencies>
 </module>

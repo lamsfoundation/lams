@@ -1,5 +1,5 @@
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
-  <!-- Make sub deployments isolated by default, so they cannot see each others classes without a Class-Path entry -->
+  <!-- Make sub deployments not isolated, so they can see each others classes without a Class-Path entry -->
   <ear-subdeployments-isolated>false</ear-subdeployments-isolated>
   <deployment>
     <!-- exclude-subsystem prevents a subsystems deployment unit processors running on a deployment -->
@@ -17,41 +17,43 @@
     
     <!-- This allows you to define additional dependencies, it is the same as using the Dependencies: manifest attribute -->
     <dependencies>
-      <module name="org.apache.poi" />
-      <module name="org.apache.aspirin" />
-      <module name="com.tacitknowledge.autopatch" />
-      <module name="org.apache.axis" /> <!-- depends on: saaj, jaxrpc -->
-      <module name="org.apache.batik" />
-      <module name="net.sf.cglib" />
-      <module name="net.fckeditor" />
-      <module name="com.flagstone" />
-      <module name="org.apache.commons.beanutils" /> <!-- depends on: commons logging, commons collections -->
-      <module name="org.apache.commons.io" />
-      <module name="org.apache.commons.lang" />
-      <module name="org.apache.commons.codec" />
-      <module name="org.apache.commons.pool" />
-      <module name="org.apache.commons.fileupload" />
-      <module name="org.apache.commons.httpclient" />
-      <module name="org.apache.commons.validator" />
-      <module name="org.hibernate.cache" />
-      <module name="org.jboss.cache" />
-      <module name="org.jgroups" />
-      <module name="org.jboss.jbossweb" />
-      <module name="org.jdom" slot="0.7" />
-      <module name="org.verisign.joid" />
-      <module name="com.google.gson" />
-      <module name="org.apache.lucene" slot="2.4" />
-      <module name="org.quartz" />
-      <module name="uk.ac.reload" />
-      <module name="org.springframework" />
-      <module name="org.apache.struts" /> <!-- depends on: antlr, apache oro -->
-      <module name="org.apache.strutsel" /> <!-- depends on: struts -->
-      <module name="org.tuckey.urlrewrite" />
-      <module name="com.allaire.wddx" />
-      <module name="org.apache.xmlcommons" />
-      <module name="com.thoughtworks.xstream" /> <!-- depends on: xom, xpp, joda -->
-      <module name="org.lamsfoundation.lams.session" />
-      <module name="org.lamsfoundation.lams.valve" />
+      <module name="org.apache.poi" export="true" />
+      <module name="org.apache.aspirin" export="true" />
+      <module name="com.tacitknowledge.autopatch" export="true" />
+      <module name="org.apache.axis" export="true" /> <!-- depends on: javax.xml.rpc.api, javax.wsdl4j.api:1.5 -->
+      <module name="org.apache.batik" export="true" />
+      <module name="net.sf.cglib" export="true" />
+      <module name="net.fckeditor" export="true" />
+      <module name="com.flagstone" export="true" />
+      <module name="org.apache.commons.beanutils" export="true" /> <!-- depends on: org.apache.commons.logging, org.apache.commons.collections -->
+      <module name="org.apache.commons.io" export="true" />
+      <module name="org.apache.commons.lang" export="true" />
+      <module name="org.apache.commons.codec" export="true" />
+      <module name="org.apache.commons.pool" export="true" />
+      <module name="org.apache.commons.fileupload" export="true" />
+      <module name="org.apache.commons.httpclient" export="true" />
+      <module name="org.apache.commons.validator" export="true" />
+      <module name="org.hibernate.cache" export="true" />
+      <module name="org.jboss.cache" export="true" />
+      <module name="org.jgroups" export="true" />
+      <module name="org.jboss.jbossweb" export="true" />
+      <module name="org.jdom" slot="0.7" export="true" />
+      <module name="org.verisign.joid" export="true" />
+      <module name="com.google.gson" export="true" />
+      <module name="org.apache.lucene" slot="2.4" export="true" />
+      <module name="org.quartz" export="true" />
+      <module name="uk.ac.reload" export="true" />
+      <module name="org.springframework" export="true" />
+      <module name="org.apache.struts" export="true" /> <!-- depends on: org.antlr, org.apache.oro, javax.servlet.jsp.api,
+      																	 org.apache.commons.validator, org.apache.commons.logging,
+      																	 org.apache.xmlcommons, org.apache.commons.digester -->
+      <module name="org.apache.strutsel" export="true" /> <!-- depends on: org.apache.struts, javax.servlet.jsp.api -->
+      <module name="org.tuckey.urlrewrite" export="true" />
+      <module name="com.allaire.wddx" export="true" />
+      <module name="org.apache.xmlcommons" export="true" />
+      <module name="com.thoughtworks.xstream" export="true" /> <!-- depends on: nu.xom, org.xmlpull (xpp), org.joda.time:2.1 -->
+      <module name="org.lamsfoundation.lams.session" export="true" />
+      <module name="org.lamsfoundation.lams.valve" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

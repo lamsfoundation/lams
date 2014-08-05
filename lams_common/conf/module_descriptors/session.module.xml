@@ -26,4 +26,8 @@
   <resources>
     <resource-root path="lams-session.jar"/>
   </resources>
+  <dependencies>
+  	<module name="javax.servlet.api" />
+  	<module name="org.apache.log4j" />
+  </dependencies>
 </module>
