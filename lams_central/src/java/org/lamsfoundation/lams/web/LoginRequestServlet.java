@@ -134,7 +134,12 @@ public class LoginRequestServlet extends HttpServlet {
 	    //in case of request for learner with strict authentication check cache should also contain lsid
 	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
 		String lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
+		if (lsId == null) {
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
+		    return;
+		}
 		Authenticator.authenticate(serverMap, timestamp, extUsername, method, lsId, hash);
+		
 	    } else {
 		Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
 	    }
