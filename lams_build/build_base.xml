@@ -121,9 +121,9 @@
 	<target name="copy-tags" description="Copies LAMS TLD and TAGs.">
 		<echo>${ant.project.name}: Copying tags from Central</echo>
    		<copy todir="${conf.web.dir}/WEB-INF/tlds/lams" 
-   			  file="${tag.web.dir}/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
+   			  file="../lams_central/web/WEB-INF/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
 		<copy todir="${conf.web.dir}/WEB-INF/tags" overwrite="true" verbose="true">
-			<fileset dir="${tag.web.dir}/tags" />
+			<fileset dir="../lams_central/web/WEB-INF/tags" />
 		</copy>
 	</target>
 	
