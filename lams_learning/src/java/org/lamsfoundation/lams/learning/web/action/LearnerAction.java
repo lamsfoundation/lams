@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -163,6 +162,11 @@ public class LearnerAction extends LamsDispatchAction {
 	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
 		request.setAttribute("messageKey", "User " + user.getLogin()
 			+ " is not a learner in the requested lesson.");
+		return mapping.findForward("message");
+	    }
+	    // check lesson's state if its suitable for learner's access
+	    if (!lesson.isLessonAccessibleForLearner()) {
+		request.setAttribute("messageKey", "Lesson is inaccessible");
 		return mapping.findForward("message");
 	    }
 
