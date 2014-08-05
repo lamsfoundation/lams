@@ -15,9 +15,7 @@
 	var presenceEnabled = ${presenceEnabledPatch eq 'true'};
 	var presenceShown = ${presenceShown eq 'true'};
 	var presenceImEnabled = ${presenceImEnabled eq 'true'};
-	<c:set var="displayName">
-		<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>
-	</c:set>
+	<c:set var="displayName"><lams:user property="firstName"/> <lams:user property="lastName"/></c:set>
 	var nickname = "<c:out value='${displayName}'/>";
 	
 	// labels used in JS file
