@@ -235,9 +235,7 @@
 	
 	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
 		<echo>Deploying EAR</echo>
-		<delete>
-			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear*"/>
-		</delete>
+		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
 		<copy todir="${server.home}/standalone/deployments/lams.ear">
 			<fileset dir="assembly/lams.ear" />
 		</copy>
@@ -505,6 +503,14 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/digester/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-digester*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/digester/main/module.xml"
+			  file="lib/jakarta-commons/digester.module.xml" overwrite="true" verbose="true" />
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-fileupload.jar" />
@@ -745,6 +751,9 @@
 		</copy>
 		
 		<!-- Mark EAR for WildFly deployment -->
+		<delete >
+			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear.*"/>
+		</delete>
 		<touch file="${server.home}/standalone/deployments/lams.ear.dodeploy" />
 
 		<!-- 
