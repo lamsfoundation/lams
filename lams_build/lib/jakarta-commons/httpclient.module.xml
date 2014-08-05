@@ -24,6 +24,6 @@
 
 <module xmlns="urn:jboss:module:1.3" name="org.apache.commons.httpclient">
   <resources>
-    <resource-root path="commons-httpclient.jar"/>
+    <resource-root path="commons-httpclient-3.0.jar"/>
   </resources>
 </module>

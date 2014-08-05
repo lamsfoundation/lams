@@ -412,7 +412,7 @@
 				<include name="xmlbeans-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
 			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
 		
 		
@@ -513,7 +513,7 @@
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
-				<include name="commons-httpclient.jar" />
+				<include name="commons-httpclient-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
