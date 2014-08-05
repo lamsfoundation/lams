@@ -29,5 +29,6 @@
   
   <dependencies>
     <module name="org.apache.struts"/>
+    <module name="javax.servlet.jsp.api"/>
   </dependencies>
 </module>
