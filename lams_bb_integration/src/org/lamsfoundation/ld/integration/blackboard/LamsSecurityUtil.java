@@ -61,11 +61,13 @@ public class LamsSecurityUtil {
      * @param ctx
      *            the blackboard contect, contains session data
      * @param method
-     *            the mehtod to request of LAMS "author", "monitor", "learner"
+     *            the mehtod to request of LAMS "author", "monitor", "learnerStrictAuth"
+     * @param lsid
+     *            lesson id. It is expected to be present in case of "monitor" and "learnerStrictAuth"
      * @return a url pointing to the LAMS lesson, monitor, author session
      * @throws Exception
      */
-    public static String generateRequestURL(Context ctx, String method) {
+    public static String generateRequestURL(Context ctx, String method, String lsid) {
 	
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
@@ -81,7 +83,7 @@ public class LamsSecurityUtil {
 	String firstName = ctx.getUser().getGivenName();
 	String lastName  = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
-	String hash = generateAuthenticationHash(timestamp, username, method, serverId);
+	String hash = generateAuthenticationHash(timestamp, username, method, lsid, serverId);
 	String courseId = ctx.getCourse().getCourseId();
 
 	String locale = ctx.getUser().getLocale();
@@ -96,6 +98,10 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(reqSrc, "UTF8") + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
 		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
 		    + "&email=" + URLEncoder.encode(email, "UTF-8");
+	    
+	    if ("learnerStrictAuth".equals(method) || "monitor".equals(method)) {
+		url +=  "&lsid=" + lsid;
+	    }
 		    
 	} catch (UnsupportedEncodingException e) {
 	    throw new RuntimeException(e);
@@ -425,11 +431,16 @@ public class LamsSecurityUtil {
 //    }
 
     // generate authentication hash code to validate parameters
-    public static String generateAuthenticationHash(String datetime, String login, String method, String serverId) {
+    public static String generateAuthenticationHash(String datetime, String login, String method, String lsid, String serverId) {
 	String secretkey = LamsPluginUtil.getSecretKey();
 
-	String plaintext = datetime.toLowerCase().trim() + login.toLowerCase().trim() + method.toLowerCase().trim()
-		+ serverId.toLowerCase().trim() + secretkey.toLowerCase().trim();
+	//in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid + serverID + serverKey]
+	//regular case: [ts + uid + method + serverID + serverKey]	
+	String plaintext = "learnerStrictAuth".equals(method) ? datetime.toLowerCase().trim()
+		+ login.toLowerCase().trim() + method.toLowerCase().trim() + lsid.toLowerCase().trim()
+		+ serverId.toLowerCase().trim() + secretkey.toLowerCase().trim() : datetime.toLowerCase().trim()
+		+ login.toLowerCase().trim() + method.toLowerCase().trim() + serverId.toLowerCase().trim()
+		+ secretkey.toLowerCase().trim();
 
 	String hash = sha1(plaintext);
 	return hash;
