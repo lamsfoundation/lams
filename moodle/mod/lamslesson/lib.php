@@ -57,6 +57,7 @@ define('LAMSLESSON_PARAM_LSID', 'lsid');
 define('LAMSLESSON_PARAM_AUTHOR_METHOD', 'author');
 define('LAMSLESSON_PARAM_MONITOR_METHOD', 'monitor');
 define('LAMSLESSON_PARAM_LEARNER_METHOD', 'learner');
+define('LAMSLESSON_PARAM_LEARNER_STRICT_METHOD', 'learnerStrictAuth');
 define('LAMSLESSON_PARAM_PREVIEW_METHOD', 'preview');
 define('LAMSLESSON_PARAM_VERIFY_METHOD', 'verify');
 define('LAMSLESSON_PARAM_JOIN', 'join');
@@ -703,11 +704,23 @@ function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $co
     $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
     
     $datetime = date('F d,Y g:i a');
-    $plaintext = trim($datetime)
-        .trim($username)
-        .trim($method)
-        .trim($CFG->lamslesson_serverid)
-        .trim($CFG->lamslesson_serverkey);
+
+    // check if we are to use lessonstrictauth
+    if ($method == LAMSLESSON_PARAM_LEARNER_STRICT_METHOD) {
+	$plaintext = trim($datetime)
+            .trim($username)
+            .trim($method)
+	    .trim($lessonid)
+            .trim($CFG->lamslesson_serverid)
+            .trim($CFG->lamslesson_serverkey);
+
+    } else {
+   	 $plaintext = trim($datetime)
+            .trim($username)
+            .trim($method)
+            .trim($CFG->lamslesson_serverid)
+            .trim($CFG->lamslesson_serverkey);
+    }
     $hash = sha1(strtolower($plaintext));
     $url = $CFG->lamslesson_serverurl. LAMSLESSON_LOGIN_REQUEST .
         '?'.LAMSLESSON_PARAM_UID.'='.$username.
