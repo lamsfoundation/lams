@@ -45,7 +45,7 @@
 	<!-- JNDI DataSource for all "core" components 		  -->
 	<!-- uses lams-ds datasource set up in the app-server -->
 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName"><value>java:jdbc/lams-ds</value></property>
+		<property name="jndiName"><value>java:jboss/datasources/lams-ds</value></property>
 	</bean>
 
 	<!--  Transaction manager for all transactions involving the core classes or the content repository. 

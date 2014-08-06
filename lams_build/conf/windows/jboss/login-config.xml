@@ -129,7 +129,7 @@ $Revision$
 	<application-policy name = "lams">
        <authentication>
           <login-module code = "org.lamsfoundation.lams.security.UniversalLoginModule" flag = "required">
-             <module-option name="dsJndiName">java:/jdbc/lams-ds</module-option>
+             <module-option name="dsJndiName">java:jboss/datasources/lams-ds</module-option>
              <module-option name="principalsQuery">select password from lams_user where login=?</module-option>
              <module-option name="rolesQuery">
              	SELECT DISTINCT  r.name,'Roles' FROM
