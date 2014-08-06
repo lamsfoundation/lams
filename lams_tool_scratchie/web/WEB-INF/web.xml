@@ -97,11 +97,6 @@
 </servlet>
 
 <servlet>
-		<servlet-name>completeItem</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.scratchie.web.servlet.CompleteItemServlet</servlet-class>
-</servlet>
-
-<servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
