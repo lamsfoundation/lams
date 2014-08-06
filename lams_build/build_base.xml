@@ -303,7 +303,7 @@
 	
 	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">	
 		<echo>${ant.project.name}: Deploying JAR</echo>
-		<copy file="${basedir}/build/lib/${product}.jar" todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
+		<copy file="${basedir}/build/lib/${product}.jar" todir="${server.home}/standalone/deployments/lams.ear/lib" overwrite="true" verbose="true" />
 	</target>
 	
 	
@@ -312,7 +312,7 @@
 		<copy file="${basedir}/build/lib/${product}.war" todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
 		
 		<echo>Copying language files for ${ant.project.name}, if exist</echo>
-		<copy todir="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		<copy todir="${server.home}/standalone/deployments/lams.ear/lib/lams-dictionary.jar/lib/${product.path.filesystem}" overwrite="true">
 		   <fileset dir="${conf.dir}/language/lams" erroronmissingdir="false">
 		    <include name="**/*.properties"/>
 		    <include name="**/*.txt"/>

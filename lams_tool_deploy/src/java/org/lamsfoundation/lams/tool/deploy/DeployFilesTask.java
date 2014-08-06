@@ -23,30 +23,30 @@
 
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
+
 import java.io.File;
 
 /**
  * Deploys required files to the lams ear.
+ * 
  * @author chris
  */
-public class DeployFilesTask extends FilesTask
-{
+public class DeployFilesTask extends FilesTask {
 
-    
     /**
-     * Copies files to lams.ear. 
+     * Copies files to lams.ear.
+     * 
      * @return Map containing key "numFiles", value Long
      */
-    public void execute() throws DeployException
-    {
-        File lamsEar =  getLamsEar();
-        int size = deployFiles.size();
-        for (int i = 0; i < size; i++)
-        {
-            copyFile(deployFiles.get(i), lamsEar);
-        }
-        
+    public void execute() throws DeployException {
+	File lamsEar = new File(lamsEarPath);
+	File lamsLib = new File(lamsLibPath);
+	for (String deployFile : deployFiles) {
+	    if (deployFile.endsWith(".jar")) {
+		copyFile(deployFile, lamsLib);
+	    } else {
+		copyFile(deployFile, lamsEar);
+	    }
+	}
     }
-    
-
 }

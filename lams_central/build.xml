@@ -67,7 +67,7 @@
 		</copy>
 		
 		<echo>${ant.project.name}: Copying language files</echo>
-		<copy todir="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar" overwrite="true">
+		<copy todir="${server.home}/standalone/deployments/lams.ear/lib/lams-dictionary.jar" overwrite="true">
 		   <fileset dir="${basedir}/build/lib/language" />
 		</copy>
 	</target>

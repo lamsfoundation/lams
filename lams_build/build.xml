@@ -179,20 +179,23 @@
 		<echo>${ant.project.name}: Copying libraries</echo>
 		<copy todir="assembly/lams.ear" flatten="true">
 			<fileset dir="..">
+				<include name="lams_monitoring/build/lib/*.war"/>
+				<include name="lams_learning/build/lib/*.war"/>
+				<include name="lams_admin/build/lib/*.war"/>
+				<include name="lams_gradebook/build/lib/*.war"/>
+			</fileset>
+		</copy>
+		<copy todir="assembly/lams.ear/lib" flatten="true">
+			<fileset dir="..">
 				<include name="lams_common/build/lib/lams.jar" />
 				<include name="lams_contentrepository/build/lib/*.jar" />
 				<include name="lams_central/build/lib/*.jar" />
 				<include name="lams_monitoring/build/lib/*.jar"/>
-				<include name="lams_monitoring/build/lib/*.war"/>
 				<include name="lams_learning/build/lib/*.jar"/>
-				<include name="lams_learning/build/lib/*.war"/>
 				<include name="lams_admin/build/lib/*.jar"/>
-				<include name="lams_admin/build/lib/*.war"/>
 				<include name="lams_gradebook/build/lib/*.jar"/>
-				<include name="lams_gradebook/build/lib/*.war"/>
 			</fileset>
 		</copy>
-		
 
 		<echo>Copying lams-central.war</echo>
 		<copy todir="assembly/lams.ear/lams-central.war">
@@ -205,7 +208,7 @@
 		/>
 		
 		<echo>Copying language files</echo>
-		<copy todir="assembly/lams.ear/lams-dictionary.jar">
+		<copy todir="assembly/lams.ear/lib/lams-dictionary.jar">
 			<fileset dir="../lams_common/build/lib/language" />
 			<fileset dir="../lams_contentrepository/build/lib/language" />
 			<fileset dir="../lams_central/build/lib/language" />
@@ -313,7 +316,7 @@
 		<property name="library.assembly"     value="assembly/${library.name}" />
 		<property name="library.basedir"      value="librarypackages/${library.name}" />
 		<property name="library.language.src" value="${library.basedir}/language/lams" />
-		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lib/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
 
 		<copy todir="${library.assembly}/sql" overwrite="true" verbose="true">
 			<fileset dir="${library.basedir}">
