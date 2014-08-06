@@ -37,7 +37,7 @@
     }
 
     // Get the Login Request URL for authoring LAMS Lessons
-    String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
+    String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
     
     // Get the list of Learning Designs
     //String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);

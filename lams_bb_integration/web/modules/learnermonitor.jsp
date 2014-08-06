@@ -45,9 +45,9 @@
     
     // Get the LAMS access URLs
     String lsid = request.getParameter("lsid");
-    String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + lsid;
-    String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor") + "&lsid=" + lsid;
-    String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
+    String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learnerStrictAuth", lsid);
+    String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor", lsid);
+    String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
 	
     // Get Course ID and Session User ID
     BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
