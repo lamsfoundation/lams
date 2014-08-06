@@ -32,5 +32,6 @@
   	<module name="javax.servlet.api" />
   	<module name="org.hibernate" />
   	<module name="org.apache.commons.logging" />
+  	<module name="org.apache.xmlcommons" />
   </dependencies>
 </module>
