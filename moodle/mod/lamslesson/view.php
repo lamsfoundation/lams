@@ -95,7 +95,7 @@ echo $OUTPUT->box_end();
 
 echo $OUTPUT->box_start('generalbox', 'intro');
 if ($canparticipate || $canmanage) {
-  $learnerurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
+  $learnerurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_STRICT_METHOD);
   echo '<div class="centerlink">';
   echo '<span id="learnerbutton" class="yui3-button yui3-link-button"><span class="first-child"> ';
   echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
