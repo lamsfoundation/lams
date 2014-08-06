@@ -57,7 +57,6 @@
       <module name="org.apache.strutsel" export="true" /> <!-- depends on: org.apache.struts, javax.servlet.jsp.api -->
       <module name="org.tuckey.urlrewrite" export="true" />
       <module name="com.allaire.wddx" export="true" />
-      <module name="org.apache.xmlcommons" export="true" />
       <module name="com.thoughtworks.xstream" export="true" /> <!-- depends on: nu.xom,
 																				org.xmlpull (xpp),
 																				org.joda.time:2.1 -->

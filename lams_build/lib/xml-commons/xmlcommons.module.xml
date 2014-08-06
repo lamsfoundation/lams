@@ -27,4 +27,7 @@
   	<resource-root path="xml-apis.jar"/>
     <resource-root path="xml-apis-ext.jar"/>
   </resources>
+  <exports>
+  	<exclude path="javax/**" />
+  </exports>
 </module>
