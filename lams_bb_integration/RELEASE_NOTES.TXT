@@ -51,5 +51,12 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 ===================
 * LDEV-3176 Fix wrong URL format for starting LAMS lesson
 * LDEV-2790 Use html editor for lesson description
-* LDEV-3180 Load LAMS sequences on demand 
 
+1.2.4 Release Fixes
+===================
+* LDEV-3180 Load LAMS sequences on demand 
+* LDEV-3217 encoding emails before sending them to LAMS 
+
+1.2.5 Release Fixes
+===================
+* LDEV-3285: include lessonid in integration hash 
