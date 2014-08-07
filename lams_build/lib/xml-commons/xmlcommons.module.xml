@@ -24,10 +24,24 @@
 
 <module xmlns="urn:jboss:module:1.3" name="org.apache.xmlcommons">
   <resources>
-  	<resource-root path="xml-apis.jar"/>
+  	<resource-root path="xml-apis.jar">
+  		<filter>
+  			<exclude-set>
+				<path name="javax" />
+				<path name="org/xml" />
+				<path name="org/w3c/dom" />
+  			</exclude-set>
+  		</filter>
+  	</resource-root>
     <resource-root path="xml-apis-ext.jar"/>
   </resources>
-  <exports>
-  	<exclude path="javax/**" />
-  </exports>
+  <dependencies>
+     <system export="true">
+		<paths>
+			<path name="javax/xml/parsers" />
+			<path name="org/xml/sax" />
+			<path name="org/w3c/dom" />
+		</paths>
+	</system>
+  </dependencies>
 </module>
