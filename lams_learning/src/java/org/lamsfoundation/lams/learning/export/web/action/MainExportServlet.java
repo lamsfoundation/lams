@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,17 +48,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServiceProxy;
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -86,66 +87,56 @@ public class MainExportServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    /**
-     * If it is running from the learner interface then can use the userID from the user object If running from the
-     * monitoring interface, the learner's userID is supplied by the request parameters.
-     * 
-     * @return userID
-     */
-    protected Integer getLearnerUserID(HttpServletRequest request) {
-	Integer userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
-	if (userId == null) {
-	    HttpSession session = SessionManager.getSession();
-	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    userId = userDto.getUserID();
-	}
-	return userId;
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IOException, ExportPortfolioException {
-
-	MainExportServlet.log.debug("Doing export portfolio");
 	Portfolio portfolios = null;
-	String role = null;
-	ToolAccessMode accessMode = null;
 	String exportFilename = "";
-	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
-	//lesson's runtime content folder
-	String learnerContentFolder = FileUtil.getLearnerContentFolder(lessonID);
-
-	/**
-	 * Get the cookies that were sent along with this request, then pass it onto export service
-	 */
-	Cookie[] cookies = request.getCookies();
-
-	IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this
-		.getServletContext());
-
+	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true);
 	String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
+	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
+	String learnerContentFolder = FileUtil.getLearnerContentFolder(lessonID);
+	Integer userIdParam = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	Integer currentUserId = userDto.getUserID();
 
+	Cookie[] cookies = request.getCookies();
 	if (MainExportServlet.log.isDebugEnabled()) {
 	    int numCookies = cookies != null ? cookies.length : 0;
 	    MainExportServlet.log.debug("Export portfolio: mode " + mode + " # cookies "
 		    + new Integer(numCookies).toString());
 	}
 
-	if (mode.equals(ToolAccessMode.LEARNER.toString())) {
-	    // TODO check if the user id is coming from the request then the current user should have monitoring
-	    // privilege
-	    Integer userId = getLearnerUserID(request);
+	IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this
+		.getServletContext());
+	ILessonService lessonService = ExportPortfolioServiceProxy.getLessonService(this.getServletContext());
+	Lesson lesson = lessonService.getLesson(lessonID);
 
-	    if ((role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true)) != null) {
-		accessMode = role.equals(ToolAccessMode.TEACHER.toString()) ? ToolAccessMode.TEACHER : null;
+	if (mode.equals(ToolAccessMode.LEARNER.toString())) {
+	    if (!lesson.getLearnerExportAvailable()) {
+		throw new ExportPortfolioException("This lesson does not allow export portfolio for learners");
+	    }
+	    ToolAccessMode accessMode = ToolAccessMode.TEACHER.toString().equals(role) ? ToolAccessMode.TEACHER : null;
+	    boolean canExport = isPartOfClass(lesson, currentUserId, accessMode != null);
+	    if (!canExport) {
+		throw new ExportPortfolioException("User " + currentUserId + " is not a participant in lesson "
+			+ lessonID + " and may not export portfolio");
 	    }
 
-	    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, accessMode, cookies);
+	    portfolios = exportService.exportPortfolioForStudent(userIdParam == null ? currentUserId : userIdParam,
+		    lessonID, true, accessMode, cookies);
 	    String learnerName = portfolios.getLearnerName();
 	    String learnerLogin = learnerName.substring(learnerName.indexOf('(') + 1, learnerName.lastIndexOf(')'));
 	    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + " "
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    boolean canExport = isPartOfClass(lesson, currentUserId, true);
+	    if (!canExport) {
+		throw new ExportPortfolioException("User " + currentUserId + " is not a participant in lesson "
+			+ lessonID + " and may not export portfolio");
+	    }
+	    
 	    // done in the monitoring environment
 	    portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
 	    exportFilename = ExportPortfolioConstants.EXPORT_TEACHER_PREFIX + " " + portfolios.getLessonName() + ".zip";
@@ -171,7 +162,8 @@ public class MainExportServlet extends HttpServlet {
 	    bundler.bundleStylesheet();
 
 	    // bundle all user uploaded content and CKEditor smileys with the package
-	    ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID(), learnerContentFolder);
+	    ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID(),
+		    learnerContentFolder);
 	    imageBundler.bundleImages();
 
 	    // zip up the contents of the temp export folder using a constant name
@@ -228,19 +220,22 @@ public class MainExportServlet extends HttpServlet {
      */
     private void replaceImageFolderLinks(String filename, String contentFolderID, String learnerContentFolder) {
 	try {
-	    // ((\\\\)?/)* stands for any number of slashes(/) or escaped slashes(\/, which was produced by running StringEscapeUtils.escapeJavaScript() beforehand)
+	    // ((\\\\)?/)* stands for any number of slashes(/) or escaped slashes(\/, which was produced by running
+	    // StringEscapeUtils.escapeJavaScript() beforehand)
 	    String ckeditorpath = "((\\\\)?/)*lams((\\\\)?/)+www((\\\\)?/)+secure((\\\\)?/)+" + contentFolderID;
 	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
 	    String ckeditorsmiley = "/lams/ckeditor/images/smiley";
 	    String ckeditorvr = "/lams/ckeditor/plugins/videorecorder";
-	    String learnerContentPath = "((\\\\)?/)+lams((\\\\)?/)+www((\\\\)?/)+secure((\\\\)?/)+" + learnerContentFolder.replaceAll("/", "((\\\\\\\\)?/)+");
+	    String learnerContentPath = "((\\\\)?/)+lams((\\\\)?/)+www((\\\\)?/)+secure((\\\\)?/)+"
+		    + learnerContentFolder.replaceAll("/", "((\\\\\\\\)?/)+");
 
 	    // Replacing string
 	    String newckeditorpath = "../" + contentFolderID;
 	    String newckeditorrecpath = "../../../../" + contentFolderID + "/Recordings";
 	    String newckeditorsmiley = "../ckeditor/images/smiley";
 	    String newckeditorvr = "../ckeditor/plugins/videorecorder";
-	    String newLearnerContentPath = "../" + learnerContentFolder;;
+	    String newLearnerContentPath = "../" + learnerContentFolder;
+	    ;
 
 	    File fin = new File(filename);
 	    // Open and input stream
@@ -260,7 +255,7 @@ public class MainExportServlet extends HttpServlet {
 
 	    Pattern p4 = Pattern.compile(ckeditorvr);
 	    Matcher m4 = p4.matcher("");
-	    
+
 	    Pattern p5 = Pattern.compile(learnerContentPath);
 	    Matcher m5 = p5.matcher("");
 
@@ -284,7 +279,7 @@ public class MainExportServlet extends HttpServlet {
 		// Replace the p3 matching patterns with the newckeditorvr
 		m4.reset(thirdpass);
 		String forthpass = m4.replaceAll(newckeditorvr);
-		
+
 		// Replace the p4 matching patterns with the newLearnerContentPath
 		m5.reset(forthpass);
 		String result = m5.replaceAll(newLearnerContentPath);
@@ -307,4 +302,22 @@ public class MainExportServlet extends HttpServlet {
 	}
     }
 
+    private boolean isPartOfClass(Lesson lesson, Integer userId, boolean isTeacher) {
+	Set<User> users = null;
+	if (isTeacher) {
+	    users = lesson.getLessonClass().getStaffGroup().getUsers();
+	} else {
+	    users = lesson.getLessonClass().getLearnersGroup().getUsers();
+	}
+
+	// slightly easier than getting user from some other service and using collection methods, like contains()
+	boolean result = false;
+	for (User user : users) {
+	    if (user.getUserId().equals(userId)) {
+		result = true;
+		break;
+	    }
+	}
+	return result;
+    }
 }
