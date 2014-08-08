@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,23 +20,23 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.id;
+
 import java.io.Serializable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.id.insert.AbstractReturningDelegate;
-import org.hibernate.id.insert.AbstractSelectingDelegate;
-import org.hibernate.id.insert.IdentifierGeneratingInsert;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
+import org.hibernate.id.insert.IdentifierGeneratingInsert;
+import org.hibernate.id.insert.AbstractSelectingDelegate;
+import org.hibernate.id.insert.AbstractReturningDelegate;
 import org.hibernate.id.insert.InsertSelectIdentityInsert;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.HibernateException;
+import org.hibernate.AssertionFailure;
 
 /**
  * A generator for use with ANSI-SQL IDENTITY columns used as the primary key.
@@ -86,26 +86,23 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getTransactionCoordinator()
-					.getJdbcCoordinator()
-					.getStatementPreparer()
-					.prepareStatement( insertSQL, PreparedStatement.RETURN_GENERATED_KEYS );
+			return session.getBatcher().prepareStatement( insertSQL, true );
 		}
 
-		public Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
-			session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
+		public Serializable executeAndExtract(PreparedStatement insert) throws SQLException {
+			insert.executeUpdate();
 			ResultSet rs = null;
 			try {
 				rs = insert.getGeneratedKeys();
 				return IdentifierGeneratorHelper.getGeneratedIdentity(
 						rs,
-						persister.getRootTableKeyColumnNames()[0],
+						persister.getIdentifierColumnNames()[0],
 						persister.getIdentifierType()
 				);
 			}
 			finally {
 				if ( rs != null ) {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, insert );
+					rs.close();
 				}
 			}
 		}
@@ -134,23 +131,25 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getTransactionCoordinator()
-					.getJdbcCoordinator()
-					.getStatementPreparer()
-					.prepareStatement( insertSQL, PreparedStatement.NO_GENERATED_KEYS );
+			return session.getBatcher().prepareStatement( insertSQL, false );
 		}
 
-		public Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
-			ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().execute( insert );
+		public Serializable executeAndExtract(PreparedStatement insert) throws SQLException {
+			if ( !insert.execute() ) {
+				while ( !insert.getMoreResults() && insert.getUpdateCount() != -1 ) {
+					// do nothing until we hit the rsult set containing the generated id
+				}
+			}
+			ResultSet rs = insert.getResultSet();
 			try {
 				return IdentifierGeneratorHelper.getGeneratedIdentity(
 						rs,
-						persister.getRootTableKeyColumnNames()[0],
+						persister.getIdentifierColumnNames()[0],
 						persister.getIdentifierType()
 				);
 			}
 			finally {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( rs, insert );
+				rs.close();
 			}
 		}
 
@@ -189,7 +188,11 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 				SessionImplementor session,
 		        ResultSet rs,
 		        Object object) throws SQLException {
-			return IdentifierGeneratorHelper.getGeneratedIdentity( rs, persister.getRootTableKeyColumnNames()[0], persister.getIdentifierType() );
+			return IdentifierGeneratorHelper.getGeneratedIdentity(
+					rs,
+					persister.getIdentifierColumnNames()[0],
+					persister.getIdentifierType()
+			);
 		}
 	}
 

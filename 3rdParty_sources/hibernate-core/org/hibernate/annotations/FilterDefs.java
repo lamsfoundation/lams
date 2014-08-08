@@ -22,15 +22,15 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Array of filter definitions.
+ * Array of filter definitions
  *
  * @author Matthew Inger
  * @author Emmanuel Bernard
@@ -38,8 +38,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({PACKAGE, TYPE})
 @Retention(RUNTIME)
 public @interface FilterDefs {
-	/**
-	 * The aggregated filter definitions.
-	 */
 	FilterDef[] value();
 }

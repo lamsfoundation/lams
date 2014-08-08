@@ -34,24 +34,22 @@ import java.util.Map;
 import javax.persistence.EntityListeners;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
-import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.TableGenerator;
 
+import org.dom4j.Element;
+
 import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.java.JavaMetadataProvider;
-import org.hibernate.internal.util.ReflectHelper;
-
-import org.dom4j.Element;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * MetadataProvider aware of the JPA Deployment descriptor
  *
  * @author Emmanuel Bernard
  */
-@SuppressWarnings("unchecked")
 public class JPAMetadataProvider implements MetadataProvider, Serializable {
 	private transient MetadataProvider delegate = new JavaMetadataProvider();
 	private transient Map<Object, Object> defaults;
@@ -65,12 +63,12 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 		delegate = new JavaMetadataProvider();
 		cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
 	}
-	@Override
+
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
 		AnnotationReader reader = cache.get( annotatedElement );
 		if (reader == null) {
 			if ( xmlContext.hasContext() ) {
-				reader = new JPAOverriddenAnnotationReader( annotatedElement, xmlContext );
+				reader = new JPAOverridenAnnotationReader( annotatedElement, xmlContext );
 			}
 			else {
 				reader = delegate.getAnnotationReader( annotatedElement );
@@ -79,14 +77,12 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 		}
 		return reader;
 	}
-	@Override
+
 	public Map<Object, Object> getDefaults() {
 		if ( defaults == null ) {
 			defaults = new HashMap<Object, Object>();
 			XMLContext.Default xmlDefaults = xmlContext.getDefault( null );
 
-			defaults.put( "schema", xmlDefaults.getSchema() );
-			defaults.put( "catalog", xmlDefaults.getCatalog() );
 			defaults.put( "delimited-identifier", xmlDefaults.getDelimitedIdentifier() );
 			List<Class> entityListeners = new ArrayList<Class>();
 			for ( String className : xmlContext.getDefaultEntityListeners() ) {
@@ -107,7 +103,7 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					defaults.put( SequenceGenerator.class, sequenceGenerators );
 				}
 				for ( Element subelement : elements ) {
-					sequenceGenerators.add( JPAOverriddenAnnotationReader.buildSequenceGeneratorAnnotation( subelement ) );
+					sequenceGenerators.add( JPAOverridenAnnotationReader.buildSequenceGeneratorAnnotation( subelement ) );
 				}
 
 				elements = element.elements( "table-generator" );
@@ -118,7 +114,7 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 				}
 				for ( Element subelement : elements ) {
 					tableGenerators.add(
-							JPAOverriddenAnnotationReader.buildTableGeneratorAnnotation(
+							JPAOverridenAnnotationReader.buildTableGeneratorAnnotation(
 									subelement, xmlDefaults
 							)
 					);
@@ -129,7 +125,7 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					namedQueries = new ArrayList<NamedQuery>();
 					defaults.put( NamedQuery.class, namedQueries );
 				}
-				List<NamedQuery> currentNamedQueries = JPAOverriddenAnnotationReader.buildNamedQueries(
+				List<NamedQuery> currentNamedQueries = JPAOverridenAnnotationReader.buildNamedQueries(
 						element, false, xmlDefaults
 				);
 				namedQueries.addAll( currentNamedQueries );
@@ -139,7 +135,7 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					namedNativeQueries = new ArrayList<NamedNativeQuery>();
 					defaults.put( NamedNativeQuery.class, namedNativeQueries );
 				}
-				List<NamedNativeQuery> currentNamedNativeQueries = JPAOverriddenAnnotationReader.buildNamedQueries(
+				List<NamedNativeQuery> currentNamedNativeQueries = JPAOverridenAnnotationReader.buildNamedQueries(
 						element, true, xmlDefaults
 				);
 				namedNativeQueries.addAll( currentNamedNativeQueries );
@@ -151,20 +147,10 @@ public class JPAMetadataProvider implements MetadataProvider, Serializable {
 					sqlResultSetMappings = new ArrayList<SqlResultSetMapping>();
 					defaults.put( SqlResultSetMapping.class, sqlResultSetMappings );
 				}
-				List<SqlResultSetMapping> currentSqlResultSetMappings = JPAOverriddenAnnotationReader.buildSqlResultsetMappings(
+				List<SqlResultSetMapping> currentSqlResultSetMappings = JPAOverridenAnnotationReader.buildSqlResultsetMappings(
 						element, xmlDefaults
 				);
 				sqlResultSetMappings.addAll( currentSqlResultSetMappings );
-
-				List<NamedStoredProcedureQuery> namedStoredProcedureQueries = (List<NamedStoredProcedureQuery>)defaults.get( NamedStoredProcedureQuery.class );
-				if(namedStoredProcedureQueries==null){
-					namedStoredProcedureQueries = new ArrayList<NamedStoredProcedureQuery>(  );
-					defaults.put( NamedStoredProcedureQuery.class, namedStoredProcedureQueries );
-				}
-				List<NamedStoredProcedureQuery> currentNamedStoredProcedureQueries = JPAOverriddenAnnotationReader.buildNamedStoreProcedureQueries(
-						element, xmlDefaults
-				);
-				namedStoredProcedureQueries.addAll( currentNamedStoredProcedureQueries );
 			}
 		}
 		return defaults;

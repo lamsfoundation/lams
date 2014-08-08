@@ -29,12 +29,7 @@ package org.hibernate.criterion;
  * @author Gavin King
  */
 public class AvgProjection extends AggregateProjection {
-	/**
-	 * Constructs the AvgProjection
-	 *
-	 * @param propertyName The name of the property to average
-	 */
 	public AvgProjection(String propertyName) {
-		super( "avg", propertyName );
+		super("avg", propertyName);
 	}
 }

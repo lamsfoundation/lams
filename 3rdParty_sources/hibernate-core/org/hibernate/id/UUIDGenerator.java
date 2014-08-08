@@ -27,17 +27,17 @@ import java.io.Serializable;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.id.uuid.StandardRandomStrategy;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.Type;
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * An {@link IdentifierGenerator} which generates {@link UUID} values using a pluggable
@@ -60,7 +60,7 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 	public static final String UUID_GEN_STRATEGY = "uuid_gen_strategy";
 	public static final String UUID_GEN_STRATEGY_CLASS = "uuid_gen_strategy_class";
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, UUIDGenerator.class.getName());
+	private static final Logger log = LoggerFactory.getLogger( UUIDGenerator.class );
 
 	private UUIDGenerationStrategy strategy;
 	private UUIDTypeDescriptor.ValueTransformer valueTransformer;
@@ -85,11 +85,11 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 						strategy = (UUIDGenerationStrategy) strategyClass.newInstance();
 					}
 					catch ( Exception ignore ) {
-                        LOG.unableToInstantiateUuidGenerationStrategy(ignore);
+						log.warn( "Unable to instantiate UUID generation strategy class : {}", ignore );
 					}
 				}
 				catch ( ClassNotFoundException ignore ) {
-                    LOG.unableToLocateUuidGenerationStrategy(strategyClassName);
+					log.warn( "Unable to locate requested UUID generation strategy class : {}", strategyClassName );
 				}
 			}
 		}
@@ -115,4 +115,5 @@ public class UUIDGenerator implements IdentifierGenerator, Configurable {
 	public Serializable generate(SessionImplementor session, Object object) throws HibernateException {
 		return valueTransformer.transform( strategy.generateUUID( session ) );
 	}
+
 }

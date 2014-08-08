@@ -22,13 +22,14 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.property;
-import java.lang.reflect.Member;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * Represents a "back-reference" to the index of a collection.
@@ -50,12 +51,10 @@ public class IndexPropertyAccessor implements PropertyAccessor {
 		this.entityName = entityName;
 	}
 
-	@Override
 	public Setter getSetter(Class theClass, String propertyName) {
 		return new IndexSetter();
 	}
 
-	@Override
 	public Getter getGetter(Class theClass, String propertyName) {
 		return new IndexGetter();
 	}
@@ -65,20 +64,27 @@ public class IndexPropertyAccessor implements PropertyAccessor {
 	 * The Setter implementation for index backrefs.
 	 */
 	public static final class IndexSetter implements Setter {
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public void set(Object target, Object value, SessionFactoryImplementor factory) {
 			// do nothing...
 		}
+
 	}
 
 
@@ -86,37 +92,47 @@ public class IndexPropertyAccessor implements PropertyAccessor {
 	 * The Getter implementation for index backrefs.
 	 */
 	public class IndexGetter implements Getter {
-		@Override
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) throws HibernateException {
-			if ( session == null ) {
+			if (session==null) {
 				return BackrefPropertyAccessor.UNKNOWN;
 			}
 			else {
-				return session.getPersistenceContext().getIndexInOwner( entityName, propertyName, target, mergeMap );
+				return session.getPersistenceContext()
+						.getIndexInOwner(entityName, propertyName, target, mergeMap);
 			}
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object get(Object target)  {
 			return BackrefPropertyAccessor.UNKNOWN;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Member getMember() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Class getReturnType() {
 			return Object.class;
 		}

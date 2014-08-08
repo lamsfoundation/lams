@@ -21,6 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.annotations;
 
 import java.lang.annotation.Retention;
@@ -31,16 +32,13 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Optional annotation in conjunction with {@link javax.persistence.Version} and timestamp version properties
- * indicating the source of the timestamp value.
+ * Optional annotation in conjunction with {@link javax.persistence.Version} and timestamp version properties.
+ * The annotation value decides where the timestamp is generated.
  *
  * @author Hardy Ferentschik
  */
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface Source {
-	/**
-	 * How is the timestamp generated?  Default is a JVM generated value.
-	 */
 	SourceType value() default SourceType.VM;
 }

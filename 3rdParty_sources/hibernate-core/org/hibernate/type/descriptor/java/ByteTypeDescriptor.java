@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type.descriptor.java;
+
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
@@ -37,17 +38,17 @@ public class ByteTypeDescriptor extends AbstractTypeDescriptor<Byte> {
 		super( Byte.class );
 	}
 
-	@Override
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public String toString(Byte value) {
 		return value == null ? null : value.toString();
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Byte fromString(String string) {
 		return Byte.valueOf( string );
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Byte value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -75,7 +76,8 @@ public class ByteTypeDescriptor extends AbstractTypeDescriptor<Byte> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public <X> Byte wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -84,7 +86,7 @@ public class ByteTypeDescriptor extends AbstractTypeDescriptor<Byte> {
 			return (Byte) value;
 		}
 		if ( Number.class.isInstance( value ) ) {
-			return ( (Number) value ).byteValue();
+			return Byte.valueOf( ( (Number) value ).byteValue() );
 		}
 		if ( String.class.isInstance( value ) ) {
 			return Byte.valueOf( ( (String) value ) );

@@ -23,42 +23,41 @@
  *
  */
 package org.hibernate.criterion;
+
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.TypedValue;
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.engine.TypedValue;
 
 /**
- * A criterion that is a wrapper for another, negating the wrapped one.
- *
+ * Negates another criterion
  * @author Gavin King
  */
 public class NotExpression implements Criterion {
+
 	private Criterion criterion;
 
-	/**
-	 * Constructs a NotExpression
-	 *
-	 * @param criterion The expression to wrap and negate
-	 *
-	 * @see Restrictions#not
-	 */
 	protected NotExpression(Criterion criterion) {
 		this.criterion = criterion;
 	}
 
-	@Override
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
-		return criteriaQuery.getFactory().getDialect().getNotExpression(
-				criterion.toSqlString( criteria, criteriaQuery )
-		);
+	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
+	throws HibernateException {
+		if ( criteriaQuery.getFactory().getDialect() instanceof MySQLDialect ) {
+			return "not (" + criterion.toSqlString(criteria, criteriaQuery) + ')';
+		}
+		else {
+			return "not " + criterion.toSqlString(criteria, criteriaQuery);
+		}
 	}
 
-	@Override
-	public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
-		return criterion.getTypedValues( criteria, criteriaQuery );
+	public TypedValue[] getTypedValues(
+		Criteria criteria, CriteriaQuery criteriaQuery)
+	throws HibernateException {
+		return criterion.getTypedValues(criteria, criteriaQuery);
 	}
 
-	@Override
 	public String toString() {
 		return "not " + criterion.toString();
 	}

@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate;
+
 import java.util.Properties;
 
 import org.hibernate.type.BasicType;
@@ -107,13 +108,5 @@ public interface TypeHelper {
 	 */
 	public Type custom(Class userTypeClass, Properties properties);
 
-	/**
-	 * Retrieve the type representing an ANY mapping.
-	 *
-	 * @param metaType The meta type for the ANY
-	 * @param identifierType The identifier type for the ANY
-	 *
-	 * @return The type, or null
-	 */
 	public Type any(Type metaType, Type identifierType);
 }

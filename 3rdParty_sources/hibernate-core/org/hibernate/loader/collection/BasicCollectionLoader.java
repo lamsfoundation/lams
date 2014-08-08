@@ -24,14 +24,13 @@
  */
 package org.hibernate.loader.collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.LoadQueryInfluencers;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.LoadQueryInfluencers;
 import org.hibernate.loader.JoinWalker;
 import org.hibernate.persister.collection.QueryableCollection;
-
-import org.jboss.logging.Logger;
 
 /**
  * Loads a collection of values or a many-to-many association.
@@ -44,44 +43,43 @@ import org.jboss.logging.Logger;
  */
 public class BasicCollectionLoader extends CollectionLoader {
 
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, BasicCollectionLoader.class.getName() );
+	private static final Logger log = LoggerFactory.getLogger(BasicCollectionLoader.class);
 
 	public BasicCollectionLoader(
-			QueryableCollection collectionPersister,
-			SessionFactoryImplementor session,
+			QueryableCollection collectionPersister, 
+			SessionFactoryImplementor session, 
 			LoadQueryInfluencers loadQueryInfluencers) throws MappingException {
 		this( collectionPersister, 1, session, loadQueryInfluencers );
 	}
 
 	public BasicCollectionLoader(
-			QueryableCollection collectionPersister,
-			int batchSize,
-			SessionFactoryImplementor factory,
+			QueryableCollection collectionPersister, 
+			int batchSize, 
+			SessionFactoryImplementor factory, 
 			LoadQueryInfluencers loadQueryInfluencers) throws MappingException {
 		this( collectionPersister, batchSize, null, factory, loadQueryInfluencers );
 	}
-
+	
 	protected BasicCollectionLoader(
-			QueryableCollection collectionPersister,
-			int batchSize,
-			String subquery,
-			SessionFactoryImplementor factory,
+			QueryableCollection collectionPersister, 
+			int batchSize, 
+			String subquery, 
+			SessionFactoryImplementor factory, 
 			LoadQueryInfluencers loadQueryInfluencers) throws MappingException {
 		super( collectionPersister, factory, loadQueryInfluencers );
-
+		
 		JoinWalker walker = new BasicCollectionJoinWalker(
-				collectionPersister,
-				batchSize,
-				subquery,
-				factory,
+				collectionPersister, 
+				batchSize, 
+				subquery, 
+				factory, 
 				loadQueryInfluencers
 		);
 		initFromWalker( walker );
 
 		postInstantiate();
 
-		if ( LOG.isDebugEnabled() ) {
-			LOG.debugf( "Static select for collection %s: %s", collectionPersister.getRole(), getSQLString() );
-		}
+		log.debug( "Static select for collection " + collectionPersister.getRole() + ": " + getSQLString() );
 	}
+	
 }

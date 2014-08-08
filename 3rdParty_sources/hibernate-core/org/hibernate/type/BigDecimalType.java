@@ -42,7 +42,9 @@ public class BigDecimalType extends AbstractSingleColumnStandardBasicType<BigDec
 		super( NumericTypeDescriptor.INSTANCE, BigDecimalTypeDescriptor.INSTANCE );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getName() {
 		return "big_decimal";
 	}

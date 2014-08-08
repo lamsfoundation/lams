@@ -25,9 +25,10 @@ package org.hibernate.mapping;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.PrimitiveType;
+import org.hibernate.type.TypeFactory;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * An array mapping has a primary key consisting of the key columns + index column.
@@ -59,15 +60,13 @@ public class Array extends List {
 		}
 	}
 
-	@Override
-    public CollectionType getDefaultCollectionType() throws MappingException {
+	public CollectionType getDefaultCollectionType() throws MappingException {
 		return getMappings().getTypeResolver()
 				.getTypeFactory()
-				.array( getRole(), getReferencedPropertyName(), getElementClass() );
+				.array( getRole(), getReferencedPropertyName(), isEmbedded(), getElementClass() );
 	}
 
-	@Override
-    public boolean isArray() {
+	public boolean isArray() {
 		return true;
 	}
 
@@ -83,9 +82,8 @@ public class Array extends List {
 	public void setElementClassName(String elementClassName) {
 		this.elementClassName = elementClassName;
 	}
-
-	@Override
-    public Object accept(ValueVisitor visitor) {
+	
+	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
 	}
 }

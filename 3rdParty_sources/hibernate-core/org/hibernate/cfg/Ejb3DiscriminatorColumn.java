@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
+
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 
@@ -34,8 +35,8 @@ import org.hibernate.annotations.DiscriminatorFormula;
  * @author Emmanuel Bernard
  */
 public class Ejb3DiscriminatorColumn extends Ejb3Column {
-	public static final String DEFAULT_DISCRIMINATOR_COLUMN_NAME = "DTYPE";
-	public static final String DEFAULT_DISCRIMINATOR_TYPE = "string";
+	private static final String DEFAULT_DISCRIMINATOR_COLUMN_NAME = "DTYPE";
+	private static final String DEFAULT_DISCRIMINATOR_TYPE = "string";
 	private static final int DEFAULT_DISCRIMINATOR_LENGTH = 31;
 
 	private String discriminatorTypeName;

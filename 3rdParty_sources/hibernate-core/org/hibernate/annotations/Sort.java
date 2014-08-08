@@ -23,35 +23,29 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Collection sort (in-memory sorting).  Different that ordering, which is applied during the SQL select.
+ * Collection sort
+ * (Java level sorting)
  *
  * @author Emmanuel Bernard
- *
- * @see OrderBy
- *
- * @deprecated Use {@link SortComparator} or {@link SortNatural} instead depending on need.
  */
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
-@Deprecated
 public @interface Sort {
 	/**
-	 * The type of sorting to use.  The default is to not use sorting.
+	 * sort type
 	 */
 	SortType type() default SortType.UNSORTED;
-
 	/**
-	 * Specifies the comparator to use.  Only valid when {@link #type} specifies {@link SortType#COMPARATOR}.
-	 *
-	 * TODO find a way to use Class<Comparator> -> see HHH-8164
+	 * Sort comparator implementation
 	 */
+	//TODO find a way to use Class<Comparator>
+
 	Class comparator() default void.class;
 }

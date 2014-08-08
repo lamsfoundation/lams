@@ -23,13 +23,14 @@
  *
  */
 package org.hibernate.id;
+
 import java.io.Serializable;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**

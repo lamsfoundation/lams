@@ -26,68 +26,53 @@ package org.hibernate.dialect;
 import java.lang.reflect.Method;
 import java.sql.Types;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.MappingException;
 import org.hibernate.dialect.function.AnsiTrimFunction;
 import org.hibernate.dialect.function.DerbyConcatFunction;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.DerbyCaseFragment;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.ReflectHelper;
 
 /**
- * Hibernate Dialect for Cloudscape 10 - aka Derby. This implements both an
+ * Hibernate Dialect for Cloudscape 10 - aka Derby. This implements both an 
  * override for the identity column generator as well as for the case statement
  * issue documented at:
  * http://www.jroller.com/comments/kenlars99/Weblog/cloudscape_soon_to_be_derby
  *
  * @author Simon Johnston
- *
- * @deprecated HHH-6073
  */
-@Deprecated
 public class DerbyDialect extends DB2Dialect {
-	@SuppressWarnings("deprecation")
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			DerbyDialect.class.getName()
-	);
+	private static final Logger log = LoggerFactory.getLogger( DerbyDialect.class );
 
 	private int driverVersionMajor;
 	private int driverVersionMinor;
 
-	/**
-	 * Constructs a DerbyDialect
-	 */
-	@SuppressWarnings("deprecation")
 	public DerbyDialect() {
 		super();
-		if ( this.getClass() == DerbyDialect.class ) {
-			LOG.deprecatedDerbyDialect();
-		}
-
 		registerFunction( "concat", new DerbyConcatFunction() );
 		registerFunction( "trim", new AnsiTrimFunction() );
-		registerColumnType( Types.BLOB, "blob" );
+        registerColumnType( Types.BLOB, "blob" );
 		determineDriverVersion();
-
-		if ( driverVersionMajor > 10 || ( driverVersionMajor == 10 && driverVersionMinor >= 7 ) ) {
-			registerColumnType( Types.BOOLEAN, "boolean" );
-		}
+        if ( driverVersionMajor > 10 || ( driverVersionMajor == 10 && driverVersionMinor >= 7 ) ) {
+           registerColumnType( Types.BOOLEAN, "boolean" );
+        }
 	}
 
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	private void determineDriverVersion() {
 		try {
 			// locate the derby sysinfo class and query its version info
 			final Class sysinfoClass = ReflectHelper.classForName( "org.apache.derby.tools.sysinfo", this.getClass() );
 			final Method majorVersionGetter = sysinfoClass.getMethod( "getMajorVersion", ReflectHelper.NO_PARAM_SIGNATURE );
 			final Method minorVersionGetter = sysinfoClass.getMethod( "getMinorVersion", ReflectHelper.NO_PARAM_SIGNATURE );
-			driverVersionMajor = (Integer) majorVersionGetter.invoke( null, ReflectHelper.NO_PARAMS );
-			driverVersionMinor = (Integer) minorVersionGetter.invoke( null, ReflectHelper.NO_PARAMS );
+			driverVersionMajor = ( (Integer) majorVersionGetter.invoke( null, ReflectHelper.NO_PARAMS ) ).intValue();
+			driverVersionMinor = ( (Integer) minorVersionGetter.invoke( null, ReflectHelper.NO_PARAMS ) ).intValue();
 		}
 		catch ( Exception e ) {
-			LOG.unableToLoadDerbyDriver( e.getMessage() );
+			log.warn( "Unable to load/access derby driver class sysinfo to check versions : " + e );
 			driverVersionMajor = -1;
 			driverVersionMinor = -1;
 		}
@@ -97,22 +82,21 @@ public class DerbyDialect extends DB2Dialect {
 		return driverVersionMajor > 10 || ( driverVersionMajor == 10 && driverVersionMinor >= 5 );
 	}
 
-	@Override
 	public String getCrossJoinSeparator() {
 		return ", ";
 	}
 
-	@Override
+	/**
+	 * Return the case statement modified for Cloudscape.
+	 */
 	public CaseFragment createCaseFragment() {
 		return new DerbyCaseFragment();
 	}
 
-	@Override
 	public boolean dropConstraints() {
-		return true;
+	      return true;
 	}
 
-	@Override
 	public boolean supportsSequences() {
 		// technically sequence support was added in 10.6.1.0...
 		//
@@ -137,38 +121,31 @@ public class DerbyDialect extends DB2Dialect {
 		}
 	}
 
-	@Override
 	public boolean supportsLimit() {
 		return isTenPointFiveReleaseOrNewer();
 	}
-
-	@Override
+	
+	//HHH-4531
 	public boolean supportsCommentOn() {
-		//HHH-4531
 		return false;
 	}
 
-	@Override
-	@SuppressWarnings("deprecation")
 	public boolean supportsLimitOffset() {
 		return isTenPointFiveReleaseOrNewer();
 	}
 
-	@Override
-	public String getForUpdateString() {
+   public String getForUpdateString() {
 		return " for update with rs";
-	}
+   }
 
-	@Override
 	public String getWriteLockString(int timeout) {
 		return " for update with rs";
 	}
 
-	@Override
 	public String getReadLockString(int timeout) {
 		return " for read only with rs";
 	}
-
+	
 
 	/**
 	 * {@inheritDoc}
@@ -183,9 +160,9 @@ public class DerbyDialect extends DB2Dialect {
 	 * [WITH {RR|RS|CS|UR}]
 	 * </pre>
 	 */
-	@Override
 	public String getLimitString(String query, final int offset, final int limit) {
-		final StringBuilder sb = new StringBuilder(query.length() + 50);
+		StringBuffer sb = new StringBuffer(query.length() + 50);
+
 		final String normalizedSelect = query.toLowerCase().trim();
 		final int forUpdateIndex = normalizedSelect.lastIndexOf( "for update") ;
 
@@ -209,7 +186,7 @@ public class DerbyDialect extends DB2Dialect {
 		sb.append( limit ).append( " rows only" );
 
 		if ( hasForUpdateClause( forUpdateIndex ) ) {
-			sb.append( ' ' );
+			sb.append(' ');
 			sb.append( query.substring( forUpdateIndex ) );
 		}
 		else if ( hasWithClause( normalizedSelect ) ) {
@@ -218,7 +195,6 @@ public class DerbyDialect extends DB2Dialect {
 		return sb.toString();
 	}
 
-	@Override
 	public boolean supportsVariableLimit() {
 		// we bind the limit and offset values directly into the sql...
 		return false;
@@ -240,20 +216,17 @@ public class DerbyDialect extends DB2Dialect {
 		return i;
 	}
 
-	@Override
 	public String getQuerySequencesString() {
-		return null ;
+	   return null ;
 	}
 
 
 	// Overridden informational metadata ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	@Override
 	public boolean supportsLobValueChangePropogation() {
 		return false;
 	}
 
-	@Override
 	public boolean supportsUnboundedLobLocatorMaterialization() {
 		return false;
 	}

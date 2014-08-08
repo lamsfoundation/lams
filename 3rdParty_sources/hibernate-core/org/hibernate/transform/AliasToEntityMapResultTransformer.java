@@ -23,8 +23,10 @@
  *
  */
 package org.hibernate.transform;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Serializable;
 
 /**
  * {@link ResultTransformer} implementation which builds a map for each "row",
@@ -36,7 +38,7 @@ import java.util.Map;
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class AliasToEntityMapResultTransformer extends AliasedTupleSubsetResultTransformer {
+public class AliasToEntityMapResultTransformer extends BasicTransformerAdapter implements Serializable {
 
 	public static final AliasToEntityMapResultTransformer INSTANCE = new AliasToEntityMapResultTransformer();
 
@@ -46,7 +48,9 @@ public class AliasToEntityMapResultTransformer extends AliasedTupleSubsetResultT
 	private AliasToEntityMapResultTransformer() {
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		Map result = new HashMap(tuple.length);
 		for ( int i=0; i<tuple.length; i++ ) {
@@ -56,11 +60,6 @@ public class AliasToEntityMapResultTransformer extends AliasedTupleSubsetResultT
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public boolean isTransformedValueATupleElement(String[] aliases, int tupleLength) {
-		return false;
 	}
 
 	/**

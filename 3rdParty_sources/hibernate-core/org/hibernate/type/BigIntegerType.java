@@ -46,7 +46,9 @@ public class BigIntegerType
 		super( NumericTypeDescriptor.INSTANCE, BigIntegerTypeDescriptor.INSTANCE );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getName() {
 		return "big_integer";
 	}
@@ -56,12 +58,16 @@ public class BigIntegerType
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String objectToSQLString(BigInteger value, Dialect dialect) {
 		return BigIntegerTypeDescriptor.INSTANCE.toString( value );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public BigInteger stringToObject(String string) {
 		return BigIntegerTypeDescriptor.INSTANCE.fromString( string );
 	}

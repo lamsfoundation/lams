@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.tuple.component;
+
 import java.util.Map;
 
 import org.hibernate.mapping.Component;
@@ -31,8 +32,8 @@ import org.hibernate.property.Getter;
 import org.hibernate.property.PropertyAccessor;
 import org.hibernate.property.PropertyAccessorFactory;
 import org.hibernate.property.Setter;
-import org.hibernate.tuple.DynamicMapInstantiator;
 import org.hibernate.tuple.Instantiator;
+import org.hibernate.tuple.DynamicMapInstantiator;
 
 /**
  * A {@link ComponentTuplizer} specific to the dynamic-map entity mode.

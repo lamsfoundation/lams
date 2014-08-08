@@ -23,20 +23,21 @@
  */
 package org.hibernate.dialect.lock;
 
+import org.hibernate.LockOptions;
+import org.hibernate.persister.entity.Lockable;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.JDBCException;
+import org.hibernate.LockMode;
+import org.hibernate.sql.SimpleSelect;
+import org.hibernate.pretty.MessageHelper;
+import org.hibernate.exception.JDBCExceptionHelper;
+
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.hibernate.JDBCException;
-import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.persister.entity.Lockable;
-import org.hibernate.pretty.MessageHelper;
-import org.hibernate.sql.SimpleSelect;
 
 /**
  * A locking strategy where the locks are obtained through select statements.
@@ -46,9 +47,9 @@ import org.hibernate.sql.SimpleSelect;
  *
  * @see org.hibernate.dialect.Dialect#getForUpdateString(org.hibernate.LockMode)
  * @see org.hibernate.dialect.Dialect#appendLockHint(org.hibernate.LockMode, String)
+ * @since 3.2
  *
  * @author Steve Ebersole
- * @since 3.2
  */
 public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 	/**
@@ -61,17 +62,19 @@ public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 		super( lockable, lockMode );
 	}
 
-	@Override
+	/**
+	 * @see LockingStrategy#lock
+	 */
 	public void lock(
-			Serializable id,
-			Object version,
-			Object object,
-			int timeout,
-			SessionImplementor session) throws StaleObjectStateException, JDBCException {
+	        Serializable id,
+	        Object version,
+	        Object object,
+	        int timeout, 
+	        SessionImplementor session) throws StaleObjectStateException, JDBCException {
 		final String sql = determineSql( timeout );
-		final SessionFactoryImplementor factory = session.getFactory();
+		SessionFactoryImplementor factory = session.getFactory();
 		try {
-			final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+			PreparedStatement st = session.getBatcher().prepareSelectStatement( sql );
 			try {
 				getLockable().getIdentifierType().nullSafeSet( st, id, 1, session );
 				if ( getLockable().isVersioned() ) {
@@ -83,7 +86,7 @@ public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 					);
 				}
 
-				final ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+				ResultSet rs = st.executeQuery();
 				try {
 					if ( !rs.next() ) {
 						if ( factory.getStatistics().isStatisticsEnabled() ) {
@@ -94,16 +97,17 @@ public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 					}
 				}
 				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+					rs.close();
 				}
 			}
 			finally {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+				session.getBatcher().closeStatement( st );
 			}
 
 		}
 		catch ( SQLException sqle ) {
-			throw session.getFactory().getSQLExceptionHelper().convert(
+			throw JDBCExceptionHelper.convert(
+					session.getFactory().getSQLExceptionConverter(),
 					sqle,
 					"could not lock: " + MessageHelper.infoString( getLockable(), id, session.getFactory() ),
 					sql
@@ -112,10 +116,10 @@ public class SelectLockingStrategy extends AbstractSelectLockingStrategy {
 	}
 
 	protected String generateLockString(int timeout) {
-		final SessionFactoryImplementor factory = getLockable().getFactory();
-		final LockOptions lockOptions = new LockOptions( getLockMode() );
+		SessionFactoryImplementor factory = getLockable().getFactory();
+		LockOptions lockOptions = new LockOptions( getLockMode() );
 		lockOptions.setTimeOut( timeout );
-		final SimpleSelect select = new SimpleSelect( factory.getDialect() )
+		SimpleSelect select = new SimpleSelect( factory.getDialect() )
 				.setLockOptions( lockOptions )
 				.setTableName( getLockable().getRootTableName() )
 				.addColumn( getLockable().getRootTableIdentifierColumnNames()[0] )

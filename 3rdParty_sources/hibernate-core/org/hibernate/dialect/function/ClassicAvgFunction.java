@@ -22,11 +22,12 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.dialect.function;
+
 import java.sql.Types;
 
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
-import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.Mapping;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
@@ -34,16 +35,13 @@ import org.hibernate.type.Type;
  * Classic AVG sqlfunction that return types as it was done in Hibernate 3.1 
  * 
  * @author Max Rydahl Andersen
+ *
  */
 public class ClassicAvgFunction extends StandardSQLFunction {
-	/**
-	 * Constructs a ClassicAvgFunction
-	 */
 	public ClassicAvgFunction() {
 		super( "avg" );
 	}
 
-	@Override
 	public Type getReturnType(Type columnType, Mapping mapping) throws QueryException {
 		int[] sqlTypes;
 		try {
@@ -52,12 +50,8 @@ public class ClassicAvgFunction extends StandardSQLFunction {
 		catch ( MappingException me ) {
 			throw new QueryException( me );
 		}
-
-		if ( sqlTypes.length != 1 ) {
-			throw new QueryException( "multi-column type in avg()" );
-		}
-
-		final int sqlType = sqlTypes[0];
+		if ( sqlTypes.length != 1 ) throw new QueryException( "multi-column type in avg()" );
+		int sqlType = sqlTypes[0];
 		if ( sqlType == Types.INTEGER || sqlType == Types.BIGINT || sqlType == Types.TINYINT ) {
 			return StandardBasicTypes.FLOAT;
 		}

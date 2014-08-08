@@ -27,14 +27,17 @@ import java.util.Map;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.EntityMode;
-import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.NullPrecedence;
-import org.hibernate.cache.spi.QueryCacheFactory;
-import org.hibernate.cache.spi.RegionFactory;
-import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
-import org.hibernate.hql.spi.MultiTableBulkIdStrategy;
-import org.hibernate.hql.spi.QueryTranslatorFactory;
-import org.hibernate.loader.BatchFetchStyle;
+import org.hibernate.cache.QueryCacheFactory;
+import org.hibernate.cache.RegionFactory;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.JdbcSupport;
+import org.hibernate.exception.SQLExceptionConverter;
+import org.hibernate.hql.QueryTranslatorFactory;
+import org.hibernate.jdbc.BatcherFactory;
+import org.hibernate.jdbc.util.SQLStatementLogger;
+import org.hibernate.transaction.TransactionFactory;
+import org.hibernate.transaction.TransactionManagerLookup;
 import org.hibernate.tuple.entity.EntityTuplizerFactory;
 
 /**
@@ -44,8 +47,12 @@ import org.hibernate.tuple.entity.EntityTuplizerFactory;
  */
 public final class Settings {
 
+//	private boolean showSql;
+//	private boolean formatSql;
+	private SQLStatementLogger sqlStatementLogger;
 	private Integer maximumFetchDepth;
 	private Map querySubstitutions;
+	private Dialect dialect;
 	private int jdbcBatchSize;
 	private int defaultBatchFetchSize;
 	private boolean scrollableResultSetsEnabled;
@@ -54,7 +61,6 @@ public final class Settings {
 	private String defaultCatalogName;
 	private Integer jdbcFetchSize;
 	private String sessionFactoryName;
-	private boolean sessionFactoryNameAlsoJndiName;
 	private boolean autoCreateSchema;
 	private boolean autoDropSchema;
 	private boolean autoUpdateSchema;
@@ -62,7 +68,6 @@ public final class Settings {
 	private boolean queryCacheEnabled;
 	private boolean structuredCacheEntriesEnabled;
 	private boolean secondLevelCacheEnabled;
-	private boolean autoEvictCollectionCache;
 	private String cacheRegionPrefix;
 	private boolean minimalPutsEnabled;
 	private boolean commentsEnabled;
@@ -74,7 +79,12 @@ public final class Settings {
 	private ConnectionReleaseMode connectionReleaseMode;
 	private RegionFactory regionFactory;
 	private QueryCacheFactory queryCacheFactory;
+	private ConnectionProvider connectionProvider;
+	private TransactionFactory transactionFactory;
+	private TransactionManagerLookup transactionManagerLookup;
+	private BatcherFactory batcherFactory;
 	private QueryTranslatorFactory queryTranslatorFactory;
+	private SQLExceptionConverter sqlExceptionConverter;
 	private boolean wrapResultSetsEnabled;
 	private boolean orderUpdatesEnabled;
 	private boolean orderInsertsEnabled;
@@ -85,22 +95,10 @@ public final class Settings {
 	private boolean namedQueryStartupCheckingEnabled;
 	private EntityTuplizerFactory entityTuplizerFactory;
 	private boolean checkNullability;
-	private NullPrecedence defaultNullPrecedence;
-	private boolean initializeLazyStateOutsideTransactions;
 //	private ComponentTuplizerFactory componentTuplizerFactory; todo : HHH-3517 and HHH-1907
 //	private BytecodeProvider bytecodeProvider;
+	private JdbcSupport jdbcSupport;
 	private String importFiles;
-	private MultiTenancyStrategy multiTenancyStrategy;
-
-	private JtaPlatform jtaPlatform;
-
-	private MultiTableBulkIdStrategy multiTableBulkIdStrategy;
-	private BatchFetchStyle batchFetchStyle;
-	private boolean directReferenceCacheEntriesEnabled;
-	
-	private boolean jtaTrackByThread;
-	private BaselineSessionEventsListenerBuilder baselineSessionEventsListenerBuilder;
-
 
 	/**
 	 * Package protected constructor
@@ -110,6 +108,14 @@ public final class Settings {
 
 	// public getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//	public boolean isShowSqlEnabled() {
+//		return showSql;
+//	}
+//
+//	public boolean isFormatSqlEnabled() {
+//		return formatSql;
+//	}
+
 	public String getImportFiles() {
 		return importFiles;
 	}
@@ -118,12 +124,20 @@ public final class Settings {
 		this.importFiles = importFiles;
 	}
 
+	public SQLStatementLogger getSqlStatementLogger() {
+		return sqlStatementLogger;
+	}
+
 	public String getDefaultSchemaName() {
 		return defaultSchemaName;
 	}
 
 	public String getDefaultCatalogName() {
 		return defaultCatalogName;
+	}
+
+	public Dialect getDialect() {
+		return dialect;
 	}
 
 	public int getJdbcBatchSize() {
@@ -158,12 +172,16 @@ public final class Settings {
 		return jdbcFetchSize;
 	}
 
-	public String getSessionFactoryName() {
-		return sessionFactoryName;
+	public ConnectionProvider getConnectionProvider() {
+		return connectionProvider;
 	}
 
-	public boolean isSessionFactoryNameAlsoJndiName() {
-		return sessionFactoryNameAlsoJndiName;
+	public TransactionFactory getTransactionFactory() {
+		return transactionFactory;
+	}
+
+	public String getSessionFactoryName() {
+		return sessionFactoryName;
 	}
 
 	public boolean isAutoCreateSchema() {
@@ -184,6 +202,10 @@ public final class Settings {
 
 	public RegionFactory getRegionFactory() {
 		return regionFactory;
+	}
+
+	public TransactionManagerLookup getTransactionManagerLookup() {
+		return transactionManagerLookup;
 	}
 
 	public boolean isQueryCacheEnabled() {
@@ -218,6 +240,10 @@ public final class Settings {
 		return flushBeforeCompletionEnabled;
 	}
 
+	public BatcherFactory getBatcherFactory() {
+		return batcherFactory;
+	}
+
 	public boolean isAutoCloseSessionEnabled() {
 		return autoCloseSessionEnabled;
 	}
@@ -228,6 +254,10 @@ public final class Settings {
 
 	public QueryTranslatorFactory getQueryTranslatorFactory() {
 		return queryTranslatorFactory;
+	}
+
+	public SQLExceptionConverter getSQLExceptionConverter() {
+		return sqlExceptionConverter;
 	}
 
 	public boolean isWrapResultSetsEnabled() {
@@ -244,10 +274,6 @@ public final class Settings {
 
 	public boolean isStructuredCacheEntriesEnabled() {
 		return structuredCacheEntriesEnabled;
-	}
-
-	public boolean isDirectReferenceCacheEntriesEnabled() {
-		return directReferenceCacheEntriesEnabled;
 	}
 
 	public EntityMode getDefaultEntityMode() {
@@ -282,11 +308,24 @@ public final class Settings {
 //		return componentTuplizerFactory;
 //	}
 
-	public NullPrecedence getDefaultNullPrecedence() {
-		return defaultNullPrecedence;
+	public JdbcSupport getJdbcSupport() {
+		return jdbcSupport;
 	}
 
+
 	// package protected setters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//	void setShowSqlEnabled(boolean b) {
+//		showSql = b;
+//	}
+//
+//	void setFormatSqlEnabled(boolean b) {
+//		formatSql = b;
+//	}
+
+	void setSqlStatementLogger(SQLStatementLogger sqlStatementLogger) {
+		this.sqlStatementLogger = sqlStatementLogger;
+	}
 
 	void setDefaultSchemaName(String string) {
 		defaultSchemaName = string;
@@ -294,6 +333,10 @@ public final class Settings {
 
 	void setDefaultCatalogName(String string) {
 		defaultCatalogName = string;
+	}
+
+	void setDialect(Dialect dialect) {
+		this.dialect = dialect;
 	}
 
 	void setJdbcBatchSize(int i) {
@@ -328,12 +371,16 @@ public final class Settings {
 		jdbcFetchSize = integer;
 	}
 
-	void setSessionFactoryName(String string) {
-		sessionFactoryName = string;
+	void setConnectionProvider(ConnectionProvider provider) {
+		connectionProvider = provider;
 	}
 
-	void setSessionFactoryNameAlsoJndiName(boolean sessionFactoryNameAlsoJndiName) {
-		this.sessionFactoryNameAlsoJndiName = sessionFactoryNameAlsoJndiName;
+	void setTransactionFactory(TransactionFactory factory) {
+		transactionFactory = factory;
+	}
+
+	void setSessionFactoryName(String string) {
+		sessionFactoryName = string;
 	}
 
 	void setAutoCreateSchema(boolean b) {
@@ -354,6 +401,10 @@ public final class Settings {
 
 	void setRegionFactory(RegionFactory regionFactory) {
 		this.regionFactory = regionFactory;
+	}
+
+	void setTransactionManagerLookup(TransactionManagerLookup lookup) {
+		transactionManagerLookup = lookup;
 	}
 
 	void setQueryCacheEnabled(boolean b) {
@@ -388,6 +439,10 @@ public final class Settings {
 		this.flushBeforeCompletionEnabled = flushBeforeCompletionEnabled;
 	}
 
+	void setBatcherFactory(BatcherFactory batcher) {
+		this.batcherFactory = batcher;
+	}
+
 	void setAutoCloseSessionEnabled(boolean autoCloseSessionEnabled) {
 		this.autoCloseSessionEnabled = autoCloseSessionEnabled;
 	}
@@ -398,6 +453,10 @@ public final class Settings {
 
 	void setQueryTranslatorFactory(QueryTranslatorFactory queryTranslatorFactory) {
 		this.queryTranslatorFactory = queryTranslatorFactory;
+	}
+
+	void setSQLExceptionConverter(SQLExceptionConverter sqlExceptionConverter) {
+		this.sqlExceptionConverter = sqlExceptionConverter;
 	}
 
 	void setWrapResultSetsEnabled(boolean wrapResultSetsEnabled) {
@@ -456,6 +515,10 @@ public final class Settings {
 //		this.componentTuplizerFactory = componentTuplizerFactory;
 //	}
 
+	void setJdbcSupport(JdbcSupport jdbcSupport) {
+		this.jdbcSupport = jdbcSupport;
+	}
+
 	//	public BytecodeProvider getBytecodeProvider() {
 //		return bytecodeProvider;
 //	}
@@ -463,77 +526,4 @@ public final class Settings {
 //	void setBytecodeProvider(BytecodeProvider bytecodeProvider) {
 //		this.bytecodeProvider = bytecodeProvider;
 //	}
-
-
-	public JtaPlatform getJtaPlatform() {
-		return jtaPlatform;
-	}
-
-	void setJtaPlatform(JtaPlatform jtaPlatform) {
-		this.jtaPlatform = jtaPlatform;
-	}
-
-	public MultiTenancyStrategy getMultiTenancyStrategy() {
-		return multiTenancyStrategy;
-	}
-
-	void setMultiTenancyStrategy(MultiTenancyStrategy multiTenancyStrategy) {
-		this.multiTenancyStrategy = multiTenancyStrategy;
-	}
-
-	public boolean isInitializeLazyStateOutsideTransactionsEnabled() {
-		return initializeLazyStateOutsideTransactions;
-	}
-
-	void setInitializeLazyStateOutsideTransactions(boolean initializeLazyStateOutsideTransactions) {
-		this.initializeLazyStateOutsideTransactions = initializeLazyStateOutsideTransactions;
-	}
-
-	public MultiTableBulkIdStrategy getMultiTableBulkIdStrategy() {
-		return multiTableBulkIdStrategy;
-	}
-
-	void setMultiTableBulkIdStrategy(MultiTableBulkIdStrategy multiTableBulkIdStrategy) {
-		this.multiTableBulkIdStrategy = multiTableBulkIdStrategy;
-	}
-
-	public BatchFetchStyle getBatchFetchStyle() {
-		return batchFetchStyle;
-	}
-
-	void setBatchFetchStyle(BatchFetchStyle batchFetchStyle) {
-		this.batchFetchStyle = batchFetchStyle;
-	}
-
-	public void setDirectReferenceCacheEntriesEnabled(boolean directReferenceCacheEntriesEnabled) {
-		this.directReferenceCacheEntriesEnabled = directReferenceCacheEntriesEnabled;
-	}
-
-	void setDefaultNullPrecedence(NullPrecedence defaultNullPrecedence) {
-		this.defaultNullPrecedence = defaultNullPrecedence;
-	}
-
-	public boolean isJtaTrackByThread() {
-		return jtaTrackByThread;
-	}
-
-	public void setJtaTrackByThread(boolean jtaTrackByThread) {
-		this.jtaTrackByThread = jtaTrackByThread;
-	}
-
-	public boolean isAutoEvictCollectionCache() {
-		return autoEvictCollectionCache;
-	}
-
-	public void setAutoEvictCollectionCache(boolean autoEvictCollectionCache) {
-		this.autoEvictCollectionCache = autoEvictCollectionCache;
-	}
-
-	public void setBaselineSessionEventsListenerBuilder(BaselineSessionEventsListenerBuilder baselineSessionEventsListenerBuilder) {
-		this.baselineSessionEventsListenerBuilder = baselineSessionEventsListenerBuilder;
-	}
-
-	public BaselineSessionEventsListenerBuilder getBaselineSessionEventsListenerBuilder() {
-		return baselineSessionEventsListenerBuilder;
-	}
 }

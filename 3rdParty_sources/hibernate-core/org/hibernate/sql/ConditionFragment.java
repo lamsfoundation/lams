@@ -24,7 +24,7 @@
  */
 package org.hibernate.sql;
 
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.util.ArrayHelper;
 
 /**
  * @author Gavin King
@@ -66,7 +66,7 @@ public class ConditionFragment {
 	}
 
 	public String toFragmentString() {
-		StringBuilder buf = new StringBuilder( lhs.length * 10 );
+		StringBuffer buf = new StringBuffer( lhs.length * 10 );
 		for ( int i=0; i<lhs.length; i++ ) {
 			buf.append(tableAlias)
 				.append('.')

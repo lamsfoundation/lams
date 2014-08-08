@@ -25,7 +25,7 @@ package org.hibernate.type;
 
 import java.io.Serializable;
 
-import org.hibernate.engine.internal.CascadePoint;
+import org.hibernate.engine.Cascade;
 
 /**
  * Represents directionality of the foreign key constraint
@@ -35,25 +35,18 @@ public abstract class ForeignKeyDirection implements Serializable {
 	protected ForeignKeyDirection() {}
 	/**
 	 * Should we cascade at this cascade point?
-	 *
-	 * @param cascadePoint The point at which the cascade is being initiated.
-	 *
-	 * @return {@code true} if cascading should be performed now.
-	 *
-	 * @see org.hibernate.engine.internal.Cascade
+	 * @see org.hibernate.engine.Cascade
 	 */
-	public abstract boolean cascadeNow(CascadePoint cascadePoint);
+	public abstract boolean cascadeNow(int cascadePoint);
 
 	/**
 	 * A foreign key from child to parent
 	 */
 	public static final ForeignKeyDirection FOREIGN_KEY_TO_PARENT = new ForeignKeyDirection() {
-		@Override
-		public boolean cascadeNow(CascadePoint cascadePoint) {
-			return cascadePoint != CascadePoint.BEFORE_INSERT_AFTER_DELETE;
+		public boolean cascadeNow(int cascadePoint) {
+			return cascadePoint!=Cascade.BEFORE_INSERT_AFTER_DELETE;
 		}
 
-		@Override
 		public String toString() {
 			return "toParent";
 		}
@@ -66,12 +59,10 @@ public abstract class ForeignKeyDirection implements Serializable {
 	 * A foreign key from parent to child
 	 */
 	public static final ForeignKeyDirection FOREIGN_KEY_FROM_PARENT = new ForeignKeyDirection() {
-		@Override
-		public boolean cascadeNow(CascadePoint cascadePoint) {
-			return cascadePoint != CascadePoint.AFTER_INSERT_BEFORE_DELETE;
+		public boolean cascadeNow(int cascadePoint) {
+			return cascadePoint!=Cascade.AFTER_INSERT_BEFORE_DELETE;
 		}
 
-		@Override
 		public String toString() {
 			return "fromParent";
 		}

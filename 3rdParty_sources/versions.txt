@@ -19,7 +19,7 @@ Commons IO 2.4
 
 gson 2.2.4
 
-Hibernate Core 4.3.5
+Hibernate Core 3.6.10
 
 httpunit 1.7
 

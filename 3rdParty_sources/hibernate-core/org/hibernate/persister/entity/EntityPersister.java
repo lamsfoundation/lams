@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,50 +20,42 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.persister.entity;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.MappingException;
-import org.hibernate.bytecode.spi.EntityInstrumentationMetadata;
-import org.hibernate.cache.spi.OptimisticCacheSource;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
-import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
-import org.hibernate.cache.spi.entry.CacheEntry;
-import org.hibernate.cache.spi.entry.CacheEntryStructure;
-import org.hibernate.engine.spi.CascadeStyle;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.ValueInclusion;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.internal.FilterAliasGenerator;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.walking.spi.EntityDefinition;
+import org.hibernate.EntityMode;
+import org.hibernate.LockOptions;
 import org.hibernate.tuple.entity.EntityMetamodel;
-import org.hibernate.tuple.entity.EntityTuplizer;
+import org.hibernate.cache.OptimisticCacheSource;
+import org.hibernate.cache.access.EntityRegionAccessStrategy;
+import org.hibernate.cache.entry.CacheEntryStructure;
+import org.hibernate.engine.CascadeStyle;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.ValueInclusion;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
 import org.hibernate.type.VersionType;
 
 /**
- * Contract describing mapping information and persistence logic for a particular strategy of entity mapping.  A given
- * persister instance corresponds to a given mapped entity class.
+ * Implementors define mapping and persistence logic for a particular
+ * strategy of entity mapping.  An instance of entity persisters corresponds
+ * to a given mapped entity.
  * <p/>
- * Implementations must be thread-safe (preferably immutable).
+ * Implementors must be threadsafe (preferrably immutable) and must provide a constructor
+ * matching the signature of: {@link org.hibernate.mapping.PersistentClass}, {@link org.hibernate.engine.SessionFactoryImplementor}
  *
  * @author Gavin King
- * @author Steve Ebersole
- *
- * @see org.hibernate.persister.spi.PersisterFactory
- * @see org.hibernate.persister.spi.PersisterClassResolver
  */
-public interface EntityPersister extends OptimisticCacheSource, EntityDefinition {
+public interface EntityPersister extends OptimisticCacheSource {
 
 	/**
 	 * The property name of the "special" identifier property in HQL
@@ -71,14 +63,7 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	public static final String ENTITY_ID = "id";
 
 	/**
-	 * Generate the entity definition for this object. This must be done for all
-	 * entity persisters before calling {@link #postInstantiate()}.
-	 */
-	public void generateEntityDefinition();
-
-	/**
-	 * Finish the initialization of this object. {@link #generateEntityDefinition()}
-	 * must be called for all entity persisters before calling this method.
+	 * Finish the initialization of this object.
 	 * <p/>
 	 * Called only once per {@link org.hibernate.SessionFactory} lifecycle,
 	 * after all entity persisters have been instantiated.
@@ -337,12 +322,6 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	public boolean hasLazyProperties();
 
 	/**
-	 * Load the id for the entity based on the natural id.
-	 */
-	public Serializable loadEntityIdByNaturalId(Object[] naturalIdValues, LockOptions lockOptions,
-			SessionImplementor session);
-
-	/**
 	 * Load an instance of the persistent class.
 	 */
 	public Object load(Serializable id, Object optionalObject, LockMode lockMode, SessionImplementor session)
@@ -418,18 +397,12 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 
 	/**
 	 * Which of the properties of this class are database generated values on insert?
-	 *
-	 * @deprecated Replaced internally with InMemoryValueGenerationStrategy / InDatabaseValueGenerationStrategy
 	 */
-	@Deprecated
 	public ValueInclusion[] getPropertyInsertGenerationInclusions();
 
 	/**
 	 * Which of the properties of this class are database generated values on update?
-	 *
-	 * @deprecated Replaced internally with InMemoryValueGenerationStrategy / InDatabaseValueGenerationStrategy
 	 */
-	@Deprecated
 	public ValueInclusion[] getPropertyUpdateGenerationInclusions();
 
 	/**
@@ -494,18 +467,6 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	 */
 	public CacheEntryStructure getCacheEntryStructure();
 
-	public CacheEntry buildCacheEntry(Object entity, Object[] state, Object version, SessionImplementor session);
-
-	/**
-	 * Does this class have a natural id cache
-	 */
-	public boolean hasNaturalIdCache();
-	
-	/**
-	 * Get the NaturalId cache (optional operation)
-	 */
-	public NaturalIdRegionAccessStrategy getNaturalIdCacheAccessStrategy();
-
 	/**
 	 * Get the user-visible metadata for the class (optional operation)
 	 */
@@ -529,8 +490,6 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	public Object[] getDatabaseSnapshot(Serializable id, SessionImplementor session)
 	throws HibernateException;
 
-	public Serializable getIdByUniqueKey(Serializable key, String uniquePropertyName, SessionImplementor session);
-
 	/**
 	 * Get the current version of the object, or return null if there is no row for
 	 * the given identifier. In the case of unversioned data, return any object
@@ -543,9 +502,14 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	throws HibernateException;
 
 	/**
+	 * Try to discover the entity mode from the entity instance
+	 */
+	public EntityMode guessEntityMode(Object object);
+
+	/**
 	 * Has the class actually been bytecode instrumented?
 	 */
-	public boolean isInstrumented();
+	public boolean isInstrumented(EntityMode entityMode);
 
 	/**
 	 * Does this entity define any properties as being database generated on insert?
@@ -607,7 +571,7 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	 * Perform a select to retrieve the values of any generated properties
 	 * back from the database, injecting these generated values into the
 	 * given entity as well as writing this state to the
-	 * {@link org.hibernate.engine.spi.PersistenceContext}.
+	 * {@link org.hibernate.engine.PersistenceContext}.
 	 * <p/>
 	 * Note, that because we update the PersistenceContext here, callers
 	 * need to take care that they have already written the initial snapshot
@@ -623,7 +587,7 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	 * Perform a select to retrieve the values of any generated properties
 	 * back from the database, injecting these generated values into the
 	 * given entity as well as writing this state to the
-	 * {@link org.hibernate.engine.spi.PersistenceContext}.
+	 * {@link org.hibernate.engine.PersistenceContext}.
 	 * <p/>
 	 * Note, that because we update the PersistenceContext here, callers
 	 * need to take care that they have already written the initial snapshot
@@ -644,51 +608,54 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	/**
 	 * The persistent class, or null
 	 */
-	public Class getMappedClass();
+	public Class getMappedClass(EntityMode entityMode);
 
 	/**
-	 * Does the class implement the {@link org.hibernate.classic.Lifecycle} interface.
+	 * Does the class implement the <tt>Lifecycle</tt> interface.
 	 */
-	public boolean implementsLifecycle();
+	public boolean implementsLifecycle(EntityMode entityMode);
 
+	/**
+	 * Does the class implement the <tt>Validatable</tt> interface.
+	 */
+	public boolean implementsValidatable(EntityMode entityMode);
 	/**
 	 * Get the proxy interface that instances of <em>this</em> concrete class will be
 	 * cast to (optional operation).
 	 */
-	public Class getConcreteProxyClass();
+	public Class getConcreteProxyClass(EntityMode entityMode);
 
 	/**
 	 * Set the given values to the mapped properties of the given object
 	 */
-	public void setPropertyValues(Object object, Object[] values);
+	public void setPropertyValues(Object object, Object[] values, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Set the value of a particular property
 	 */
-	public void setPropertyValue(Object object, int i, Object value);
+	public void setPropertyValue(Object object, int i, Object value, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Return the (loaded) values of the mapped properties of the object (not including backrefs)
 	 */
-	public Object[] getPropertyValues(Object object);
+	public Object[] getPropertyValues(Object object, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Get the value of a particular property
 	 */
-	public Object getPropertyValue(Object object, int i) throws HibernateException;
+	public Object getPropertyValue(Object object, int i, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Get the value of a particular property
 	 */
-	public Object getPropertyValue(Object object, String propertyName);
+	public Object getPropertyValue(Object object, String propertyName, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Get the identifier of an instance (throw an exception if no identifier property)
-	 *
 	 * @deprecated Use {@link #getIdentifier(Object,SessionImplementor)} instead
+	 * @noinspection JavaDoc
 	 */
-	@SuppressWarnings( {"JavaDoc"})
-	public Serializable getIdentifier(Object object) throws HibernateException;
+	public Serializable getIdentifier(Object object, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Get the identifier of an instance (throw an exception if no identifier property)
@@ -702,6 +669,20 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 
     /**
      * Inject the identifier value into the given entity.
+     * </p>
+     * Has no effect if the entity does not define an identifier property
+     *
+     * @param entity The entity to inject with the identifier value.
+     * @param id The value to be injected as the identifier.
+	 * @param entityMode The entity mode
+	 *
+	 * @deprecated Use {@link #setIdentifier(Object, Serializable, SessionImplementor)} instead.
+	 * @noinspection JavaDoc
+     */
+	public void setIdentifier(Object entity, Serializable id, EntityMode entityMode) throws HibernateException;
+
+    /**
+     * Inject the identifier value into the given entity.
      *
      * @param entity The entity to inject with the identifier value.
      * @param id The value to be injected as the identifier.
@@ -712,7 +693,15 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	/**
 	 * Get the version number (or timestamp) from the object's version property (or return null if not versioned)
 	 */
-	public Object getVersion(Object object) throws HibernateException;
+	public Object getVersion(Object object, EntityMode entityMode) throws HibernateException;
+
+	/**
+	 * Create a class instance initialized with the given identifier
+	 *
+	 * @deprecated Use {@link #instantiate(Serializable, SessionImplementor)} instead
+	 * @noinspection JavaDoc
+	 */
+	public Object instantiate(Serializable id, EntityMode entityMode) throws HibernateException;
 
 	/**
 	 * Create a class instance initialized with the given identifier
@@ -727,12 +716,24 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	/**
 	 * Is the given object an instance of this entity?
 	 */
-	public boolean isInstance(Object object);
+	public boolean isInstance(Object object, EntityMode entityMode);
 
 	/**
 	 * Does the given instance have any uninitialized lazy properties?
 	 */
-	public boolean hasUninitializedLazyProperties(Object object);
+	public boolean hasUninitializedLazyProperties(Object object, EntityMode entityMode);
+
+	/**
+	 * Set the identifier and version of the given instance back to its "unsaved" value.
+	 *
+	 * @param entity The entity instance
+	 * @param currentId The currently assigned identifier value.
+	 * @param currentVersion The currently assigned version value.
+	 * @param entityMode The entity mode represented by the entity instance.
+	 *
+	 * @deprecated Use {@link #resetIdentifier(Object, Serializable, Object, SessionImplementor)} instead
+	 */
+	public void resetIdentifier(Object entity, Serializable currentId, Object currentVersion, EntityMode entityMode);
 
 	/**
 	 * Set the identifier and version of the given instance back to its "unsaved" value.
@@ -758,22 +759,12 @@ public interface EntityPersister extends OptimisticCacheSource, EntityDefinition
 	 *
 	 * @param instance The entity instance
 	 * @param factory Reference to the SessionFactory
+	 * @param entityMode The entity mode represented by the entity instance.
 	 *
 	 * @return The appropriate persister
 	 *
 	 * @throws HibernateException Indicates that instance was deemed to not be a subclass of the entity mapped by
 	 * this persister.
 	 */
-	public EntityPersister getSubclassEntityPersister(Object instance, SessionFactoryImplementor factory);
-
-	public EntityMode getEntityMode();
-	public EntityTuplizer getEntityTuplizer();
-
-	public EntityInstrumentationMetadata getInstrumentationMetadata();
-	
-	public FilterAliasGenerator getFilterAliasGenerator(final String rootAlias);
-
-	public int[] resolveAttributeIndexes(Set<String> properties);
-
-	public boolean canUseReferenceCacheEntries();
+	public EntityPersister getSubclassEntityPersister(Object instance, SessionFactoryImplementor factory, EntityMode entityMode);
 }

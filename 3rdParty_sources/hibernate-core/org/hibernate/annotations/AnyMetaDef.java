@@ -23,44 +23,40 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.Retention;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Used to provide metadata about an {@link Any} or {@link ManyToAny} mapping.
- *
- * @see AnyMetaDefs
+ * Defines @Any and @manyToAny metadata
  *
  * @author Emmanuel Bernard
- * @author Steve Ebersole
  */
 @java.lang.annotation.Target( { PACKAGE, TYPE, METHOD, FIELD } )
 @Retention( RUNTIME )
 public @interface AnyMetaDef {
 	/**
-	 * If defined, assign a global meta definition name to be used in an @Any or @ManyToAny annotation.  If
-	 * not defined, the metadata applies to the current property or field.
+	 * If defined, assign a global meta definition name to be used in an @Any or @ManyToAny annotation
+	 * If not defined, the metadata applies to the current property or field
 	 */
 	String name() default "";
 
 	/**
-	 * Names the discriminator Hibernate Type for this Any/ManyToAny mapping.  The default is to use
-	 * {@link org.hibernate.type.StringType}
+	 * meta discriminator Hibernate type
 	 */
 	String metaType();
 
 	/**
-	 * Names the identifier Hibernate Type for the entity associated through this Any/ManyToAny mapping.
+	 * Hibernate type of the id column
+	 * @return
 	 */
 	String idType();
 
 	/**
-	 * Maps discriminator values to the matching corresponding entity types.
+	 * Matching discriminator values with their respective entity
 	 */
 	MetaValue[] metaValues();
 }

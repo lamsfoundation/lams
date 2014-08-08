@@ -23,28 +23,20 @@
  */
 package org.hibernate.annotations;
 
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 /**
- * Used to apply a Hibernate formula (derived value) as the inheritance discriminator "column".  Used in place of
- * the JPA {@link javax.persistence.DiscriminatorColumn} when a formula is wanted.
- *
- * To be placed on the root entity.
- *
- * @see Formula
+ * Discriminator formula
+ * To be placed at the root entity.
  *
  * @author Emmanuel Bernard
- * @author Steve Ebersole
+ * @see Formula
  */
 @Target({TYPE})
 @Retention(RUNTIME)
 public @interface DiscriminatorFormula {
-	/**
-	 * The formula string.
-	 */
 	String value();
 }

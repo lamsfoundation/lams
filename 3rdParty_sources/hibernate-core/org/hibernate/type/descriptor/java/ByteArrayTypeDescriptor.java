@@ -29,12 +29,11 @@ import java.sql.Blob;
 import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.jdbc.BinaryStream;
-import org.hibernate.engine.jdbc.internal.BinaryStreamImpl;
+import org.hibernate.type.descriptor.BinaryStream;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
- * Descriptor for {@code Byte[]} handling.
+ * TODO : javadoc
  *
  * @author Steve Ebersole
  */
@@ -45,11 +44,12 @@ public class ByteArrayTypeDescriptor extends AbstractTypeDescriptor<Byte[]> {
 	public ByteArrayTypeDescriptor() {
 		super( Byte[].class, ArrayMutabilityPlan.INSTANCE );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public String toString(Byte[] bytes) {
-		final StringBuilder buf = new StringBuilder();
+		final StringBuffer buf = new StringBuffer();
 		for ( Byte aByte : bytes ) {
-			final String hexStr = Integer.toHexString( aByte - Byte.MIN_VALUE );
+			final String hexStr = Integer.toHexString( aByte.byteValue() - Byte.MIN_VALUE );
 			if ( hexStr.length() == 1 ) {
 				buf.append( '0' );
 			}
@@ -57,7 +57,8 @@ public class ByteArrayTypeDescriptor extends AbstractTypeDescriptor<Byte[]> {
 		}
 		return buf.toString();
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Byte[] fromString(String string) {
 		if ( string == null ) {
 			return null;
@@ -68,13 +69,12 @@ public class ByteArrayTypeDescriptor extends AbstractTypeDescriptor<Byte[]> {
 		Byte[] bytes = new Byte[string.length() / 2];
 		for ( int i = 0; i < bytes.length; i++ ) {
 			final String hexStr = string.substring( i * 2, (i + 1) * 2 );
-			bytes[i] = (byte) ( Integer.parseInt( hexStr, 16 ) + Byte.MIN_VALUE );
+			bytes[i] = Byte.valueOf( (byte) (Integer.parseInt(hexStr, 16) + Byte.MIN_VALUE) );
 		}
 		return bytes;
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Byte[] value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -97,7 +97,7 @@ public class ByteArrayTypeDescriptor extends AbstractTypeDescriptor<Byte[]> {
 
 		throw unknownUnwrap( type );
 	}
-	@Override
+
 	public <X> Byte[] wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -123,24 +123,26 @@ public class ByteArrayTypeDescriptor extends AbstractTypeDescriptor<Byte[]> {
 		throw unknownWrap( value.getClass() );
 	}
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	private Byte[] wrapBytes(byte[] bytes) {
 		if ( bytes == null ) {
 			return null;
 		}
 		final Byte[] result = new Byte[bytes.length];
 		for ( int i = 0; i < bytes.length; i++ ) {
-			result[i] = bytes[i];
+			result[i] = Byte.valueOf( bytes[i] );
 		}
 		return result;
 	}
 
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	private byte[] unwrapBytes(Byte[] bytes) {
 		if ( bytes == null ) {
 			return null;
 		}
 		final byte[] result = new byte[bytes.length];
 		for ( int i = 0; i < bytes.length; i++ ) {
-			result[i] = bytes[i];
+			result[i] = bytes[i].byteValue();
 		}
 		return result;
 	}

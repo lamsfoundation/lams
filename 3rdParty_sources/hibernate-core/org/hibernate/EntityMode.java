@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,56 +20,53 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.io.Serializable;
 
 /**
  * Defines the representation modes available for entities.
  *
  * @author Steve Ebersole
  */
-public enum EntityMode {
-	/**
-	 * The {@code pojo} entity mode describes an entity model made up of entity classes (loosely) following
-	 * the java bean convention.
-	 */
-	POJO( "pojo" ),
+public class EntityMode implements Serializable {
 
-	/**
-	 * The {@code dynamic-map} entity mode describes an entity model defined using {@link java.util.Map} references.
-	 */
-	MAP( "dynamic-map" );
+	private static final Map INSTANCES = new HashMap();
+
+	public static final EntityMode POJO = new EntityMode( "pojo" );
+	public static final EntityMode DOM4J = new EntityMode( "dom4j" );
+	public static final EntityMode MAP = new EntityMode( "dynamic-map" );
+
+	static {
+		INSTANCES.put( POJO.name, POJO );
+		INSTANCES.put( DOM4J.name, DOM4J );
+		INSTANCES.put( MAP.name, MAP );
+	}
 
 	private final String name;
 
-	private EntityMode(String name) {
+	public EntityMode(String name) {
 		this.name = name;
 	}
 
-	@Override
 	public String toString() {
 		return name;
 	}
 
-	private static final String DYNAMIC_MAP_NAME = MAP.name.toUpperCase();
-
-	/**
-	 * Legacy-style entity-mode name parsing.  <b>Case insensitive</b>
-	 *
-	 * @param entityMode The entity mode name to evaluate
-	 *
-	 * @return The appropriate entity mode; {@code null} for incoming {@code entityMode} param is treated by returning
-	 * {@link #POJO}.
-	 */
-	public static EntityMode parse(String entityMode) {
-		if ( entityMode == null ) {
-			return POJO;
-		}
-		entityMode = entityMode.toUpperCase();
-		if ( DYNAMIC_MAP_NAME.equals( entityMode ) ) {
-			return MAP;
-		}
-		return valueOf( entityMode );
+	private Object readResolve() {
+		return INSTANCES.get( name );
 	}
 
+	public static EntityMode parse(String name) {
+		EntityMode rtn = ( EntityMode ) INSTANCES.get( name );
+		if ( rtn == null ) {
+			// default is POJO
+			rtn = POJO;
+		}
+		return rtn;
+	}
 }

@@ -22,11 +22,12 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.collections.JoinedIterator;
+import org.hibernate.engine.Mapping;
+import org.hibernate.util.JoinedIterator;
 
 /**
  * @author Gavin King
@@ -38,7 +39,7 @@ public class SingleTableSubclass extends Subclass {
 	}
 	
 	protected Iterator getNonDuplicatedPropertyIterator() {
-		return new JoinedIterator(
+		return new JoinedIterator( 
 				getSuperclass().getUnjoinedPropertyIterator(),
 				getUnjoinedPropertyIterator()
 		);

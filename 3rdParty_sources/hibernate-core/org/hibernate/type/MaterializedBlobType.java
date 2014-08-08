@@ -22,8 +22,10 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
+
 import org.hibernate.type.descriptor.java.PrimitiveByteArrayTypeDescriptor;
 import org.hibernate.type.descriptor.sql.BlobTypeDescriptor;
+import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
  * A type that maps between {@link java.sql.Types#BLOB BLOB} and {@code byte[]}
@@ -33,11 +35,20 @@ import org.hibernate.type.descriptor.sql.BlobTypeDescriptor;
  * @author Gail Badner
  * @author Steve Ebersole
  */
-public class MaterializedBlobType extends AbstractSingleColumnStandardBasicType<byte[]> {
+public class MaterializedBlobType extends LobType<byte[]> {
+
 	public static final MaterializedBlobType INSTANCE = new MaterializedBlobType();
 
 	public MaterializedBlobType() {
-		super( BlobTypeDescriptor.DEFAULT, PrimitiveByteArrayTypeDescriptor.INSTANCE );
+		this(
+				BlobTypeDescriptor.DEFAULT,
+				new AlternativeLobTypes.BlobTypes<byte[],MaterializedBlobType>( MaterializedBlobType.class )
+		);
+	}
+
+	protected MaterializedBlobType(SqlTypeDescriptor sqlTypeDescriptor,
+								   AlternativeLobTypes.BlobTypes<byte[],MaterializedBlobType> blobTypes) {
+		super( sqlTypeDescriptor, PrimitiveByteArrayTypeDescriptor.INSTANCE, blobTypes );
 	}
 
 	public String getName() {

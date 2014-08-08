@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.id.enhanced;
 
@@ -27,14 +28,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.JDBCExceptionHelper;
+import org.hibernate.HibernateException;
 import org.hibernate.id.IdentifierGeneratorHelper;
 import org.hibernate.id.IntegralDataTypeHolder;
-import org.hibernate.internal.CoreMessageLogger;
-
-import org.jboss.logging.Logger;
 
 /**
  * Describes a sequence.
@@ -42,10 +44,7 @@ import org.jboss.logging.Logger;
  * @author Steve Ebersole
  */
 public class SequenceStructure implements DatabaseStructure {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			SequenceStructure.class.getName()
-	);
+	private static final Logger log = LoggerFactory.getLogger( SequenceStructure.class );
 
 	private final String sequenceName;
 	private final int initialValue;
@@ -68,48 +67,57 @@ public class SequenceStructure implements DatabaseStructure {
 		sql = dialect.getSequenceNextValString( sequenceName );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getName() {
 		return sequenceName;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getIncrementSize() {
 		return incrementSize;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getTimesAccessed() {
 		return accessCounter;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getInitialValue() {
 		return initialValue;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public AccessCallback buildCallback(final SessionImplementor session) {
 		return new AccessCallback() {
-			@Override
 			public IntegralDataTypeHolder getNextValue() {
 				accessCounter++;
 				try {
-					final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+					PreparedStatement st = session.getBatcher().prepareSelectStatement( sql );
 					try {
-						final ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+						ResultSet rs = st.executeQuery();
 						try {
 							rs.next();
-							final IntegralDataTypeHolder value = IdentifierGeneratorHelper.getIntegralDataTypeHolder( numberType );
+							IntegralDataTypeHolder value = IdentifierGeneratorHelper.getIntegralDataTypeHolder( numberType );
 							value.initialize( rs, 1 );
-							if ( LOG.isDebugEnabled() ) {
-								LOG.debugf( "Sequence value obtained: %s", value.makeValue() );
+							if ( log.isDebugEnabled() ) {
+								log.debug( "Sequence value obtained: " + value.makeValue() );
 							}
 							return value;
 						}
 						finally {
 							try {
-								session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+								rs.close();
 							}
 							catch( Throwable ignore ) {
 								// intentionally empty
@@ -117,44 +125,41 @@ public class SequenceStructure implements DatabaseStructure {
 						}
 					}
 					finally {
-						session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+						session.getBatcher().closeStatement( st );
 					}
 
 				}
 				catch ( SQLException sqle) {
-					throw session.getFactory().getSQLExceptionHelper().convert(
+					throw JDBCExceptionHelper.convert(
+							session.getFactory().getSQLExceptionConverter(),
 							sqle,
 							"could not get next sequence value",
 							sql
 					);
 				}
 			}
-
-			@Override
-			public String getTenantIdentifier() {
-				return session.getTenantIdentifier();
-			}
 		};
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void prepare(Optimizer optimizer) {
 		applyIncrementSizeToSourceValues = optimizer.applyIncrementSizeToSourceValues();
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String[] sqlCreateStrings(Dialect dialect) throws HibernateException {
-		final int sourceIncrementSize = applyIncrementSizeToSourceValues ? incrementSize : 1;
+		int sourceIncrementSize = applyIncrementSizeToSourceValues ? incrementSize : 1;
 		return dialect.getCreateSequenceStrings( sequenceName, initialValue, sourceIncrementSize );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String[] sqlDropStrings(Dialect dialect) throws HibernateException {
 		return dialect.getDropSequenceStrings( sequenceName );
-	}
-
-	@Override
-	public boolean isPhysicalSequence() {
-		return true;
 	}
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.tool.hbm2ddl;
 
@@ -35,82 +36,63 @@ import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.cfg.NamingStrategy;
+import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.internal.FormatStyle;
-import org.hibernate.engine.jdbc.internal.Formatter;
-import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
-import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.internal.util.config.ConfigurationHelper;
-import org.hibernate.service.ServiceRegistry;
-
-import org.jboss.logging.Logger;
+import org.hibernate.jdbc.util.FormatStyle;
+import org.hibernate.jdbc.util.Formatter;
+import org.hibernate.jdbc.util.SQLStatementLogger;
+import org.hibernate.util.PropertiesHelper;
+import org.hibernate.util.ReflectHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A commandline tool to update a database schema. May also be called from inside an application.
+ * A commandline tool to update a database schema. May also be called from
+ * inside an application.
  *
  * @author Christoph Sturm
- * @author Steve Ebersole
  */
 public class SchemaUpdate {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, SchemaUpdate.class.getName());
 
-	private final Configuration configuration;
-	private final ConnectionHelper connectionHelper;
-	private final SqlStatementLogger sqlStatementLogger;
-	private final SqlExceptionHelper sqlExceptionHelper;
-	private final Dialect dialect;
-
-	private final List<Exception> exceptions = new ArrayList<Exception>();
-
-	private Formatter formatter;
-
-	private boolean haltOnError;
+	private static final Logger log = LoggerFactory.getLogger( SchemaUpdate.class );
+	private ConnectionHelper connectionHelper;
+	private Configuration configuration;
+	private Dialect dialect;
+	private List exceptions;
+	private boolean haltOnError = false;
 	private boolean format = true;
-	private String outputFile;
+	private String outputFile = null;
 	private String delimiter;
+	private Formatter formatter;
+	private SQLStatementLogger sqlStatementLogger;
 
 	public SchemaUpdate(Configuration cfg) throws HibernateException {
 		this( cfg, cfg.getProperties() );
 	}
 
-	public SchemaUpdate(Configuration configuration, Properties properties) throws HibernateException {
-		this.configuration = configuration;
-		this.dialect = Dialect.getDialect( properties );
-
+	public SchemaUpdate(Configuration cfg, Properties connectionProperties) throws HibernateException {
+		this.configuration = cfg;
+		dialect = Dialect.getDialect( connectionProperties );
 		Properties props = new Properties();
 		props.putAll( dialect.getDefaultProperties() );
-		props.putAll( properties );
-		this.connectionHelper = new ManagedProviderConnectionHelper( props );
-
-		this.sqlExceptionHelper = new SqlExceptionHelper();
-		this.sqlStatementLogger = new SqlStatementLogger( false, true );
-		this.formatter = FormatStyle.DDL.getFormatter();
+		props.putAll( connectionProperties );
+		connectionHelper = new ManagedProviderConnectionHelper( props );
+		exceptions = new ArrayList();
+		formatter = ( PropertiesHelper.getBoolean( Environment.FORMAT_SQL, props ) ? FormatStyle.DDL : FormatStyle.NONE ).getFormatter();
 	}
 
-	public SchemaUpdate(ServiceRegistry serviceRegistry, Configuration cfg) throws HibernateException {
+	public SchemaUpdate(Configuration cfg, Settings settings) throws HibernateException {
 		this.configuration = cfg;
-
-		final JdbcServices jdbcServices = serviceRegistry.getService( JdbcServices.class );
-		this.dialect = jdbcServices.getDialect();
-		this.connectionHelper = new SuppliedConnectionProviderConnectionHelper( jdbcServices.getConnectionProvider() );
-
-		this.sqlExceptionHelper = new SqlExceptionHelper();
-		this.sqlStatementLogger = jdbcServices.getSqlStatementLogger();
-		this.formatter = ( sqlStatementLogger.isFormat() ? FormatStyle.DDL : FormatStyle.NONE ).getFormatter();
-	}
-
-	private static StandardServiceRegistryImpl createServiceRegistry(Properties properties) {
-		Environment.verifyProperties( properties );
-		ConfigurationHelper.resolvePlaceHolders( properties );
-		return (StandardServiceRegistryImpl) new StandardServiceRegistryBuilder().applySettings( properties ).build();
+		dialect = settings.getDialect();
+		connectionHelper = new SuppliedConnectionProviderConnectionHelper(
+				settings.getConnectionProvider()
+		);
+		exceptions = new ArrayList();
+		sqlStatementLogger = settings.getSqlStatementLogger();
+		formatter = ( sqlStatementLogger.isFormatSql() ? FormatStyle.DDL : FormatStyle.NONE ).getFormatter();
 	}
 
 	public static void main(String[] args) {
@@ -155,16 +137,10 @@ public class SchemaUpdate {
 				cfg.setProperties( props );
 			}
 
-			StandardServiceRegistryImpl serviceRegistry = createServiceRegistry( cfg.getProperties() );
-			try {
-				new SchemaUpdate( serviceRegistry, cfg ).execute( script, doUpdate );
-			}
-			finally {
-				serviceRegistry.destroy();
-			}
+			new SchemaUpdate( cfg ).execute( script, doUpdate );
 		}
 		catch ( Exception e ) {
-            LOG.unableToRunSchemaUpdate(e);
+			log.error( "Error running schema update", e );
 			e.printStackTrace();
 		}
 	}
@@ -175,11 +151,8 @@ public class SchemaUpdate {
 	 * @param script print all DDL to the console
 	 */
 	public void execute(boolean script, boolean doUpdate) {
-		execute( Target.interpret( script, doUpdate ) );
-	}
-	
-	public void execute(Target target) {
-        LOG.runningHbm2ddlSchemaUpdate();
+
+		log.info( "Running hbm2ddl schema update" );
 
 		Connection connection = null;
 		Statement stmt = null;
@@ -188,63 +161,65 @@ public class SchemaUpdate {
 		exceptions.clear();
 
 		try {
+
 			DatabaseMetadata meta;
 			try {
-                LOG.fetchingDatabaseMetadata();
+				log.info( "fetching database metadata" );
 				connectionHelper.prepare( true );
 				connection = connectionHelper.getConnection();
-				meta = new DatabaseMetadata( connection, dialect, configuration );
+				meta = new DatabaseMetadata( connection, dialect );
 				stmt = connection.createStatement();
 			}
 			catch ( SQLException sqle ) {
 				exceptions.add( sqle );
-                LOG.unableToGetDatabaseMetadata(sqle);
+				log.error( "could not get database metadata", sqle );
 				throw sqle;
 			}
 
-            LOG.updatingSchema();
+			log.info( "updating schema" );
 
+			
 			if ( outputFile != null ) {
-                LOG.writingGeneratedSchemaToFile( outputFile );
+				log.info( "writing generated schema to file: " + outputFile );
 				outputFileWriter = new FileWriter( outputFile );
 			}
+			 
+			String[] createSQL = configuration.generateSchemaUpdateScript( dialect, meta );
+			for ( int j = 0; j < createSQL.length; j++ ) {
 
-			List<SchemaUpdateScript> scripts = configuration.generateSchemaUpdateScriptList( dialect, meta );
-			for ( SchemaUpdateScript script : scripts ) {
-				String formatted = formatter.format( script.getScript() );
+				final String sql = createSQL[j];
+				String formatted = formatter.format( sql );
 				try {
 					if ( delimiter != null ) {
 						formatted += delimiter;
 					}
-					if ( target.doScript() ) {
+					if ( script ) {
 						System.out.println( formatted );
 					}
 					if ( outputFile != null ) {
 						outputFileWriter.write( formatted + "\n" );
 					}
-					if ( target.doExport() ) {
-                        LOG.debug( script.getScript() );
+					if ( doUpdate ) {
+						log.debug( sql );
 						stmt.executeUpdate( formatted );
 					}
 				}
 				catch ( SQLException e ) {
-					if (!script.isQuiet()) {
-						if ( haltOnError ) {
-							throw new JDBCException( "Error during DDL export", e );
-						}
-						exceptions.add( e );
-	                    LOG.unsuccessful(script.getScript());
-	                    LOG.error(e.getMessage());
+					if ( haltOnError ) {
+						throw new JDBCException( "Error during DDL export", e );
 					}
+					exceptions.add( e );
+					log.error( "Unsuccessful: " + sql );
+					log.error( e.getMessage() );
 				}
 			}
 
-            LOG.schemaUpdateComplete();
+			log.info( "schema update complete" );
 
 		}
 		catch ( Exception e ) {
 			exceptions.add( e );
-            LOG.unableToCompleteSchemaUpdate(e);
+			log.error( "could not complete schema update", e );
 		}
 		finally {
 
@@ -256,7 +231,7 @@ public class SchemaUpdate {
 			}
 			catch ( Exception e ) {
 				exceptions.add( e );
-                LOG.unableToCloseConnection(e);
+				log.error( "Error closing connection", e );
 			}
 			try {
 				if( outputFileWriter != null ) {
@@ -265,7 +240,7 @@ public class SchemaUpdate {
 			}
 			catch(Exception e) {
 				exceptions.add(e);
-                LOG.unableToCloseConnection(e);
+				log.error( "Error closing connection", e );
 			}
 		}
 	}
@@ -294,4 +269,5 @@ public class SchemaUpdate {
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
 	}
+
 }

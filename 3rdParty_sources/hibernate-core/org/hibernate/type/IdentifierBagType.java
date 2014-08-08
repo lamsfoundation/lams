@@ -27,24 +27,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.hibernate.HibernateException;
-import org.hibernate.collection.internal.PersistentIdentifierBag;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.collection.PersistentIdentifierBag;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 public class IdentifierBagType extends CollectionType {
 
-	/**
-	 * @deprecated Use {@link #IdentifierBagType(org.hibernate.type.TypeFactory.TypeScope, String, String)}
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
 	public IdentifierBagType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
-	}
-
-	public IdentifierBagType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
-		super( typeScope, role, propertyRef );
 	}
 
 	public PersistentCollection instantiate(

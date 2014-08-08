@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.param;
+
 import org.hibernate.type.Type;
 
 /**
@@ -46,22 +47,30 @@ public abstract class AbstractExplicitParameterSpecification implements Explicit
 		this.sourceColumn = sourceColumn;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getSourceLine() {
 		return sourceLine;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getSourceColumn() {
 		return sourceColumn;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Type getExpectedType() {
 		return expectedType;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setExpectedType(Type expectedType) {
 		this.expectedType = expectedType;
 	}

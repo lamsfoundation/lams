@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type.descriptor.java;
+
 import org.hibernate.HibernateException;
 import org.hibernate.type.descriptor.WrapperOptions;
 
@@ -36,20 +37,20 @@ public class CharacterTypeDescriptor extends AbstractTypeDescriptor<Character> {
 	public CharacterTypeDescriptor() {
 		super( Character.class );
 	}
-	@Override
+
 	public String toString(Character value) {
 		return value.toString();
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Character fromString(String string) {
 		if ( string.length() != 1 ) {
 			throw new HibernateException( "multiple or zero characters found parsing string" );
 		}
-		return string.charAt( 0 );
+		return Character.valueOf( string.charAt( 0 ) );
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Character value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -65,7 +66,8 @@ public class CharacterTypeDescriptor extends AbstractTypeDescriptor<Character> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public <X> Character wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -75,11 +77,11 @@ public class CharacterTypeDescriptor extends AbstractTypeDescriptor<Character> {
 		}
 		if ( String.class.isInstance( value ) ) {
 			final String str = (String) value;
-			return str.charAt( 0 );
+			return Character.valueOf( str.charAt(0) );
 		}
 		if ( Number.class.isInstance( value ) ) {
 			final Number nbr = (Number) value;
-			return (char) nbr.shortValue();
+			return Character.valueOf( (char)nbr.shortValue() );
 		}
 		throw unknownWrap( value.getClass() );
 	}

@@ -23,11 +23,6 @@
  */
 package org.hibernate.type;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
-
 /**
  * Centralizes access to the standard set of basic {@link Type types}.
  * <p/>
@@ -41,13 +36,7 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * @author Gavin King
  * @author Steve Ebersole
  */
-@SuppressWarnings( {"UnusedDeclaration"})
-public final class StandardBasicTypes {
-	private StandardBasicTypes() {
-	}
-
-	private static final Set<SqlTypeDescriptor> SQL_TYPE_DESCRIPTORS = new HashSet<SqlTypeDescriptor>();
-
+public class StandardBasicTypes {
 	/**
 	 * The standard Hibernate type for mapping {@link Boolean} to JDBC {@link java.sql.Types#BIT BIT}.
 	 *
@@ -273,6 +262,12 @@ public final class StandardBasicTypes {
 	public static final MaterializedBlobType MATERIALIZED_BLOB = MaterializedBlobType.INSTANCE;
 
 	/**
+	 * The standard Hibernate type for mapping {@code Byte[]} to JDBC {@link java.sql.Types#BLOB BLOB}
+	 * @see WrappedMaterializedBlobType
+	 */
+	public static final WrappedMaterializedBlobType WRAPPER_MATERIALIZED_BLOB = WrappedMaterializedBlobType.INSTANCE;
+
+	/**
 	 * The standard Hibernate type for mapping {@code char[]} to JDBC {@link java.sql.Types#VARCHAR VARCHAR}.
 	 *
 	 * @see CharArrayType
@@ -297,29 +292,12 @@ public final class StandardBasicTypes {
 	public static final TextType TEXT = TextType.INSTANCE;
 
 	/**
-	 * The standard Hibernate type for mapping {@link String} to JDBC {@link java.sql.Types#LONGNVARCHAR LONGNVARCHAR}.
-	 * <p/>
-	 * Similar to a {@link #MATERIALIZED_NCLOB}
-	 *
-	 * @see NTextType
-	 */
-	public static final NTextType NTEXT = NTextType.INSTANCE;
-
-	/**
 	 * The standard Hibernate type for mapping {@link java.sql.Clob} to JDBC {@link java.sql.Types#CLOB CLOB}.
 	 *
 	 * @see ClobType
 	 * @see #MATERIALIZED_CLOB
 	 */
 	public static final ClobType CLOB = ClobType.INSTANCE;
-
-	/**
-	 * The standard Hibernate type for mapping {@link java.sql.NClob} to JDBC {@link java.sql.Types#NCLOB NCLOB}.
-	 *
-	 * @see NClobType
-	 * @see #MATERIALIZED_NCLOB
-	 */
-	public static final NClobType NCLOB = NClobType.INSTANCE;
 
 	/**
 	 * The standard Hibernate type for mapping {@link String} to JDBC {@link java.sql.Types#CLOB CLOB}.
@@ -331,13 +309,16 @@ public final class StandardBasicTypes {
 	public static final MaterializedClobType MATERIALIZED_CLOB = MaterializedClobType.INSTANCE;
 
 	/**
-	 * The standard Hibernate type for mapping {@link String} to JDBC {@link java.sql.Types#NCLOB NCLOB}.
-	 *
-	 * @see MaterializedNClobType
-	 * @see #MATERIALIZED_CLOB
-	 * @see #NTEXT
+	 * The standard Hibernate type for mapping {@link Character[]} to JDBC {@link java.sql.Types#CLOB CLOB}.
+	 * @see CharacterArrayClobType
 	 */
-	public static final MaterializedNClobType MATERIALIZED_NCLOB = MaterializedNClobType.INSTANCE;
+	public static final CharacterArrayClobType WRAPPER_CHARACTERS_CLOB = CharacterArrayClobType.INSTANCE;
+
+	/**
+	 * The standard Hibernate type for mapping {@link Character[]} to JDBC {@link java.sql.Types#CLOB CLOB}.
+	 * @see PrimitiveCharacterArrayClobType
+	 */
+	public static final PrimitiveCharacterArrayClobType CHARACTERS_CLOB = PrimitiveCharacterArrayClobType.INSTANCE;
 
 	/**
 	 * The standard Hibernate type for mapping {@link java.io.Serializable} to JDBC {@link java.sql.Types#VARBINARY VARBINARY}.

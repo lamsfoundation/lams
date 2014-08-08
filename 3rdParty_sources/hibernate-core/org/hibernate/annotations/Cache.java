@@ -22,35 +22,27 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
+
+import static java.lang.annotation.ElementType.*;
 import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 /**
- * Add caching strategy to a root entity or a collection.
+ * Add caching strategy to a root entity or a collection
  *
  * @author Emmanuel Bernard
  */
 @Target({TYPE, METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface Cache {
-	/**
-	 * The concurrency strategy chosen.
-	 */
+	/** concurrency strategy chosen */
 	CacheConcurrencyStrategy usage();
-
-	/**
-	 * The cache region name.
-	 */
+	/** cache region name */
 	String region() default "";
-
 	/**
-	 * How lazy properties are included in the second level cache. Default value is "all"; other allowable
-	 * value: "non-lazy"
+	 * whether or not lazy-properties are included in the second level cache
+	 * default all, other value: non-lazy
 	 */
 	String include() default "all";
 }

@@ -36,25 +36,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.type.PrimitiveWrapperHelper;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.StringHelper;
 
 /**
- * No idea.
- *
  * @author Emmanuel Bernard
  */
 public abstract class AbstractPropertyHolder implements PropertyHolder {
-	private static final Logger log = CoreLogging.logger( AbstractPropertyHolder.class );
-
 	protected AbstractPropertyHolder parent;
 	private Map<String, Column[]> holderColumnOverride;
 	private Map<String, Column[]> currentPropertyColumnOverride;
@@ -66,7 +57,8 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 	private Mappings mappings;
 	private Boolean isInIdClass;
 
-	AbstractPropertyHolder(
+
+	public AbstractPropertyHolder(
 			String path,
 			PropertyHolder parent,
 			XClass clazzToProcess,
@@ -77,102 +69,25 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 		buildHierarchyColumnOverride( clazzToProcess );
 	}
 
-	protected abstract String normalizeCompositePathForLogging(String attributeName);
-	protected abstract String normalizeCompositePath(String attributeName);
 
-	protected abstract AttributeConversionInfo locateAttributeConversionInfo(XProperty property);
-	protected abstract AttributeConversionInfo locateAttributeConversionInfo(String path);
-
-	@Override
-	public AttributeConverterDefinition resolveAttributeConverterDefinition(XProperty property) {
-		AttributeConversionInfo info = locateAttributeConversionInfo( property );
-		if ( info != null ) {
-			if ( info.isConversionDisabled() ) {
-				return null;
-			}
-			else {
-				try {
-					return makeAttributeConverterDefinition( info );
-				}
-				catch (Exception e) {
-					throw new IllegalStateException(
-							String.format( "Unable to instantiate AttributeConverter [%s", info.getConverterClass().getName() ),
-							e
-					);
-				}
-			}
-		}
-
-		log.debugf( "Attempting to locate auto-apply AttributeConverter for property [%s:%s]", path, property.getName() );
-
-		final Class propertyType = mappings.getReflectionManager().toClass( property.getType() );
-		for ( AttributeConverterDefinition attributeConverterDefinition : mappings.getAttributeConverters() ) {
-			if ( ! attributeConverterDefinition.isAutoApply() ) {
-				continue;
-			}
-			log.debugf(
-					"Checking auto-apply AttributeConverter [%s] type [%s] for match [%s]",
-					attributeConverterDefinition.toString(),
-					attributeConverterDefinition.getEntityAttributeType().getSimpleName(),
-					propertyType.getSimpleName()
-			);
-			if ( areTypeMatch( attributeConverterDefinition.getEntityAttributeType(), propertyType ) ) {
-				return attributeConverterDefinition;
-			}
-		}
-
-		return null;
-	}
-
-	protected AttributeConverterDefinition makeAttributeConverterDefinition(AttributeConversionInfo conversion) {
-		try {
-			return new AttributeConverterDefinition( conversion.getConverterClass().newInstance(), false );
-		}
-		catch (Exception e) {
-			throw new AnnotationException( "Unable to create AttributeConverter instance", e );
-		}
-	}
-
-	protected boolean areTypeMatch(Class converterDefinedType, Class propertyType) {
-		if ( converterDefinedType == null ) {
-			throw new AnnotationException( "AttributeConverter defined java type cannot be null" );
-		}
-		if ( propertyType == null ) {
-			throw new AnnotationException( "Property defined java type cannot be null" );
-		}
-
-		return converterDefinedType.equals( propertyType )
-				|| PrimitiveWrapperHelper.arePrimitiveWrapperEquivalents( converterDefinedType, propertyType );
-	}
-
-	@Override
 	public boolean isInIdClass() {
 		return isInIdClass != null ? isInIdClass : parent != null ? parent.isInIdClass() : false;
 	}
 
-	@Override
 	public void setInIdClass(Boolean isInIdClass) {
 		this.isInIdClass = isInIdClass;
 	}
 
-	@Override
 	public String getPath() {
 		return path;
 	}
 
-	/**
-	 * Get the mappings
-	 *
-	 * @return The mappings
-	 */
 	protected Mappings getMappings() {
 		return mappings;
 	}
 
 	/**
-	 * Set the property be processed.  property can be null
-	 *
-	 * @param property The property
+	 * property can be null
 	 */
 	protected void setCurrentProperty(XProperty property) {
 		if ( property == null ) {
@@ -210,8 +125,8 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 	 * replace the placeholder 'collection&&element' with nothing
 	 *
 	 * These rules are here to support both JPA 2 and legacy overriding rules.
+	 *
 	 */
-	@Override
 	public Column[] getOverriddenColumn(String propertyName) {
 		Column[] result = getExactOverriddenColumn( propertyName );
 		if (result == null) {
@@ -278,8 +193,8 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 	 * replace the placeholder 'collection&&element' with nothing
 	 *
 	 * These rules are here to support both JPA 2 and legacy overriding rules.
+	 *
 	 */
-	@Override
 	public JoinColumn[] getOverriddenJoinColumn(String propertyName) {
 		JoinColumn[] result = getExactOverriddenJoinColumn( propertyName );
 		if ( result == null && propertyName.contains( ".collection&&element." ) ) {
@@ -312,8 +227,8 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 	 * replace the placeholder 'collection&&element' with nothing
 	 *
 	 * These rules are here to support both JPA 2 and legacy overriding rules.
+	 *
 	 */
-	@Override
 	public JoinTable getJoinTable(XProperty property) {
 		final String propertyName = StringHelper.qualify( getPath(), property.getName() );
 		JoinTable result = getOverriddenJoinTable( propertyName );
@@ -328,6 +243,7 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 	 * replace the placeholder 'collection&&element' with nothing
 	 *
 	 * These rules are here to support both JPA 2 and legacy overriding rules.
+	 *
 	 */
 	public JoinTable getOverriddenJoinTable(String propertyName) {
 		JoinTable result = getExactOverriddenJoinTable( propertyName );
@@ -370,7 +286,7 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 				Map<String, JoinTable> currentJoinTableOverride = buildJoinTableOverride( current, getPath() );
 				currentOverride.putAll( columnOverride ); //subclasses have precedence over superclasses
 				currentJoinOverride.putAll( joinColumnOverride ); //subclasses have precedence over superclasses
-				currentJoinTableOverride.putAll( joinTableOverride ); //subclasses have precedence over superclasses
+				currentJoinOverride.putAll( joinColumnOverride ); //subclasses have precedence over superclasses
 				columnOverride = currentOverride;
 				joinColumnOverride = currentJoinOverride;
 				joinTableOverride = currentJoinTableOverride;
@@ -469,7 +385,6 @@ public abstract class AbstractPropertyHolder implements PropertyHolder {
 		return tableOverride;
 	}
 
-	@Override
 	public void setParentProperty(String parentProperty) {
 		throw new AssertionFailure( "Setting the parent property to a non component" );
 	}

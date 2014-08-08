@@ -30,8 +30,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.jdbc.BinaryStream;
-import org.hibernate.engine.jdbc.internal.BinaryStreamImpl;
+import org.hibernate.type.descriptor.BinaryStream;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
@@ -63,7 +62,7 @@ public class PrimitiveByteArrayTypeDescriptor extends AbstractTypeDescriptor<byt
 	}
 
 	public String toString(byte[] bytes) {
-		final StringBuilder buf = new StringBuilder( bytes.length * 2 );
+		final StringBuffer buf = new StringBuffer();
 		for ( byte aByte : bytes ) {
 			final String hexStr = Integer.toHexString( aByte - Byte.MIN_VALUE );
 			if ( hexStr.length() == 1 ) {

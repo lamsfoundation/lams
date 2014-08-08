@@ -35,11 +35,6 @@ import java.sql.Types;
 public class AvgWithArgumentCastFunction extends StandardAnsiSqlAggregationFunctions.AvgFunction {
 	private final String castType;
 
-	/**
-	 * Constructs a AvgWithArgumentCastFunction
-	 *
-	 * @param castType The type to cast the avg argument to
-	 */
 	public AvgWithArgumentCastFunction(String castType) {
 		this.castType = castType;
 	}

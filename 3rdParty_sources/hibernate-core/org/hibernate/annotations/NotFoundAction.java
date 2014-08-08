@@ -23,20 +23,18 @@
  */
 package org.hibernate.annotations;
 
-
 /**
- * Possible actions when an associated entity is not found in the database.  Often seen with "legacy" foreign-key
- * schemes which do not use {@code NULL} to indicate a missing reference, instead using a "magic value".
+ * Actoin to use when an element is not found in DB while beeing expected
  *
  * @author Emmanuel Bernard
  */
 public enum NotFoundAction {
 	/**
-	 * Raise an exception when an element is not found (default and recommended).
+	 * raise an exception when an element is not found (default and recommended)
 	 */
 	EXCEPTION,
 	/**
-	 * Ignore the element when not found in database.
+	 * ignore the element when not found in DB
 	 */
 	IGNORE
 }

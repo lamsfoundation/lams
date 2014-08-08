@@ -44,25 +44,26 @@ public class TrueFalseType
 	public TrueFalseType() {
 		super( CharTypeDescriptor.INSTANCE, new BooleanTypeDescriptor( 'T', 'F' ) );
 	}
-	@Override
+
 	public String getName() {
 		return "true_false";
 	}
-	@Override
+
 	public Class getPrimitiveClass() {
 		return boolean.class;
 	}
-	@Override
+
 	public Boolean stringToObject(String xml) throws Exception {
 		return fromString( xml );
 	}
-	@Override
+
 	public Serializable getDefaultValue() {
 		return Boolean.FALSE;
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public String objectToSQLString(Boolean value, Dialect dialect) throws Exception {
-		return StringType.INSTANCE.objectToSQLString( value ? "T" : "F", dialect );
+		return StringType.INSTANCE.objectToSQLString( value.booleanValue() ? "T" : "F", dialect );
 	}
 
 }

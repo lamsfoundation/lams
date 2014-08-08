@@ -22,12 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type.descriptor.java;
+
 import org.hibernate.HibernateException;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.descriptor.WrapperOptions;
+import org.hibernate.util.ReflectHelper;
 
 /**
- * Descriptor for {@link Class} handling.
+ * TODO : javadoc
  *
  * @author Steve Ebersole
  */

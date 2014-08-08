@@ -26,23 +26,21 @@ package org.hibernate.tuple.entity;
 import java.util.Map;
 
 import org.hibernate.EntityMode;
-import org.hibernate.EntityNameResolver;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.EntityNameResolver;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.tuple.Instantiator;
+import org.hibernate.tuple.DynamicMapInstantiator;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
-import org.hibernate.metamodel.binding.AttributeBinding;
-import org.hibernate.metamodel.binding.EntityBinding;
 import org.hibernate.property.Getter;
 import org.hibernate.property.PropertyAccessor;
 import org.hibernate.property.PropertyAccessorFactory;
 import org.hibernate.property.Setter;
-import org.hibernate.proxy.ProxyFactory;
 import org.hibernate.proxy.map.MapProxyFactory;
-import org.hibernate.tuple.DynamicMapInstantiator;
-import org.hibernate.tuple.Instantiator;
+import org.hibernate.proxy.ProxyFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link EntityTuplizer} specific to the dynamic-map entity mode.
@@ -51,17 +49,16 @@ import org.hibernate.tuple.Instantiator;
  * @author Gavin King
  */
 public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
-	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( DynamicMapEntityTuplizer.class );
+
+	static final Logger log = LoggerFactory.getLogger( DynamicMapEntityTuplizer.class );
 
 	DynamicMapEntityTuplizer(EntityMetamodel entityMetamodel, PersistentClass mappedEntity) {
 		super(entityMetamodel, mappedEntity);
 	}
-
-	DynamicMapEntityTuplizer(EntityMetamodel entityMetamodel, EntityBinding mappedEntity) {
-		super(entityMetamodel, mappedEntity);
-	}
-
-	@Override
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public EntityMode getEntityMode() {
 		return EntityMode.MAP;
 	}
@@ -75,23 +72,31 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 		}
 	}
 
-	@Override
-    protected Getter buildPropertyGetter(Property mappedProperty, PersistentClass mappedEntity) {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Getter buildPropertyGetter(Property mappedProperty, PersistentClass mappedEntity) {
 		return buildPropertyAccessor(mappedProperty).getGetter( null, mappedProperty.getName() );
 	}
 
-	@Override
-    protected Setter buildPropertySetter(Property mappedProperty, PersistentClass mappedEntity) {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Setter buildPropertySetter(Property mappedProperty, PersistentClass mappedEntity) {
 		return buildPropertyAccessor(mappedProperty).getSetter( null, mappedProperty.getName() );
 	}
 
-	@Override
-    protected Instantiator buildInstantiator(PersistentClass mappingInfo) {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Instantiator buildInstantiator(PersistentClass mappingInfo) {
         return new DynamicMapInstantiator( mappingInfo );
 	}
 
-	@Override
-    protected ProxyFactory buildProxyFactory(PersistentClass mappingInfo, Getter idGetter, Setter idSetter) {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected ProxyFactory buildProxyFactory(PersistentClass mappingInfo, Getter idGetter, Setter idSetter) {
 
 		ProxyFactory pf = new MapProxyFactory();
 		try {
@@ -106,80 +111,43 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 			);
 		}
 		catch ( HibernateException he ) {
-			LOG.unableToCreateProxyFactory( getEntityName(), he );
+			log.warn( "could not create proxy factory for:" + getEntityName(), he );
 			pf = null;
 		}
 		return pf;
 	}
 
-	private PropertyAccessor buildPropertyAccessor(AttributeBinding mappedProperty) {
-		// TODO: fix when backrefs are working in new metamodel
-		//if ( mappedProperty.isBackRef() ) {
-		//	return mappedProperty.getPropertyAccessor( null );
-		//}
-		//else {
-			return PropertyAccessorFactory.getDynamicMapPropertyAccessor();
-		//}
-	}
-
-	@Override
-	protected Getter buildPropertyGetter(AttributeBinding mappedProperty) {
-		return buildPropertyAccessor( mappedProperty ).getGetter( null, mappedProperty.getAttribute().getName() );
-	}
-
-	@Override
-	protected Setter buildPropertySetter(AttributeBinding mappedProperty) {
-		return buildPropertyAccessor( mappedProperty ).getSetter( null, mappedProperty.getAttribute().getName() );
-	}
-
-	@Override
-	protected Instantiator buildInstantiator(EntityBinding mappingInfo) {
-		return new DynamicMapInstantiator( mappingInfo );
-	}
-
-	@Override
-	protected ProxyFactory buildProxyFactory(EntityBinding mappingInfo, Getter idGetter, Setter idSetter) {
-
-		ProxyFactory pf = new MapProxyFactory();
-		try {
-			//TODO: design new lifecycle for ProxyFactory
-			pf.postInstantiate(
-					getEntityName(),
-					null,
-					null,
-					null,
-					null,
-					null
-			);
-		}
-		catch ( HibernateException he ) {
-			LOG.unableToCreateProxyFactory(getEntityName(), he);
-			pf = null;
-		}
-		return pf;
-	}
-
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Class getMappedClass() {
 		return Map.class;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Class getConcreteProxyClass() {
 		return Map.class;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isInstrumented() {
 		return false;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public EntityNameResolver[] getEntityNameResolvers() {
 		return new EntityNameResolver[] { BasicEntityNameResolver.INSTANCE };
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String determineConcreteSubclassEntityName(Object entityInstance, SessionFactoryImplementor factory) {
 		return extractEmbeddedEntityName( ( Map ) entityInstance );
 	}
@@ -191,11 +159,10 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 	public static class BasicEntityNameResolver implements EntityNameResolver {
 		public static final BasicEntityNameResolver INSTANCE = new BasicEntityNameResolver();
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String resolveEntityName(Object entity) {
-			if ( ! Map.class.isInstance( entity ) ) {
-				return null;
-			}
 			final String entityName = extractEmbeddedEntityName( ( Map ) entity );
 			if ( entityName == null ) {
 				throw new HibernateException( "Could not determine type of dynamic map entity" );
@@ -203,13 +170,17 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 			return entityName;
 		}
 
-		@Override
-        public boolean equals(Object obj) {
+		/**
+		 * {@inheritDoc}
+		 */
+		public boolean equals(Object obj) {
 			return getClass().equals( obj.getClass() );
 		}
 
-		@Override
-        public int hashCode() {
+		/**
+		 * {@inheritDoc}
+		 */
+		public int hashCode() {
 			return getClass().hashCode();
 		}
 	}

@@ -23,7 +23,6 @@
  */
 package org.hibernate.type;
 
-
 /**
  * Marker interface for basic types.
  *

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,59 +20,57 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.loader.custom;
 
-import java.io.Serializable;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.HashSet;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.QueryException;
 import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.cache.spi.QueryCache;
-import org.hibernate.cache.spi.QueryKey;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.hql.internal.HolderInstantiator;
-import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.LockOptions;
+import org.hibernate.engine.QueryParameters;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.hql.HolderInstantiator;
 import org.hibernate.loader.CollectionAliases;
 import org.hibernate.loader.EntityAliases;
 import org.hibernate.loader.Loader;
-import org.hibernate.loader.spi.AfterLoadAction;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.persister.entity.Queryable;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.type.CollectionType;
-import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
+import org.hibernate.type.TypeFactory;
+import org.hibernate.type.EntityType;
+import org.hibernate.type.CollectionType;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.StringHelper;
 
 
 /**
  * Extension point for loaders which use a SQL result set with "unexpected" column aliases.
- *
+ * 
  * @author Gavin King
  * @author Steve Ebersole
  */
 public class CustomLoader extends Loader {
-
+	
 	// Currently *not* cachable if autodiscover types is in effect (e.g. "select * ...")
 
 	private final String sql;
-	private final Set<Serializable> querySpaces = new HashSet<Serializable>();
+	private final Set querySpaces = new HashSet();
 	private final Map namedParameterBindPoints;
 
 	private final Queryable[] entityPersisters;
@@ -85,8 +83,6 @@ public class CustomLoader extends Loader {
 
 	private final LockMode[] lockModes;
 
-	private boolean[] includeInResultRow;
-
 //	private final String[] sqlAliases;
 //	private final String[] sqlAliasSuffixes;
 	private final ResultRowProcessor rowProcessor;
@@ -98,6 +94,7 @@ public class CustomLoader extends Loader {
 	// this is only needed (afaict) for ResultTransformer processing...
 	private String[] transformerAliases;
 
+
 	public CustomLoader(CustomQuery customQuery, SessionFactoryImplementor factory) {
 		super( factory );
 
@@ -105,28 +102,27 @@ public class CustomLoader extends Loader {
 		this.querySpaces.addAll( customQuery.getQuerySpaces() );
 		this.namedParameterBindPoints = customQuery.getNamedParameterBindPoints();
 
-		List<Queryable> entityPersisters = new ArrayList<Queryable>();
-		List<Integer> entityOwners = new ArrayList<Integer>();
-		List<EntityAliases> entityAliases = new ArrayList<EntityAliases>();
+		List entityPersisters = new ArrayList();
+		List entityOwners = new ArrayList();
+		List entityAliases = new ArrayList();
 
-		List<QueryableCollection> collectionPersisters = new ArrayList<QueryableCollection>();
-		List<Integer> collectionOwners = new ArrayList<Integer>();
-		List<CollectionAliases> collectionAliases = new ArrayList<CollectionAliases>();
+		List collectionPersisters = new ArrayList();
+		List collectionOwners = new ArrayList();
+		List collectionAliases = new ArrayList();
 
-		List<LockMode> lockModes = new ArrayList<LockMode>();
-		List<ResultColumnProcessor> resultColumnProcessors = new ArrayList<ResultColumnProcessor>();
-		List<Return> nonScalarReturnList = new ArrayList<Return>();
-		List<Type> resultTypes = new ArrayList<Type>();
-		List<String> specifiedAliases = new ArrayList<String>();
-
+		List lockModes = new ArrayList();
+		List resultColumnProcessors = new ArrayList();
+		List nonScalarReturnList = new ArrayList();
+		List resultTypes = new ArrayList();
+		List specifiedAliases = new ArrayList();
 		int returnableCounter = 0;
 		boolean hasScalars = false;
 
-		List<Boolean> includeInResultRowList = new ArrayList<Boolean>();
-
-		for ( Return rtn : customQuery.getCustomQueryReturns() ) {
+		Iterator itr = customQuery.getCustomQueryReturns().iterator();
+		while ( itr.hasNext() ) {
+			final Return rtn = ( Return ) itr.next();
 			if ( rtn instanceof ScalarReturn ) {
-				ScalarReturn scalarRtn = (ScalarReturn) rtn;
+				ScalarReturn scalarRtn = ( ScalarReturn ) rtn;
 				resultTypes.add( scalarRtn.getType() );
 				specifiedAliases.add( scalarRtn.getColumnAlias() );
 				resultColumnProcessors.add(
@@ -135,91 +131,68 @@ public class CustomLoader extends Loader {
 								scalarRtn.getType()
 						)
 				);
-				includeInResultRowList.add( true );
 				hasScalars = true;
-			}
-			else if ( ConstructorReturn.class.isInstance( rtn ) ) {
-				final ConstructorReturn constructorReturn = (ConstructorReturn) rtn;
-				resultTypes.add( null ); // this bit makes me nervous
-				includeInResultRowList.add( true );
-				hasScalars = true;
-
-				ScalarResultColumnProcessor[] scalarProcessors = new ScalarResultColumnProcessor[constructorReturn.getScalars().length];
-				int i = 0;
-				for ( ScalarReturn scalarReturn : constructorReturn.getScalars() ) {
-					scalarProcessors[i++] = new ScalarResultColumnProcessor(
-							StringHelper.unquote( scalarReturn.getColumnAlias(), factory.getDialect() ),
-							scalarReturn.getType()
-					);
-				}
-
-				resultColumnProcessors.add(
-						new ConstructorResultColumnProcessor( constructorReturn.getTargetClass(), scalarProcessors )
-				);
 			}
 			else if ( rtn instanceof RootReturn ) {
-				RootReturn rootRtn = (RootReturn) rtn;
-				Queryable persister = (Queryable) factory.getEntityPersister( rootRtn.getEntityName() );
+				RootReturn rootRtn = ( RootReturn ) rtn;
+				Queryable persister = ( Queryable ) factory.getEntityPersister( rootRtn.getEntityName() );
 				entityPersisters.add( persister );
 				lockModes.add( (rootRtn.getLockMode()) );
 				resultColumnProcessors.add( new NonScalarResultColumnProcessor( returnableCounter++ ) );
 				nonScalarReturnList.add( rtn );
-				entityOwners.add( -1 );
+				entityOwners.add( new Integer( -1 ) );
 				resultTypes.add( persister.getType() );
 				specifiedAliases.add( rootRtn.getAlias() );
 				entityAliases.add( rootRtn.getEntityAliases() );
 				ArrayHelper.addAll( querySpaces, persister.getQuerySpaces() );
-				includeInResultRowList.add( true );
 			}
 			else if ( rtn instanceof CollectionReturn ) {
-				CollectionReturn collRtn = (CollectionReturn) rtn;
+				CollectionReturn collRtn = ( CollectionReturn ) rtn;
 				String role = collRtn.getOwnerEntityName() + "." + collRtn.getOwnerProperty();
-				QueryableCollection persister = (QueryableCollection) factory.getCollectionPersister( role );
+				QueryableCollection persister = ( QueryableCollection ) factory.getCollectionPersister( role );
 				collectionPersisters.add( persister );
 				lockModes.add( collRtn.getLockMode() );
 				resultColumnProcessors.add( new NonScalarResultColumnProcessor( returnableCounter++ ) );
 				nonScalarReturnList.add( rtn );
-				collectionOwners.add( -1 );
+				collectionOwners.add( new Integer( -1 ) );
 				resultTypes.add( persister.getType() );
 				specifiedAliases.add( collRtn.getAlias() );
 				collectionAliases.add( collRtn.getCollectionAliases() );
 				// determine if the collection elements are entities...
 				Type elementType = persister.getElementType();
 				if ( elementType.isEntityType() ) {
-					Queryable elementPersister = (Queryable) ((EntityType) elementType).getAssociatedJoinable( factory );
+					Queryable elementPersister = ( Queryable ) ( ( EntityType ) elementType ).getAssociatedJoinable( factory );
 					entityPersisters.add( elementPersister );
-					entityOwners.add( -1 );
+					entityOwners.add( new Integer( -1 ) );
 					entityAliases.add( collRtn.getElementEntityAliases() );
 					ArrayHelper.addAll( querySpaces, elementPersister.getQuerySpaces() );
 				}
-				includeInResultRowList.add( true );
 			}
 			else if ( rtn instanceof EntityFetchReturn ) {
-				EntityFetchReturn fetchRtn = (EntityFetchReturn) rtn;
+				EntityFetchReturn fetchRtn = ( EntityFetchReturn ) rtn;
 				NonScalarReturn ownerDescriptor = fetchRtn.getOwner();
 				int ownerIndex = nonScalarReturnList.indexOf( ownerDescriptor );
-				entityOwners.add( ownerIndex );
+				entityOwners.add( new Integer( ownerIndex ) );
 				lockModes.add( fetchRtn.getLockMode() );
 				Queryable ownerPersister = determineAppropriateOwnerPersister( ownerDescriptor );
-				EntityType fetchedType = (EntityType) ownerPersister.getPropertyType( fetchRtn.getOwnerProperty() );
+				EntityType fetchedType = ( EntityType ) ownerPersister.getPropertyType( fetchRtn.getOwnerProperty() );
 				String entityName = fetchedType.getAssociatedEntityName( getFactory() );
-				Queryable persister = (Queryable) factory.getEntityPersister( entityName );
+				Queryable persister = ( Queryable ) factory.getEntityPersister( entityName );
 				entityPersisters.add( persister );
 				nonScalarReturnList.add( rtn );
 				specifiedAliases.add( fetchRtn.getAlias() );
 				entityAliases.add( fetchRtn.getEntityAliases() );
 				ArrayHelper.addAll( querySpaces, persister.getQuerySpaces() );
-				includeInResultRowList.add( false );
 			}
 			else if ( rtn instanceof CollectionFetchReturn ) {
-				CollectionFetchReturn fetchRtn = (CollectionFetchReturn) rtn;
+				CollectionFetchReturn fetchRtn = ( CollectionFetchReturn ) rtn;
 				NonScalarReturn ownerDescriptor = fetchRtn.getOwner();
 				int ownerIndex = nonScalarReturnList.indexOf( ownerDescriptor );
-				collectionOwners.add( ownerIndex );
+				collectionOwners.add( new Integer( ownerIndex ) );
 				lockModes.add( fetchRtn.getLockMode() );
 				Queryable ownerPersister = determineAppropriateOwnerPersister( ownerDescriptor );
 				String role = ownerPersister.getEntityName() + '.' + fetchRtn.getOwnerProperty();
-				QueryableCollection persister = (QueryableCollection) factory.getCollectionPersister( role );
+				QueryableCollection persister = ( QueryableCollection ) factory.getCollectionPersister( role );
 				collectionPersisters.add( persister );
 				nonScalarReturnList.add( rtn );
 				specifiedAliases.add( fetchRtn.getAlias() );
@@ -227,13 +200,12 @@ public class CustomLoader extends Loader {
 				// determine if the collection elements are entities...
 				Type elementType = persister.getElementType();
 				if ( elementType.isEntityType() ) {
-					Queryable elementPersister = (Queryable) ((EntityType) elementType).getAssociatedJoinable( factory );
+					Queryable elementPersister = ( Queryable ) ( ( EntityType ) elementType ).getAssociatedJoinable( factory );
 					entityPersisters.add( elementPersister );
-					entityOwners.add( ownerIndex );
+					entityOwners.add( new Integer( ownerIndex ) );
 					entityAliases.add( fetchRtn.getElementEntityAliases() );
 					ArrayHelper.addAll( querySpaces, elementPersister.getQuerySpaces() );
 				}
-				includeInResultRowList.add( false );
 			}
 			else {
 				throw new HibernateException( "unexpected custom query return type : " + rtn.getClass().getName() );
@@ -242,27 +214,27 @@ public class CustomLoader extends Loader {
 
 		this.entityPersisters = new Queryable[ entityPersisters.size() ];
 		for ( int i = 0; i < entityPersisters.size(); i++ ) {
-			this.entityPersisters[i] = entityPersisters.get( i );
+			this.entityPersisters[i] = ( Queryable ) entityPersisters.get( i );
 		}
 		this.entiytOwners = ArrayHelper.toIntArray( entityOwners );
 		this.entityAliases = new EntityAliases[ entityAliases.size() ];
 		for ( int i = 0; i < entityAliases.size(); i++ ) {
-			this.entityAliases[i] = entityAliases.get( i );
+			this.entityAliases[i] = ( EntityAliases ) entityAliases.get( i );
 		}
 
 		this.collectionPersisters = new QueryableCollection[ collectionPersisters.size() ];
 		for ( int i = 0; i < collectionPersisters.size(); i++ ) {
-			this.collectionPersisters[i] = collectionPersisters.get( i );
+			this.collectionPersisters[i] = ( QueryableCollection ) collectionPersisters.get( i );
 		}
 		this.collectionOwners = ArrayHelper.toIntArray( collectionOwners );
 		this.collectionAliases = new CollectionAliases[ collectionAliases.size() ];
 		for ( int i = 0; i < collectionAliases.size(); i++ ) {
-			this.collectionAliases[i] = collectionAliases.get( i );
+			this.collectionAliases[i] = ( CollectionAliases ) collectionAliases.get( i );
 		}
 
 		this.lockModes = new LockMode[ lockModes.size() ];
 		for ( int i = 0; i < lockModes.size(); i++ ) {
-			this.lockModes[i] = lockModes.get( i );
+			this.lockModes[i] = ( LockMode ) lockModes.get( i );
 		}
 
 		this.resultTypes = ArrayHelper.toTypeArray( resultTypes );
@@ -270,10 +242,8 @@ public class CustomLoader extends Loader {
 
 		this.rowProcessor = new ResultRowProcessor(
 				hasScalars,
-				resultColumnProcessors.toArray( new ResultColumnProcessor[ resultColumnProcessors.size() ] )
+		        ( ResultColumnProcessor[] ) resultColumnProcessors.toArray( new ResultColumnProcessor[ resultColumnProcessors.size() ] )
 		);
-
-		this.includeInResultRow = ArrayHelper.toBooleanArray( includeInResultRowList );
 	}
 
 	private Queryable determineAppropriateOwnerPersister(NonScalarReturn ownerDescriptor) {
@@ -310,13 +280,11 @@ public class CustomLoader extends Loader {
 		return ( Queryable ) getFactory().getEntityPersister( entityName );
 	}
 
-	@Override
-    protected String getQueryIdentifier() {
+	protected String getQueryIdentifier() {
 		return sql;
 	}
 
-	@Override
-    public String getSQLString() {
+	protected String getSQLString() {
 		return sql;
 	}
 
@@ -324,28 +292,23 @@ public class CustomLoader extends Loader {
 		return querySpaces;
 	}
 
-	@Override
-    protected LockMode[] getLockModes(LockOptions lockOptions) {
+	protected LockMode[] getLockModes(LockOptions lockOptions) {
 		return lockModes;
 	}
 
-	@Override
-    protected Loadable[] getEntityPersisters() {
+	protected Loadable[] getEntityPersisters() {
 		return entityPersisters;
 	}
 
-	@Override
-    protected CollectionPersister[] getCollectionPersisters() {
+	protected CollectionPersister[] getCollectionPersisters() {
 		return collectionPersisters;
 	}
 
-	@Override
-    protected int[] getCollectionOwners() {
+	protected int[] getCollectionOwners() {
 		return collectionOwners;
 	}
-
-	@Override
-    protected int[] getOwners() {
+	
+	protected int[] getOwners() {
 		return entiytOwners;
 	}
 
@@ -353,37 +316,9 @@ public class CustomLoader extends Loader {
 		return list( session, queryParameters, querySpaces, resultTypes );
 	}
 
-	@Override
-	protected String applyLocks(
-			String sql,
-			QueryParameters parameters,
-			Dialect dialect,
-			List<AfterLoadAction> afterLoadActions) throws QueryException {
-		final LockOptions lockOptions = parameters.getLockOptions();
-		if ( lockOptions == null ||
-				( lockOptions.getLockMode() == LockMode.NONE && lockOptions.getAliasLockCount() == 0 ) ) {
-			return sql;
-		}
-
-		// user is request locking, lets see if we can apply locking directly to the SQL...
-
-		// 		some dialects wont allow locking with paging...
-		afterLoadActions.add(
-				new AfterLoadAction() {
-					private final LockOptions originalLockOptions = lockOptions.makeCopy();
-					@Override
-					public void afterLoad(SessionImplementor session, Object entity, Loadable persister) {
-						( (Session) session ).buildLockRequest( originalLockOptions ).lock( persister.getEntityName(), entity );
-					}
-				}
-		);
-		parameters.getLockOptions().setLockMode( LockMode.READ );
-
-		return sql;
-	}
-
-	public ScrollableResults scroll(final QueryParameters queryParameters, final SessionImplementor session)
-			throws HibernateException {
+	public ScrollableResults scroll(
+			final QueryParameters queryParameters,
+			final SessionImplementor session) throws HibernateException {		
 		return scroll(
 				queryParameters,
 				resultTypes,
@@ -391,7 +326,7 @@ public class CustomLoader extends Loader {
 				session
 		);
 	}
-
+	
 	static private HolderInstantiator getHolderInstantiator(ResultTransformer resultTransformer, String[] queryReturnAliases) {
 		if ( resultTransformer == null ) {
 			return HolderInstantiator.NOOP_INSTANTIATOR;
@@ -401,23 +336,11 @@ public class CustomLoader extends Loader {
 		}
 	}
 
-	@Override
-    protected String[] getResultRowAliases() {
-		return transformerAliases;
-	}
-
-	@Override
-    protected ResultTransformer resolveResultTransformer(ResultTransformer resultTransformer) {
+	protected ResultTransformer resolveResultTransformer(ResultTransformer resultTransformer) {
 		return HolderInstantiator.resolveResultTransformer( null, resultTransformer );
 	}
-
-	@Override
-    protected boolean[] includeInResultRow() {
-		return includeInResultRow;
-	}
-
-	@Override
-    protected Object getResultColumnOrRow(
+	
+	protected Object getResultColumnOrRow(
 			Object[] row,
 	        ResultTransformer transformer,
 	        ResultSet rs,
@@ -425,15 +348,7 @@ public class CustomLoader extends Loader {
 		return rowProcessor.buildResultRow( row, rs, transformer != null, session );
 	}
 
-	@Override
-    protected Object[] getResultRow(Object[] row, ResultSet rs, SessionImplementor session)
-			throws SQLException, HibernateException {
-		return rowProcessor.buildResultRow( row, rs, session );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-    protected List getResultList(List results, ResultTransformer resultTransformer) throws QueryException {
+	protected List getResultList(List results, ResultTransformer resultTransformer) throws QueryException {
 		// meant to handle dynamic instantiation queries...(Copy from QueryLoader)
 		HolderInstantiator holderInstantiator = HolderInstantiator.getHolderInstantiator(
 				null,
@@ -446,7 +361,7 @@ public class CustomLoader extends Loader {
 				Object result = holderInstantiator.instantiate(row);
 				results.set( i, result );
 			}
-
+			
 			return resultTransformer.transformList(results);
 		}
 		else {
@@ -457,19 +372,16 @@ public class CustomLoader extends Loader {
 	private String[] getReturnAliasesForTransformer() {
 		return transformerAliases;
 	}
-
-	@Override
-    protected EntityAliases[] getEntityAliases() {
+	
+	protected EntityAliases[] getEntityAliases() {
 		return entityAliases;
 	}
 
-	@Override
-    protected CollectionAliases[] getCollectionAliases() {
+	protected CollectionAliases[] getCollectionAliases() {
 		return collectionAliases;
 	}
-
-	@Override
-    public int[] getNamedParameterLocs(String name) throws QueryException {
+	
+	public int[] getNamedParameterLocs(String name) throws QueryException {
 		Object loc = namedParameterBindPoints.get( name );
 		if ( loc == null ) {
 			throw new QueryException(
@@ -478,7 +390,7 @@ public class CustomLoader extends Loader {
 			);
 		}
 		if ( loc instanceof Integer ) {
-			return new int[] { (Integer) loc };
+			return new int[] { ( ( Integer ) loc ).intValue() };
 		}
 		else {
 			return ArrayHelper.toIntArray( ( List ) loc );
@@ -486,19 +398,139 @@ public class CustomLoader extends Loader {
 	}
 
 
-	@Override
-    protected void autoDiscoverTypes(ResultSet rs) {
-		try {
-			JdbcResultMetadata metadata = new JdbcResultMetadata( getFactory(), rs );
-			rowProcessor.prepareForAutoDiscovery( metadata );
+	public class ResultRowProcessor {
+		private final boolean hasScalars;
+		private ResultColumnProcessor[] columnProcessors;
 
-			List<String> aliases = new ArrayList<String>();
-			List<Type> types = new ArrayList<Type>();
-			for ( ResultColumnProcessor resultProcessor : rowProcessor.getColumnProcessors() ) {
-				resultProcessor.performDiscovery( metadata, types, aliases );
+		public ResultRowProcessor(boolean hasScalars, ResultColumnProcessor[] columnProcessors) {
+			this.hasScalars = hasScalars || ( columnProcessors == null || columnProcessors.length == 0 );
+			this.columnProcessors = columnProcessors;
+		}
+
+		public void prepareForAutoDiscovery(Metadata metadata) throws SQLException {
+			if ( columnProcessors == null || columnProcessors.length == 0 ) {
+				int columns = metadata.getColumnCount();
+				columnProcessors = new ResultColumnProcessor[ columns ];
+				for ( int i = 1; i <= columns; i++ ) {
+					columnProcessors[ i - 1 ] = new ScalarResultColumnProcessor( i );
+				}
+
+			}
+		}
+
+		/**
+		 * Build a logical result row.
+		 * <p/>
+		 * At this point, Loader has already processed all non-scalar result data.  We
+		 * just need to account for scalar result data here...
+		 *
+		 * @param data Entity data defined as "root returns" and already handled by the
+		 * normal Loader mechanism.
+		 * @param resultSet The JDBC result set (positioned at the row currently being processed).
+		 * @param hasTransformer Does this query have an associated {@link ResultTransformer}
+		 * @param session The session from which the query request originated.
+		 * @return The logical result row
+		 * @throws SQLException
+		 * @throws HibernateException
+		 */
+		public Object buildResultRow(
+				Object[] data,
+				ResultSet resultSet,
+				boolean hasTransformer,
+				SessionImplementor session) throws SQLException, HibernateException {
+			Object[] resultRow;
+			if ( !hasScalars ) {
+				resultRow = data;
+			}
+			else {
+				// build an array with indices equal to the total number
+				// of actual returns in the result Hibernate will return
+				// for this query (scalars + non-scalars)
+				resultRow = new Object[ columnProcessors.length ];
+				for ( int i = 0; i < columnProcessors.length; i++ ) {
+					resultRow[i] = columnProcessors[i].extract( data, resultSet, session );
+				}
 			}
 
-			validateAliases( aliases );
+			return ( hasTransformer )
+			       ? resultRow
+			       : ( resultRow.length == 1 )
+			         ? resultRow[0]
+			         : resultRow;
+		}
+	}
+
+	private static interface ResultColumnProcessor {
+		public Object extract(Object[] data, ResultSet resultSet, SessionImplementor session) throws SQLException, HibernateException;
+		public void performDiscovery(Metadata metadata, List types, List aliases) throws SQLException, HibernateException;
+	}
+
+	public class NonScalarResultColumnProcessor implements ResultColumnProcessor {
+		private final int position;
+
+		public NonScalarResultColumnProcessor(int position) {
+			this.position = position;
+		}
+
+		public Object extract(
+				Object[] data,
+				ResultSet resultSet,
+				SessionImplementor session) throws SQLException, HibernateException {
+			return data[ position ];
+		}
+
+		public void performDiscovery(Metadata metadata, List types, List aliases) {
+		}
+
+	}
+
+	public class ScalarResultColumnProcessor implements ResultColumnProcessor {
+		private int position = -1;
+		private String alias;
+		private Type type;
+
+		public ScalarResultColumnProcessor(int position) {
+			this.position = position;
+		}
+
+		public ScalarResultColumnProcessor(String alias, Type type) {
+			this.alias = alias;
+			this.type = type;
+		}
+
+		public Object extract(
+				Object[] data,
+				ResultSet resultSet,
+				SessionImplementor session) throws SQLException, HibernateException {
+			return type.nullSafeGet( resultSet, alias, session, null );
+		}
+
+		public void performDiscovery(Metadata metadata, List types, List aliases) throws SQLException {
+			if ( alias == null ) {
+				alias = metadata.getColumnName( position );
+			}
+			else if ( position < 0 ) {
+				position = metadata.resolveColumnPosition( alias );
+			}
+			if ( type == null ) {
+				type = metadata.getHibernateType( position );
+			}
+			types.add( type );
+			aliases.add( alias );
+		}
+	}
+
+	protected void autoDiscoverTypes(ResultSet rs) {
+		try {
+			Metadata metadata = new Metadata( getFactory(), rs );
+			List aliases = new ArrayList();
+			List types = new ArrayList();
+
+			rowProcessor.prepareForAutoDiscovery( metadata );
+
+			for ( int i = 0; i < rowProcessor.columnProcessors.length; i++ ) {
+				rowProcessor.columnProcessors[i].performDiscovery( metadata, types, aliases );
+			}
 
 			resultTypes = ArrayHelper.toTypeArray( types );
 			transformerAliases = ArrayHelper.toStringArray( aliases );
@@ -508,50 +540,61 @@ public class CustomLoader extends Loader {
 		}
 	}
 
-	private void validateAliases(List<String> aliases) {
-		// lets make sure we did not end up with duplicate aliases.  this can occur when the user supplied query
-		// did not rename same-named columns.  e.g.:
-		//		select u.username, u2.username from t_user u, t_user u2 ...
-		//
-		// the above will lead to an unworkable situation in most cases (the difference is how the driver/db
-		// handle this situation.  But if the 'aliases' variable contains duplicate names, then we have that
-		// troublesome condition, so lets throw an error.  See HHH-5992
-		final HashSet<String> aliasesSet = new HashSet<String>();
-		for ( String alias : aliases ) {
-			validateAlias( alias );
-			boolean alreadyExisted = !aliasesSet.add( alias );
-			if ( alreadyExisted ) {
-				throw new NonUniqueDiscoveredSqlAliasException(
-						"Encountered a duplicated sql alias [" + alias + "] during auto-discovery of a native-sql query"
-				);
+	private static class Metadata {
+		private final SessionFactoryImplementor factory;
+		private final ResultSet resultSet;
+		private final ResultSetMetaData resultSetMetaData;
+
+		public Metadata(SessionFactoryImplementor factory, ResultSet resultSet) throws HibernateException {
+			try {
+				this.factory = factory;
+				this.resultSet = resultSet;
+				this.resultSetMetaData = resultSet.getMetaData();
+			}
+			catch( SQLException e ) {
+				throw new HibernateException( "Could not extract result set metadata", e );
 			}
 		}
-	}
 
-	@SuppressWarnings("UnusedParameters")
-	protected void validateAlias(String alias) {
-	}
-	
-	/**
-	 * {@link #resultTypes} can be overridden by {@link #autoDiscoverTypes(ResultSet)},
-	 * *after* {@link #list(SessionImplementor, QueryParameters)} has already been called.  It's a bit of a
-	 * chicken-and-the-egg issue since {@link #autoDiscoverTypes(ResultSet)} needs the {@link ResultSet}.
-	 * 
-	 * As a hacky workaround, override
-	 * {@link #putResultInQueryCache(SessionImplementor, QueryParameters, Type[], QueryCache, QueryKey, List)} here
-	 * and provide the {@link #resultTypes}.
-	 * 
-	 * @see HHH-3051
-	 */
-	@Override
-	protected void putResultInQueryCache(
-			final SessionImplementor session,
-			final QueryParameters queryParameters,
-			final Type[] resultTypes,
-			final QueryCache queryCache,
-			final QueryKey key,
-			final List result) {
-		super.putResultInQueryCache( session, queryParameters, this.resultTypes, queryCache, key, result );
-	}
+		public int getColumnCount() throws HibernateException {
+			try {
+				return resultSetMetaData.getColumnCount();
+			}
+			catch( SQLException e ) {
+				throw new HibernateException( "Could not determine result set column count", e );
+			}
+		}
 
+		public int resolveColumnPosition(String columnName) throws HibernateException {
+			try {
+				return resultSet.findColumn( columnName );
+			}
+			catch( SQLException e ) {
+				throw new HibernateException( "Could not resolve column name in result set [" + columnName + "]", e );
+			}
+		}
+
+		public String getColumnName(int position) throws HibernateException {
+			try {
+				return factory.getDialect().getColumnAliasExtractor().extractColumnAlias( resultSetMetaData, position );
+			}
+			catch( SQLException e ) {
+				throw new HibernateException( "Could not resolve column name [" + position + "]", e );
+			}
+		}
+
+		public Type getHibernateType(int columnPos) throws SQLException {
+			int columnType = resultSetMetaData.getColumnType( columnPos );
+			int scale = resultSetMetaData.getScale( columnPos );
+			int precision = resultSetMetaData.getPrecision( columnPos );
+			return factory.getTypeResolver().heuristicType(
+					factory.getDialect().getHibernateTypeName(
+							columnType,
+							precision,
+							precision,
+							scale
+					)
+			);
+		}
+	}
 }

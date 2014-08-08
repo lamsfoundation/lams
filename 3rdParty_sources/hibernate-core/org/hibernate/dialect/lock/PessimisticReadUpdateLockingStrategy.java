@@ -23,22 +23,19 @@
  */
 package org.hibernate.dialect.lock;
 
-import java.io.Serializable;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
-import org.hibernate.LockMode;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.*;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.JDBCExceptionHelper;
 import org.hibernate.persister.entity.Lockable;
 import org.hibernate.pretty.MessageHelper;
 import org.hibernate.sql.Update;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.jboss.logging.Logger;
+import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * A pessimistic locking strategy where the locks are obtained through update statements.
@@ -47,15 +44,13 @@ import org.jboss.logging.Logger;
  *
  * This class is a clone of UpdateLockingStrategy.
  *
+ * @since 3.5
+ *
  * @author Steve Ebersole
  * @author Scott Marlow
- * @since 3.5
  */
 public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			PessimisticReadUpdateLockingStrategy.class.getName()
-	);
+	private static final Logger log = LoggerFactory.getLogger( PessimisticReadUpdateLockingStrategy.class );
 
 	private final Lockable lockable;
 	private final LockMode lockMode;
@@ -65,7 +60,7 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 	 * Construct a locking strategy based on SQL UPDATE statements.
 	 *
 	 * @param lockable The metadata for the entity to be locked.
-	 * @param lockMode Indicates the type of lock to be acquired.  Note that
+	 * @param lockMode Indictates the type of lock to be acquired.  Note that
 	 * read-locks are not valid for this strategy.
 	 */
 	public PessimisticReadUpdateLockingStrategy(Lockable lockable, LockMode lockMode) {
@@ -75,7 +70,7 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 			throw new HibernateException( "[" + lockMode + "] not valid for update statement" );
 		}
 		if ( !lockable.isVersioned() ) {
-			LOG.writeLocksNotSupported( lockable.getEntityName() );
+			log.warn( "write locks via update not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
 			this.sql = null;
 		}
 		else {
@@ -83,58 +78,59 @@ public class PessimisticReadUpdateLockingStrategy implements LockingStrategy {
 		}
 	}
 
-	@Override
-	public void lock(Serializable id, Object version, Object object, int timeout, SessionImplementor session) {
+   /**
+	 * @see org.hibernate.dialect.lock.LockingStrategy#lock
+	 */
+	public void lock(
+      Serializable id,
+      Object version,
+      Object object,
+      int timeout, SessionImplementor session) throws StaleObjectStateException, JDBCException {
 		if ( !lockable.isVersioned() ) {
 			throw new HibernateException( "write locks via update not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
 		}
-
-		final SessionFactoryImplementor factory = session.getFactory();
+		SessionFactoryImplementor factory = session.getFactory();
 		try {
+			PreparedStatement st = session.getBatcher().prepareSelectStatement( sql );
 			try {
-				final PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
-				try {
-					lockable.getVersionType().nullSafeSet( st, version, 1, session );
-					int offset = 2;
+				lockable.getVersionType().nullSafeSet( st, version, 1, session );
+				int offset = 2;
 
-					lockable.getIdentifierType().nullSafeSet( st, id, offset, session );
-					offset += lockable.getIdentifierType().getColumnSpan( factory );
+				lockable.getIdentifierType().nullSafeSet( st, id, offset, session );
+				offset += lockable.getIdentifierType().getColumnSpan( factory );
 
-					if ( lockable.isVersioned() ) {
-						lockable.getVersionType().nullSafeSet( st, version, offset, session );
-					}
-
-					final int affected = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( st );
-					// todo:  should this instead check for exactly one row modified?
-					if ( affected < 0 ) {
-						if (factory.getStatistics().isStatisticsEnabled()) {
-							factory.getStatisticsImplementor().optimisticFailure( lockable.getEntityName() );
-						}
-						throw new StaleObjectStateException( lockable.getEntityName(), id );
-					}
-
+				if ( lockable.isVersioned() ) {
+					lockable.getVersionType().nullSafeSet( st, version, offset, session );
 				}
-				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+
+				int affected = st.executeUpdate();
+				if ( affected < 0 ) {  // todo:  should this instead check for exactly one row modified?
+					if (factory.getStatistics().isStatisticsEnabled()) {
+						factory.getStatisticsImplementor().optimisticFailure( lockable.getEntityName() );
+					}
+					throw new StaleObjectStateException( lockable.getEntityName(), id );
 				}
 
 			}
-			catch ( SQLException e ) {
-				throw session.getFactory().getSQLExceptionHelper().convert(
-						e,
-						"could not lock: " + MessageHelper.infoString( lockable, id, session.getFactory() ),
-						sql
-				);
+			finally {
+				session.getBatcher().closeStatement( st );
 			}
+
 		}
-		catch (JDBCException e) {
-			throw new PessimisticEntityLockException( object, "could not obtain pessimistic lock", e );
+		catch ( SQLException sqle ) {
+			JDBCException e = JDBCExceptionHelper.convert(
+					session.getFactory().getSQLExceptionConverter(),
+					sqle,
+					"could not lock: " + MessageHelper.infoString( lockable, id, session.getFactory() ),
+					sql
+				);
+			throw new PessimisticLockException("could not obtain pessimistic lock", e, object);
 		}
 	}
 
 	protected String generateLockString() {
-		final SessionFactoryImplementor factory = lockable.getFactory();
-		final Update update = new Update( factory.getDialect() );
+		SessionFactoryImplementor factory = lockable.getFactory();
+		Update update = new Update( factory.getDialect() );
 		update.setTableName( lockable.getRootTableName() );
 		update.addPrimaryKeyColumns( lockable.getRootTableIdentifierColumnNames() );
 		update.setVersionColumnName( lockable.getVersionColumnName() );

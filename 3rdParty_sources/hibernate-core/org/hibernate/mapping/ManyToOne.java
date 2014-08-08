@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
+import org.hibernate.type.TypeFactory;
 
 /**
  * A many-to-one association mapping
@@ -45,11 +47,11 @@ public class ManyToOne extends ToOne {
 
 	public Type getType() throws MappingException {
 		return getMappings().getTypeResolver().getTypeFactory().manyToOne(
-				getReferencedEntityName(),
-				referenceToPrimaryKey, 
+				getReferencedEntityName(), 
 				getReferencedPropertyName(),
 				isLazy(),
 				isUnwrapProxy(),
+				isEmbedded(),
 				isIgnoreNotFound(),
 				isLogicalOneToOne
 		);

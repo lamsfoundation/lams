@@ -24,7 +24,6 @@
  */
 package org.hibernate.persister.entity;
 
-
 /**
  * Contract for things that can be locked via a {@link org.hibernate.dialect.lock.LockingStrategy}.
  * <p/>

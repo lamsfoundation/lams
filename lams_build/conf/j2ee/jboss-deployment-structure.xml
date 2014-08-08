@@ -35,7 +35,7 @@
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
-      <module name="org.hibernate" export="true" />
+      <module name="org.hibernate" slot="3" export="true" />
       <module name="org.hibernate.cache" export="true" />
       <module name="org.jboss.cache" export="true" />
       <module name="org.jgroups" export="true" />

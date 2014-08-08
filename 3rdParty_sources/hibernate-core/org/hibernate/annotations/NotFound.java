@@ -23,23 +23,19 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Action to do when an element is not found on a association.
+ * Action to do when an element is not found on a association whiel beeing expected
  *
  * @author Emmanuel Bernard
  */
-@Target( { METHOD, FIELD })
+@Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface NotFound {
-	/**
-	 * The action to perform when an associated entity is not found.  By default an exception is thrown.
-	 */
 	NotFoundAction action() default NotFoundAction.EXCEPTION;
 }

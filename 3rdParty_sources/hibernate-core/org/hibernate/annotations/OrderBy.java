@@ -22,31 +22,21 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Order a collection using SQL ordering (not HQL ordering).
- *
- * Different from {@link javax.persistence.OrderBy} in that this expects SQL fragment, JPA OrderBy expects a
- * valid JPQL order-by fragment.
+ * Order a collection using SQL ordering (not HQL ordering)
  *
  * @author Emmanuel Bernard
- * @author Steve Ebersole
- *
- * @see javax.persistence.OrderBy
- * @see SortComparator
- * @see SortNatural
  */
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface OrderBy {
-	/**
-	 * SQL ordering clause.
-	 */
+	/** SQL orderby clause */
 	String clause();
 }

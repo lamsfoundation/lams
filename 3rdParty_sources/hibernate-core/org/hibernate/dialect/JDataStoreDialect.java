@@ -28,11 +28,12 @@ import java.sql.Types;
 import org.hibernate.cfg.Environment;
 
 /**
- * A Dialect for JDataStore.
+ * A <tt>Dialect</tt> for JDataStore.
  * 
  * @author Vishy Kasar
  */
 public class JDataStoreDialect extends Dialect {
+
 	/**
 	 * Creates new JDataStoreDialect
 	 */
@@ -60,48 +61,38 @@ public class JDataStoreDialect extends Dialect {
 		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE );
 	}
 
-	@Override
 	public String getAddColumnString() {
 		return "add";
 	}
 
-	@Override
 	public boolean dropConstraints() {
 		return false;
 	}
 
-	@Override
 	public String getCascadeConstraintsString() {
 		return " cascade";
 	}
 
-	@Override
 	public boolean supportsIdentityColumns() {
 		return true;
 	}
 
-	@Override
 	public String getIdentitySelectString() {
-		// NOT_SUPPORTED_SHOULD_USE_JDBC3_PreparedStatement.getGeneratedKeys_method
-		return null;
+		return null; // NOT_SUPPORTED_SHOULD_USE_JDBC3_PreparedStatement.getGeneratedKeys_method
 	}
 
-	@Override
 	public String getIdentityColumnString() {
 		return "autoincrement";
 	}
 
-	@Override
 	public String getNoColumnsInsertString() {
 		return "default values";
 	}
 
-	@Override
 	public boolean supportsColumnCheck() {
 		return false;
 	}
 
-	@Override
 	public boolean supportsTableCheck() {
 		return false;
 	}

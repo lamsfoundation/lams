@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.id.insert;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 

@@ -23,13 +23,14 @@
  *
  */
 package org.hibernate.param;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.QueryParameters;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -60,7 +61,9 @@ public class DynamicFilterParameterSpecification implements ParameterSpecificati
 		this.definedParameterType = definedParameterType;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int bind(
 			PreparedStatement statement,
 			QueryParameters qp,
@@ -83,17 +86,23 @@ public class DynamicFilterParameterSpecification implements ParameterSpecificati
 		}
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Type getExpectedType() {
 		return definedParameterType;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setExpectedType(Type expectedType) {
 		// todo : throw exception?  maybe warn if not the same?
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String renderDisplayInfo() {
 		return "dynamic-filter={filterName=" + filterName + ",paramName=" + parameterName + "}";
 	}

@@ -24,29 +24,26 @@
 package org.hibernate.annotations;
 
 /**
- * Possible optimistic locking strategies.
+ * Optimistic locking strategy
+ * VERSION is the default and recommanded one
  *
  * @author Emmanuel Bernard
  */
 public enum OptimisticLockType {
 	/**
-	 * Perform no optimistic locking.
+	 * no optimistic locking
 	 */
 	NONE,
 	/**
-	 * Perform optimistic locking using a dedicated version column.
-	 *
-	 * @see javax.persistence.Version
+	 * use a column version
 	 */
 	VERSION,
 	/**
-	 * Perform optimistic locking based on *dirty* fields as part of an expanded WHERE clause restriction for the
-	 * UPDATE/DELETE SQL statement.
+	 * dirty columns are compared
 	 */
 	DIRTY,
 	/**
-	 * Perform optimistic locking based on *all* fields as part of an expanded WHERE clause restriction for the
-	 * UPDATE/DELETE SQL statement.
+	 * all columns are compared
 	 */
 	ALL
 }

@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.id.insert;
+
 import org.hibernate.dialect.Dialect;
 
 /**

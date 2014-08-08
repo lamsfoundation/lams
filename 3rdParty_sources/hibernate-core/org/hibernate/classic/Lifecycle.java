@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.classic;
+
 import java.io.Serializable;
 
 import org.hibernate.CallbackException;
@@ -75,7 +76,7 @@ public interface Lifecycle {
 	 * Called when an entity is saved.
 	 * @param s the session
 	 * @return true to veto save
-	 * @throws CallbackException Indicates a problem happened during callback
+	 * @throws CallbackException
 	 */
 	public boolean onSave(Session s) throws CallbackException;
 
@@ -85,7 +86,7 @@ public interface Lifecycle {
 	 * state is persisted during a flush.
 	 * @param s the session
 	 * @return true to veto update
-	 * @throws CallbackException Indicates a problem happened during callback
+	 * @throws CallbackException
 	 */
 	public boolean onUpdate(Session s) throws CallbackException;
 
@@ -93,7 +94,7 @@ public interface Lifecycle {
 	 * Called when an entity is deleted.
 	 * @param s the session
 	 * @return true to veto delete
-	 * @throws CallbackException Indicates a problem happened during callback
+	 * @throws CallbackException
 	 */
 	public boolean onDelete(Session s) throws CallbackException;
 
@@ -108,3 +109,9 @@ public interface Lifecycle {
 	 */
 	public void onLoad(Session s, Serializable id);
 }
+
+
+
+
+
+

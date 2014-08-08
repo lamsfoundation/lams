@@ -22,11 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
+
 import java.util.Map;
 
+import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * Superclass of nullable immutable types.
@@ -36,7 +38,7 @@ import org.hibernate.engine.spi.SessionImplementor;
  */
 public abstract class ImmutableType extends NullableType {
 
-	public final Object deepCopy(Object value, SessionFactoryImplementor factory) {
+	public final Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory) {
 		return value;
 	}
 

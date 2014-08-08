@@ -34,14 +34,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.dialect.function.SQLFunctionRegistry;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.internal.util.StringHelper;
+import org.hibernate.util.StringHelper;
 import org.hibernate.sql.ordering.antlr.ColumnMapper;
-import org.hibernate.sql.ordering.antlr.OrderByAliasResolver;
-import org.hibernate.sql.ordering.antlr.OrderByFragmentTranslator;
-import org.hibernate.sql.ordering.antlr.OrderByTranslation;
-import org.hibernate.sql.ordering.antlr.SqlValueReference;
 import org.hibernate.sql.ordering.antlr.TranslationContext;
+import org.hibernate.sql.ordering.antlr.OrderByFragmentTranslator;
+import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * Parses SQL fragments specified in mapping documents
@@ -58,7 +55,6 @@ public final class Template {
 		KEYWORDS.add("or");
 		KEYWORDS.add("not");
 		KEYWORDS.add("like");
-		KEYWORDS.add("escape");
 		KEYWORDS.add("is");
 		KEYWORDS.add("in");
 		KEYWORDS.add("between");
@@ -89,7 +85,7 @@ public final class Template {
 
 		BEFORE_TABLE_KEYWORDS.add("from");
 		BEFORE_TABLE_KEYWORDS.add("join");
-
+		
 		FUNCTION_KEYWORDS.add("as");
 		FUNCTION_KEYWORDS.add("leading");
 		FUNCTION_KEYWORDS.add("trailing");
@@ -117,15 +113,9 @@ public final class Template {
 	 *
 	 * @deprecated Only intended for annotations usage; use {@link #renderWhereStringTemplate(String, String, Dialect, SQLFunctionRegistry)} instead
 	 */
-	@Deprecated
-    @SuppressWarnings({ "JavaDoc" })
+	@SuppressWarnings({ "JavaDoc" })
 	public static String renderWhereStringTemplate(String sqlWhereString, String placeholder, Dialect dialect) {
-		return renderWhereStringTemplate(
-				sqlWhereString,
-				placeholder,
-				dialect,
-				new SQLFunctionRegistry( dialect, java.util.Collections.<String, SQLFunction>emptyMap() )
-		);
+		return renderWhereStringTemplate( sqlWhereString, placeholder, dialect, new SQLFunctionRegistry( dialect, java.util.Collections.EMPTY_MAP ) );
 	}
 
 	/**
@@ -146,14 +136,14 @@ public final class Template {
 		// 		which the tokens occur.  Depending on the state of those flags we decide whether we need to qualify
 		//		identifier references.
 
-		String symbols = new StringBuilder()
+		String symbols = new StringBuffer()
 				.append( "=><!+-*/()',|&`" )
 				.append( StringHelper.WHITESPACE )
 				.append( dialect.openQuote() )
 				.append( dialect.closeQuote() )
 				.toString();
 		StringTokenizer tokens = new StringTokenizer( sqlWhereString, symbols, true );
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 
 		boolean quoted = false;
 		boolean quotedIdentifier = false;
@@ -308,7 +298,7 @@ public final class Template {
 			else if ( isNamedParameter(token) ) {
 				result.append(token);
 			}
-			else if ( isIdentifier(token)
+			else if ( isIdentifier(token, dialect)
 					&& !isFunctionOrKeyword(lcToken, nextToken, dialect , functionRegistry) ) {
 				result.append(placeholder)
 						.append('.')
@@ -575,32 +565,31 @@ public final class Template {
 		private final String trimSource;
 
 		private TrimOperands(List<String> operands) {
-			final int size = operands.size();
-			if ( size == 1 ) {
+			if ( operands.size() == 1 ) {
 				trimSpec = null;
 				trimChar = null;
 				from = null;
 				trimSource = operands.get(0);
 			}
-			else if ( size == 4 ) {
+			else if ( operands.size() == 4 ) {
 				trimSpec = operands.get(0);
 				trimChar = operands.get(1);
 				from = operands.get(2);
 				trimSource = operands.get(3);
 			}
 			else {
-				if ( size < 1 || size > 4 ) {
-					throw new HibernateException( "Unexpected number of trim function operands : " + size );
+				if ( operands.size() < 1 || operands.size() > 4 ) {
+					throw new HibernateException( "Unexpected number of trim function operands : " + operands.size() );
 				}
 
 				// trim-source will always be the last operand
-				trimSource = operands.get( size - 1 );
+				trimSource = operands.get( operands.size() - 1 );
 
 				// ANSI SQL says that more than one operand means that the FROM is required
-				if ( ! "from".equals( operands.get( size - 2 ) ) ) {
-					throw new HibernateException( "Expecting FROM, found : " + operands.get( size - 2 ) );
+				if ( ! "from".equals( operands.get( operands.size() - 2 ) ) ) {
+					throw new HibernateException( "Expecting FROM, found : " + operands.get( operands.size() - 2 ) );
 				}
-				from = operands.get( size - 2 );
+				from = operands.get( operands.size() - 2 );
 
 				// trim-spec, if there is one will always be the first operand
 				if ( "leading".equalsIgnoreCase( operands.get(0) )
@@ -611,7 +600,7 @@ public final class Template {
 				}
 				else {
 					trimSpec = null;
-					if ( size - 2 == 0 ) {
+					if ( operands.size() - 2 == 0 ) {
 						trimChar = null;
 					}
 					else {
@@ -634,9 +623,8 @@ public final class Template {
 
 	public static class NoOpColumnMapper implements ColumnMapper {
 		public static final NoOpColumnMapper INSTANCE = new NoOpColumnMapper();
-		public SqlValueReference[] map(String reference) {
-//			return new String[] { reference };
-			return null;
+		public String[] map(String reference) {
+			return new String[] { reference };
 		}
 	}
 
@@ -650,10 +638,9 @@ public final class Template {
 	 *
 	 * @return The rendered <tt>ORDER BY</tt> template.
 	 *
-	 * @deprecated Use {@link #translateOrderBy} instead
+	 * @deprecated Use {@link #renderOrderByStringTemplate(String,ColumnMapper,SessionFactoryImplementor,Dialect,SQLFunctionRegistry)} instead
 	 */
-	@Deprecated
-    public static String renderOrderByStringTemplate(
+	public static String renderOrderByStringTemplate(
 			String orderByFragment,
 			Dialect dialect,
 			SQLFunctionRegistry functionRegistry) {
@@ -665,28 +652,6 @@ public final class Template {
 				functionRegistry
 		);
 	}
-
-	public static String renderOrderByStringTemplate(
-			String orderByFragment,
-			final ColumnMapper columnMapper,
-			final SessionFactoryImplementor sessionFactory,
-			final Dialect dialect,
-			final SQLFunctionRegistry functionRegistry) {
-		return translateOrderBy(
-				orderByFragment,
-				columnMapper,
-				sessionFactory,
-				dialect,
-				functionRegistry
-		).injectAliases( LEGACY_ORDER_BY_ALIAS_RESOLVER );
-	}
-
-	public static OrderByAliasResolver LEGACY_ORDER_BY_ALIAS_RESOLVER = new OrderByAliasResolver() {
-		@Override
-		public String resolveTableAlias(String columnReference) {
-			return TEMPLATE;
-		}
-	};
 
 	/**
 	 * Performs order-by template rendering allowing {@link ColumnMapper column mapping}.  An <tt>ORDER BY</tt> template
@@ -701,7 +666,7 @@ public final class Template {
 	 *
 	 * @return The rendered <tt>ORDER BY</tt> template.
 	 */
-	public static OrderByTranslation translateOrderBy(
+	public static String renderOrderByStringTemplate(
 			String orderByFragment,
 			final ColumnMapper columnMapper,
 			final SessionFactoryImplementor sessionFactory,
@@ -725,7 +690,8 @@ public final class Template {
 			}
 		};
 
-		return OrderByFragmentTranslator.translate( context, orderByFragment );
+		OrderByFragmentTranslator translator = new OrderByFragmentTranslator( context );
+		return translator.render( orderByFragment );
 	}
 
 	private static boolean isNamedParameter(String token) {
@@ -756,7 +722,7 @@ public final class Template {
 		return ! function.hasParenthesesIfNoArguments();
 	}
 
-	private static boolean isIdentifier(String token) {
+	private static boolean isIdentifier(String token, Dialect dialect) {
 		return token.charAt(0)=='`' || ( //allow any identifier quoted with backtick
 			Character.isLetter( token.charAt(0) ) && //only recognizes identifiers beginning with a letter
 			token.indexOf('.') < 0

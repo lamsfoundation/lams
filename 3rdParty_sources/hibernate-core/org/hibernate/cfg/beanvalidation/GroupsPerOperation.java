@@ -23,15 +23,15 @@
  */
 package org.hibernate.cfg.beanvalidation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import javax.validation.groups.Default;
 
+import org.hibernate.util.ReflectHelper;
 import org.hibernate.HibernateException;
-import org.hibernate.internal.util.ReflectHelper;
 
 /**
  * @author Emmanuel Bernard

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,8 +20,10 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -43,335 +45,179 @@ import org.hibernate.type.Type;
  * Contrary to JDBC, columns of results are numbered from zero.
  *
  * @see Query#scroll()
- *
  * @author Gavin King
  */
 public interface ScrollableResults {
 	/**
-	 * Advance to the next result.
-	 *
-	 * @return {@code true} if there is another result
+	 * Advance to the next result
+	 * @return <tt>true</tt> if there is another result
 	 */
-	public boolean next();
-
+	public boolean next() throws HibernateException;
 	/**
-	 * Retreat to the previous result.
-	 *
-	 * @return {@code true} if there is a previous result
+	 * Retreat to the previous result
+	 * @return <tt>true</tt> if there is a previous result
 	 */
-	public boolean previous();
-
+	public boolean previous() throws HibernateException;
 	/**
-	 * Scroll the specified number of positions from the current position.
-	 *
-	 * @param positions a positive (forward) or negative (backward) number of rows
-	 *
-	 * @return {@code true} if there is a result at the new location
+	 * Scroll an arbitrary number of locations
+	 * @param i a positive (forward) or negative (backward) number of rows
+	 * @return <tt>true</tt> if there is a result at the new location
 	 */
-	public boolean scroll(int positions);
-
+	public boolean scroll(int i) throws HibernateException;
 	/**
-	 * Go to the last result.
-	 *
-	 * @return {@code true} if there are any results
+	 * Go to the last result
+	 * @return <tt>true</tt> if there are any results
 	 */
-	public boolean last();
-
+	public boolean last() throws HibernateException;
 	/**
-	 * Go to the first result.
-	 *
-	 * @return {@code true} if there are any results
+	 * Go to the first result
+	 * @return <tt>true</tt> if there are any results
 	 */
-	public boolean first();
-
+	public boolean first() throws HibernateException;
 	/**
-	 * Go to a location just before first result,  This is the location of the cursor on a newly returned
-	 * scrollable result.
+	 * Go to a location just before first result (this is the initial location)
 	 */
-	public void beforeFirst();
-
+	public void beforeFirst() throws HibernateException;
 	/**
-	 * Go to a location just after the last result.
+	 * Go to a location just after the last result
 	 */
-	public void afterLast();
-
+	public void afterLast() throws HibernateException;
 	/**
 	 * Is this the first result?
 	 *
-	 * @return {@code true} if this is the first row of results, otherwise {@code false}
+	 * @return <tt>true</tt> if this is the first row of results
+	 * @throws HibernateException
 	 */
-	public boolean isFirst();
-
+	public boolean isFirst() throws HibernateException;
 	/**
 	 * Is this the last result?
 	 *
-	 * @return {@code true} if this is the last row of results.
+	 * @return <tt>true</tt> if this is the last row of results
+	 * @throws HibernateException
 	 */
-	public boolean isLast();
-
-	/**
-	 * Get the current position in the results. The first position is number 0 (unlike JDBC).
-	 *
-	 * @return The current position number, numbered from 0; -1 indicates that there is no current row
-	 */
-	public int getRowNumber();
-
-	/**
-	 * Set the current position in the result set.  Can be numbered from the first position (positive number) or
-	 * the last row (negative number).
-	 *
-	 * @param rowNumber the row number.  A positive number indicates a value numbered from the first row; a
-	 * negative number indicates a value numbered from the last row.
-	 *
-	 * @return true if there is a row at that row number
-	 */
-	public boolean setRowNumber(int rowNumber);
-
+	public boolean isLast() throws HibernateException;
 	/**
 	 * Release resources immediately.
 	 */
-	public void close();
-
+	public void close() throws HibernateException;
 	/**
-	 * Get the current row of results.
-	 *
-	 * @return The array of results
+	 * Get the current row of results
+	 * @return an object or array
 	 */
-	public Object[] get();
-
+	public Object[] get() throws HibernateException;
 	/**
 	 * Get the <tt>i</tt>th object in the current row of results, without
 	 * initializing any other results in the row. This method may be used
 	 * safely, regardless of the type of the column (ie. even for scalar
 	 * results).
-	 *
 	 * @param i the column, numbered from zero
-	 *
-	 * @return The requested result object; may return {@code null}
-	 *
-	 * @throws IndexOutOfBoundsException If i is an invalid index.
+	 * @return an object of any Hibernate type or <tt>null</tt>
 	 */
-	public Object get(int i);
+	public Object get(int i) throws HibernateException;
 
 	/**
-	 * Get the type of the <tt>i</tt>th column of results.
-	 *
+	 * Get the type of the <tt>i</tt>th column of results
 	 * @param i the column, numbered from zero
-	 *
 	 * @return the Hibernate type
-	 *
-	 * @throws IndexOutOfBoundsException If i is an invalid index.
 	 */
 	public Type getType(int i);
 
 	/**
-	 * Convenience method to read an integer.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as an integer
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read an <tt>integer</tt>
 	 */
-	public Integer getInteger(int col);
-
+	public Integer getInteger(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a long.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a long
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>long</tt>
 	 */
-	public Long getLong(int col);
-
+	public Long getLong(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a float.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a float
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>float</tt>
 	 */
-	public Float getFloat(int col);
-
+	public Float getFloat(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a boolean.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a boolean
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>boolean</tt>
 	 */
-	public Boolean getBoolean(int col);
-
+	public Boolean getBoolean(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a double.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a double
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>double</tt>
 	 */
-	public Double getDouble(int col);
-
+	public Double getDouble(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a short.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a short
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>short</tt>
 	 */
-	public Short getShort(int col);
-
+	public Short getShort(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a byte.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a byte
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>byte</tt>
 	 */
-	public Byte getByte(int col);
-
+	public Byte getByte(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a char.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a char
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>character</tt>
 	 */
-	public Character getCharacter(int col);
-
+	public Character getCharacter(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a binary (byte[]).
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a binary (byte[])
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>binary</tt>
 	 */
-	public byte[] getBinary(int col);
-
+	public byte[] getBinary(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a String using streaming.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a String
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read <tt>text</tt>
 	 */
-	public String getText(int col);
-
+	public String getText(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a blob.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a Blob
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>blob</tt>
 	 */
-	public Blob getBlob(int col);
-
+	public Blob getBlob(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a clob.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a Clob
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>clob</tt>
 	 */
-	public Clob getClob(int col);
-
+	public Clob getClob(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a string.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a String
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>string</tt>
 	 */
-	public String getString(int col);
-
+	public String getString(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a BigDecimal.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a BigDecimal
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>big_decimal</tt>
 	 */
-	public BigDecimal getBigDecimal(int col);
-
+	public BigDecimal getBigDecimal(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a BigInteger.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a BigInteger
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>big_integer</tt>
 	 */
-	public BigInteger getBigInteger(int col);
-
+	public BigInteger getBigInteger(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a Date.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a Date
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>date</tt>, <tt>time</tt> or <tt>timestamp</tt>
 	 */
-	public Date getDate(int col);
-
+	public Date getDate(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a Locale.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a Locale
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>locale</tt>
 	 */
-	public Locale getLocale(int col);
-
+	public Locale getLocale(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a Calendar.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a Calendar
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>calendar</tt> or <tt>calendar_date</tt>
 	 */
-	public Calendar getCalendar(int col);
-
+	public Calendar getCalendar(int col) throws HibernateException;
 	/**
-	 * Convenience method to read a TimeZone.
-	 *
-	 * @param col The column, numbered from zero
-	 *
-	 * @return The column value as a TimeZone
-	 *
-	 * @throws IndexOutOfBoundsException If col is an invalid index.
+	 * Convenience method to read a <tt>currency</tt>
 	 */
-	public TimeZone getTimeZone(int col);
+	//public Currency getCurrency(int col) throws HibernateException;
+	/**
+	 * Convenience method to read a <tt>timezone</tt>
+	 */
+	public TimeZone getTimeZone(int col) throws HibernateException;
+	/**
+	 * Get the current location in the result set. The first
+	 * row is number <tt>0</tt>, contrary to JDBC.
+	 * @return the row number, numbered from <tt>0</tt>, or <tt>-1</tt> if
+	 * there is no current row
+	 */
+	public int getRowNumber() throws HibernateException;
+	/**
+	 * Set the current location in the result set, numbered from either the
+	 * first row (row number <tt>0</tt>), or the last row (row
+	 * number <tt>-1</tt>).
+	 * @param rowNumber the row number, numbered from the last row, in the
+	 * case of a negative row number
+	 * @return true if there is a row at that row number
+	 */
+	public boolean setRowNumber(int rowNumber) throws HibernateException;
 }
 
 

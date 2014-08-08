@@ -23,9 +23,10 @@
  *
  */
 package org.hibernate.exception;
-import java.sql.SQLException;
 
 import org.hibernate.JDBCException;
+
+import java.sql.SQLException;
 
 /**
  * Implementation of JDBCException indicating that the requested DML operation

@@ -22,12 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.io.Serializable;
 import java.util.Iterator;
 
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.Mapping;
 import org.hibernate.type.Type;
 
 /**
@@ -41,7 +42,7 @@ import org.hibernate.type.Type;
  */
 public interface Value extends Serializable {
 	public int getColumnSpan();
-	public Iterator<Selectable> getColumnIterator();
+	public Iterator getColumnIterator();
 	public Type getType() throws MappingException;
 	public FetchMode getFetchMode();
 	public Table getTable();

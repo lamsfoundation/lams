@@ -28,7 +28,7 @@ import java.util.Currency;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
- * Descriptor for {@link Currency} handling.
+ * TODO : javadoc
  *
  * @author Steve Ebersole
  */
@@ -39,12 +39,10 @@ public class CurrencyTypeDescriptor extends AbstractTypeDescriptor<Currency> {
 		super( Currency.class );
 	}
 
-	@Override
 	public String toString(Currency value) {
 		return value.getCurrencyCode();
 	}
 
-	@Override
 	public Currency fromString(String string) {
 		return Currency.getInstance( string );
 	}
@@ -60,7 +58,6 @@ public class CurrencyTypeDescriptor extends AbstractTypeDescriptor<Currency> {
 		throw unknownUnwrap( type );
 	}
 
-	@Override
 	public <X> Currency wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;

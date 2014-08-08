@@ -21,6 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.annotations;
 
 /**
@@ -31,25 +32,21 @@ package org.hibernate.annotations;
 public enum SourceType {
 	/**
 	 * Get the timestamp from the current VM.
+	 * @see 
 	 */
-	VM( "timestamp" ),
+	VM("timestamp"),
 
 	/**
 	 * Get the timestamp from the database.
 	 */
-	DB( "dbtimestamp" );
+	DB("dbtimestamp");
 
 	private final String typeName;
 
-	private SourceType(String typeName ) {
+	SourceType(String typeName ) {
 		this.typeName = typeName;
 	}
 
-	/**
-	 * Get the corresponding Hibernate {@link org.hibernate.type.VersionType} name.
-	 *
-	 * @return The corresponding type name.
-	 */
 	public String typeName() {
 		return typeName;
 	}

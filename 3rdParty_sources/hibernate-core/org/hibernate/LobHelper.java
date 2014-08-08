@@ -27,10 +27,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.NClob;
 
 /**
- * A {@link Session session's} helper for creating LOB data.
+ * A {@link Session session's} helper for creating LOB data
  *
  * @author Steve Ebersole
  */
@@ -56,7 +55,7 @@ public interface LobHelper {
 	public Blob createBlob(InputStream stream, long length);
 
 	/**
-	 * Create a new {@link java.sql.Clob} from content.
+	 * Create a new {@link java.sql.Clob} from content
 	 *
 	 * @param string The string data
 	 *
@@ -75,21 +74,27 @@ public interface LobHelper {
 	public Clob createClob(Reader reader, long length);
 
 	/**
-	 * Create a new {@link NClob} from content.
+	 * Create a new {@link java.sql.Clob} from content.
+	 * <p/>
+	 * Note, on JDK 1.6+ environments will
+	 * create and return a NClob instead (NClob extends the Clob interface).
 	 *
 	 * @param string The string data
 	 *
-	 * @return The created {@link NClob}
+	 * @return The created {@link java.sql.Clob}/NClob
 	 */
-	public NClob createNClob(String string);
+	public Clob createNClob(String string);
 
 	/**
-	 * Create a new {@link NClob} from character reader.
+	 * Create a new {@link Clob} from character reader.
+	 * <p/>
+	 * Note, on JDK 1.6+ environments will
+	 * create and return a NClob instead (NClob extends the Clob interface).
 	 *
 	 * @param reader a character stream
 	 * @param length the number of characters in the stream
 	 *
-	 * @return The created {@link NClob}
+	 * @return The created {@link java.sql.Clob}/NClob
 	 */
-	public NClob createNClob(Reader reader, long length);
+	public Clob createNClob(Reader reader, long length);
 }

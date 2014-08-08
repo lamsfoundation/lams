@@ -24,26 +24,19 @@
  */
 package org.hibernate.sql;
 
-
 /**
  * A disjunctive string of conditions
  * @author Gavin King
  */
 public class DisjunctionFragment {
-	private StringBuilder buffer = new StringBuilder();
+
+	private StringBuffer buffer = new StringBuffer();
 
 	public DisjunctionFragment addCondition(ConditionFragment fragment) {
-		addCondition( fragment.toFragmentString() );
-		return this;
-	}
-
-	public DisjunctionFragment addCondition(String fragment) {
-		if ( buffer.length() > 0 ) {
-			buffer.append(" or ");
-		}
-		buffer.append( '(' )
-				.append( fragment )
-				.append( ')' );
+		if ( buffer.length()>0 ) buffer.append(" or ");
+		buffer.append("(")
+			.append( fragment.toFragmentString() )
+			.append(")");
 		return this;
 	}
 

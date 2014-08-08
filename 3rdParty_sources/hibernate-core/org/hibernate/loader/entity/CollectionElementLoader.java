@@ -28,31 +28,30 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.LoadQueryInfluencers;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.LoadQueryInfluencers;
 import org.hibernate.loader.JoinWalker;
 import org.hibernate.loader.OuterJoinLoader;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.ArrayHelper;
 
 /**
- *
+ * 
  *
  * @author Gavin King
  */
 public class CollectionElementLoader extends OuterJoinLoader {
-
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, CollectionElementLoader.class.getName() );
+	
+	private static final Logger log = LoggerFactory.getLogger(CollectionElementLoader.class);
 
 	private final OuterJoinLoadable persister;
 	private final Type keyType;
@@ -61,7 +60,7 @@ public class CollectionElementLoader extends OuterJoinLoader {
 
 	public CollectionElementLoader(
 			QueryableCollection collectionPersister,
-			SessionFactoryImplementor factory,
+			SessionFactoryImplementor factory, 
 			LoadQueryInfluencers loadQueryInfluencers) throws MappingException {
 		super( factory, loadQueryInfluencers );
 
@@ -69,13 +68,13 @@ public class CollectionElementLoader extends OuterJoinLoader {
 		this.indexType = collectionPersister.getIndexType();
 		this.persister = (OuterJoinLoadable) collectionPersister.getElementPersister();
 		this.entityName = persister.getEntityName();
-
+		
 		JoinWalker walker = new EntityJoinWalker(
 				persister, 
-				ArrayHelper.join(
-						collectionPersister.getKeyColumnNames(),
-						collectionPersister.toColumns("index")
-				),
+				ArrayHelper.join( 
+						collectionPersister.getKeyColumnNames(), 
+						collectionPersister.getIndexColumnNames()
+					),
 				1, 
 				LockMode.NONE, 
 				factory, 
@@ -84,25 +83,23 @@ public class CollectionElementLoader extends OuterJoinLoader {
 		initFromWalker( walker );
 
 		postInstantiate();
-
-		if ( LOG.isDebugEnabled() ) {
-			LOG.debugf( "Static select for entity %s: %s", entityName, getSQLString() );
-		}
+		
+		log.debug( "Static select for entity " + entityName + ": " + getSQLString() );
 
 	}
 
-	public Object loadElement(SessionImplementor session, Object key, Object index)
+	public Object loadElement(SessionImplementor session, Object key, Object index) 
 	throws HibernateException {
-
+		
 		List list = loadEntity(
-				session,
+				session, 
 				key,
 				index,
-				keyType,
+				keyType, 
 				indexType,
 				persister
 			);
-
+		
 		if ( list.size()==1 ) {
 			return list.get(0);
 		}
@@ -117,11 +114,10 @@ public class CollectionElementLoader extends OuterJoinLoader {
 				throw new HibernateException("More than one row was found");
 			}
 		}
-
+		
 	}
 
-	@Override
-    protected Object getResultColumnOrRow(
+	protected Object getResultColumnOrRow(
 		Object[] row,
 		ResultTransformer transformer,
 		ResultSet rs, SessionImplementor session)
@@ -129,8 +125,8 @@ public class CollectionElementLoader extends OuterJoinLoader {
 		return row[row.length-1];
 	}
 
-	@Override
-    protected boolean isSingleRowLoader() {
+	protected boolean isSingleRowLoader() {
 		return true;
 	}
+
 }

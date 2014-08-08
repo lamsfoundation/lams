@@ -34,19 +34,20 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.EntityMode;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.event.spi.PreDeleteEvent;
-import org.hibernate.event.spi.PreDeleteEventListener;
-import org.hibernate.event.spi.PreInsertEvent;
-import org.hibernate.event.spi.PreInsertEventListener;
-import org.hibernate.event.spi.PreUpdateEvent;
-import org.hibernate.event.spi.PreUpdateEventListener;
-import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.event.Initializable;
+import org.hibernate.event.PreDeleteEvent;
+import org.hibernate.event.PreDeleteEventListener;
+import org.hibernate.event.PreInsertEvent;
+import org.hibernate.event.PreInsertEventListener;
+import org.hibernate.event.PreUpdateEvent;
+import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
-
-import org.jboss.logging.Logger;
 
 /**
  * Event listener used to enable Bean Validation for insert/update/delete events.
@@ -55,12 +56,10 @@ import org.jboss.logging.Logger;
  * @author Hardy Ferentschik
  */
 //FIXME review exception model
-public class BeanValidationEventListener
-		implements PreInsertEventListener, PreUpdateEventListener, PreDeleteEventListener {
+public class BeanValidationEventListener implements
+		PreInsertEventListener, PreUpdateEventListener, PreDeleteEventListener, Initializable {
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class,
-                                                                       BeanValidationEventListener.class.getName());
-
+	private static final Logger log = LoggerFactory.getLogger( BeanValidationEventListener.class );
 	private ValidatorFactory factory;
 	private ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
 			new ConcurrentHashMap<EntityPersister, Set<String>>();
@@ -93,7 +92,7 @@ public class BeanValidationEventListener
 
 	public boolean onPreInsert(PreInsertEvent event) {
 		validate(
-				event.getEntity(), event.getPersister().getEntityMode(), event.getPersister(),
+				event.getEntity(), event.getSession().getEntityMode(), event.getPersister(),
 				event.getSession().getFactory(), GroupsPerOperation.Operation.INSERT
 		);
 		return false;
@@ -101,7 +100,7 @@ public class BeanValidationEventListener
 
 	public boolean onPreUpdate(PreUpdateEvent event) {
 		validate(
-				event.getEntity(), event.getPersister().getEntityMode(), event.getPersister(),
+				event.getEntity(), event.getSession().getEntityMode(), event.getPersister(),
 				event.getSession().getFactory(), GroupsPerOperation.Operation.UPDATE
 		);
 		return false;
@@ -109,7 +108,7 @@ public class BeanValidationEventListener
 
 	public boolean onPreDelete(PreDeleteEvent event) {
 		validate(
-				event.getEntity(), event.getPersister().getEntityMode(), event.getPersister(),
+				event.getEntity(), event.getSession().getEntityMode(), event.getPersister(),
 				event.getSession().getFactory(), GroupsPerOperation.Operation.DELETE
 		);
 		return false;
@@ -140,7 +139,9 @@ public class BeanValidationEventListener
 						new HashSet<ConstraintViolation<?>>( constraintViolations.size() );
 				Set<String> classNames = new HashSet<String>();
 				for ( ConstraintViolation<?> violation : constraintViolations ) {
-					LOG.trace( violation );
+					if ( log.isTraceEnabled() ) {
+						log.trace( violation.toString() );
+					}
 					propagatedViolations.add( violation );
 					classNames.add( violation.getLeafBean().getClass().getName() );
 				}

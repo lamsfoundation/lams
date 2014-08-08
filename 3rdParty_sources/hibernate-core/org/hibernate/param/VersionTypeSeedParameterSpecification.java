@@ -23,13 +23,14 @@
  *
  */
 package org.hibernate.param;
+
+import org.hibernate.engine.QueryParameters;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.type.VersionType;
+import org.hibernate.type.Type;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.type.Type;
-import org.hibernate.type.VersionType;
 
 /**
  * Parameter bind specification used for optimisitc lock version seeding (from insert statements).
@@ -37,7 +38,7 @@ import org.hibernate.type.VersionType;
  * @author Steve Ebersole
  */
 public class VersionTypeSeedParameterSpecification implements ParameterSpecification {
-	private final VersionType type;
+	private VersionType type;
 
 	/**
 	 * Constructs a version seed parameter bind specification.
@@ -48,24 +49,32 @@ public class VersionTypeSeedParameterSpecification implements ParameterSpecifica
 		this.type = type;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int bind(PreparedStatement statement, QueryParameters qp, SessionImplementor session, int position)
 	        throws SQLException {
 		type.nullSafeSet( statement, type.seed( session ), position, session );
 		return 1;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Type getExpectedType() {
 		return type;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setExpectedType(Type expectedType) {
 		// expected type is intrinsic here...
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String renderDisplayInfo() {
 		return "version-seed, type=" + type;
 	}

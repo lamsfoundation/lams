@@ -28,25 +28,21 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.access.CollectionRegionAccessStrategy;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.jdbc.batch.internal.BasicBatchKey;
-import org.hibernate.engine.spi.LoadQueryInfluencers;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SubselectFetch;
-import org.hibernate.internal.FilterAliasGenerator;
-import org.hibernate.internal.StaticFilterAliasGenerator;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.SubselectFetch;
+import org.hibernate.engine.LoadQueryInfluencers;
+import org.hibernate.exception.JDBCExceptionHelper;
 import org.hibernate.jdbc.Expectation;
 import org.hibernate.jdbc.Expectations;
-import org.hibernate.loader.collection.BatchingCollectionInitializerBuilder;
+import org.hibernate.loader.collection.BatchingCollectionInitializer;
 import org.hibernate.loader.collection.CollectionInitializer;
 import org.hibernate.loader.collection.SubselectCollectionLoader;
 import org.hibernate.mapping.Collection;
@@ -57,6 +53,7 @@ import org.hibernate.sql.Insert;
 import org.hibernate.sql.SelectFragment;
 import org.hibernate.sql.Update;
 import org.hibernate.type.AssociationType;
+import org.hibernate.util.ArrayHelper;
 
 /**
  * Collection persister for collections of values and many-to-many associations.
@@ -80,8 +77,7 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 	/**
 	 * Generate the SQL DELETE that deletes all rows
 	 */
-	@Override
-    protected String generateDeleteString() {
+	protected String generateDeleteString() {
 		
 		Delete delete = new Delete()
 				.setTableName( qualifiedTableName )
@@ -99,8 +95,7 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 	/**
 	 * Generate the SQL INSERT that creates a new row
 	 */
-	@Override
-    protected String generateInsertRowString() {
+	protected String generateInsertRowString() {
 		
 		Insert insert = new Insert( getDialect() )
 				.setTableName( qualifiedTableName )
@@ -126,8 +121,7 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 	/**
 	 * Generate the SQL UPDATE that updates a row
 	 */
-	@Override
-    protected String generateUpdateRowString() {
+	protected String generateUpdateRowString() {
 		
 		Update update = new Update( getDialect() )
 			.setTableName( qualifiedTableName );
@@ -153,19 +147,11 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 		
 		return update.toStatementString();
 	}
-	
-	@Override
-	protected void doProcessQueuedOps(PersistentCollection collection, Serializable id,
-			int nextIndex, SessionImplementor session)
-			throws HibernateException {
-		// nothing to do
-	}
 
 	/**
 	 * Generate the SQL DELETE that deletes a particular row
 	 */
-	@Override
-    protected String generateDeleteRowString() {
+	protected String generateDeleteRowString() {
 		
 		Delete delete = new Delete()
 			.setTableName( qualifiedTableName );
@@ -201,15 +187,11 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 		return false;
 	}
 
-	@Override
-    public boolean isManyToMany() {
+	public boolean isManyToMany() {
 		return elementType.isEntityType(); //instanceof AssociationType;
 	}
 
-	private BasicBatchKey updateBatchKey;
-
-	@Override
-    protected int doUpdateRows(Serializable id, PersistentCollection collection, SessionImplementor session)
+	protected int doUpdateRows(Serializable id, PersistentCollection collection, SessionImplementor session)
 			throws HibernateException {
 		
 		if ( ArrayHelper.isAllFalse(elementColumnIsSettable) ) return 0;
@@ -229,22 +211,22 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 					int offset = 1;
 
 					if ( useBatch ) {
-						if ( updateBatchKey == null ) {
-							updateBatchKey = new BasicBatchKey(
-									getRole() + "#UPDATE",
-									expectation
-							);
+						if ( st == null ) {
+							if ( callable ) {
+								st = session.getBatcher().prepareBatchCallableStatement( sql );
+							}
+							else {
+								st = session.getBatcher().prepareBatchStatement( sql );
+							}
 						}
-						st = session.getTransactionCoordinator()
-								.getJdbcCoordinator()
-								.getBatch( updateBatchKey )
-								.getBatchStatement( sql, callable );
 					}
 					else {
-						st = session.getTransactionCoordinator()
-								.getJdbcCoordinator()
-								.getStatementPreparer()
-								.prepareStatement( sql, callable );
+						if ( callable ) {
+							st = session.getBatcher().prepareCallableStatement( sql );
+						}
+						else {
+							st = session.getBatcher().prepareStatement( sql );
+						}
 					}
 
 					try {
@@ -264,24 +246,21 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 						}
 
 						if ( useBatch ) {
-							session.getTransactionCoordinator()
-									.getJdbcCoordinator()
-									.getBatch( updateBatchKey )
-									.addToBatch();
+							session.getBatcher().addToBatch( expectation );
 						}
 						else {
-							expectation.verifyOutcome( session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( st ), st, -1 );
+							expectation.verifyOutcome( st.executeUpdate(), st, -1 );
 						}
 					}
 					catch ( SQLException sqle ) {
 						if ( useBatch ) {
-							session.getTransactionCoordinator().getJdbcCoordinator().abortBatch();
+							session.getBatcher().abortBatch( sqle );
 						}
 						throw sqle;
 					}
 					finally {
 						if ( !useBatch ) {
-							session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+							session.getBatcher().closeStatement( st );
 						}
 					}
 					count++;
@@ -291,9 +270,10 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 			return count;
 		}
 		catch ( SQLException sqle ) {
-			throw getSQLExceptionHelper().convert(
+			throw JDBCExceptionHelper.convert(
+					getSQLExceptionConverter(),
 					sqle,
-					"could not update collection rows: " + MessageHelper.collectionInfoString( this, collection, id, session ),
+					"could not update collection rows: " + MessageHelper.collectionInfoString( this, id, getFactory() ),
 					getSQLUpdateRowString()
 				);
 		}
@@ -338,35 +318,20 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 	 *
 	 * @see org.hibernate.loader.collection.BasicCollectionLoader
 	 */
-	@Override
-    protected CollectionInitializer createCollectionInitializer(LoadQueryInfluencers loadQueryInfluencers)
+	protected CollectionInitializer createCollectionInitializer(LoadQueryInfluencers loadQueryInfluencers)
 			throws MappingException {
-		return BatchingCollectionInitializerBuilder.getBuilder( getFactory() )
-				.createBatchingCollectionInitializer( this, batchSize, getFactory(), loadQueryInfluencers );
+		return BatchingCollectionInitializer.createBatchingCollectionInitializer( this, batchSize, getFactory(), loadQueryInfluencers );
 	}
 
-	@Override
 	public String fromJoinFragment(String alias, boolean innerJoin, boolean includeSubclasses) {
 		return "";
 	}
 
-	@Override
-	public String fromJoinFragment(String alias, boolean innerJoin, boolean includeSubclasses, Set<String> treatAsDeclarations) {
-		return "";
-	}
-
-	@Override
 	public String whereJoinFragment(String alias, boolean innerJoin, boolean includeSubclasses) {
 		return "";
 	}
 
-	@Override
-	public String whereJoinFragment(String alias, boolean innerJoin, boolean includeSubclasses, Set<String> treatAsDeclarations) {
-		return "";
-	}
-
-	@Override
-    protected CollectionInitializer createSubselectInitializer(SubselectFetch subselect, SessionImplementor session) {
+	protected CollectionInitializer createSubselectInitializer(SubselectFetch subselect, SessionImplementor session) {
 		return new SubselectCollectionLoader( 
 				this,
 				subselect.toSubselectString( getCollectionType().getLHSPropertyName() ),
@@ -376,11 +341,6 @@ public class BasicCollectionPersister extends AbstractCollectionPersister {
 				session.getFactory(),
 				session.getLoadQueryInfluencers() 
 		);
-	}
-
-	@Override
-	public FilterAliasGenerator getFilterAliasGenerator(String rootAlias) {
-		return new StaticFilterAliasGenerator(rootAlias);
 	}
 
 }

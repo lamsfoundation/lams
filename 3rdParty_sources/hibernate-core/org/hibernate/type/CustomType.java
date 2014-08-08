@@ -31,21 +31,20 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.dom4j.Node;
+
+import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.metamodel.relational.Size;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.LoggableUserType;
-import org.hibernate.usertype.Sized;
 import org.hibernate.usertype.UserType;
 import org.hibernate.usertype.UserVersionType;
-
-import org.dom4j.Node;
+import org.hibernate.util.ArrayHelper;
 
 /**
  * Adapts {@link UserType} to the generic {@link Type} interface, in order
@@ -54,15 +53,10 @@ import org.dom4j.Node;
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class CustomType
-		extends AbstractType
-		implements IdentifierType, DiscriminatorType, VersionType, BasicType, StringRepresentableType {
-
+public class CustomType extends AbstractType implements IdentifierType, DiscriminatorType, VersionType, BasicType {
 	private final UserType userType;
 	private final String name;
 	private final int[] types;
-	private final Size[] dictatedSizes;
-	private final Size[] defaultSizes;
 	private final boolean customLogging;
 	private final String[] registrationKeys;
 
@@ -74,12 +68,6 @@ public class CustomType
 		this.userType = userType;
 		this.name = userType.getClass().getName();
 		this.types = userType.sqlTypes();
-		this.dictatedSizes = Sized.class.isInstance( userType )
-				? ( (Sized) userType ).dictatedSizes()
-				: new Size[ types.length ];
-		this.defaultSizes = Sized.class.isInstance( userType )
-				? ( (Sized) userType ).defaultSizes()
-				: new Size[ types.length ];
 		this.customLogging = LoggableUserType.class.isInstance( userType );
 		this.registrationKeys = registrationKeys;
 	}
@@ -96,16 +84,6 @@ public class CustomType
 		return types;
 	}
 
-	@Override
-	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
-		return dictatedSizes;
-	}
-
-	@Override
-	public Size[] defaultSizes(Mapping mapping) throws MappingException {
-		return defaultSizes;
-	}
-
 	public int getColumnSpan(Mapping session) {
 		return types.length;
 	}
@@ -115,16 +93,20 @@ public class CustomType
 	}
 
 	public boolean isEqual(Object x, Object y) throws HibernateException {
-		return userType.equals( x, y );
+		return userType.equals(x, y);
 	}
 
-	public int getHashCode(Object x) {
+	public boolean isEqual(Object x, Object y, EntityMode entityMode) throws HibernateException {
+		return isEqual(x, y);
+	}
+
+	public int getHashCode(Object x, EntityMode entityMode) {
 		return userType.hashCode(x);
 	}
 
 	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
-		return userType.nullSafeGet(rs, names, session, owner);
+		return userType.nullSafeGet(rs, names, owner);
 	}
 
 	public Object nullSafeGet(ResultSet rs, String columnName, SessionImplementor session, Object owner)
@@ -149,36 +131,44 @@ public class CustomType
 			SessionImplementor session,
 			Object owner,
 			Map copyCache) throws HibernateException {
-		return userType.replace( original, target, owner );
+		return userType.replace(original, target, owner);
 	}
 
 	public void nullSafeSet(PreparedStatement st, Object value, int index, boolean[] settable, SessionImplementor session)
 			throws HibernateException, SQLException {
 		if ( settable[0] ) {
-			userType.nullSafeSet( st, value, index, session );
+			userType.nullSafeSet( st, value, index );
 		}
 	}
 
 	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
 			throws HibernateException, SQLException {
-		userType.nullSafeSet( st, value, index, session );
+		userType.nullSafeSet( st, value, index );
 	}
 
 	@SuppressWarnings({ "UnusedDeclaration" })
 	public String toXMLString(Object value, SessionFactoryImplementor factory) {
-		return toString( value );
+		if ( value == null ) {
+			return null;
+		}
+		if ( userType instanceof EnhancedUserType ) {
+			return ( (EnhancedUserType) userType ).toXMLString( value );
+		}
+		else {
+			return value.toString();
+		}
 	}
 
 	@SuppressWarnings({ "UnusedDeclaration" })
 	public Object fromXMLString(String xml, Mapping factory) {
-		return fromStringValue( xml );
+		return ( (EnhancedUserType) userType ).fromXMLString(xml);
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public Object deepCopy(Object value, SessionFactoryImplementor factory)
+	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory)
 			throws HibernateException {
 		return userType.deepCopy(value);
 	}
@@ -188,7 +178,7 @@ public class CustomType
 	}
 
 	public Object stringToObject(String xml) {
-		return fromStringValue( xml );
+		return ( (EnhancedUserType) userType ).fromXMLString(xml);
 	}
 
 	public String objectToSQLString(Object value, Dialect dialect) throws Exception {
@@ -240,40 +230,5 @@ public class CustomType
 	public boolean isDirty(Object old, Object current, boolean[] checkable, SessionImplementor session)
 			throws HibernateException {
 		return checkable[0] && isDirty(old, current, session);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public String toString(Object value) throws HibernateException {
-		if ( StringRepresentableType.class.isInstance( userType ) ) {
-			return ( (StringRepresentableType) userType ).toString( value );
-		}
-		if ( value == null ) {
-			return null;
-		}
-		if ( EnhancedUserType.class.isInstance( userType ) ) {
-			//noinspection deprecation
-			return ( (EnhancedUserType) userType ).toXMLString( value );
-		}
-		return value.toString();
-	}
-
-	@Override
-	public Object fromStringValue(String string) throws HibernateException {
-		if ( StringRepresentableType.class.isInstance( userType ) ) {
-			return ( (StringRepresentableType) userType ).fromStringValue( string );
-		}
-		if ( EnhancedUserType.class.isInstance( userType ) ) {
-			//noinspection deprecation
-			return ( (EnhancedUserType) userType ).fromXMLString( string );
-		}
-		throw new HibernateException(
-				String.format(
-						"Could not process #fromStringValue, UserType class [%s] did not implement %s or %s",
-						name,
-						StringRepresentableType.class.getName(),
-						EnhancedUserType.class.getName()
-				)
-		);
 	}
 }

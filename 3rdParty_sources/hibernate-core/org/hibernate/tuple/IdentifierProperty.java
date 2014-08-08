@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,10 +20,11 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.tuple;
 
-import org.hibernate.engine.spi.IdentifierValue;
+import org.hibernate.engine.IdentifierValue;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.PostInsertIdentifierGenerator;
 import org.hibernate.type.Type;
@@ -34,7 +35,7 @@ import org.hibernate.type.Type;
  *
  * @author Steve Ebersole
  */
-public class IdentifierProperty extends AbstractAttribute implements IdentifierAttribute {
+public class IdentifierProperty extends Property {
 
 	private boolean virtual;
 	private boolean embedded;
@@ -63,7 +64,7 @@ public class IdentifierProperty extends AbstractAttribute implements IdentifierA
 			boolean embedded,
 			IdentifierValue unsavedValue,
 			IdentifierGenerator identifierGenerator) {
-		super( name, type );
+		super(name, node, type);
 		this.virtual = false;
 		this.embedded = embedded;
 		this.hasIdentifierMapper = false;
@@ -87,7 +88,7 @@ public class IdentifierProperty extends AbstractAttribute implements IdentifierA
 			boolean hasIdentifierMapper,
 			IdentifierValue unsavedValue,
 	        IdentifierGenerator identifierGenerator) {
-		super( null, type );
+		super(null, null, type);
 		this.virtual = true;
 		this.embedded = embedded;
 		this.hasIdentifierMapper = hasIdentifierMapper;
@@ -96,38 +97,27 @@ public class IdentifierProperty extends AbstractAttribute implements IdentifierA
 		this.identifierAssignedByInsert = identifierGenerator instanceof PostInsertIdentifierGenerator;
 	}
 
-	@Override
 	public boolean isVirtual() {
 		return virtual;
 	}
 
-	@Override
 	public boolean isEmbedded() {
 		return embedded;
 	}
 
-	@Override
 	public IdentifierValue getUnsavedValue() {
 		return unsavedValue;
 	}
 
-	@Override
 	public IdentifierGenerator getIdentifierGenerator() {
 		return identifierGenerator;
 	}
 
-	@Override
 	public boolean isIdentifierAssignedByInsert() {
 		return identifierAssignedByInsert;
 	}
 
-	@Override
 	public boolean hasIdentifierMapper() {
 		return hasIdentifierMapper;
-	}
-
-	@Override
-	public String toString() {
-		return "IdentifierAttribute(" + getName() + ")";
 	}
 }

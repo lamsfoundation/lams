@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.LinkedHashSet;
 
 /**
@@ -88,7 +89,9 @@ public class FetchProfile {
 		fetches.add( new Fetch( entity, association, style ) );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -102,7 +105,9 @@ public class FetchProfile {
 		return name.equals( that.name );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode() {
 		return name.hashCode();
 	}

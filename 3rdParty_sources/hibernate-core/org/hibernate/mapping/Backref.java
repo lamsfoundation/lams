@@ -33,12 +33,16 @@ public class Backref extends Property {
 	private String collectionRole;
 	private String entityName;
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isBackRef() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isSynthetic() {
 		return true;
 	}
@@ -51,12 +55,10 @@ public class Backref extends Property {
 		this.collectionRole = collectionRole;
 	}
 
-	@Override
 	public boolean isBasicPropertyAccessor() {
 		return false;
 	}
 
-	@Override
 	public PropertyAccessor getPropertyAccessor(Class clazz) {
 		return new BackrefPropertyAccessor(collectionRole, entityName);
 	}
@@ -64,7 +66,6 @@ public class Backref extends Property {
 	public String getEntityName() {
 		return entityName;
 	}
-
 	public void setEntityName(String entityName) {
 		this.entityName = entityName;
 	}

@@ -24,19 +24,18 @@
  */
 package org.hibernate.jdbc;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
-
-import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.StaleStateException;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
-import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
+import org.hibernate.util.JDBCExceptionReporter;
 import org.hibernate.exception.GenericJDBCException;
-import org.hibernate.internal.CoreMessageLogger;
 
-import org.jboss.logging.Logger;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 
 /**
  * Holds various often used {@link Expectation} definitions.
@@ -44,9 +43,7 @@ import org.jboss.logging.Logger;
  * @author Steve Ebersole
  */
 public class Expectations {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, Expectations.class.getName());
-	private static SqlExceptionHelper sqlExceptionHelper = new SqlExceptionHelper();
+	private static final Logger log = LoggerFactory.getLogger( Expectations.class );
 
 	public static final int USUAL_EXPECTED_COUNT = 1;
 	public static final int USUAL_PARAM_POSITION = 1;
@@ -75,13 +72,22 @@ public class Expectations {
 		}
 
 		private void checkBatched(int rowCount, int batchPosition) {
-            if (rowCount == -2) LOG.debugf("Success of batch update unknown: %s", batchPosition);
-            else if (rowCount == -3) throw new BatchFailedException("Batch update failed: " + batchPosition);
+			if ( rowCount == -2 ) {
+				if ( log.isDebugEnabled() ) {
+					log.debug( "success of batch update unknown: " + batchPosition );
+				}
+			}
+			else if ( rowCount == -3 ) {
+				throw new BatchFailedException( "Batch update failed: " + batchPosition );
+			}
 			else {
-                if (expectedRowCount > rowCount) throw new StaleStateException(
-                                                                               "Batch update returned unexpected row count from update ["
-                                                                               + batchPosition + "]; actual row count: " + rowCount
-                                                                               + "; expected: " + expectedRowCount);
+				if ( expectedRowCount > rowCount ) {
+					throw new StaleStateException(
+							"Batch update returned unexpected row count from update [" + batchPosition +
+							"]; actual row count: " + rowCount +
+							"; expected: " + expectedRowCount
+					);
+				}
 				if ( expectedRowCount < rowCount ) {
 					String msg = "Batch update returned unexpected row count from update [" +
 					             batchPosition + "]; actual row count: " + rowCount +
@@ -123,24 +129,21 @@ public class Expectations {
 			this.parameterPosition = parameterPosition;
 		}
 
-		@Override
-        public int prepare(PreparedStatement statement) throws SQLException, HibernateException {
+		public int prepare(PreparedStatement statement) throws SQLException, HibernateException {
 			toCallableStatement( statement ).registerOutParameter( parameterPosition, Types.NUMERIC );
 			return 1;
 		}
 
-		@Override
-        public boolean canBeBatched() {
+		public boolean canBeBatched() {
 			return false;
 		}
 
-		@Override
-        protected int determineRowCount(int reportedRowCount, PreparedStatement statement) {
+		protected int determineRowCount(int reportedRowCount, PreparedStatement statement) {
 			try {
 				return toCallableStatement( statement ).getInt( parameterPosition );
 			}
 			catch( SQLException sqle ) {
-				sqlExceptionHelper.logExceptions( sqle, "could not extract row counts from CallableStatement" );
+				JDBCExceptionReporter.logExceptions( sqle, "could not extract row counts from CallableStatement" );
 				throw new GenericJDBCException( "could not extract row counts from CallableStatement", sqle );
 			}
 		}

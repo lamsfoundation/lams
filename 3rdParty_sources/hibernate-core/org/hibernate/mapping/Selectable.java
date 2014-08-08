@@ -26,9 +26,6 @@ package org.hibernate.mapping;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunctionRegistry;
 
-/**
- * Models the commonality between a column and a formula (computed value).
- */
 public interface Selectable {
 	public String getAlias(Dialect dialect);
 	public String getAlias(Dialect dialect, Table table);

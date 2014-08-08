@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,80 +20,64 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
 
 import java.sql.SQLException;
 
+
 /**
- * Wraps a {@link SQLException}.  Indicates that an exception occurred during a JDBC call.
- *
- * @author Gavin King
+ * Wraps an <tt>SQLException</tt>. Indicates that an exception
+ * occurred during a JDBC call.
  *
  * @see java.sql.SQLException
+ * @author Gavin King
  */
 public class JDBCException extends HibernateException {
-	private final SQLException sqlException;
-	private final String sql;
 
-	/**
-	 * Constructs a JDBCException using the given information.
-	 *
-	 * @param message The message explaining the exception condition
-	 * @param cause The underlying cause
-	 */
-	public JDBCException(String message, SQLException cause) {
-		this( message, cause, null );
+	private SQLException sqle;
+	private String sql;
+
+	public JDBCException(String string, SQLException root) {
+		super(string, root);
+		sqle=root;
 	}
 
-	/**
-	 * Constructs a JDBCException using the given information.
-	 *
-	 * @param message The message explaining the exception condition
-	 * @param cause The underlying cause
-	 * @param sql The sql being executed when the exception occurred
-	 */
-	public JDBCException(String message, SQLException cause, String sql) {
-		super( message, cause );
-		this.sqlException = cause;
+	public JDBCException(String string, SQLException root, String sql) {
+		this(string, root);
 		this.sql = sql;
 	}
 
 	/**
-	 * Get the X/Open or ANSI SQL SQLState error code from the underlying {@link SQLException}.
-	 *
-	 * @return The X/Open or ANSI SQL SQLState error code; may return null.
-	 *
-	 * @see java.sql.SQLException#getSQLState()
+	 * Get the SQLState of the underlying <tt>SQLException</tt>.
+	 * @see java.sql.SQLException
+	 * @return String
 	 */
 	public String getSQLState() {
-		return sqlException.getSQLState();
+		return sqle.getSQLState();
 	}
 
 	/**
-	 * Get the vendor specific error code from the underlying {@link SQLException}.
-	 *
-	 * @return The vendor specific error code
-	 *
-	 * @see java.sql.SQLException#getErrorCode()
+	 * Get the <tt>errorCode</tt> of the underlying <tt>SQLException</tt>.
+	 * @see java.sql.SQLException
+	 * @return int the error code
 	 */
 	public int getErrorCode() {
-		return sqlException.getErrorCode();
+		return sqle.getErrorCode();
 	}
 
 	/**
-	 * Get the underlying {@link SQLException}.
-	 *
-	 * @return The SQLException
+	 * Get the underlying <tt>SQLException</tt>.
+	 * @return SQLException
 	 */
 	public SQLException getSQLException() {
-		return sqlException;
+		return sqle;
 	}
 	
 	/**
-	 * Get the actual SQL statement being executed when the exception occurred.
-	 *
-	 * @return The SQL statement; may return null.
+	 * Get the actual SQL statement that caused the exception
+	 * (may be null)
 	 */
 	public String getSQL() {
 		return sql;

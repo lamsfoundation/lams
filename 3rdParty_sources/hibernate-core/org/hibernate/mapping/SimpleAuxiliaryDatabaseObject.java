@@ -22,12 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.HashSet;
 
-import org.hibernate.HibernateException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.StringHelper;
+import org.hibernate.engine.Mapping;
+import org.hibernate.HibernateException;
+import org.hibernate.util.StringHelper;
 
 /**
  * A simple implementation of AbstractAuxiliaryDatabaseObject in which the CREATE and DROP strings are

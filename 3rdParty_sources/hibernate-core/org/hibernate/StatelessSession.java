@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
 
@@ -42,7 +43,7 @@ import java.sql.Connection;
  *
  * @author Gavin King
  */
-public interface StatelessSession extends SharedSessionContract {
+public interface StatelessSession extends Serializable {
 	/**
 	 * Close the stateless session and release the JDBC connection.
 	 */
@@ -52,8 +53,6 @@ public interface StatelessSession extends SharedSessionContract {
 	 * Insert a row.
 	 *
 	 * @param entity a new transient instance
-	 *
-	 * @return The identifier of the inserted entity
 	 */
 	public Serializable insert(Object entity);
 
@@ -62,7 +61,6 @@ public interface StatelessSession extends SharedSessionContract {
 	 *
 	 * @param entityName The entityName for the entity to be inserted
 	 * @param entity a new transient instance
-	 *
 	 * @return the identifier of the instance
 	 */
 	public Serializable insert(String entityName, Object entity);
@@ -100,18 +98,12 @@ public interface StatelessSession extends SharedSessionContract {
 	/**
 	 * Retrieve a row.
 	 *
-	 * @param entityName The name of the entity to retrieve
-	 * @param id The id of the entity to retrieve
-	 *
 	 * @return a detached entity instance
 	 */
 	public Object get(String entityName, Serializable id);
 
 	/**
 	 * Retrieve a row.
-	 *
-	 * @param entityClass The class of the entity to retrieve
-	 * @param id The id of the entity to retrieve
 	 *
 	 * @return a detached entity instance
 	 */
@@ -120,20 +112,12 @@ public interface StatelessSession extends SharedSessionContract {
 	/**
 	 * Retrieve a row, obtaining the specified lock mode.
 	 *
-	 * @param entityName The name of the entity to retrieve
-	 * @param id The id of the entity to retrieve
-	 * @param lockMode The lock mode to apply to the entity
-	 *
 	 * @return a detached entity instance
 	 */
 	public Object get(String entityName, Serializable id, LockMode lockMode);
 
 	/**
 	 * Retrieve a row, obtaining the specified lock mode.
-	 *
-	 * @param entityClass The class of the entity to retrieve
-	 * @param id The id of the entity to retrieve
-	 * @param lockMode The lock mode to apply to the entity
 	 *
 	 * @return a detached entity instance
 	 */
@@ -172,6 +156,76 @@ public interface StatelessSession extends SharedSessionContract {
 	public void refresh(String entityName, Object entity, LockMode lockMode);
 
 	/**
+	 * Create a new instance of <tt>Query</tt> for the given HQL query string.
+	 * Entities returned by the query are detached.
+	 */
+	public Query createQuery(String queryString);
+
+	/**
+	 * Obtain an instance of <tt>Query</tt> for a named query string defined in
+	 * the mapping file. Entities returned by the query are detached.
+	 */
+	public Query getNamedQuery(String queryName);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity class,
+	 * or a superclass of an entity class. Entities returned by the query are
+	 * detached.
+	 *
+	 * @param persistentClass a class, which is persistent, or has persistent subclasses
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(Class persistentClass);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity class,
+	 * or a superclass of an entity class, with the given alias.
+	 * Entities returned by the query are detached.
+	 *
+	 * @param persistentClass a class, which is persistent, or has persistent subclasses
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(Class persistentClass, String alias);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity name.
+	 * Entities returned by the query are detached.
+	 *
+	 * @param entityName
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(String entityName);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity name,
+	 * with the given alias. Entities returned by the query are detached.
+	 *
+	 * @param entityName
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(String entityName, String alias);
+
+	/**
+	 * Create a new instance of <tt>SQLQuery</tt> for the given SQL query string.
+	 * Entities returned by the query are detached.
+	 *
+	 * @param queryString a SQL query
+	 * @return SQLQuery
+	 * @throws HibernateException
+	 */
+	public SQLQuery createSQLQuery(String queryString) throws HibernateException;
+
+	/**
+	 * Begin a Hibernate transaction.
+	 */
+	public Transaction beginTransaction();
+
+	/**
+	 * Get the current Hibernate transaction.
+	 */
+	public Transaction getTransaction();
+
+	/**
 	 * Returns the current JDBC connection associated with this
 	 * instance.<br>
 	 * <br>
@@ -179,11 +233,6 @@ public interface StatelessSession extends SharedSessionContract {
 	 * CMT environment), it is the application's responsibility to
 	 * close the connection returned by this call. Otherwise, the
 	 * application should not close the connection.
-	 *
-	 * @deprecated just missed when deprecating same method from {@link Session}
-	 *
-	 * @return The connection associated with this stateless session
 	 */
-	@Deprecated
 	public Connection connection();
 }

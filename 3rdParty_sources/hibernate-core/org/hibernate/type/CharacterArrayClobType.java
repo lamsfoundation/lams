@@ -22,8 +22,10 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
+
 import org.hibernate.type.descriptor.java.CharacterArrayTypeDescriptor;
 import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
+import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
  * A type that maps between {@link java.sql.Types#CLOB CLOB} and {@link Character Character[]}
@@ -33,16 +35,22 @@ import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
  * @author Emmanuel Bernard
  * @author Steve Ebersole
  */
-public class CharacterArrayClobType extends AbstractSingleColumnStandardBasicType<Character[]> {
+public class CharacterArrayClobType extends LobType<Character[]> {
 	public static final CharacterArrayClobType INSTANCE = new CharacterArrayClobType();
 
 	public CharacterArrayClobType() {
-		super( ClobTypeDescriptor.DEFAULT, CharacterArrayTypeDescriptor.INSTANCE );
+		this(
+				ClobTypeDescriptor.DEFAULT,
+				new AlternativeLobTypes.ClobTypes<Character[],CharacterArrayClobType>( CharacterArrayClobType.class )
+		);
+	}
+
+	protected CharacterArrayClobType(SqlTypeDescriptor sqlTypeDescriptor,
+									 AlternativeLobTypes.ClobTypes<Character[],CharacterArrayClobType> clobTypes) {
+		super( sqlTypeDescriptor, CharacterArrayTypeDescriptor.INSTANCE, clobTypes );
 	}
 
 	public String getName() {
-		// todo name these annotation types for addition to the registry
-		return null;
+		return "wrapper_characters_clob";
 	}
-
 }

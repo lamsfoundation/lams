@@ -23,9 +23,9 @@
  */
 package org.hibernate.tool.instrument.javassist;
 
-import org.hibernate.bytecode.buildtime.internal.JavassistInstrumenter;
-import org.hibernate.bytecode.buildtime.spi.Instrumenter;
-import org.hibernate.bytecode.buildtime.spi.Logger;
+import org.hibernate.bytecode.buildtime.Instrumenter;
+import org.hibernate.bytecode.buildtime.JavassistInstrumenter;
+import org.hibernate.bytecode.buildtime.Logger;
 import org.hibernate.tool.instrument.BasicInstrumentationTask;
 
 /**
@@ -64,8 +64,7 @@ import org.hibernate.tool.instrument.BasicInstrumentationTask;
  * @author Steve Ebersole
  */
 public class InstrumentTask extends BasicInstrumentationTask {
-	@Override
-    protected Instrumenter buildInstrumenter(Logger logger, Instrumenter.Options options) {
+	protected Instrumenter buildInstrumenter(Logger logger, Instrumenter.Options options) {
 		return new JavassistInstrumenter( logger, options );
 	}
 }

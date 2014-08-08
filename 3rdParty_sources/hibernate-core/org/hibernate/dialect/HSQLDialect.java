@@ -23,37 +23,30 @@
  */
 package org.hibernate.dialect;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.io.Serializable;
 
-import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
-import org.hibernate.MappingException;
 import org.hibernate.StaleObjectStateException;
+import org.hibernate.JDBCException;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.persister.entity.Lockable;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.AvgWithArgumentCastFunction;
-import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
+import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
-import org.hibernate.dialect.lock.LockingStrategy;
-import org.hibernate.dialect.lock.OptimisticForceIncrementLockingStrategy;
-import org.hibernate.dialect.lock.OptimisticLockingStrategy;
-import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
-import org.hibernate.dialect.lock.PessimisticReadSelectLockingStrategy;
-import org.hibernate.dialect.lock.PessimisticWriteSelectLockingStrategy;
-import org.hibernate.dialect.lock.SelectLockingStrategy;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
-import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.JdbcExceptionHelper;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.persister.entity.Lockable;
+import org.hibernate.dialect.lock.*;
+import org.hibernate.exception.JDBCExceptionHelper;
+import org.hibernate.exception.TemplatedViolatedConstraintNameExtracter;
+import org.hibernate.exception.ViolatedConstraintNameExtracter;
 import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.util.ReflectHelper;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An SQL dialect compatible with HSQLDB (HyperSQL).
@@ -67,12 +60,8 @@ import org.jboss.logging.Logger;
  * @author Phillip Baird
  * @author Fred Toussi
  */
-@SuppressWarnings("deprecation")
 public class HSQLDialect extends Dialect {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			HSQLDialect.class.getName()
-	);
+	private static final Logger log = LoggerFactory.getLogger( HSQLDialect.class );
 
 	/**
 	 * version is 18 for 1.8 or 20 for 2.0
@@ -80,15 +69,12 @@ public class HSQLDialect extends Dialect {
 	private int hsqldbVersion = 18;
 
 
-	/**
-	 * Constructs a HSQLDialect
-	 */
 	public HSQLDialect() {
 		super();
 
 		try {
-			final Class props = ReflectHelper.classForName( "org.hsqldb.persist.HsqlDatabaseProperties" );
-			final String versionString = (String) props.getDeclaredField( "THIS_VERSION" ).get( null );
+			Class props = ReflectHelper.classForName( "org.hsqldb.persist.HsqlDatabaseProperties" );
+			String versionString = (String) props.getDeclaredField( "THIS_VERSION" ).get( null );
 
 			hsqldbVersion = Integer.parseInt( versionString.substring( 0, 1 ) ) * 10;
 			hsqldbVersion += Integer.parseInt( versionString.substring( 2, 3 ) );
@@ -100,7 +86,7 @@ public class HSQLDialect extends Dialect {
 		registerColumnType( Types.BIGINT, "bigint" );
 		registerColumnType( Types.BINARY, "binary($l)" );
 		registerColumnType( Types.BIT, "bit" );
-		registerColumnType( Types.BOOLEAN, "boolean" );
+        registerColumnType( Types.BOOLEAN, "boolean" );
 		registerColumnType( Types.CHAR, "char($l)" );
 		registerColumnType( Types.DATE, "date" );
 
@@ -130,8 +116,8 @@ public class HSQLDialect extends Dialect {
 			registerColumnType( Types.CLOB, "longvarchar" );
 		}
 		else {
-			registerColumnType( Types.BLOB, "blob($l)" );
-			registerColumnType( Types.CLOB, "clob($l)" );
+			registerColumnType( Types.BLOB, "blob" );
+			registerColumnType( Types.CLOB, "clob" );
 		}
 
 		// aggregate functions
@@ -150,7 +136,6 @@ public class HSQLDialect extends Dialect {
 		registerFunction( "reverse", new StandardSQLFunction( "reverse" ) );
 		registerFunction( "space", new StandardSQLFunction( "space", StandardBasicTypes.STRING ) );
 		registerFunction( "str", new SQLFunctionTemplate( StandardBasicTypes.STRING, "cast(?1 as varchar(256))" ) );
-		registerFunction( "to_char", new StandardSQLFunction( "to_char", StandardBasicTypes.STRING ) );
 		registerFunction( "rawtohex", new StandardSQLFunction( "rawtohex" ) );
 		registerFunction( "hextoraw", new StandardSQLFunction( "hextoraw" ) );
 
@@ -160,10 +145,9 @@ public class HSQLDialect extends Dialect {
 
 		// datetime functions
 		if ( hsqldbVersion < 20 ) {
-			registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.DATE, false ) );
-		}
-		else {
-			registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.TIMESTAMP, false ) );
+		registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.DATE, false ) );
+		} else {
+		    registerFunction( "sysdate", new NoArgSQLFunction( "sysdate", StandardBasicTypes.TIMESTAMP, false ) );
 		}
 		registerFunction( "current_date", new NoArgSQLFunction( "current_date", StandardBasicTypes.DATE, false ) );
 		registerFunction( "curdate", new NoArgSQLFunction( "curdate", StandardBasicTypes.DATE ) );
@@ -217,7 +201,8 @@ public class HSQLDialect extends Dialect {
 		// special functions
 		// from v. 2.2.0 ROWNUM() is supported in all modes as the equivalent of Oracle ROWNUM
 		if ( hsqldbVersion > 21 ) {
-			registerFunction( "rownum", new NoArgSQLFunction( "rownum", StandardBasicTypes.INTEGER ) );
+		    registerFunction("rownum",
+				     new NoArgSQLFunction("rownum", StandardBasicTypes.INTEGER));
 		}
 
 		// function templates
@@ -226,56 +211,45 @@ public class HSQLDialect extends Dialect {
 		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE );
 	}
 
-	@Override
 	public String getAddColumnString() {
 		return "add column";
 	}
 
-	@Override
 	public boolean supportsIdentityColumns() {
 		return true;
 	}
 
-	@Override
 	public String getIdentityColumnString() {
-		//not null is implicit
-		return "generated by default as identity (start with 1)";
+		return "generated by default as identity (start with 1)"; //not null is implicit
 	}
 
-	@Override
 	public String getIdentitySelectString() {
 		return "call identity()";
 	}
 
-	@Override
 	public String getIdentityInsertString() {
 		return hsqldbVersion < 20 ? "null" : "default";
 	}
 
-	@Override
 	public boolean supportsLockTimeouts() {
 		return false;
 	}
 
-	@Override
 	public String getForUpdateString() {
-		if ( hsqldbVersion >= 20 ) {
-			return " for update";
-		}
-		else {
-			return "";
-		}
+		return "";
 	}
 
-	@Override
+	public boolean supportsUnique() {
+		return false;
+	}
+
 	public boolean supportsLimit() {
 		return true;
 	}
 
-	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
 		if ( hsqldbVersion < 20 ) {
-			return new StringBuilder( sql.length() + 10 )
+			return new StringBuffer( sql.length() + 10 )
 					.append( sql )
 					.insert(
 							sql.toLowerCase().indexOf( "select" ) + 6,
@@ -284,88 +258,70 @@ public class HSQLDialect extends Dialect {
 					.toString();
 		}
 		else {
-			return sql + (hasOffset ? " offset ? limit ?" : " limit ?");
+			return new StringBuffer( sql.length() + 20 )
+					.append( sql )
+					.append( hasOffset ? " offset ? limit ?" : " limit ?" )
+					.toString();
 		}
 	}
 
-	@Override
 	public boolean bindLimitParametersFirst() {
 		return hsqldbVersion < 20;
 	}
 
-	@Override
 	public boolean supportsIfExistsAfterTableName() {
 		return true;
 	}
 
-	@Override
 	public boolean supportsColumnCheck() {
 		return hsqldbVersion >= 20;
 	}
 
-	@Override
 	public boolean supportsSequences() {
 		return true;
 	}
 
-	@Override
 	public boolean supportsPooledSequences() {
 		return true;
 	}
 
-	/**
-	 * HSQL will start with 0, by default.  In order for Hibernate to know that this not transient,
-	 * manually start with 1.
-	 */
-	@Override
 	protected String getCreateSequenceString(String sequenceName) {
-		return "create sequence " + sequenceName + " start with 1";
-	}
-	
-	/**
-	 * Because of the overridden {@link #getCreateSequenceString(String)}, we must also override
-	 * {@link #getCreateSequenceString(String, int, int)} to prevent 2 instances of "start with".
-	 */
-	@Override
-	protected String getCreateSequenceString(String sequenceName, int initialValue, int incrementSize) throws MappingException {
-		if ( supportsPooledSequences() ) {
-			return "create sequence " + sequenceName + " start with " + initialValue + " increment by " + incrementSize;
-		}
-		throw new MappingException( getClass().getName() + " does not support pooled sequences" );
+		return "create sequence " + sequenceName;
 	}
 
-	@Override
 	protected String getDropSequenceString(String sequenceName) {
 		return "drop sequence " + sequenceName;
 	}
 
-	@Override
 	public String getSelectSequenceNextValString(String sequenceName) {
 		return "next value for " + sequenceName;
 	}
 
-	@Override
 	public String getSequenceNextValString(String sequenceName) {
 		return "call next value for " + sequenceName;
 	}
 
-	@Override
 	public String getQuerySequencesString() {
 		// this assumes schema support, which is present in 1.8.0 and later...
 		return "select sequence_name from information_schema.system_sequences";
 	}
 
-	@Override
 	public ViolatedConstraintNameExtracter getViolatedConstraintNameExtracter() {
 		return hsqldbVersion < 20 ? EXTRACTER_18 : EXTRACTER_20;
 	}
 
-	private static final ViolatedConstraintNameExtracter EXTRACTER_18 = new TemplatedViolatedConstraintNameExtracter() {
-		@Override
+	private static ViolatedConstraintNameExtracter EXTRACTER_18 = new TemplatedViolatedConstraintNameExtracter() {
+
+		/**
+		 * Extract the name of the violated constraint from the given SQLException.
+		 *
+		 * @param sqle The exception that was the result of the constraint violation.
+		 * @return The extracted constraint name.
+		 */
 		public String extractConstraintName(SQLException sqle) {
 			String constraintName = null;
 
-			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
+			int errorCode = JDBCExceptionHelper.extractErrorCode( sqle );
 
 			if ( errorCode == -8 ) {
 				constraintName = extractUsingTemplate(
@@ -397,12 +353,12 @@ public class HSQLDialect extends Dialect {
 	 * HSQLDB 2.0 messages have changed
 	 * messages may be localized - therefore use the common, non-locale element " table: "
 	 */
-	private static final ViolatedConstraintNameExtracter EXTRACTER_20 = new TemplatedViolatedConstraintNameExtracter() {
-		@Override
+	private static ViolatedConstraintNameExtracter EXTRACTER_20 = new TemplatedViolatedConstraintNameExtracter() {
+
 		public String extractConstraintName(SQLException sqle) {
 			String constraintName = null;
 
-			final int errorCode = JdbcExceptionHelper.extractErrorCode( sqle );
+			int errorCode = JDBCExceptionHelper.extractErrorCode( sqle );
 
 			if ( errorCode == -8 ) {
 				constraintName = extractUsingTemplate(
@@ -428,24 +384,23 @@ public class HSQLDialect extends Dialect {
 		}
 	};
 
-	@Override
 	public String getSelectClauseNullString(int sqlType) {
 		String literal;
 		switch ( sqlType ) {
-			case Types.LONGVARCHAR:
+		        case Types.LONGVARCHAR:
 			case Types.VARCHAR:
 			case Types.CHAR:
 				literal = "cast(null as varchar(100))";
 				break;
-			case Types.LONGVARBINARY:
-			case Types.VARBINARY:
-			case Types.BINARY:
+		        case Types.LONGVARBINARY:
+		        case Types.VARBINARY:
+		        case Types.BINARY:
 				literal = "cast(null as varbinary(100))";
 				break;
-			case Types.CLOB:
+		        case Types.CLOB:
 				literal = "cast(null as clob)";
 				break;
-			case Types.BLOB:
+		        case Types.BLOB:
 				literal = "cast(null as blob)";
 				break;
 			case Types.DATE:
@@ -454,10 +409,10 @@ public class HSQLDialect extends Dialect {
 			case Types.TIMESTAMP:
 				literal = "cast(null as timestamp)";
 				break;
-			case Types.BOOLEAN:
+		        case Types.BOOLEAN:
 				literal = "cast(null as boolean)";
 				break;
-			case Types.BIT:
+		        case Types.BIT:
 				literal = "cast(null as bit)";
 				break;
 			case Types.TIME:
@@ -469,13 +424,11 @@ public class HSQLDialect extends Dialect {
 		return literal;
 	}
 
-	@Override
-	public boolean supportsUnionAll() {
-		return true;
-	}
+    public boolean supportsUnionAll() {
+        return true;
+    }
 
 	// temporary table support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 	// Hibernate uses this information for temporary tables that it uses for its own operations
 	// therefore the appropriate strategy is taken with different versions of HSQLDB
 
@@ -485,24 +438,37 @@ public class HSQLDialect extends Dialect {
 	// the definition and data is private to the session and table declaration
 	// can happen in the middle of a transaction
 
-	@Override
+	/**
+	 * Does this dialect support temporary tables?
+	 *
+	 * @return True if temp tables are supported; false otherwise.
+	 */
 	public boolean supportsTemporaryTables() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * With HSQLDB 2.0, the table name is qualified with MODULE to assist the drop
+	 * statement (in-case there is a global name beginning with HT_)
+	 *
+	 * @param baseTableName The table name from which to base the temp table name.
+	 *
+	 * @return The generated temp table name.
+	 */
 	public String generateTemporaryTableName(String baseTableName) {
 		if ( hsqldbVersion < 20 ) {
 			return "HT_" + baseTableName;
 		}
 		else {
-			// With HSQLDB 2.0, the table name is qualified with MODULE to assist the drop
-			// statement (in-case there is a global name beginning with HT_)
 			return "MODULE.HT_" + baseTableName;
 		}
 	}
 
-	@Override
+	/**
+	 * Command used to create a temporary table.
+	 *
+	 * @return The command used to create a temporary table.
+	 */
 	public String getCreateTemporaryTableString() {
 		if ( hsqldbVersion < 20 ) {
 			return "create global temporary table";
@@ -512,19 +478,40 @@ public class HSQLDialect extends Dialect {
 		}
 	}
 
-	@Override
+	/**
+	 * No fragment is needed if data is not needed beyond commit, otherwise
+	 * should add "on commit preserve rows"
+	 *
+	 * @return Any required postfix.
+	 */
 	public String getCreateTemporaryTablePostfix() {
 		return "";
 	}
 
-	@Override
+	/**
+	 * Command used to drop a temporary table.
+	 *
+	 * @return The command used to drop a temporary table.
+	 */
 	public String getDropTemporaryTableString() {
 		return "drop table";
 	}
 
-	@Override
+	/**
+	 * Different behavior for GLOBAL TEMPORARY (1.8) and LOCAL TEMPORARY (2.0)
+	 * <p/>
+	 * Possible return values and their meanings:<ul>
+	 * <li>{@link Boolean#TRUE} - Unequivocally, perform the temporary table DDL
+	 * in isolation.</li>
+	 * <li>{@link Boolean#FALSE} - Unequivocally, do <b>not</b> perform the
+	 * temporary table DDL in isolation.</li>
+	 * <li><i>null</i> - defer to the JDBC driver response in regards to
+	 * {@link java.sql.DatabaseMetaData#dataDefinitionCausesTransactionCommit()}</li>
+	 * </ul>
+	 *
+	 * @return see the result matrix above.
+	 */
 	public Boolean performTemporaryTableDDLInIsolation() {
-		// Different behavior for GLOBAL TEMPORARY (1.8) and LOCAL TEMPORARY (2.0)
 		if ( hsqldbVersion < 20 ) {
 			return Boolean.TRUE;
 		}
@@ -533,13 +520,20 @@ public class HSQLDialect extends Dialect {
 		}
 	}
 
-	@Override
+	/**
+	 * Do we need to drop the temporary table after use?
+	 *
+	 * todo - clarify usage by Hibernate
+	 *
+	 * Version 1.8 GLOBAL TEMPORARY table definitions persist beyond the end
+	 * of the session (by default, data is cleared at commit).<p>
+	 *
+	 * Version 2.x LOCAL TEMPORARY table definitions do not persist beyond
+	 * the end of the session (by default, data is cleared at commit).
+	 *
+	 * @return True if the table should be dropped.
+	 */
 	public boolean dropTemporaryTableAfterUse() {
-		// Version 1.8 GLOBAL TEMPORARY table definitions persist beyond the end
-		// of the session (by default, data is cleared at commit).<p>
-		//
-		// Version 2.x LOCAL TEMPORARY table definitions do not persist beyond
-		// the end of the session (by default, data is cleared at commit).
 		return true;
 	}
 
@@ -550,25 +544,44 @@ public class HSQLDialect extends Dialect {
 	 * be treated as a callable statement. It is equivalent to
 	 * "select current_timestamp from dual" in some databases.
 	 * HSQLDB 2.0 also supports VALUES CURRENT_TIMESTAMP
-	 * <p/>
-	 * {@inheritDoc}
+	 *
+	 * @return True if the current timestamp can be retrieved; false otherwise.
 	 */
-	@Override
 	public boolean supportsCurrentTimestampSelection() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * Should the value returned by {@link #getCurrentTimestampSelectString}
+	 * be treated as callable.  Typically this indicates that JDBC escape
+	 * syntax is being used...<p>
+	 *
+	 * CALL CURRENT_TIMESTAMP is used but this should not
+	 * be treated as a callable statement.
+	 *
+	 * @return True if the {@link #getCurrentTimestampSelectString} return
+	 *         is callable; false otherwise.
+	 */
 	public boolean isCurrentTimestampSelectStringCallable() {
 		return false;
 	}
 
-	@Override
+	/**
+	 * Retrieve the command used to retrieve the current timestamp from the
+	 * database.
+	 *
+	 * @return The command.
+	 */
 	public String getCurrentTimestampSelectString() {
 		return "call current_timestamp";
 	}
 
-	@Override
+	/**
+	 * The name of the database-specific SQL function for retrieving the
+	 * current timestamp.
+	 *
+	 * @return The function name.
+	 */
 	public String getCurrentTimestampSQLFunctionName() {
 		// the standard SQL function name is current_timestamp...
 		return "current_timestamp";
@@ -577,10 +590,14 @@ public class HSQLDialect extends Dialect {
 	/**
 	 * For HSQLDB 2.0, this is a copy of the base class implementation.
 	 * For HSQLDB 1.8, only READ_UNCOMMITTED is supported.
-	 * <p/>
-	 * {@inheritDoc}
+	 *
+	 * @param lockable The persister for the entity to be locked.
+	 * @param lockMode The type of lock to be acquired.
+	 *
+	 * @return The appropriate locking strategy.
+	 *
+	 * @since 3.2
 	 */
-	@Override
 	public LockingStrategy getLockingStrategy(Lockable lockable, LockMode lockMode) {
 		if ( lockMode == LockMode.PESSIMISTIC_FORCE_INCREMENT ) {
 			return new PessimisticForceIncrementLockingStrategy( lockable, lockMode );
@@ -606,7 +623,7 @@ public class HSQLDialect extends Dialect {
 		}
 	}
 
-	private static class ReadUncommittedLockingStrategy extends SelectLockingStrategy {
+	public static class ReadUncommittedLockingStrategy extends SelectLockingStrategy {
 		public ReadUncommittedLockingStrategy(Lockable lockable, LockMode lockMode) {
 			super( lockable, lockMode );
 		}
@@ -614,13 +631,12 @@ public class HSQLDialect extends Dialect {
 		public void lock(Serializable id, Object version, Object object, int timeout, SessionImplementor session)
 				throws StaleObjectStateException, JDBCException {
 			if ( getLockMode().greaterThan( LockMode.READ ) ) {
-				LOG.hsqldbSupportsOnlyReadCommittedIsolation();
+				log.warn( "HSQLDB supports only READ_UNCOMMITTED isolation" );
 			}
 			super.lock( id, version, object, timeout, session );
 		}
 	}
 
-	@Override
 	public boolean supportsCommentOn() {
 		return hsqldbVersion >= 20;
 	}
@@ -632,32 +648,54 @@ public class HSQLDialect extends Dialect {
 		return false;
 	}
 
-	@Override
+	/**
+	 * todo - needs usage clarification
+	 *
+	 * If the SELECT statement is always part of a UNION, then the type of
+	 * parameter is resolved by v. 2.0, but not v. 1.8 (assuming the other
+	 * SELECT in the UNION has a column reference in the same position and
+	 * can be type-resolved).
+	 *
+	 * On the other hand if the SELECT statement is isolated, all versions of
+	 * HSQLDB require casting for "select ? from .." to work.
+	 *
+	 * @return True if select clause parameter must be cast()ed
+	 *
+	 * @since 3.2
+	 */
 	public boolean requiresCastingOfParametersInSelectClause() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * For the underlying database, is READ_COMMITTED isolation implemented by
+	 * forcing readers to wait for write locks to be released?
+	 *
+	 * @return True if writers block readers to achieve READ_COMMITTED; false otherwise.
+	 */
 	public boolean doesReadCommittedCauseWritersToBlockReaders() {
 		return hsqldbVersion >= 20;
 	}
 
-	@Override
+	/**
+	 * For the underlying database, is REPEATABLE_READ isolation implemented by
+	 * forcing writers to wait for read locks to be released?
+	 *
+	 * @return True if readers block writers to achieve REPEATABLE_READ; false otherwise.
+	 */
 	public boolean doesRepeatableReadCauseReadersToBlockWriters() {
 		return hsqldbVersion >= 20;
 	}
 
-	@Override
+
 	public boolean supportsLobValueChangePropogation() {
 		return false;
 	}
 
-	@Override
-	public String toBooleanValueString(boolean bool) {
-		return String.valueOf( bool );
-	}
+    public String toBooleanValueString(boolean bool) {
+        return String.valueOf( bool );
+    }
 
-	@Override
 	public boolean supportsTupleDistinctCounts() {
 		return false;
 	}

@@ -26,28 +26,27 @@ package org.hibernate.type;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import org.hibernate.collection.internal.PersistentSet;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.dom4j.Element;
+import org.hibernate.EntityMode;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.PersistentElementHolder;
+import org.hibernate.collection.PersistentSet;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 public class SetType extends CollectionType {
 
-	/**
-	 * @deprecated Use {@link #SetType(org.hibernate.type.TypeFactory.TypeScope, String, String)} instead.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
 	public SetType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
-	public SetType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
-		super( typeScope, role, propertyRef );
-	}
-
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) {
-		return new PersistentSet(session);
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentElementHolder(session, persister, key);
+		}
+		else {
+			return new PersistentSet(session);
+		}
 	}
 
 	public Class getReturnedClass() {
@@ -55,7 +54,12 @@ public class SetType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		return new PersistentSet( session, (java.util.Set) collection );
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentElementHolder( session, (Element) collection );
+		}
+		else {
+			return new PersistentSet( session, (java.util.Set) collection );
+		}
 	}
 
 	public Object instantiate(int anticipatedSize) {

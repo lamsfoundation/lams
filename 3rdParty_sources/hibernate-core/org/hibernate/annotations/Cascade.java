@@ -22,26 +22,18 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Apply a cascade strategy on an association.  Used to apply Hibernate specific cascades.  For JPA cascading, prefer
- * using {@link javax.persistence.CascadeType} on {@link javax.persistence.OneToOne},
- * {@link javax.persistence.OneToMany}, etc.  Hibernate will merge together both sets of cascades.
- *
- * @author Emmanuel Bernard
- * @author Steve Ebersole
+ * Apply a cascade strategy on an association
  */
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface Cascade {
-	/**
-	 * The cascade value.
-	 */
 	CascadeType[] value();
 }

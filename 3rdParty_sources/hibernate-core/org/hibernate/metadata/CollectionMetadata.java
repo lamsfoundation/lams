@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.metadata;
+
 import org.hibernate.type.Type;
 
 /**

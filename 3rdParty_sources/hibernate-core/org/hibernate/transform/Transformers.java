@@ -24,7 +24,6 @@
  */
 package org.hibernate.transform;
 
-
 final public class Transformers {
 
 	private Transformers() {}

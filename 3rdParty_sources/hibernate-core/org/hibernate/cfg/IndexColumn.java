@@ -22,7 +22,9 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
+
 import java.util.Map;
+
 import javax.persistence.OrderColumn;
 
 import org.hibernate.mapping.Join;
@@ -62,7 +64,7 @@ public class IndexColumn extends Ejb3Column {
 		setUnique( unique );
 		setInsertable( insertable );
 		setUpdatable( updatable );
-		setExplicitTableName( secondaryTableName );
+		setSecondaryTableName( secondaryTableName );
 		setPropertyHolder( propertyHolder );
 		setJoins( joins );
 		setMappings( mappings );
@@ -77,27 +79,17 @@ public class IndexColumn extends Ejb3Column {
 		this.base = base;
 	}
 
-	/**
-	 * JPA 2 {@link OrderColumn @OrderColumn} processing.
-	 *
-	 * @param ann The OrderColumn annotation instance
-	 * @param propertyHolder Information about the property
-	 * @param inferredData Yeah, right.  Uh...
-	 * @param secondaryTables Any secondary tables available.
-	 * @param mappings The mappings being built.
-	 *
-	 * @return The index column
-	 */
+	//JPA 2 @OrderColumn processing
 	public static IndexColumn buildColumnFromAnnotation(
 			OrderColumn ann,
 			PropertyHolder propertyHolder,
 			PropertyData inferredData,
 			Map<String, Join> secondaryTables,
 			Mappings mappings) {
-		final IndexColumn column;
+		IndexColumn column;
 		if ( ann != null ) {
-			final String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
-			final String name = BinderHelper.isEmptyAnnotationValue( ann.name() ) ? inferredData.getPropertyName() + "_ORDER" : ann.name();
+			String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
+			String name = BinderHelper.isEmptyAnnotationValue( ann.name() ) ? inferredData.getPropertyName() + "_ORDER" : ann.name();
 			//TODO move it to a getter based system and remove the constructor
 // The JPA OrderColumn annotation defines no table element...
 //			column = new IndexColumn(
@@ -120,25 +112,16 @@ public class IndexColumn extends Ejb3Column {
 		return column;
 	}
 
-	/**
-	 * Legacy {@link IndexColumn @IndexColumn} processing.
-	 *
-	 * @param ann The IndexColumn annotation instance
-	 * @param propertyHolder Information about the property
-	 * @param inferredData Yeah, right.  Uh...
-	 * @param mappings The mappings being built.
-	 *
-	 * @return The index column
-	 */
+	//legacy @IndexColumn processing
 	public static IndexColumn buildColumnFromAnnotation(
 			org.hibernate.annotations.IndexColumn ann,
 			PropertyHolder propertyHolder,
 			PropertyData inferredData,
 			Mappings mappings) {
-		final IndexColumn column;
+		IndexColumn column;
 		if ( ann != null ) {
-			final String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
-			final String name = BinderHelper.isEmptyAnnotationValue( ann.name() ) ? inferredData.getPropertyName() : ann.name();
+			String sqlType = BinderHelper.isEmptyAnnotationValue( ann.columnDefinition() ) ? null : ann.columnDefinition();
+			String name = BinderHelper.isEmptyAnnotationValue( ann.name() ) ? inferredData.getPropertyName() : ann.name();
 			//TODO move it to a getter based system and remove the constructor
 			column = new IndexColumn(
 					false, sqlType, 0, 0, 0, name, ann.nullable(),

@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.descriptor.java.ShortTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SmallIntTypeDescriptor;
 
@@ -43,12 +43,13 @@ public class ShortType
 
 	public static final ShortType INSTANCE = new ShortType();
 
-	private static final Short ZERO = (short) 0;
+	@SuppressWarnings({ "UnnecessaryBoxing" })
+	private static final Short ZERO = Short.valueOf( (short) 0 );
 
 	public ShortType() {
 		super( SmallIntTypeDescriptor.INSTANCE, ShortTypeDescriptor.INSTANCE );
 	}
-	@Override
+
 	public String getName() {
 		return "short";
 	}
@@ -57,33 +58,39 @@ public class ShortType
 	public String[] getRegistrationKeys() {
 		return new String[] { getName(), short.class.getName(), Short.class.getName() };
 	}
-	@Override
+
 	public Serializable getDefaultValue() {
 		return ZERO;
 	}
-	@Override
+	
 	public Class getPrimitiveClass() {
 		return short.class;
 	}
-	@Override
+
 	public String objectToSQLString(Short value, Dialect dialect) throws Exception {
 		return value.toString();
 	}
-	@Override
+
 	public Short stringToObject(String xml) throws Exception {
-		return Short.valueOf( xml );
+		return new Short(xml);
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing", "UnnecessaryUnboxing" })
 	public Short next(Short current, SessionImplementor session) {
-		return (short) ( current + 1 );
+		return Short.valueOf( (short) ( current.shortValue() + 1 ) );
 	}
-	@Override
+
 	public Short seed(SessionImplementor session) {
 		return ZERO;
 	}
-	@Override
+
 	public Comparator<Short> getComparator() {
 		return getJavaTypeDescriptor().getComparator();
 	}
 
 }
+
+
+
+
+

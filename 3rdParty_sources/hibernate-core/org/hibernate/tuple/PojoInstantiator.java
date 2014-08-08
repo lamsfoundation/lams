@@ -28,23 +28,21 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.InstantiationException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.bytecode.spi.ReflectionOptimizer;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.mapping.Component;
+import org.hibernate.bytecode.ReflectionOptimizer;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.metamodel.binding.EntityBinding;
-
-import org.jboss.logging.Logger;
+import org.hibernate.mapping.Component;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * Defines a POJO-based instantiator for use from the tuplizers.
  */
 public class PojoInstantiator implements Instantiator, Serializable {
 
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, PojoInstantiator.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(PojoInstantiator.class);
 
 	private transient Constructor constructor;
 
@@ -52,11 +50,9 @@ public class PojoInstantiator implements Instantiator, Serializable {
 	private final transient ReflectionOptimizer.InstantiationOptimizer optimizer;
 	private final boolean embeddedIdentifier;
 	private final Class proxyInterface;
-	private final boolean isAbstract;
 
 	public PojoInstantiator(Component component, ReflectionOptimizer.InstantiationOptimizer optimizer) {
 		this.mappedClass = component.getComponentClass();
-		this.isAbstract = ReflectHelper.isAbstractClass( mappedClass );
 		this.optimizer = optimizer;
 
 		this.proxyInterface = null;
@@ -66,14 +62,17 @@ public class PojoInstantiator implements Instantiator, Serializable {
 			constructor = ReflectHelper.getDefaultConstructor(mappedClass);
 		}
 		catch ( PropertyNotFoundException pnfe ) {
-			LOG.noDefaultConstructor(mappedClass.getName());
+			log.info(
+			        "no default (no-argument) constructor for class: " +
+					mappedClass.getName() +
+					" (class must be instantiated by Interceptor)"
+			);
 			constructor = null;
 		}
 	}
 
 	public PojoInstantiator(PersistentClass persistentClass, ReflectionOptimizer.InstantiationOptimizer optimizer) {
 		this.mappedClass = persistentClass.getMappedClass();
-		this.isAbstract = ReflectHelper.isAbstractClass( mappedClass );
 		this.proxyInterface = persistentClass.getProxyInterface();
 		this.embeddedIdentifier = persistentClass.hasEmbeddedIdentifier();
 		this.optimizer = optimizer;
@@ -82,23 +81,11 @@ public class PojoInstantiator implements Instantiator, Serializable {
 			constructor = ReflectHelper.getDefaultConstructor( mappedClass );
 		}
 		catch ( PropertyNotFoundException pnfe ) {
-			LOG.noDefaultConstructor(mappedClass.getName());
-			constructor = null;
-		}
-	}
-
-	public PojoInstantiator(EntityBinding entityBinding, ReflectionOptimizer.InstantiationOptimizer optimizer) {
-		this.mappedClass = entityBinding.getEntity().getClassReference();
-		this.isAbstract = ReflectHelper.isAbstractClass( mappedClass );
-		this.proxyInterface = entityBinding.getProxyInterfaceType().getValue();
-		this.embeddedIdentifier = entityBinding.getHierarchyDetails().getEntityIdentifier().isEmbedded();
-		this.optimizer = optimizer;
-
-		try {
-			constructor = ReflectHelper.getDefaultConstructor( mappedClass );
-		}
-		catch ( PropertyNotFoundException pnfe ) {
-			LOG.noDefaultConstructor(mappedClass.getName());
+			log.info(
+			        "no default (no-argument) constructor for class: " +
+					mappedClass.getName() +
+					" (class must be instantiated by Interceptor)"
+			);
 			constructor = null;
 		}
 	}
@@ -106,11 +93,11 @@ public class PojoInstantiator implements Instantiator, Serializable {
 	private void readObject(java.io.ObjectInputStream stream)
 	throws ClassNotFoundException, IOException {
 		stream.defaultReadObject();
-		constructor = ReflectHelper.getDefaultConstructor( mappedClass );
+		constructor = ReflectHelper.getDefaultConstructor(mappedClass);
 	}
 
 	public Object instantiate() {
-		if ( isAbstract ) {
+		if ( ReflectHelper.isAbstractClass(mappedClass) ) {
 			throw new InstantiationException( "Cannot instantiate abstract class or interface: ", mappedClass );
 		}
 		else if ( optimizer != null ) {
@@ -121,23 +108,23 @@ public class PojoInstantiator implements Instantiator, Serializable {
 		}
 		else {
 			try {
-				return constructor.newInstance( (Object[]) null );
+				return constructor.newInstance( null );
 			}
 			catch ( Exception e ) {
 				throw new InstantiationException( "Could not instantiate entity: ", mappedClass, e );
 			}
 		}
 	}
-
+	
 	public Object instantiate(Serializable id) {
-		final boolean useEmbeddedIdentifierInstanceAsEntity = embeddedIdentifier &&
-				id != null &&
+		final boolean useEmbeddedIdentifierInstanceAsEntity = embeddedIdentifier && 
+				id != null && 
 				id.getClass().equals(mappedClass);
 		return useEmbeddedIdentifierInstanceAsEntity ? id : instantiate();
 	}
 
 	public boolean isInstance(Object object) {
-		return mappedClass.isInstance(object) ||
+		return mappedClass.isInstance(object) || 
 				( proxyInterface!=null && proxyInterface.isInstance(object) ); //this one needed only for guessEntityMode()
 	}
 }

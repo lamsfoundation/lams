@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import org.hibernate.dialect.Dialect;
 
 /**
@@ -32,8 +33,8 @@ import org.hibernate.dialect.Dialect;
  */
 public class QueryJoinFragment extends JoinFragment {
 
-	private StringBuilder afterFrom = new StringBuilder();
-	private StringBuilder afterWhere = new StringBuilder();
+	private StringBuffer afterFrom = new StringBuffer();
+	private StringBuffer afterWhere = new StringBuffer();
 	private Dialect dialect;
 	private boolean useThetaStyleInnerJoins;
 
@@ -42,16 +43,16 @@ public class QueryJoinFragment extends JoinFragment {
 		this.useThetaStyleInnerJoins = useThetaStyleInnerJoins;
 	}
 
-	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, JoinType joinType) {
+	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, int joinType) {
 		addJoin( tableName, alias, alias, fkColumns, pkColumns, joinType, null );
 	}
 
-	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, JoinType joinType, String on) {
+	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, int joinType, String on) {
 		addJoin( tableName, alias, alias, fkColumns, pkColumns, joinType, on );
 	}
 
-	private void addJoin(String tableName, String alias, String concreteAlias, String[] fkColumns, String[] pkColumns, JoinType joinType, String on) {
-		if ( !useThetaStyleInnerJoins || joinType != JoinType.INNER_JOIN ) {
+	private void addJoin(String tableName, String alias, String concreteAlias, String[] fkColumns, String[] pkColumns, int joinType, String on) {
+		if ( !useThetaStyleInnerJoins || joinType != INNER_JOIN ) {
 			JoinFragment jf = dialect.createOuterJoinFragment();
 			jf.addJoin( tableName, alias, fkColumns, pkColumns, joinType, on );
 			addFragment( jf );
@@ -78,8 +79,8 @@ public class QueryJoinFragment extends JoinFragment {
 
 	public JoinFragment copy() {
 		QueryJoinFragment copy = new QueryJoinFragment( dialect, useThetaStyleInnerJoins );
-		copy.afterFrom = new StringBuilder( afterFrom.toString() );
-		copy.afterWhere = new StringBuilder( afterWhere.toString() );
+		copy.afterFrom = new StringBuffer( afterFrom.toString() );
+		copy.afterWhere = new StringBuffer( afterWhere.toString() );
 		return copy;
 	}
 

@@ -23,42 +23,27 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Describe an index column of a List.
+ * Describe an index column of a List
+ * Prefer the standard {@link javax.persistence.OrderColumn} annotation
  *
  * @author Matthew Inger
- *
- * @deprecated Prefer the standard JPA {@link javax.persistence.OrderColumn} annotation and the Hibernate specific
- * {@link ListIndexBase} (for replacing {@link #base()}).
  */
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
-@Deprecated
 public @interface IndexColumn {
-	/**
-	 * The column name.
-	 */
+	/** column name */
 	String name();
-
-	/**
-	 * The starting index value.  Zero (0) by default, since Lists indexes start at zero (0).
-	 */
+	/** index in DB start from base */
 	int base() default 0;
-
-	/**
-	 * Is the column nullable?
-	 */
+	/** is the index nullable */
 	boolean nullable() default true;
-
-	/**
-	 * An explicit column definition.
-	 */
+	/** column definition, default to an appropriate integer */
 	String columnDefinition() default "";
 }

@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
+
 import javax.persistence.Access;
 
 import org.hibernate.MappingException;

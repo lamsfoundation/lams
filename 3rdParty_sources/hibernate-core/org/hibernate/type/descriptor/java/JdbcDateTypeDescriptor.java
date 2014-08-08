@@ -33,7 +33,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
- * Descriptor for {@link java.sql.Date} handling.
+ * TODO : javadoc
  *
  * @author Steve Ebersole
  */
@@ -43,7 +43,7 @@ public class JdbcDateTypeDescriptor extends AbstractTypeDescriptor<Date> {
 
 	public static class DateMutabilityPlan extends MutableMutabilityPlan<Date> {
 		public static final DateMutabilityPlan INSTANCE = new DateMutabilityPlan();
-		@Override
+
 		public Date deepCopyNotNull(Date value) {
 			return java.sql.Date.class.isInstance( value )
 					? new java.sql.Date( value.getTime() )
@@ -54,11 +54,11 @@ public class JdbcDateTypeDescriptor extends AbstractTypeDescriptor<Date> {
 	public JdbcDateTypeDescriptor() {
 		super( Date.class, DateMutabilityPlan.INSTANCE );
 	}
-	@Override
+
 	public String toString(Date value) {
 		return new SimpleDateFormat( DATE_FORMAT ).format( value );
 	}
-	@Override
+
 	public Date fromString(String string) {
 		try {
 			return new Date( new SimpleDateFormat(DATE_FORMAT).parse( string ).getTime() );
@@ -103,7 +103,6 @@ public class JdbcDateTypeDescriptor extends AbstractTypeDescriptor<Date> {
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Date value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -139,7 +138,8 @@ public class JdbcDateTypeDescriptor extends AbstractTypeDescriptor<Date> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public <X> Date wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;

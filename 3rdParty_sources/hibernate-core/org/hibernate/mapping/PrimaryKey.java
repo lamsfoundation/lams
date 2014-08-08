@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.dialect.Dialect;
@@ -33,7 +34,7 @@ import org.hibernate.dialect.Dialect;
 public class PrimaryKey extends Constraint {
 
 	public String sqlConstraintString(Dialect dialect) {
-		StringBuilder buf = new StringBuilder("primary key (");
+		StringBuffer buf = new StringBuffer("primary key (");
 		Iterator iter = getColumnIterator();
 		while ( iter.hasNext() ) {
 			buf.append( ( (Column) iter.next() ).getQuotedName(dialect) );
@@ -43,7 +44,7 @@ public class PrimaryKey extends Constraint {
 	}
 
 	public String sqlConstraintString(Dialect dialect, String constraintName, String defaultCatalog, String defaultSchema) {
-		StringBuilder buf = new StringBuilder(
+		StringBuffer buf = new StringBuffer(
 			dialect.getAddPrimaryKeyConstraintString(constraintName)
 		).append('(');
 		Iterator iter = getColumnIterator();
@@ -52,9 +53,5 @@ public class PrimaryKey extends Constraint {
 			if ( iter.hasNext() ) buf.append(", ");
 		}
 		return buf.append(')').toString();
-	}
-	
-	public String generatedConstraintNamePrefix() {
-		return "PK_";
 	}
 }

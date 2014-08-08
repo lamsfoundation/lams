@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,7 +148,7 @@ public class SimpleSelect {
 	}
 
 	public String toStatementString() {
-		StringBuilder buf = new StringBuilder( 
+		StringBuffer buf = new StringBuffer( 
 				columns.size()*10 + 
 				tableName.length() + 
 				whereTokens.size() * 10 + 
@@ -177,7 +178,7 @@ public class SimpleSelect {
 		}
 		
 		buf.append(" from ")
-			.append( dialect.appendLockHint(lockOptions, tableName) );
+			.append( dialect.appendLockHint(lockOptions.getLockMode(), tableName) );
 		
 		if ( whereTokens.size() > 0 ) {
 			buf.append(" where ")
@@ -194,7 +195,7 @@ public class SimpleSelect {
 	}
 
 	public String toWhereClause() {
-		StringBuilder buf = new StringBuilder( whereTokens.size() * 5 );
+		StringBuffer buf = new StringBuffer( whereTokens.size() * 5 );
 		Iterator iter = whereTokens.iterator();
 		while ( iter.hasNext() ) {
 			buf.append( iter.next() );

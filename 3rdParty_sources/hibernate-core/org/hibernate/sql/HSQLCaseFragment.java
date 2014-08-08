@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -36,8 +37,8 @@ import java.util.Map;
 public class HSQLCaseFragment extends CaseFragment {
 
 	public String toFragmentString() {
-		StringBuilder buf = new StringBuilder( cases.size() * 15 + 10 );
-		StringBuilder buf2 = new StringBuilder( cases.size() );
+		StringBuffer buf = new StringBuffer( cases.size() * 15 + 10 );
+		StringBuffer buf2 = new StringBuffer( cases.size() );
 
 		Iterator iter = cases.entrySet().iterator();
 		while ( iter.hasNext() ) {

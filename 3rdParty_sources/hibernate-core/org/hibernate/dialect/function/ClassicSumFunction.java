@@ -30,9 +30,6 @@ package org.hibernate.dialect.function;
  *
  */
 public class ClassicSumFunction extends StandardSQLFunction {
-	/**
-	 * Constructs a ClassicSumFunction
-	 */
 	public ClassicSumFunction() {
 		super( "sum" );
 	}

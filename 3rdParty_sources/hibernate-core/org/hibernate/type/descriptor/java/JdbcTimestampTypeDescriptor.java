@@ -31,10 +31,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.hibernate.HibernateException;
+import org.hibernate.cfg.Environment;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
- * Descriptor for {@link Timestamp} handling.
+ * TODO : javadoc
  *
  * @author Steve Ebersole
  */
@@ -44,7 +45,7 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 
 	public static class TimestampMutabilityPlan extends MutableMutabilityPlan<Date> {
 		public static final TimestampMutabilityPlan INSTANCE = new TimestampMutabilityPlan();
-		@Override
+
 		public Date deepCopyNotNull(Date value) {
 			if ( value instanceof Timestamp ) {
 				Timestamp orig = (Timestamp) value;
@@ -53,7 +54,8 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 				return ts;
 			}
 			else {
-				return new Date( value.getTime() );
+				Date orig = value;
+				return new Date( orig.getTime() );
 			}
 		}
 	}
@@ -61,11 +63,11 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 	public JdbcTimestampTypeDescriptor() {
 		super( Date.class, TimestampMutabilityPlan.INSTANCE );
 	}
-	@Override
+
 	public String toString(Date value) {
 		return new SimpleDateFormat( TIMESTAMP_FORMAT ).format( value );
 	}
-	@Override
+
 	public Date fromString(String string) {
 		try {
 			return new Timestamp( new SimpleDateFormat( TIMESTAMP_FORMAT ).parse( string ).getTime() );
@@ -93,6 +95,11 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 		int n1 = oneIsTimestamp ? ( (Timestamp) one ).getNanos() : 0;
 		int n2 = anotherIsTimestamp ? ( (Timestamp) another ).getNanos() : 0;
 
+		if ( !Environment.jvmHasJDK14Timestamp() ) {
+			t1 += n1 / 1000000;
+			t2 += n2 / 1000000;
+		}
+
 		if ( t1 != t2 ) {
 			return false;
 		}
@@ -115,7 +122,6 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Date value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -151,7 +157,8 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public <X> Date wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -161,7 +168,7 @@ public class JdbcTimestampTypeDescriptor extends AbstractTypeDescriptor<Date> {
 		}
 
 		if ( Long.class.isInstance( value ) ) {
-			return new Timestamp( (Long) value );
+			return new Timestamp( ( (Long) value ).longValue() );
 		}
 
 		if ( Calendar.class.isInstance( value ) ) {

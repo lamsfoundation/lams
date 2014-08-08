@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
 
@@ -30,12 +31,9 @@ package org.hibernate;
  * @author Gavin King
  */
 public class PropertyNotFoundException extends MappingException {
-	/**
-	 * Constructs a PropertyNotFoundException given the specified message.
-	 *
-	 * @param message A message explaining the exception condition
-	 */
-	public PropertyNotFoundException(String message) {
-		super( message );
+
+	public PropertyNotFoundException(String s) {
+		super(s);
 	}
+
 }

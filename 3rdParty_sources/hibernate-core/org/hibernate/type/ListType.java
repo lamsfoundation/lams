@@ -27,28 +27,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.collection.internal.PersistentList;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.dom4j.Element;
+import org.hibernate.EntityMode;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.PersistentList;
+import org.hibernate.collection.PersistentListElementHolder;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 public class ListType extends CollectionType {
 
-	/**
-	 * @deprecated Use {@link #ListType(org.hibernate.type.TypeFactory.TypeScope, String, String)}
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
 	public ListType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
-	public ListType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
-		super( typeScope, role, propertyRef );
-	}
-
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) {
-		return new PersistentList(session);
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentListElementHolder(session, persister, key);
+		}
+		else {
+			return new PersistentList(session);
+		}
 	}
 
 	public Class getReturnedClass() {
@@ -56,7 +55,12 @@ public class ListType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		return new PersistentList( session, (List) collection );
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentListElementHolder( session, (Element) collection );
+		}
+		else {
+			return new PersistentList( session, (List) collection );
+		}
 	}
 
 	public Object instantiate(int anticipatedSize) {
@@ -67,7 +71,7 @@ public class ListType extends CollectionType {
 		List list = (List) collection;
 		for ( int i=0; i<list.size(); i++ ) {
 			//TODO: proxies!
-			if ( list.get(i)==element ) return i;
+			if ( list.get(i)==element ) return new Integer(i);
 		}
 		return null;
 	}

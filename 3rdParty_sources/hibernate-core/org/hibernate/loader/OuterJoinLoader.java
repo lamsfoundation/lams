@@ -23,11 +23,14 @@
  *
  */
 package org.hibernate.loader;
-import org.hibernate.LockMode;
+
+import java.util.Map;
+
 import org.hibernate.LockOptions;
+import org.hibernate.LockMode;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.LoadQueryInfluencers;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.LoadQueryInfluencers;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.type.EntityType;
@@ -75,8 +78,7 @@ public abstract class OuterJoinLoader extends BasicLoader {
 		return collectionSuffixes;
 	}
 
-	@Override
-	public final String getSQLString() {
+	protected final String getSQLString() {
 		return sql;
 	}
 

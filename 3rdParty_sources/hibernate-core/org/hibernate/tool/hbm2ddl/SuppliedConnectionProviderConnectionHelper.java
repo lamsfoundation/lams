@@ -24,11 +24,11 @@
  */
 package org.hibernate.tool.hbm2ddl;
 
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.util.JDBCExceptionReporter;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 
 /**
  * A {@link ConnectionHelper} implementation based on a provided
@@ -68,7 +68,7 @@ class SuppliedConnectionProviderConnectionHelper implements ConnectionHelper {
 	public void release() throws SQLException {
 		// we only release the connection
 		if ( connection != null ) {
-			new SqlExceptionHelper().logAndClearWarnings( connection );
+			JDBCExceptionReporter.logAndClearWarnings( connection );
 			if ( toggleAutoCommit ) {
 				connection.setAutoCommit( false );
 			}

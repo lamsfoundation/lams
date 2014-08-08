@@ -23,12 +23,13 @@
  *
  */
 package org.hibernate.sql;
+
+import org.hibernate.dialect.Dialect;
+import org.hibernate.HibernateException;
+
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-
-import org.hibernate.HibernateException;
-import org.hibernate.dialect.Dialect;
 
 /**
  * Implementation of InsertSelect.
@@ -78,7 +79,7 @@ public class InsertSelect {
 		if ( tableName == null ) throw new HibernateException( "no table name defined for insert-select" );
 		if ( select == null ) throw new HibernateException( "no select defined for insert-select" );
 
-		StringBuilder buf = new StringBuilder( (columnNames.size() * 15) + tableName.length() + 10 );
+		StringBuffer buf = new StringBuffer( (columnNames.size() * 15) + tableName.length() + 10 );
 		if ( comment!=null ) {
 			buf.append( "/* " ).append( comment ).append( " */ " );
 		}

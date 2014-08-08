@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.engine.profile;
+
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -34,12 +35,6 @@ public class Association {
 	private final String associationPath;
 	private final String role;
 
-	/**
-	 * Constructs a association defining what is to be fetched.
-	 *
-	 * @param owner The entity owning the association
-	 * @param associationPath The path of the association, from the entity
-	 */
 	public Association(EntityPersister owner, String associationPath) {
 		this.owner = owner;
 		this.associationPath = associationPath;

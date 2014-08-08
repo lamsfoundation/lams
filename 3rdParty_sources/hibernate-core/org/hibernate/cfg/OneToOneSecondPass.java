@@ -31,9 +31,7 @@ import org.hibernate.MappingException;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.cfg.annotations.PropertyBinder;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Column;
-import org.hibernate.mapping.Component;
 import org.hibernate.mapping.DependantValue;
 import org.hibernate.mapping.Join;
 import org.hibernate.mapping.ManyToOne;
@@ -42,6 +40,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.type.ForeignKeyDirection;
+import org.hibernate.util.StringHelper;
 
 /**
  * We have to handle OneToOne in a second pass because:
@@ -213,28 +212,8 @@ public class OneToOneSecondPass implements SecondPass {
 				else {
 					propertyHolder.addProperty( prop, inferredData.getDeclaringClass() );
 				}
-				
-				value.setReferencedPropertyName( mappedBy );
 
-				// HHH-6813
-				// Foo: @Id long id, @OneToOne(mappedBy="foo") Bar bar
-				// Bar: @Id @OneToOne Foo foo
-				boolean referencesDerivedId = false;
-				try {
-					referencesDerivedId = otherSide.getIdentifier() instanceof Component
-							&& ( (Component) otherSide.getIdentifier() ).getProperty( mappedBy ) != null;
-				}
-				catch ( MappingException e ) {
-					// ignore
-				}
-				boolean referenceToPrimaryKey  = referencesDerivedId || mappedBy == null;
-				value.setReferenceToPrimaryKey( referenceToPrimaryKey );
-				
-				// If the other side is a derived ID, prevent an infinite
-				// loop of attempts to resolve identifiers.
-				if ( referencesDerivedId ) {
-					( (ManyToOne) otherSideProperty.getValue() ).setReferenceToPrimaryKey( false );
-				}
+				value.setReferencedPropertyName( mappedBy );
 
 				String propertyRef = value.getReferencedPropertyName();
 				if ( propertyRef != null ) {

@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.persister.collection;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,15 +31,14 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
-import org.hibernate.cache.spi.entry.CacheEntryStructure;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.cache.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.entry.CacheEntryStructure;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.metadata.CollectionMetadata;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.persister.walking.spi.CollectionDefinition;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.Type;
 
@@ -58,10 +58,10 @@ import org.hibernate.type.Type;
  * May be considered an immutable view of the mapping object
  *
  * @see QueryableCollection
- * @see org.hibernate.collection.spi.PersistentCollection
+ * @see PersistentCollection
  * @author Gavin King
  */
-public interface CollectionPersister extends CollectionDefinition {
+public interface CollectionPersister {
 	/**
 	 * Initialize the given collection with the given key
 	 */
@@ -199,16 +199,6 @@ public interface CollectionPersister extends CollectionDefinition {
 		Serializable key,
 		SessionImplementor session)
 		throws HibernateException;
-	
-	/**
-	 * Process queued operations within the PersistentCollection.
-	 */
-	public void processQueuedOps(
-			PersistentCollection collection,
-			Serializable key,
-			SessionImplementor session)
-			throws HibernateException;
-	
 	/**
 	 * Get the name of this collection role (the fully qualified class name,
 	 * extended by a "property path")
@@ -318,10 +308,4 @@ public interface CollectionPersister extends CollectionDefinition {
 	public boolean indexExists(Serializable key, Object index, SessionImplementor session);
 	public boolean elementExists(Serializable key, Object element, SessionImplementor session);
 	public Object getElementByIndex(Serializable key, Object index, SessionImplementor session, Object owner);
-	public int getBatchSize();
-
-	/**
-	 * @return the name of the property this collection is mapped by
-	 */
-	public String getMappedByProperty();
 }

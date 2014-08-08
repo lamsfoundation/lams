@@ -28,51 +28,28 @@ import java.util.Map;
 
 import org.hibernate.dialect.Dialect;
 
-/**
- * Defines a registry for SQLFunction instances
- *
- * @author Steve Ebersole
- */
 public class SQLFunctionRegistry {
 	private final Dialect dialect;
 	private final Map<String, SQLFunction> userFunctions;
-
-	/**
-	 * Constructs a SQLFunctionRegistry
-	 *
-	 * @param dialect The dialect
-	 * @param userFunctions Any application-supplied function definitions
-	 */
+	
 	public SQLFunctionRegistry(Dialect dialect, Map<String, SQLFunction> userFunctions) {
 		this.dialect = dialect;
-		this.userFunctions = new HashMap<String, SQLFunction>( userFunctions );
+		this.userFunctions = new HashMap<String, SQLFunction>();
+		this.userFunctions.putAll( userFunctions );
 	}
-
-	/**
-	 * Find a SQLFunction by name
-	 *
-	 * @param functionName The name of the function to locate
-	 *
-	 * @return The located function, maye return {@code null}
-	 */
+	
 	public SQLFunction findSQLFunction(String functionName) {
-		final String name = functionName.toLowerCase();
-		final SQLFunction userFunction = userFunctions.get( name );
+		// TODO: lower casing done here. Was done "at random" before; maybe not needed at all ?
+		String name = functionName.toLowerCase();
+		SQLFunction userFunction = userFunctions.get( name );
 		return userFunction != null
 				? userFunction
-				: dialect.getFunctions().get( name );
+				: (SQLFunction) dialect.getFunctions().get( name );
 	}
 
-	/**
-	 * Does this registry contain the named function
-	 *
-	 * @param functionName The name of the function to attempt to locate
-	 *
-	 * @return {@code true} if the registry contained that function
-	 */
-	@SuppressWarnings("UnusedDeclaration")
 	public boolean hasFunction(String functionName) {
-		final String name = functionName.toLowerCase();
+		// TODO: toLowerCase was not done before. Only used in Template.
+		String name = functionName.toLowerCase();
 		return userFunctions.containsKey( name ) || dialect.getFunctions().containsKey( name );
 	}
 

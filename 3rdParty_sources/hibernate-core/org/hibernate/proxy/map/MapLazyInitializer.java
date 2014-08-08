@@ -23,10 +23,11 @@
  *
  */
 package org.hibernate.proxy.map;
+
 import java.io.Serializable;
 import java.util.Map;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.proxy.AbstractLazyInitializer;
 
 /**

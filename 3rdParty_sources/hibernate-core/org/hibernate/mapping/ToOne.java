@@ -22,12 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.engine.Mapping;
 import org.hibernate.type.Type;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * A simple-point association (ie. a reference to another entity).
@@ -41,7 +42,6 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	private boolean embedded;
 	private boolean lazy = true;
 	protected boolean unwrapProxy;
-	protected boolean referenceToPrimaryKey = true;
 
 	protected ToOne(Mappings mappings, Table table) {
 		super( mappings, table );
@@ -78,7 +78,7 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	public void setTypeUsingReflection(String className, String propertyName)
 	throws MappingException {
 		if (referencedEntityName==null) {
-			referencedEntityName = ReflectHelper.reflectedPropertyClass( className, propertyName ).getName();
+			referencedEntityName = ReflectHelper.reflectedPropertyClass(className, propertyName).getName();
 		}
 	}
 
@@ -89,21 +89,11 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
 	}
-
-	/**
-	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
+	
 	public boolean isEmbedded() {
 		return embedded;
 	}
-
-	/**
-	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
+	
 	public void setEmbedded(boolean embedded) {
 		this.embedded = embedded;
 	}
@@ -129,14 +119,6 @@ public abstract class ToOne extends SimpleValue implements Fetchable {
 
 	public void setUnwrapProxy(boolean unwrapProxy) {
 		this.unwrapProxy = unwrapProxy;
-	}
-
-	public boolean isReferenceToPrimaryKey() {
-		return referenceToPrimaryKey;
-	}
-
-	public void setReferenceToPrimaryKey(boolean referenceToPrimaryKey) {
-		this.referenceToPrimaryKey = referenceToPrimaryKey;
 	}
 	
 }

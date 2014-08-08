@@ -24,7 +24,6 @@
  */
 package org.hibernate.jdbc;
 
-
 /**
  * Much like {@link TooManyRowsAffectedException}, indicates that more
  * rows than what we were expcecting were affected.  Additionally, this form

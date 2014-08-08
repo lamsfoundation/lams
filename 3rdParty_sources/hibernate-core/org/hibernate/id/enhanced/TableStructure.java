@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,41 +20,39 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.id.enhanced;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.internal.FormatStyle;
-import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
-import org.hibernate.engine.spi.SessionEventListenerManager;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.TransactionHelper;
 import org.hibernate.id.IdentifierGenerationException;
 import org.hibernate.id.IdentifierGeneratorHelper;
 import org.hibernate.id.IntegralDataTypeHolder;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.jdbc.AbstractReturningWork;
-
-import org.jboss.logging.Logger;
+import org.hibernate.jdbc.util.FormatStyle;
+import org.hibernate.jdbc.util.SQLStatementLogger;
 
 /**
  * Describes a table used to mimic sequence behavior
  *
  * @author Steve Ebersole
  */
-public class TableStructure implements DatabaseStructure {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			TableStructure.class.getName()
-	);
+public class TableStructure extends TransactionHelper implements DatabaseStructure {
+	private static final Logger log = LoggerFactory.getLogger( TableStructure.class );
+	private static final SQLStatementLogger SQL_STATEMENT_LOGGER = new SQLStatementLogger( false, false );
 
 	private final String tableName;
 	private final String valueColumnName;
@@ -89,142 +87,55 @@ public class TableStructure implements DatabaseStructure {
 				" where " + valueColumnName + "=?";
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getName() {
 		return tableName;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getInitialValue() {
 		return initialValue;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getIncrementSize() {
 		return incrementSize;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getTimesAccessed() {
 		return accessCounter;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void prepare(Optimizer optimizer) {
 		applyIncrementSizeToSourceValues = optimizer.applyIncrementSizeToSourceValues();
 	}
 
-	private IntegralDataTypeHolder makeValue() {
-		return IdentifierGeneratorHelper.getIntegralDataTypeHolder( numberType );
-	}
-
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public AccessCallback buildCallback(final SessionImplementor session) {
-		final SqlStatementLogger statementLogger = session.getFactory().getServiceRegistry()
-				.getService( JdbcServices.class )
-				.getSqlStatementLogger();
-		final SessionEventListenerManager statsCollector = session.getEventListenerManager();
-
 		return new AccessCallback() {
-			@Override
 			public IntegralDataTypeHolder getNextValue() {
-				return session.getTransactionCoordinator().getTransaction().createIsolationDelegate().delegateWork(
-						new AbstractReturningWork<IntegralDataTypeHolder>() {
-							@Override
-							public IntegralDataTypeHolder execute(Connection connection) throws SQLException {
-								final IntegralDataTypeHolder value = makeValue();
-								int rows;
-								do {
-									final PreparedStatement selectStatement = prepareStatement( connection, selectQuery, statementLogger, statsCollector );
-									try {
-										final ResultSet selectRS = executeQuery( selectStatement, statsCollector );
-										if ( !selectRS.next() ) {
-											final String err = "could not read a hi value - you need to populate the table: " + tableName;
-											LOG.error( err );
-											throw new IdentifierGenerationException( err );
-										}
-										value.initialize( selectRS, 1 );
-										selectRS.close();
-									}
-									catch (SQLException sqle) {
-										LOG.error( "could not read a hi value", sqle );
-										throw sqle;
-									}
-									finally {
-										selectStatement.close();
-									}
-
-
-									final PreparedStatement updatePS = prepareStatement( connection, updateQuery, statementLogger, statsCollector );
-									try {
-										final int increment = applyIncrementSizeToSourceValues ? incrementSize : 1;
-										final IntegralDataTypeHolder updateValue = value.copy().add( increment );
-										updateValue.bind( updatePS, 1 );
-										value.bind( updatePS, 2 );
-										rows = executeUpdate( updatePS, statsCollector );
-									}
-									catch (SQLException e) {
-										LOG.unableToUpdateQueryHiValue( tableName, e );
-										throw e;
-									}
-									finally {
-										updatePS.close();
-									}
-								} while ( rows == 0 );
-
-								accessCounter++;
-
-								return value;
-							}
-						},
-						true
-				);
-			}
-
-			@Override
-			public String getTenantIdentifier() {
-				return session.getTenantIdentifier();
+				return ( IntegralDataTypeHolder ) doWorkInNewTransaction( session );
 			}
 		};
 	}
 
-	private PreparedStatement prepareStatement(
-			Connection connection,
-			String sql,
-			SqlStatementLogger statementLogger,
-			SessionEventListenerManager statsCollector) throws SQLException {
-		statementLogger.logStatement( sql, FormatStyle.BASIC.getFormatter() );
-		try {
-			statsCollector.jdbcPrepareStatementStart();
-			return connection.prepareStatement( sql );
-		}
-		finally {
-			statsCollector.jdbcPrepareStatementEnd();
-		}
-	}
-
-	private int executeUpdate(PreparedStatement ps, SessionEventListenerManager statsCollector) throws SQLException {
-		try {
-			statsCollector.jdbcExecuteStatementStart();
-			return ps.executeUpdate();
-		}
-		finally {
-			statsCollector.jdbcExecuteStatementEnd();
-		}
-
-	}
-
-	private ResultSet executeQuery(PreparedStatement ps, SessionEventListenerManager statsCollector) throws SQLException {
-		try {
-			statsCollector.jdbcExecuteStatementStart();
-			return ps.executeQuery();
-		}
-		finally {
-			statsCollector.jdbcExecuteStatementEnd();
-		}
-	}
-
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String[] sqlCreateStrings(Dialect dialect) throws HibernateException {
 		return new String[] {
 				dialect.getCreateTableString() + " " + tableName + " ( " + valueColumnName + " " + dialect.getTypeName( Types.BIGINT ) + " )",
@@ -232,13 +143,69 @@ public class TableStructure implements DatabaseStructure {
 		};
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String[] sqlDropStrings(Dialect dialect) throws HibernateException {
-		return new String[] { dialect.getDropTableString( tableName ) };
+		StringBuffer sqlDropString = new StringBuffer().append( "drop table " );
+		if ( dialect.supportsIfExistsBeforeTableName() ) {
+			sqlDropString.append( "if exists " );
+		}
+		sqlDropString.append( tableName ).append( dialect.getCascadeConstraintsString() );
+		if ( dialect.supportsIfExistsAfterTableName() ) {
+			sqlDropString.append( " if exists" );
+		}
+		return new String[] { sqlDropString.toString() };
 	}
 
-	@Override
-	public boolean isPhysicalSequence() {
-		return false;
+	/**
+	 * {@inheritDoc}
+	 */
+	protected Serializable doWorkInCurrentTransaction(Connection conn, String sql) throws SQLException {
+		IntegralDataTypeHolder value = IdentifierGeneratorHelper.getIntegralDataTypeHolder( numberType );
+		int rows;
+		do {
+			SQL_STATEMENT_LOGGER.logStatement( selectQuery, FormatStyle.BASIC );
+			PreparedStatement selectPS = conn.prepareStatement( selectQuery );
+			try {
+				ResultSet selectRS = selectPS.executeQuery();
+				if ( !selectRS.next() ) {
+					String err = "could not read a hi value - you need to populate the table: " + tableName;
+					log.error( err );
+					throw new IdentifierGenerationException( err );
+				}
+				value.initialize( selectRS, 1 );
+				selectRS.close();
+			}
+			catch ( SQLException sqle ) {
+				log.error( "could not read a hi value", sqle );
+				throw sqle;
+			}
+			finally {
+				selectPS.close();
+			}
+
+			SQL_STATEMENT_LOGGER.logStatement( updateQuery, FormatStyle.BASIC );
+			PreparedStatement updatePS = conn.prepareStatement( updateQuery );
+			try {
+				final int increment = applyIncrementSizeToSourceValues ? incrementSize : 1;
+				final IntegralDataTypeHolder updateValue = value.copy().add( increment );
+				updateValue.bind( updatePS, 1 );
+				value.bind( updatePS, 2 );
+				rows = updatePS.executeUpdate();
+			}
+			catch ( SQLException sqle ) {
+				log.error( "could not updateQuery hi value in: " + tableName, sqle );
+				throw sqle;
+			}
+			finally {
+				updatePS.close();
+			}
+		} while ( rows == 0 );
+
+		accessCounter++;
+
+		return value;
 	}
+
 }

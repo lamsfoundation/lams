@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.tool.hbm2ddl;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -32,7 +33,7 @@ import java.sql.SQLException;
  *
  * @author Steve Ebersole
  */
-public interface ConnectionHelper {
+interface ConnectionHelper {
 	/**
 	 * Prepare the helper for use.
 	 *

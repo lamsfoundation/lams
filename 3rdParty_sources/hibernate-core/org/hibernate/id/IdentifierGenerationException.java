@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.id;
+
 import org.hibernate.HibernateException;
 
 /**

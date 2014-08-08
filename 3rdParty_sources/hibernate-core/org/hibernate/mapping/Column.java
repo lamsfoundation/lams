@@ -22,15 +22,16 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.io.Serializable;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunctionRegistry;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.StringHelper;
+import org.hibernate.engine.Mapping;
 import org.hibernate.sql.Template;
+import org.hibernate.util.StringHelper;
 
 /**
  * A column of a relational database table
@@ -46,13 +47,13 @@ public class Column implements Selectable, Serializable, Cloneable {
 	private int precision=DEFAULT_PRECISION;
 	private int scale=DEFAULT_SCALE;
 	private Value value;
-	private int typeIndex;
+	private int typeIndex = 0;
 	private String name;
 	private boolean nullable=true;
-	private boolean unique;
+	private boolean unique=false;
 	private String sqlType;
 	private Integer sqlTypeCode;
-	private boolean quoted;
+	private boolean quoted=false;
 	int uniqueInteger;
 	private String checkConstraint;
 	private String comment;
@@ -84,7 +85,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	}
 	public void setName(String name) {
 		if (
-			StringHelper.isNotEmpty( name ) &&
+			name.charAt(0)=='`' ||
 			Dialect.QUOTE.indexOf( name.charAt(0) ) > -1 //TODO: deprecated, remove eventually
 		) {
 			quoted=true;
@@ -108,38 +109,38 @@ public class Column implements Selectable, Serializable, Cloneable {
 			name;
 	}
 	
-	@Override
+	/**
+	 * For any column name, generate an alias that is unique
+	 * to that column name, and also 10 characters or less
+	 * in length.
+	 */
 	public String getAlias(Dialect dialect) {
-		final int lastLetter = StringHelper.lastIndexOfLetter( name );
-		final String suffix = Integer.toString(uniqueInteger) + '_';
-
 		String alias = name;
+		String unique = Integer.toString(uniqueInteger) + '_';
+		int lastLetter = StringHelper.lastIndexOfLetter(name);
 		if ( lastLetter == -1 ) {
 			alias = "column";
 		}
-		else if ( name.length() > lastLetter + 1 ) {
-			alias = name.substring( 0, lastLetter + 1 );
+		else if ( lastLetter < name.length()-1 ) {
+			alias = name.substring(0, lastLetter+1);
 		}
-
-		boolean useRawName = name.length() + suffix.length() <= dialect.getMaxAliasLength()
-				&& !quoted && !name.toLowerCase().equals( "rowid" );
-		if ( !useRawName ) {
-			if ( suffix.length() >= dialect.getMaxAliasLength() ) {
-				throw new MappingException( String.format(
-						"Unique suffix [%s] length must be less than maximum [%d]",
-						suffix, dialect.getMaxAliasLength() ) );
-			}
-			if ( alias.length() + suffix.length() > dialect.getMaxAliasLength() ) {
-				alias = alias.substring( 0, dialect.getMaxAliasLength() - suffix.length() );
-			}
+		if ( alias.length() > dialect.getMaxAliasLength() ) {
+			alias = alias.substring( 0, dialect.getMaxAliasLength() - unique.length() );
 		}
-		return alias + suffix;
+		boolean useRawName = name.equals(alias) && 
+			!quoted && 
+			!name.toLowerCase().equals("rowid");
+		if ( useRawName ) {
+			return alias;
+		}
+		else {
+			return alias + unique;
+		}
 	}
 	
 	/**
 	 * Generate a column alias that is unique across multiple tables
 	 */
-	@Override
 	public String getAlias(Dialect dialect, Table table) {
 		return getAlias(dialect) + table.getUniqueInteger() + '_';
 	}
@@ -159,19 +160,56 @@ public class Column implements Selectable, Serializable, Cloneable {
 		this.typeIndex = typeIndex;
 	}
 
+	public int getSqlTypeCode(Mapping mapping) throws MappingException {
+		org.hibernate.type.Type type = getValue().getType();
+		try {
+			int sqlTypeCode = type.sqlTypes(mapping)[ getTypeIndex() ];
+			if(getSqlTypeCode()!=null && getSqlTypeCode().intValue()!=sqlTypeCode) {
+				throw new MappingException("SQLType code's does not match. mapped as " + sqlTypeCode + " but is " + getSqlTypeCode() );
+			}
+			return sqlTypeCode;
+		}
+		catch (Exception e) {
+			throw new MappingException(
+					"Could not determine type for column " +
+					name +
+					" of type " +
+					type.getClass().getName() +
+					": " +
+					e.getClass().getName(),
+					e
+				);
+		}
+	}
+
+	/**
+	 * Returns the underlying columns sqltypecode.
+	 * If null, it is because the sqltype code is unknown.
+	 * 
+	 * Use #getSqlTypeCode(Mapping) to retreive the sqltypecode used
+	 * for the columns associated Value/Type.
+	 * 
+	 * @return sqltypecode if it is set, otherwise null.
+	 */
+	public Integer getSqlTypeCode() {
+		return sqlTypeCode;
+	}
+	
+	public void setSqlTypeCode(Integer typecode) {
+		sqlTypeCode=typecode;
+	}
+	
 	public boolean isUnique() {
 		return unique;
 	}
 
-	@Override
-	public int hashCode() {
-		//used also for generation of FK names!
-		return isQuoted() ?
-			name.hashCode() :
-			name.toLowerCase().hashCode();
+
+	public String getSqlType(Dialect dialect, Mapping mapping) throws HibernateException {
+		return sqlType==null ?
+			dialect.getTypeName( getSqlTypeCode(mapping), getLength(), getPrecision(), getScale() ) :
+			sqlType;
 	}
 
-	@Override
 	public boolean equals(Object object) {
 		return object instanceof Column && equals( (Column) object );
 	}
@@ -185,51 +223,12 @@ public class Column implements Selectable, Serializable, Cloneable {
 			name.equalsIgnoreCase(column.name);
 	}
 
-    public int getSqlTypeCode(Mapping mapping) throws MappingException {
-        org.hibernate.type.Type type = getValue().getType();
-        try {
-            int sqlTypeCode = type.sqlTypes( mapping )[getTypeIndex()];
-            if ( getSqlTypeCode() != null && getSqlTypeCode() != sqlTypeCode ) {
-                throw new MappingException( "SQLType code's does not match. mapped as " + sqlTypeCode + " but is " + getSqlTypeCode() );
-            }
-            return sqlTypeCode;
-        }
-        catch ( Exception e ) {
-            throw new MappingException(
-                    "Could not determine type for column " +
-                            name +
-                            " of type " +
-                            type.getClass().getName() +
-                            ": " +
-                            e.getClass().getName(),
-                    e
-            );
-        }
-    }
-
-    /**
-     * Returns the underlying columns sqltypecode.
-     * If null, it is because the sqltype code is unknown.
-     *
-     * Use #getSqlTypeCode(Mapping) to retreive the sqltypecode used
-     * for the columns associated Value/Type.
-     *
-     * @return sqlTypeCode if it is set, otherwise null.
-     */
-    public Integer getSqlTypeCode() {
-        return sqlTypeCode;
-    }
-
-    public void setSqlTypeCode(Integer typeCode) {
-        sqlTypeCode=typeCode;
-    }
-
-    public String getSqlType(Dialect dialect, Mapping mapping) throws HibernateException {
-        if ( sqlType == null ) {
-            sqlType = dialect.getTypeName( getSqlTypeCode( mapping ), getLength(), getPrecision(), getScale() );
-        }
-        return sqlType;
-    }
+	//used also for generation of FK names!
+	public int hashCode() {
+		return isQuoted() ? 
+			name.hashCode() : 
+			name.toLowerCase().hashCode();
+	}
 
 	public String getSqlType() {
 		return sqlType;
@@ -247,7 +246,6 @@ public class Column implements Selectable, Serializable, Cloneable {
 		return quoted;
 	}
 
-	@Override
 	public String toString() {
 		return getClass().getName() + '(' + getName() + ')';
 	}
@@ -264,7 +262,6 @@ public class Column implements Selectable, Serializable, Cloneable {
 		return checkConstraint!=null;
 	}
 
-	@Override
 	public String getTemplate(Dialect dialect, SQLFunctionRegistry functionRegistry) {
 		return hasCustomRead()
 				? Template.renderWhereStringTemplate( customRead, dialect, functionRegistry )
@@ -282,18 +279,14 @@ public class Column implements Selectable, Serializable, Cloneable {
 	public String getWriteExpr() {
 		return ( customWrite != null && customWrite.length() > 0 ) ? customWrite : "?";
 	}
-
-	@Override
+	
 	public boolean isFormula() {
 		return false;
 	}
 
-	@Override
 	public String getText(Dialect d) {
 		return getQuotedName(d);
 	}
-
-	@Override
 	public String getText() {
 		return getName();
 	}
@@ -351,8 +344,7 @@ public class Column implements Selectable, Serializable, Cloneable {
 	/**
 	 * Shallow copy, the value is not copied
 	 */
-	@Override
-	public Column clone() {
+	protected Object clone() {
 		Column copy = new Column();
 		copy.setLength( length );
 		copy.setScale( scale );

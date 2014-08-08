@@ -23,12 +23,11 @@
  */
 package org.hibernate.type.descriptor;
 
-import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Contract for extracting value via JDBC (from {@link ResultSet} or as output param from {@link CallableStatement}).
+ * Contract for extracting a value from a {@link ResultSet}.
  *
  * @author Steve Ebersole
  */
@@ -45,8 +44,4 @@ public interface ValueExtractor<X> {
 	 * @throws SQLException Indicates a JDBC error occurred.
 	 */
 	public X extract(ResultSet rs, String name, WrapperOptions options) throws SQLException;
-
-	public X extract(CallableStatement rs, int index, WrapperOptions options) throws SQLException;
-
-	public X extract(CallableStatement statement, String[] paramNames, WrapperOptions options) throws SQLException;
 }

@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg.annotations;
+
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.PersistentClass;
 
@@ -31,8 +32,8 @@ import org.hibernate.mapping.PersistentClass;
  * @author Matthew Inger
  */
 public class BagBinder extends CollectionBinder {
+
 	public BagBinder() {
-		super( false );
 	}
 
 	protected Collection createCollection(PersistentClass persistentClass) {

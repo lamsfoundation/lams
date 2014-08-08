@@ -23,7 +23,6 @@
  */
 package org.hibernate.mapping;
 
-
 /**
  * Common interface for things that can handle meta attributes.
  * 

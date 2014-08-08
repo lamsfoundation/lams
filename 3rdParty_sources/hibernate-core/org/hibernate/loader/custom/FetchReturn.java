@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.loader.custom;
+
 import org.hibernate.LockMode;
 
 /**

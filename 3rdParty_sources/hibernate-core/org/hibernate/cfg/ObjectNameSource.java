@@ -23,7 +23,6 @@
  */
 package org.hibernate.cfg;
 
-
 /**
  * Source for database object names (identifiers).
  *

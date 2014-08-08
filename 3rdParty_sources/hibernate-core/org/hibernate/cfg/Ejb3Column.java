@@ -27,21 +27,19 @@ import java.util.Map;
 
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.ColumnTransformers;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.cfg.annotations.Nullability;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Formula;
 import org.hibernate.mapping.Join;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.Table;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.StringHelper;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Wrap state of an EJB3 @Column annotation
@@ -50,13 +48,11 @@ import org.jboss.logging.Logger;
  * @author Emmanuel Bernard
  */
 public class Ejb3Column {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, Ejb3Column.class.getName());
-
+	private static final Logger log = LoggerFactory.getLogger( Ejb3Column.class );
 	private Column mappingColumn;
 	private boolean insertable = true;
 	private boolean updatable = true;
-	private String explicitTableName;
+	private String secondaryTableName;
 	protected Map<String, Join> joins;
 	protected PropertyHolder propertyHolder;
 	private Mappings mappings;
@@ -75,8 +71,6 @@ public class Ejb3Column {
 	private Table table;
 	private String readExpression;
 	private String writeExpression;
-
-	private String defaultValue;
 
 	public void setTable(Table table) {
 		this.table = table;
@@ -109,42 +103,13 @@ public class Ejb3Column {
 	public boolean isFormula() {
 		return StringHelper.isNotEmpty( formulaString );
 	}
-
+		
 	public String getFormulaString() {
 		return formulaString;
 	}
 
-	/**
-	 * Deprecated as this is badly named for its use.
-	 *
-	 * @deprecated Use {@link #getExplicitTableName} instead
-	 */
-	@Deprecated
 	public String getSecondaryTableName() {
-		return explicitTableName;
-	}
-
-	public String getExplicitTableName() {
-		return explicitTableName;
-	}
-
-	/**
-	 * Deprecated as this is badly named for its use.
-	 *
-	 * @deprecated Use {@link #setExplicitTableName} instead
-	 */
-	@Deprecated
-	public void setSecondaryTableName(String explicitTableName) {
-		setExplicitTableName( explicitTableName );
-	}
-
-	public void setExplicitTableName(String explicitTableName) {
-		if ( "``".equals( explicitTableName ) ) {
-			this.explicitTableName = "";
-		}
-		else {
-			this.explicitTableName = explicitTableName;
-		}
+		return secondaryTableName;
 	}
 
 	public void setFormula(String formula) {
@@ -211,20 +176,12 @@ public class Ejb3Column {
 		return mappingColumn.isNullable();
 	}
 
-	public String getDefaultValue() {
-		return defaultValue;
-	}
-
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
-
 	public Ejb3Column() {
 	}
 
 	public void bind() {
 		if ( StringHelper.isNotEmpty( formulaString ) ) {
-			LOG.debugf( "Binding formula %s", formulaString );
+			log.debug( "binding formula {}", formulaString );
 			formula = new Formula();
 			formula.setFormula( formulaString );
 		}
@@ -232,12 +189,7 @@ public class Ejb3Column {
 			initMappingColumn(
 					logicalColumnName, propertyName, length, precision, scale, nullable, sqlType, unique, true
 			);
-			if ( defaultValue != null ) {
-				mappingColumn.setDefaultValue( defaultValue );
-			}
-			if ( LOG.isDebugEnabled() ) {
-				LOG.debugf( "Binding column: %s", toString() );
-			}
+			log.debug( "Binding column: " + toString());
 		}
 	}
 
@@ -266,7 +218,7 @@ public class Ejb3Column {
 			this.mappingColumn.setNullable( nullable );
 			this.mappingColumn.setSqlType( sqlType );
 			this.mappingColumn.setUnique( unique );
-
+			
 			if(writeExpression != null && !writeExpression.matches("[^?]*\\?[^?]*")) {
 				throw new AnnotationException(
 						"@WriteExpression must contain exactly one value placeholder ('?') character: property ["
@@ -380,10 +332,7 @@ public class Ejb3Column {
 	 * @throws AnnotationException missing secondary table
 	 */
 	public Table getTable() {
-		if ( table != null ){
-			return table;
-		}
-
+		if ( table != null ) return table; //association table
 		if ( isSecondary() ) {
 			return getJoin().getTable();
 		}
@@ -394,19 +343,21 @@ public class Ejb3Column {
 
 	public boolean isSecondary() {
 		if ( propertyHolder == null ) {
-			throw new AssertionFailure( "Should not call getTable() on column w/o persistent class defined" );
+			throw new AssertionFailure( "Should not call getTable() on column wo persistent class defined" );
 		}
-
-		return StringHelper.isNotEmpty( explicitTableName )
-				&& !propertyHolder.getTable().getName().equals( explicitTableName );
+		if ( StringHelper.isNotEmpty( secondaryTableName ) ) {
+			return true;
+		}
+		// else {
+		return false;
 	}
 
 	public Join getJoin() {
-		Join join = joins.get( explicitTableName );
+		Join join = joins.get( secondaryTableName );
 		if ( join == null ) {
 			throw new AnnotationException(
 					"Cannot find the expected secondary table: no "
-							+ explicitTableName + " available for " + propertyHolder.getClassName()
+							+ secondaryTableName + " available for " + propertyHolder.getClassName()
 			);
 		}
 		else {
@@ -416,6 +367,15 @@ public class Ejb3Column {
 
 	public void forceNotNull() {
 		mappingColumn.setNullable( false );
+	}
+
+	public void setSecondaryTableName(String secondaryTableName) {
+		if ( "``".equals( secondaryTableName ) ) {
+			this.secondaryTableName = "";
+		}
+		else {
+			this.secondaryTableName = secondaryTableName;
+		}
 	}
 
 	public static Ejb3Column[] buildColumnFromAnnotation(
@@ -460,7 +420,7 @@ public class Ejb3Column {
 					throw new AnnotationException( "AttributeOverride.column() should override all columns for now" );
 				}
 				actualCols = overriddenCols.length == 0 ? null : overriddenCols;
-				LOG.debugf( "Column(s) overridden for property %s", inferredData.getPropertyName() );
+				log.debug( "Column(s) overridden for property {}", inferredData.getPropertyName() );
 			}
 			if ( actualCols == null ) {
 				columns = buildImplicitColumn(
@@ -481,16 +441,9 @@ public class Ejb3Column {
 					final String sqlType = col.columnDefinition().equals( "" )
 							? null
 							: nameNormalizer.normalizeIdentifierQuoting( col.columnDefinition() );
-					final String tableName = ! StringHelper.isEmpty(col.table())
-                                             ? nameNormalizer.normalizeIdentifierQuoting( mappings.getNamingStrategy().tableName( col.table() ) )
-                                             : "";
+					final String tableName = nameNormalizer.normalizeIdentifierQuoting( col.table() );
 					final String columnName = nameNormalizer.normalizeIdentifierQuoting( col.name() );
 					Ejb3Column column = new Ejb3Column();
-
-					if ( length == 1 ) {
-						applyColumnDefault( column, inferredData );
-					}
-
 					column.setImplicit( false );
 					column.setSqlType( sqlType );
 					column.setLength( col.length() );
@@ -512,7 +465,7 @@ public class Ejb3Column {
 					column.setUnique( col.unique() );
 					column.setInsertable( col.insertable() );
 					column.setUpdatable( col.updatable() );
-					column.setExplicitTableName( tableName );
+					column.setSecondaryTableName( tableName );
 					column.setPropertyHolder( propertyHolder );
 					column.setJoins( secondaryTables );
 					column.setMappings( mappings );
@@ -523,21 +476,6 @@ public class Ejb3Column {
 			}
 		}
 		return columns;
-	}
-
-	private static void applyColumnDefault(Ejb3Column column, PropertyData inferredData) {
-		final XProperty xProperty = inferredData.getProperty();
-		if ( xProperty != null ) {
-			ColumnDefault columnDefaultAnn = xProperty.getAnnotation( ColumnDefault.class );
-			if ( columnDefaultAnn != null ) {
-				column.setDefaultValue( columnDefaultAnn.value() );
-			}
-		}
-		else {
-			LOG.trace(
-					"Could not perform @ColumnDefault lookup as 'PropertyData' did not give access to XProperty"
-			);
-		}
 	}
 
 	//must only be called after all setters are defined and before bind
@@ -557,7 +495,7 @@ public class Ejb3Column {
 	}
 
 	private void processExpression(ColumnTransformer annotation) {
-		String nonNullLogicalColumnName = logicalColumnName != null ? logicalColumnName : ""; //use the default for annotations
+		String nonNullLogicalColumnName = logicalColumnName != null ? logicalColumnName : ""; //use the default for annotations 
 		if ( annotation != null &&
 				( StringHelper.isEmpty( annotation.forColumn() )
 						|| annotation.forColumn().equals( nonNullLogicalColumnName ) ) ) {
@@ -606,7 +544,6 @@ public class Ejb3Column {
 		else {
 			column.setImplicit( true );
 		}
-		applyColumnDefault( column, inferredData );
 		column.extractDataFromPropertyData( inferredData );
 		column.bind();
 		return columns;
@@ -614,14 +551,14 @@ public class Ejb3Column {
 
 	public static void checkPropertyConsistency(Ejb3Column[] columns, String propertyName) {
 		int nbrOfColumns = columns.length;
-
+		
 		if ( nbrOfColumns > 1 ) {
 			for (int currentIndex = 1; currentIndex < nbrOfColumns; currentIndex++) {
-
+				
 				if (columns[currentIndex].isFormula() || columns[currentIndex - 1].isFormula()) {
 					continue;
 				}
-
+				
 				if ( columns[currentIndex].isInsertable() != columns[currentIndex - 1].isInsertable() ) {
 					throw new AnnotationException(
 							"Mixing insertable and non insertable columns in a property is not allowed: " + propertyName
@@ -644,7 +581,7 @@ public class Ejb3Column {
 				}
 			}
 		}
-
+		
 	}
 
 	public void addIndex(Index index, boolean inSecondPass) {

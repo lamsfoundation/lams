@@ -28,10 +28,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.JDBCExceptionHelper;
 
 /**
  * Generates <tt>string</tt> values using the SQL Server NEWID() function.
@@ -39,46 +40,51 @@ import org.hibernate.internal.CoreMessageLogger;
  * @author Joseph Fifield
  */
 public class GUIDGenerator implements IdentifierGenerator {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( GUIDGenerator.class );
-
-	private static boolean WARNED;
+	private static final Logger log = LoggerFactory.getLogger(GUIDGenerator.class);
+	private static boolean warned = false;
 
 	public GUIDGenerator() {
-		if ( !WARNED ) {
-			WARNED = true;
-            LOG.deprecatedUuidGenerator( UUIDGenerator.class.getName(), UUIDGenerationStrategy.class.getName() );
+		if ( ! warned ) {
+			warned = true;
+			log.warn(
+					"DEPRECATED : use {} instead with custom {} implementation",
+					UUIDGenerator.class.getName(),
+					UUIDGenerationStrategy.class.getName()
+			);
 		}
 	}
 
-	public Serializable generate(SessionImplementor session, Object obj) throws HibernateException {
+	public Serializable generate(SessionImplementor session, Object obj)
+	throws HibernateException {
+		
 		final String sql = session.getFactory().getDialect().getSelectGUIDString();
 		try {
-			PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
+			PreparedStatement st = session.getBatcher().prepareSelectStatement(sql);
 			try {
-				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
+				ResultSet rs = st.executeQuery();
 				final String result;
 				try {
-					if ( !rs.next() ) {
-						throw new HibernateException( "The database returned no GUID identity value" );
-					}
+					rs.next();
 					result = rs.getString(1);
 				}
 				finally {
-					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
+					rs.close();
 				}
-                LOG.guidGenerated(result);
+				log.debug("GUID identifier generated: " + result);
 				return result;
 			}
 			finally {
-				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
+				session.getBatcher().closeStatement(st);
 			}
 		}
 		catch (SQLException sqle) {
-			throw session.getFactory().getSQLExceptionHelper().convert(
+			throw JDBCExceptionHelper.convert(
+					session.getFactory().getSQLExceptionConverter(),
 					sqle,
 					"could not retrieve GUID",
 					sql
 				);
 		}
 	}
+
 }

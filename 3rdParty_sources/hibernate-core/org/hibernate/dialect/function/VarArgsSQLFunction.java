@@ -26,8 +26,8 @@ package org.hibernate.dialect.function;
 import java.util.List;
 
 import org.hibernate.QueryException;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -74,26 +74,35 @@ public class VarArgsSQLFunction implements SQLFunction {
 		this( null, begin, sep, end );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * Always returns true here.
+	 */
 	public boolean hasArguments() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * Always returns true here.
+	 */
 	public boolean hasParenthesesIfNoArguments() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
 		return registeredType == null ? firstArgumentType : registeredType;
 	}
 
-	@Override
 	public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-		final StringBuilder buf = new StringBuilder().append( begin );
+		StringBuffer buf = new StringBuffer().append( begin );
 		for ( int i = 0; i < arguments.size(); i++ ) {
-			buf.append( transformArgument( (String) arguments.get( i ) ) );
+			buf.append( transformArgument( ( String ) arguments.get( i ) ) );
 			if ( i < arguments.size() - 1 ) {
 				buf.append( sep );
 			}

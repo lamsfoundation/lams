@@ -25,9 +25,9 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/xerces/main/xercesImpl-2.9.1-jbossas-2.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/jstl/api/main/jboss-jstl-api_1.2_spec-1.1.0.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/mail/api/main/javax.mail-1.5.1.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-4.3.5.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/3/hibernate3.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
-			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/"/>
+			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/3.6/javadocs/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/beanutils/main/commons-beanutils-1.8.3.jar"/>

@@ -22,12 +22,14 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
-import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.Mapping;
 import org.hibernate.type.CollectionType;
+import org.hibernate.type.TypeFactory;
 
 /**
  * A set with no nullable element columns. It will have a primary key
@@ -61,17 +63,17 @@ public class Set extends Collection {
 		if ( isSorted() ) {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.sortedSet( getRole(), getReferencedPropertyName(), getComparator() );
+					.sortedSet( getRole(), getReferencedPropertyName(), isEmbedded(), getComparator() );
 		}
 		else if ( hasOrder() ) {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.orderedSet( getRole(), getReferencedPropertyName() );
+					.orderedSet( getRole(), getReferencedPropertyName(), isEmbedded() );
 		}
 		else {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.set( getRole(), getReferencedPropertyName() );
+					.set( getRole(), getReferencedPropertyName(), isEmbedded() );
 		}
 	}
 

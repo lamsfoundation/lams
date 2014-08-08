@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.tool.hbm2ddl;
 
@@ -28,20 +29,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.cfg.NamingStrategy;
+import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.internal.util.config.ConfigurationHelper;
-import org.hibernate.service.ServiceRegistry;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * A commandline tool to update a database schema. May also be called from
@@ -50,8 +45,8 @@ import org.jboss.logging.Logger;
  * @author Christoph Sturm
  */
 public class SchemaValidator {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, SchemaValidator.class.getName());
 
+	private static final Logger log = LoggerFactory.getLogger( SchemaValidator.class );
 	private ConnectionHelper connectionHelper;
 	private Configuration configuration;
 	private Dialect dialect;
@@ -69,17 +64,12 @@ public class SchemaValidator {
 		connectionHelper = new ManagedProviderConnectionHelper( props );
 	}
 
-	public SchemaValidator(ServiceRegistry serviceRegistry, Configuration cfg ) throws HibernateException {
+	public SchemaValidator(Configuration cfg, Settings settings) throws HibernateException {
 		this.configuration = cfg;
-		final JdbcServices jdbcServices = serviceRegistry.getService( JdbcServices.class );
-		this.dialect = jdbcServices.getDialect();
-		this.connectionHelper = new SuppliedConnectionProviderConnectionHelper( jdbcServices.getConnectionProvider() );
-	}
-
-	private static StandardServiceRegistryImpl createServiceRegistry(Properties properties) {
-		Environment.verifyProperties( properties );
-		ConfigurationHelper.resolvePlaceHolders( properties );
-		return (StandardServiceRegistryImpl) new StandardServiceRegistryBuilder().applySettings( properties ).build();
+		dialect = settings.getDialect();
+		connectionHelper = new SuppliedConnectionProviderConnectionHelper(
+				settings.getConnectionProvider()
+		);
 	}
 
 	public static void main(String[] args) {
@@ -115,16 +105,10 @@ public class SchemaValidator {
 				cfg.setProperties( props );
 			}
 
-			StandardServiceRegistryImpl serviceRegistry = createServiceRegistry( cfg.getProperties() );
-			try {
-				new SchemaValidator( serviceRegistry, cfg ).validate();
-			}
-			finally {
-				serviceRegistry.destroy();
-			}
+			new SchemaValidator( cfg ).validate();
 		}
 		catch ( Exception e ) {
-            LOG.unableToRunSchemaUpdate(e);
+			log.error( "Error running schema update", e );
 			e.printStackTrace();
 		}
 	}
@@ -134,7 +118,7 @@ public class SchemaValidator {
 	 */
 	public void validate() {
 
-        LOG.runningSchemaValidator();
+		log.info( "Running schema validator" );
 
 		Connection connection = null;
 
@@ -142,13 +126,13 @@ public class SchemaValidator {
 
 			DatabaseMetadata meta;
 			try {
-                LOG.fetchingDatabaseMetadata();
+				log.info( "fetching database metadata" );
 				connectionHelper.prepare( false );
 				connection = connectionHelper.getConnection();
-				meta = new DatabaseMetadata( connection, dialect, configuration, false );
+				meta = new DatabaseMetadata( connection, dialect, false );
 			}
 			catch ( SQLException sqle ) {
-                LOG.unableToGetDatabaseMetadata(sqle);
+				log.error( "could not get database metadata", sqle );
 				throw sqle;
 			}
 
@@ -156,7 +140,7 @@ public class SchemaValidator {
 
 		}
 		catch ( SQLException e ) {
-            LOG.unableToCompleteSchemaValidation(e);
+			log.error( "could not complete schema validation", e );
 		}
 		finally {
 
@@ -164,9 +148,10 @@ public class SchemaValidator {
 				connectionHelper.release();
 			}
 			catch ( Exception e ) {
-                LOG.unableToCloseConnection(e);
+				log.error( "Error closing connection", e );
 			}
 
 		}
 	}
+
 }

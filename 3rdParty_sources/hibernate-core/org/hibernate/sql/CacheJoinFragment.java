@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import org.hibernate.AssertionFailure;
 
 /**
@@ -34,11 +35,11 @@ import org.hibernate.AssertionFailure;
  */
 public class CacheJoinFragment extends ANSIJoinFragment {
 
-	public void addJoin(String rhsTableName, String rhsAlias, String[] lhsColumns, String[] rhsColumns, JoinType joinType, String on) {
-		if ( joinType == JoinType.FULL_JOIN ) {
+	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, int joinType, String on) {
+		if ( joinType == FULL_JOIN ) {
 			throw new AssertionFailure( "Cache does not support full outer joins" );
 		}
-		super.addJoin( rhsTableName, rhsAlias, lhsColumns, rhsColumns, joinType, on );
+		super.addJoin( tableName, alias, fkColumns, pkColumns, joinType, on );
 	}
 
 }

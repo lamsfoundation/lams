@@ -30,8 +30,6 @@ import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
 import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
-import org.hibernate.type.descriptor.sql.TinyIntTypeDescriptor;
 
 /**
  * An SQL dialect targeting Sybase Adaptive Server Enterprise (ASE) 15 and higher.
@@ -40,10 +38,7 @@ import org.hibernate.type.descriptor.sql.TinyIntTypeDescriptor;
  *
  * @author Gavin King
  */
-public class SybaseASE15Dialect extends SybaseDialect {
-	/**
-	 * Constructs a SybaseASE15Dialect
-	 */
+public class SybaseASE15Dialect extends AbstractTransactSQLDialect {
 	public SybaseASE15Dialect() {
 		super();
 
@@ -53,8 +48,9 @@ public class SybaseASE15Dialect extends SybaseDialect {
 		registerColumnType( Types.DATE, "date" );
 		registerColumnType( Types.DECIMAL, "numeric($p,$s)" );
 		registerColumnType( Types.TIME, "time" );
-		registerColumnType( Types.REAL, "real" );
-		registerColumnType( Types.BOOLEAN, "tinyint" );
+        registerColumnType( Types.BINARY, "binary($l)" );
+        registerColumnType( Types.REAL, "real" );
+        registerColumnType( Types.BOOLEAN, "bit" );
 
 		registerFunction( "second", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datepart(second, ?1)" ) );
 		registerFunction( "minute", new SQLFunctionTemplate( StandardBasicTypes.INTEGER, "datepart(minute, ?1)" ) );
@@ -167,7 +163,7 @@ public class SybaseASE15Dialect extends SybaseDialect {
 		registerFunction( "variance", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "variance" ) );
 		registerFunction( "var_pop", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "var_pop" ) );
 		registerFunction( "var_samp", new SQLFunctionTemplate( StandardBasicTypes.DOUBLE, "var_samp" ) );
-		registerFunction( "sysdate", new NoArgSQLFunction("getdate", StandardBasicTypes.TIMESTAMP) );
+        registerFunction( "sysdate", new NoArgSQLFunction("getdate", StandardBasicTypes.TIMESTAMP) );
 
 		registerSybaseKeywords();
 	}
@@ -394,12 +390,10 @@ public class SybaseASE15Dialect extends SybaseDialect {
 
 	// Overridden informational metadata ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	@Override
 	public boolean supportsCascadeDelete() {
 		return false;
 	}
 
-	@Override
 	public int getMaxAliasLength() {
 		return 30;
 	}
@@ -409,15 +403,11 @@ public class SybaseASE15Dialect extends SybaseDialect {
 	 * <p/>
 	 * If the DB is configured to be case-sensitive, then this return
 	 * value will be incorrect.
-	 * <p/>
-	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean areStringComparisonsCaseInsensitive() {
 		return true;
 	}
 
-	@Override
 	public String getCurrentTimestampSQLFunctionName() {
 		return "getdate()";
 	}
@@ -426,26 +416,16 @@ public class SybaseASE15Dialect extends SybaseDialect {
 	 * Actually Sybase does not support LOB locators at al.
 	 *
 	 * @return false.
-	 * <p/>
-	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean supportsExpectedLobUsagePattern() {
 		return false;
 	}
 
-	@Override
+     public boolean supportsUniqueConstraintInCreateAlterTable() {
+         return false;
+     }
+
 	public String getCrossJoinSeparator() {
 		return ", ";
-	}
-
-	@Override
-	protected SqlTypeDescriptor getSqlTypeDescriptorOverride(int sqlCode) {
-		return sqlCode == Types.BOOLEAN ? TinyIntTypeDescriptor.INSTANCE : super.getSqlTypeDescriptorOverride( sqlCode );
-	}
-
-	@Override
-	public boolean supportsLockTimeouts() {
-		return false;
 	}
 }

@@ -24,44 +24,42 @@
  */
 package org.hibernate.loader.criteria;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.LinkedHashMap;
 
 import org.hibernate.Criteria;
+import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
+import org.hibernate.LockOptions;
+import org.hibernate.criterion.EnhancedProjection;
+import org.hibernate.hql.ast.util.SessionFactoryHelper;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.EnhancedProjection;
 import org.hibernate.criterion.Projection;
-import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.RowSelection;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.TypedValue;
-import org.hibernate.hql.internal.ast.util.SessionFactoryHelper;
-import org.hibernate.internal.CriteriaImpl;
-import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.engine.QueryParameters;
+import org.hibernate.engine.RowSelection;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.TypedValue;
+import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.persister.entity.PropertyMapping;
 import org.hibernate.persister.entity.Queryable;
-import org.hibernate.sql.JoinType;
 import org.hibernate.type.AssociationType;
-import org.hibernate.type.CollectionType;
 import org.hibernate.type.StringRepresentableType;
 import org.hibernate.type.Type;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.StringHelper;
 
 /**
  * @author Gavin King
@@ -75,17 +73,16 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	private final CriteriaImpl rootCriteria;
 	private final String rootEntityName;
 	private final String rootSQLAlias;
+	private int aliasCount = 0;
 
-	private final Map<Criteria, CriteriaInfoProvider> criteriaInfoMap = new LinkedHashMap<Criteria, CriteriaInfoProvider>();
-	private final Map<String, CriteriaInfoProvider> nameCriteriaInfoMap = new LinkedHashMap<String, CriteriaInfoProvider>();
-	private final Map<Criteria, String> criteriaSQLAliasMap = new HashMap<Criteria, String>();
-	private final Map<String, Criteria> aliasCriteriaMap = new HashMap<String, Criteria>();
-	private final Map<String, Criteria> associationPathCriteriaMap = new LinkedHashMap<String, Criteria>();
-	private final Map<String, JoinType> associationPathJoinTypesMap = new LinkedHashMap<String,JoinType>();
-	private final Map<String, Criterion> withClauseMap = new HashMap<String, Criterion>();
+	private final Map criteriaEntityNames = new LinkedHashMap();
+	private final Map criteriaSQLAliasMap = new HashMap();
+	private final Map aliasCriteriaMap = new HashMap();
+	private final Map associationPathCriteriaMap = new LinkedHashMap();
+	private final Map associationPathJoinTypesMap = new LinkedHashMap();
+	private final Map withClauseMap = new HashMap();
 	
 	private final SessionFactoryImplementor sessionFactory;
-	private final SessionFactoryHelper helper;
 
 	public CriteriaQueryTranslator(
 			final SessionFactoryImplementor factory,
@@ -106,15 +103,13 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 		this.rootEntityName = rootEntityName;
 		this.sessionFactory = factory;
 		this.rootSQLAlias = rootSQLAlias;
-		this.helper = new SessionFactoryHelper(factory);
 		createAliasCriteriaMap();
 		createAssociationPathCriteriaMap();
 		createCriteriaEntityNameMap();
 		createCriteriaSQLAliasMap();
 	}
-	@Override
+
 	public String generateSQLAlias() {
-		int aliasCount = 0;
 		return StringHelper.generateAlias( Criteria.ROOT_ALIAS, aliasCount ) + '_';
 	}
 
@@ -123,35 +118,37 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	private Criteria getAliasedCriteria(String alias) {
-		return aliasCriteriaMap.get( alias );
+		return ( Criteria ) aliasCriteriaMap.get( alias );
 	}
 
 	public boolean isJoin(String path) {
 		return associationPathCriteriaMap.containsKey( path );
 	}
 
-	public JoinType getJoinType(String path) {
-		JoinType result = associationPathJoinTypesMap.get( path );
-		return ( result == null ? JoinType.INNER_JOIN : result );
+	public int getJoinType(String path) {
+		Integer result = ( Integer ) associationPathJoinTypesMap.get( path );
+		return ( result == null ? Criteria.INNER_JOIN : result.intValue() );
 	}
 
 	public Criteria getCriteria(String path) {
-		return associationPathCriteriaMap.get( path );
+		return ( Criteria ) associationPathCriteriaMap.get( path );
 	}
 
-	public Set<Serializable> getQuerySpaces() {
-		Set<Serializable> result = new HashSet<Serializable>();
-		for ( CriteriaInfoProvider info : criteriaInfoMap.values() ) {
-			result.addAll( Arrays.asList( info.getSpaces() ) );
+	public Set getQuerySpaces() {
+		Set result = new HashSet();
+		Iterator iter = criteriaEntityNames.values().iterator();
+		while ( iter.hasNext() ) {
+			String entityName = ( String ) iter.next();
+			result.addAll( Arrays.asList( getFactory().getEntityPersister( entityName ).getQuerySpaces() ) );
 		}
 		return result;
 	}
 
 	private void createAliasCriteriaMap() {
 		aliasCriteriaMap.put( rootCriteria.getAlias(), rootCriteria );
-		Iterator<CriteriaImpl.Subcriteria> iter = rootCriteria.iterateSubcriteria();
+		Iterator iter = rootCriteria.iterateSubcriteria();
 		while ( iter.hasNext() ) {
-			Criteria subcriteria = iter.next();
+			Criteria subcriteria = ( Criteria ) iter.next();
 			if ( subcriteria.getAlias() != null ) {
 				Object old = aliasCriteriaMap.put( subcriteria.getAlias(), subcriteria );
 				if ( old != null ) {
@@ -162,22 +159,23 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	private void createAssociationPathCriteriaMap() {
-		final Iterator<CriteriaImpl.Subcriteria> iter = rootCriteria.iterateSubcriteria();
+		Iterator iter = rootCriteria.iterateSubcriteria();
 		while ( iter.hasNext() ) {
-			CriteriaImpl.Subcriteria crit = iter.next();
+			CriteriaImpl.Subcriteria crit = ( CriteriaImpl.Subcriteria ) iter.next();
 			String wholeAssociationPath = getWholeAssociationPath( crit );
 			Object old = associationPathCriteriaMap.put( wholeAssociationPath, crit );
 			if ( old != null ) {
 				throw new QueryException( "duplicate association path: " + wholeAssociationPath );
 			}
-			JoinType joinType = crit.getJoinType();
-			old = associationPathJoinTypesMap.put( wholeAssociationPath, joinType );
+			int joinType = crit.getJoinType();
+			old = associationPathJoinTypesMap.put( wholeAssociationPath, new Integer( joinType ) );
 			if ( old != null ) {
 				// TODO : not so sure this is needed...
 				throw new QueryException( "duplicate association path: " + wholeAssociationPath );
 			}
-			if ( crit.getWithClause() != null ) {
-				this.withClauseMap.put( wholeAssociationPath, crit.getWithClause() );
+			if ( crit.getWithClause() != null )
+			{
+				this.withClauseMap.put(wholeAssociationPath, crit.getWithClause());
 			}
 		}
 	}
@@ -195,7 +193,7 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 				// and the qualifier is not the alias of this criteria
 				//      -> check to see if we belong to some criteria other
 				//          than the one that created us
-				parent = aliasCriteriaMap.get( testAlias );
+				parent = ( Criteria ) aliasCriteriaMap.get( testAlias );
 			}
 		}
 		if ( parent == null ) {
@@ -217,69 +215,39 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	private void createCriteriaEntityNameMap() {
-		// initialize the rootProvider first
-		final CriteriaInfoProvider rootProvider = new EntityCriteriaInfoProvider(
-				(Queryable) sessionFactory.getEntityPersister( rootEntityName )
-		);
-		criteriaInfoMap.put( rootCriteria, rootProvider);
-		nameCriteriaInfoMap.put( rootProvider.getName(), rootProvider );
-
-		for ( final String key : associationPathCriteriaMap.keySet() ) {
-			final Criteria value = associationPathCriteriaMap.get( key );
-			final CriteriaInfoProvider info = getPathInfo( key );
-			criteriaInfoMap.put( value, info );
-			nameCriteriaInfoMap.put( info.getName(), info );
+		criteriaEntityNames.put( rootCriteria, rootEntityName );
+		Iterator iter = associationPathCriteriaMap.entrySet().iterator();
+		while ( iter.hasNext() ) {
+			Map.Entry me = ( Map.Entry ) iter.next();
+			criteriaEntityNames.put(
+					me.getValue(), //the criteria instance
+			        getPathEntityName( ( String ) me.getKey() )
+			);
 		}
 	}
 
-
-	private CriteriaInfoProvider getPathInfo(String path) {
+	private String getPathEntityName(String path) {
+		Queryable persister = ( Queryable ) sessionFactory.getEntityPersister( rootEntityName );
 		StringTokenizer tokens = new StringTokenizer( path, "." );
 		String componentPath = "";
-
-		// start with the 'rootProvider'
-		CriteriaInfoProvider provider = nameCriteriaInfoMap.get( rootEntityName );
-
 		while ( tokens.hasMoreTokens() ) {
 			componentPath += tokens.nextToken();
-			final Type type = provider.getType( componentPath );
+			Type type = persister.toType( componentPath );
 			if ( type.isAssociationType() ) {
-				// CollectionTypes are always also AssociationTypes - but there's not always an associated entity...
-				final AssociationType atype = (AssociationType) type;
-				final CollectionType ctype = type.isCollectionType() ? (CollectionType)type : null;
-				final Type elementType = (ctype != null) ? ctype.getElementType( sessionFactory ) : null;
-				// is the association a collection of components or value-types? (i.e a colloction of valued types?)
-				if ( ctype != null  && elementType.isComponentType() ) {
-					provider = new ComponentCollectionCriteriaInfoProvider( helper.getCollectionPersister(ctype.getRole()) );
-				}
-				else if ( ctype != null && !elementType.isEntityType() ) {
-					provider = new ScalarCollectionCriteriaInfoProvider( helper, ctype.getRole() );
-				}
-				else {
-					provider = new EntityCriteriaInfoProvider(
-							(Queryable) sessionFactory.getEntityPersister( atype.getAssociatedEntityName( sessionFactory ) )
-					);
-				}
-				
+				AssociationType atype = ( AssociationType ) type;
+				persister = ( Queryable ) sessionFactory.getEntityPersister(
+						atype.getAssociatedEntityName( sessionFactory )
+				);
 				componentPath = "";
 			}
 			else if ( type.isComponentType() ) {
-				if (!tokens.hasMoreTokens()) {
-					throw new QueryException(
-							"Criteria objects cannot be created directly on components.  Create a criteria on " +
-									"owning entity and use a dotted property to access component property: " + path
-					);
-				}
-				else {
-					componentPath += '.';
-				}
+				componentPath += '.';
 			}
 			else {
 				throw new QueryException( "not an association: " + componentPath );
 			}
 		}
-		
-		return provider;
+		return persister.getEntityName();
 	}
 
 	public int getSQLAliasCount() {
@@ -288,16 +256,16 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 
 	private void createCriteriaSQLAliasMap() {
 		int i = 0;
-		for(final Criteria crit : criteriaInfoMap.keySet()){
-			final CriteriaInfoProvider value = criteriaInfoMap.get( crit );
+		Iterator criteriaIterator = criteriaEntityNames.entrySet().iterator();
+		while ( criteriaIterator.hasNext() ) {
+			Map.Entry me = ( Map.Entry ) criteriaIterator.next();
+			Criteria crit = ( Criteria ) me.getKey();
 			String alias = crit.getAlias();
 			if ( alias == null ) {
-				// the entity name
-				alias = value.getName();
+				alias = ( String ) me.getValue(); // the entity name
 			}
 			criteriaSQLAliasMap.put( crit, StringHelper.generateAlias( alias, i++ ) );
 		}
-
 		criteriaSQLAliasMap.put( rootCriteria, rootSQLAlias );
 	}
 
@@ -306,33 +274,34 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	public QueryParameters getQueryParameters() {
-		final RowSelection selection = new RowSelection();
+		LockOptions lockOptions = new LockOptions();
+		RowSelection selection = new RowSelection();
 		selection.setFirstRow( rootCriteria.getFirstResult() );
 		selection.setMaxRows( rootCriteria.getMaxResults() );
 		selection.setTimeout( rootCriteria.getTimeout() );
 		selection.setFetchSize( rootCriteria.getFetchSize() );
 
-		final LockOptions lockOptions = new LockOptions();
-		final Map<String, LockMode> lockModeMap = rootCriteria.getLockModes();
-		for ( final String key : lockModeMap.keySet() ) {
-			final Criteria subcriteria = getAliasedCriteria( key );
-			lockOptions.setAliasSpecificLockMode( getSQLAlias( subcriteria ), lockModeMap.get( key ) );
+		Iterator iter = rootCriteria.getLockModes().entrySet().iterator();
+		while ( iter.hasNext() ) {
+			Map.Entry me = ( Map.Entry ) iter.next();
+			final Criteria subcriteria = getAliasedCriteria( ( String ) me.getKey() );
+			lockOptions.setAliasSpecificLockMode( getSQLAlias( subcriteria ), (LockMode)me.getValue() );
 		}
-
-		final List<Object> values = new ArrayList<Object>();
-		final List<Type> types = new ArrayList<Type>();
-		final Iterator<CriteriaImpl.Subcriteria> subcriteriaIterator = rootCriteria.iterateSubcriteria();
-		while ( subcriteriaIterator.hasNext() ) {
-			final CriteriaImpl.Subcriteria subcriteria = subcriteriaIterator.next();
-			final LockMode lm = subcriteria.getLockMode();
+		List values = new ArrayList();
+		List types = new ArrayList();
+		iter = rootCriteria.iterateSubcriteria();
+		while ( iter.hasNext() ) {
+			CriteriaImpl.Subcriteria subcriteria = ( CriteriaImpl.Subcriteria ) iter.next();
+			LockMode lm = subcriteria.getLockMode();
 			if ( lm != null ) {
 				lockOptions.setAliasSpecificLockMode( getSQLAlias( subcriteria ), lm );
 			}
-			if ( subcriteria.getWithClause() != null ) {
-				final TypedValue[] tv = subcriteria.getWithClause().getTypedValues( subcriteria, this );
-				for ( TypedValue aTv : tv ) {
-					values.add( aTv.getValue() );
-					types.add( aTv.getType() );
+			if ( subcriteria.getWithClause() != null )
+			{
+				TypedValue[] tv = subcriteria.getWithClause().getTypedValues( subcriteria, this );
+				for ( int i = 0; i < tv.length; i++ ) {
+					values.add( tv[i].getValue() );
+					types.add( tv[i].getType() );
 				}
 			}
 		}
@@ -340,29 +309,28 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 		// Type and value gathering for the WHERE clause needs to come AFTER lock mode gathering,
 		// because the lock mode gathering loop now contains join clauses which can contain
 		// parameter bindings (as in the HQL WITH clause).
-		final Iterator<CriteriaImpl.CriterionEntry> iter = rootCriteria.iterateExpressionEntries();
+		iter = rootCriteria.iterateExpressionEntries();
 		while ( iter.hasNext() ) {
-			final CriteriaImpl.CriterionEntry ce = iter.next();
-			final TypedValue[] tv = ce.getCriterion().getTypedValues( ce.getCriteria(), this );
-			for ( TypedValue aTv : tv ) {
-				values.add( aTv.getValue() );
-				types.add( aTv.getType() );
+			CriteriaImpl.CriterionEntry ce = ( CriteriaImpl.CriterionEntry ) iter.next();
+			TypedValue[] tv = ce.getCriterion().getTypedValues( ce.getCriteria(), this );
+			for ( int i = 0; i < tv.length; i++ ) {
+				values.add( tv[i].getValue() );
+				types.add( tv[i].getType() );
 			}
 		}
 
-		final Object[] valueArray = values.toArray();
-		final Type[] typeArray = ArrayHelper.toTypeArray( types );
+		Object[] valueArray = values.toArray();
+		Type[] typeArray = ArrayHelper.toTypeArray( types );
 		return new QueryParameters(
 				typeArray,
 		        valueArray,
 		        lockOptions,
 		        selection,
 		        rootCriteria.isReadOnlyInitialized(),
-		        ( rootCriteria.isReadOnlyInitialized() && rootCriteria.isReadOnly() ),
+		        ( rootCriteria.isReadOnlyInitialized() ? rootCriteria.isReadOnly() : false ),
 		        rootCriteria.getCacheable(),
 		        rootCriteria.getCacheRegion(),
 		        rootCriteria.getComment(),
-		        rootCriteria.getQueryHints(),
 		        rootCriteria.isLookupByNaturalKey(),
 		        rootCriteria.getResultTransformer()
 		);
@@ -390,11 +358,6 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 		);
 	}
 
-	/* package-protected */
-	Type getResultType(Criteria criteria) {
-		return getFactory().getTypeResolver().getTypeFactory().manyToOne( getEntityName( criteria ) );
-	}
-
 	public Type[] getProjectedTypes() {
 		return rootCriteria.getProjection().getTypes( rootCriteria, this );
 	}
@@ -410,10 +373,10 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	public String getWhereCondition() {
-		StringBuilder condition = new StringBuilder( 30 );
-		Iterator<CriteriaImpl.CriterionEntry> criterionIterator = rootCriteria.iterateExpressionEntries();
+		StringBuffer condition = new StringBuffer( 30 );
+		Iterator criterionIterator = rootCriteria.iterateExpressionEntries();
 		while ( criterionIterator.hasNext() ) {
-			CriteriaImpl.CriterionEntry entry = criterionIterator.next();
+			CriteriaImpl.CriterionEntry entry = ( CriteriaImpl.CriterionEntry ) criterionIterator.next();
 			String sqlString = entry.getCriterion().toSqlString( entry.getCriteria(), this );
 			condition.append( sqlString );
 			if ( criterionIterator.hasNext() ) {
@@ -424,10 +387,10 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	}
 
 	public String getOrderBy() {
-		StringBuilder orderBy = new StringBuilder( 30 );
-		Iterator<CriteriaImpl.OrderEntry> criterionIterator = rootCriteria.iterateOrderings();
+		StringBuffer orderBy = new StringBuffer( 30 );
+		Iterator criterionIterator = rootCriteria.iterateOrderings();
 		while ( criterionIterator.hasNext() ) {
-			CriteriaImpl.OrderEntry oe = criterionIterator.next();
+			CriteriaImpl.OrderEntry oe = ( CriteriaImpl.OrderEntry ) criterionIterator.next();
 			orderBy.append( oe.getOrder().toSqlString( oe.getCriteria(), this ) );
 			if ( criterionIterator.hasNext() ) {
 				orderBy.append( ", " );
@@ -435,20 +398,19 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 		}
 		return orderBy.toString();
 	}
-	@Override
+
 	public SessionFactoryImplementor getFactory() {
 		return sessionFactory;
 	}
-	@Override
+
 	public String getSQLAlias(Criteria criteria) {
-		return criteriaSQLAliasMap.get( criteria );
+		return ( String ) criteriaSQLAliasMap.get( criteria );
 	}
-	@Override
+
 	public String getEntityName(Criteria criteria) {
-		final CriteriaInfoProvider infoProvider = criteriaInfoMap.get( criteria );
-		return infoProvider != null ? infoProvider.getName() : null;
+		return ( String ) criteriaEntityNames.get( criteria );
 	}
-	@Override
+
 	public String getColumn(Criteria criteria, String propertyName) {
 		String[] cols = getColumns( propertyName, criteria );
 		if ( cols.length != 1 ) {
@@ -461,7 +423,6 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	 * Get the names of the columns constrained
 	 * by this criterion.
 	 */
-	@Override
 	public String[] getColumnsUsingProjection(
 			Criteria subcriteria,
 	        String propertyName) throws HibernateException {
@@ -496,22 +457,26 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 			return projectionColumns;
 		}
 	}
-	@Override
-	public String[] getIdentifierColumns(Criteria criteria) {
+
+	public String[] getIdentifierColumns(Criteria subcriteria) {
 		String[] idcols =
-				( ( Loadable ) getPropertyMapping( getEntityName( criteria ) ) ).getIdentifierColumnNames();
-		return StringHelper.qualify( getSQLAlias( criteria ), idcols );
+				( ( Loadable ) getPropertyMapping( getEntityName( subcriteria ) ) ).getIdentifierColumnNames();
+		return StringHelper.qualify( getSQLAlias( subcriteria ), idcols );
 	}
-	@Override
-	public Type getIdentifierType(Criteria criteria) {
-		return ( ( Loadable ) getPropertyMapping( getEntityName( criteria ) ) ).getIdentifierType();
+
+	public Type getIdentifierType(Criteria subcriteria) {
+		return ( ( Loadable ) getPropertyMapping( getEntityName( subcriteria ) ) ).getIdentifierType();
 	}
-	@Override
-	public TypedValue getTypedIdentifierValue(Criteria criteria, Object value) {
-		final Loadable loadable = ( Loadable ) getPropertyMapping( getEntityName( criteria ) );
-		return new TypedValue( loadable.getIdentifierType(), value );
+
+	public TypedValue getTypedIdentifierValue(Criteria subcriteria, Object value) {
+		final Loadable loadable = ( Loadable ) getPropertyMapping( getEntityName( subcriteria ) );
+		return new TypedValue(
+				loadable.getIdentifierType(),
+		        value,
+		        EntityMode.POJO
+		);
 	}
-	@Override
+
 	public String[] getColumns(
 			String propertyName,
 	        Criteria subcriteria) throws HibernateException {
@@ -527,7 +492,6 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	 * property path is not found in subcriteria, try the "outer" query.
 	 * Projection aliases are ignored.
 	 */
-	@Override
 	public String[] findColumns(String propertyName, Criteria subcriteria )
 	throws HibernateException {
 		try {
@@ -543,7 +507,7 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 			}
 		}
 	}
-	@Override
+
 	public Type getTypeUsingProjection(Criteria subcriteria, String propertyName)
 			throws HibernateException {
 
@@ -577,7 +541,7 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 			return projectionTypes[0];
 		}
 	}
-	@Override
+
 	public Type getType(Criteria subcriteria, String propertyName)
 			throws HibernateException {
 		return getPropertyMapping( getEntityName( subcriteria, propertyName ) )
@@ -587,89 +551,97 @@ public class CriteriaQueryTranslator implements CriteriaQuery {
 	/**
 	 * Get the a typed value for the given property value.
 	 */
-	@Override
-	public TypedValue getTypedValue(Criteria subcriteria, String propertyName, Object value) throws HibernateException {
+	public TypedValue getTypedValue(Criteria subcriteria, String propertyName, Object value)
+			throws HibernateException {
 		// Detect discriminator values...
 		if ( value instanceof Class ) {
-			final Class entityClass = (Class) value;
-			final Queryable q = SessionFactoryHelper.findQueryableUsingImports( sessionFactory, entityClass.getName() );
+			Class entityClass = ( Class ) value;
+			Queryable q = SessionFactoryHelper.findQueryableUsingImports( sessionFactory, entityClass.getName() );
 			if ( q != null ) {
-				final Type type = q.getDiscriminatorType();
+				Type type = q.getDiscriminatorType();
 				String stringValue = q.getDiscriminatorSQLValue();
-				if ( stringValue != null
-						&& stringValue.length() > 2
-						&& stringValue.startsWith( "'" )
-						&& stringValue.endsWith( "'" ) ) {
-					// remove the single quotes
-					stringValue = stringValue.substring( 1, stringValue.length() - 1 );
+				if (stringValue != null && stringValue.length() > 2
+						&& stringValue.startsWith("'")
+						&& stringValue.endsWith("'")) { // remove the single
+														// quotes
+					stringValue = stringValue.substring(1,
+							stringValue.length() - 1);
 				}
 				
 				// Convert the string value into the proper type.
 				if ( type instanceof StringRepresentableType ) {
-					final StringRepresentableType nullableType = (StringRepresentableType) type;
+					StringRepresentableType nullableType = (StringRepresentableType) type;
 					value = nullableType.fromStringValue( stringValue );
 				}
 				else {
 					throw new QueryException( "Unsupported discriminator type " + type );
 				}
-				return new TypedValue( type, value );
+				return new TypedValue(
+						type,
+				        value,
+				        EntityMode.POJO
+				);
 			}
 		}
 		// Otherwise, this is an ordinary value.
-		return new TypedValue( getTypeUsingProjection( subcriteria, propertyName ), value );
+		return new TypedValue(
+				getTypeUsingProjection( subcriteria, propertyName ),
+		        value,
+		        EntityMode.POJO
+		);
 	}
 
-	private PropertyMapping getPropertyMapping(String entityName) throws MappingException {
-		final CriteriaInfoProvider info = nameCriteriaInfoMap.get( entityName );
-		if ( info == null ) {
-			throw new HibernateException( "Unknown entity: " + entityName );
-		}
-		return info.getPropertyMapping();
+	private PropertyMapping getPropertyMapping(String entityName)
+			throws MappingException {
+		return ( PropertyMapping ) sessionFactory.getEntityPersister( entityName );
 	}
 
 	//TODO: use these in methods above
-	@Override
+
 	public String getEntityName(Criteria subcriteria, String propertyName) {
 		if ( propertyName.indexOf( '.' ) > 0 ) {
-			final String root = StringHelper.root( propertyName );
-			final Criteria crit = getAliasedCriteria( root );
+			String root = StringHelper.root( propertyName );
+			Criteria crit = getAliasedCriteria( root );
 			if ( crit != null ) {
 				return getEntityName( crit );
 			}
 		}
 		return getEntityName( subcriteria );
 	}
-	@Override
+
 	public String getSQLAlias(Criteria criteria, String propertyName) {
 		if ( propertyName.indexOf( '.' ) > 0 ) {
-			final String root = StringHelper.root( propertyName );
-			final Criteria subcriteria = getAliasedCriteria( root );
+			String root = StringHelper.root( propertyName );
+			Criteria subcriteria = getAliasedCriteria( root );
 			if ( subcriteria != null ) {
 				return getSQLAlias( subcriteria );
 			}
 		}
 		return getSQLAlias( criteria );
 	}
-	@Override
+
 	public String getPropertyName(String propertyName) {
 		if ( propertyName.indexOf( '.' ) > 0 ) {
-			final String root = StringHelper.root( propertyName );
-			final Criteria criteria = getAliasedCriteria( root );
-			if ( criteria != null ) {
+			String root = StringHelper.root( propertyName );
+			Criteria crit = getAliasedCriteria( root );
+			if ( crit != null ) {
 				return propertyName.substring( root.length() + 1 );
 			}
 		}
 		return propertyName;
 	}
 
-	public String getWithClause(String path) {
-		final Criterion criterion = withClauseMap.get( path );
-		return criterion == null ? null : criterion.toSqlString( getCriteria( path ), this );
+	public String getWithClause(String path)
+	{
+		final Criterion crit = (Criterion)this.withClauseMap.get(path);
+		return crit == null ? null : crit.toSqlString(getCriteria(path), this);
 	}
 
-	public boolean hasRestriction(String path) {
-		final CriteriaImpl.Subcriteria subcriteria = (CriteriaImpl.Subcriteria) getCriteria( path );
-		return subcriteria != null && subcriteria.hasRestriction();
+	public boolean hasRestriction(String path)
+	{
+		final CriteriaImpl.Subcriteria crit = ( CriteriaImpl.Subcriteria ) getCriteria( path );
+		return crit == null ? false : crit.hasRestriction();
 	}
+
 
 }

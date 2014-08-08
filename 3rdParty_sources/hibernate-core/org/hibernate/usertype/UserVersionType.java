@@ -23,9 +23,10 @@
  *
  */
 package org.hibernate.usertype;
+
 import java.util.Comparator;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * A user type that may be used for a version property

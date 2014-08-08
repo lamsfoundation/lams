@@ -24,6 +24,18 @@
  */
 package org.hibernate.tool.hbm2ddl;
 
+import org.hibernate.HibernateException;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.NamingStrategy;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.ReflectHelper;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.MatchingTask;
+import org.apache.tools.ant.types.FileSet;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,18 +44,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import org.hibernate.HibernateException;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.NamingStrategy;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.internal.util.collections.ArrayHelper;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.MatchingTask;
-import org.apache.tools.ant.types.FileSet;
 
 /**
  * An Ant task for <tt>SchemaExport</tt>.
@@ -72,16 +72,16 @@ import org.apache.tools.ant.types.FileSet;
 public class SchemaExportTask extends MatchingTask {
 
 	private List fileSets = new LinkedList();
-	private File propertiesFile;
-	private File configurationFile;
-	private File outputFile;
-	private boolean quiet;
-	private boolean text;
-	private boolean drop;
-	private boolean create;
-	private boolean haltOnError;
-	private String delimiter;
-	private String namingStrategy;
+	private File propertiesFile = null;
+	private File configurationFile = null;
+	private File outputFile = null;
+	private boolean quiet = false;
+	private boolean text = false;
+	private boolean drop = false;
+	private boolean create = false;
+	private boolean haltOnError = false;
+	private String delimiter = null;
+	private String namingStrategy = null;
 
 	public void addFileset(FileSet set) {
 		fileSets.add(set);
@@ -164,8 +164,7 @@ public class SchemaExportTask extends MatchingTask {
 	/**
 	 * Execute the task
 	 */
-	@Override
-    public void execute() throws BuildException {
+	public void execute() throws BuildException {
 		try {
 			getSchemaExport( getConfiguration() ).execute(!quiet, !text, drop, create);
 		}

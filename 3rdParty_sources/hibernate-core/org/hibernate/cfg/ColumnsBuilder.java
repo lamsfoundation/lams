@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.JoinColumn;
@@ -33,6 +34,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.AnnotationException;
+import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
@@ -40,7 +42,7 @@ import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.cfg.annotations.EntityBinder;
 import org.hibernate.cfg.annotations.Nullability;
-import org.hibernate.internal.util.StringHelper;
+import org.hibernate.util.StringHelper;
 
 /**
  * Do the initial discovery of columns metadata and apply defaults.
@@ -112,6 +114,7 @@ class ColumnsBuilder {
 		}
 		else if ( joinColumns == null &&
 				( property.isAnnotationPresent( OneToMany.class )
+						|| property.isAnnotationPresent( CollectionOfElements.class ) //legacy Hibernate
 						|| property.isAnnotationPresent( ElementCollection.class )
 				) ) {
 			OneToMany oneToMany = property.getAnnotation( OneToMany.class );

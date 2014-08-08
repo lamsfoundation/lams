@@ -25,8 +25,8 @@ package org.hibernate.type.descriptor.java;
 
 import org.hibernate.type.descriptor.WrapperOptions;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
 
 /**
  * Descriptor for {@link Boolean} handling.
@@ -58,17 +58,16 @@ public class BooleanTypeDescriptor extends AbstractTypeDescriptor<Boolean> {
 		stringValueTrue = String.valueOf( characterValueTrue );
 		stringValueFalse = String.valueOf( characterValueFalse );
 	}
-	@Override
+
 	public String toString(Boolean value) {
 		return value == null ? null : value.toString();
 	}
-	@Override
+
 	public Boolean fromString(String string) {
 		return Boolean.valueOf( string );
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Boolean value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -96,7 +95,8 @@ public class BooleanTypeDescriptor extends AbstractTypeDescriptor<Boolean> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public <X> Boolean wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -109,7 +109,7 @@ public class BooleanTypeDescriptor extends AbstractTypeDescriptor<Boolean> {
 			return intValue == 0 ? FALSE : TRUE;
 		}
 		if ( Character.class.isInstance( value ) ) {
-			return isTrue( (Character) value ) ? TRUE : FALSE;
+			return isTrue( ( (Character) value ).charValue() ) ? TRUE : FALSE;
 		}
 		if ( String.class.isInstance( value ) ) {
 			return isTrue( ( (String) value ).charAt( 0 ) ) ? TRUE : FALSE;
@@ -125,19 +125,23 @@ public class BooleanTypeDescriptor extends AbstractTypeDescriptor<Boolean> {
 		return value ? 1 : 0;
 	}
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Byte toByte(Boolean value) {
-		return (byte) toInt( value );
+		return Byte.valueOf( (byte) toInt( value ) );
 	}
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Short toShort(Boolean value) {
-		return (short) toInt( value );
+		return Short.valueOf( (short ) toInt( value ) );
 	}
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Integer toInteger(Boolean value) {
-		return toInt( value );
+		return Integer.valueOf( toInt( value ) );
 	}
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public Long toLong(Boolean value) {
-		return (long) toInt( value );
+		return Long.valueOf( toInt( value ) );
 	}
 }

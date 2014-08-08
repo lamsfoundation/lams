@@ -22,12 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.proxy;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.CompositeType;
 
 /**
@@ -63,11 +64,11 @@ public interface ProxyFactory {
 	 */
 	public void postInstantiate(
 			String entityName,
-			Class persistentClass,
-			Set interfaces,
-			Method getIdentifierMethod,
-			Method setIdentifierMethod,
-			CompositeType componentIdType) throws HibernateException;
+	        Class persistentClass,
+	        Set interfaces,
+	        Method getIdentifierMethod,
+	        Method setIdentifierMethod,
+	        CompositeType componentIdType) throws HibernateException;
 
 	/**
 	 * Create a new proxy instance

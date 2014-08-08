@@ -23,6 +23,8 @@
  *
  */
 package org.hibernate.persister.entity;
+
+import org.hibernate.persister.entity.DiscriminatorMetadata;
 import org.hibernate.sql.SelectFragment;
 
 /**
@@ -53,7 +55,7 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	public String getDiscriminatorSQLValue();
 
 	/**
-	 * Given a query alias and an identifying suffix, render the identifier select fragment.
+	 * Given a query alias and an identifying suffix, render the intentifier select fragment.
 	 */
 	public String identifierSelectFragment(String name, String suffix);
 	/**
@@ -68,16 +70,16 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	public String[] getIdentifierColumnNames();
 
 	/**
-	 * Is the inheritance hierarchy described by this persister contained across
+	 * Is the inheritence hierarchy described by this persister contained across
 	 * multiple tables?
 	 *
-	 * @return True if the inheritance hierarchy is spread across multiple tables; false otherwise.
+	 * @return True if the inheritence hierarchy is spread across multiple tables; false otherwise.
 	 */
 	public boolean isMultiTable();
 
 	/**
 	 * Get the names of all tables used in the hierarchy (up and down) ordered such
-	 * that deletes in the given order would not cause constraint violations.
+	 * that deletes in the given order would not cause contraint violations.
 	 *
 	 * @return The ordered array of table names.
 	 */
@@ -91,8 +93,9 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	 * {@link #getConstraintOrderedTableNameClosure()}.
 	 * <p/>
 	 * The second dimension should have the same length across all the elements in
-	 * the first dimension.  If not, that would be a problem ;)
+	 * the first dimension.  If not, that'd be a problem ;)
 	 *
+	 * @return
 	 */
 	public String[][] getContraintOrderedTableKeyColumnClosure();
 
@@ -121,7 +124,7 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	 * It is also relative to the indexing used to resolve {@link #getSubclassTableName}...
 	 *
 	 * @param propertyPath The name of the property.
-	 * @return The number of the table to which the property is mapped.
+	 * @return The nunber of the table to which the property is mapped.
 	 */
 	public int getSubclassPropertyTableNumber(String propertyPath);
 
@@ -142,6 +145,7 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	 * array.
 	 *
 	 * @param number The index into the internal array.
+	 * @return
 	 */
 	public String getSubclassTableName(int number);
 
@@ -155,7 +159,7 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	 * enabled-filters).
 	 * </p>
 	 * This may or may not be different from the root alias depending upon the
-	 * inheritance mapping strategy.
+	 * inheritence mapping strategy.
 	 *
 	 * @param rootAlias The root alias
 	 * @return The alias used for "filter conditions" within the where clause.
@@ -169,8 +173,6 @@ public interface Queryable extends Loadable, PropertyMapping, Joinable {
 	 * @return The entity discriminator metadata
 	 */
 	public DiscriminatorMetadata getTypeDiscriminatorMetadata();
-
-	String[][] getSubclassPropertyFormulaTemplateClosure();
 
 	public static class Declarer {
 		public static final Declarer CLASS = new Declarer( "class" );

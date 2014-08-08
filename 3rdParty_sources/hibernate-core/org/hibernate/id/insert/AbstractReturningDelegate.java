@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,22 +20,23 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.id.insert;
+
+import org.hibernate.id.PostInsertIdentityPersister;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.JDBCExceptionHelper;
+import org.hibernate.pretty.MessageHelper;
+
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.id.PostInsertIdentityPersister;
-import org.hibernate.pretty.MessageHelper;
-
 /**
  * Abstract InsertGeneratedIdentifierDelegate implementation where the
- * underlying strategy causes the enerated identitifer to be returned as an
+ * underlying strategy causes the generated identifier to be returned as an
  * effect of performing the insert statement.  Thus, there is no need for an
- * additional sql statement to determine the generated identitifer.
+ * additional sql statement to determine the generated identifier.
  *
  * @author Steve Ebersole
  */
@@ -46,27 +47,25 @@ public abstract class AbstractReturningDelegate implements InsertGeneratedIdenti
 		this.persister = persister;
 	}
 
-	public final Serializable performInsert(
-			String insertSQL,
-			SessionImplementor session,
-			Binder binder) {
+	public final Serializable performInsert(String insertSQL, SessionImplementor session, Binder binder) {
 		try {
 			// prepare and execute the insert
 			PreparedStatement insert = prepare( insertSQL, session );
 			try {
 				binder.bindValues( insert );
-				return executeAndExtract( insert, session );
+				return executeAndExtract( insert );
 			}
 			finally {
 				releaseStatement( insert, session );
 			}
 		}
 		catch ( SQLException sqle ) {
-			throw session.getFactory().getSQLExceptionHelper().convert(
-			        sqle,
-			        "could not insert: " + MessageHelper.infoString( persister ),
-			        insertSQL
-				);
+			throw JDBCExceptionHelper.convert(
+					session.getFactory().getSQLExceptionConverter(),
+					sqle,
+					"could not insert: " + MessageHelper.infoString( persister ),
+					insertSQL
+			);
 		}
 	}
 
@@ -76,9 +75,9 @@ public abstract class AbstractReturningDelegate implements InsertGeneratedIdenti
 
 	protected abstract PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException;
 
-	protected abstract Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException;
+	protected abstract Serializable executeAndExtract(PreparedStatement insert) throws SQLException;
 
 	protected void releaseStatement(PreparedStatement insert, SessionImplementor session) throws SQLException {
-		session.getTransactionCoordinator().getJdbcCoordinator().release( insert );
+		session.getBatcher().closeStatement( insert );
 	}
 }

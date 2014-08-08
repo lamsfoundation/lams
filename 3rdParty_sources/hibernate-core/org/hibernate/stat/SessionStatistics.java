@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.stat;
 
@@ -31,6 +32,7 @@ import java.util.Set;
  * @author Gavin King
  */
 public interface SessionStatistics {
+
 	/**
 	 * Get the number of entity instances associated with the session
 	 */
@@ -42,12 +44,12 @@ public interface SessionStatistics {
 
 	/**
 	 * Get the set of all <tt>EntityKey</tt>s
-	 * @see org.hibernate.engine.spi.EntityKey
+	 * @see org.hibernate.engine.EntityKey
 	 */
 	public Set getEntityKeys();
 	/**
 	 * Get the set of all <tt>CollectionKey</tt>s
-	 * @see org.hibernate.engine.spi.CollectionKey
+	 * @see org.hibernate.engine.CollectionKey
 	 */
 	public Set getCollectionKeys();
 	

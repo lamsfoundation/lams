@@ -23,7 +23,6 @@
  */
 package org.hibernate.cfg;
 
-
 /**
  * Type of annotation of a class will give its type
  *

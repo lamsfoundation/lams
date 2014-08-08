@@ -22,85 +22,44 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Extends {@link javax.persistence.NamedNativeQuery} with Hibernate features.
+ * Extends {@link javax.persistence.NamedNativeQuery} with Hibernate features
  *
  * @author Emmanuel Bernard
- *
- * @see org.hibernate.SQLQuery
  */
 @Target({TYPE, PACKAGE})
 @Retention(RUNTIME)
 public @interface NamedNativeQuery {
-	/**
-	 * The name.  It is a named query after all :)
-	 */
 	String name();
 
-	/**
-	 * The SQL query string.
-	 */
 	String query();
 
-	/**
-	 * The result Class.  Should not be used in conjunction with {@link #resultSetMapping()}
-	 */
 	Class resultClass() default void.class;
 
-	/**
-	 * The name of a SQLResultSetMapping to use.  Should not be used in conjunction with {@link #resultClass()}.
-	 */
-	String resultSetMapping() default "";
-
-	/**
-	 * The flush mode for the query.
-	 */
+	String resultSetMapping() default ""; // name of SQLResultSetMapping
+	/** the flush mode for the query */
 	FlushModeType flushMode() default FlushModeType.PERSISTENCE_CONTEXT;
-
-	/**
-	 * Whether the query (results) is cacheable or not.  Default is {@code false}, that is not cacheable.
-	 */
+	/** mark the query as cacheable or not */
 	boolean cacheable() default false;
-
-	/**
-	 * If the query results are cacheable, name the query cache region to use.
-	 */
+	/** the cache region to use */
 	String cacheRegion() default "";
-
-	/**
-	 * The number of rows fetched by the JDBC Driver per trip.
-	 */
+	/** the number of rows fetched by the JDBC Driver per roundtrip */
 	int fetchSize() default -1;
-
-	/**
-	 * The query timeout (in seconds).  Default is no timeout.
-	 */
+	/**the query timeout in seconds*/
 	int timeout() default -1;
 
-	/**
-	 * Does the SQL ({@link #query()}) represent a call to a procedure/function?
-	 */
 	boolean callable() default false;
-
-	/**
-	 * A comment added to the SQL query.  Useful when engaging with DBA.
-	 */
+	/**comment added to the SQL query, useful for the DBA */
 	String comment() default "";
-
-	/**
-	 * The cache mode used for this query.  This refers to entities/collections returned from the query.
-	 */
+	/**the cache mode used for this query*/
 	CacheModeType cacheMode() default CacheModeType.NORMAL;
-
-	/**
-	 * Whether the results should be read-only.  Default is {@code false}.
-	 */
+	/**marks whether the results are fetched in read-only mode or not*/
 	boolean readOnly() default false;
 }

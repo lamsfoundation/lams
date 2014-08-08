@@ -30,17 +30,15 @@ import java.util.StringTokenizer;
 import org.hibernate.EntityMode;
 import org.hibernate.MappingException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.spi.CascadeStyle;
-import org.hibernate.engine.spi.CascadeStyles;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.engine.CascadeStyle;
+import org.hibernate.engine.Mapping;
 import org.hibernate.property.Getter;
 import org.hibernate.property.PropertyAccessor;
 import org.hibernate.property.PropertyAccessorFactory;
 import org.hibernate.property.Setter;
-import org.hibernate.tuple.ValueGeneration;
 import org.hibernate.type.CompositeType;
 import org.hibernate.type.Type;
+import org.hibernate.util.ArrayHelper;
 
 /**
  * Represents a property as part of an entity or a component.
@@ -48,6 +46,7 @@ import org.hibernate.type.Type;
  * @author Gavin King
  */
 public class Property implements Serializable, MetaAttributable {
+
 	private String name;
 	private Value value;
 	private String cascade;
@@ -55,7 +54,7 @@ public class Property implements Serializable, MetaAttributable {
 	private boolean insertable = true;
 	private boolean selectable = true;
 	private boolean optimisticLocked = true;
-	private ValueGeneration valueGenerationStrategy;
+	private PropertyGeneration generation = PropertyGeneration.NEVER;
 	private String propertyAccessorName;
 	private boolean lazy;
 	private boolean optional;
@@ -63,7 +62,6 @@ public class Property implements Serializable, MetaAttributable {
 	private java.util.Map metaAttributes;
 	private PersistentClass persistentClass;
 	private boolean naturalIdentifier;
-	private boolean lob;
 
 	public boolean isBackRef() {
 		return false;
@@ -127,8 +125,8 @@ public class Property implements Serializable, MetaAttributable {
 		}
 		int length = compositeType.getSubtypes().length;
 		for ( int i=0; i<length; i++ ) {
-			if ( compositeType.getCascadeStyle(i) != CascadeStyles.NONE ) {
-				return CascadeStyles.ALL;
+			if ( compositeType.getCascadeStyle(i) != CascadeStyle.NONE ) {
+				return CascadeStyle.ALL;
 			}
 		}
 		return getCascadeStyle( cascade );
@@ -145,16 +143,16 @@ public class Property implements Serializable, MetaAttributable {
 	
 	private static CascadeStyle getCascadeStyle(String cascade) {
 		if ( cascade==null || cascade.equals("none") ) {
-			return CascadeStyles.NONE;
+			return CascadeStyle.NONE;
 		}
 		else {
 			StringTokenizer tokens = new StringTokenizer(cascade, ", ");
 			CascadeStyle[] styles = new CascadeStyle[ tokens.countTokens() ] ;
 			int i=0;
 			while ( tokens.hasMoreTokens() ) {
-				styles[i++] = CascadeStyles.getCascadeStyle( tokens.nextToken() );
+				styles[i++] = CascadeStyle.getCascadeStyle( tokens.nextToken() );
 			}
-			return new CascadeStyles.MultipleCascadeStyle(styles);
+			return new CascadeStyle.MultipleCascadeStyle(styles);
 		}		
 	}
 	
@@ -175,28 +173,32 @@ public class Property implements Serializable, MetaAttributable {
 	}
 
 	public boolean isUpdateable() {
-		// if the property mapping consists of all formulas,
+		// if the property mapping consists of all formulas, 
 		// make it non-updateable
-		return updateable && !ArrayHelper.isAllFalse( value.getColumnUpdateability() );
+		final boolean[] columnUpdateability = value.getColumnUpdateability();
+		return updateable && ( 
+				//columnUpdateability.length==0 ||
+				!ArrayHelper.isAllFalse(columnUpdateability)
+			);
 	}
 
 	public boolean isInsertable() {
 		// if the property mapping consists of all formulas, 
-		// make it non-insertable
+		// make it insertable
 		final boolean[] columnInsertability = value.getColumnInsertability();
 		return insertable && (
 				columnInsertability.length==0 ||
-				!ArrayHelper.isAllFalse( columnInsertability )
+				!ArrayHelper.isAllFalse(columnInsertability)
 			);
 	}
 
-	public ValueGeneration getValueGenerationStrategy() {
-		return valueGenerationStrategy;
-	}
+    public PropertyGeneration getGeneration() {
+        return generation;
+    }
 
-	public void setValueGenerationStrategy(ValueGeneration valueGenerationStrategy) {
-		this.valueGenerationStrategy = valueGenerationStrategy;
-	}
+    public void setGeneration(PropertyGeneration generation) {
+        this.generation = generation;
+    }
 
     public void setUpdateable(boolean mutable) {
 		this.updateable = mutable;
@@ -315,12 +317,17 @@ public class Property implements Serializable, MetaAttributable {
 	}
 
 	public String getAccessorPropertyName( EntityMode mode ) {
-		return getName();
+		if ( mode == EntityMode.DOM4J ) {
+			return nodeName;
+		}
+		else {
+			return getName();
+		}
 	}
 
 	// todo : remove
 	public Getter getGetter(Class clazz) throws PropertyNotFoundException, MappingException {
-		return getPropertyAccessor(clazz).getGetter( clazz, name );
+		return getPropertyAccessor(clazz).getGetter(clazz, name);
 	}
 
 	// todo : remove
@@ -340,13 +347,4 @@ public class Property implements Serializable, MetaAttributable {
 	public void setNaturalIdentifier(boolean naturalIdentifier) {
 		this.naturalIdentifier = naturalIdentifier;
 	}
-
-	public boolean isLob() {
-		return lob;
-	}
-
-	public void setLob(boolean lob) {
-		this.lob = lob;
-	}
-
 }

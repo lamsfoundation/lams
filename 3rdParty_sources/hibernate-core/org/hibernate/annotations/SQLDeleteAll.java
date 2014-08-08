@@ -23,16 +23,16 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Custom SQL statement for delete of all of a collection's elements.
+ * SqlDelete Annotation for overwriting Hibernate default DELETE ALL method
  *
  * @author L�szl� Benke
  */
@@ -40,12 +40,12 @@ import static java.lang.annotation.ElementType.TYPE;
 @Retention( RetentionPolicy.RUNTIME )
 public @interface SQLDeleteAll {
 	/**
-	 * Procedure name or SQL DELETE statement.
+	 * Procedure name or DELETE STATEMENT
 	 */
 	String sql();
 
 	/**
-	 * Is the statement callable (aka a {@link java.sql.CallableStatement})?
+	 * Is the statement using stored procedure or not
 	 */
 	boolean callable() default false;
 

@@ -33,11 +33,6 @@ import java.sql.Types;
 public class FloatTypeDescriptor extends RealTypeDescriptor {
 	public static final FloatTypeDescriptor INSTANCE = new FloatTypeDescriptor();
 
-	public FloatTypeDescriptor() {
-		SqlTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
-	}
-
-	@Override
 	public int getSqlType() {
 		return Types.FLOAT;
 	}

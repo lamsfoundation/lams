@@ -28,11 +28,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.hibernate.internal.util.xml.XMLHelper;
-import org.hibernate.mapping.Component;
-import org.hibernate.mapping.PersistentClass;
-
 import org.dom4j.Element;
+import org.hibernate.util.XMLHelper;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Component;
 
 /**
  * Performs "instantiation" based on DOM4J elements.

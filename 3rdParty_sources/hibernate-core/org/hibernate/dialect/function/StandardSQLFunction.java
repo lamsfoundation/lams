@@ -25,8 +25,8 @@ package org.hibernate.dialect.function;
 
 import java.util.List;
 
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -85,24 +85,32 @@ public class StandardSQLFunction implements SQLFunction {
 		return registeredType;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean hasArguments() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean hasParenthesesIfNoArguments() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Type getReturnType(Type firstArgumentType, Mapping mapping) {
 		return registeredType == null ? firstArgumentType : registeredType;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor sessionFactory) {
-		final StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append( name ).append( '(' );
 		for ( int i = 0; i < arguments.size(); i++ ) {
 			buf.append( arguments.get( i ) );
@@ -113,7 +121,6 @@ public class StandardSQLFunction implements SQLFunction {
 		return buf.append( ')' ).toString();
 	}
 
-	@Override
 	public String toString() {
 		return name;
 	}

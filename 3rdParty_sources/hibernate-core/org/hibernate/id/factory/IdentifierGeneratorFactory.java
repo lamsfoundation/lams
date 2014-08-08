@@ -23,11 +23,13 @@
  *
  */
 package org.hibernate.id.factory;
-import java.util.Properties;
 
-import org.hibernate.dialect.Dialect;
+import java.util.Properties;
+import java.io.Serializable;
+
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.type.Type;
+import org.hibernate.dialect.Dialect;
 
 /**
  * Contract for a <tt>factory</tt> of {@link IdentifierGenerator} instances.
@@ -35,22 +37,14 @@ import org.hibernate.type.Type;
  * @author Steve Ebersole
  */
 public interface IdentifierGeneratorFactory {
-	/**
-	 * Get the dialect.
-	 *
-	 * @return the dialect
-	 */
-	public Dialect getDialect();
 
 	/**
 	 * Allow injection of the dialect to use.
 	 *
 	 * @param dialect The dialect
-	 *
 	 * @deprecated The intention is that Dialect should be required to be specified up-front and it would then get
 	 * ctor injected.
 	 */
-	@Deprecated
 	public void setDialect(Dialect dialect);
 
 	/**

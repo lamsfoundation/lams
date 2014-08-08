@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.transform;
+
 import java.util.List;
 
 /**

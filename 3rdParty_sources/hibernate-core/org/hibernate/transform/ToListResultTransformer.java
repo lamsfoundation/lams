@@ -26,12 +26,14 @@ package org.hibernate.transform;
 
 import java.util.Arrays;
 import java.util.List;
+import java.io.Serializable;
 
 /**
  * Tranforms each result row from a tuple into a {@link List}, such that what
  * you end up with is a {@link List} of {@link List Lists}.
  */
-public class ToListResultTransformer extends BasicTransformerAdapter {
+public class ToListResultTransformer extends BasicTransformerAdapter implements Serializable {
+
 	public static final ToListResultTransformer INSTANCE = new ToListResultTransformer();
 
 	/**
@@ -40,7 +42,9 @@ public class ToListResultTransformer extends BasicTransformerAdapter {
 	private ToListResultTransformer() {
 	}
 	
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		return Arrays.asList( tuple );
 	}

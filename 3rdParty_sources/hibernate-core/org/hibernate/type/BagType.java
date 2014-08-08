@@ -27,30 +27,29 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.dom4j.Element;
+import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.collection.internal.PersistentBag;
-import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.collection.PersistentBag;
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.PersistentElementHolder;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 public class BagType extends CollectionType {
 
-	/**
-	 * @deprecated Use {@link #BagType(TypeFactory.TypeScope, String, String )}
-	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
-	 */
-	@Deprecated
 	public BagType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
-	public BagType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
-		super( typeScope, role, propertyRef );
-	}
-
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key)
 	throws HibernateException {
-		return new PersistentBag(session);
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentElementHolder(session, persister, key);
+		}
+		else {
+			return new PersistentBag(session);
+		}
 	}
 
 	public Class getReturnedClass() {
@@ -58,7 +57,12 @@ public class BagType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		return new PersistentBag( session, (Collection) collection );
+		if ( session.getEntityMode()==EntityMode.DOM4J ) {
+			return new PersistentElementHolder( session, (Element) collection );
+		}
+		else {
+			return new PersistentBag( session, (Collection) collection );
+		}
 	}
 
 	public Object instantiate(int anticipatedSize) {

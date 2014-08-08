@@ -22,58 +22,70 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.property;
-import java.lang.reflect.Member;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * @author Gavin King
  */
 public class EmbeddedPropertyAccessor implements PropertyAccessor {
-
+	
 	public static final class EmbeddedGetter implements Getter {
 		private final Class clazz;
 		
 		EmbeddedGetter(Class clazz) {
 			this.clazz = clazz;
 		}
-
-		@Override
+		
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object get(Object target) throws HibernateException {
 			return target;
 		}
-
-		@Override
+		
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) {
 			return get( target );
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Member getMember() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Class getReturnType() {
 			return clazz;
 		}
-
-		@Override
+		
 		public String toString() {
 			return "EmbeddedGetter(" + clazz.getName() + ')';
 		}
@@ -85,34 +97,42 @@ public class EmbeddedPropertyAccessor implements PropertyAccessor {
 		EmbeddedSetter(Class clazz) {
 			this.clazz = clazz;
 		}
-
-		@Override
+		
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public void set(Object target, Object value, SessionFactoryImplementor factory) {
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String toString() {
 			return "EmbeddedSetter(" + clazz.getName() + ')';
 		}
 	}
 
-	@Override
-	public Getter getGetter(Class theClass, String propertyName) throws PropertyNotFoundException {
+	public Getter getGetter(Class theClass, String propertyName)
+	throws PropertyNotFoundException {
 		return new EmbeddedGetter(theClass);
 	}
 
-	@Override
-	public Setter getSetter(Class theClass, String propertyName) throws PropertyNotFoundException {
+	public Setter getSetter(Class theClass, String propertyName)
+	throws PropertyNotFoundException {
 		return new EmbeddedSetter(theClass);
 	}
 

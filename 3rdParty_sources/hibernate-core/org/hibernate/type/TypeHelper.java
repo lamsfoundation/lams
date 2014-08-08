@@ -22,13 +22,14 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
+
 import java.io.Serializable;
 import java.util.Map;
 
-import org.hibernate.bytecode.instrumentation.spi.LazyPropertyInitializer;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.intercept.LazyPropertyInitializer;
 import org.hibernate.property.BackrefPropertyAccessor;
-import org.hibernate.tuple.NonIdentifierAttribute;
+import org.hibernate.tuple.StandardProperty;
 
 /**
  * Collection of convenience methods relating to operations across arrays of types...
@@ -64,7 +65,7 @@ public class TypeHelper {
 					target[i] = values[i];
 				}
 				else {
-					target[i] = types[i].deepCopy( values[i], session
+					target[i] = types[i].deepCopy( values[i], session.getEntityMode(), session
 						.getFactory() );
 				}
 			}
@@ -280,7 +281,7 @@ public class TypeHelper {
 	 * @return Array containing indices of the dirty properties, or null if no properties considered dirty.
 	 */
 	public static int[] findDirty(
-			final NonIdentifierAttribute[] properties,
+			final StandardProperty[] properties,
 			final Object[] currentState,
 			final Object[] previousState,
 			final boolean[][] includeColumns,
@@ -328,7 +329,7 @@ public class TypeHelper {
 	 * @return Array containing indices of the modified properties, or null if no properties considered modified.
 	 */
 	public static int[] findModified(
-			final NonIdentifierAttribute[] properties,
+			final StandardProperty[] properties,
 			final Object[] currentState,
 			final Object[] previousState,
 			final boolean[][] includeColumns,

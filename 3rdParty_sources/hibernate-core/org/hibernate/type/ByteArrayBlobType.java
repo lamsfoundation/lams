@@ -31,14 +31,14 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
 
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.collections.ArrayHelper;
-
 import org.dom4j.Node;
+import org.hibernate.EntityMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Hibernate;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.util.ArrayHelper;
 
 /**
  * Map a Byte[] into a Blob
@@ -56,7 +56,7 @@ public class ByteArrayBlobType extends AbstractLobType {
 	}
 
 	@Override
-	public boolean isEqual(Object x, Object y, SessionFactoryImplementor factory) {
+	public boolean isEqual(Object x, Object y, EntityMode entityMode, SessionFactoryImplementor factory) {
 		if ( x == y ) return true;
 		if ( x == null || y == null ) return false;
 		if ( x instanceof Byte[] ) {
@@ -71,7 +71,7 @@ public class ByteArrayBlobType extends AbstractLobType {
 		}
 	}
 
-	public int getHashCode(Object x, SessionFactoryImplementor factory) {
+	public int getHashCode(Object x, EntityMode entityMode, SessionFactoryImplementor factory) {
 		if ( x instanceof Character[] ) {
 			Object[] o = (Object[]) x;
 			return ArrayHelper.hash( o );
@@ -82,7 +82,7 @@ public class ByteArrayBlobType extends AbstractLobType {
 		}
 	}
 
-	public Object deepCopy(Object value, SessionFactoryImplementor factory)
+	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory)
 			throws HibernateException {
 		if ( value == null ) return null;
 		if ( value instanceof Byte[] ) {
@@ -209,8 +209,8 @@ public class ByteArrayBlobType extends AbstractLobType {
 			Map copyCache
 	)
 			throws HibernateException {
-		if ( isEqual( original, target ) ) return original;
-		return deepCopy( original, session.getFactory() );
+		if ( isEqual( original, target, session.getEntityMode() ) ) return original;
+		return deepCopy( original, session.getEntityMode(), session.getFactory() );
 	}
 
 	public boolean[] toColumnNullness(Object value, Mapping mapping) {

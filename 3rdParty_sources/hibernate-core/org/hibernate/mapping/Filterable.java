@@ -23,14 +23,13 @@
  */
 package org.hibernate.mapping;
 
-
 /**
  * Defines mapping elements to which filters may be applied.
  *
  * @author Steve Ebersole
  */
 public interface Filterable {
-	public void addFilter(String name, String condition, boolean autoAliasInjection, java.util.Map<String,String> aliasTableMap, java.util.Map<String,String> aliasEntityMap);
+	public void addFilter(String name, String condition);
 
-	public java.util.List getFilters();
+	public java.util.Map getFilterMap();
 }

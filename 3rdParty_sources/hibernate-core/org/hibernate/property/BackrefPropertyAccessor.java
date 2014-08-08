@@ -22,13 +22,14 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.property;
+
 import java.io.Serializable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Map;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * Represents a "back-reference" to the id of a collection owner.  A "back-reference" is pertinent in mapping scenarios
@@ -55,7 +56,6 @@ public class BackrefPropertyAccessor implements PropertyAccessor {
 	 * we don't know the value of the back reference
 	 */
 	public static final Serializable UNKNOWN = new Serializable() {
-		@Override
 		public String toString() {
 			return "<unknown>";
 		}
@@ -79,12 +79,16 @@ public class BackrefPropertyAccessor implements PropertyAccessor {
 		this.getter = new BackrefGetter();
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Setter getSetter(Class theClass, String propertyName) {
 		return setter;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Getter getGetter(Class theClass, String propertyName) {
 		return getter;
 	}
@@ -94,17 +98,24 @@ public class BackrefPropertyAccessor implements PropertyAccessor {
 	 * Internal implementation of a property setter specific to these back-ref properties.
 	 */
 	public static final class BackrefSetter implements Setter {
-		@Override
+
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public void set(Object target, Object value, SessionFactoryImplementor factory) {
 			// this page intentionally left blank :)
 		}
@@ -116,7 +127,10 @@ public class BackrefPropertyAccessor implements PropertyAccessor {
 	 * Internal implementation of a property getter specific to these back-ref properties.
 	 */
 	public class BackrefGetter implements Getter {
-		@Override
+
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) {
 			if ( session == null ) {
 				return UNKNOWN;
@@ -126,27 +140,37 @@ public class BackrefPropertyAccessor implements PropertyAccessor {
 			}
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Member getMember() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object get(Object target) {
 			return UNKNOWN;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Class getReturnType() {
 			return Object.class;
 		}

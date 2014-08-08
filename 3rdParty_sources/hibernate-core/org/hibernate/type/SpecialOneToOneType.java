@@ -30,10 +30,9 @@ import java.sql.SQLException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.internal.ForeignKeys;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.relational.Size;
+import org.hibernate.engine.ForeignKeys;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * A one-to-one association that maps to specific formula(s)
@@ -43,10 +42,6 @@ import org.hibernate.metamodel.relational.Size;
  */
 public class SpecialOneToOneType extends OneToOneType {
 	
-	/**
-	 * @deprecated Use {@link #SpecialOneToOneType(org.hibernate.type.TypeFactory.TypeScope, String, ForeignKeyDirection, boolean, String, boolean, boolean, String, String)} instead.
-	 */
-	@Deprecated
 	public SpecialOneToOneType(
 			TypeFactory.TypeScope scope,
 			String referencedEntityName,
@@ -56,48 +51,25 @@ public class SpecialOneToOneType extends OneToOneType {
 			boolean unwrapProxy,
 			String entityName,
 			String propertyName) {
-		this( scope, referencedEntityName, foreignKeyType, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, entityName, propertyName );
-	}
-	
-	public SpecialOneToOneType(
-			TypeFactory.TypeScope scope,
-			String referencedEntityName,
-			ForeignKeyDirection foreignKeyType,
-			boolean referenceToPrimaryKey, 
-			String uniqueKeyPropertyName,
-			boolean lazy,
-			boolean unwrapProxy,
-			String entityName,
-			String propertyName) {
 		super(
 				scope,
 				referencedEntityName, 
-				foreignKeyType,
-				referenceToPrimaryKey, 
+				foreignKeyType, 
 				uniqueKeyPropertyName, 
 				lazy,
 				unwrapProxy,
+				true, 
 				entityName, 
 				propertyName
 			);
 	}
 	
 	public int getColumnSpan(Mapping mapping) throws MappingException {
-		return super.getIdentifierOrUniqueKeyType( mapping ).getColumnSpan( mapping );
+		return super.getIdentifierOrUniqueKeyType(mapping).getColumnSpan(mapping);
 	}
 	
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
-		return super.getIdentifierOrUniqueKeyType( mapping ).sqlTypes( mapping );
-	}
-
-	@Override
-	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
-		return super.getIdentifierOrUniqueKeyType( mapping ).dictatedSizes( mapping );
-	}
-
-	@Override
-	public Size[] defaultSizes(Mapping mapping) throws MappingException {
-		return super.getIdentifierOrUniqueKeyType( mapping ).defaultSizes( mapping );
+		return super.getIdentifierOrUniqueKeyType(mapping).sqlTypes(mapping);
 	}
 
 	public boolean useLHSPrimaryKey() {

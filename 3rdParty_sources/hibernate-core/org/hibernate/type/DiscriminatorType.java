@@ -23,7 +23,6 @@
  */
 package org.hibernate.type;
 
-
 /**
  * Additional contract for a {@link Type} may be used for a discriminator.
  * 

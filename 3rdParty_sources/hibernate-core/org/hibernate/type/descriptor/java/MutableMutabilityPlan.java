@@ -31,23 +31,29 @@ import java.io.Serializable;
  * @author Steve Ebersole
  */
 public abstract class MutableMutabilityPlan<T> implements MutabilityPlan<T> {
-	@Override
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isMutable() {
 		return true;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Serializable disassemble(T value) {
 		return (Serializable) deepCopy( value );
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public T assemble(Serializable cached) {
-		return deepCopy( (T) cached );
+		return (T) deepCopy( (T) cached );
 	}
 
-	@Override
 	public final T deepCopy(T value) {
 		return value == null ? null : deepCopyNotNull( value );
 	}

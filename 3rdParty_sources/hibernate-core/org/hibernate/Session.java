@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,13 +20,13 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
 
 import java.io.Serializable;
 import java.sql.Connection;
 
-import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.jdbc.Work;
 import org.hibernate.stat.SessionStatistics;
 
@@ -89,18 +89,30 @@ import org.hibernate.stat.SessionStatistics;
  * @see SessionFactory
  * @author Gavin King
  */
-public interface Session extends SharedSessionContract {
+public interface Session extends Serializable {
+
 	/**
-	 * Obtain a {@link Session} builder with the ability to grab certain information from this session.
+	 * Retrieve the entity mode in effect for this session.
 	 *
-	 * @return The session builder
+	 * @return The entity mode for this session.
 	 */
-	public SharedSessionBuilder sessionWithOptions();
+	public EntityMode getEntityMode();
+
+	/**
+	 * Starts a new Session with the given entity mode in effect. This secondary
+	 * Session inherits the connection, transaction, and other context
+	 * information from the primary Session. It doesn't need to be flushed
+	 * or closed by the developer.
+	 * 
+	 * @param entityMode The entity mode to use for the new session.
+	 * @return The new session
+	 */
+	public Session getSession(EntityMode entityMode);
 
 	/**
 	 * Force this session to flush. Must be called at the end of a
 	 * unit of work, before committing the transaction and closing the
-	 * session (depending on {@link #setFlushMode(FlushMode)},
+	 * session (depending on {@link #setFlushMode flush-mode},
 	 * {@link Transaction#commit()} calls this method).
 	 * <p/>
 	 * <i>Flushing</i> is the process of synchronizing the underlying persistent
@@ -158,6 +170,21 @@ public interface Session extends SharedSessionContract {
 	 * @see SessionFactory
 	 */
 	public SessionFactory getSessionFactory();
+
+	/**
+	 * Get the JDBC connection of this Session.<br>
+	 * <br>
+	 * If the session is using aggressive collection release (as in a
+	 * CMT environment), it is the application's responsibility to
+	 * close the connection returned by this call. Otherwise, the
+	 * application should not close the connection.
+	 *
+	 * @return the JDBC connection in use by the <tt>Session</tt>
+	 * @throws HibernateException if the <tt>Session</tt> is disconnected
+	 * @deprecated (scheduled for removal in 4.x).  Replacement depends on need; for doing direct JDBC stuff use
+	 * {@link #doWork}; for opening a 'temporary Session' use (TBD).
+	 */
+	public Connection connection() throws HibernateException;
 
 	/**
 	 * End the session by releasing the JDBC connection and cleaning up.  It is
@@ -251,7 +278,7 @@ public interface Session extends SharedSessionContract {
 	 * @throws TransientObjectException if the instance is transient or associated with
 	 * a different session
 	 */
-	public Serializable getIdentifier(Object object);
+	public Serializable getIdentifier(Object object) throws HibernateException;
 
 	/**
 	 * Check if this instance is associated with this <tt>Session</tt>.
@@ -266,12 +293,10 @@ public interface Session extends SharedSessionContract {
 	 * not be synchronized with the database. This operation cascades to associated
 	 * instances if the association is mapped with <tt>cascade="evict"</tt>.
 	 *
-	 * @param object The entity to evict
-	 *
-	 * @throws NullPointerException if the passed object is {@code null}
-	 * @throws IllegalArgumentException if the passed object is not defined as an entity
+	 * @param object a persistent instance
+	 * @throws HibernateException
 	 */
-	public void evict(Object object);
+	public void evict(Object object) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -280,13 +305,11 @@ public interface Session extends SharedSessionContract {
 	 * @param theClass a persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
 	 * @param lockMode the lock level
-	 *
 	 * @return the persistent instance or proxy
-	 *
+	 * @throws HibernateException
 	 * @deprecated LockMode parameter should be replaced with LockOptions
 	 */
-	@Deprecated
-	public Object load(Class theClass, Serializable id, LockMode lockMode);
+	public Object load(Class theClass, Serializable id, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -296,8 +319,9 @@ public interface Session extends SharedSessionContract {
 	 * @param id a valid identifier of an existing persistent instance of the class
 	 * @param lockOptions contains the lock level
 	 * @return the persistent instance or proxy
+	 * @throws HibernateException
 	 */
-	public Object load(Class theClass, Serializable id, LockOptions lockOptions);
+	public Object load(Class theClass, Serializable id, LockOptions lockOptions) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -306,13 +330,11 @@ public interface Session extends SharedSessionContract {
 	 * @param entityName a persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
 	 * @param lockMode the lock level
-	 *
 	 * @return the persistent instance or proxy
-	 *
+	 * @throws HibernateException
 	 * @deprecated LockMode parameter should be replaced with LockOptions
 	 */
-	@Deprecated
-	public Object load(String entityName, Serializable id, LockMode lockMode);
+	public Object load(String entityName, Serializable id, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -321,10 +343,10 @@ public interface Session extends SharedSessionContract {
 	 * @param entityName a persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
 	 * @param lockOptions contains the lock level
-	 *
 	 * @return the persistent instance or proxy
+	 * @throws HibernateException
 	 */
-	public Object load(String entityName, Serializable id, LockOptions lockOptions);
+	public Object load(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -337,10 +359,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param theClass a persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
-	 *
 	 * @return the persistent instance or proxy
+	 * @throws HibernateException
 	 */
-	public Object load(Class theClass, Serializable id);
+	public Object load(Class theClass, Serializable id) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -353,10 +375,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param entityName a persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
-	 *
 	 * @return the persistent instance or proxy
+	 * @throws HibernateException
 	 */
-	public Object load(String entityName, Serializable id);
+	public Object load(String entityName, Serializable id) throws HibernateException;
 
 	/**
 	 * Read the persistent state associated with the given identifier into the given transient
@@ -364,54 +386,51 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param object an "empty" instance of the persistent class
 	 * @param id a valid identifier of an existing persistent instance of the class
+	 * @throws HibernateException
 	 */
-	public void load(Object object, Serializable id);
+	public void load(Object object, Serializable id) throws HibernateException;
 
 	/**
 	 * Persist the state of the given detached instance, reusing the current
 	 * identifier value.  This operation cascades to associated instances if
-	 * the association is mapped with {@code cascade="replicate"}
+	 * the association is mapped with <tt>cascade="replicate"</tt>.
 	 *
 	 * @param object a detached instance of a persistent class
-	 * @param replicationMode The replication mode to use
 	 */
-	public void replicate(Object object, ReplicationMode replicationMode);
+	public void replicate(Object object, ReplicationMode replicationMode) throws HibernateException;
 
 	/**
 	 * Persist the state of the given detached instance, reusing the current
 	 * identifier value.  This operation cascades to associated instances if
-	 * the association is mapped with {@code cascade="replicate"}
+	 * the association is mapped with <tt>cascade="replicate"</tt>.
 	 *
-	 * @param entityName The entity name
 	 * @param object a detached instance of a persistent class
-	 * @param replicationMode The replication mode to use
 	 */
-	public void replicate(String entityName, Object object, ReplicationMode replicationMode) ;
+	public void replicate(String entityName, Object object, ReplicationMode replicationMode) throws HibernateException;
 
 	/**
 	 * Persist the given transient instance, first assigning a generated identifier. (Or
 	 * using the current value of the identifier property if the <tt>assigned</tt>
 	 * generator is used.) This operation cascades to associated instances if the
-	 * association is mapped with {@code cascade="save-update"}
+	 * association is mapped with <tt>cascade="save-update"</tt>.
 	 *
 	 * @param object a transient instance of a persistent class
-	 *
 	 * @return the generated identifier
+	 * @throws HibernateException
 	 */
-	public Serializable save(Object object);
+	public Serializable save(Object object) throws HibernateException;
 
 	/**
 	 * Persist the given transient instance, first assigning a generated identifier. (Or
 	 * using the current value of the identifier property if the <tt>assigned</tt>
 	 * generator is used.)  This operation cascades to associated instances if the
-	 * association is mapped with {@code cascade="save-update"}
+	 * association is mapped with <tt>cascade="save-update"</tt>.
 	 *
-	 * @param entityName The entity name
 	 * @param object a transient instance of a persistent class
-	 *
 	 * @return the generated identifier
+	 * @throws HibernateException
 	 */
-	public Serializable save(String entityName, Object object);
+	public Serializable save(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Either {@link #save(Object)} or {@link #update(Object)} the given
@@ -419,14 +438,14 @@ public interface Session extends SharedSessionContract {
 	 * manual for discussion of unsaved-value checking).
 	 * <p/>
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="save-update"}
-	 *
-	 * @param object a transient or detached instance containing new or updated state
+	 * with <tt>cascade="save-update"</tt>.
 	 *
 	 * @see Session#save(java.lang.Object)
 	 * @see Session#update(Object object)
+	 * @param object a transient or detached instance containing new or updated state
+	 * @throws HibernateException
 	 */
-	public void saveOrUpdate(Object object);
+	public void saveOrUpdate(Object object) throws HibernateException;
 
 	/**
 	 * Either {@link #save(String, Object)} or {@link #update(String, Object)}
@@ -434,36 +453,36 @@ public interface Session extends SharedSessionContract {
 	 * (see the manual for discussion of unsaved-value checking).
 	 * <p/>
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="save-update"}
-	 *
-	 * @param entityName The entity name
-	 * @param object a transient or detached instance containing new or updated state
+	 * with <tt>cascade="save-update"</tt>.
 	 *
 	 * @see Session#save(String,Object)
 	 * @see Session#update(String,Object)
+	 * @param object a transient or detached instance containing new or updated state
+	 * @throws HibernateException
 	 */
-	public void saveOrUpdate(String entityName, Object object);
+	public void saveOrUpdate(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Update the persistent instance with the identifier of the given detached
 	 * instance. If there is a persistent instance with the same identifier,
 	 * an exception is thrown. This operation cascades to associated instances
-	 * if the association is mapped with {@code cascade="save-update"}
+	 * if the association is mapped with <tt>cascade="save-update"</tt>.
 	 *
 	 * @param object a detached instance containing updated state
+	 * @throws HibernateException
 	 */
-	public void update(Object object);
+	public void update(Object object) throws HibernateException;
 
 	/**
 	 * Update the persistent instance with the identifier of the given detached
 	 * instance. If there is a persistent instance with the same identifier,
 	 * an exception is thrown. This operation cascades to associated instances
-	 * if the association is mapped with {@code cascade="save-update"}
+	 * if the association is mapped with <tt>cascade="save-update"</tt>.
 	 *
-	 * @param entityName The entity name
 	 * @param object a detached instance containing updated state
+	 * @throws HibernateException
 	 */
-	public void update(String entityName, Object object);
+	public void update(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Copy the state of the given object onto the persistent object with the same
@@ -472,15 +491,14 @@ public interface Session extends SharedSessionContract {
 	 * given instance is unsaved, save a copy of and return it as a newly persistent
 	 * instance. The given instance does not become associated with the session.
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="merge"}
-	 * <p/>
+	 * with <tt>cascade="merge"</tt>.<br>
+	 * <br>
 	 * The semantics of this method are defined by JSR-220.
 	 *
 	 * @param object a detached instance with state to be copied
-	 *
 	 * @return an updated persistent instance
 	 */
-	public Object merge(Object object);
+	public Object merge(Object object) throws HibernateException;
 
 	/**
 	 * Copy the state of the given object onto the persistent object with the same
@@ -489,59 +507,58 @@ public interface Session extends SharedSessionContract {
 	 * given instance is unsaved, save a copy of and return it as a newly persistent
 	 * instance. The given instance does not become associated with the session.
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="merge"}
-	 * <p/>
+	 * with <tt>cascade="merge"</tt>.<br>
+	 * <br>
 	 * The semantics of this method are defined by JSR-220.
 	 *
-	 * @param entityName The entity name
 	 * @param object a detached instance with state to be copied
-	 *
 	 * @return an updated persistent instance
 	 */
-	public Object merge(String entityName, Object object);
+	public Object merge(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Make a transient instance persistent. This operation cascades to associated
-	 * instances if the association is mapped with {@code cascade="persist"}
-	 * <p/>
+	 * instances if the association is mapped with <tt>cascade="persist"</tt>.<br>
+	 * <br>
 	 * The semantics of this method are defined by JSR-220.
 	 *
 	 * @param object a transient instance to be made persistent
 	 */
-	public void persist(Object object);
+	public void persist(Object object) throws HibernateException;
 	/**
 	 * Make a transient instance persistent. This operation cascades to associated
-	 * instances if the association is mapped with {@code cascade="persist"}
-	 * <p/>
+	 * instances if the association is mapped with <tt>cascade="persist"</tt>.<br>
+	 * <br>
 	 * The semantics of this method are defined by JSR-220.
 	 *
-	 * @param entityName The entity name
 	 * @param object a transient instance to be made persistent
 	 */
-	public void persist(String entityName, Object object);
+	public void persist(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Remove a persistent instance from the datastore. The argument may be
 	 * an instance associated with the receiving <tt>Session</tt> or a transient
 	 * instance with an identifier associated with existing persistent state.
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="delete"}
+	 * with <tt>cascade="delete"</tt>.
 	 *
 	 * @param object the instance to be removed
+	 * @throws HibernateException
 	 */
-	public void delete(Object object);
+	public void delete(Object object) throws HibernateException;
 
 	/**
 	 * Remove a persistent instance from the datastore. The <b>object</b> argument may be
 	 * an instance associated with the receiving <tt>Session</tt> or a transient
 	 * instance with an identifier associated with existing persistent state.
 	 * This operation cascades to associated instances if the association is mapped
-	 * with {@code cascade="delete"}
+	 * with <tt>cascade="delete"</tt>.
 	 *
 	 * @param entityName The entity name for the instance to be removed.
 	 * @param object the instance to be removed
+	 * @throws HibernateException
 	 */
-	public void delete(String entityName, Object object);
+	public void delete(String entityName, Object object) throws HibernateException;
 
 	/**
 	 * Obtain the specified lock level upon the given object. This may be used to
@@ -552,11 +569,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param object a persistent or transient instance
 	 * @param lockMode the lock level
-	 *
+	 * @throws HibernateException
 	 * @deprecated instead call buildLockRequest(LockMode).lock(object)
 	 */
-	@Deprecated
-	public void lock(Object object, LockMode lockMode);
+	public void lock(Object object, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Obtain the specified lock level upon the given object. This may be used to
@@ -565,27 +581,24 @@ public interface Session extends SharedSessionContract {
 	 * with a session (<tt>LockMode.NONE</tt>). This operation cascades to associated
 	 * instances if the association is mapped with <tt>cascade="lock"</tt>.
 	 *
-	 * @param entityName The name of the entity
 	 * @param object a persistent or transient instance
 	 * @param lockMode the lock level
-	 *
+	 * @throws HibernateException
 	 * @deprecated instead call buildLockRequest(LockMode).lock(entityName, object)
 	 */
-	@SuppressWarnings( {"JavaDoc"})
-	@Deprecated
-	public void lock(String entityName, Object object, LockMode lockMode);
+	public void lock(String entityName, Object object, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Build a LockRequest that specifies the LockMode, pessimistic lock timeout and lock scope.
 	 * timeout and scope is ignored for optimistic locking.  After building the LockRequest,
 	 * call LockRequest.lock to perform the requested locking. 
-	 * <p/>
-	 * Example usage:
-	 * {@code session.buildLockRequest().setLockMode(LockMode.PESSIMISTIC_WRITE).setTimeOut(60000).lock(entity);}
+	 *
+	 * Use: session.buildLockRequest().
+	 *      setLockMode(LockMode.PESSIMISTIC_WRITE).setTimeOut(1000 * 60).lock(entity);
 	 *
 	 * @param lockOptions contains the lock level
-	 *
 	 * @return a lockRequest that can be used to lock the passed object.
+	 * @throws HibernateException
 	 */
 	public LockRequest buildLockRequest(LockOptions lockOptions);
 
@@ -601,24 +614,9 @@ public interface Session extends SharedSessionContract {
 	 * </ul>
 	 *
 	 * @param object a persistent or detached instance
+	 * @throws HibernateException
 	 */
-	public void refresh(Object object);
-
-	/**
-	 * Re-read the state of the given instance from the underlying database. It is
-	 * inadvisable to use this to implement long-running sessions that span many
-	 * business tasks. This method is, however, useful in certain special circumstances.
-	 * For example
-	 * <ul>
-	 * <li>where a database trigger alters the object state upon insert or update
-	 * <li>after executing direct SQL (eg. a mass update) in the same session
-	 * <li>after inserting a <tt>Blob</tt> or <tt>Clob</tt>
-	 * </ul>
-	 *
-	 * @param entityName a persistent class
-	 * @param object a persistent or detached instance
-	 */
-	public void refresh(String entityName, Object object);
+	public void refresh(Object object) throws HibernateException;
 
 	/**
 	 * Re-read the state of the given instance from the underlying database, with
@@ -628,11 +626,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param object a persistent or detached instance
 	 * @param lockMode the lock mode to use
-	 *
+	 * @throws HibernateException
 	 * @deprecated LockMode parameter should be replaced with LockOptions
 	 */
-	@Deprecated
-	public void refresh(Object object, LockMode lockMode);
+	public void refresh(Object object, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Re-read the state of the given instance from the underlying database, with
@@ -642,41 +639,115 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param object a persistent or detached instance
 	 * @param lockOptions contains the lock mode to use
+	 * @throws HibernateException
 	 */
-	public void refresh(Object object, LockOptions lockOptions);
-
-	/**
-	 * Re-read the state of the given instance from the underlying database, with
-	 * the given <tt>LockMode</tt>. It is inadvisable to use this to implement
-	 * long-running sessions that span many business tasks. This method is, however,
-	 * useful in certain special circumstances.
-	 *
-	 * @param entityName a persistent class
-	 * @param object a persistent or detached instance
-	 * @param lockOptions contains the lock mode to use
-	 */
-	public void refresh(String entityName, Object object, LockOptions lockOptions);
+	public void refresh(Object object, LockOptions lockOptions) throws HibernateException;
 
 	/**
 	 * Determine the current lock mode of the given object.
 	 *
 	 * @param object a persistent instance
-	 *
 	 * @return the current lock mode
+	 * @throws HibernateException
 	 */
-	public LockMode getCurrentLockMode(Object object);
+	public LockMode getCurrentLockMode(Object object) throws HibernateException;
 
 	/**
-	 * Create a {@link Query} instance for the given collection and filter string.  Contains an implicit {@code FROM}
-	 * element named {@code this} which refers to the defined table for the collection elements, as well as an implicit
-	 * {@code WHERE} restriction for this particular collection instance's key value.
+	 * Begin a unit of work and return the associated <tt>Transaction</tt> object.
+	 * If a new underlying transaction is required, begin the transaction. Otherwise
+	 * continue the new work in the context of the existing underlying transaction.
+	 * The class of the returned <tt>Transaction</tt> object is determined by the
+	 * property <tt>hibernate.transaction_factory</tt>.
+	 *
+	 * @return a Transaction instance
+	 * @throws HibernateException
+	 * @see Transaction
+	 */
+	public Transaction beginTransaction() throws HibernateException;
+
+	/**
+	 * Get the <tt>Transaction</tt> instance associated with this session.
+	 * The class of the returned <tt>Transaction</tt> object is determined by the
+	 * property <tt>hibernate.transaction_factory</tt>.
+	 *
+	 * @return a Transaction instance
+	 * @throws HibernateException
+	 * @see Transaction
+	 */
+	public Transaction getTransaction();
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity class,
+	 * or a superclass of an entity class.
+	 *
+	 * @param persistentClass a class, which is persistent, or has persistent subclasses
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(Class persistentClass);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity class,
+	 * or a superclass of an entity class, with the given alias.
+	 *
+	 * @param persistentClass a class, which is persistent, or has persistent subclasses
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(Class persistentClass, String alias);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity name.
+	 *
+	 * @param entityName
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(String entityName);
+
+	/**
+	 * Create a new <tt>Criteria</tt> instance, for the given entity name,
+	 * with the given alias.
+	 *
+	 * @param entityName
+	 * @return Criteria
+	 */
+	public Criteria createCriteria(String entityName, String alias);
+
+	/**
+	 * Create a new instance of <tt>Query</tt> for the given HQL query string.
+	 *
+	 * @param queryString a HQL query
+	 * @return Query
+	 * @throws HibernateException
+	 */
+	public Query createQuery(String queryString) throws HibernateException;
+
+	/**
+	 * Create a new instance of <tt>SQLQuery</tt> for the given SQL query string.
+	 *
+	 * @param queryString a SQL query
+	 * @return SQLQuery
+	 * @throws HibernateException
+	 */
+	public SQLQuery createSQLQuery(String queryString) throws HibernateException;
+
+	/**
+	 * Create a new instance of <tt>Query</tt> for the given collection and filter string.
 	 *
 	 * @param collection a persistent collection
-	 * @param queryString a Hibernate query fragment.
-	 *
-	 * @return The query instance for manipulation and execution
+	 * @param queryString a Hibernate query
+	 * @return Query
+	 * @throws HibernateException
 	 */
-	public Query createFilter(Object collection, String queryString);
+	public Query createFilter(Object collection, String queryString) throws HibernateException;
+
+	/**
+	 * Obtain an instance of <tt>Query</tt> for a named query string defined in the
+	 * mapping file.
+	 *
+	 * @param queryName the name of a query defined externally
+	 * @return Query
+	 * @throws HibernateException
+	 */
+	public Query getNamedQuery(String queryName) throws HibernateException;
 
 	/**
 	 * Completely clear the session. Evict all loaded instances and cancel all pending
@@ -692,10 +763,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param clazz a persistent class
 	 * @param id an identifier
-	 *
 	 * @return a persistent instance or null
+	 * @throws HibernateException
 	 */
-	public Object get(Class clazz, Serializable id);
+	public Object get(Class clazz, Serializable id) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -706,13 +777,11 @@ public interface Session extends SharedSessionContract {
 	 * @param clazz a persistent class
 	 * @param id an identifier
 	 * @param lockMode the lock mode
-	 *
 	 * @return a persistent instance or null
-	 *
+	 * @throws HibernateException
 	 * @deprecated LockMode parameter should be replaced with LockOptions
 	 */
-	@Deprecated
-	public Object get(Class clazz, Serializable id, LockMode lockMode);
+	public Object get(Class clazz, Serializable id, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -723,10 +792,10 @@ public interface Session extends SharedSessionContract {
 	 * @param clazz a persistent class
 	 * @param id an identifier
 	 * @param lockOptions the lock mode
-	 *
 	 * @return a persistent instance or null
+	 * @throws HibernateException
 	 */
-	public Object get(Class clazz, Serializable id, LockOptions lockOptions);
+	public Object get(Class clazz, Serializable id, LockOptions lockOptions) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given named entity with the given identifier,
@@ -735,10 +804,10 @@ public interface Session extends SharedSessionContract {
 	 *
 	 * @param entityName the entity name
 	 * @param id an identifier
-	 *
 	 * @return a persistent instance or null
+	 * @throws HibernateException
 	 */
-	public Object get(String entityName, Serializable id);
+	public Object get(String entityName, Serializable id) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -749,13 +818,11 @@ public interface Session extends SharedSessionContract {
 	 * @param entityName the entity name
 	 * @param id an identifier
 	 * @param lockMode the lock mode
-	 *
 	 * @return a persistent instance or null
-	 *
+	 * @throws HibernateException
 	 * @deprecated LockMode parameter should be replaced with LockOptions
 	 */
-	@Deprecated
-	public Object get(String entityName, Serializable id, LockMode lockMode);
+	public Object get(String entityName, Serializable id, LockMode lockMode) throws HibernateException;
 
 	/**
 	 * Return the persistent instance of the given entity class with the given identifier,
@@ -766,99 +833,24 @@ public interface Session extends SharedSessionContract {
 	 * @param entityName the entity name
 	 * @param id an identifier
 	 * @param lockOptions contains the lock mode
-	 *
 	 * @return a persistent instance or null
+	 * @throws HibernateException
 	 */
-	public Object get(String entityName, Serializable id, LockOptions lockOptions);
+	public Object get(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException;
 
 	/**
-	 * Return the entity name for a persistent entity.
+	 * Return the entity name for a persistent entity
 	 *   
 	 * @param object a persistent entity
-	 *
 	 * @return the entity name
+	 * @throws HibernateException
 	 */
-	public String getEntityName(Object object);
-	
-	/**
-	 * Create an {@link IdentifierLoadAccess} instance to retrieve the specified entity type by
-	 * primary key.
-	 * 
-	 * @param entityName The entity name of the entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by primary key
-	 *
-	 * @throws HibernateException If the specified entity name cannot be resolved as an entity name
-	 */
-	public IdentifierLoadAccess byId(String entityName);
-
-	/**
-	 * Create an {@link IdentifierLoadAccess} instance to retrieve the specified entity by
-	 * primary key.
-	 *
-	 * @param entityClass The entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by primary key
-	 *
-	 * @throws HibernateException If the specified Class cannot be resolved as a mapped entity
-	 */
-	public IdentifierLoadAccess byId(Class entityClass);
-
-	/**
-	 * Create an {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
-	 * its natural id.
-	 * 
-	 * @param entityName The entity name of the entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by natural id
-	 *
-	 * @throws HibernateException If the specified entity name cannot be resolved as an entity name
-	 */
-	public NaturalIdLoadAccess byNaturalId(String entityName);
-
-	/**
-	 * Create an {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
-	 * its natural id.
-	 * 
-	 * @param entityClass The entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by natural id
-	 *
-	 * @throws HibernateException If the specified Class cannot be resolved as a mapped entity
-	 */
-	public NaturalIdLoadAccess byNaturalId(Class entityClass);
-
-	/**
-	 * Create an {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
-	 * its natural id.
-	 *
-	 * @param entityName The entity name of the entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by natural id
-	 *
-	 * @throws HibernateException If the specified entityClass cannot be resolved as a mapped entity, or if the
-	 * entity does not define a natural-id or if its natural-id is made up of multiple attributes.
-	 */
-	public SimpleNaturalIdLoadAccess bySimpleNaturalId(String entityName);
-
-	/**
-	 * Create an {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
-	 * its simple (single attribute) natural id.
-	 *
-	 * @param entityClass The entity type to be retrieved
-	 *
-	 * @return load delegate for loading the specified entity type by natural id
-	 *
-	 * @throws HibernateException If the specified entityClass cannot be resolved as a mapped entity, or if the
-	 * entity does not define a natural-id or if its natural-id is made up of multiple attributes.
-	 */
-	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass);
+	public String getEntityName(Object object) throws HibernateException;
 
 	/**
 	 * Enable the named filter for this current session.
 	 *
 	 * @param filterName The name of the filter to be enabled.
-	 *
 	 * @return The Filter instance representing the enabled filter.
 	 */
 	public Filter enableFilter(String filterName);
@@ -867,7 +859,6 @@ public interface Session extends SharedSessionContract {
 	 * Retrieve a currently enabled filter by name.
 	 *
 	 * @param filterName The name of the filter to be retrieved.
-	 *
 	 * @return The Filter instance representing the enabled filter.
 	 */
 	public Filter getEnabledFilter(String filterName);
@@ -881,8 +872,6 @@ public interface Session extends SharedSessionContract {
 	
 	/**
 	 * Get the statistics for this session.
-	 *
-	 * @return The session statistics being collected for this session
 	 */
 	public SessionStatistics getStatistics();
 
@@ -894,7 +883,8 @@ public interface Session extends SharedSessionContract {
 	 * @see org.hibernate.Session#isDefaultReadOnly()
 	 *
 	 * @param entityOrProxy an entity or HibernateProxy
-	 * @return {@code true} if the entity or proxy is read-only, {@code false} if the entity or proxy is modifiable.
+	 * @return true, the entity or proxy is read-only;
+	 *         false, the entity or proxy is modifiable.
 	 */
 	public boolean isReadOnly(Object entityOrProxy);
 
@@ -915,13 +905,14 @@ public interface Session extends SharedSessionContract {
 	 * @see Query#setReadOnly(boolean)
 	 * 
 	 * @param entityOrProxy an entity or HibernateProxy
-	 * @param readOnly {@code true} if the entity or proxy should be made read-only; {@code false} if the entity or
-	 * proxy should be made modifiable
+	 * @param readOnly if true, the entity or proxy is made read-only;
+	 *                  if false, the entity or proxy is made modifiable.
 	 */
 	public void setReadOnly(Object entityOrProxy, boolean readOnly);
 
 	/**
-	 * Controller for allowing users to perform JDBC related work using the Connection managed by this Session.
+	 * Controller for allowing users to perform JDBC related work using the Connection
+	 * managed by this Session.
 	 *
 	 * @param work The work to be performed.
 	 * @throws HibernateException Generally indicates wrapped {@link java.sql.SQLException}
@@ -929,42 +920,44 @@ public interface Session extends SharedSessionContract {
 	public void doWork(Work work) throws HibernateException;
 
 	/**
-	 * Controller for allowing users to perform JDBC related work using the Connection managed by this Session.  After
-	 * execution returns the result of the {@link ReturningWork#execute} call.
-	 *
-	 * @param work The work to be performed.
-	 * @param <T> The type of the result returned from the work
-	 *
-	 * @return the result from calling {@link ReturningWork#execute}.
-	 *
-	 * @throws HibernateException Generally indicates wrapped {@link java.sql.SQLException}
-	 */
-	public <T> T doReturningWork(ReturningWork<T> work) throws HibernateException;
-
-	/**
-	 * Disconnect the session from its underlying JDBC connection.  This is intended for use in cases where the
-	 * application has supplied the JDBC connection to the session and which require long-sessions (aka, conversations).
+	 * Disconnect the <tt>Session</tt> from the current JDBC connection. If
+	 * the connection was obtained by Hibernate close it and return it to
+	 * the connection pool; otherwise, return it to the application.
 	 * <p/>
-	 * It is considered an error to call this method on a session which was not opened by supplying the JDBC connection
-	 * and an exception will be thrown.
+	 * This is used by applications which supply JDBC connections to Hibernate
+	 * and which require long-sessions (or long-conversations)
 	 * <p/>
-	 * For non-user-supplied scenarios, normal transaction management already handles disconnection and reconnection
-	 * automatically.
+	 * Note that disconnect() called on a session where the connection was
+	 * retrieved by Hibernate through its configured
+	 * {@link org.hibernate.connection.ConnectionProvider} has no effect,
+	 * provided {@link ConnectionReleaseMode#ON_CLOSE} is not in effect.
 	 *
-	 * @return the application-supplied connection or {@code null}
-	 *
+	 * @return the application-supplied connection or <tt>null</tt>
 	 * @see #reconnect(Connection)
+	 * @see #reconnect()
 	 */
-	Connection disconnect();
+	Connection disconnect() throws HibernateException;
 
 	/**
-	 * Reconnect to the given JDBC connection.
+	 * Obtain a new JDBC connection. This is used by applications which
+	 * require long transactions and do not supply connections to the
+	 * session.
+	 *
+	 * @see #disconnect()
+	 * @deprecated Manual reconnection is only needed in the case of
+	 * application-supplied connections, in which case the
+	 * {@link #reconnect(java.sql.Connection)} for should be used.
+	 */
+	void reconnect() throws HibernateException;
+
+	/**
+	 * Reconnect to the given JDBC connection. This is used by applications
+	 * which require long transactions and use application-supplied connections.
 	 *
 	 * @param connection a JDBC connection
-	 * 
 	 * @see #disconnect()
 	 */
-	void reconnect(Connection connection);
+	void reconnect(Connection connection) throws HibernateException;
 
 	/**
 	 * Is a particular fetch profile enabled on this session?
@@ -1022,15 +1015,7 @@ public interface Session extends SharedSessionContract {
 	 * Contains locking details (LockMode, Timeout and Scope).
 	 */
 	public interface LockRequest {
-		/**
-		 * Constant usable as a time out value that indicates no wait semantics should be used in
-		 * attempting to acquire locks.
-		 */
 		static final int PESSIMISTIC_NO_WAIT = 0;
-		/**
-		 * Constant usable as a time out value that indicates that attempting to acquire locks should be allowed to
-		 * wait forever (apply no timeout).
-		 */
 		static final int PESSIMISTIC_WAIT_FOREVER = -1;
 
 		/**
@@ -1043,7 +1028,7 @@ public interface Session extends SharedSessionContract {
 		/**
 		 * Specify the LockMode to be used.  The default is LockMode.none.
 		 *
-		 * @param lockMode The lock mode to use for this request
+		 * @param lockMode
 		 *
 		 * @return this LockRequest instance for operation chaining.
 		 */
@@ -1075,34 +1060,16 @@ public interface Session extends SharedSessionContract {
 
 		/**
 		 * Specify if LockMode should be cascaded to owned collections and relationships.
-		 * The association must be mapped with {@code cascade="lock"} for scope=true to work.
+		 * The association must be mapped with <tt>cascade="lock" for scope=true to work.
 		 *
-		 * @param scope {@code true} to cascade locks; {@code false} to not.
+		 * @param scope
 		 *
-		 * @return {@code this}, for method chaining
+		 * @return
 		 */
 		LockRequest setScope(boolean scope);
 
-		/**
-		 * Perform the requested locking.
-		 *
-		 * @param entityName The name of the entity to lock
-		 * @param object The instance of the entity to lock
-		 */
-		void lock(String entityName, Object object);
+		void lock(String entityName, Object object) throws HibernateException;
 
-		/**
-		 * Perform the requested locking.
-		 *
-		 * @param object The instance of the entity to lock
-		 */
-		void lock(Object object);
+		public void lock(Object object) throws HibernateException;
 	}
-
-	/**
-	 * Add one or more listeners to the Session
-	 *
-	 * @param listeners The listener(s) to add
-	 */
-	public void addEventListeners(SessionEventListener... listeners);
 }

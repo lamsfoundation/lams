@@ -42,8 +42,6 @@ public interface ColumnAliasExtractor {
 	 * @param position The column position
 	 *
 	 * @return The alias
-	 *
-	 * @throws SQLException Indicates a problem accessing the JDBC ResultSetMetaData
 	 */
 	public String extractColumnAlias(ResultSetMetaData metaData, int position) throws SQLException;
 
@@ -51,7 +49,6 @@ public interface ColumnAliasExtractor {
 	 * An extractor which uses {@link ResultSetMetaData#getColumnLabel}
 	 */
 	public static final ColumnAliasExtractor COLUMN_LABEL_EXTRACTOR = new ColumnAliasExtractor() {
-		@Override
 		public String extractColumnAlias(ResultSetMetaData metaData, int position) throws SQLException {
 			return metaData.getColumnLabel( position );
 		}
@@ -60,9 +57,7 @@ public interface ColumnAliasExtractor {
 	/**
 	 * An extractor which uses {@link ResultSetMetaData#getColumnName}
 	 */
-	@SuppressWarnings("UnusedDeclaration")
 	public static final ColumnAliasExtractor COLUMN_NAME_EXTRACTOR = new ColumnAliasExtractor() {
-		@Override
 		public String extractColumnAlias(ResultSetMetaData metaData, int position) throws SQLException {
 			return metaData.getColumnName( position );
 		}

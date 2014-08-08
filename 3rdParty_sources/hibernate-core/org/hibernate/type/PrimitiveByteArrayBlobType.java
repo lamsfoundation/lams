@@ -23,7 +23,6 @@
  */
 package org.hibernate.type;
 
-
 /**
  * Map a byte[] to a Blob
  *

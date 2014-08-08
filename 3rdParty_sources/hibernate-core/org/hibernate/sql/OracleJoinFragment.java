@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,10 +34,10 @@ import java.util.Set;
  */
 public class OracleJoinFragment extends JoinFragment {
 
-	private StringBuilder afterFrom = new StringBuilder();
-	private StringBuilder afterWhere = new StringBuilder();
+	private StringBuffer afterFrom = new StringBuffer();
+	private StringBuffer afterWhere = new StringBuffer();
 
-	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, JoinType joinType) {
+	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, int joinType) {
 
 		addCrossJoin( tableName, alias );
 
@@ -44,12 +45,12 @@ public class OracleJoinFragment extends JoinFragment {
 			setHasThetaJoins( true );
 			afterWhere.append( " and " )
 					.append( fkColumns[j] );
-			if ( joinType == JoinType.RIGHT_OUTER_JOIN || joinType == JoinType.FULL_JOIN ) afterWhere.append( "(+)" );
+			if ( joinType == RIGHT_OUTER_JOIN || joinType == FULL_JOIN ) afterWhere.append( "(+)" );
 			afterWhere.append( '=' )
 					.append( alias )
 					.append( '.' )
 					.append( pkColumns[j] );
-			if ( joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.FULL_JOIN ) afterWhere.append( "(+)" );
+			if ( joinType == LEFT_OUTER_JOIN || joinType == FULL_JOIN ) afterWhere.append( "(+)" );
 		}
 
 	}
@@ -69,8 +70,8 @@ public class OracleJoinFragment extends JoinFragment {
 
 	public JoinFragment copy() {
 		OracleJoinFragment copy = new OracleJoinFragment();
-		copy.afterFrom = new StringBuilder( afterFrom.toString() );
-		copy.afterWhere = new StringBuilder( afterWhere.toString() );
+		copy.afterFrom = new StringBuffer( afterFrom.toString() );
+		copy.afterWhere = new StringBuffer( afterWhere.toString() );
 		return copy;
 	}
 
@@ -103,13 +104,13 @@ public class OracleJoinFragment extends JoinFragment {
 		afterFrom.append( fromFragmentString );
 	}
 
-	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, JoinType joinType, String on) {
+	public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, int joinType, String on) {
 		//arbitrary on clause ignored!!
 		addJoin( tableName, alias, fkColumns, pkColumns, joinType );
-		if ( joinType == JoinType.INNER_JOIN ) {
+		if ( joinType == JoinFragment.INNER_JOIN ) {
 			addCondition( on );
 		}
-		else if ( joinType == JoinType.LEFT_OUTER_JOIN ) {
+		else if ( joinType == JoinFragment.LEFT_OUTER_JOIN ) {
 			addLeftOuterJoinCondition( on );
 		}
 		else {
@@ -126,11 +127,11 @@ public class OracleJoinFragment extends JoinFragment {
 	 * for a filter.
 	 */
 	private void addLeftOuterJoinCondition(String on) {
-		StringBuilder buf = new StringBuilder( on );
+		StringBuffer buf = new StringBuffer( on );
 		for ( int i = 0; i < buf.length(); i++ ) {
 			char character = buf.charAt( i );
-			final boolean isInsertPoint = OPERATORS.contains( Character.valueOf( character ) )
-					|| ( character == ' ' && buf.length() > i + 3 && "is ".equals( buf.substring( i + 1, i + 4 ) ) );
+			boolean isInsertPoint = OPERATORS.contains( new Character( character ) ) ||
+					( character == ' ' && buf.length() > i + 3 && "is ".equals( buf.substring( i + 1, i + 4 ) ) );
 			if ( isInsertPoint ) {
 				buf.insert( i, "(+)" );
 				i += 3;
@@ -142,8 +143,8 @@ public class OracleJoinFragment extends JoinFragment {
 	private static final Set OPERATORS = new HashSet();
 
 	static {
-		OPERATORS.add( Character.valueOf( '=' ) );
-		OPERATORS.add( Character.valueOf( '<' ) );
-		OPERATORS.add( Character.valueOf( '>' ) );
+		OPERATORS.add( new Character( '=' ) );
+		OPERATORS.add( new Character( '<' ) );
+		OPERATORS.add( new Character( '>' ) );
 	}
 }

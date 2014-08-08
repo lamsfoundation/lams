@@ -24,14 +24,14 @@
  */
 package org.hibernate.transform;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
+import java.io.Serializable;
 
-import org.hibernate.internal.CoreMessageLogger;
-
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Distinctions the result tuples in the final result based on the defined
@@ -42,12 +42,11 @@ import org.jboss.logging.Logger;
  *
  * @author Steve Ebersole
  */
-public class DistinctResultTransformer extends BasicTransformerAdapter {
+public class DistinctResultTransformer extends BasicTransformerAdapter implements Serializable {
 
 	public static final DistinctResultTransformer INSTANCE = new DistinctResultTransformer();
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class,
-                                                                       DistinctResultTransformer.class.getName());
+	private static final Logger log = LoggerFactory.getLogger( DistinctResultTransformer.class );
 
 	/**
 	 * Helper class to handle distincting
@@ -62,8 +61,7 @@ public class DistinctResultTransformer extends BasicTransformerAdapter {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
-        public boolean equals(Object other) {
+		public boolean equals(Object other) {
 			return Identity.class.isInstance( other )
 					&& this.entity == ( ( Identity ) other ).entity;
 		}
@@ -71,8 +69,7 @@ public class DistinctResultTransformer extends BasicTransformerAdapter {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
-        public int hashCode() {
+		public int hashCode() {
 			return System.identityHashCode( entity );
 		}
 	}
@@ -86,8 +83,7 @@ public class DistinctResultTransformer extends BasicTransformerAdapter {
 	/**
 	 * Uniquely distinct each tuple row here.
 	 */
-	@Override
-    public List transformList(List list) {
+	public List transformList(List list) {
 		List result = new ArrayList( list.size() );
 		Set distinct = new HashSet();
 		for ( int i = 0; i < list.size(); i++ ) {
@@ -96,7 +92,13 @@ public class DistinctResultTransformer extends BasicTransformerAdapter {
 				result.add( entity );
 			}
 		}
-		LOG.debugf( "Transformed: %s rows to: %s distinct results", list.size(), result.size() );
+		if ( log.isDebugEnabled() ) {
+			log.debug(
+					"transformed: " +
+							list.size() + " rows to: " +
+							result.size() + " distinct results"
+			);
+		}
 		return result;
 	}
 

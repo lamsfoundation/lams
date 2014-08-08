@@ -27,9 +27,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.HibernateException;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.usertype.CompositeUserType;
 import org.hibernate.usertype.UserType;
 
@@ -39,11 +40,11 @@ import org.hibernate.usertype.UserType;
  * @author Steve Ebersole
  */
 public class BasicTypeRegistry implements Serializable {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( BasicTypeRegistry.class );
+	private static final Logger log = LoggerFactory.getLogger( BasicTypeRegistry.class );
 
 	// TODO : analyze these sizing params; unfortunately this seems to be the only way to give a "concurrencyLevel"
 	private Map<String,BasicType> registry = new ConcurrentHashMap<String, BasicType>( 100, .75f, 1 );
-	private boolean locked;
+	private boolean locked = false;
 
 	public BasicTypeRegistry() {
 		register( BooleanType.INSTANCE );
@@ -62,8 +63,6 @@ public class BasicTypeRegistry implements Serializable {
 		register( BigIntegerType.INSTANCE );
 
 		register( StringType.INSTANCE );
-		register( StringNVarcharType.INSTANCE );
-		register( CharacterNCharType.INSTANCE );
 		register( UrlType.INSTANCE );
 
 		register( DateType.INSTANCE );
@@ -87,13 +86,13 @@ public class BasicTypeRegistry implements Serializable {
 		register( CharArrayType.INSTANCE );
 		register( CharacterArrayType.INSTANCE );
 		register( TextType.INSTANCE );
-		register( NTextType.INSTANCE );
 		register( BlobType.INSTANCE );
 		register( MaterializedBlobType.INSTANCE );
+		register( WrappedMaterializedBlobType.INSTANCE );
 		register( ClobType.INSTANCE );
-		register( NClobType.INSTANCE );
 		register( MaterializedClobType.INSTANCE );
-		register( MaterializedNClobType.INSTANCE );
+		register( CharacterArrayClobType.INSTANCE );
+		register( PrimitiveCharacterArrayClobType.INSTANCE );
 		register( SerializableType.INSTANCE );
 
 		register( ObjectType.INSTANCE );
@@ -137,15 +136,19 @@ public class BasicTypeRegistry implements Serializable {
 		}
 
 		if ( type.getRegistrationKeys() == null || type.getRegistrationKeys().length == 0 ) {
-			LOG.typeDefinedNoRegistrationKeys( type );
+			log.warn( "Type [{}] defined no registration keys; ignoring", type );
 		}
 
 		for ( String key : type.getRegistrationKeys() ) {
 			// be safe...
-            if (key == null) continue;
-            LOG.debugf("Adding type registration %s -> %s", key, type);
+			if ( key == null ) {
+				continue;
+			}
+			log.debug( "Adding type registration {} -> {}", key, type );
 			final Type old = registry.put( key, type );
-            if (old != null && old != type) LOG.typeRegistrationOverridesPrevious(key, old);
+			if ( old != null && old != type ) {
+				log.info( "Type registration [{}] overrides previous : {}", key, old );
+			}
 		}
 	}
 

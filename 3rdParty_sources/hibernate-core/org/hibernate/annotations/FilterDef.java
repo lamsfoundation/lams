@@ -22,15 +22,15 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
- * Filter definition.  Defines a name, default condition and parameter types (if any).
+ * Filter definition
  *
  * @author Matthew Inger
  * @author Emmanuel Bernard
@@ -38,18 +38,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, PACKAGE})
 @Retention(RUNTIME)
 public @interface FilterDef {
-	/**
-	 * The filter name.
-	 */
 	String name();
 
-	/**
-	 * The default filter condition.
-	 */
 	String defaultCondition() default "";
 
-	/**
-	 * The filter parameter definitions.
-	 */
 	ParamDef[] parameters() default {};
 }

@@ -23,16 +23,17 @@
  *
  */
 package org.hibernate.loader.custom.sql;
+
+import org.hibernate.QueryException;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.query.ParameterParser;
+import org.hibernate.persister.collection.SQLLoadableCollection;
+import org.hibernate.persister.entity.SQLLoadable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.QueryException;
-import org.hibernate.engine.query.spi.ParameterParser;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.persister.collection.SQLLoadableCollection;
-import org.hibernate.persister.entity.SQLLoadable;
 
 /**
  * @author Gavin King
@@ -51,7 +52,7 @@ public class SQLQueryParser {
 	private final ParserContext context;
 
 	private final Map namedParameters = new HashMap();
-	private long aliasesFound;
+	private long aliasesFound = 0;
 
 	static interface ParserContext {
 		boolean isEntityAlias(String aliasName);
@@ -87,7 +88,7 @@ public class SQLQueryParser {
 	//       don't get'em'all we throw an exception! Way better than trial and error ;)
 	private String substituteBrackets(String sqlQuery) throws QueryException {
 
-		StringBuilder result = new StringBuilder( sqlQuery.length() + 20 );
+		StringBuffer result = new StringBuffer( sqlQuery.length() + 20 );
 		int left, right;
 
 		// replace {....} with corresponding column aliases
@@ -295,38 +296,33 @@ public class SQLQueryParser {
 	}
 
 	public static class ParameterSubstitutionRecognizer implements ParameterParser.Recognizer {
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 		Map namedParameterBindPoints = new HashMap();
-		int parameterCount;
+		int parameterCount = 0;
 
-		@Override
 		public void outParameter(int position) {
 			result.append( '?' );
 		}
 
-		@Override
 		public void ordinalParameter(int position) {
 			result.append( '?' );
 		}
 
-		@Override
 		public void namedParameter(String name, int position) {
 			addNamedParameter( name );
 			result.append( '?' );
 		}
 
-		@Override
 		public void jpaPositionalParameter(String name, int position) {
 			namedParameter( name, position );
 		}
 
-		@Override
 		public void other(char character) {
 			result.append( character );
 		}
 
 		private void addNamedParameter(String name) {
-			Integer loc = parameterCount++;
+			Integer loc = new Integer( parameterCount++ );
 			Object o = namedParameterBindPoints.get( name );
 			if ( o == null ) {
 				namedParameterBindPoints.put( name, loc );

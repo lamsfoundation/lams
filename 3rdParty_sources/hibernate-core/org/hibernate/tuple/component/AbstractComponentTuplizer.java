@@ -23,16 +23,17 @@
  *
  */
 package org.hibernate.tuple.component;
+
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.tuple.Instantiator;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.Property;
 import org.hibernate.property.Getter;
 import org.hibernate.property.Setter;
-import org.hibernate.tuple.Instantiator;
 
 /**
  * Support for tuplizers relating to components.

@@ -26,11 +26,13 @@ package org.hibernate.dialect.lock;
 import java.io.Serializable;
 
 import org.hibernate.HibernateException;
+import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
-import org.hibernate.action.internal.EntityIncrementVersionProcess;
-import org.hibernate.engine.spi.EntityEntry;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.event.spi.EventSource;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.action.EntityIncrementVersionProcess;
+import org.hibernate.engine.EntityEntry;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.event.EventSource;
 import org.hibernate.persister.entity.Lockable;
 
 /**
@@ -60,14 +62,22 @@ public class OptimisticForceIncrementLockingStrategy implements LockingStrategy 
 		}
 	}
 
-	@Override
-	public void lock(Serializable id, Object version, Object object, int timeout, SessionImplementor session) {
+	/**
+	 * @see LockingStrategy#lock
+	 */
+	public void lock(
+			Serializable id,
+			Object version,
+			Object object,
+			int timeout, SessionImplementor session) throws StaleObjectStateException, JDBCException {
 		if ( !lockable.isVersioned() ) {
 			throw new HibernateException( "[" + lockMode + "] not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
 		}
-		final EntityEntry entry = session.getPersistenceContext().getEntry( object );
-		// Register the EntityIncrementVersionProcess action to run just prior to transaction commit.
-		( (EventSource) session ).getActionQueue().registerProcess( new EntityIncrementVersionProcess( object, entry ) );
+		EntityEntry entry = session.getPersistenceContext().getEntry( object );
+		EntityIncrementVersionProcess incrementVersion = new EntityIncrementVersionProcess( object, entry );
+		EventSource source = (EventSource) session;
+		// Register the EntityIncrementVersionProcess action to run just prior to transaction commit. 
+		source.getActionQueue().registerProcess( incrementVersion );
 	}
 
 	protected LockMode getLockMode() {

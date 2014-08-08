@@ -23,7 +23,6 @@
  */
 package org.hibernate.cfg;
 
-
 /**
  * Bind query
  *

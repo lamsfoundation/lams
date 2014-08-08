@@ -23,10 +23,11 @@
  *
  */
 package org.hibernate.proxy;
+
 import java.io.Serializable;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * Handles fetching of the underlying entity for a proxy
@@ -43,14 +44,14 @@ public interface LazyInitializer {
 	public void initialize() throws HibernateException;
 
 	/**
-	 * Retrieve the identifier value for the entity our owning proxy represents.
+	 * Retrieve the identifier value for the enity our owning proxy represents.
 	 *
 	 * @return The identifier value.
 	 */
 	public Serializable getIdentifier();
 
 	/**
-	 * Set the identifier value for the entity our owning proxy represents.
+	 * Set the identifier value for the enity our owning proxy represents.
 	 *
 	 * @param id The identifier value.
 	 */
@@ -94,7 +95,7 @@ public interface LazyInitializer {
 	 *
 	 * @throws HibernateException Indicates problem locating the target.
 	 */
-	public Object getImplementation(SessionImplementor session) throws HibernateException;
+	public abstract Object getImplementation(SessionImplementor session) throws HibernateException;
 
 	/**
 	 * Initialize the proxy manually by injecting its target.
@@ -117,12 +118,12 @@ public interface LazyInitializer {
 	 * detached or its associated session is closed.
 	 *
 	 * To check if the read-only/modifiable setting is available:
+	 * @see org.hibernate.proxy.LazyInitializer#isReadOnlySettingAvailable()
 	 *
 	 * @return true, if this proxy is read-only; false, otherwise
 	 * @throws org.hibernate.TransientObjectException if the proxy is detached (getSession() == null)
 	 * @throws org.hibernate.SessionException if the proxy is associated with a sesssion that is closed
 	 *
-	 * @see org.hibernate.proxy.LazyInitializer#isReadOnlySettingAvailable()
 	 * @see org.hibernate.Session#isReadOnly(Object entityOrProxy)
 	 */
 	public boolean isReadOnly();
@@ -138,10 +139,10 @@ public interface LazyInitializer {
 	 * If the associated proxy already has the specified read-only/modifiable
 	 * setting, then this method does nothing.
 	 *
-	 * @param readOnly if true, the associated proxy is made read-only;
+	 * @param readOnly, if true, the associated proxy is made read-only;
 	 *                  if false, the associated proxy is made modifiable.
 	 * @throws org.hibernate.TransientObjectException if the proxy is not association with a session
-	 * @throws org.hibernate.SessionException if the proxy is associated with a session that is closed
+	 * @throws org.hibernate.SessionException if the proxy is associated with a sesssion that is closed
 	 * 
 	 * @see org.hibernate.Session#setReadOnly(Object entityOrProxy, boolean readOnly)
 	 */

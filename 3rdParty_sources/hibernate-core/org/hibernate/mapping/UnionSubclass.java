@@ -22,10 +22,11 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.Mapping;
 
 /**
  * A subclass in a table-per-concrete-class mapping

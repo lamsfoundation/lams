@@ -20,6 +20,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate;
+
 import java.io.Serializable;
 
 /**
@@ -98,28 +99,6 @@ public interface Cache {
 	public void evictEntityRegions();
 
 	/**
-	 * Evicts all naturalId data from the given region (i.e. for all entities of
-	 * type).
-	 *
-	 * @param naturalIdClass The naturalId class.
-	 */
-	@SuppressWarnings( {"UnusedDeclaration"})
-	public void evictNaturalIdRegion(Class naturalIdClass);
-
-	/**
-	 * Evicts all naturalId data from the given region (i.e. for all entities of
-	 * type).
-	 *
-	 * @param naturalIdName The naturalId name.
-	 */
-	public void evictNaturalIdRegion(String naturalIdName);
-
-	/**
-	 * Evict data from all naturalId regions.
-	 */
-	public void evictNaturalIdRegions();
-
-	/**
 	 * Determine whether the cache contains data for the given collection.
 	 * <p/>
 	 * The semantic here is whether the cache contains data visible for the
@@ -132,7 +111,6 @@ public interface Cache {
 	 *
 	 * @return True if the underlying cache contains corresponding data; false otherwise.
 	 */
-	@SuppressWarnings( {"UnusedDeclaration"})
 	public boolean containsCollection(String role, Serializable ownerIdentifier);
 
 	/**
@@ -145,7 +123,7 @@ public interface Cache {
 
 	/**
 	 * Evicts all entity data from the given region (i.e. evicts cached data
-	 * for all of the specified collection role).
+	 * for all of the specified c9ollection role).
 	 *
 	 * @param role The "collection role" (in form [owner-entity-name].[collection-property-name]).
 	 */
@@ -166,7 +144,6 @@ public interface Cache {
 	 *
 	 * @return True if the underlying cache contains corresponding data; false otherwise.
 	 */
-	@SuppressWarnings( {"UnusedDeclaration"})
 	public boolean containsQuery(String regionName);
 
 	/**
@@ -185,9 +162,4 @@ public interface Cache {
 	 * Evict data from all query regions.
 	 */
 	public void evictQueryRegions();
-	
-	/**
-	 * Evict all data from the cache.
-	 */
-	public void evictAllRegions();
 }

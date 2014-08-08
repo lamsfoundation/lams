@@ -44,24 +44,25 @@ public class YesNoType
 	public YesNoType() {
 		super( CharTypeDescriptor.INSTANCE, BooleanTypeDescriptor.INSTANCE );
 	}
-	@Override
+
 	public String getName() {
 		return "yes_no";
 	}
-	@Override
+
 	public Class getPrimitiveClass() {
 		return boolean.class;
 	}
-	@Override
+
 	public Boolean stringToObject(String xml) throws Exception {
 		return fromString( xml );
 	}
-	@Override
+
 	public Serializable getDefaultValue() {
 		return Boolean.FALSE;
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryUnboxing" })
 	public String objectToSQLString(Boolean value, Dialect dialect) throws Exception {
-		return StringType.INSTANCE.objectToSQLString( value ? "Y" : "N", dialect );
+		return StringType.INSTANCE.objectToSQLString( value.booleanValue() ? "Y" : "N", dialect );
 	}
 }

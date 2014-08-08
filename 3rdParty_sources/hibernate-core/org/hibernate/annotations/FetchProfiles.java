@@ -21,6 +21,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
+// $Id$
+
 package org.hibernate.annotations;
 
 import java.lang.annotation.Retention;
@@ -31,15 +34,10 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Collects together multiple fetch profiles.
- *
  * @author Hardy Ferentschik
  */
 @Target({ TYPE, PACKAGE })
 @Retention(RUNTIME)
 public @interface FetchProfiles {
-	/**
-	 * The aggregated fetch profiles.
-	 */
-	public FetchProfile[] value();
+	public abstract FetchProfile[] value();
 }

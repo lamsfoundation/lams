@@ -24,10 +24,12 @@
 package org.hibernate.mapping;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.hibernate.internal.util.collections.JoinedIterator;
+import org.hibernate.util.JoinedIterator;
 
 /**
  * @author Gavin King
@@ -41,23 +43,20 @@ public class DenormalizedTable extends Table {
 		includedTable.setHasDenormalizedTables();
 	}
 	
-	@Override
-    public void createForeignKeys() {
+	public void createForeignKeys() {
 		includedTable.createForeignKeys();
 		Iterator iter = includedTable.getForeignKeyIterator();
 		while ( iter.hasNext() ) {
 			ForeignKey fk = (ForeignKey) iter.next();
 			createForeignKey( 
-					Constraint.generateName( fk.generatedConstraintNamePrefix(), this, fk.getColumns() ),
+					fk.getName() + Integer.toHexString( getName().hashCode() ), 
 					fk.getColumns(), 
-					fk.getReferencedEntityName(),
-					fk.getReferencedColumns()
+					fk.getReferencedEntityName() 
 				);
 		}
 	}
 
-	@Override
-    public Column getColumn(Column column) {
+	public Column getColumn(Column column) {
 		Column superColumn = super.getColumn( column );
 		if (superColumn != null) {
 			return superColumn;
@@ -67,36 +66,33 @@ public class DenormalizedTable extends Table {
 		}
 	}
 
-	@Override
-    public Iterator getColumnIterator() {
+	public Iterator getColumnIterator() {
 		return new JoinedIterator(
 				includedTable.getColumnIterator(),
 				super.getColumnIterator()
 			);
 	}
 
-	@Override
-    public boolean containsColumn(Column column) {
+	public boolean containsColumn(Column column) {
 		return super.containsColumn(column) || includedTable.containsColumn(column);
 	}
 
-	@Override
-    public PrimaryKey getPrimaryKey() {
+	public PrimaryKey getPrimaryKey() {
 		return includedTable.getPrimaryKey();
 	}
 
-	@Override
-    public Iterator getUniqueKeyIterator() {
-		Iterator iter = includedTable.getUniqueKeyIterator();
-		while ( iter.hasNext() ) {
-			UniqueKey uk = (UniqueKey) iter.next();
-			createUniqueKey( uk.getColumns() );
-		}
-		return getUniqueKeys().values().iterator();
+	public Iterator getUniqueKeyIterator() {
+		//wierd implementation because of hacky behavior
+		//of Table.sqlCreateString() which modifies the
+		//list of unique keys by side-effect on some
+		//dialects
+		Map uks = new HashMap();
+		uks.putAll( getUniqueKeys() );
+		uks.putAll( includedTable.getUniqueKeys() );
+		return uks.values().iterator();
 	}
 
-	@Override
-    public Iterator getIndexIterator() {
+	public Iterator getIndexIterator() {
 		List indexes = new ArrayList();
 		Iterator iter = includedTable.getIndexIterator();
 		while ( iter.hasNext() ) {

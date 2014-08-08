@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,44 +20,40 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.persister.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.MappingException;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
-import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
+import org.hibernate.cache.access.EntityRegionAccessStrategy;
 import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
 import org.hibernate.id.IdentityGenerator;
-import org.hibernate.internal.FilterAliasGenerator;
-import org.hibernate.internal.StaticFilterAliasGenerator;
-import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.internal.util.collections.JoinedIterator;
-import org.hibernate.internal.util.collections.SingletonIterator;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Subclass;
 import org.hibernate.mapping.Table;
-import org.hibernate.metamodel.binding.EntityBinding;
 import org.hibernate.sql.SelectFragment;
 import org.hibernate.sql.SimpleSelect;
-import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.JoinedIterator;
+import org.hibernate.util.SingletonIterator;
 
 /**
  * Implementation of the "table-per-concrete-class" or "roll-down" mapping 
@@ -74,7 +70,6 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 	private final String[] subclassClosure;
 	private final String[] spaces;
 	private final String[] subclassSpaces;
-	private final Object discriminatorValue;
 	private final String discriminatorSQLValue;
 	private final Map subclassByDiscriminatorValue = new HashMap();
 
@@ -86,11 +81,10 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 	public UnionSubclassEntityPersister(
 			final PersistentClass persistentClass, 
 			final EntityRegionAccessStrategy cacheAccessStrategy,
-			final NaturalIdRegionAccessStrategy naturalIdRegionAccessStrategy,
 			final SessionFactoryImplementor factory,
 			final Mapping mapping) throws HibernateException {
 
-		super( persistentClass, cacheAccessStrategy, naturalIdRegionAccessStrategy, factory );
+		super( persistentClass, cacheAccessStrategy, factory );
 		
 		if ( getIdentifierGenerator() instanceof IdentityGenerator ) {
 			throw new MappingException(
@@ -150,7 +144,6 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 		deleteCallable = new boolean[] { callable };
 		deleteResultCheckStyles = new ExecuteUpdateResultCheckStyle[] { checkStyle };
 
-		discriminatorValue = persistentClass.getSubclassId();
 		discriminatorSQLValue = String.valueOf( persistentClass.getSubclassId() );
 
 		// PROPERTIES
@@ -161,7 +154,7 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 
 		// SUBCLASSES
 		subclassByDiscriminatorValue.put( 
-				persistentClass.getSubclassId(),
+				new Integer( persistentClass.getSubclassId() ), 
 				persistentClass.getEntityName() 
 		);
 		if ( persistentClass.isPolymorphic() ) {
@@ -170,7 +163,7 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 			while ( iter.hasNext() ) {
 				Subclass sc = (Subclass) iter.next();
 				subclassClosure[k++] = sc.getEntityName();
-				subclassByDiscriminatorValue.put( sc.getSubclassId(), sc.getEntityName() );
+				subclassByDiscriminatorValue.put( new Integer( sc.getSubclassId() ), sc.getEntityName() );
 			}
 		}
 		
@@ -243,25 +236,6 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 
 	}
 
-	public UnionSubclassEntityPersister(
-			final EntityBinding entityBinding,
-			final EntityRegionAccessStrategy cacheAccessStrategy,
-			final NaturalIdRegionAccessStrategy naturalIdRegionAccessStrategy,
-			final SessionFactoryImplementor factory,
-			final Mapping mapping) throws HibernateException {
-		super(entityBinding, cacheAccessStrategy, naturalIdRegionAccessStrategy, factory );
-		// TODO: implement!!! initializing final fields to null to make compiler happy.
-		subquery = null;
-		tableName = null;
-		subclassClosure = null;
-		spaces = null;
-		subclassSpaces = null;
-		discriminatorValue = null;
-		discriminatorSQLValue = null;
-		constraintOrderedTableNames = null;
-		constraintOrderedKeyColumnNames = null;
-	}
-
 	public Serializable[] getQuerySpaces() {
 		return subclassSpaces;
 	}
@@ -271,11 +245,7 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 	}
 
 	public Type getDiscriminatorType() {
-		return StandardBasicTypes.INTEGER;
-	}
-
-	public Object getDiscriminatorValue() {
-		return discriminatorValue;
+		return Hibernate.INTEGER;
 	}
 
 	public String getDiscriminatorSQLValue() {
@@ -357,16 +327,10 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 		return getTableName() + ' '  + name;
 	}
 
-	@Override
 	public String filterFragment(String name) {
-		return hasWhere()
-				? " and " + getSQLWhereString( name )
-				: "";
-	}
-
-	@Override
-	protected String filterFragment(String alias, Set<String> treatAsDeclarations) {
-		return filterFragment( alias );
+		return hasWhere() ?
+			" and " + getSQLWhereString(name) :
+			"";
 	}
 
 	public String getSubclassPropertyTableName(int i) {
@@ -437,7 +401,7 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 			}
 		}
 
-		StringBuilder buf = new StringBuilder()
+		StringBuffer buf = new StringBuffer()
 			.append("( ");
 
 		Iterator siter = new JoinedIterator(
@@ -459,7 +423,7 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 						buf.append( dialect.getSelectClauseNullString(sqlType) )
 							.append(" as ");
 					}
-					buf.append( col.getQuotedName(dialect) );
+					buf.append( col.getName() );
 					buf.append(", ");
 				}
 				buf.append( clazz.getSubclassId() )
@@ -515,10 +479,5 @@ public class UnionSubclassEntityPersister extends AbstractEntityPersister {
 
 	public String[][] getContraintOrderedTableKeyColumnClosure() {
 		return constraintOrderedKeyColumnNames;
-	}
-
-	@Override
-	public FilterAliasGenerator getFilterAliasGenerator(String rootAlias) {
-		return new StaticFilterAliasGenerator(rootAlias);
 	}
 }

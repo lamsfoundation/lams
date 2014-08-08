@@ -21,6 +21,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
+// $Id$
+
 package org.hibernate.cfg.annotations.reflection;
 
 import java.io.Serializable;
@@ -28,29 +31,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.AccessType;
-import javax.persistence.AttributeConverter;
 
-import org.hibernate.AnnotationException;
-import org.hibernate.cfg.AttributeConverterDefinition;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.internal.CoreLogging;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.ReflectHelper;
-import org.hibernate.internal.util.StringHelper;
+import javax.persistence.AccessType;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
 
+import org.hibernate.AnnotationException;
+import org.hibernate.util.StringHelper;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 /**
- * A helper for consuming orm.xml mappings.
- *
  * @author Emmanuel Bernard
- * @author Brett Meyer
  */
 public class XMLContext implements Serializable {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( XMLContext.class );
-
+	private Logger log = LoggerFactory.getLogger( XMLContext.class );
 	private Default globalDefaults;
 	private Map<String, Element> classOverriding = new HashMap<String, Element>();
 	private Map<String, Default> defaultsOverriding = new HashMap<String, Default>();
@@ -93,7 +90,7 @@ public class XMLContext implements Serializable {
 				}
 			}
 			else {
-				LOG.duplicateMetadata();
+				log.warn( "Found more than one <persistence-unit-metadata>, subsequent ignored" );
 			}
 		}
 
@@ -109,16 +106,14 @@ public class XMLContext implements Serializable {
 		unitElement = root.element( "access" );
 		setAccess( unitElement, entityMappingDefault );
 		defaultElements.add( root );
-		
-		setLocalAttributeConverterDefinitions( root.elements( "converter" ) );
 
-		List<Element> entities = root.elements( "entity" );
+		List<Element> entities = (List<Element>) root.elements( "entity" );
 		addClass( entities, packageName, entityMappingDefault, addedClasses );
 
-		entities = root.elements( "mapped-superclass" );
+		entities = (List<Element>) root.elements( "mapped-superclass" );
 		addClass( entities, packageName, entityMappingDefault, addedClasses );
 
-		entities = root.elements( "embeddable" );
+		entities = (List<Element>) root.elements( "embeddable" );
 		addClass( entities, packageName, entityMappingDefault, addedClasses );
 		return addedClasses;
 	}
@@ -162,7 +157,7 @@ public class XMLContext implements Serializable {
 			setAccess( access, localDefault );
 			defaultsOverriding.put( className, localDefault );
 
-			LOG.debugf( "Adding XML overriding information for %s", className );
+			log.debug( "Adding XML overriding information for {}", className );
 			addEntityListenerClasses( element, packageName, addedClasses );
 		}
 	}
@@ -172,48 +167,29 @@ public class XMLContext implements Serializable {
 		Element listeners = element.element( "entity-listeners" );
 		if ( listeners != null ) {
 			@SuppressWarnings( "unchecked" )
-			List<Element> elements = listeners.elements( "entity-listener" );
+			List<Element> elements = (List<Element>) listeners.elements( "entity-listener" );
 			for (Element listener : elements) {
 				String listenerClassName = buildSafeClassName( listener.attributeValue( "class" ), packageName );
 				if ( classOverriding.containsKey( listenerClassName ) ) {
 					//maybe switch it to warn?
 					if ( "entity-listener".equals( classOverriding.get( listenerClassName ).getName() ) ) {
-						LOG.duplicateListener( listenerClassName );
+						log.info(
+								"entity-listener duplication, first event definition will be used: {}",
+								listenerClassName
+						);
 						continue;
 					}
-					throw new IllegalStateException("Duplicate XML entry for " + listenerClassName);
+					else {
+						throw new IllegalStateException( "Duplicate XML entry for " + listenerClassName );
+					}
 				}
 				localAddedClasses.add( listenerClassName );
 				classOverriding.put( listenerClassName, listener );
 			}
 		}
-		LOG.debugf( "Adding XML overriding information for listeners: %s", localAddedClasses );
+		log.debug( "Adding XML overriding information for listener: {}", localAddedClasses );
 		addedClasses.addAll( localAddedClasses );
 		return localAddedClasses;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void setLocalAttributeConverterDefinitions(List<Element> converterElements) {
-		for ( Element converterElement : converterElements ) {
-			final String className = converterElement.attributeValue( "class" );
-			final String autoApplyAttribute = converterElement.attributeValue( "auto-apply" );
-			final boolean autoApply = autoApplyAttribute != null && Boolean.parseBoolean( autoApplyAttribute );
-
-			try {
-				final Class<? extends AttributeConverter> attributeConverterClass = ReflectHelper.classForName(
-						className
-				);
-				attributeConverterDefinitions.add(
-						new AttributeConverterDefinition( attributeConverterClass.newInstance(), autoApply )
-				);
-			}
-			catch (ClassNotFoundException e) {
-				throw new AnnotationException( "Unable to locate specified AttributeConverter implementation class : " + className, e );
-			}
-			catch (Exception e) {
-				throw new AnnotationException( "Unable to instantiate specified AttributeConverter implementation class : " + className, e );
-			}
-		}
 	}
 
 	public static String buildSafeClassName(String className, String defaultPackageName) {
@@ -247,15 +223,6 @@ public class XMLContext implements Serializable {
 
 	public boolean hasContext() {
 		return hasContext;
-	}
-
-	private List<AttributeConverterDefinition> attributeConverterDefinitions = new ArrayList<AttributeConverterDefinition>();
-
-	public void applyDiscoveredAttributeConverters(Configuration configuration) {
-		for ( AttributeConverterDefinition definition : attributeConverterDefinitions ) {
-			configuration.addAttributeConverter( definition );
-		}
-		attributeConverterDefinitions.clear();
 	}
 
 	public static class Default implements Serializable {

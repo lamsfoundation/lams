@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.usertype;
 
@@ -29,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
 
 /**
  * This interface should be implemented by user-defined "types".
@@ -100,30 +100,29 @@ public interface UserType {
 	 * Retrieve an instance of the mapped class from a JDBC resultset. Implementors
 	 * should handle possibility of null values.
 	 *
-	 *
 	 * @param rs a JDBC result set
 	 * @param names the column names
-	 * @param session
-	 *@param owner the containing entity  @return Object
+	 * @param owner the containing entity
+	 * @return Object
 	 * @throws HibernateException
 	 * @throws SQLException
+	 * @deprecated SessionImplementor will be added as an argument in a future version (see HHH-5968)
 	 */
-	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner) throws HibernateException, SQLException;
+	public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException, SQLException;
 
 	/**
 	 * Write an instance of the mapped class to a prepared statement. Implementors
 	 * should handle possibility of null values. A multi-column type should be written
 	 * to parameters starting from <tt>index</tt>.
 	 *
-	 *
 	 * @param st a JDBC prepared statement
 	 * @param value the object to write
 	 * @param index statement parameter index
-	 * @param session
 	 * @throws HibernateException
 	 * @throws SQLException
+	 * @deprecated SessionImplementor will be added as an argument in a future version (see HHH-5968)
 	 */
-	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session) throws HibernateException, SQLException;
+	public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException, SQLException;
 
 	/**
 	 * Return a deep copy of the persistent state, stopping at entities and at
@@ -177,7 +176,6 @@ public interface UserType {
 	 * @return the value to be merged
 	 */
 	public Object replace(Object original, Object target, Object owner) throws HibernateException;
-
 }
 
 

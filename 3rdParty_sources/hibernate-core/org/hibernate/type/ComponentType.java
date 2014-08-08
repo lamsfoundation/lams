@@ -25,38 +25,36 @@ package org.hibernate.type;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.hibernate.EntityMode;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.spi.CascadeStyle;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.metamodel.relational.Size;
-import org.hibernate.tuple.StandardProperty;
-import org.hibernate.tuple.component.ComponentMetamodel;
+import org.hibernate.engine.CascadeStyle;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.tuple.component.ComponentTuplizer;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.hibernate.tuple.component.ComponentMetamodel;
+import org.hibernate.tuple.StandardProperty;
+import org.hibernate.tuple.EntityModeToTuplizerMapping;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.StringHelper;
 
 /**
  * Handles "component" mappings
  *
  * @author Gavin King
  */
-public class ComponentType extends AbstractType implements CompositeType, ProcedureParameterExtractionAware {
+public class ComponentType extends AbstractType implements CompositeType {
 
 	private final TypeFactory.TypeScope typeScope;
 	private final String[] propertyNames;
@@ -66,10 +64,8 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 	private final CascadeStyle[] cascade;
 	private final FetchMode[] joinedFetch;
 	private final boolean isKey;
-	private boolean hasNotNullProperty;
 
-	protected final EntityMode entityMode;
-	protected final ComponentTuplizer componentTuplizer;
+	protected final EntityModeToTuplizerMapping tuplizerMapping;
 
 	public ComponentType(TypeFactory.TypeScope typeScope, ComponentMetamodel metamodel) {
 		this.typeScope = typeScope;
@@ -89,27 +85,32 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 			this.propertyNullability[i] = prop.isNullable();
 			this.cascade[i] = prop.getCascadeStyle();
 			this.joinedFetch[i] = prop.getFetchMode();
-			if (!prop.isNullable()) {
-				hasNotNullProperty = true;
-			}
 		}
 
-		this.entityMode = metamodel.getEntityMode();
-		this.componentTuplizer = metamodel.getComponentTuplizer();
+		this.tuplizerMapping = metamodel.getTuplizerMapping();
 	}
 
 	public boolean isKey() {
 		return isKey;
 	}
 
-	public EntityMode getEntityMode() {
-		return entityMode;
+	public EntityModeToTuplizerMapping getTuplizerMapping() {
+		return tuplizerMapping;
 	}
 
-	public ComponentTuplizer getComponentTuplizer() {
-		return componentTuplizer;
+	public int[] sqlTypes(Mapping mapping) throws MappingException {
+		//Not called at runtime so doesn't matter if its slow :)
+		int[] sqlTypes = new int[getColumnSpan( mapping )];
+		int n = 0;
+		for ( int i = 0; i < propertySpan; i++ ) {
+			int[] subtypes = propertyTypes[i].sqlTypes( mapping );
+			for ( int j = 0; j < subtypes.length; j++ ) {
+				sqlTypes[n++] = subtypes[j];
+			}
+		}
+		return sqlTypes;
 	}
-	@Override
+
 	public int getColumnSpan(Mapping mapping) throws MappingException {
 		int span = 0;
 		for ( int i = 0; i < propertySpan; i++ ) {
@@ -117,58 +118,16 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		}
 		return span;
 	}
-	@Override
-	public int[] sqlTypes(Mapping mapping) throws MappingException {
-		//Not called at runtime so doesn't matter if its slow :)
-		int[] sqlTypes = new int[getColumnSpan( mapping )];
-		int n = 0;
-		for ( int i = 0; i < propertySpan; i++ ) {
-			int[] subtypes = propertyTypes[i].sqlTypes( mapping );
-			for ( int subtype : subtypes ) {
-				sqlTypes[n++] = subtype;
-			}
-		}
-		return sqlTypes;
-	}
 
-	@Override
-	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
-		//Not called at runtime so doesn't matter if its slow :)
-		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
-		int soFar = 0;
-		for ( Type propertyType : propertyTypes ) {
-			final Size[] propertySizes = propertyType.dictatedSizes( mapping );
-			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
-			soFar += propertySizes.length;
-		}
-		return sizes;
-	}
-
-	@Override
-	public Size[] defaultSizes(Mapping mapping) throws MappingException {
-		//Not called at runtime so doesn't matter if its slow :)
-		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
-		int soFar = 0;
-		for ( Type propertyType : propertyTypes ) {
-			final Size[] propertySizes = propertyType.defaultSizes( mapping );
-			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
-			soFar += propertySizes.length;
-		}
-		return sizes;
-	}
-
-
-	@Override
-    public final boolean isComponentType() {
+	public final boolean isComponentType() {
 		return true;
 	}
 
 	public Class getReturnedClass() {
-		return componentTuplizer.getMappedClass();
+		return tuplizerMapping.getTuplizer( EntityMode.POJO ).getMappedClass(); //TODO
 	}
 
-	@Override
-    public boolean isSame(Object x, Object y) throws HibernateException {
+	public boolean isSame(Object x, Object y, EntityMode entityMode) throws HibernateException {
 		if ( x == y ) {
 			return true;
 		}
@@ -178,52 +137,57 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		Object[] xvalues = getPropertyValues( x, entityMode );
 		Object[] yvalues = getPropertyValues( y, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			if ( !propertyTypes[i].isSame( xvalues[i], yvalues[i] ) ) {
+			if ( !propertyTypes[i].isSame( xvalues[i], yvalues[i], entityMode ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	@Override
-	public boolean isEqual(final Object x, final Object y) throws HibernateException {
+	public boolean isEqual(Object x, Object y, EntityMode entityMode)
+			throws HibernateException {
 		if ( x == y ) {
 			return true;
 		}
 		if ( x == null || y == null ) {
 			return false;
 		}
+		Object[] xvalues = getPropertyValues( x, entityMode );
+		Object[] yvalues = getPropertyValues( y, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			if ( !propertyTypes[i].isEqual( getPropertyValue( x, i ), getPropertyValue( y, i ) ) ) {
+			if ( !propertyTypes[i].isEqual( xvalues[i], yvalues[i], entityMode ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	@Override
-	public boolean isEqual(final Object x, final Object y, final SessionFactoryImplementor factory) throws HibernateException {
+	public boolean isEqual(Object x, Object y, EntityMode entityMode, SessionFactoryImplementor factory)
+			throws HibernateException {
 		if ( x == y ) {
 			return true;
 		}
 		if ( x == null || y == null ) {
 			return false;
 		}
+		Object[] xvalues = getPropertyValues( x, entityMode );
+		Object[] yvalues = getPropertyValues( y, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			if ( !propertyTypes[i].isEqual( getPropertyValue( x, i ), getPropertyValue( y, i ), factory ) ) {
+			if ( !propertyTypes[i].isEqual( xvalues[i], yvalues[i], entityMode, factory ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	@Override
-	public int compare(final Object x, final Object y) {
+	public int compare(Object x, Object y, EntityMode entityMode) {
 		if ( x == y ) {
 			return 0;
 		}
+		Object[] xvalues = getPropertyValues( x, entityMode );
+		Object[] yvalues = getPropertyValues( y, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			int propertyCompare = propertyTypes[i].compare( getPropertyValue( x, i ), getPropertyValue( y, i ) );
+			int propertyCompare = propertyTypes[i].compare( xvalues[i], yvalues[i], entityMode );
 			if ( propertyCompare != 0 ) {
 				return propertyCompare;
 			}
@@ -235,61 +199,68 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		return false;
 	}
 
-	@Override
-	public int getHashCode(final Object x) {
+	public int getHashCode(Object x, EntityMode entityMode) {
 		int result = 17;
+		Object[] values = getPropertyValues( x, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			Object y = getPropertyValue( x, i );
+			Object y = values[i];
 			result *= 37;
 			if ( y != null ) {
-				result += propertyTypes[i].getHashCode( y );
+				result += propertyTypes[i].getHashCode( y, entityMode );
 			}
 		}
 		return result;
 	}
 
-	@Override
-	public int getHashCode(final Object x, final SessionFactoryImplementor factory) {
+	public int getHashCode(Object x, EntityMode entityMode, SessionFactoryImplementor factory) {
 		int result = 17;
+		Object[] values = getPropertyValues( x, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			Object y = getPropertyValue( x, i );
+			Object y = values[i];
 			result *= 37;
 			if ( y != null ) {
-				result += propertyTypes[i].getHashCode( y, factory );
+				result += propertyTypes[i].getHashCode( y, entityMode, factory );
 			}
 		}
 		return result;
 	}
 
-	@Override
-	public boolean isDirty(final Object x, final Object y, final SessionImplementor session) throws HibernateException {
+	public boolean isDirty(Object x, Object y, SessionImplementor session)
+			throws HibernateException {
 		if ( x == y ) {
 			return false;
 		}
 		if ( x == null || y == null ) {
 			return true;
 		}
-		for ( int i = 0; i < propertySpan; i++ ) {
-			if ( propertyTypes[i].isDirty( getPropertyValue( x, i ), getPropertyValue( y, i ), session ) ) {
+		EntityMode entityMode = session.getEntityMode();
+		Object[] xvalues = getPropertyValues( x, entityMode );
+		Object[] yvalues = getPropertyValues( y, entityMode );
+		for ( int i = 0; i < xvalues.length; i++ ) {
+			if ( propertyTypes[i].isDirty( xvalues[i], yvalues[i], session ) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean isDirty(final Object x, final Object y, final boolean[] checkable, final SessionImplementor session) throws HibernateException {
+	public boolean isDirty(Object x, Object y, boolean[] checkable, SessionImplementor session)
+			throws HibernateException {
 		if ( x == y ) {
 			return false;
 		}
 		if ( x == null || y == null ) {
 			return true;
 		}
+		EntityMode entityMode = session.getEntityMode();
+		Object[] xvalues = getPropertyValues( x, entityMode );
+		Object[] yvalues = getPropertyValues( y, entityMode );
 		int loc = 0;
-		for ( int i = 0; i < propertySpan; i++ ) {
+		for ( int i = 0; i < xvalues.length; i++ ) {
 			int len = propertyTypes[i].getColumnSpan( session.getFactory() );
 			if ( len <= 1 ) {
 				final boolean dirty = ( len == 0 || checkable[loc] ) &&
-				                      propertyTypes[i].isDirty( getPropertyValue( x, i ), getPropertyValue( y, i ), session );
+				                      propertyTypes[i].isDirty( xvalues[i], yvalues[i], session );
 				if ( dirty ) {
 					return true;
 				}
@@ -297,7 +268,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 			else {
 				boolean[] subcheckable = new boolean[len];
 				System.arraycopy( checkable, loc, subcheckable, 0, len );
-				final boolean dirty = propertyTypes[i].isDirty( getPropertyValue( x, i ), getPropertyValue( y, i ), subcheckable, session );
+				final boolean dirty = propertyTypes[i].isDirty( xvalues[i], yvalues[i], subcheckable, session );
 				if ( dirty ) {
 					return true;
 				}
@@ -307,21 +278,23 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		return false;
 	}
 
-	@Override
-	public boolean isModified(final Object old, final Object current, final boolean[] checkable, final SessionImplementor session) throws HibernateException {
+	public boolean isModified(Object old, Object current, boolean[] checkable, SessionImplementor session)
+			throws HibernateException {
+
 		if ( current == null ) {
 			return old != null;
 		}
 		if ( old == null ) {
-			return true;
+			return current != null;
 		}
+		Object[] currentValues = getPropertyValues( current, session );
 		Object[] oldValues = ( Object[] ) old;
 		int loc = 0;
-		for ( int i = 0; i < propertySpan; i++ ) {
+		for ( int i = 0; i < currentValues.length; i++ ) {
 			int len = propertyTypes[i].getColumnSpan( session.getFactory() );
 			boolean[] subcheckable = new boolean[len];
 			System.arraycopy( checkable, loc, subcheckable, 0, len );
-			if ( propertyTypes[i].isModified( oldValues[i], getPropertyValue( current, i ), subcheckable, session ) ) {
+			if ( propertyTypes[i].isModified( oldValues[i], currentValues[i], subcheckable, session ) ) {
 				return true;
 			}
 			loc += len;
@@ -329,23 +302,23 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		return false;
 
 	}
-	@Override
+
 	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		return resolve( hydrate( rs, names, session, owner ), session, owner );
 	}
-	@Override
+
 	public void nullSafeSet(PreparedStatement st, Object value, int begin, SessionImplementor session)
 			throws HibernateException, SQLException {
 
-		Object[] subvalues = nullSafeGetValues( value, entityMode );
+		Object[] subvalues = nullSafeGetValues( value, session.getEntityMode() );
 
 		for ( int i = 0; i < propertySpan; i++ ) {
 			propertyTypes[i].nullSafeSet( st, subvalues[i], begin, session );
 			begin += propertyTypes[i].getColumnSpan( session.getFactory() );
 		}
 	}
-	@Override
+
 	public void nullSafeSet(
 			PreparedStatement st,
 			Object value,
@@ -354,7 +327,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 			SessionImplementor session)
 			throws HibernateException, SQLException {
 
-		Object[] subvalues = nullSafeGetValues( value, entityMode );
+		Object[] subvalues = nullSafeGetValues( value, session.getEntityMode() );
 
 		int loc = 0;
 		for ( int i = 0; i < propertySpan; i++ ) {
@@ -386,89 +359,68 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 			return getPropertyValues( value, entityMode );
 		}
 	}
-	@Override
+
 	public Object nullSafeGet(ResultSet rs, String name, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 
 		return nullSafeGet( rs, new String[] {name}, session, owner );
 	}
-	@Override
+
 	public Object getPropertyValue(Object component, int i, SessionImplementor session)
 			throws HibernateException {
-		return getPropertyValue( component, i );
+		return getPropertyValue( component, i, session.getEntityMode() );
 	}
+
 	public Object getPropertyValue(Object component, int i, EntityMode entityMode)
 			throws HibernateException {
-		return getPropertyValue( component, i );
+		return tuplizerMapping.getTuplizer( entityMode ).getPropertyValue( component, i );
 	}
 
-	public Object getPropertyValue(Object component, int i)
-			throws HibernateException {
-		if ( component instanceof Object[] ) {
-			// A few calls to hashCode pass the property values already in an
-			// Object[] (ex: QueryKey hash codes for cached queries).
-			// It's easiest to just check for the condition here prior to
-			// trying reflection.
-			return (( Object[] ) component)[i];
-		} else {
-			return componentTuplizer.getPropertyValue( component, i );
-		}
-	}
-
-	@Override
 	public Object[] getPropertyValues(Object component, SessionImplementor session)
 			throws HibernateException {
-		return getPropertyValues( component, entityMode );
+		return getPropertyValues( component, session.getEntityMode() );
 	}
-	@Override
+
 	public Object[] getPropertyValues(Object component, EntityMode entityMode)
 			throws HibernateException {
-		if ( component instanceof Object[] ) {
-			// A few calls to hashCode pass the property values already in an 
-			// Object[] (ex: QueryKey hash codes for cached queries).
-			// It's easiest to just check for the condition here prior to
-			// trying reflection.
-			return ( Object[] ) component;
-		} else {
-			return componentTuplizer.getPropertyValues( component );
-		}
+		return tuplizerMapping.getTuplizer( entityMode ).getPropertyValues( component );
 	}
-	@Override
+
 	public void setPropertyValues(Object component, Object[] values, EntityMode entityMode)
 			throws HibernateException {
-		componentTuplizer.setPropertyValues( component, values );
+		tuplizerMapping.getTuplizer( entityMode ).setPropertyValues( component, values );
 	}
-	@Override
+
 	public Type[] getSubtypes() {
 		return propertyTypes;
 	}
-	@Override
+
 	public String getName() {
 		return "component" + ArrayHelper.toString( propertyNames );
 	}
-	@Override
+
 	public String toLoggableString(Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
 		if ( value == null ) {
 			return "null";
 		}
-
+		Map result = new HashMap();
+		EntityMode entityMode = tuplizerMapping.guessEntityMode( value );
 		if ( entityMode == null ) {
 			throw new ClassCastException( value.getClass().getName() );
 		}
-		Map<String,String> result = new HashMap<String, String>();
 		Object[] values = getPropertyValues( value, entityMode );
 		for ( int i = 0; i < propertyTypes.length; i++ ) {
 			result.put( propertyNames[i], propertyTypes[i].toLoggableString( values[i], factory ) );
 		}
 		return StringHelper.unqualify( getName() ) + result.toString();
 	}
-	@Override
+
 	public String[] getPropertyNames() {
 		return propertyNames;
 	}
-	@Override
-	public Object deepCopy(Object component, SessionFactoryImplementor factory)
+
+	public Object deepCopy(Object component, EntityMode entityMode, SessionFactoryImplementor factory)
 			throws HibernateException {
 		if ( component == null ) {
 			return null;
@@ -476,7 +428,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 
 		Object[] values = getPropertyValues( component, entityMode );
 		for ( int i = 0; i < propertySpan; i++ ) {
-			values[i] = propertyTypes[i].deepCopy( values[i], factory );
+			values[i] = propertyTypes[i].deepCopy( values[i], entityMode, factory );
 		}
 
 		Object result = instantiate( entityMode );
@@ -484,13 +436,14 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 
 		//not absolutely necessary, but helps for some
 		//equals()/hashCode() implementations
-		if ( componentTuplizer.hasParentProperty() ) {
-			componentTuplizer.setParent( result, componentTuplizer.getParent( component ), factory );
+		ComponentTuplizer ct = ( ComponentTuplizer ) tuplizerMapping.getTuplizer( entityMode );
+		if ( ct.hasParentProperty() ) {
+			ct.setParent( result, ct.getParent( component ), factory );
 		}
 
 		return result;
 	}
-	@Override
+
 	public Object replace(
 			Object original,
 			Object target,
@@ -508,6 +461,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 				? instantiate( owner, session )
 				: target;
 
+		final EntityMode entityMode = session.getEntityMode();
 		Object[] values = TypeHelper.replace(
 				getPropertyValues( original, entityMode ),
 				getPropertyValues( result, entityMode ),
@@ -521,8 +475,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		return result;
 	}
 
-	@Override
-    public Object replace(
+	public Object replace(
 			Object original,
 			Object target,
 			SessionImplementor session,
@@ -540,6 +493,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 				instantiate( owner, session ) :
 				target;
 
+		final EntityMode entityMode = session.getEntityMode();
 		Object[] values = TypeHelper.replace(
 				getPropertyValues( original, entityMode ),
 				getPropertyValues( result, entityMode ),
@@ -558,16 +512,17 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 	 * This method does not populate the component parent
 	 */
 	public Object instantiate(EntityMode entityMode) throws HibernateException {
-		return componentTuplizer.instantiate();
+		return tuplizerMapping.getTuplizer( entityMode ).instantiate();
 	}
 
 	public Object instantiate(Object parent, SessionImplementor session)
 			throws HibernateException {
 
-		Object result = instantiate( entityMode );
+		Object result = instantiate( session.getEntityMode() );
 
-		if ( componentTuplizer.hasParentProperty() && parent != null ) {
-			componentTuplizer.setParent(
+		ComponentTuplizer ct = ( ComponentTuplizer ) tuplizerMapping.getTuplizer( session.getEntityMode() );
+		if ( ct.hasParentProperty() && parent != null ) {
+			ct.setParent(
 					result,
 					session.getPersistenceContext().proxyFor( parent ),
 					session.getFactory()
@@ -576,24 +531,23 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 
 		return result;
 	}
-	@Override
+
 	public CascadeStyle getCascadeStyle(int i) {
 		return cascade[i];
 	}
-	@Override
+
 	public boolean isMutable() {
 		return true;
 	}
 
-	@Override
-    public Serializable disassemble(Object value, SessionImplementor session, Object owner)
+	public Serializable disassemble(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 
 		if ( value == null ) {
 			return null;
 		}
 		else {
-			Object[] values = getPropertyValues( value, entityMode );
+			Object[] values = getPropertyValues( value, session.getEntityMode() );
 			for ( int i = 0; i < propertyTypes.length; i++ ) {
 				values[i] = propertyTypes[i].disassemble( values[i], session, owner );
 			}
@@ -601,8 +555,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		}
 	}
 
-	@Override
-    public Object assemble(Serializable object, SessionImplementor session, Object owner)
+	public Object assemble(Serializable object, SessionImplementor session, Object owner)
 			throws HibernateException {
 
 		if ( object == null ) {
@@ -615,17 +568,16 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 				assembled[i] = propertyTypes[i].assemble( ( Serializable ) values[i], session, owner );
 			}
 			Object result = instantiate( owner, session );
-			setPropertyValues( result, assembled, entityMode );
+			setPropertyValues( result, assembled, session.getEntityMode() );
 			return result;
 		}
 	}
-	@Override
+
 	public FetchMode getFetchMode(int i) {
 		return joinedFetch[i];
 	}
 
-	@Override
-    public Object hydrate(
+	public Object hydrate(
 			final ResultSet rs,
 			final String[] names,
 			final SessionImplementor session,
@@ -654,8 +606,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		return notNull ? values : null;
 	}
 
-	@Override
-    public Object resolve(Object value, SessionImplementor session, Object owner)
+	public Object resolve(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 
 		if ( value != null ) {
@@ -665,7 +616,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 			for ( int i = 0; i < values.length; i++ ) {
 				resolvedValues[i] = propertyTypes[i].resolve( values[i], session, owner );
 			}
-			setPropertyValues( result, resolvedValues, entityMode );
+			setPropertyValues( result, resolvedValues, session.getEntityMode() );
 			return result;
 		}
 		else {
@@ -673,31 +624,29 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		}
 	}
 
-	@Override
-    public Object semiResolve(Object value, SessionImplementor session, Object owner)
+	public Object semiResolve(Object value, SessionImplementor session, Object owner)
 			throws HibernateException {
 		//note that this implementation is kinda broken
 		//for components with many-to-one associations
 		return resolve( value, session, owner );
 	}
-	@Override
+
 	public boolean[] getPropertyNullability() {
 		return propertyNullability;
 	}
 
-	@Override
-    public boolean isXMLElement() {
+	public boolean isXMLElement() {
 		return true;
 	}
-	@Override
+
 	public Object fromXMLNode(Node xml, Mapping factory) throws HibernateException {
 		return xml;
 	}
-	@Override
+
 	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) throws HibernateException {
 		replaceNode( node, ( Element ) value );
 	}
-	@Override
+
 	public boolean[] toColumnNullness(Object value, Mapping mapping) {
 		boolean[] result = new boolean[ getColumnSpan( mapping ) ];
 		if ( value == null ) {
@@ -712,7 +661,7 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		}
 		return result;
 	}
-	@Override
+
 	public boolean isEmbedded() {
 		return false;
 	}
@@ -727,90 +676,5 @@ public class ComponentType extends AbstractType implements CompositeType, Proced
 		throw new PropertyNotFoundException(
 				"Unable to locate property named " + name + " on " + getReturnedClass().getName()
 		);
-	}
-
-	private Boolean canDoExtraction;
-
-	@Override
-	public boolean canDoExtraction() {
-		if ( canDoExtraction == null ) {
-			canDoExtraction = determineIfProcedureParamExtractionCanBePerformed();
-		}
-		return canDoExtraction;
-	}
-
-	private boolean determineIfProcedureParamExtractionCanBePerformed() {
-		for ( Type propertyType : propertyTypes ) {
-			if ( ! ProcedureParameterExtractionAware.class.isInstance( propertyType ) ) {
-				return false;
-			}
-			if ( ! ( (ProcedureParameterExtractionAware) propertyType ).canDoExtraction() ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public Object extract(CallableStatement statement, int startIndex, SessionImplementor session) throws SQLException {
-		Object[] values = new Object[propertySpan];
-
-		int currentIndex = startIndex;
-		boolean notNull = false;
-		for ( int i = 0; i < propertySpan; i++ ) {
-			// we know this cast is safe from canDoExtraction
-			final ProcedureParameterExtractionAware propertyType = (ProcedureParameterExtractionAware) propertyTypes[i];
-			final Object value = propertyType.extract( statement, currentIndex, session );
-			if ( value == null ) {
-				if ( isKey ) {
-					return null; //different nullability rules for pk/fk
-				}
-			}
-			else {
-				notNull = true;
-			}
-			values[i] = value;
-			currentIndex += propertyType.getColumnSpan( session.getFactory() );
-		}
-
-		if ( ! notNull ) {
-			values = null;
-		}
-
-		return resolve( values, session, null );
-	}
-
-	@Override
-	public Object extract(CallableStatement statement, String[] paramNames, SessionImplementor session) throws SQLException {
-		// for this form to work all sub-property spans must be one (1)...
-
-		Object[] values = new Object[propertySpan];
-
-		int indx = 0;
-		boolean notNull = false;
-		for ( String paramName : paramNames ) {
-			// we know this cast is safe from canDoExtraction
-			final ProcedureParameterExtractionAware propertyType = (ProcedureParameterExtractionAware) propertyTypes[indx];
-			final Object value = propertyType.extract( statement, new String[] { paramName }, session );
-			if ( value == null ) {
-				if ( isKey ) {
-					return null; //different nullability rules for pk/fk
-				}
-			}
-			else {
-				notNull = true;
-			}
-			values[indx] = value;
-		}
-
-		if ( ! notNull ) {
-			values = null;
-		}
-
-		return resolve( values, session, null );
-	}
-	
-	public boolean hasNotNullProperty() {
-		return hasNotNullProperty;
 	}
 }

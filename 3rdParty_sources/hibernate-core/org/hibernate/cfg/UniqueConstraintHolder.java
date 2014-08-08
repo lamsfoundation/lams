@@ -23,7 +23,6 @@
  */
 package org.hibernate.cfg;
 
-
 /**
  * {@link javax.persistence.UniqueConstraint} annotations are handled via second pass.  I do not
  * understand the reasons why at this time, so here I use a holder object to hold the information

@@ -24,21 +24,17 @@
 package org.hibernate.annotations;
 
 /**
- * Maps a given discriminator value to the corresponding entity type.  See {@link Any} for more information.
- *
- * @see Any
- *
+ * Represent a discriminator value associated to a given entity type
  * @author Emmanuel Bernard
- * @author Steve Ebersole
  */
 public @interface MetaValue {
 	/**
-	 * The entity type.
+	 * entity type
 	 */
 	Class targetEntity();
 
 	/**
-	 * The corresponding discriminator value stored in database.
+	 * discriminator value stored in database
 	 */
 	String value();
 }

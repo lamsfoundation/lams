@@ -22,9 +22,11 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.type.CollectionType;
+import org.hibernate.type.TypeFactory;
 
 /**
  * A map has a primary key consisting of
@@ -44,17 +46,17 @@ public class Map extends IndexedCollection {
 		if ( isSorted() ) {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.sortedMap( getRole(), getReferencedPropertyName(), getComparator() );
+					.sortedMap( getRole(), getReferencedPropertyName(), isEmbedded(), getComparator() );
 		}
 		else if ( hasOrder() ) {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.orderedMap( getRole(), getReferencedPropertyName() );
+					.orderedMap( getRole(), getReferencedPropertyName(), isEmbedded() );
 		}
 		else {
 			return getMappings().getTypeResolver()
 					.getTypeFactory()
-					.map( getRole(), getReferencedPropertyName() );
+					.map( getRole(), getReferencedPropertyName(), isEmbedded() );
 		}
 	}
 

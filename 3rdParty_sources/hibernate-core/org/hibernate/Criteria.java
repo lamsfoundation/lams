@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, 2013, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate;
 
@@ -29,9 +30,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
-import org.hibernate.sql.JoinType;
 import org.hibernate.transform.ResultTransformer;
-
 
 /**
  * <tt>Criteria</tt> is a simplified API for retrieving entities
@@ -120,7 +119,7 @@ public interface Criteria extends CriteriaSpecification {
 	 * @return this (for method chaining)
 	 */
 	public Criteria add(Criterion criterion);
-
+	
 	/**
 	 * Add an {@link Order ordering} to the result set.
 	 *
@@ -144,7 +143,7 @@ public interface Criteria extends CriteriaSpecification {
 	public Criteria setFetchMode(String associationPath, FetchMode mode) throws HibernateException;
 
 	/**
-	 * Set the lock mode of the current entity.
+	 * Set the lock mode of the current entity
 	 *
 	 * @param lockMode The lock mode to be applied
 	 *
@@ -153,7 +152,7 @@ public interface Criteria extends CriteriaSpecification {
 	public Criteria setLockMode(LockMode lockMode);
 
 	/**
-	 * Set the lock mode of the aliased entity.
+	 * Set the lock mode of the aliased entity
 	 *
 	 * @param alias The previously assigned alias representing the entity to
 	 *			which the given lock mode should apply.
@@ -166,8 +165,8 @@ public interface Criteria extends CriteriaSpecification {
 	/**
 	 * Join an association, assigning an alias to the joined association.
 	 * <p/>
-	 * Functionally equivalent to {@link #createAlias(String, String, JoinType )} using
-	 * {@link JoinType#INNER_JOIN} for the joinType.
+	 * Functionally equivalent to {@link #createAlias(String, String, int)} using
+	 * {@link #INNER_JOIN} for the joinType.
 	 *
 	 * @param associationPath A dot-seperated property path
 	 * @param alias The alias to assign to the joined association (for later reference).
@@ -182,23 +181,6 @@ public interface Criteria extends CriteriaSpecification {
 	 * Join an association using the specified join-type, assigning an alias
 	 * to the joined association.
 	 * <p/>
-	 * The joinType is expected to be one of {@link JoinType#INNER_JOIN} (the default),
-	 * {@link JoinType#FULL_JOIN}, or {@link JoinType#LEFT_OUTER_JOIN}.
-	 *
-	 * @param associationPath A dot-seperated property path
-	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param joinType The type of join to use.
-	 *
-	 * @return this (for method chaining)
-	 *
-	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 */
-	public Criteria createAlias(String associationPath, String alias, JoinType joinType) throws HibernateException;
-
-	/**
-	 * Join an association using the specified join-type, assigning an alias
-	 * to the joined association.
-	 * <p/>
 	 * The joinType is expected to be one of {@link #INNER_JOIN} (the default),
 	 * {@link #FULL_JOIN}, or {@link #LEFT_JOIN}.
 	 *
@@ -209,33 +191,13 @@ public interface Criteria extends CriteriaSpecification {
 	 * @return this (for method chaining)
 	 *
 	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 * @deprecated use {@link #createAlias(String, String, org.hibernate.sql.JoinType)}
 	 */
-	@Deprecated
 	public Criteria createAlias(String associationPath, String alias, int joinType) throws HibernateException;
 
 	/**
 	 * Join an association using the specified join-type, assigning an alias
 	 * to the joined association.
 	 * <p/>
-	 * The joinType is expected to be one of {@link JoinType#INNER_JOIN} (the default),
-	 * {@link JoinType#FULL_JOIN}, or {@link JoinType#LEFT_OUTER_JOIN}.
-	 *
-	 * @param associationPath A dot-seperated property path
-	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param joinType The type of join to use.
-	 * @param withClause The criteria to be added to the join condition (<tt>ON</tt> clause)
-	 *
-	 * @return this (for method chaining)
-	 *
-	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 */
-	public Criteria createAlias(String associationPath, String alias, JoinType joinType, Criterion withClause) throws HibernateException;
-
-	/**
-	 * Join an association using the specified join-type, assigning an alias
-	 * to the joined association.
-	 * <p/>
 	 * The joinType is expected to be one of {@link #INNER_JOIN} (the default),
 	 * {@link #FULL_JOIN}, or {@link #LEFT_JOIN}.
 	 *
@@ -247,16 +209,14 @@ public interface Criteria extends CriteriaSpecification {
 	 * @return this (for method chaining)
 	 *
 	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 * @deprecated use {@link #createAlias(String, String, JoinType, Criterion)}
 	 */
-	@Deprecated
 	public Criteria createAlias(String associationPath, String alias, int joinType, Criterion withClause) throws HibernateException;
-
+	
 	/**
 	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity.
 	 * <p/>
-	 * Functionally equivalent to {@link #createCriteria(String, org.hibernate.sql.JoinType)} using
-	 * {@link JoinType#INNER_JOIN} for the joinType.
+	 * Functionally equivalent to {@link #createCriteria(String, int)} using
+	 * {@link #INNER_JOIN} for the joinType.
 	 *
 	 * @param associationPath A dot-seperated property path
 	 *
@@ -277,29 +237,14 @@ public interface Criteria extends CriteriaSpecification {
 	 *
 	 * @throws HibernateException Indicates a problem creating the sub criteria
 	 */
-	public Criteria createCriteria(String associationPath, JoinType joinType) throws HibernateException;
-
-	/**
-	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity, using the
-	 * specified join type.
-	 *
-	 * @param associationPath A dot-seperated property path
-	 * @param joinType The type of join to use.
-	 *
-	 * @return the created "sub criteria"
-	 *
-	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 * @deprecated use {@link #createAlias(String, String, org.hibernate.sql.JoinType)}
-	 */
-	@Deprecated
 	public Criteria createCriteria(String associationPath, int joinType) throws HibernateException;
 
 	/**
 	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity,
 	 * assigning the given alias.
 	 * <p/>
-	 * Functionally equivalent to {@link #createCriteria(String, String, org.hibernate.sql.JoinType)} using
-	 * {@link JoinType#INNER_JOIN} for the joinType.
+	 * Functionally equivalent to {@link #createCriteria(String, String, int)} using
+	 * {@link #INNER_JOIN} for the joinType.
 	 *
 	 * @param associationPath A dot-seperated property path
 	 * @param alias The alias to assign to the joined association (for later reference).
@@ -322,24 +267,7 @@ public interface Criteria extends CriteriaSpecification {
 	 *
 	 * @throws HibernateException Indicates a problem creating the sub criteria
 	 */
-	public Criteria createCriteria(String associationPath, String alias, JoinType joinType) throws HibernateException;
-
-	/**
-	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity,
-	 * assigning the given alias and using the specified join type.
-	 *
-	 * @param associationPath A dot-seperated property path
-	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param joinType The type of join to use.
-	 *
-	 * @return the created "sub criteria"
-	 *
-	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 * @deprecated use {@link #createCriteria(String, org.hibernate.sql.JoinType)}
-	 */
-	@Deprecated
 	public Criteria createCriteria(String associationPath, String alias, int joinType) throws HibernateException;
-
 
 	/**
 	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity,
@@ -354,23 +282,6 @@ public interface Criteria extends CriteriaSpecification {
 	 * 
 	 * @throws HibernateException Indicates a problem creating the sub criteria
 	 */
-	public Criteria createCriteria(String associationPath, String alias, JoinType joinType, Criterion withClause) throws HibernateException;
-
-	/**
-	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity,
-	 * assigning the given alias and using the specified join type.
-	 *
-	 * @param associationPath A dot-seperated property path
-	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param joinType The type of join to use.
-	 * @param withClause The criteria to be added to the join condition (<tt>ON</tt> clause)
-	 *
-	 * @return the created "sub criteria"
-	 *
-	 * @throws HibernateException Indicates a problem creating the sub criteria
-	 * @deprecated use {@link #createCriteria(String, String, org.hibernate.sql.JoinType, org.hibernate.criterion.Criterion)}
-	 */
-	@Deprecated
 	public Criteria createCriteria(String associationPath, String alias, int joinType, Criterion withClause) throws HibernateException;
 
 	/**
@@ -394,7 +305,7 @@ public interface Criteria extends CriteriaSpecification {
 	 * @return this (for method chaining)
 	 */
 	public Criteria setMaxResults(int maxResults);
-
+	
 	/**
 	 * Set the first result to be retrieved.
 	 *
@@ -417,7 +328,7 @@ public interface Criteria extends CriteriaSpecification {
 	 * read-only/modifiable setting was not initialized, then the default
 	 * read-only/modifiable setting for the persistence context is returned instead.
 	 * @see Criteria#setReadOnly(boolean)
-	 * @see org.hibernate.engine.spi.PersistenceContext#isDefaultReadOnly()
+	 * @see org.hibernate.engine.PersistenceContext#isDefaultReadOnly()
 	 *
 	 * The read-only/modifiable setting has no impact on entities/proxies returned by the
 	 * Criteria that existed in the session before the Criteria was executed.
@@ -434,11 +345,11 @@ public interface Criteria extends CriteriaSpecification {
 	 * Set the read-only/modifiable mode for entities and proxies
 	 * loaded by this Criteria. This setting overrides the default setting
 	 * for the persistence context.
-	 * @see org.hibernate.engine.spi.PersistenceContext#isDefaultReadOnly()
+	 * @see org.hibernate.engine.PersistenceContext#isDefaultReadOnly()
 	 *
 	 * To set the default read-only/modifiable setting used for
 	 * entities and proxies that are loaded into the session:
-	 * @see org.hibernate.engine.spi.PersistenceContext#setDefaultReadOnly(boolean)
+	 * @see org.hibernate.engine.PersistenceContext#setDefaultReadOnly(boolean)
 	 * @see org.hibernate.Session#setDefaultReadOnly(boolean)
 	 *
 	 * Read-only entities are not dirty-checked and snapshots of persistent
@@ -454,7 +365,6 @@ public interface Criteria extends CriteriaSpecification {
 	 *
 	 * @param readOnly true, entities and proxies loaded by the criteria will be put in read-only mode
 	 *                 false, entities and proxies loaded by the criteria will be put in modifiable mode
-	 * @return {@code this}, for method chaining
 	 */
 	public Criteria setReadOnly(boolean readOnly);
 
@@ -506,18 +416,6 @@ public interface Criteria extends CriteriaSpecification {
 	 * @return this (for method chaining)
 	 */
 	public Criteria setComment(String comment);
-	
-	  
-	/**
-	 * Add a DB query hint to the SQL.  These differ from JPA's {@link javax.persistence.QueryHint}, which is specific
-	 * to the JPA implementation and ignores DB vendor-specific hints.  Instead, these are intended solely for the
-	 * vendor-specific hints, such as Oracle's optimizers.  Multiple query hints are supported; the Dialect will
-	 * determine concatenation and placement.
-	 * 
-	 * @param hint The database specific query hint to add.
-	 * @return this (for method chaining)
-	 */
-	public Criteria addQueryHint(String hint);
 
 	/**
 	 * Override the flush mode for this particular query.
@@ -544,9 +442,9 @@ public interface Criteria extends CriteriaSpecification {
 	 * exeucting the SQL or processing the SQL results.
 	 */
 	public List list() throws HibernateException;
-
+	
 	/**
-	 * Get the results as an instance of {@link ScrollableResults}.
+	 * Get the results as an instance of {@link ScrollableResults}
 	 *
 	 * @return The {@link ScrollableResults} representing the matched
 	 * query results.

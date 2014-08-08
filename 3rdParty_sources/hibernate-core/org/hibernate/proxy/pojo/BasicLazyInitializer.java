@@ -26,28 +26,28 @@ package org.hibernate.proxy.pojo;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.MarkerObject;
-import org.hibernate.proxy.AbstractLazyInitializer;
+import org.hibernate.engine.EntityKey;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.CompositeType;
+import org.hibernate.util.MarkerObject;
+import org.hibernate.util.ReflectHelper;
+import org.hibernate.proxy.AbstractLazyInitializer;
 
 /**
  * Lazy initializer for POJOs
- *
+ * 
  * @author Gavin King
  */
 public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 
 	protected static final Object INVOKE_IMPLEMENTATION = new MarkerObject("INVOKE_IMPLEMENTATION");
 
-	protected final Class persistentClass;
-	protected final Method getIdentifierMethod;
-	protected final Method setIdentifierMethod;
-	protected final boolean overridesEquals;
-	protected final CompositeType componentIdType;
-
+	protected Class persistentClass;
+	protected Method getIdentifierMethod;
+	protected Method setIdentifierMethod;
+	protected boolean overridesEquals;
 	private Object replacement;
+	protected CompositeType componentIdType;
 
 	protected BasicLazyInitializer(
 			String entityName,
@@ -56,18 +56,18 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 	        Method getIdentifierMethod,
 	        Method setIdentifierMethod,
 	        CompositeType componentIdType,
-	        SessionImplementor session,
-	        boolean overridesEquals) {
+	        SessionImplementor session) {
 		super(entityName, id, session);
 		this.persistentClass = persistentClass;
 		this.getIdentifierMethod = getIdentifierMethod;
 		this.setIdentifierMethod = setIdentifierMethod;
 		this.componentIdType = componentIdType;
-		this.overridesEquals = overridesEquals;
+		overridesEquals = ReflectHelper.overridesEquals(persistentClass);
 	}
 
 	protected abstract Object serializableProxy();
 
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	protected final Object invoke(Method method, Object[] args, Object proxy) throws Throwable {
 		String methodName = method.getName();
 		int params = args.length;
@@ -77,7 +77,7 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 				return getReplacement();
 			}
 			else if ( !overridesEquals && "hashCode".equals(methodName) ) {
-				return System.identityHashCode(proxy);
+				return Integer.valueOf( System.identityHashCode(proxy) );
 			}
 			else if ( isUninitialized() && method.equals(getIdentifierMethod) ) {
 				return getIdentifier();
@@ -88,7 +88,7 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 		}
 		else if ( params==1 ) {
 			if ( !overridesEquals && "equals".equals(methodName) ) {
-				return args[0]==proxy;
+				return args[0]==proxy ? Boolean.TRUE : Boolean.FALSE;
 			}
 			else if ( method.equals(setIdentifierMethod) ) {
 				initialize();
@@ -108,12 +108,14 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 	}
 
 	private Object getReplacement() {
+
 		final SessionImplementor session = getSession();
 		if ( isUninitialized() && session != null && session.isOpen()) {
-			final EntityKey key = session.generateEntityKey(
+			final EntityKey key = new EntityKey(
 					getIdentifier(),
-					session.getFactory().getEntityPersister( getEntityName() )
-			);
+			        session.getFactory().getEntityPersister( getEntityName() ),
+			        session.getEntityMode()
+				);
 			final Object entity = session.getPersistenceContext().getEntity(key);
 			if (entity!=null) setImplementation( entity );
 		}

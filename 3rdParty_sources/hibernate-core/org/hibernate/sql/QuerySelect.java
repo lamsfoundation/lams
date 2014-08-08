@@ -23,6 +23,7 @@
  *
  */
 package org.hibernate.sql;
+
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -35,13 +36,13 @@ import org.hibernate.dialect.Dialect;
 public class QuerySelect {
 	private Dialect dialect;
 	private JoinFragment joins;
-	private StringBuilder select = new StringBuilder();
-	private StringBuilder where = new StringBuilder();
-	private StringBuilder groupBy = new StringBuilder();
-	private StringBuilder orderBy = new StringBuilder();
-	private StringBuilder having = new StringBuilder();
+	private StringBuffer select = new StringBuffer();
+	private StringBuffer where = new StringBuffer();
+	private StringBuffer groupBy = new StringBuffer();
+	private StringBuffer orderBy = new StringBuffer();
+	private StringBuffer having = new StringBuffer();
 	private String comment;
-	private boolean distinct;
+	private boolean distinct=false;
 
 	private static final HashSet DONT_SPACE_TOKENS = new HashSet();
 	static {
@@ -133,7 +134,7 @@ public class QuerySelect {
 	}
 
 	public String toQueryString() {
-		StringBuilder buf = new StringBuilder(50);
+		StringBuffer buf = new StringBuffer(50);
 		if (comment!=null) buf.append("/* ").append(comment).append(" */ ");
 		buf.append("select ");
 		if (distinct) buf.append("distinct ");
@@ -176,7 +177,7 @@ public class QuerySelect {
 		return dialect.transformSelectString( buf.toString() );
 	}
 
-	private static void appendTokens(StringBuilder buf, Iterator iter) {
+	private static void appendTokens(StringBuffer buf, Iterator iter) {
 		boolean lastSpaceable=true;
 		boolean lastQuoted=false;
 		while ( iter.hasNext() ) {

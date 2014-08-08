@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
+
 import java.io.Serializable;
 
 /**
@@ -29,10 +30,7 @@ import java.io.Serializable;
  * so, at what time(s) they are generated.
  *
  * @author Steve Ebersole
- *
- * @deprecated This is replaced by {@link org.hibernate.tuple.ValueGeneration} and {@link org.hibernate.tuple.GenerationTiming}
  */
-@Deprecated
 public class PropertyGeneration implements Serializable {
 
 	/**

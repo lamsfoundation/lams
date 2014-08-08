@@ -27,19 +27,19 @@ package org.hibernate.persister.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.engine.Mapping;
 import org.hibernate.sql.Template;
 import org.hibernate.type.AssociationType;
 import org.hibernate.type.CompositeType;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
-
-import org.jboss.logging.Logger;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.StringHelper;
 
 /**
  * Basic implementation of the {@link PropertyMapping} contract.
@@ -47,9 +47,7 @@ import org.jboss.logging.Logger;
  * @author Gavin King
  */
 public abstract class AbstractPropertyMapping implements PropertyMapping {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class,
-                                                                       AbstractPropertyMapping.class.getName());
+	private static final Logger log = LoggerFactory.getLogger( AbstractPropertyMapping.class );
 
 	private final Map typesByPropertyPath = new HashMap();
 	private final Map columnsByPropertyPath = new HashMap();
@@ -68,7 +66,7 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 	public String[] getIdentifierColumnReaders() {
 		throw new UnsupportedOperationException("one-to-one is not supported here");
 	}
-
+	
 	protected abstract String getEntityName();
 
 	public Type toType(String propertyName) throws QueryException {
@@ -98,7 +96,7 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			throw propertyException( propertyName );
 		}
 		String[] formulaTemplates = (String[]) formulaTemplatesByPropertyPath.get(propertyName);
-		String[] columnReaderTemplates = (String[]) columnReaderTemplatesByPropertyPath.get(propertyName);
+		String[] columnReaderTemplates = (String[]) columnReaderTemplatesByPropertyPath.get(propertyName);		
 		String[] result = new String[columns.length];
 		for ( int i=0; i<columns.length; i++ ) {
 			if ( columnReaderTemplates[i]==null ) {
@@ -139,8 +137,12 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 			String[] formulaTemplates) {
 		// TODO : not quite sure yet of the difference, but this is only needed from annotations for @Id @ManyToOne support
 		if ( typesByPropertyPath.containsKey( path ) ) {
-			if ( LOG.isTraceEnabled() ) {
-				LOG.tracev( "Skipping duplicate registration of path [{0}], existing type = [{1}], incoming type = [{2}]", path, typesByPropertyPath.get( path ), type );
+			if ( log.isTraceEnabled() ) {
+				log.trace(
+						"Skipping duplicate registration of path [" + path
+								+ "], existing type = [" + typesByPropertyPath.get(path)
+								+ "], incoming type = [" + type + "]"
+				);
 			}
 			return;
 		}
@@ -279,7 +281,7 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 				int length = types[i].getColumnSpan(factory);
 				String[] columnSlice = ArrayHelper.slice(columns, begin, length);
 				String[] columnReaderSlice = ArrayHelper.slice(columnReaders, begin, length);
-				String[] columnReaderTemplateSlice = ArrayHelper.slice( columnReaderTemplates, begin, length );
+				String[] columnReaderTemplateSlice = ArrayHelper.slice(columnReaderTemplates, begin, length);
 				String[] formulaSlice = formulaTemplates==null ?
 						null : ArrayHelper.slice(formulaTemplates, begin, length);
 				initPropertyPaths(subpath, types[i], columnSlice, columnReaderSlice, columnReaderTemplateSlice, formulaSlice, factory);
@@ -292,6 +294,12 @@ public abstract class AbstractPropertyMapping implements PropertyMapping {
 	}
 
 	private static String extendPath(String path, String property) {
-		return StringHelper.isEmpty( path ) ? property : StringHelper.qualify( path, property );
+		if ( path==null || "".equals(path) ) {
+			return property;
+		}
+		else {
+			return StringHelper.qualify(path, property);
+		}
 	}
+
 }

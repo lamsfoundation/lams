@@ -22,6 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type.descriptor.java;
+
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
@@ -35,17 +36,16 @@ public class ShortTypeDescriptor extends AbstractTypeDescriptor<Short> {
 	public ShortTypeDescriptor() {
 		super( Short.class );
 	}
-	@Override
+
 	public String toString(Short value) {
 		return value == null ? null : value.toString();
 	}
-	@Override
+
 	public Short fromString(String string) {
 		return Short.valueOf( string );
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	@Override
 	public <X> X unwrap(Short value, Class<X> type, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -73,7 +73,8 @@ public class ShortTypeDescriptor extends AbstractTypeDescriptor<Short> {
 		}
 		throw unknownUnwrap( type );
 	}
-	@Override
+
+	@SuppressWarnings({ "UnnecessaryBoxing" })
 	public <X> Short wrap(X value, WrapperOptions options) {
 		if ( value == null ) {
 			return null;
@@ -82,7 +83,7 @@ public class ShortTypeDescriptor extends AbstractTypeDescriptor<Short> {
 			return (Short) value;
 		}
 		if ( Number.class.isInstance( value ) ) {
-			return ( (Number) value ).shortValue();
+			return Short.valueOf( ( (Number) value ).shortValue() );
 		}
 		if ( String.class.isInstance( value ) ) {
 			return Short.valueOf( ( (String) value ) );

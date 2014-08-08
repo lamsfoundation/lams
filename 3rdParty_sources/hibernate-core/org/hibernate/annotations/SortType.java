@@ -24,24 +24,12 @@
 package org.hibernate.annotations;
 
 /**
- * Possible collection sorting strategies.
+ * Sort strategies
  *
  * @author Emmanuel Bernard
- *
- * @deprecated Since {@link Sort} is deprecated.
  */
-@Deprecated
 public enum SortType {
-	/**
-	 * The collection is unsorted.
-	 */
 	UNSORTED,
-	/**
-	 * The collection is sorted using its natural sorting.
-	 */
 	NATURAL,
-	/**
-	 * The collection is sorted using a supplied comparator.
-	 */
 	COMPARATOR
 }

@@ -22,26 +22,31 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.property;
-import java.lang.reflect.Member;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * @author Gavin King
  */
 public class MapAccessor implements PropertyAccessor {
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Getter getGetter(Class theClass, String propertyName)
 		throws PropertyNotFoundException {
 		return new MapGetter(propertyName);
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Setter getSetter(Class theClass, String propertyName)
 		throws PropertyNotFoundException {
 		return new MapSetter(propertyName);
@@ -54,21 +59,26 @@ public class MapAccessor implements PropertyAccessor {
 			this.name = name;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
-		@SuppressWarnings("unchecked")
+		/**
+		 * {@inheritDoc}
+		 */
 		public void set(Object target, Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
-			( (Map) target ).put( name, value );
+			( (Map) target ).put(name, value);
 		}
 
 	}
@@ -80,32 +90,44 @@ public class MapAccessor implements PropertyAccessor {
 			this.name = name;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Member getMember() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object get(Object target) throws HibernateException {
 			return ( (Map) target ).get(name);
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) {
 			return get( target );
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Class getReturnType() {
 			return Object.class;
 		}

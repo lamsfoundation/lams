@@ -22,14 +22,15 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.property;
-import java.lang.reflect.Member;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
 
 /**
  * Used to declare properties not represented at the pojo level
@@ -37,12 +38,16 @@ import org.hibernate.engine.spi.SessionImplementor;
  * @author Michael Bartmann
  */
 public class NoopAccessor implements PropertyAccessor {
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Getter getGetter(Class arg0, String arg1) throws PropertyNotFoundException {
 		return new NoopGetter();
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Setter getSetter(Class arg0, String arg1) throws PropertyNotFoundException {
 		return new NoopSetter();
 	}
@@ -56,33 +61,42 @@ public class NoopAccessor implements PropertyAccessor {
 		 * <p/>
 		 * Here we always return <tt>null</tt>
 		 */
-		@Override
 		public Object get(Object target) throws HibernateException {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Object getForInsert(Object target, Map map, SessionImplementor arg1)
 				throws HibernateException {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Class getReturnType() {
 			return Object.class;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Member getMember() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}
@@ -92,17 +106,23 @@ public class NoopAccessor implements PropertyAccessor {
 	 * A Setter which will just do nothing.
 	 */
 	private static class NoopSetter implements Setter {
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public void set(Object target, Object value, SessionFactoryImplementor arg2) {
 			// nothing to do
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public String getMethodName() {
 			return null;
 		}
 
-		@Override
+		/**
+		 * {@inheritDoc}
+		 */
 		public Method getMethod() {
 			return null;
 		}

@@ -27,13 +27,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Iterator;
 
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.mapping.ForeignKey;
-import org.jboss.logging.Logger;
 
 /**
  * JDBC table metadata
@@ -42,9 +42,8 @@ import org.jboss.logging.Logger;
  * @author Max Rydahl Andersen
  */
 public class TableMetadata {
-
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, TableMetadata.class.getName());
-
+	private static final Logger log = LoggerFactory.getLogger(TableMetadata.class);
+	
 	private final String catalog;
 	private final String schema;
 	private final String name;
@@ -63,11 +62,11 @@ public class TableMetadata {
 		}
 		String cat = catalog==null ? "" : catalog + '.';
 		String schem = schema==null ? "" : schema + '.';
-        LOG.tableFound( cat + schem + name );
-        LOG.columns( columns.keySet() );
+		log.info( "table found: " + cat + schem + name );
+		log.info( "columns: " + columns.keySet() );
 		if (extras) {
-            LOG.foreignKeys( foreignKeys.keySet() );
-            LOG.indexes( indexes.keySet() );
+			log.info( "foreign keys: " + foreignKeys.keySet() );
+			log.info( "indexes: " + indexes.keySet() );
 		}
 	}
 
@@ -78,22 +77,21 @@ public class TableMetadata {
 	public String getCatalog() {
 		return catalog;
 	}
-
+	
 	public String getSchema() {
 		return schema;
 	}
-
-	@Override
-    public String toString() {
+	
+	public String toString() {
 		return "TableMetadata(" + name + ')';
 	}
 
 	public ColumnMetadata getColumnMetadata(String columnName) {
-		return (ColumnMetadata) columns.get( StringHelper.toLowerCase(columnName) );
+		return (ColumnMetadata) columns.get( columnName.toLowerCase() );
 	}
 
 	public ForeignKeyMetadata getForeignKeyMetadata(String keyName) {
-		return (ForeignKeyMetadata) foreignKeys.get( StringHelper.toLowerCase(keyName) );
+		return (ForeignKeyMetadata) foreignKeys.get( keyName.toLowerCase() );
 	}
 
 	public ForeignKeyMetadata getForeignKeyMetadata(ForeignKey fk) {
@@ -108,7 +106,7 @@ public class TableMetadata {
 	}
 
 	public IndexMetadata getIndexMetadata(String indexName) {
-		return (IndexMetadata) indexes.get( StringHelper.toLowerCase(indexName) );
+		return (IndexMetadata) indexes.get( indexName.toLowerCase() );
 	}
 
 	private void addForeignKey(ResultSet rs) throws SQLException {
@@ -121,7 +119,7 @@ public class TableMetadata {
 		ForeignKeyMetadata info = getForeignKeyMetadata(fk);
 		if (info == null) {
 			info = new ForeignKeyMetadata(rs);
-			foreignKeys.put( StringHelper.toLowerCase(info.getName()), info );
+			foreignKeys.put( info.getName().toLowerCase(), info );
 		}
 
 		info.addReference( rs );
@@ -137,7 +135,7 @@ public class TableMetadata {
 		IndexMetadata info = getIndexMetadata(index);
 		if (info == null) {
 			info = new IndexMetadata(rs);
-			indexes.put( StringHelper.toLowerCase(info.getName()), info );
+			indexes.put( info.getName().toLowerCase(), info );
 		}
 
 		info.addColumn( getColumnMetadata( rs.getString("COLUMN_NAME") ) );
@@ -152,7 +150,7 @@ public class TableMetadata {
 
 		if ( getColumnMetadata(column) == null ) {
 			ColumnMetadata info = new ColumnMetadata(rs);
-			columns.put( StringHelper.toLowerCase(info.getName()), info );
+			columns.put( info.getName().toLowerCase(), info );
 		}
 	}
 
@@ -177,7 +175,7 @@ public class TableMetadata {
 
 		try {
 			rs = meta.getIndexInfo(catalog, schema, name, false, true);
-
+			
 			while ( rs.next() ) {
 				if ( rs.getShort("TYPE") == DatabaseMetaData.tableIndexStatistic ) {
 					continue;
@@ -194,7 +192,7 @@ public class TableMetadata {
 
 	private void initColumns(DatabaseMetaData meta) throws SQLException {
 		ResultSet rs = null;
-
+		
 		try {
 			rs = meta.getColumns(catalog, schema, name, "%");
 			while ( rs.next() ) {
@@ -207,4 +205,11 @@ public class TableMetadata {
 			}
 		}
 	}
+	
 }
+
+
+
+
+
+

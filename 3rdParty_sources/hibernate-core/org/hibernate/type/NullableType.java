@@ -27,60 +27,44 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
-import org.hibernate.MappingException;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.collections.ArrayHelper;
-import org.hibernate.internal.util.compare.EqualsHelper;
-import org.hibernate.metamodel.relational.Size;
-
-import org.jboss.logging.Logger;
-
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.dom4j.Node;
+
+import org.hibernate.EntityMode;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.Mapping;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.util.ArrayHelper;
+import org.hibernate.util.EqualsHelper;
+import org.hibernate.util.StringHelper;
 
 /**
  * Superclass of single-column nullable types.
- *
+ * 
  * @author Gavin King
  *
  * @deprecated Use the {@link AbstractStandardBasicType} approach instead
  */
-@Deprecated
 public abstract class NullableType extends AbstractType implements StringRepresentableType, XmlRepresentableType {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, NullableType.class.getName());
-
-	private final Size dictatedSize = new Size();
 
 	/**
-	 * A convenience form of {@link #sqlTypes(org.hibernate.engine.spi.Mapping)}, returning
-	 * just a single type value since these are explicitly dealing with single column
-	 * mappings.
-	 *
-	 * @return The {@link java.sql.Types} mapping value.
+	 * This is the old scheme where logging of parameter bindings and value extractions
+	 * was controlled by the trace level enablement on the 'org.hibernate.type' package...
+	 * <p/>
+	 * Originally was cached such because of performance of looking up the logger each time
+	 * in order to check the trace-enablement.  Driving this via a central Log-specific class
+	 * would alleviate that performance hit, and yet still allow more "normal" logging usage/config.
 	 */
-	public abstract int sqlType();
+	private static final boolean IS_VALUE_TRACING_ENABLED = LoggerFactory.getLogger( StringHelper.qualifier( Type.class.getName() ) ).isTraceEnabled();
+	private transient Logger log;
 
-	/**
-	 * A convenience form of {@link #dictatedSizes}, returning just a single size since we are explicitly dealing with
-	 * single column mappings here.
-	 *
-	 * @return The {@link java.sql.Types} mapping value.
-	 */
-	public Size dictatedSize() {
-		return dictatedSize;
-	}
-
-	/**
-	 * A convenience form of {@link #defaultSizes}, returning just a single size since we are explicitly dealing with
-	 * single column mappings here.
-	 *
-	 * @return The {@link java.sql.Types} mapping value.
-	 */
-	public Size defaultSize() {
-		return LEGACY_DEFAULT_SIZE;
+	private Logger log() {
+		if ( log == null ) {
+			log = LoggerFactory.getLogger( getClass() );
+		}
+		return log;
 	}
 
 	/**
@@ -111,6 +95,15 @@ public abstract class NullableType extends AbstractType implements StringReprese
 	 * @throws java.sql.SQLException Indicates problem making the JDBC call(s).
 	 */
 	public abstract void set(PreparedStatement st, Object value, int index) throws HibernateException, SQLException;
+
+	/**
+	 * A convenience form of {@link #sqlTypes(org.hibernate.engine.Mapping)}, returning
+	 * just a single type value since these are explicitly dealing with single column
+	 * mappings.
+	 *
+	 * @return The {@link java.sql.Types} mapping value.
+	 */
+	public abstract int sqlType();
 
 	/**
 	 * A null-safe version of {@link #toString(Object)}.  Specifically we are
@@ -148,22 +141,26 @@ public abstract class NullableType extends AbstractType implements StringReprese
 	throws HibernateException, SQLException {
 		try {
 			if ( value == null ) {
-				LOG.tracev("Binding null to parameter: {0}", index);
+				if ( IS_VALUE_TRACING_ENABLED ) {
+					log().trace( "binding null to parameter: " + index );
+				}
 
 				st.setNull( index, sqlType() );
 			}
 			else {
-				if (LOG.isTraceEnabled()) LOG.tracev("Binding '{0}' to parameter: {1}", toString(value), index);
+				if ( IS_VALUE_TRACING_ENABLED ) {
+					log().trace( "binding '" + toString( value ) + "' to parameter: " + index );
+				}
 
 				set( st, value, index );
 			}
 		}
 		catch ( RuntimeException re ) {
-			LOG.unableToBindValueToParameter( nullSafeToString( value ), index, re.getMessage() );
+			log().info( "could not bind value '" + nullSafeToString( value ) + "' to parameter: " + index + "; " + re.getMessage() );
 			throw re;
 		}
 		catch ( SQLException se ) {
-			LOG.unableToBindValueToParameter( nullSafeToString( value ), index, se.getMessage() );
+			log().info( "could not bind value '" + nullSafeToString( value ) + "' to parameter: " + index + "; " + se.getMessage() );
 			throw se;
 		}
 	}
@@ -187,25 +184,31 @@ public abstract class NullableType extends AbstractType implements StringReprese
 		try {
 			Object value = get(rs, name);
 			if ( value == null || rs.wasNull() ) {
-				LOG.tracev( "Returning null as column {0}", name );
+				if ( IS_VALUE_TRACING_ENABLED ) {
+					log().trace( "returning null as column: " + name );
+				}
 				return null;
 			}
-			if ( LOG.isTraceEnabled() ) LOG.trace( "Returning '" + toString( value ) + "' as column " + name );
-			return value;
+			else {
+				if ( IS_VALUE_TRACING_ENABLED ) {
+					log().trace( "returning '" + toString( value ) + "' as column: " + name );
+				}
+				return value;
+			}
 		}
 		catch ( RuntimeException re ) {
-			LOG.unableToReadColumnValueFromResultSet( name, re.getMessage() );
+			log().info( "could not read column value from result set: " + name + "; " + re.getMessage() );
 			throw re;
 		}
 		catch ( SQLException se ) {
-			LOG.unableToReadColumnValueFromResultSet( name, se.getMessage() );
+			log().info( "could not read column value from result set: " + name + "; " + se.getMessage() );
 			throw se;
 		}
 	}
 
 	public final Object nullSafeGet(ResultSet rs, String name, SessionImplementor session, Object owner)
 	throws HibernateException, SQLException {
-		return nullSafeGet( rs, name );
+		return nullSafeGet(rs, name);
 	}
 
 	public final String toXMLString(Object value, SessionFactoryImplementor pc)
@@ -225,17 +228,10 @@ public abstract class NullableType extends AbstractType implements StringReprese
 		return new int[] { sqlType() };
 	}
 
-	@Override
-	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
-		return new Size[] { dictatedSize() };
+	public final boolean isEqual(Object x, Object y, EntityMode entityMode) {
+		return isEqual(x, y);
 	}
 
-	@Override
-	public Size[] defaultSizes(Mapping mapping) throws MappingException {
-		return new Size[] { defaultSize() };
-	}
-
-	@Override
 	public boolean isEqual(Object x, Object y) {
 		return EqualsHelper.equals(x, y);
 	}
