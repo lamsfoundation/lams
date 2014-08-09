@@ -62,7 +62,7 @@ public class DeployLanguageFilesTask extends FilesTask {
 	if (dictionaryPacket != null) {
 	    dictionaryPacket = dictionaryPacket.replace('.', File.separatorChar);
 	}
-	String packageName = lamsLibPath + File.separator + LANGUAGE_JAR_DIRECTORY + File.separator + dictionaryPacket;
+	String packageName = lamsEarPath + File.separator + LANGUAGE_JAR_DIRECTORY + File.separator + dictionaryPacket;
 	File dictionaryDir = new File(packageName);
 	if (!dictionaryDir.exists()) {
 	    dictionaryDir.mkdirs();

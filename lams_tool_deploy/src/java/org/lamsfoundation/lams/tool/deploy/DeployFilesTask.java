@@ -40,7 +40,7 @@ public class DeployFilesTask extends FilesTask {
      */
     public void execute() throws DeployException {
 	File lamsEar = new File(lamsEarPath);
-	File lamsLib = new File(lamsLibPath);
+	File lamsLib = new File(lamsEarPath, "lib");
 	for (String deployFile : deployFiles) {
 	    if (deployFile.endsWith(".jar")) {
 		copyFile(deployFile, lamsLib);

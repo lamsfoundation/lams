@@ -37,12 +37,10 @@ import org.apache.commons.io.FileUtils;
  */
 public abstract class FilesTask implements Task {
 
-    private static final String EAR_LIB_DIRECTORY = "lib";
     /**
      * Holds value of property lamsEarPath.
      */
     protected String lamsEarPath;
-    protected String lamsLibPath;
 
     /**
      * Holds value of property deployFiles.
@@ -61,7 +59,6 @@ public abstract class FilesTask implements Task {
      */
     public void setLamsEarPath(String lamsEarPath) {
 	this.lamsEarPath = lamsEarPath;
-	this.lamsLibPath = lamsEarPath + File.separator + EAR_LIB_DIRECTORY;
     }
 
     /**
