@@ -31,6 +31,8 @@ package org.lamsfoundation.lams.gradebook.util;
  */
 public class GradebookConstants {
     
+    public static final String MODULE_NAME = "gradebook";
+    
     // Parameters
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_ROWS = "rows";

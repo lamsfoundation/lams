@@ -19,6 +19,7 @@
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="messageService"><ref bean="gradebookMessageService"/></property>
+		<property name="auditService"><ref bean="auditService"/></property>
 	</bean>
 	
 	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >

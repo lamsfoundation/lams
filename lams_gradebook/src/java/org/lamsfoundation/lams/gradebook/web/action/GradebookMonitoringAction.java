@@ -252,7 +252,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 			if (markStr != null && !markStr.equals("")) {
 				Double mark = Double.parseDouble(markStr);
-				gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true);
+				gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true, true);
 			}
 
 			if (feedback != null) {
