@@ -130,6 +130,13 @@ public interface IGradebookService {
     void updateUserLessonGradebookFeedback(Lesson lesson, User learner, String feedback);
     
     /**
+     * Toggle on/off marks released option
+     * 
+     * @param lessonId
+     */
+    void toggleMarksReleased(Long lessonId);
+    
+    /**
      * Gets the lesson row dtos for a given organisation
      * 
      * @param organisation

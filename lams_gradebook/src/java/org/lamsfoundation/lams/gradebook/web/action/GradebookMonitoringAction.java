@@ -265,32 +265,26 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		return null;
 	}
 
-	/**
-	 * Toggles the release mark flag for a lesson
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
-		initServices();
-		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    /**
+     * Toggles the release mark flag for a lesson
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	initServices();
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	
+	gradebookService.toggleMarksReleased(lessonID);
 
-		Lesson lesson = lessonService.getLesson(lessonID);
-
-		boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
-
-		lesson.setMarksReleased(!marksReleased);
-
-		userService.save(lesson);
-
-		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, "success");
-		return null;
-	}
+	writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, "success");
+	return null;
+    }
 
     /**
      * Exports Lesson Gradebook into excel.

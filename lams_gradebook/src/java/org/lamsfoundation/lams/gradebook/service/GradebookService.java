@@ -41,9 +41,15 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -81,6 +87,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -445,6 +452,22 @@ public class GradebookService implements IGradebookService {
 
 	gradebookUserActivity.setFeedback(feedback);
 	gradebookDAO.insertOrUpdate(gradebookUserActivity);
+    }
+    
+    @Override
+    public void toggleMarksReleased(Long lessonId) {
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+
+	boolean isMarksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
+	lesson.setMarksReleased(!isMarksReleased);
+	userService.save(lesson);
+	
+	// audit log marks released
+	UserDTO monitor = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	String messageKey = (isMarksReleased) ? "audit.marks.released.off" : "audit.marks.released.on";
+	String message = messageService.getMessage(messageKey, new String[] {lessonId.toString()});
+	auditService.log(monitor, GradebookConstants.MODULE_NAME, message);
     }
 
     @SuppressWarnings("unchecked")
