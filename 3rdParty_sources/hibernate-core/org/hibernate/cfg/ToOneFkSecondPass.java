@@ -29,14 +29,14 @@ import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.annotations.TableBinder;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.mapping.Component;
+import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.ManyToOne;
 import org.hibernate.mapping.OneToOne;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.ToOne;
-import org.hibernate.mapping.KeyValue;
-import org.hibernate.mapping.Component;
-import org.hibernate.util.StringHelper;
 
 /**
  * Enable a proper set of the FK columns in respect with the id column order
@@ -65,11 +65,13 @@ public class ToOneFkSecondPass extends FkSecondPass {
 		this.path = entityClassName != null ? path.substring( entityClassName.length() + 1 ) : path;
 	}
 
-	public String getReferencedEntityName() {
+	@Override
+    public String getReferencedEntityName() {
 		return ( (ToOne) value ).getReferencedEntityName();
 	}
 
-	public boolean isInPrimaryKey() {
+	@Override
+    public boolean isInPrimaryKey() {
 		if ( entityClassName == null ) return false;
 		final PersistentClass persistentClass = mappings.getClass( entityClassName );
 		Property property = persistentClass.getIdentifierProperty();
@@ -82,7 +84,7 @@ public class ToOneFkSecondPass extends FkSecondPass {
 		}
 		else {
 			//try the embedded property
-			//embedded property starts their path with 'id.' See PropertyPreloadedData( ) use when idClass != null in AnnotationBinder
+			//embedded property starts their path with 'id.' See PropertyPreloadedData( ) use when idClass != null in AnnotationSourceProcessor
 			if ( path.startsWith( "id." ) ) {
 				KeyValue valueIdentifier = persistentClass.getIdentifier();
 				String localPath = path.substring( 3 );
@@ -114,12 +116,12 @@ public class ToOneFkSecondPass extends FkSecondPass {
 			BinderHelper.createSyntheticPropertyReference( columns, ref, null, manyToOne, false, mappings );
 			TableBinder.bindFk( ref, null, columns, manyToOne, unique, mappings );
 			/*
-			 * HbmBinder does this only when property-ref != null, but IMO, it makes sense event if it is null
+			 * HbmMetadataSourceProcessorImpl does this only when property-ref != null, but IMO, it makes sense event if it is null
 			 */
 			if ( !manyToOne.isIgnoreNotFound() ) manyToOne.createPropertyRefConstraints( persistentClasses );
 		}
 		else if ( value instanceof OneToOne ) {
-			( (OneToOne) value ).createForeignKey();
+			value.createForeignKey();
 		}
 		else {
 			throw new AssertionFailure( "FkSecondPass for a wrong value type: " + value.getClass().getName() );

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.transaction.jta;
 
 import java.util.List;
-
 import javax.naming.NamingException;
 
 import com.ibm.websphere.uow.UOWSynchronizationRegistry;
@@ -25,6 +24,7 @@ import com.ibm.wsspi.uow.UOWAction;
 import com.ibm.wsspi.uow.UOWActionException;
 import com.ibm.wsspi.uow.UOWException;
 import com.ibm.wsspi.uow.UOWManager;
+import com.ibm.wsspi.uow.UOWManagerFactory;
 
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.InvalidTimeoutException;
@@ -35,8 +35,12 @@ import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.CallbackPreferringPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+import org.springframework.transaction.support.SmartTransactionObject;
 import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionSynchronizationUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * WebSphere-specific PlatformTransactionManager implementation that delegates
@@ -50,32 +54,29 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * a {@link TransactionCallback} through the {@link #execute} method, which
  * will be handled through the callback-based WebSphere UOWManager API instead
  * of through standard JTA API (UserTransaction / TransactionManager). This avoids
- * the use of the non-public <code>javax.transaction.TransactionManager</code>
+ * the use of the non-public {@code javax.transaction.TransactionManager}
  * API on WebSphere, staying within supported WebSphere API boundaries.
  *
  * <p>This transaction manager implementation derives from Spring's standard
  * {@link JtaTransactionManager}, inheriting the capability to support programmatic
- * transaction demarcation via <code>getTransaction</code> / <code>commit</code> /
- * <code>rollback</code> calls through a JTA UserTransaction handle, for callers
+ * transaction demarcation via {@code getTransaction} / {@code commit} /
+ * {@code rollback} calls through a JTA UserTransaction handle, for callers
  * that do not use the TransactionCallback-based {@link #execute} method. However,
- * transaction suspension is <i>not</i> supported in this <code>getTransaction</code>
+ * transaction suspension is <i>not</i> supported in this {@code getTransaction}
  * style (unless you explicitly specify a {@link #setTransactionManager} reference,
  * despite the official WebSphere recommendations). Use the {@link #execute} style
  * for any code that might require transaction suspension.
  *
- * <p>This transaction manager is compatible with WebSphere 7.0 as well as recent
- * WebSphere 6.0.x and 6.1.x versions. Check the documentation for your specific
- * WebSphere version to find out whether UOWManager support is available. If it
- * is not available, consider using Spring's standard {@link JtaTransactionManager}
- * class, if necessary specifying the {@link WebSphereTransactionManagerFactoryBean}
- * as "transactionManager" through the corresponding bean property. However, note
- * that transaction suspension is not officially supported in such a scenario
- * (despite it being known to work properly).
- *
- * <p>The default JNDI location for the UOWManager is "java:comp/websphere/UOWManager".
+ * <p>This transaction manager is compatible with WebSphere 6.1.0.9 and above.
+ * The default JNDI location for the UOWManager is "java:comp/websphere/UOWManager".
  * If the location happens to differ according to your WebSphere documentation,
  * simply specify the actual location through this transaction manager's
  * "uowManagerName" bean property.
+ *
+ * <p><b>NOTE: This JtaTransactionManager is intended to refine specific transaction
+ * demarcation behavior on Spring's side. It will happily co-exist with independently
+ * configured WebSphere transaction strategies in your persistence provider, with no
+ * need to specifically connect those setups in any way.</b>
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -83,6 +84,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see #setUowManagerName
  * @see com.ibm.wsspi.uow.UOWManager
  */
+@SuppressWarnings("serial")
 public class WebSphereUowTransactionManager extends JtaTransactionManager
 		implements CallbackPreferringPlatformTransactionManager {
 
@@ -95,7 +97,7 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 
 	private UOWManager uowManager;
 
-	private String uowManagerName = DEFAULT_UOW_MANAGER_NAME;
+	private String uowManagerName;
 
 
 	/**
@@ -136,6 +138,7 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 	}
 
 
+	@Override
 	public void afterPropertiesSet() throws TransactionSystemException {
 		initUserTransactionAndTransactionManager();
 
@@ -145,15 +148,13 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 				this.uowManager = lookupUowManager(this.uowManagerName);
 			}
 			else {
-				throw new IllegalStateException("'uowManager' or 'uowManagerName' is required");
+				this.uowManager = lookupDefaultUowManager();
 			}
 		}
 	}
 
 	/**
 	 * Look up the WebSphere UOWManager in JNDI via the configured name.
-	 * Called by <code>afterPropertiesSet</code> if no direct UOWManager reference was set.
-	 * Can be overridden in subclasses to provide a different UOWManager object.
 	 * @param uowManagerName the JNDI name of the UOWManager
 	 * @return the UOWManager object
 	 * @throws TransactionSystemException if the JNDI lookup failed
@@ -165,7 +166,7 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 			if (logger.isDebugEnabled()) {
 				logger.debug("Retrieving WebSphere UOWManager from JNDI location [" + uowManagerName + "]");
 			}
-			return (UOWManager) getJndiTemplate().lookup(uowManagerName, UOWManager.class);
+			return getJndiTemplate().lookup(uowManagerName, UOWManager.class);
 		}
 		catch (NamingException ex) {
 			throw new TransactionSystemException(
@@ -174,14 +175,51 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 	}
 
 	/**
+	 * Obtain the WebSphere UOWManager from the default JNDI location
+	 * "java:comp/websphere/UOWManager".
+	 * @return the UOWManager object
+	 * @throws TransactionSystemException if the JNDI lookup failed
+	 * @see #setJndiTemplate
+	 */
+	protected UOWManager lookupDefaultUowManager() throws TransactionSystemException {
+		try {
+			logger.debug("Retrieving WebSphere UOWManager from default JNDI location [" + DEFAULT_UOW_MANAGER_NAME + "]");
+			return getJndiTemplate().lookup(DEFAULT_UOW_MANAGER_NAME, UOWManager.class);
+		}
+		catch (NamingException ex) {
+			logger.debug("WebSphere UOWManager is not available at default JNDI location [" +
+					DEFAULT_UOW_MANAGER_NAME + "] - falling back to UOWManagerFactory lookup");
+			return UOWManagerFactory.getUOWManager();
+		}
+	}
+
+	/**
 	 * Registers the synchronizations as interposed JTA Synchronization on the UOWManager.
 	 */
-	protected void doRegisterAfterCompletionWithJtaTransaction(JtaTransactionObject txObject, List synchronizations) {
+	@Override
+	protected void doRegisterAfterCompletionWithJtaTransaction(
+			JtaTransactionObject txObject, List<TransactionSynchronization> synchronizations) {
+
 		this.uowManager.registerInterposedSynchronization(new JtaAfterCompletionSynchronization(synchronizations));
 	}
 
+	/**
+	 * Returns {@code true} since WebSphere ResourceAdapters (as exposed in JNDI)
+	 * implicitly perform transaction enlistment if the MessageEndpointFactory's
+	 * {@code isDeliveryTransacted} method returns {@code true}.
+	 * In that case we'll simply skip the {@link #createTransaction} call.
+	 * @see javax.resource.spi.endpoint.MessageEndpointFactory#isDeliveryTransacted
+	 * @see org.springframework.jca.endpoint.AbstractMessageEndpointFactory
+	 * @see TransactionFactory#createTransaction
+	 */
+	@Override
+	public boolean supportsResourceAdapterManagedTransactions() {
+		return true;
+	}
 
-	public Object execute(TransactionDefinition definition, TransactionCallback callback) throws TransactionException {
+
+	@Override
+	public <T> T execute(TransactionDefinition definition, TransactionCallback<T> callback) throws TransactionException {
 		if (definition == null) {
 			// Use defaults if no transaction definition given.
 			definition = new DefaultTransactionDefinition();
@@ -239,7 +277,7 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 		if (debug) {
 			logger.debug("Creating new transaction with name [" + definition.getName() + "]: " + definition);
 		}
-		SuspendedResourcesHolder suspendedResources = (existingTx && !joinTx ? suspend(null) : null);
+		SuspendedResourcesHolder suspendedResources = (!joinTx ? suspend(null) : null);
 		try {
 			if (definition.getTimeout() > TransactionDefinition.TIMEOUT_DEFAULT) {
 				this.uowManager.setUOWTimeout(uowType, definition.getTimeout());
@@ -247,7 +285,7 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 			if (debug) {
 				logger.debug("Invoking WebSphere UOW action: type=" + uowType + ", join=" + joinTx);
 			}
-			UOWActionAdapter action = new UOWActionAdapter(
+			UOWActionAdapter<T> action = new UOWActionAdapter<T>(
 					definition, callback, (uowType == UOWManager.UOW_TYPE_GLOBAL_TRANSACTION), !joinTx, newSynch, debug);
 			this.uowManager.runUnderUOW(uowType, joinTx, action);
 			if (debug) {
@@ -272,11 +310,11 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 	/**
 	 * Adapter that executes the given Spring transaction within the WebSphere UOWAction shape.
 	 */
-	private class UOWActionAdapter implements UOWAction {
+	private class UOWActionAdapter<T> implements UOWAction, SmartTransactionObject {
 
 		private final TransactionDefinition definition;
 
-		private final TransactionCallback callback;
+		private final TransactionCallback<T> callback;
 
 		private final boolean actualTransaction;
 
@@ -286,9 +324,11 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 
 		private boolean debug;
 
-		private Object result;
+		private T result;
 
-		public UOWActionAdapter(TransactionDefinition definition, TransactionCallback callback,
+		private Throwable exception;
+
+		public UOWActionAdapter(TransactionDefinition definition, TransactionCallback<T> callback,
 				boolean actualTransaction, boolean newTransaction, boolean newSynchronization, boolean debug) {
 			this.definition = definition;
 			this.callback = callback;
@@ -298,13 +338,18 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 			this.debug = debug;
 		}
 
+		@Override
 		public void run() {
-			DefaultTransactionStatus status = newTransactionStatus(
+			DefaultTransactionStatus status = prepareTransactionStatus(
 					this.definition, (this.actualTransaction ? this : null),
 					this.newTransaction, this.newSynchronization, this.debug, null);
 			try {
 				this.result = this.callback.doInTransaction(status);
 				triggerBeforeCommit(status);
+			}
+			catch (Throwable ex) {
+				this.exception = ex;
+				uowManager.setRollbackOnly();
 			}
 			finally {
 				if (status.isLocalRollbackOnly()) {
@@ -315,15 +360,30 @@ public class WebSphereUowTransactionManager extends JtaTransactionManager
 				}
 				triggerBeforeCompletion(status);
 				if (status.isNewSynchronization()) {
-					List synchronizations = TransactionSynchronizationManager.getSynchronizations();
+					List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
 					TransactionSynchronizationManager.clear();
-					uowManager.registerInterposedSynchronization(new JtaAfterCompletionSynchronization(synchronizations));
+					if (!synchronizations.isEmpty()) {
+						uowManager.registerInterposedSynchronization(new JtaAfterCompletionSynchronization(synchronizations));
+					}
 				}
 			}
 		}
 
-		public Object getResult() {
+		public T getResult() {
+			if (this.exception != null) {
+				ReflectionUtils.rethrowRuntimeException(this.exception);
+			}
 			return this.result;
+		}
+
+		@Override
+		public boolean isRollbackOnly() {
+			return uowManager.getRollbackOnly();
+		}
+
+		@Override
+		public void flush() {
+			TransactionSynchronizationUtils.triggerFlush();
 		}
 	}
 

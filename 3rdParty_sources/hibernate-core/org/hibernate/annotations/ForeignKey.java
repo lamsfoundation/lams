@@ -23,19 +23,22 @@
  */
 package org.hibernate.annotations;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-
-@Target({FIELD, METHOD, TYPE})
-@Retention(RUNTIME)
 
 /**
- * Define the foreign key name
+ * Define the foreign key name.
+ *
+ * @deprecated Prefer the JPA 2.1 introduced {@link javax.persistence.ForeignKey} instead.
  */
+@Target({FIELD, METHOD, TYPE})
+@Retention(RUNTIME)
+@Deprecated
 public @interface ForeignKey {
 	/**
 	 * Name of the foreign key.  Used in OneToMany, ManyToOne, and OneToOne

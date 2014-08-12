@@ -29,17 +29,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.ObjectNameNormalizer;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.exception.JDBCExceptionHelper;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Table;
 import org.hibernate.type.Type;
-import org.hibernate.util.StringHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * <b>increment</b><br>
@@ -53,9 +53,11 @@ import org.hibernate.util.StringHelper;
  *
  * @author Gavin King
  * @author Steve Ebersole
+ * @author Brett Meyer
  */
 public class IncrementGenerator implements IdentifierGenerator, Configurable {
-	private static final Logger log = LoggerFactory.getLogger(IncrementGenerator.class);
+
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, IncrementGenerator.class.getName());
 
 	private Class returnClass;
 	private String sql;
@@ -98,11 +100,11 @@ public class IncrementGenerator implements IdentifierGenerator, Configurable {
 				)
 		);
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for ( int i=0; i < tables.length; i++ ) {
 			final String tableName = dialect.quote( normalizer.normalizeIdentifierQuoting( tables[i] ) );
 			if ( tables.length > 1 ) {
-				buf.append( "select " ).append( column ).append( " from " );
+				buf.append( "select max(" ).append( column ).append( ") as mx from " );
 			}
 			buf.append( Table.qualify( catalog, schema, tableName ) );
 			if ( i < tables.length-1 ) {
@@ -111,46 +113,45 @@ public class IncrementGenerator implements IdentifierGenerator, Configurable {
 		}
 		if ( tables.length > 1 ) {
 			buf.insert( 0, "( " ).append( " ) ids_" );
-			column = "ids_." + column;
+			column = "ids_.mx";
 		}
-		
+
 		sql = "select max(" + column + ") from " + buf.toString();
 	}
 
 	private void initializePreviousValueHolder(SessionImplementor session) {
 		previousValueHolder = IdentifierGeneratorHelper.getIntegralDataTypeHolder( returnClass );
 
-		log.debug( "fetching initial value: " + sql );
+		final boolean debugEnabled = LOG.isDebugEnabled();
+		if ( debugEnabled ) {
+			LOG.debugf( "Fetching initial value: %s", sql );
+		}
 		try {
-			PreparedStatement st = session.getBatcher().prepareSelectStatement( sql );
+			PreparedStatement st = session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( sql );
 			try {
-				ResultSet rs = st.executeQuery();
+				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( st );
 				try {
-					if ( rs.next() ) {
-						previousValueHolder.initialize( rs, 0L ).increment();
-					}
-					else {
-						previousValueHolder.initialize( 1L );
-					}
+                    if (rs.next()) previousValueHolder.initialize(rs, 0L).increment();
+                    else previousValueHolder.initialize(1L);
 					sql = null;
-					log.debug( "first free id: " + previousValueHolder.makeValue() );
+					if ( debugEnabled ) {
+						LOG.debugf( "First free id: %s", previousValueHolder.makeValue() );
+					}
 				}
 				finally {
-					rs.close();
+					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, st );
 				}
 			}
 			finally {
-				session.getBatcher().closeStatement(st);
+				session.getTransactionCoordinator().getJdbcCoordinator().release( st );
 			}
 		}
 		catch (SQLException sqle) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
+			throw session.getFactory().getSQLExceptionHelper().convert(
 					sqle,
 					"could not fetch initial value for increment generator",
 					sql
 			);
 		}
 	}
-
 }

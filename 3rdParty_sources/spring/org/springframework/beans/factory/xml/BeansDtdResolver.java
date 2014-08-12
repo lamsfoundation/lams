@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.xml;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +42,7 @@ import org.springframework.core.io.Resource;
  * @see ResourceEntityResolver
  */
 public class BeansDtdResolver implements EntityResolver {
-	
+
 	private static final String DTD_EXTENSION = ".dtd";
 
 	private static final String[] DTD_NAMES = {"spring-beans-2.0", "spring-beans"};
@@ -49,6 +50,7 @@ public class BeansDtdResolver implements EntityResolver {
 	private static final Log logger = LogFactory.getLog(BeansDtdResolver.class);
 
 
+	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Trying to resolve XML entity with public ID [" + publicId +
@@ -56,8 +58,8 @@ public class BeansDtdResolver implements EntityResolver {
 		}
 		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
 			int lastPathSeparator = systemId.lastIndexOf("/");
-			for (int i = 0; i < DTD_NAMES.length; ++i) {
-				int dtdNameStart = systemId.indexOf(DTD_NAMES[i]);
+			for (String DTD_NAME : DTD_NAMES) {
+				int dtdNameStart = systemId.indexOf(DTD_NAME);
 				if (dtdNameStart > lastPathSeparator) {
 					String dtdFile = systemId.substring(dtdNameStart);
 					if (logger.isTraceEnabled()) {
@@ -78,13 +80,19 @@ public class BeansDtdResolver implements EntityResolver {
 							logger.debug("Could not resolve beans DTD [" + systemId + "]: not found in class path", ex);
 						}
 					}
-				
+
 				}
 			}
 		}
 
 		// Use the default behavior -> download from website or wherever.
 		return null;
+	}
+
+
+	@Override
+	public String toString() {
+		return "EntityResolver for DTDs " + Arrays.toString(DTD_NAMES);
 	}
 
 }

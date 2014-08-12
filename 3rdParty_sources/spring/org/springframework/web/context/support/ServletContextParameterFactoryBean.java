@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,21 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.web.context.ServletContextAware;
 
 /**
- * FactoryBean that retrieves a specific ServletContext init parameter
- * (that is, a "context-param" defined in <code>web.xml</code>).
+ * {@link FactoryBean} that retrieves a specific ServletContext init parameter
+ * (that is, a "context-param" defined in {@code web.xml}).
  * Exposes that ServletContext init parameter when used as bean reference,
  * effectively making it available as named Spring bean instance.
  *
+ * <p><b>NOTE:</b> As of Spring 3.0, you may also use the "contextParameters" default
+ * bean which is of type Map, and dereference it using an "#{contextParameters.myKey}"
+ * expression to access a specific parameter by name.
+ *
  * @author Juergen Hoeller
  * @since 1.2.4
+ * @see org.springframework.web.context.WebApplicationContext#CONTEXT_PARAMETERS_BEAN_NAME
  * @see ServletContextAttributeFactoryBean
  */
-public class ServletContextParameterFactoryBean implements FactoryBean, ServletContextAware {
+public class ServletContextParameterFactoryBean implements FactoryBean<String>, ServletContextAware {
 
 	private String initParamName;
 
@@ -45,6 +50,7 @@ public class ServletContextParameterFactoryBean implements FactoryBean, ServletC
 		this.initParamName = initParamName;
 	}
 
+	@Override
 	public void setServletContext(ServletContext servletContext) {
 		if (this.initParamName == null) {
 			throw new IllegalArgumentException("initParamName is required");
@@ -56,14 +62,17 @@ public class ServletContextParameterFactoryBean implements FactoryBean, ServletC
 	}
 
 
-	public Object getObject() throws Exception {
+	@Override
+	public String getObject() {
 		return this.paramValue;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<String> getObjectType() {
 		return String.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

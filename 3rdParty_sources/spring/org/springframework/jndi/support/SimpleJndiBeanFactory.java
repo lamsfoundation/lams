@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.springframework.jndi.TypeMismatchNamingException;
  *
  * <p>The main intent of this factory is usage in combination with Spring's
  * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor},
- * configured as "resourceFactory" for resolving <code>@Resource</code>
+ * configured as "resourceFactory" for resolving {@code @Resource}
  * annotations as JNDI objects without intermediate bean definitions.
  * It may be used for similar lookup scenarios as well, of course,
  * in particular if BeanFactory-style type checking is required.
@@ -60,13 +60,13 @@ import org.springframework.jndi.TypeMismatchNamingException;
 public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFactory {
 
 	/** JNDI names of resources that are known to be shareable, i.e. can be cached */
-	private final Set shareableResources = new HashSet();
+	private final Set<String> shareableResources = new HashSet<String>();
 
 	/** Cache of shareable singleton objects: bean name --> bean instance */
-	private final Map singletonObjects = new HashMap();
+	private final Map<String, Object> singletonObjects = new HashMap<String, Object>();
 
 	/** Cache of the types of nonshareable resources: bean name --> bean type */
-	private final Map resourceTypes = new HashMap();
+	private final Map<String, Class<?>> resourceTypes = new HashMap<String, Class<?>>();
 
 
 	public SimpleJndiBeanFactory() {
@@ -95,11 +95,18 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 	}
 
 
+	//---------------------------------------------------------------------
+	// Implementation of BeanFactory interface
+	//---------------------------------------------------------------------
+
+
+	@Override
 	public Object getBean(String name) throws BeansException {
-		return getBean(name, (Class) null);
+		return getBean(name, Object.class);
 	}
 
-	public Object getBean(String name, Class requiredType) throws BeansException {
+	@Override
+	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
 		try {
 			if (isSingleton(name)) {
 				return doGetSingleton(name, requiredType);
@@ -119,7 +126,13 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 		}
 	}
 
-	public Object getBean(String name, Object[] args) throws BeansException {
+	@Override
+	public <T> T getBean(Class<T> requiredType) throws BeansException {
+		return getBean(requiredType.getSimpleName(), requiredType);
+	}
+
+	@Override
+	public Object getBean(String name, Object... args) throws BeansException {
 		if (args != null) {
 			throw new UnsupportedOperationException(
 					"SimpleJndiBeanFactory does not support explicit bean creation arguments)");
@@ -127,6 +140,7 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 		return getBean(name);
 	}
 
+	@Override
 	public boolean containsBean(String name) {
 		if (this.singletonObjects.containsKey(name) || this.resourceTypes.containsKey(name)) {
 			return true;
@@ -140,20 +154,24 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 		}
 	}
 
+	@Override
 	public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
 		return this.shareableResources.contains(name);
 	}
 
+	@Override
 	public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
 		return !this.shareableResources.contains(name);
 	}
 
-	public boolean isTypeMatch(String name, Class targetType) throws NoSuchBeanDefinitionException {
-		Class type = getType(name);
+	@Override
+	public boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException {
+		Class<?> type = getType(name);
 		return (targetType == null || (type != null && targetType.isAssignableFrom(type)));
 	}
 
-	public Class getType(String name) throws NoSuchBeanDefinitionException {
+	@Override
+	public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
 		try {
 			return doGetType(name);
 		}
@@ -165,12 +183,14 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 		}
 	}
 
+	@Override
 	public String[] getAliases(String name) {
 		return new String[0];
 	}
 
 
-	private Object doGetSingleton(String name, Class requiredType) throws NamingException {
+	@SuppressWarnings("unchecked")
+	private <T> T doGetSingleton(String name, Class<T> requiredType) throws NamingException {
 		synchronized (this.singletonObjects) {
 			if (this.singletonObjects.containsKey(name)) {
 				Object jndiObject = this.singletonObjects.get(name);
@@ -178,15 +198,15 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 					throw new TypeMismatchNamingException(
 							convertJndiName(name), requiredType, (jndiObject != null ? jndiObject.getClass() : null));
 				}
-				return jndiObject;
+				return (T) jndiObject;
 			}
-			Object jndiObject = lookup(name, requiredType);
+			T jndiObject = lookup(name, requiredType);
 			this.singletonObjects.put(name, jndiObject);
 			return jndiObject;
 		}
 	}
 
-	private Class doGetType(String name) throws NamingException {
+	private Class<?> doGetType(String name) throws NamingException {
 		if (isSingleton(name)) {
 			Object jndiObject = doGetSingleton(name, null);
 			return (jndiObject != null ? jndiObject.getClass() : null);
@@ -194,11 +214,11 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 		else {
 			synchronized (this.resourceTypes) {
 				if (this.resourceTypes.containsKey(name)) {
-					return (Class) this.resourceTypes.get(name);
+					return this.resourceTypes.get(name);
 				}
 				else {
 					Object jndiObject = lookup(name, null);
-					Class type = (jndiObject != null ? jndiObject.getClass() : null);
+					Class<?> type = (jndiObject != null ? jndiObject.getClass() : null);
 					this.resourceTypes.put(name, type);
 					return type;
 				}

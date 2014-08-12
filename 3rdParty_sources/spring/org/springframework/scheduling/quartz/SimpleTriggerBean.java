@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.scheduling.quartz;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,10 +28,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Constants;
 
 /**
- * Convenience subclass of Quartz's {@link org.quartz.SimpleTrigger}
- * class, making bean-style usage easier.
+ * Convenience subclass of Quartz's {@link org.quartz.SimpleTrigger} class,
+ * making bean-style usage easier.
  *
- * <p>SimpleTrigger itself is already a JavaBean but lacks sensible defaults.
+ * <p>{@code SimpleTrigger} itself is already a JavaBean but lacks sensible defaults.
  * This class uses the Spring bean name as job name, the Quartz default group
  * ("DEFAULT") as job group, the current time as start time, and indefinite
  * repetition, if not specified.
@@ -42,10 +41,11 @@ import org.springframework.core.Constants;
  * to automatically register a trigger for the corresponding JobDetail,
  * instead of registering the JobDetail separately.
  *
- * <p><b>NOTE:</b> This convenience subclass does not work with trigger
- * persistence in Quartz 1.6, due to a change in Quartz's trigger handling.
- * Use Quartz 1.5 if you rely on trigger persistence based on this class,
- * or the standard Quartz {@link org.quartz.SimpleTrigger} class instead.
+ * <p><b>NOTE: This convenience subclass does not work against Quartz 2.0.</b>
+ * Use Quartz 2.0's native {@code JobDetailImpl} class or the new Quartz 2.0
+ * builder API instead. Alternatively, switch to Spring's {@link SimpleTriggerFactoryBean}
+ * which largely is a drop-in replacement for this class and its properties and
+ * consistently works against Quartz 1.x as well as Quartz 2.x.
  *
  * @author Juergen Hoeller
  * @since 18.02.2004
@@ -59,8 +59,9 @@ import org.springframework.core.Constants;
  * @see SchedulerFactoryBean#setJobDetails
  * @see CronTriggerBean
  */
+@SuppressWarnings("serial")
 public class SimpleTriggerBean extends SimpleTrigger
-    implements JobDetailAwareTrigger, BeanNameAware, InitializingBean {
+		implements JobDetailAwareTrigger, BeanNameAware, InitializingBean {
 
 	/** Constants for the SimpleTrigger class */
 	private static final Constants constants = new Constants(SimpleTrigger.class);
@@ -85,14 +86,14 @@ public class SimpleTriggerBean extends SimpleTrigger
 	 * (for example Spring-managed beans)
 	 * @see JobDetailBean#setJobDataAsMap
 	 */
-	public void setJobDataAsMap(Map jobDataAsMap) {
+	public void setJobDataAsMap(Map<String, ?> jobDataAsMap) {
 		getJobDataMap().putAll(jobDataAsMap);
 	}
 
 	/**
 	 * Set the misfire instruction via the name of the corresponding
 	 * constant in the {@link org.quartz.SimpleTrigger} class.
-	 * Default is <code>MISFIRE_INSTRUCTION_SMART_POLICY</code>.
+	 * Default is {@code MISFIRE_INSTRUCTION_SMART_POLICY}.
 	 * @see org.quartz.SimpleTrigger#MISFIRE_INSTRUCTION_FIRE_NOW
 	 * @see org.quartz.SimpleTrigger#MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT
 	 * @see org.quartz.SimpleTrigger#MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT
@@ -111,22 +112,22 @@ public class SimpleTriggerBean extends SimpleTrigger
 	 * by the TriggerListener implementation.
 	 * @see SchedulerFactoryBean#setTriggerListeners
 	 * @see org.quartz.TriggerListener#getName
+	 * @deprecated as of Spring 4.0, since it only works on Quartz 1.x
 	 */
-	public void setTriggerListenerNames(String[] names) {
-		for (int i = 0; i < names.length; i++) {
-			addTriggerListener(names[i]);
+	@Deprecated
+	public void setTriggerListenerNames(String... names) {
+		for (String name : names) {
+			addTriggerListener(name);
 		}
 	}
 
 	/**
-	 * Set the delay before starting the job for the first time.
-	 * The given number of milliseconds will be added to the current
-	 * time to calculate the start time. Default is 0.
-	 * <p>This delay will just be applied if no custom start time was
-	 * specified. However, in typical usage within a Spring context,
-	 * the start time will be the container startup time anyway.
-	 * Specifying a relative delay is appropriate in that case.
-	 * @see #setStartTime
+	 * Set the start delay in milliseconds.
+	 * <p>The start delay is added to the current system time (when the bean starts)
+	 * to control the {@link #setStartTime start time} of the trigger.
+	 * <p>If the start delay is non-zero, it will <strong>always</strong>
+	 * take precedence over start time.
+	 * @param startDelay the start delay, in milliseconds
 	 */
 	public void setStartDelay(long startDelay) {
 		this.startDelay = startDelay;
@@ -144,23 +145,26 @@ public class SimpleTriggerBean extends SimpleTrigger
 		this.jobDetail = jobDetail;
 	}
 
+	@Override
 	public JobDetail getJobDetail() {
 		return this.jobDetail;
 	}
 
+	@Override
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
 	}
 
 
-	public void afterPropertiesSet() throws ParseException {
+	@Override
+	public void afterPropertiesSet() {
 		if (getName() == null) {
 			setName(this.beanName);
 		}
 		if (getGroup() == null) {
 			setGroup(Scheduler.DEFAULT_GROUP);
 		}
-		if (getStartTime() == null) {
+		if (this.startDelay > 0 || getStartTime() == null) {
 			setStartTime(new Date(System.currentTimeMillis() + this.startDelay));
 		}
 		if (this.jobDetail != null) {

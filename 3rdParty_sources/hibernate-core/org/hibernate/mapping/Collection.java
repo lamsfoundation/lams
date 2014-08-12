@@ -23,8 +23,9 @@
  */
 package org.hibernate.mapping;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -32,14 +33,13 @@ import java.util.Properties;
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.ExecuteUpdateResultCheckStyle;
+import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.FilterConfiguration;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
-import org.hibernate.util.ArrayHelper;
-import org.hibernate.util.EmptyIterator;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * Mapping for a collection. Subclasses specialize to particular collection styles.
@@ -72,6 +72,7 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	private String referencedPropertyName;
 	private String nodeName;
 	private String elementNodeName;
+	private String mappedByProperty;
 	private boolean sorted;
 	private Comparator comparator;
 	private String comparatorClassName;
@@ -83,8 +84,8 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	private Class collectionPersisterClass;
 	private String typeName;
 	private Properties typeParameters;
-	private final java.util.Map filters = new HashMap();
-	private final java.util.Map manyToManyFilters = new HashMap();
+	private final java.util.List filters = new ArrayList();
+	private final java.util.List manyToManyFilters = new ArrayList();
 	private final java.util.Set synchronizedTables = new HashSet();
 
 	private String customSQLInsert;
@@ -213,7 +214,7 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	}
 
 	public void setRole(String role) {
-		this.role = role==null ? null : role.intern();
+		this.role = role;
 	}
 
 	public void setSorted(boolean sorted) {
@@ -233,7 +234,8 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	 *
 	 * @param owner The owner
 	 */
-	public void setOwner(PersistentClass owner) {
+	@Deprecated
+    public void setOwner(PersistentClass owner) {
 		this.owner = owner;
 	}
 
@@ -365,8 +367,8 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 		}
 	}
 
-	public Iterator getColumnIterator() {
-		return EmptyIterator.INSTANCE;
+	public Iterator<Selectable> getColumnIterator() {
+		return Collections.<Selectable>emptyList().iterator();
 	}
 
 	public int getColumnSpan() {
@@ -384,7 +386,7 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 		else {
 			return mappings.getTypeResolver()
 					.getTypeFactory()
-					.customCollection( typeName, typeParameters, role, referencedPropertyName, isEmbedded() );
+					.customCollection( typeName, typeParameters, role, referencedPropertyName );
 		}
 	}
 
@@ -520,23 +522,23 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 		return deleteAllCheckStyle;
 	}
 
-	public void addFilter(String name, String condition) {
-		filters.put( name, condition );
+	public void addFilter(String name, String condition, boolean autoAliasInjection, java.util.Map<String,String> aliasTableMap, java.util.Map<String,String> aliasEntityMap) {
+		filters.add(new FilterConfiguration(name, condition, autoAliasInjection, aliasTableMap, aliasEntityMap, null));
 	}
-
-	public java.util.Map getFilterMap() {
+	public java.util.List getFilters() {
 		return filters;
 	}
 
-	public void addManyToManyFilter(String name, String condition) {
-		manyToManyFilters.put( name, condition );
+	public void addManyToManyFilter(String name, String condition, boolean autoAliasInjection, java.util.Map<String,String> aliasTableMap, java.util.Map<String,String> aliasEntityMap) {
+		manyToManyFilters.add(new FilterConfiguration(name, condition, autoAliasInjection, aliasTableMap, aliasEntityMap, null));
 	}
 
-	public java.util.Map getManyToManyFilterMap() {
+	public java.util.List getManyToManyFilters() {
 		return manyToManyFilters;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return getClass().getName() + '(' + getRole() + ')';
 	}
 
@@ -549,7 +551,7 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	}
 
 	public void setLoaderName(String name) {
-		this.loaderName = name==null ? null : name.intern();
+		this.loaderName = name;
 	}
 
 	public String getReferencedPropertyName() {
@@ -557,7 +559,7 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	}
 
 	public void setReferencedPropertyName(String propertyRef) {
-		this.referencedPropertyName = propertyRef==null ? null : propertyRef.intern();
+		this.referencedPropertyName = propertyRef;
 	}
 
 	public boolean isOptimisticLocked() {
@@ -612,10 +614,20 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 		this.elementNodeName = elementNodeName;
 	}
 
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public boolean isEmbedded() {
 		return embedded;
 	}
 
+	/**
+	 * @deprecated To be removed in 5.  Removed as part of removing the notion of DOM entity-mode.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public void setEmbedded(boolean embedded) {
 		this.embedded = embedded;
 	}
@@ -655,5 +667,13 @@ public abstract class Collection implements Fetchable, Value, Filterable {
 	
 	public String getComparatorClassName() {
 		return comparatorClassName;
+	}
+
+	public String getMappedByProperty() {
+		return mappedByProperty;
+	}
+
+	public void setMappedByProperty(String mappedByProperty) {
+		this.mappedByProperty = mappedByProperty;
 	}
 }

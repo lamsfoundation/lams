@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.id;
 
@@ -30,12 +31,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.hibernate.HibernateException;
-import org.hibernate.type.Type;
+import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.type.CustomType;
+import org.hibernate.type.Type;
+
+import org.jboss.logging.Logger;
 
 /**
  * Factory and helper methods for {@link IdentifierGenerator} framework.
@@ -44,7 +45,9 @@ import org.hibernate.type.CustomType;
  * @author Steve Ebersole
  */
 public final class IdentifierGeneratorHelper {
-	private static final Logger log = LoggerFactory.getLogger( IdentifierGeneratorHelper.class );
+
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class,
+                                                                       IdentifierGeneratorHelper.class.getName());
 
 	/**
 	 * Marker object returned from {@link IdentifierGenerator#generate} to indicate that we should short-circuit any
@@ -53,6 +56,7 @@ public final class IdentifierGeneratorHelper {
 	 * entity's id value.
 	 */
 	public static final Serializable SHORT_CIRCUIT_INDICATOR = new Serializable() {
+		@Override
 		public String toString() {
 			return "SHORT_CIRCUIT_INDICATOR";
 		}
@@ -63,6 +67,7 @@ public final class IdentifierGeneratorHelper {
 	 * be generated as part of the datbase insertion.
 	 */
 	public static final Serializable POST_INSERT_INDICATOR = new Serializable() {
+		@Override
 		public String toString() {
 			return "POST_INSERT_INDICATOR";
 		}
@@ -73,7 +78,7 @@ public final class IdentifierGeneratorHelper {
 	 * Get the generated identifier when using identity columns
 	 *
 	 * @param rs The result set from which to extract the the generated identity.
-	 * @param identifierColumnName The name of the identifier column
+	 * @param identifier The name of the identifier column
 	 * @param type The expected type mapping for the identity value.
 	 *
 	 * @return The generated identity value
@@ -81,12 +86,12 @@ public final class IdentifierGeneratorHelper {
 	 * @throws SQLException Can be thrown while accessing the result set
 	 * @throws HibernateException Indicates a problem reading back a generated identity value.
 	 */
-	public static Serializable getGeneratedIdentity(ResultSet rs, String identifierColumnName, Type type) throws SQLException, HibernateException {
+	public static Serializable getGeneratedIdentity(ResultSet rs, String identifier, Type type) throws SQLException, HibernateException {
 		if ( !rs.next() ) {
 			throw new HibernateException( "The database returned no natively generated identity value" );
 		}
-		final Serializable id = get( rs, identifierColumnName, type );
-		log.debug( "Natively generated identity: " + id );
+		final Serializable id = get( rs, identifier, type );
+		LOG.debugf( "Natively generated identity: %s", id );
 		return id;
 	}
 
@@ -95,7 +100,7 @@ public final class IdentifierGeneratorHelper {
 	 * and wrp it in the appropriate Java numeric type.
 	 *
 	 * @param rs The result set from which to extract the value.
-	 * @param identifierColumnName The name of the identifier column
+	 * @param identifier The name of the identifier column
 	 * @param type The expected type of the value.
 	 *
 	 * @return The extracted value.
@@ -103,7 +108,7 @@ public final class IdentifierGeneratorHelper {
 	 * @throws SQLException Indicates problems access the result set
 	 * @throws IdentifierGenerationException Indicates an unknown type.
 	 */
-	public static Serializable get(ResultSet rs, String identifierColumnName,Type type) throws SQLException, IdentifierGenerationException {
+	public static Serializable get(ResultSet rs, String identifier, Type type) throws SQLException, IdentifierGenerationException {
 		if ( ResultSetIdentifierConsumer.class.isInstance( type ) ) {
 			return ( ( ResultSetIdentifierConsumer ) type ).consumeIdentifier( rs );
 		}
@@ -142,22 +147,22 @@ public final class IdentifierGeneratorHelper {
 		}
 		else {
 			if ( clazz == Long.class ) {
-				return rs.getLong( identifierColumnName );
+				return rs.getLong(identifier);
 			}
 			else if ( clazz == Integer.class ) {
-				return rs.getInt( identifierColumnName );
+				return rs.getInt(identifier);
 			}
 			else if ( clazz == Short.class ) {
-				return rs.getShort( identifierColumnName );
+				return rs.getShort(identifier);
 			}
 			else if ( clazz == String.class ) {
-				return rs.getString( identifierColumnName );
+				return rs.getString(identifier);
 			}
 			else if ( clazz == BigInteger.class ) {
-				return rs.getBigDecimal( identifierColumnName ).setScale( 0, BigDecimal.ROUND_UNNECESSARY ).toBigInteger();
+				return rs.getBigDecimal(identifier).setScale( 0, BigDecimal.ROUND_UNNECESSARY ).toBigInteger();
 			}
 			else if ( clazz == BigDecimal.class ) {
-				return rs.getBigDecimal( identifierColumnName ).setScale( 0, BigDecimal.ROUND_UNNECESSARY );
+				return rs.getBigDecimal(identifier).setScale( 0, BigDecimal.ROUND_UNNECESSARY );
 			}
 			else {
 				throw new IdentifierGenerationException(
@@ -179,15 +184,16 @@ public final class IdentifierGeneratorHelper {
 	 *
 	 * @deprecated Use the {@link #getIntegralDataTypeHolder holders} instead.
 	 */
-	public static Number createNumber(long value, Class clazz) throws IdentifierGenerationException {
+	@Deprecated
+    public static Number createNumber(long value, Class clazz) throws IdentifierGenerationException {
 		if ( clazz == Long.class ) {
-			return new Long( value );
+			return value;
 		}
 		else if ( clazz == Integer.class ) {
-			return new Integer( ( int ) value );
+			return ( int ) value;
 		}
 		else if ( clazz == Short.class ) {
-			return new Short( ( short ) value );
+			return ( short ) value;
 		}
 		else {
 			throw new IdentifierGenerationException( "unrecognized id type : " + clazz.getName() );
@@ -373,13 +379,13 @@ public final class IdentifierGeneratorHelper {
 			// TODO : should we check for truncation?
 			checkInitialized();
 			if ( exactType == Long.class ) {
-				return new Long( value );
+				return value;
 			}
 			else if ( exactType == Integer.class ) {
-				return new Integer( ( int ) value );
+				return ( int ) value;
 			}
 			else {
-				return new Short( ( short ) value );
+				return ( short ) value;
 			}
 		}
 
@@ -395,11 +401,13 @@ public final class IdentifierGeneratorHelper {
 			return result;
 		}
 
-		public String toString() {
+		@Override
+        public String toString() {
 			return "BasicHolder[" + exactType.getName() + "[" + value + "]]";
 		}
 
-		public boolean equals(Object o) {
+		@Override
+        public boolean equals(Object o) {
 			if ( this == o ) {
 				return true;
 			}
@@ -412,7 +420,8 @@ public final class IdentifierGeneratorHelper {
 			return value == that.value;
 		}
 
-		public int hashCode() {
+		@Override
+        public int hashCode() {
 			return (int) ( value ^ ( value >>> 32 ) );
 		}
 	}
@@ -533,11 +542,13 @@ public final class IdentifierGeneratorHelper {
 			return result;
 		}
 
-		public String toString() {
+		@Override
+        public String toString() {
 			return "BigIntegerHolder[" + value + "]";
 		}
 
-		public boolean equals(Object o) {
+		@Override
+        public boolean equals(Object o) {
 			if ( this == o ) {
 				return true;
 			}
@@ -552,7 +563,8 @@ public final class IdentifierGeneratorHelper {
 					: value.equals( that.value );
 		}
 
-		public int hashCode() {
+		@Override
+        public int hashCode() {
 			return value != null ? value.hashCode() : 0;
 		}
 	}
@@ -673,11 +685,13 @@ public final class IdentifierGeneratorHelper {
 			return result;
 		}
 
-		public String toString() {
+		@Override
+        public String toString() {
 			return "BigDecimalHolder[" + value + "]";
 		}
 
-		public boolean equals(Object o) {
+		@Override
+        public boolean equals(Object o) {
 			if ( this == o ) {
 				return true;
 			}
@@ -692,7 +706,8 @@ public final class IdentifierGeneratorHelper {
 					: this.value.equals( that.value );
 		}
 
-		public int hashCode() {
+		@Override
+        public int hashCode() {
 			return value != null ? value.hashCode() : 0;
 		}
 	}
@@ -702,5 +717,4 @@ public final class IdentifierGeneratorHelper {
 	 */
 	private IdentifierGeneratorHelper() {
 	}
-
 }

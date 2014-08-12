@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.List;
-
 import javax.management.DynamicMBean;
 import javax.management.MBeanParameterInfo;
 import javax.management.MBeanServer;
@@ -33,7 +32,6 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.core.JdkVersion;
 import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -76,12 +74,12 @@ public abstract class JmxUtils {
 
 
 	/**
-	 * Attempt to find a locally running <code>MBeanServer</code>. Fails if no
-	 * <code>MBeanServer</code> can be found. Logs a warning if more than one
-	 * <code>MBeanServer</code> found, returning the first one from the list.
-	 * @return the <code>MBeanServer</code> if found
+	 * Attempt to find a locally running {@code MBeanServer}. Fails if no
+	 * {@code MBeanServer} can be found. Logs a warning if more than one
+	 * {@code MBeanServer} found, returning the first one from the list.
+	 * @return the {@code MBeanServer} if found
 	 * @throws org.springframework.jmx.MBeanServerNotFoundException
-	 * if no <code>MBeanServer</code> could be found
+	 * if no {@code MBeanServer} could be found
 	 * @see javax.management.MBeanServerFactory#findMBeanServer
 	 */
 	public static MBeanServer locateMBeanServer() throws MBeanServerNotFoundException {
@@ -89,32 +87,35 @@ public abstract class JmxUtils {
 	}
 
 	/**
-	 * Attempt to find a locally running <code>MBeanServer</code>. Fails if no
-	 * <code>MBeanServer</code> can be found. Logs a warning if more than one
-	 * <code>MBeanServer</code> found, returning the first one from the list.
+	 * Attempt to find a locally running {@code MBeanServer}. Fails if no
+	 * {@code MBeanServer} can be found. Logs a warning if more than one
+	 * {@code MBeanServer} found, returning the first one from the list.
 	 * @param agentId the agent identifier of the MBeanServer to retrieve.
-	 * If this parameter is <code>null</code>, all registered MBeanServers are
-	 * considered.
-	 * @return the <code>MBeanServer</code> if found
+	 * If this parameter is {@code null}, all registered MBeanServers are considered.
+	 * If the empty String is given, the platform MBeanServer will be returned.
+	 * @return the {@code MBeanServer} if found
 	 * @throws org.springframework.jmx.MBeanServerNotFoundException
-	 * if no <code>MBeanServer</code> could be found
+	 * if no {@code MBeanServer} could be found
 	 * @see javax.management.MBeanServerFactory#findMBeanServer(String)
 	 */
 	public static MBeanServer locateMBeanServer(String agentId) throws MBeanServerNotFoundException {
-		List servers = MBeanServerFactory.findMBeanServer(agentId);
-
 		MBeanServer server = null;
-		if (servers != null && servers.size() > 0) {
-			// Check to see if an MBeanServer is registered.
-			if (servers.size() > 1 && logger.isWarnEnabled()) {
-				logger.warn("Found more than one MBeanServer instance" +
-						(agentId != null ? " with agent id [" + agentId + "]" : "") +
-						". Returning first from list.");
+
+		// null means any registered server, but "" specifically means the platform server
+		if (!"".equals(agentId)) {
+			List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(agentId);
+			if (servers != null && servers.size() > 0) {
+				// Check to see if an MBeanServer is registered.
+				if (servers.size() > 1 && logger.isWarnEnabled()) {
+					logger.warn("Found more than one MBeanServer instance" +
+							(agentId != null ? " with agent id [" + agentId + "]" : "") +
+							". Returning first from list.");
+				}
+				server = servers.get(0);
 			}
-			server = (MBeanServer) servers.get(0);
 		}
 
-		if (server == null && agentId == null && JdkVersion.isAtLeastJava15()) {
+		if (server == null && !StringUtils.hasLength(agentId)) {
 			// Attempt to load the PlatformMBeanServer.
 			try {
 				server = ManagementFactory.getPlatformMBeanServer();
@@ -138,30 +139,30 @@ public abstract class JmxUtils {
 	}
 
 	/**
-	 * Convert an array of <code>MBeanParameterInfo</code> into an array of
-	 * <code>Class</code> instances corresponding to the parameters.
+	 * Convert an array of {@code MBeanParameterInfo} into an array of
+	 * {@code Class} instances corresponding to the parameters.
 	 * @param paramInfo the JMX parameter info
 	 * @return the parameter types as classes
 	 * @throws ClassNotFoundException if a parameter type could not be resolved
 	 */
-	public static Class[] parameterInfoToTypes(MBeanParameterInfo[] paramInfo) throws ClassNotFoundException {
+	public static Class<?>[] parameterInfoToTypes(MBeanParameterInfo[] paramInfo) throws ClassNotFoundException {
 		return parameterInfoToTypes(paramInfo, ClassUtils.getDefaultClassLoader());
 	}
 
 	/**
-	 * Convert an array of <code>MBeanParameterInfo</code> into an array of
-	 * <code>Class</code> instances corresponding to the parameters.
+	 * Convert an array of {@code MBeanParameterInfo} into an array of
+	 * {@code Class} instances corresponding to the parameters.
 	 * @param paramInfo the JMX parameter info
 	 * @param classLoader the ClassLoader to use for loading parameter types
 	 * @return the parameter types as classes
 	 * @throws ClassNotFoundException if a parameter type could not be resolved
 	 */
-	public static Class[] parameterInfoToTypes(MBeanParameterInfo[] paramInfo, ClassLoader classLoader)
+	public static Class<?>[] parameterInfoToTypes(MBeanParameterInfo[] paramInfo, ClassLoader classLoader)
 			throws ClassNotFoundException {
 
-		Class[] types = null;
+		Class<?>[] types = null;
 		if (paramInfo != null && paramInfo.length > 0) {
-			types = new Class[paramInfo.length];
+			types = new Class<?>[paramInfo.length];
 			for (int x = 0; x < paramInfo.length; x++) {
 				types[x] = ClassUtils.forName(paramInfo[x].getType(), classLoader);
 			}
@@ -170,14 +171,14 @@ public abstract class JmxUtils {
 	}
 
 	/**
-	 * Create a <code>String[]</code> representing the argument signature of a
+	 * Create a {@code String[]} representing the argument signature of a
 	 * method. Each element in the array is the fully qualified class name
 	 * of the corresponding argument in the methods signature.
 	 * @param method the method to build an argument signature for
 	 * @return the signature as array of argument types
 	 */
 	public static String[] getMethodSignature(Method method) {
-		Class[] types = method.getParameterTypes();
+		Class<?>[] types = method.getParameterTypes();
 		String[] signature = new String[types.length];
 		for (int x = 0; x < types.length; x++) {
 			signature[x] = types[x].getName();
@@ -188,9 +189,9 @@ public abstract class JmxUtils {
 	/**
 	 * Return the JMX attribute name to use for the given JavaBeans property.
 	 * <p>When using strict casing, a JavaBean property with a getter method
-	 * such as <code>getFoo()</code> translates to an attribute called
-	 * <code>Foo</code>. With strict casing disabled, <code>getFoo()</code>
-	 * would translate to just <code>foo</code>.
+	 * such as {@code getFoo()} translates to an attribute called
+	 * {@code Foo}. With strict casing disabled, {@code getFoo()}
+	 * would translate to just {@code foo}.
 	 * @param property the JavaBeans property descriptor
 	 * @param useStrictCasing whether to use strict casing
 	 * @return the JMX attribute name to use
@@ -206,7 +207,7 @@ public abstract class JmxUtils {
 
 	/**
 	 * Append an additional key/value pair to an existing {@link ObjectName} with the key being
-	 * the static value <code>identity</code> and the value being the identity hash code of the
+	 * the static value {@code identity} and the value being the identity hash code of the
 	 * managed resource being exposed on the supplied {@link ObjectName}. This can be used to
 	 * provide a unique {@link ObjectName} for each distinct instance of a particular bean or
 	 * class. Useful when generating {@link ObjectName ObjectNames} at runtime for a set of
@@ -221,7 +222,7 @@ public abstract class JmxUtils {
 	public static ObjectName appendIdentityToObjectName(ObjectName objectName, Object managedResource)
 			throws MalformedObjectNameException {
 
-		Hashtable keyProperties = objectName.getKeyPropertyList();
+		Hashtable<String, String> keyProperties = objectName.getKeyPropertyList();
 		keyProperties.put(IDENTITY_OBJECT_NAME_KEY, ObjectUtils.getIdentityHexString(managedResource));
 		return ObjectNameManager.getInstance(objectName.getDomain(), keyProperties);
 	}
@@ -236,7 +237,7 @@ public abstract class JmxUtils {
 	 * @return the bean class to expose
 	 * @see org.springframework.util.ClassUtils#getUserClass(Object)
 	 */
-	public static Class getClassToExpose(Object managedBean) {
+	public static Class<?> getClassToExpose(Object managedBean) {
 		return ClassUtils.getUserClass(managedBean);
 	}
 
@@ -246,12 +247,12 @@ public abstract class JmxUtils {
 	 * (for example, checked for annotations).
 	 * <p>This implementation returns the superclass for a CGLIB proxy and
 	 * the class of the given bean else (for a JDK proxy or a plain bean class).
-	 * @param beanClass the bean class (might be an AOP proxy class)
+	 * @param clazz the bean class (might be an AOP proxy class)
 	 * @return the bean class to expose
 	 * @see org.springframework.util.ClassUtils#getUserClass(Class)
 	 */
-	public static Class getClassToExpose(Class beanClass) {
-		return ClassUtils.getUserClass(beanClass);
+	public static Class<?> getClassToExpose(Class<?> clazz) {
+		return ClassUtils.getUserClass(clazz);
 	}
 
 	/**
@@ -259,14 +260,14 @@ public abstract class JmxUtils {
 	 * <p>This implementation checks for {@link javax.management.DynamicMBean}
 	 * classes as well as classes with corresponding "*MBean" interface
 	 * (Standard MBeans) or corresponding "*MXBean" interface (Java 6 MXBeans).
-	 * @param beanClass the bean class to analyze
+	 * @param clazz the bean class to analyze
 	 * @return whether the class qualifies as an MBean
 	 * @see org.springframework.jmx.export.MBeanExporter#isMBean(Class)
 	 */
-	public static boolean isMBean(Class beanClass) {
-		return (beanClass != null &&
-				(DynamicMBean.class.isAssignableFrom(beanClass) ||
-						(getMBeanInterface(beanClass) != null || getMXBeanInterface(beanClass) != null)));
+	public static boolean isMBean(Class<?> clazz) {
+		return (clazz != null &&
+				(DynamicMBean.class.isAssignableFrom(clazz) ||
+						(getMBeanInterface(clazz) != null || getMXBeanInterface(clazz) != null)));
 	}
 
 	/**
@@ -276,14 +277,13 @@ public abstract class JmxUtils {
 	 * @param clazz the class to check
 	 * @return the Standard MBean interface for the given class
 	 */
-	public static Class getMBeanInterface(Class clazz) {
-		if (clazz.getSuperclass() == null) {
+	public static Class<?> getMBeanInterface(Class<?> clazz) {
+		if (clazz == null || clazz.getSuperclass() == null) {
 			return null;
 		}
 		String mbeanInterfaceName = clazz.getName() + MBEAN_SUFFIX;
-		Class[] implementedInterfaces = clazz.getInterfaces();
-		for (int x = 0; x < implementedInterfaces.length; x++) {
-			Class iface = implementedInterfaces[x];
+		Class<?>[] implementedInterfaces = clazz.getInterfaces();
+		for (Class<?> iface : implementedInterfaces) {
 			if (iface.getName().equals(mbeanInterfaceName)) {
 				return iface;
 			}
@@ -298,18 +298,17 @@ public abstract class JmxUtils {
 	 * @param clazz the class to check
 	 * @return whether there is an MXBean interface for the given class
 	 */
-	public static Class getMXBeanInterface(Class clazz) {
-		if (clazz.getSuperclass() == null) {
+	public static Class<?> getMXBeanInterface(Class<?> clazz) {
+		if (clazz == null || clazz.getSuperclass() == null) {
 			return null;
 		}
-		Class[] implementedInterfaces = clazz.getInterfaces();
-		for (int x = 0; x < implementedInterfaces.length; x++) {
-			Class iface = implementedInterfaces[x];
+		Class<?>[] implementedInterfaces = clazz.getInterfaces();
+		for (Class<?> iface : implementedInterfaces) {
 			boolean isMxBean = iface.getName().endsWith(MXBEAN_SUFFIX);
 			if (mxBeanAnnotationAvailable) {
-				Boolean checkResult = MXBeanChecker.hasMXBeanAnnotation(iface);
+				Boolean checkResult = MXBeanChecker.evaluateMXBeanAnnotation(iface);
 				if (checkResult != null) {
-					isMxBean = checkResult.booleanValue();
+					isMxBean = checkResult;
 				}
 			}
 			if (isMxBean) {
@@ -319,20 +318,24 @@ public abstract class JmxUtils {
 		return getMXBeanInterface(clazz.getSuperclass());
 	}
 
+	/**
+	 * Check whether MXBean support is available, i.e. whether we're running
+	 * on Java 6 or above.
+	 * @return {@code true} if available; {@code false} otherwise
+	 */
+	public static boolean isMXBeanSupportAvailable() {
+		return mxBeanAnnotationAvailable;
+	}
+
 
 	/**
 	 * Inner class to avoid a Java 6 dependency.
 	 */
 	private static class MXBeanChecker {
 
-		public static Boolean hasMXBeanAnnotation(Class iface) {
-			MXBean mxBean = (MXBean) iface.getAnnotation(MXBean.class);
-			if (mxBean != null) {
-				return Boolean.valueOf(mxBean.value());
-			}
-			else {
-				return null;
-			}
+		public static Boolean evaluateMXBeanAnnotation(Class<?> iface) {
+			MXBean mxBean = iface.getAnnotation(MXBean.class);
+			return (mxBean != null ? mxBean.value() : null);
 		}
 	}
 

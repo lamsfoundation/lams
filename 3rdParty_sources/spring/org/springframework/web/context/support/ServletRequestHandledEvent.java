@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ package org.springframework.web.context.support;
  * @see org.springframework.web.servlet.FrameworkServlet
  * @see org.springframework.context.ApplicationContext#publishEvent
  */
+@SuppressWarnings("serial")
 public class ServletRequestHandledEvent extends RequestHandledEvent {
 
 	/** URL that the triggered the request */
@@ -117,16 +118,18 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
 	}
 
 
+	@Override
 	public String getShortDescription() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("url=[").append(getRequestUrl()).append("]; ");
 		sb.append("client=[").append(getClientAddress()).append("]; ");
 		sb.append(super.getShortDescription());
 		return sb.toString();
 	}
 
+	@Override
 	public String getDescription() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("url=[").append(getRequestUrl()).append("]; ");
 		sb.append("client=[").append(getClientAddress()).append("]; ");
 		sb.append("method=[").append(getMethod()).append("]; ");
@@ -135,6 +138,7 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
 		return sb.toString();
 	}
 
+	@Override
 	public String toString() {
 		return "ServletRequestHandledEvent: " + getDescription();
 	}

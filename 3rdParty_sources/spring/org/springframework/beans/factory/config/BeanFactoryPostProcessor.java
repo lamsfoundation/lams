@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2005 the original author or authors.
- * 
+ * Copyright 2002-2012 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,12 @@ import org.springframework.beans.BeansException;
  *
  * <p>See PropertyResourceConfigurer and its concrete implementations
  * for out-of-the-box solutions that address such configuration needs.
+ *
+ * <p>A BeanFactoryPostProcessor may interact with and modify bean
+ * definitions, but never bean instances. Doing so may cause premature bean
+ * instantiation, violating the container and causing unintended side-effects.
+ * If bean instance interaction is required, consider implementing
+ * {@link BeanPostProcessor} instead.
  *
  * @author Juergen Hoeller
  * @since 06.07.2003

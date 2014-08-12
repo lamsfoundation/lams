@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,14 +69,15 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	}
 
 
+	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 		InputSource source = super.resolveEntity(publicId, systemId);
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
-				String decodedSystemId = URLDecoder.decode(systemId);
+				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
 				String givenUrl = new URL(decodedSystemId).toString();
-				String systemRootUrl = new File("").toURL().toString();
+				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
 				if (givenUrl.startsWith(systemRootUrl)) {
 					resourcePath = givenUrl.substring(systemRootUrl.length());

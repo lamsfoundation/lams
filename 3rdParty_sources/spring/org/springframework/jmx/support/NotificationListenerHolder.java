@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package org.springframework.jmx.support;
 
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.management.MalformedObjectNameException;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
@@ -46,7 +45,7 @@ public class NotificationListenerHolder {
 
 	private Object handback;
 
-	protected Set mappedObjectNames;
+	protected Set<Object> mappedObjectNames;
 
 
 	/**
@@ -66,7 +65,7 @@ public class NotificationListenerHolder {
 	/**
 	 * Set the {@link javax.management.NotificationFilter} associated
 	 * with the encapsulated {@link #getNotificationFilter() NotificationFilter}.
-	 * <p>May be <code>null</code>.
+	 * <p>May be {@code null}.
 	 */
 	public void setNotificationFilter(NotificationFilter notificationFilter) {
 		this.notificationFilter = notificationFilter;
@@ -75,7 +74,7 @@ public class NotificationListenerHolder {
 	/**
 	 * Return the {@link javax.management.NotificationFilter} associated
 	 * with the encapsulated {@link #getNotificationFilter() NotificationFilter}.
-	 * <p>May be <code>null</code>.
+	 * <p>May be {@code null}.
 	 */
 	public NotificationFilter getNotificationFilter() {
 		return this.notificationFilter;
@@ -85,7 +84,7 @@ public class NotificationListenerHolder {
 	 * Set the (arbitrary) object that will be 'handed back' as-is by an
 	 * {@link javax.management.NotificationBroadcaster} when notifying
 	 * any {@link javax.management.NotificationListener}.
-	 * @param handback the handback object (can be <code>null</code>)
+	 * @param handback the handback object (can be {@code null})
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, Object)
 	 */
 	public void setHandback(Object handback) {
@@ -96,7 +95,7 @@ public class NotificationListenerHolder {
 	 * Return the (arbitrary) object that will be 'handed back' as-is by an
 	 * {@link javax.management.NotificationBroadcaster} when notifying
 	 * any {@link javax.management.NotificationListener}.
-	 * @return the handback object (may be <code>null</code>)
+	 * @return the handback object (may be {@code null})
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, Object)
 	 */
 	public Object getHandback() {
@@ -107,7 +106,7 @@ public class NotificationListenerHolder {
 	 * Set the {@link javax.management.ObjectName}-style name of the single MBean
 	 * that the encapsulated {@link #getNotificationFilter() NotificationFilter}
 	 * will be registered with to listen for {@link javax.management.Notification Notifications}.
-	 * Can be specified as <code>ObjectName</code> instance or as <code>String</code>.
+	 * Can be specified as {@code ObjectName} instance or as {@code String}.
 	 * @see #setMappedObjectNames
 	 */
 	public void setMappedObjectName(Object mappedObjectName) {
@@ -118,26 +117,19 @@ public class NotificationListenerHolder {
 	 * Set an array of {@link javax.management.ObjectName}-style names of the MBeans
 	 * that the encapsulated {@link #getNotificationFilter() NotificationFilter}
 	 * will be registered with to listen for {@link javax.management.Notification Notifications}.
-	 * Can be specified as <code>ObjectName</code> instances or as <code>String</code>s.
+	 * Can be specified as {@code ObjectName} instances or as {@code String}s.
 	 * @see #setMappedObjectName
 	 */
 	public void setMappedObjectNames(Object[] mappedObjectNames) {
-		if (mappedObjectNames != null) {
-			this.mappedObjectNames = new LinkedHashSet(mappedObjectNames.length);
-			for (int i = 0; i < mappedObjectNames.length; i++) {
-				this.mappedObjectNames.add(mappedObjectNames[i]);
-			}
-		}
-		else {
-			this.mappedObjectNames = null;
-		}
+		this.mappedObjectNames = (mappedObjectNames != null ?
+				new LinkedHashSet<Object>(Arrays.asList(mappedObjectNames)) : null);
 	}
 
 	/**
 	 * Return the list of {@link javax.management.ObjectName} String representations for
 	 * which the encapsulated {@link #getNotificationFilter() NotificationFilter} will
 	 * be registered as a listener for {@link javax.management.Notification Notifications}.
-	 * @throws MalformedObjectNameException if an <code>ObjectName</code> is malformed
+	 * @throws MalformedObjectNameException if an {@code ObjectName} is malformed
 	 */
 	public ObjectName[] getResolvedObjectNames() throws MalformedObjectNameException {
 		if (this.mappedObjectNames == null) {
@@ -145,14 +137,15 @@ public class NotificationListenerHolder {
 		}
 		ObjectName[] resolved = new ObjectName[this.mappedObjectNames.size()];
 		int i = 0;
-		for (Iterator it = this.mappedObjectNames.iterator(); it.hasNext();) {
-			resolved[i] = ObjectNameManager.getInstance(it.next());
+		for (Object objectName : this.mappedObjectNames) {
+			resolved[i] = ObjectNameManager.getInstance(objectName);
 			i++;
 		}
 		return resolved;
 	}
 
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -167,6 +160,7 @@ public class NotificationListenerHolder {
 				ObjectUtils.nullSafeEquals(this.mappedObjectNames, otherNlh.mappedObjectNames));
 	}
 
+	@Override
 	public int hashCode() {
 		int hashCode = ObjectUtils.nullSafeHashCode(this.notificationListener);
 		hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.notificationFilter);

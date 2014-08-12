@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.jmx.export.naming;
 
 import java.util.Hashtable;
-
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -32,27 +31,25 @@ import org.springframework.util.StringUtils;
 
 /**
  * An implementation of the {@link ObjectNamingStrategy} interface
- * that reads the <code>ObjectName</code> from the source-level metadata.
- * Falls back to the bean key (bean name) if no <code>ObjectName</code>
+ * that reads the {@code ObjectName} from the source-level metadata.
+ * Falls back to the bean key (bean name) if no {@code ObjectName}
  * can be found in source-level metadata.
  *
  * <p>Uses the {@link JmxAttributeSource} strategy interface, so that
  * metadata can be read using any supported implementation. Out of the box,
- * two strategies are included:
- * <ul>
- * <li><code>AttributesJmxAttributeSource</code>, for Commons Attributes
- * <li><code>AnnotationJmxAttributeSource</code>, for JDK 1.5+ annotations
- * </ul>
+ * {@link org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource}
+ * introspects a well-defined set of Java 5 annotations that come with Spring.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 1.2
  * @see ObjectNamingStrategy
+ * @see org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource
  */
 public class MetadataNamingStrategy implements ObjectNamingStrategy, InitializingBean {
 
 	/**
-	 * The <code>JmxAttributeSource</code> implementation to use for reading metadata.
+	 * The {@code JmxAttributeSource} implementation to use for reading metadata.
 	 */
 	private JmxAttributeSource attributeSource;
 
@@ -60,15 +57,15 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Create a new <code>MetadataNamingStrategy<code> which needs to be
+	 * Create a new {@code MetadataNamingStrategy} which needs to be
 	 * configured through the {@link #setAttributeSource} method.
 	 */
 	public MetadataNamingStrategy() {
 	}
 
 	/**
-	 * Create a new <code>MetadataNamingStrategy<code> for the given
-	 * <code>JmxAttributeSource</code>.
+	 * Create a new {@code MetadataNamingStrategy} for the given
+	 * {@code JmxAttributeSource}.
 	 * @param attributeSource the JmxAttributeSource to use
 	 */
 	public MetadataNamingStrategy(JmxAttributeSource attributeSource) {
@@ -78,7 +75,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Set the implementation of the <code>JmxAttributeSource</code> interface to use
+	 * Set the implementation of the {@code JmxAttributeSource} interface to use
 	 * when reading the source-level metadata.
 	 */
 	public void setAttributeSource(JmxAttributeSource attributeSource) {
@@ -97,6 +94,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 		this.defaultDomain = defaultDomain;
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		if (this.attributeSource == null) {
 			throw new IllegalArgumentException("Property 'attributeSource' is required");
@@ -105,11 +103,12 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Reads the <code>ObjectName</code> from the source-level metadata associated
-	 * with the managed resource's <code>Class</code>.
+	 * Reads the {@code ObjectName} from the source-level metadata associated
+	 * with the managed resource's {@code Class}.
 	 */
+	@Override
 	public ObjectName getObjectName(Object managedBean, String beanKey) throws MalformedObjectNameException {
-		Class managedClass = AopUtils.getTargetClass(managedBean);
+		Class<?> managedClass = AopUtils.getTargetClass(managedBean);
 		ManagedResource mr = this.attributeSource.getManagedResource(managedClass);
 
 		// Check that an object name has been specified.
@@ -125,7 +124,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 				if (domain == null) {
 					domain = ClassUtils.getPackageName(managedClass);
 				}
-				Hashtable properties = new Hashtable();
+				Hashtable<String, String> properties = new Hashtable<String, String>();
 				properties.put("type", ClassUtils.getShortName(managedClass));
 				properties.put("name", beanKey);
 				return ObjectNameManager.getInstance(domain, properties);

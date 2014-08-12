@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,11 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
 import org.hibernate.SessionFactory;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.support.PersistenceExceptionTranslator;
-import org.springframework.jdbc.support.SQLExceptionTranslator;
 
 /**
  * Abstract {@link org.springframework.beans.factory.FactoryBean} that creates
@@ -54,8 +50,8 @@ import org.springframework.jdbc.support.SQLExceptionTranslator;
  * @see org.hibernate.SessionFactory#getCurrentSession()
  * @see org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
  */
-public abstract class AbstractSessionFactoryBean
-		implements FactoryBean, InitializingBean, DisposableBean, PersistenceExceptionTranslator {
+public abstract class AbstractSessionFactoryBean extends HibernateExceptionTranslator
+		implements FactoryBean<SessionFactory>, InitializingBean, DisposableBean {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -65,8 +61,6 @@ public abstract class AbstractSessionFactoryBean
 	private boolean useTransactionAwareDataSource = false;
 
 	private boolean exposeTransactionAwareSessionFactory = true;
-
-	private SQLExceptionTranslator jdbcExceptionTranslator;
 
 	private SessionFactory sessionFactory;
 
@@ -118,7 +112,7 @@ public abstract class AbstractSessionFactoryBean
 	 * <p>A further benefit of this option is that <i>plain Sessions opened directly
 	 * via the SessionFactory</i>, outside of Spring's Hibernate support, will still
 	 * participate in active Spring-managed transactions. However, consider using
-	 * Hibernate's <code>getCurrentSession()</code> method instead (see javadoc of
+	 * Hibernate's {@code getCurrentSession()} method instead (see javadoc of
 	 * "exposeTransactionAwareSessionFactory" property).
 	 * <p><b>WARNING:</b> When using a transaction-aware JDBC DataSource in combination
 	 * with OpenSessionInViewFilter/Interceptor, whether participating in JTA or
@@ -153,17 +147,17 @@ public abstract class AbstractSessionFactoryBean
 
 	/**
 	 * Set whether to expose a transaction-aware current Session from the
-	 * SessionFactory's <code>getCurrentSession()</code> method, returning the
+	 * SessionFactory's {@code getCurrentSession()} method, returning the
 	 * Session that's associated with the current Spring-managed transaction, if any.
 	 * <p>Default is "true", letting data access code work with the plain
-	 * Hibernate SessionFactory and its <code>getCurrentSession()</code> method,
+	 * Hibernate SessionFactory and its {@code getCurrentSession()} method,
 	 * while still being able to participate in current Spring-managed transactions:
 	 * with any transaction management strategy, either local or JTA / EJB CMT,
 	 * and any transaction synchronization mechanism, either Spring or JTA.
-	 * Furthermore, <code>getCurrentSession()</code> will also seamlessly work with
+	 * Furthermore, {@code getCurrentSession()} will also seamlessly work with
 	 * a request-scoped Session managed by OpenSessionInViewFilter/Interceptor.
 	 * <p>Turn this flag off to expose the plain Hibernate SessionFactory with
-	 * Hibernate's default <code>getCurrentSession()</code> behavior, supporting
+	 * Hibernate's default {@code getCurrentSession()} behavior, supporting
 	 * plain JTA synchronization only. Alternatively, simply override the
 	 * corresponding Hibernate property "hibernate.current_session_context_class".
 	 * @see SpringSessionContext
@@ -184,29 +178,13 @@ public abstract class AbstractSessionFactoryBean
 		return this.exposeTransactionAwareSessionFactory;
 	}
 
-	/**
-	 * Set the JDBC exception translator for the SessionFactory,
-	 * exposed via the PersistenceExceptionTranslator interface.
-	 * <p>Applied to any SQLException root cause of a Hibernate JDBCException,
-	 * overriding Hibernate's default SQLException translation (which is
-	 * based on Hibernate's Dialect for a specific target database).
-	 * @param jdbcExceptionTranslator the exception translator
-	 * @see java.sql.SQLException
-	 * @see org.hibernate.JDBCException
-	 * @see org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator
-	 * @see org.springframework.jdbc.support.SQLStateSQLExceptionTranslator
-	 * @see org.springframework.dao.support.PersistenceExceptionTranslator
-	 */
-	public void setJdbcExceptionTranslator(SQLExceptionTranslator jdbcExceptionTranslator) {
-		this.jdbcExceptionTranslator = jdbcExceptionTranslator;
-	}
-
 
 	/**
 	 * Build and expose the SessionFactory.
 	 * @see #buildSessionFactory()
 	 * @see #wrapSessionFactoryIfNecessary
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		SessionFactory rawSf = buildSessionFactory();
 		this.sessionFactory = wrapSessionFactoryIfNecessary(rawSf);
@@ -229,7 +207,7 @@ public abstract class AbstractSessionFactoryBean
 	/**
 	 * Return the exposed SessionFactory.
 	 * Will throw an exception if not initialized yet.
-	 * @return the SessionFactory (never <code>null</code>)
+	 * @return the SessionFactory (never {@code null})
 	 * @throws IllegalStateException if the SessionFactory has not been initialized yet
 	 */
 	protected final SessionFactory getSessionFactory() {
@@ -242,6 +220,7 @@ public abstract class AbstractSessionFactoryBean
 	/**
 	 * Close the SessionFactory on bean factory shutdown.
 	 */
+	@Override
 	public void destroy() throws HibernateException {
 		logger.info("Closing Hibernate SessionFactory");
 		try {
@@ -256,51 +235,19 @@ public abstract class AbstractSessionFactoryBean
 	/**
 	 * Return the singleton SessionFactory.
 	 */
-	public Object getObject() {
+	@Override
+	public SessionFactory getObject() {
 		return this.sessionFactory;
 	}
 
-	public Class getObjectType() {
-		return (this.sessionFactory != null) ? this.sessionFactory.getClass() : SessionFactory.class;
+	@Override
+	public Class<? extends SessionFactory> getObjectType() {
+		return (this.sessionFactory != null ? this.sessionFactory.getClass() : SessionFactory.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
-	}
-
-
-	/**
-	 * Implementation of the PersistenceExceptionTranslator interface,
-	 * as autodetected by Spring's PersistenceExceptionTranslationPostProcessor.
-	 * <p>Converts the exception if it is a HibernateException;
-	 * else returns <code>null</code> to indicate an unknown exception.
-	 * @see org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
-	 * @see #convertHibernateAccessException
-	 */
-	public DataAccessException translateExceptionIfPossible(RuntimeException ex) {
-		if (ex instanceof HibernateException) {
-			return convertHibernateAccessException((HibernateException) ex);
-		}
-		return null;
-	}
-
-	/**
-	 * Convert the given HibernateException to an appropriate exception from the
-	 * <code>org.springframework.dao</code> hierarchy.
-	 * <p>Will automatically apply a specified SQLExceptionTranslator to a
-	 * Hibernate JDBCException, else rely on Hibernate's default translation.
-	 * @param ex HibernateException that occured
-	 * @return a corresponding DataAccessException
-	 * @see SessionFactoryUtils#convertHibernateAccessException
-	 * @see #setJdbcExceptionTranslator
-	 */
-	protected DataAccessException convertHibernateAccessException(HibernateException ex) {
-		if (this.jdbcExceptionTranslator != null && ex instanceof JDBCException) {
-			JDBCException jdbcEx = (JDBCException) ex;
-			return this.jdbcExceptionTranslator.translate(
-					"Hibernate operation: " + jdbcEx.getMessage(), jdbcEx.getSQL(), jdbcEx.getSQLException());
-		}
-		return SessionFactoryUtils.convertHibernateAccessException(ex);
 	}
 
 
@@ -315,7 +262,7 @@ public abstract class AbstractSessionFactoryBean
 	/**
 	 * Hook that allows post-processing after the SessionFactory has been
 	 * successfully created. The SessionFactory is already available through
-	 * <code>getSessionFactory()</code> at this point.
+	 * {@code getSessionFactory()} at this point.
 	 * <p>This implementation is empty.
 	 * @throws Exception in case of initialization failure
 	 * @see #getSessionFactory()
@@ -326,7 +273,7 @@ public abstract class AbstractSessionFactoryBean
 	/**
 	 * Hook that allows shutdown processing before the SessionFactory
 	 * will be closed. The SessionFactory is still available through
-	 * <code>getSessionFactory()</code> at this point.
+	 * {@code getSessionFactory()} at this point.
 	 * <p>This implementation is empty.
 	 * @see #getSessionFactory()
 	 */

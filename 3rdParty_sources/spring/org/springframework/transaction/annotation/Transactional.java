@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,15 @@ import org.springframework.transaction.TransactionDefinition;
  * it will be treated like
  * {@link org.springframework.transaction.interceptor.DefaultTransactionAttribute}
  * (rolling back on runtime exceptions).
- * 
+ *
+ * <p>For specific information about the semantics of this annotation's attributes,
+ * consider the {@link org.springframework.transaction.TransactionDefinition} and
+ * {@link org.springframework.transaction.interceptor.TransactionAttribute} javadocs.
+ *
  * @author Colin Sampaleanu
  * @author Juergen Hoeller
  * @since 1.2
+ * @see org.springframework.transaction.interceptor.TransactionAttribute
  * @see org.springframework.transaction.interceptor.DefaultTransactionAttribute
  * @see org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
  */
@@ -48,31 +53,48 @@ import org.springframework.transaction.TransactionDefinition;
 @Inherited
 @Documented
 public @interface Transactional {
-	
+
+	/**
+	 * A qualifier value for the specified transaction.
+	 * <p>May be used to determine the target transaction manager,
+	 * matching the qualifier value (or the bean name) of a specific
+	 * {@link org.springframework.transaction.PlatformTransactionManager}
+	 * bean definition.
+	 */
+	String value() default "";
+
 	/**
 	 * The transaction propagation type.
-	 * <p>Defaults to {@link Propagation#REQUIRED}.
+	 * Defaults to {@link Propagation#REQUIRED}.
+	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getPropagationBehavior()
 	 */
 	Propagation propagation() default Propagation.REQUIRED;
-	
+
 	/**
 	 * The transaction isolation level.
-	 * <p>Defaults to {@link Isolation#DEFAULT}.
+	 * Defaults to {@link Isolation#DEFAULT}.
+	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getIsolationLevel()
 	 */
 	Isolation isolation() default Isolation.DEFAULT;
 
 	/**
 	 * The timeout for this transaction.
-	 * <p>Defaults to the default timeout of the underlying transaction system.
+	 * Defaults to the default timeout of the underlying transaction system.
+	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getTimeout()
 	 */
 	int timeout() default TransactionDefinition.TIMEOUT_DEFAULT;
 
 	/**
-	 * <code>true</code> if the transaction is read-only.
-	 * <p>Defaults to <code>false</code>.
+	 * {@code true} if the transaction is read-only.
+	 * Defaults to {@code false}.
+	 * <p>This just serves as a hint for the actual transaction subsystem;
+	 * it will <i>not necessarily</i> cause failure of write access attempts.
+	 * A transaction manager which cannot interpret the read-only hint will
+	 * <i>not</i> throw an exception when asked for a read-only transaction.
+	 * @see org.springframework.transaction.interceptor.TransactionAttribute#isReadOnly()
 	 */
 	boolean readOnly() default false;
-	
+
 	/**
 	 * Defines zero (0) or more exception {@link Class classes}, which must be a
 	 * subclass of {@link Throwable}, indicating which exception types must cause
@@ -82,7 +104,7 @@ public @interface Transactional {
 	 * <p>Similar to {@link org.springframework.transaction.interceptor.RollbackRuleAttribute#RollbackRuleAttribute(Class clazz)}
 	 */
 	Class<? extends Throwable>[] rollbackFor() default {};
-	
+
 	/**
 	 * Defines zero (0) or more exception names (for exceptions which must be a
 	 * subclass of {@link Throwable}), indicating which exception types must cause
@@ -99,17 +121,17 @@ public @interface Transactional {
 	 * <p>Similar to {@link org.springframework.transaction.interceptor.RollbackRuleAttribute#RollbackRuleAttribute(String exceptionName)}
 	 */
 	String[] rollbackForClassName() default {};
-    
+
 	/**
 	 * Defines zero (0) or more exception {@link Class Classes}, which must be a
 	 * subclass of {@link Throwable}, indicating which exception types must <b>not</b>
 	 * cause a transaction rollback.
 	 * <p>This is the preferred way to construct a rollback rule, matching the
-     * exception class and subclasses.
+	 * exception class and subclasses.
 	 * <p>Similar to {@link org.springframework.transaction.interceptor.NoRollbackRuleAttribute#NoRollbackRuleAttribute(Class clazz)}
 	 */
 	Class<? extends Throwable>[] noRollbackFor() default {};
-	
+
 	/**
 	 * Defines zero (0) or more exception names (for exceptions which must be a
 	 * subclass of {@link Throwable}) indicating which exception types must <b>not</b>

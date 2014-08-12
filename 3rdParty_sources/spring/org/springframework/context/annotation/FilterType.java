@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,47 @@
 package org.springframework.context.annotation;
 
 /**
- * Enumeration of the valid type filters to be added for annotation-driven configuration.
+ * Enumeration of the type filters that may be used in conjunction with
+ * {@link ComponentScan @ComponentScan}.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 2.5
+ * @see ComponentScan
+ * @see ComponentScan#includeFilters()
+ * @see ComponentScan#excludeFilters()
+ * @see org.springframework.core.type.filter.TypeFilter
  */
 public enum FilterType {
 
+	/**
+	 * Filter candidates marked with a given annotation.
+	 * @see org.springframework.core.type.filter.AnnotationTypeFilter
+	 */
 	ANNOTATION,
+
+	/**
+	 * Filter candidates assignable to a given type.
+	 * @see org.springframework.core.type.filter.AssignableTypeFilter
+	 */
 	ASSIGNABLE_TYPE,
-	ASPECTJ_PATTERN,
-	REGEX_PATTERN,
+
+	/**
+	 * Filter candidates matching a given AspectJ type pattern expression.
+	 * @see org.springframework.core.type.filter.AspectJTypeFilter
+	 */
+	ASPECTJ,
+
+	/**
+	 * Filter candidates matching a given regex pattern.
+	 * @see org.springframework.core.type.filter.RegexPatternTypeFilter
+	 */
+	REGEX,
+
+	/** Filter candidates using a given custom
+	 * {@link org.springframework.core.type.filter.TypeFilter} implementation.
+	 */
 	CUSTOM
 
 }

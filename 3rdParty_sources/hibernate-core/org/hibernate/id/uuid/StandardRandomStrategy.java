@@ -22,10 +22,9 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.id.uuid;
-
 import java.util.UUID;
 
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.UUIDGenerationStrategy;
 
 /**
@@ -39,6 +38,7 @@ public class StandardRandomStrategy implements UUIDGenerationStrategy {
 	/**
 	 * A variant 4 (random) strategy
 	 */
+	@Override
 	public int getGeneratedVersion() {
 		// a "random" strategy
 		return 4;
@@ -47,6 +47,7 @@ public class StandardRandomStrategy implements UUIDGenerationStrategy {
 	/**
 	 * Delegates to {@link UUID#randomUUID()}
 	 */
+	@Override
 	public UUID generateUUID(SessionImplementor session) {
 		return UUID.randomUUID();
 	}

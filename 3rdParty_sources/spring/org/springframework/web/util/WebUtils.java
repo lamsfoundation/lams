@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,22 @@ package org.springframework.web.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
@@ -84,27 +88,27 @@ public abstract class WebUtils {
 	public static final String CONTENT_TYPE_CHARSET_PREFIX = ";charset=";
 
 	/**
-	 * Default character encoding to use when <code>request.getCharacterEncoding</code>
-	 * returns <code>null</code>, according to the Servlet spec.
+	 * Default character encoding to use when {@code request.getCharacterEncoding}
+	 * returns {@code null}, according to the Servlet spec.
 	 * @see ServletRequest#getCharacterEncoding
 	 */
 	public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
 	/**
 	 * Standard Servlet spec context attribute that specifies a temporary
-	 * directory for the current web application, of type <code>java.io.File</code>.
+	 * directory for the current web application, of type {@code java.io.File}.
 	 */
 	public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
 
 	/**
 	 * HTML escape parameter at the servlet context level
-	 * (i.e. a context-param in <code>web.xml</code>): "defaultHtmlEscape".
+	 * (i.e. a context-param in {@code web.xml}): "defaultHtmlEscape".
 	 */
 	public static final String HTML_ESCAPE_CONTEXT_PARAM = "defaultHtmlEscape";
 
 	/**
 	 * Web app root key parameter at the servlet context level
-	 * (i.e. a context-param in <code>web.xml</code>): "webAppRootKey".
+	 * (i.e. a context-param in {@code web.xml}): "webAppRootKey".
 	 */
 	public static final String WEB_APP_ROOT_KEY_PARAM = "webAppRootKey";
 
@@ -121,8 +125,8 @@ public abstract class WebUtils {
 	/**
 	 * Set a system property to the web application root directory.
 	 * The key of the system property can be defined with the "webAppRootKey"
-	 * context-param in <code>web.xml</code>. Default is "webapp.root".
-	 * <p>Can be used for tools that support substition with <code>System.getProperty</code>
+	 * context-param in {@code web.xml}. Default is "webapp.root".
+	 * <p>Can be used for tools that support substition with {@code System.getProperty}
 	 * values, like log4j's "${key}" syntax within log file locations.
 	 * @param servletContext the servlet context of the web application
 	 * @throws IllegalStateException if the system property is already set,
@@ -137,16 +141,16 @@ public abstract class WebUtils {
 		String root = servletContext.getRealPath("/");
 		if (root == null) {
 			throw new IllegalStateException(
-			    "Cannot set web app root system property when WAR file is not expanded");
+				"Cannot set web app root system property when WAR file is not expanded");
 		}
 		String param = servletContext.getInitParameter(WEB_APP_ROOT_KEY_PARAM);
 		String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
 		String oldValue = System.getProperty(key);
 		if (oldValue != null && !StringUtils.pathEquals(oldValue, root)) {
 			throw new IllegalStateException(
-			    "Web app root system property already set to different value: '" +
-			    key + "' = [" + oldValue + "] instead of [" + root + "] - " +
-			    "Choose unique values for the 'webAppRootKey' context-param in your web.xml files!");
+				"Web app root system property already set to different value: '" +
+				key + "' = [" + oldValue + "] instead of [" + root + "] - " +
+				"Choose unique values for the 'webAppRootKey' context-param in your web.xml files!");
 		}
 		System.setProperty(key, root);
 		servletContext.log("Set web app root system property: '" + key + "' = [" + root + "]");
@@ -167,8 +171,8 @@ public abstract class WebUtils {
 
 	/**
 	 * Return whether default HTML escaping is enabled for the web application,
-	 * i.e. the value of the "defaultHtmlEscape" context-param in <code>web.xml</code>
-	 * (if any). Falls back to <code>false</code> in case of no explicit default given.
+	 * i.e. the value of the "defaultHtmlEscape" context-param in {@code web.xml}
+	 * (if any). Falls back to {@code false} in case of no explicit default given.
 	 * @param servletContext the servlet context of the web application
 	 * @return whether default HTML escaping is enabled (default is false)
 	 */
@@ -177,12 +181,12 @@ public abstract class WebUtils {
 			return false;
 		}
 		String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
-		return Boolean.valueOf(param).booleanValue();
+		return Boolean.valueOf(param);
 	}
 
 	/**
 	 * Return whether default HTML escaping is enabled for the web application,
-	 * i.e. the value of the "defaultHtmlEscape" context-param in <code>web.xml</code>
+	 * i.e. the value of the "defaultHtmlEscape" context-param in {@code web.xml}
 	 * (if any).
 	 * <p>This method differentiates between no param specified at all and
 	 * an actual boolean value specified, allowing to have a context-specific
@@ -194,7 +198,6 @@ public abstract class WebUtils {
 		if (servletContext == null) {
 			return null;
 		}
-		Assert.notNull(servletContext, "ServletContext must not be null");
 		String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
 		return (StringUtils.hasText(param)? Boolean.valueOf(param) : null);
 	}
@@ -215,7 +218,7 @@ public abstract class WebUtils {
 	 * as provided by the servlet container.
 	 * <p>Prepends a slash if the path does not already start with a slash,
 	 * and throws a FileNotFoundException if the path cannot be resolved to
-	 * a resource (in contrast to ServletContext's <code>getRealPath</code>,
+	 * a resource (in contrast to ServletContext's {@code getRealPath},
 	 * which returns null).
 	 * @param servletContext the servlet context of the web application
 	 * @param path the path within the web application
@@ -242,7 +245,7 @@ public abstract class WebUtils {
 	/**
 	 * Determine the session id of the given request, if any.
 	 * @param request current HTTP request
-	 * @return the session id, or <code>null</code> if none
+	 * @return the session id, or {@code null} if none
 	 */
 	public static String getSessionId(HttpServletRequest request) {
 		Assert.notNull(request, "Request must not be null");
@@ -256,7 +259,7 @@ public abstract class WebUtils {
 	 * Does not create a new session if none has existed before!
 	 * @param request current HTTP request
 	 * @param name the name of the session attribute
-	 * @return the value of the session attribute, or <code>null</code> if not found
+	 * @return the value of the session attribute, or {@code null} if not found
 	 */
 	public static Object getSessionAttribute(HttpServletRequest request, String name) {
 		Assert.notNull(request, "Request must not be null");
@@ -270,11 +273,11 @@ public abstract class WebUtils {
 	 * attribute. Does not create a new session if none has existed before!
 	 * @param request current HTTP request
 	 * @param name the name of the session attribute
-	 * @return the value of the session attribute, or <code>null</code> if not found
+	 * @return the value of the session attribute, or {@code null} if not found
 	 * @throws IllegalStateException if the session attribute could not be found
 	 */
 	public static Object getRequiredSessionAttribute(HttpServletRequest request, String name)
-	    throws IllegalStateException {
+			throws IllegalStateException {
 
 		Object attr = getSessionAttribute(request, name);
 		if (attr == null) {
@@ -314,7 +317,7 @@ public abstract class WebUtils {
 	 * @return the value of the session attribute, newly created if not found
 	 * @throws IllegalArgumentException if the session attribute could not be instantiated
 	 */
-	public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class clazz)
+	public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class<?> clazz)
 			throws IllegalArgumentException {
 
 		Assert.notNull(session, "Session must not be null");
@@ -325,13 +328,13 @@ public abstract class WebUtils {
 			}
 			catch (InstantiationException ex) {
 				throw new IllegalArgumentException(
-				    "Could not instantiate class [" + clazz.getName() +
-				    "] for session attribute '" + name + "': " + ex.getMessage());
+					"Could not instantiate class [" + clazz.getName() +
+					"] for session attribute '" + name + "': " + ex.getMessage());
 			}
 			catch (IllegalAccessException ex) {
 				throw new IllegalArgumentException(
-				    "Could not access default constructor of class [" + clazz.getName() +
-				    "] for session attribute '" + name + "': " + ex.getMessage());
+					"Could not access default constructor of class [" + clazz.getName() +
+					"] for session attribute '" + name + "': " + ex.getMessage());
 			}
 			session.setAttribute(name, sessionObject);
 		}
@@ -343,18 +346,18 @@ public abstract class WebUtils {
 	 * that is, an object to synchronize on for the given session.
 	 * <p>Returns the session mutex attribute if available; usually,
 	 * this means that the HttpSessionMutexListener needs to be defined
-	 * in <code>web.xml</code>. Falls back to the HttpSession itself
+	 * in {@code web.xml}. Falls back to the HttpSession itself
 	 * if no mutex attribute found.
 	 * <p>The session mutex is guaranteed to be the same object during
 	 * the entire lifetime of the session, available under the key defined
-	 * by the <code>SESSION_MUTEX_ATTRIBUTE</code> constant. It serves as a
+	 * by the {@code SESSION_MUTEX_ATTRIBUTE} constant. It serves as a
 	 * safe reference to synchronize on for locking on the current session.
 	 * <p>In many cases, the HttpSession reference itself is a safe mutex
 	 * as well, since it will always be the same object reference for the
 	 * same active logical session. However, this is not guaranteed across
 	 * different servlet containers; the only 100% safe way is a session mutex.
 	 * @param session the HttpSession to find a mutex for
-	 * @return the mutex object (never <code>null</code>)
+	 * @return the mutex object (never {@code null})
 	 * @see #SESSION_MUTEX_ATTRIBUTE
 	 * @see HttpSessionMutexListener
 	 */
@@ -367,6 +370,48 @@ public abstract class WebUtils {
 		return mutex;
 	}
 
+
+	/**
+	 * Return an appropriate request object of the specified type, if available,
+	 * unwrapping the given request as far as necessary.
+	 * @param request the servlet request to introspect
+	 * @param requiredType the desired type of request object
+	 * @return the matching request object, or {@code null} if none
+	 * of that type is available
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getNativeRequest(ServletRequest request, Class<T> requiredType) {
+		if (requiredType != null) {
+			if (requiredType.isInstance(request)) {
+				return (T) request;
+			}
+			else if (request instanceof ServletRequestWrapper) {
+				return getNativeRequest(((ServletRequestWrapper) request).getRequest(), requiredType);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Return an appropriate response object of the specified type, if available,
+	 * unwrapping the given response as far as necessary.
+	 * @param response the servlet response to introspect
+	 * @param requiredType the desired type of response object
+	 * @return the matching response object, or {@code null} if none
+	 * of that type is available
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getNativeResponse(ServletResponse response, Class<T> requiredType) {
+		if (requiredType != null) {
+			if (requiredType.isInstance(response)) {
+				return (T) response;
+			}
+			else if (response instanceof ServletResponseWrapper) {
+				return getNativeResponse(((ServletResponseWrapper) response).getResponse(), requiredType);
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Determine whether the given request is an include request,
@@ -382,36 +427,15 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Expose the current request URI and paths as {@link javax.servlet.http.HttpServletRequest}
-	 * attributes under the keys defined in the Servlet 2.4 specification,
-	 * for containers that implement 2.3 or an earlier version of the Servlet API:
-	 * <code>javax.servlet.forward.request_uri</code>,
-	 * <code>javax.servlet.forward.context_path</code>,
-	 * <code>javax.servlet.forward.servlet_path</code>,
-	 * <code>javax.servlet.forward.path_info</code>,
-	 * <code>javax.servlet.forward.query_string</code>.
-	 * <p>Does not override values if already present, to not cause conflicts
-	 * with the attributes exposed by Servlet 2.4+ containers themselves.
-	 * @param request current servlet request
-	 */
-	public static void exposeForwardRequestAttributes(HttpServletRequest request) {
-		exposeRequestAttributeIfNotPresent(request, FORWARD_REQUEST_URI_ATTRIBUTE, request.getRequestURI());
-		exposeRequestAttributeIfNotPresent(request, FORWARD_CONTEXT_PATH_ATTRIBUTE, request.getContextPath());
-		exposeRequestAttributeIfNotPresent(request, FORWARD_SERVLET_PATH_ATTRIBUTE, request.getServletPath());
-		exposeRequestAttributeIfNotPresent(request, FORWARD_PATH_INFO_ATTRIBUTE, request.getPathInfo());
-		exposeRequestAttributeIfNotPresent(request, FORWARD_QUERY_STRING_ATTRIBUTE, request.getQueryString());
-	}
-
-	/**
 	 * Expose the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
 	 * attributes under the keys defined in the Servlet 2.3 specification, for error pages that
 	 * are rendered directly rather than through the Servlet container's error page resolution:
-	 * <code>javax.servlet.error.status_code</code>,
-	 * <code>javax.servlet.error.exception_type</code>,
-	 * <code>javax.servlet.error.message</code>,
-	 * <code>javax.servlet.error.exception</code>,
-	 * <code>javax.servlet.error.request_uri</code>,
-	 * <code>javax.servlet.error.servlet_name</code>.
+	 * {@code javax.servlet.error.status_code},
+	 * {@code javax.servlet.error.exception_type},
+	 * {@code javax.servlet.error.message},
+	 * {@code javax.servlet.error.exception},
+	 * {@code javax.servlet.error.request_uri},
+	 * {@code javax.servlet.error.servlet_name}.
 	 * <p>Does not override values if already present, to respect attribute values
 	 * that have been exposed explicitly before.
 	 * <p>Exposes status code 200 by default. Set the "javax.servlet.error.status_code"
@@ -421,7 +445,7 @@ public abstract class WebUtils {
 	 * @param servletName the name of the offending servlet
 	 */
 	public static void exposeErrorRequestAttributes(HttpServletRequest request, Throwable ex, String servletName) {
-		exposeRequestAttributeIfNotPresent(request, ERROR_STATUS_CODE_ATTRIBUTE, new Integer(HttpServletResponse.SC_OK));
+		exposeRequestAttributeIfNotPresent(request, ERROR_STATUS_CODE_ATTRIBUTE, HttpServletResponse.SC_OK);
 		exposeRequestAttributeIfNotPresent(request, ERROR_EXCEPTION_TYPE_ATTRIBUTE, ex.getClass());
 		exposeRequestAttributeIfNotPresent(request, ERROR_MESSAGE_ATTRIBUTE, ex.getMessage());
 		exposeRequestAttributeIfNotPresent(request, ERROR_EXCEPTION_ATTRIBUTE, ex);
@@ -444,12 +468,12 @@ public abstract class WebUtils {
 	/**
 	 * Clear the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
 	 * attributes under the keys defined in the Servlet 2.3 specification:
-	 * <code>javax.servlet.error.status_code</code>,
-	 * <code>javax.servlet.error.exception_type</code>,
-	 * <code>javax.servlet.error.message</code>,
-	 * <code>javax.servlet.error.exception</code>,
-	 * <code>javax.servlet.error.request_uri</code>,
-	 * <code>javax.servlet.error.servlet_name</code>.
+	 * {@code javax.servlet.error.status_code},
+	 * {@code javax.servlet.error.exception_type},
+	 * {@code javax.servlet.error.message},
+	 * {@code javax.servlet.error.exception},
+	 * {@code javax.servlet.error.request_uri},
+	 * {@code javax.servlet.error.servlet_name}.
 	 * @param request current servlet request
 	 */
 	public static void clearErrorRequestAttributes(HttpServletRequest request) {
@@ -467,16 +491,11 @@ public abstract class WebUtils {
 	 * @param request current HTTP request
 	 * @param attributes the attributes Map
 	 */
-	public static void exposeRequestAttributes(ServletRequest request, Map attributes) {
+	public static void exposeRequestAttributes(ServletRequest request, Map<String, ?> attributes) {
 		Assert.notNull(request, "Request must not be null");
-		Iterator it = attributes.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry entry = (Map.Entry) it.next();
-			if (!(entry.getKey() instanceof String)) {
-				throw new IllegalArgumentException(
-						"Invalid key [" + entry.getKey() + "] in attributes Map - only Strings allowed as attribute keys");
-			}
-			request.setAttribute((String) entry.getKey(), entry.getValue());
+		Assert.notNull(attributes, "Attributes Map must not be null");
+		for (Map.Entry<String, ?> entry : attributes.entrySet()) {
+			request.setAttribute(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -485,21 +504,20 @@ public abstract class WebUtils {
 	 * cookies can have the same name but different paths or domains.
 	 * @param request current servlet request
 	 * @param name cookie name
-	 * @return the first cookie with the given name, or <code>null</code> if none is found
+	 * @return the first cookie with the given name, or {@code null} if none is found
 	 */
 	public static Cookie getCookie(HttpServletRequest request, String name) {
 		Assert.notNull(request, "Request must not be null");
 		Cookie cookies[] = request.getCookies();
 		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (name.equals(cookies[i].getName())) {
-					return cookies[i];
+			for (Cookie cookie : cookies) {
+				if (name.equals(cookie.getName())) {
+					return cookie;
 				}
 			}
 		}
 		return null;
 	}
-
 
 	/**
 	 * Check if a specific input type="submit" parameter was sent in the request,
@@ -515,8 +533,7 @@ public abstract class WebUtils {
 		if (request.getParameter(name) != null) {
 			return true;
 		}
-		for (int i = 0; i < SUBMIT_IMAGE_SUFFIXES.length; i++) {
-			String suffix = SUBMIT_IMAGE_SUFFIXES[i];
+		for (String suffix : SUBMIT_IMAGE_SUFFIXES) {
 			if (request.getParameter(name + suffix) != null) {
 				return true;
 			}
@@ -530,7 +547,7 @@ public abstract class WebUtils {
 	 * for a description of the lookup algorithm.
 	 * @param request current HTTP request
 	 * @param name the <i>logical</i> name of the request parameter
-	 * @return the value of the parameter, or <code>null</code>
+	 * @return the value of the parameter, or {@code null}
 	 * if the parameter does not exist in given request
 	 */
 	public static String findParameterValue(ServletRequest request, String name) {
@@ -557,24 +574,25 @@ public abstract class WebUtils {
 	 * </ol>
 	 * @param parameters the available parameter map
 	 * @param name the <i>logical</i> name of the request parameter
-	 * @return the value of the parameter, or <code>null</code>
+	 * @return the value of the parameter, or {@code null}
 	 * if the parameter does not exist in given request
 	 */
-	public static String findParameterValue(Map parameters, String name) {
+	public static String findParameterValue(Map<String, ?> parameters, String name) {
 		// First try to get it as a normal name=value parameter
-		String value = (String) parameters.get(name);
-		if (value != null) {
-			return value;
+		Object value = parameters.get(name);
+		if (value instanceof String[]) {
+			String[] values = (String[]) value;
+			return (values.length > 0 ? values[0] : null);
+		}
+		else if (value != null) {
+			return value.toString();
 		}
 		// If no value yet, try to get it as a name_value=xyz parameter
 		String prefix = name + "_";
-		Iterator paramNames = parameters.keySet().iterator();
-		while (paramNames.hasNext()) {
-			String paramName = (String) paramNames.next();
+		for (String paramName : parameters.keySet()) {
 			if (paramName.startsWith(prefix)) {
 				// Support images buttons, which would submit parameters as name_value.x=123
-				for (int i = 0; i < SUBMIT_IMAGE_SUFFIXES.length; i++) {
-					String suffix = SUBMIT_IMAGE_SUFFIXES[i];
+				for (String suffix : SUBMIT_IMAGE_SUFFIXES) {
 					if (paramName.endsWith(suffix)) {
 						return paramName.substring(prefix.length(), paramName.length() - suffix.length());
 					}
@@ -600,15 +618,15 @@ public abstract class WebUtils {
 	 * @see javax.servlet.ServletRequest#getParameterValues
 	 * @see javax.servlet.ServletRequest#getParameterMap
 	 */
-	public static Map getParametersStartingWith(ServletRequest request, String prefix) {
+	public static Map<String, Object> getParametersStartingWith(ServletRequest request, String prefix) {
 		Assert.notNull(request, "Request must not be null");
-		Enumeration paramNames = request.getParameterNames();
-		Map params = new TreeMap();
+		Enumeration<String> paramNames = request.getParameterNames();
+		Map<String, Object> params = new TreeMap<String, Object>();
 		if (prefix == null) {
 			prefix = "";
 		}
 		while (paramNames != null && paramNames.hasMoreElements()) {
-			String paramName = (String) paramNames.nextElement();
+			String paramName = paramNames.nextElement();
 			if ("".equals(prefix) || paramName.startsWith(prefix)) {
 				String unprefixed = paramName.substring(prefix.length());
 				String[] values = request.getParameterValues(paramName);
@@ -636,9 +654,9 @@ public abstract class WebUtils {
 	 * @return the page specified in the request, or current page if not found
 	 */
 	public static int getTargetPage(ServletRequest request, String paramPrefix, int currentPage) {
-		Enumeration paramNames = request.getParameterNames();
+		Enumeration<String> paramNames = request.getParameterNames();
 		while (paramNames.hasMoreElements()) {
-			String paramName = (String) paramNames.nextElement();
+			String paramName = paramNames.nextElement();
 			if (paramName.startsWith(paramPrefix)) {
 				for (int i = 0; i < WebUtils.SUBMIT_IMAGE_SUFFIXES.length; i++) {
 					String suffix = WebUtils.SUBMIT_IMAGE_SUFFIXES[i];
@@ -660,6 +678,21 @@ public abstract class WebUtils {
 	 * @return the extracted URI filename (e.g. "index")
 	 */
 	public static String extractFilenameFromUrlPath(String urlPath) {
+		String filename = extractFullFilenameFromUrlPath(urlPath);
+		int dotIndex = filename.lastIndexOf('.');
+		if (dotIndex != -1) {
+			filename = filename.substring(0, dotIndex);
+		}
+		return filename;
+	}
+
+	/**
+	 * Extract the full URL filename (including file extension) from the given request URL path.
+	 * Correctly resolves nested paths such as "/products/view.html" as well.
+	 * @param urlPath the request URL path (e.g. "/products/index.html")
+	 * @return the extracted URI filename (e.g. "index.html")
+	 */
+	public static String extractFullFilenameFromUrlPath(String urlPath) {
 		int end = urlPath.indexOf(';');
 		if (end == -1) {
 			end = urlPath.indexOf('?');
@@ -668,12 +701,38 @@ public abstract class WebUtils {
 			}
 		}
 		int begin = urlPath.lastIndexOf('/', end) + 1;
-		String filename = urlPath.substring(begin, end);
-		int dotIndex = filename.lastIndexOf('.');
-		if (dotIndex != -1) {
-			filename = filename.substring(0, dotIndex);
-		}
-		return filename;
+		return urlPath.substring(begin, end);
 	}
 
+	/**
+	 * Parse the given string with matrix variables. An example string would look
+	 * like this {@code "q1=a;q1=b;q2=a,b,c"}. The resulting map would contain
+	 * keys {@code "q1"} and {@code "q2"} with values {@code ["a","b"]} and
+	 * {@code ["a","b","c"]} respectively.
+	 *
+	 * @param matrixVariables the unparsed matrix variables string
+	 * @return a map with matrix variable names and values, never {@code null}
+	 */
+	public static MultiValueMap<String, String> parseMatrixVariables(String matrixVariables) {
+		MultiValueMap<String, String> result = new LinkedMultiValueMap<String, String>();
+		if (!StringUtils.hasText(matrixVariables)) {
+			return result;
+		}
+		StringTokenizer pairs = new StringTokenizer(matrixVariables, ";");
+		while (pairs.hasMoreTokens()) {
+			String pair = pairs.nextToken();
+			int index = pair.indexOf('=');
+			if (index != -1) {
+				String name = pair.substring(0, index);
+				String rawValue = pair.substring(index + 1);
+				for (String value : StringUtils.commaDelimitedListToStringArray(rawValue)) {
+					result.add(name, value);
+				}
+			}
+			else {
+				result.add(pair, "");
+			}
+		}
+		return result;
+	}
 }

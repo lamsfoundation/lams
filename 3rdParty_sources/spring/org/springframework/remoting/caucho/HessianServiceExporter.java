@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.remoting.caucho;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,20 +35,15 @@ import org.springframework.web.util.NestedServletException;
  * <p>Hessian is a slim, binary RPC protocol.
  * For information on Hessian, see the
  * <a href="http://www.caucho.com/hessian">Hessian website</a>.
+ * <b>Note: As of Spring 4.0, this exporter requires Hessian 4.0 or above.</b>
  *
- * <p>This exporter will work with both Hessian 2.x and 3.x (respectively
- * Resin 2.x and 3.x), autodetecting the corresponding skeleton class.
- * As of Spring 2.0, it is also compatible with the new Hessian 2 protocol
- * (a.k.a. Hessian 3.0.20+), while remaining compatible with older versions.
- *
- * <p>Note: Hessian services exported with this class can be accessed by
+ * <p>Hessian services exported with this class can be accessed by
  * any Hessian client, as there isn't any special handling involved.
  *
  * @author Juergen Hoeller
  * @since 13.05.2003
  * @see HessianClientInterceptor
  * @see HessianProxyFactoryBean
- * @see org.springframework.remoting.caucho.BurlapServiceExporter
  * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
  * @see org.springframework.remoting.rmi.RmiServiceExporter
  */
@@ -58,6 +52,7 @@ public class HessianServiceExporter extends HessianExporter implements HttpReque
 	/**
 	 * Processes the incoming Hessian request and creates a Hessian response.
 	 */
+	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -66,6 +61,7 @@ public class HessianServiceExporter extends HessianExporter implements HttpReque
 					new String[] {"POST"}, "HessianServiceExporter only supports POST requests");
 		}
 
+		response.setContentType(CONTENT_TYPE_HESSIAN);
 		try {
 		  invoke(request.getInputStream(), response.getOutputStream());
 		}

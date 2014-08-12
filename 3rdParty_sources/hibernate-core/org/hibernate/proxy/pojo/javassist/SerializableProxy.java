@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.proxy.pojo.javassist;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
@@ -78,13 +77,13 @@ public final class SerializableProxy extends AbstractSerializableProxy {
 				getEntityName(),
 				persistentClass,
 				interfaces,
-				getIdentifierMethodName==null ?
-					null :
-					getIdentifierMethodClass.getDeclaredMethod(getIdentifierMethodName, null),
-				setIdentifierMethodName==null ?
-					null :
-					setIdentifierMethodClass.getDeclaredMethod(setIdentifierMethodName, setIdentifierMethodParams),
-					componentIdType,
+				getIdentifierMethodName==null
+						? null
+						: getIdentifierMethodClass.getDeclaredMethod( getIdentifierMethodName, (Class[]) null ),
+				setIdentifierMethodName==null
+						? null 
+						: setIdentifierMethodClass.getDeclaredMethod(setIdentifierMethodName, setIdentifierMethodParams),
+				componentIdType,
 				getId(),
 				null
 			);

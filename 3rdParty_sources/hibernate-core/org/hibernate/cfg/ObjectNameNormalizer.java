@@ -23,7 +23,7 @@
  */
 package org.hibernate.cfg;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 /**
  * Provides centralized normalization of how database object names are handled.
@@ -65,23 +65,24 @@ public abstract class ObjectNameNormalizer {
 	 * @return The normalized identifier.
 	 */
 	public String normalizeDatabaseIdentifier(final String explicitName, NamingStrategyHelper helper) {
+		String objectName = null;
 		// apply naming strategy
 		if ( StringHelper.isEmpty( explicitName ) ) {
 			// No explicit name given, so allow the naming strategy the chance
 			//    to determine it based on the corresponding mapped java name
-			final String objectName = helper.determineImplicitName( getNamingStrategy() );
-			// Conceivable that the naming strategy could return a quoted identifier, or
-			//    that user enabled <delimited-identifiers/>
-			return normalizeIdentifierQuoting( objectName );
+			objectName = helper.determineImplicitName( getNamingStrategy() );
 		}
 		else {
 			// An explicit name was given:
 			//    in some cases we allow the naming strategy to "fine tune" these, but first
 			//    handle any quoting for consistent handling in naming strategies
-			String objectName = normalizeIdentifierQuoting( explicitName );
+			objectName = normalizeIdentifierQuoting( explicitName );
 			objectName = helper.handleExplicitName( getNamingStrategy(), objectName );
 			return normalizeIdentifierQuoting( objectName );
 		}
+        // Conceivable that the naming strategy could return a quoted identifier, or
+			//    that user enabled <delimited-identifiers/>
+		return normalizeIdentifierQuoting( objectName );
 	}
 
 	/**
@@ -104,6 +105,12 @@ public abstract class ObjectNameNormalizer {
 
 		// Convert the JPA2 specific quoting character (double quote) to Hibernate's (back tick)
 		if ( identifier.startsWith( "\"" ) && identifier.endsWith( "\"" ) ) {
+			return '`' + identifier.substring( 1, identifier.length() - 1 ) + '`';
+		}
+
+		// Convert SQLServer style quoting
+		// TODO: This really should be tied to Dialect#openQuote/closeQuote
+		if ( identifier.startsWith( "[" ) && identifier.endsWith( "]" ) ) {
 			return '`' + identifier.substring( 1, identifier.length() - 1 ) + '`';
 		}
 

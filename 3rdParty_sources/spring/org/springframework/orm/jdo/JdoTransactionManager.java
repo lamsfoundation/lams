@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,17 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+import org.springframework.transaction.support.DelegatingTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * {@link org.springframework.transaction.PlatformTransactionManager} implementation
- * for a single JDO {@link javax.jdo.PersistenceManagerFactory}. Binds a JDO
- * PersistenceManager from the specified factory to the thread, potentially allowing
- * for one thread-bound PersistenceManager per factory.
- * {@link PersistenceManagerFactoryUtils} and {@link JdoTemplate} are aware of
- * thread-bound persistence managers and participate in such transactions automatically.
+ * {@link org.springframework.transaction.PlatformTransactionManager} implementation for a
+ * single JDO {@link javax.jdo.PersistenceManagerFactory}. Binds a JDO PersistenceManager
+ * from the specified factory to the thread, potentially allowing for one thread-bound
+ * PersistenceManager per factory. {@link PersistenceManagerFactoryUtils} and
+ * {@link org.springframework.orm.jdo.support.SpringPersistenceManagerProxyBean} are aware
+ * of thread-bound persistence managers and participate in such transactions automatically.
  * Using either of those (or going through a {@link TransactionAwarePersistenceManagerFactoryProxy}
  * is required for JDO access code supporting this transaction management mechanism.
  *
@@ -90,7 +91,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see LocalPersistenceManagerFactoryBean
  * @see PersistenceManagerFactoryUtils#getPersistenceManager
  * @see PersistenceManagerFactoryUtils#releasePersistenceManager
- * @see JdoTemplate
  * @see TransactionAwarePersistenceManagerFactoryProxy
  * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
  * @see org.springframework.jdbc.datasource.DataSourceUtils#releaseConnection
@@ -98,6 +98,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
  * @see org.springframework.transaction.jta.JtaTransactionManager
  */
+@SuppressWarnings("serial")
 public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		implements ResourceTransactionManager, InitializingBean {
 
@@ -153,7 +154,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
    * The DataSource should match the one used by the JDO PersistenceManagerFactory:
 	 * for example, you could specify the same JNDI DataSource for both.
 	 * <p>If the PersistenceManagerFactory uses a DataSource as connection factory,
-	 * the DataSource will be autodetected: You can still explictly specify the
+	 * the DataSource will be autodetected: You can still explicitly specify the
 	 * DataSource, but you don't need to in this case.
 	 * <p>A transactional JDBC Connection for this DataSource will be provided to
 	 * application code accessing this DataSource directly via DataSourceUtils
@@ -194,7 +195,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 
 	/**
 	 * Set whether to autodetect a JDBC DataSource used by the JDO PersistenceManagerFactory,
-	 * as returned by the <code>getConnectionFactory()</code> method. Default is "true".
+	 * as returned by the {@code getConnectionFactory()} method. Default is "true".
 	 * <p>Can be turned off to deliberately ignore an available DataSource,
 	 * to not expose JDO transactions as JDBC transactions for that DataSource.
 	 * @see #setDataSource
@@ -230,6 +231,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 	 * for the specified PersistenceManagerFactory if none set.
 	 * Auto-detect the PersistenceManagerFactory's DataSource, if any.
 	 */
+	@Override
 	public void afterPropertiesSet() {
 		if (getPersistenceManagerFactory() == null) {
 			throw new IllegalArgumentException("Property 'persistenceManagerFactory' is required");
@@ -254,10 +256,12 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 	}
 
 
+	@Override
 	public Object getResourceFactory() {
 		return getPersistenceManagerFactory();
 	}
 
+	@Override
 	protected Object doGetTransaction() {
 		JdoTransactionObject txObject = new JdoTransactionObject();
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
@@ -281,10 +285,12 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		return txObject;
 	}
 
+	@Override
 	protected boolean isExistingTransaction(Object transaction) {
 		return ((JdoTransactionObject) transaction).hasTransaction();
 	}
 
+	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) {
 		JdoTransactionObject txObject = (JdoTransactionObject) transaction;
 
@@ -296,7 +302,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 					"on a single DataSource, no matter whether JDO or JDBC access.");
 		}
 
-		PersistenceManager pm = null;
+		PersistenceManager pm;
 
 		try {
 			if (txObject.getPersistenceManagerHolder() == null ||
@@ -311,13 +317,19 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 			pm = txObject.getPersistenceManagerHolder().getPersistenceManager();
 
 			// Delegate to JdoDialect for actual transaction begin.
-			Object transactionData = getJdoDialect().beginTransaction(pm.currentTransaction(), definition);
+			final int timeoutToUse = determineTimeout(definition);
+			Object transactionData = getJdoDialect().beginTransaction(pm.currentTransaction(),
+					new DelegatingTransactionDefinition(definition) {
+						@Override
+						public int getTimeout() {
+							return timeoutToUse;
+						}
+					});
 			txObject.setTransactionData(transactionData);
 
 			// Register transaction timeout.
-			int timeout = determineTimeout(definition);
-			if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
-				txObject.getPersistenceManagerHolder().setTimeoutInSeconds(timeout);
+			if (timeoutToUse != TransactionDefinition.TIMEOUT_DEFAULT) {
+				txObject.getPersistenceManagerHolder().setTimeoutInSeconds(timeoutToUse);
 			}
 
 			// Register the JDO PersistenceManager's JDBC Connection for the DataSource, if set.
@@ -325,8 +337,8 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 				ConnectionHandle conHandle = getJdoDialect().getJdbcConnection(pm, definition.isReadOnly());
 				if (conHandle != null) {
 					ConnectionHolder conHolder = new ConnectionHolder(conHandle);
-					if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
-						conHolder.setTimeoutInSeconds(timeout);
+					if (timeoutToUse != TransactionDefinition.TIMEOUT_DEFAULT) {
+						conHolder.setTimeoutInSeconds(timeoutToUse);
 					}
 					if (logger.isDebugEnabled()) {
 						logger.debug("Exposing JDO transaction as JDBC transaction [" + conHolder.getConnectionHandle() + "]");
@@ -354,7 +366,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 			closePersistenceManagerAfterFailedBegin(txObject);
 			throw ex;
 		}
-		catch (Exception ex) {
+		catch (Throwable ex) {
 			closePersistenceManagerAfterFailedBegin(txObject);
 			throw new CannotCreateTransactionException("Could not open JDO PersistenceManager for transaction", ex);
 		}
@@ -382,6 +394,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		}
 	}
 
+	@Override
 	protected Object doSuspend(Object transaction) {
 		JdoTransactionObject txObject = (JdoTransactionObject) transaction;
 		txObject.setPersistenceManagerHolder(null, false);
@@ -395,6 +408,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		return new SuspendedResourcesHolder(persistenceManagerHolder, connectionHolder);
 	}
 
+	@Override
 	protected void doResume(Object transaction, Object suspendedResources) {
 		SuspendedResourcesHolder resourcesHolder = (SuspendedResourcesHolder) suspendedResources;
 		TransactionSynchronizationManager.bindResource(
@@ -405,13 +419,15 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 	}
 
 	/**
-	 * This implementation returns "true": a JDO2 commit will properly handle
+	 * This implementation returns "true": a JDO commit will properly handle
 	 * transactions that have been marked rollback-only at a global level.
 	 */
+	@Override
 	protected boolean shouldCommitOnGlobalRollbackOnly() {
 		return true;
 	}
 
+	@Override
 	protected void doCommit(DefaultTransactionStatus status) {
 		JdoTransactionObject txObject = (JdoTransactionObject) status.getTransaction();
 		if (status.isDebug()) {
@@ -428,6 +444,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		}
 	}
 
+	@Override
 	protected void doRollback(DefaultTransactionStatus status) {
 		JdoTransactionObject txObject = (JdoTransactionObject) status.getTransaction();
 		if (status.isDebug()) {
@@ -445,6 +462,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		}
 	}
 
+	@Override
 	protected void doSetRollbackOnly(DefaultTransactionStatus status) {
 		JdoTransactionObject txObject = (JdoTransactionObject) status.getTransaction();
 		if (status.isDebug()) {
@@ -454,6 +472,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		txObject.setRollbackOnly();
 	}
 
+	@Override
 	protected void doCleanupAfterCompletion(Object transaction) {
 		JdoTransactionObject txObject = (JdoTransactionObject) transaction;
 
@@ -492,8 +511,8 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 
 	/**
 	 * Convert the given JDOException to an appropriate exception from the
-	 * <code>org.springframework.dao</code> hierarchy.
-	 * <p>Default implementation delegates to the JdoDialect.
+	 * {@code org.springframework.dao} hierarchy.
+	 * <p>The default implementation delegates to the JdoDialect.
 	 * May be overridden in subclasses.
 	 * @param ex JDOException that occured
 	 * @return the corresponding DataAccessException instance
@@ -508,7 +527,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 	 * JDO transaction object, representing a PersistenceManagerHolder.
 	 * Used as transaction object by JdoTransactionManager.
 	 */
-	private static class JdoTransactionObject extends JdbcTransactionObjectSupport {
+	private class JdoTransactionObject extends JdbcTransactionObjectSupport {
 
 		private PersistenceManagerHolder persistenceManagerHolder;
 
@@ -523,11 +542,11 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		}
 
 		public PersistenceManagerHolder getPersistenceManagerHolder() {
-			return persistenceManagerHolder;
+			return this.persistenceManagerHolder;
 		}
 
 		public boolean isNewPersistenceManagerHolder() {
-			return newPersistenceManagerHolder;
+			return this.newPersistenceManagerHolder;
 		}
 
 		public boolean hasTransaction() {
@@ -540,7 +559,7 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 		}
 
 		public Object getTransactionData() {
-			return transactionData;
+			return this.transactionData;
 		}
 
 		public void setRollbackOnly() {
@@ -553,16 +572,27 @@ public class JdoTransactionManager extends AbstractPlatformTransactionManager
 			}
 		}
 
+		@Override
 		public boolean isRollbackOnly() {
 			Transaction tx = this.persistenceManagerHolder.getPersistenceManager().currentTransaction();
 			return tx.getRollbackOnly();
+		}
+
+		@Override
+		public void flush() {
+			try {
+				this.persistenceManagerHolder.getPersistenceManager().flush();
+			}
+			catch (JDOException ex) {
+				throw convertJdoAccessException(ex);
+			}
 		}
 	}
 
 
 	/**
 	 * Holder for suspended resources.
-	 * Used internally by <code>doSuspend</code> and <code>doResume</code>.
+	 * Used internally by {@code doSuspend} and {@code doResume}.
 	 */
 	private static class SuspendedResourcesHolder {
 

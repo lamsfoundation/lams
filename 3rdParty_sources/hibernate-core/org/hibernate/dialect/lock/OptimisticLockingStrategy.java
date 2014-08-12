@@ -25,27 +25,25 @@ package org.hibernate.dialect.lock;
 
 import java.io.Serializable;
 
-import org.hibernate.*;
-import org.hibernate.event.EventSource;
-import org.hibernate.action.EntityVerifyVersionProcess;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.EntityEntry;
+import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
+import org.hibernate.OptimisticLockException;
+import org.hibernate.action.internal.EntityVerifyVersionProcess;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.spi.EventSource;
 import org.hibernate.persister.entity.Lockable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An optimistic locking strategy that verifies that the version hasn't changed (prior to transaction commit).
  * <p/>
  * This strategy is valid for LockMode.OPTIMISTIC
  *
- * @since 3.5
- *
  * @author Scott Marlow
+ * @since 3.5
  */
+@SuppressWarnings("deprecation")
 public class OptimisticLockingStrategy implements LockingStrategy {
-	private static final Logger log = LoggerFactory.getLogger( OptimisticLockingStrategy.class );
-
 	private final Lockable lockable;
 	private final LockMode lockMode;
 
@@ -53,7 +51,7 @@ public class OptimisticLockingStrategy implements LockingStrategy {
 	 * Construct locking strategy.
 	 *
 	 * @param lockable The metadata for the entity to be locked.
-	 * @param lockMode Indictates the type of lock to be acquired.
+	 * @param lockMode Indicates the type of lock to be acquired.
 	 */
 	public OptimisticLockingStrategy(Lockable lockable, LockMode lockMode) {
 		this.lockable = lockable;
@@ -63,22 +61,14 @@ public class OptimisticLockingStrategy implements LockingStrategy {
 		}
 	}
 
-   /**
-	 * @see org.hibernate.dialect.lock.LockingStrategy#lock
-	 */
-	public void lock(
-      Serializable id,
-      Object version,
-      Object object,
-      int timeout, SessionImplementor session) throws StaleObjectStateException, JDBCException {
+	@Override
+	public void lock(Serializable id, Object version, Object object, int timeout, SessionImplementor session) {
 		if ( !lockable.isVersioned() ) {
-			throw new OptimisticLockException( "[" + lockMode + "] not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
+			throw new OptimisticLockException( object, "[" + lockMode + "] not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
 		}
-		EntityEntry entry = session.getPersistenceContext().getEntry(object);
-		EventSource source = (EventSource)session;
-		EntityVerifyVersionProcess verifyVersion = new EntityVerifyVersionProcess(object, entry);
+		final EntityEntry entry = session.getPersistenceContext().getEntry( object );
 		// Register the EntityVerifyVersionProcess action to run just prior to transaction commit.
-		source.getActionQueue().registerProcess(verifyVersion);
+		( (EventSource) session ).getActionQueue().registerProcess( new EntityVerifyVersionProcess( object, entry ) );
 	}
 
 	protected LockMode getLockMode() {

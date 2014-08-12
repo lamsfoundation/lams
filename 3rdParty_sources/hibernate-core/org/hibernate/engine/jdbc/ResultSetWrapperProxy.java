@@ -24,16 +24,17 @@
 package org.hibernate.engine.jdbc;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ClassLoaderHelper;
 
-import org.hibernate.util.JDBCExceptionReporter;
+import org.jboss.logging.Logger;
 
 /**
  * A proxy for a ResultSet delegate, responsible for locally caching the columnName-to-columnIndex resolution that
@@ -43,8 +44,12 @@ import org.hibernate.util.JDBCExceptionReporter;
  * @author Gail Badner
  */
 public class ResultSetWrapperProxy implements InvocationHandler {
-	private static final Logger log = LoggerFactory.getLogger( ResultSetWrapperProxy.class );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			ResultSetWrapperProxy.class.getName()
+	);
 	private static final Class[] PROXY_INTERFACES = new Class[] { ResultSet.class };
+	private static final SqlExceptionHelper SQL_EXCEPTION_HELPER = new SqlExceptionHelper();
 
 	private final ResultSet rs;
 	private final ColumnNameCache columnNameCache;
@@ -62,7 +67,7 @@ public class ResultSetWrapperProxy implements InvocationHandler {
 	 * @return The generated proxy.
 	 */
 	public static ResultSet generateProxy(ResultSet resultSet, ColumnNameCache columnNameCache) {
-		return ( ResultSet ) Proxy.newProxyInstance(
+		return (ResultSet) Proxy.newProxyInstance(
 				getProxyClassLoader(),
 				PROXY_INTERFACES,
 				new ResultSetWrapperProxy( resultSet, columnNameCache )
@@ -76,49 +81,35 @@ public class ResultSetWrapperProxy implements InvocationHandler {
 	 * @return The class loader appropriate for proxy construction.
 	 */
 	public static ClassLoader getProxyClassLoader() {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		ClassLoader cl = ClassLoaderHelper.getContextClassLoader();
 		if ( cl == null ) {
 			cl = ResultSet.class.getClassLoader();
 		}
 		return cl;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if ( "findColumn".equals( method.getName() ) ) {
-			return new Integer( findColumn( ( String ) args[0] ) );
+			return findColumn( (String) args[0] );
 		}
 
 		if ( isFirstArgColumnLabel( method, args ) ) {
 			try {
-				int columnIndex = findColumn( ( String ) args[0] );
+				final Integer columnIndex = findColumn( (String) args[0] );
 				return invokeMethod(
-						locateCorrespondingColumnIndexMethod( method ), buildColumnIndexMethodArgs( args, columnIndex )
+						locateCorrespondingColumnIndexMethod( method ),
+						buildColumnIndexMethodArgs( args, columnIndex )
 				);
 			}
 			catch ( SQLException ex ) {
-				StringBuffer buf = new StringBuffer()
-						.append( "Exception getting column index for column: [" )
-						.append( args[0] )
-						.append( "].\nReverting to using: [" )
-						.append( args[0] )
-						.append( "] as first argument for method: [" )
-						.append( method )
-						.append( "]" );
-				JDBCExceptionReporter.logExceptions( ex, buf.toString() );
+				final String msg = "Exception getting column index for column: [" + args[0] +
+						"].\nReverting to using: [" + args[0] +
+						"] as first argument for method: [" + method + "]";
+				SQL_EXCEPTION_HELPER.logExceptions( ex, msg );
 			}
 			catch ( NoSuchMethodException ex ) {
-				StringBuffer buf = new StringBuffer()
-						.append( "Exception switching from method: [" )
-						.append( method )
-						.append( "] to a method using the column index. Reverting to using: [" )
-						.append( method )
-						.append( "]" );
-				if ( log.isWarnEnabled() ) {
-					log.warn( buf.toString() );
-				}
+				LOG.unableToSwitchToMethodUsingColumnIndex( method );
 			}
 		}
 		return invokeMethod( method, args );
@@ -131,11 +122,11 @@ public class ResultSetWrapperProxy implements InvocationHandler {
 	 * @return The column index corresponding to the given column name.
 	 * @throws SQLException if the ResultSet object does not contain columnName or a database access error occurs
 	 */
-	private int findColumn(String columnName) throws SQLException {
+	private Integer findColumn(String columnName) throws SQLException {
 		return columnNameCache.getIndexForColumnName( columnName, rs );
 	}
 
-	private boolean isFirstArgColumnLabel(Method method, Object args[]) {
+	private boolean isFirstArgColumnLabel(Method method, Object[] args) {
 		// method name should start with either get or update
 		if ( ! ( method.getName().startsWith( "get" ) || method.getName().startsWith( "update" ) ) ) {
 			return false;
@@ -164,7 +155,7 @@ public class ResultSetWrapperProxy implements InvocationHandler {
 	 * @throws NoSuchMethodException Should never happen, but...
 	 */
 	private Method locateCorrespondingColumnIndexMethod(Method columnNameMethod) throws NoSuchMethodException {
-		Class actualParameterTypes[] = new Class[columnNameMethod.getParameterTypes().length];
+		final Class[] actualParameterTypes = new Class[columnNameMethod.getParameterTypes().length];
 		actualParameterTypes[0] = int.class;
 		System.arraycopy(
 				columnNameMethod.getParameterTypes(),
@@ -176,14 +167,14 @@ public class ResultSetWrapperProxy implements InvocationHandler {
 		return columnNameMethod.getDeclaringClass().getMethod( columnNameMethod.getName(), actualParameterTypes );
 	}
 
-	private Object[] buildColumnIndexMethodArgs(Object[] incomingArgs, int columnIndex) {
-		Object actualArgs[] = new Object[incomingArgs.length];
-		actualArgs[0] = new Integer( columnIndex );
+	private Object[] buildColumnIndexMethodArgs(Object[] incomingArgs, Integer columnIndex) {
+		final Object[] actualArgs = new Object[incomingArgs.length];
+		actualArgs[0] = columnIndex;
 		System.arraycopy( incomingArgs, 1, actualArgs, 1, incomingArgs.length - 1 );
 		return actualArgs;
 	}
 
-	private Object invokeMethod(Method method, Object args[]) throws Throwable {
+	private Object invokeMethod(Method method, Object[] args) throws Throwable {
 		try {
 			return method.invoke( rs, args );
 		}

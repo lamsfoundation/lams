@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package org.springframework.transaction.annotation;
 
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
-
 import javax.ejb.ApplicationException;
 import javax.ejb.TransactionAttributeType;
 
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * Strategy implementation for parsing EJB3's {@link javax.ejb.TransactionAttribute}
@@ -32,8 +31,10 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  * @author Juergen Hoeller
  * @since 2.5
  */
+@SuppressWarnings("serial")
 public class Ejb3TransactionAnnotationParser implements TransactionAnnotationParser, Serializable {
 
+	@Override
 	public TransactionAttribute parseTransactionAnnotation(AnnotatedElement ae) {
 		javax.ejb.TransactionAttribute ann = ae.getAnnotation(javax.ejb.TransactionAttribute.class);
 		if (ann != null) {
@@ -48,21 +49,31 @@ public class Ejb3TransactionAnnotationParser implements TransactionAnnotationPar
 		return new Ejb3TransactionAttribute(ann.value());
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		return (this == other || other instanceof Ejb3TransactionAnnotationParser);
+	}
+
+	@Override
+	public int hashCode() {
+		return Ejb3TransactionAnnotationParser.class.hashCode();
+	}
+
 
 	/**
 	 * EJB3-specific TransactionAttribute, implementing EJB3's rollback rules
 	 * which are based on annotated exceptions.
 	 */
-	private static class Ejb3TransactionAttribute extends DefaultTransactionDefinition
-			implements TransactionAttribute {
+	private static class Ejb3TransactionAttribute extends DefaultTransactionAttribute {
 
 		public Ejb3TransactionAttribute(TransactionAttributeType type) {
 			setPropagationBehaviorName(PREFIX_PROPAGATION + type.name());
 		}
 
+		@Override
 		public boolean rollbackOn(Throwable ex) {
 			ApplicationException ann = ex.getClass().getAnnotation(ApplicationException.class);
-			return (ann != null ? ann.rollback() : (ex instanceof RuntimeException || ex instanceof Error));
+			return (ann != null ? ann.rollback() : super.rollbackOn(ex));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * @since 2.5
  * @see org.springframework.beans.factory.annotation.Qualifier
  */
+@SuppressWarnings("serial")
 public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 
 	public static String VALUE_KEY = "value";
@@ -41,7 +42,7 @@ public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 	 * given type.
 	 * @param type the annotation type
 	 */
-	public AutowireCandidateQualifier(Class type) {
+	public AutowireCandidateQualifier(Class<?> type) {
 		this(type.getName());
 	}
 
@@ -59,18 +60,18 @@ public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 
 	/**
 	 * Construct a qualifier to match against an annotation of the
-	 * given type whose <code>value</code> attribute also matches
+	 * given type whose {@code value} attribute also matches
 	 * the specified value.
 	 * @param type the annotation type
 	 * @param value the annotation value to match
 	 */
-	public AutowireCandidateQualifier(Class type, Object value) {
+	public AutowireCandidateQualifier(Class<?> type, Object value) {
 		this(type.getName(), value);
 	}
 
 	/**
 	 * Construct a qualifier to match against an annotation of the
-	 * given type name whose <code>value</code> attribute also matches
+	 * given type name whose {@code value} attribute also matches
 	 * the specified value.
 	 * <p>The type name may match the fully-qualified class name of
 	 * the annotation or the short class name (without the package).

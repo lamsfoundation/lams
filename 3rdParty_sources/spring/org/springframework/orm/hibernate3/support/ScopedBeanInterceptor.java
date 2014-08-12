@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.aop.support.AopUtils;
  *
  * <p>Usage example:
  *
- * <pre>
+ * <pre class="code">
  * &lt;bean id=&quot;sessionFactory&quot; class=&quot;org.springframework.orm.hibernate3.LocalSessionFactoryBean&quot;&gt;
  *   ...
  *   &lt;property name=&quot;entityInterceptor&quot;&gt;
@@ -42,8 +42,10 @@ import org.springframework.aop.support.AopUtils;
  * @author Juergen Hoeller
  * @since 2.0
  */
+@SuppressWarnings("serial")
 public class ScopedBeanInterceptor extends EmptyInterceptor {
 
+	@Override
 	public String getEntityName(Object entity) {
 		if (entity instanceof ScopedObject) {
 			// Determine underlying object's type.

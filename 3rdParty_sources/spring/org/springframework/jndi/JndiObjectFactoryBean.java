@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.springframework.jndi;
 
 import java.lang.reflect.Method;
-
+import java.lang.reflect.Modifier;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -25,8 +25,14 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.SimpleTypeConverter;
+import org.springframework.beans.TypeConverter;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -61,9 +67,10 @@ import org.springframework.util.ClassUtils;
  * @see #setCache
  * @see JndiObjectTargetSource
  */
-public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryBean, BeanClassLoaderAware {
+public class JndiObjectFactoryBean extends JndiObjectLocator
+		implements FactoryBean<Object>, BeanFactoryAware, BeanClassLoaderAware {
 
-	private Class[] proxyInterfaces;
+	private Class<?>[] proxyInterfaces;
 
 	private boolean lookupOnStartup = true;
 
@@ -72,6 +79,8 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	private boolean exposeAccessContext = false;
 
 	private Object defaultObject;
+
+	private ConfigurableBeanFactory beanFactory;
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -87,8 +96,8 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	 * @see #setLookupOnStartup
 	 * @see #setCache
 	 */
-	public void setProxyInterface(Class proxyInterface) {
-		this.proxyInterfaces = new Class[] {proxyInterface};
+	public void setProxyInterface(Class<?> proxyInterface) {
+		this.proxyInterfaces = new Class<?>[] {proxyInterface};
 	}
 
 	/**
@@ -100,7 +109,7 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	 * @see #setLookupOnStartup
 	 * @see #setCache
 	 */
-	public void setProxyInterfaces(Class[] proxyInterfaces) {
+	public void setProxyInterfaces(Class<?>... proxyInterfaces) {
 		this.proxyInterfaces = proxyInterfaces;
 	}
 
@@ -149,12 +158,26 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	 * It is typically used for literal values in scenarios where the JNDI environment
 	 * might define specific config settings but those are not required to be present.
 	 * <p>Note: This is only supported for lookup on startup.
+	 * If specified together with {@link #setExpectedType}, the specified value
+	 * needs to be either of that type or convertible to it.
 	 * @see #setLookupOnStartup
+	 * @see ConfigurableBeanFactory#getTypeConverter()
+	 * @see SimpleTypeConverter
 	 */
 	public void setDefaultObject(Object defaultObject) {
 		this.defaultObject = defaultObject;
 	}
 
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		if (beanFactory instanceof ConfigurableBeanFactory) {
+			// Just optional - for getting a specifically configured TypeConverter if needed.
+			// We'll simply fall back to a SimpleTypeConverter if no specific one available.
+			this.beanFactory = (ConfigurableBeanFactory) beanFactory;
+		}
+	}
+
+	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
@@ -163,6 +186,7 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	/**
 	 * Look up the JNDI object and store it.
 	 */
+	@Override
 	public void afterPropertiesSet() throws IllegalArgumentException, NamingException {
 		super.afterPropertiesSet();
 
@@ -178,9 +202,16 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 		else {
 			if (this.defaultObject != null && getExpectedType() != null &&
 					!getExpectedType().isInstance(this.defaultObject)) {
-				throw new IllegalArgumentException("Default object [" + this.defaultObject +
-						"] of type [" + this.defaultObject.getClass().getName() +
-						"] is not of expected type [" + getExpectedType().getName() + "]");
+				TypeConverter converter = (this.beanFactory != null ?
+						this.beanFactory.getTypeConverter() : new SimpleTypeConverter());
+				try {
+					this.defaultObject = converter.convertIfNecessary(this.defaultObject, getExpectedType());
+				}
+				catch (TypeMismatchException ex) {
+					throw new IllegalArgumentException("Default object [" + this.defaultObject + "] of type [" +
+							this.defaultObject.getClass().getName() + "] is not of expected type [" +
+							getExpectedType().getName() + "] and cannot be converted either", ex);
+				}
 			}
 			// Locate specified JNDI object.
 			this.jndiObject = lookupWithFallback();
@@ -227,11 +258,13 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	/**
 	 * Return the singleton JNDI object.
 	 */
+	@Override
 	public Object getObject() {
 		return this.jndiObject;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		if (this.proxyInterfaces != null) {
 			if (this.proxyInterfaces.length == 1) {
 				return this.proxyInterfaces[0];
@@ -248,6 +281,7 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 		}
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -262,7 +296,7 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 	 * @return the merged interface as Class
 	 * @see java.lang.reflect.Proxy#getProxyClass
 	 */
-	protected Class createCompositeInterface(Class[] interfaces) {
+	protected Class<?> createCompositeInterface(Class<?>[] interfaces) {
 		return ClassUtils.createCompositeInterface(interfaces, this.beanClassLoader);
 	}
 
@@ -289,12 +323,17 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 				proxyFactory.setInterfaces(jof.proxyInterfaces);
 			}
 			else {
-				Class targetClass = targetSource.getTargetClass();
+				Class<?> targetClass = targetSource.getTargetClass();
 				if (targetClass == null) {
 					throw new IllegalStateException(
 							"Cannot deactivate 'lookupOnStartup' without specifying a 'proxyInterface' or 'expectedType'");
 				}
-				proxyFactory.setInterfaces(ClassUtils.getAllInterfacesForClass(targetClass, jof.beanClassLoader));
+				Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(targetClass, jof.beanClassLoader);
+				for (Class<?> ifc : ifcs) {
+					if (Modifier.isPublic(ifc.getModifiers())) {
+						proxyFactory.addInterface(ifc);
+					}
+				}
 			}
 			if (jof.exposeAccessContext) {
 				proxyFactory.addAdvice(new JndiContextExposingInterceptor(jof.getJndiTemplate()));
@@ -317,6 +356,7 @@ public class JndiObjectFactoryBean extends JndiObjectLocator implements FactoryB
 			this.jndiTemplate = jndiTemplate;
 		}
 
+		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			Context ctx = (isEligible(invocation.getMethod()) ? this.jndiTemplate.getContext() : null);
 			try {

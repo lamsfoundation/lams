@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.context.support;
 
 import java.io.IOException;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -52,7 +53,7 @@ import org.springframework.util.Assert;
  *
  * <p>Usage example:
  *
- * <pre>
+ * <pre class="code">
  * GenericApplicationContext ctx = new GenericApplicationContext();
  * XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
  * xmlReader.loadBeanDefinitions(new ClassPathResource("applicationContext.xml"));
@@ -75,6 +76,7 @@ import org.springframework.util.Assert;
  * from the {@link AbstractRefreshableApplicationContext} base class.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 1.1.2
  * @see #registerBeanDefinition
  * @see #refresh()
@@ -139,22 +141,49 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * the parent of the internal BeanFactory accordingly.
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
 	 */
+	@Override
 	public void setParent(ApplicationContext parent) {
 		super.setParent(parent);
 		this.beanFactory.setParentBeanFactory(getInternalParentBeanFactory());
 	}
 
+	@Override
+	public void setId(String id) {
+		super.setId(id);
+	}
+
+	/**
+	 * Set whether it should be allowed to override bean definitions by registering
+	 * a different definition with the same name, automatically replacing the former.
+	 * If not, an exception will be thrown. Default is "true".
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+	 */
+	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
+		this.beanFactory.setAllowBeanDefinitionOverriding(allowBeanDefinitionOverriding);
+	}
+
+	/**
+	 * Set whether to allow circular references between beans - and automatically
+	 * try to resolve them.
+	 * <p>Default is "true". Turn this off to throw an exception when encountering
+	 * a circular reference, disallowing them completely.
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+	 */
+	public void setAllowCircularReferences(boolean allowCircularReferences) {
+		this.beanFactory.setAllowCircularReferences(allowCircularReferences);
+	}
+
 	/**
 	 * Set a ResourceLoader to use for this context. If set, the context will
-	 * delegate all <code>getResource</code> calls to the given ResourceLoader.
+	 * delegate all {@code getResource} calls to the given ResourceLoader.
 	 * If not set, default resource loading will apply.
 	 * <p>The main reason to specify a custom ResourceLoader is to resolve
-	 * resource paths (withour URL prefix) in a specific fashion.
+	 * resource paths (without URL prefix) in a specific fashion.
 	 * The default behavior is to resolve such paths as class path locations.
 	 * To resolve resource paths as file system locations, specify a
 	 * FileSystemResourceLoader here.
 	 * <p>You can also pass in a full ResourcePatternResolver, which will
-	 * be autodetected by the context and used for <code>getResources</code>
+	 * be autodetected by the context and used for {@code getResources}
 	 * calls as well. Else, default resource pattern matching will apply.
 	 * @see #getResource
 	 * @see org.springframework.core.io.DefaultResourceLoader
@@ -172,6 +201,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * falling back to the default superclass behavior else.
 	 * @see #setResourceLoader
 	 */
+	@Override
 	public Resource getResource(String location) {
 		if (this.resourceLoader != null) {
 			return this.resourceLoader.getResource(location);
@@ -185,6 +215,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * default superclass behavior else.
 	 * @see #setResourceLoader
 	 */
+	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
 			return ((ResourcePatternResolver) this.resourceLoader).getResources(locationPattern);
@@ -202,25 +233,36 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * to register beans through our public methods (or the BeanFactory's).
 	 * @see #registerBeanDefinition
 	 */
+	@Override
 	protected final void refreshBeanFactory() throws IllegalStateException {
 		if (this.refreshed) {
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
 		}
+		this.beanFactory.setSerializationId(getId());
 		this.refreshed = true;
 	}
 
+	@Override
+	protected void cancelRefresh(BeansException ex) {
+		this.beanFactory.setSerializationId(null);
+		super.cancelRefresh(ex);
+	}
+
 	/**
-	 * Do nothing: We hold a single internal BeanFactory that will never
+	 * Not much to do: We hold a single internal BeanFactory that will never
 	 * get released.
 	 */
+	@Override
 	protected final void closeBeanFactory() {
+		this.beanFactory.setSerializationId(null);
 	}
 
 	/**
 	 * Return the single internal BeanFactory held by this context
 	 * (as ConfigurableListableBeanFactory).
 	 */
+	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
 		return this.beanFactory;
 	}
@@ -242,32 +284,39 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	// Implementation of BeanDefinitionRegistry
 	//---------------------------------------------------------------------
 
+	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
 
 		this.beanFactory.registerBeanDefinition(beanName, beanDefinition);
 	}
 
+	@Override
 	public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		this.beanFactory.removeBeanDefinition(beanName);
 	}
 
+	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		return this.beanFactory.getBeanDefinition(beanName);
 	}
 
+	@Override
 	public boolean isBeanNameInUse(String beanName) {
 		return this.beanFactory.isBeanNameInUse(beanName);
 	}
 
+	@Override
 	public void registerAlias(String beanName, String alias) {
 		this.beanFactory.registerAlias(beanName, alias);
 	}
 
+	@Override
 	public void removeAlias(String alias) {
 		this.beanFactory.removeAlias(alias);
 	}
 
+	@Override
 	public boolean isAlias(String beanName) {
 		return this.beanFactory.isAlias(beanName);
 	}

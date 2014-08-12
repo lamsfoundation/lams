@@ -27,8 +27,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.hibernate.HibernateException;
-import org.hibernate.util.ComparableComparator;
-import org.hibernate.util.EqualsHelper;
+import org.hibernate.internal.util.compare.ComparableComparator;
+import org.hibernate.internal.util.compare.EqualsHelper;
 
 /**
  * Abstract adapter for Java type descriptors.
@@ -63,48 +63,38 @@ public abstract class AbstractTypeDescriptor<T> implements JavaTypeDescriptor<T>
 		this.type = type;
 		this.mutabilityPlan = mutabilityPlan;
 		this.comparator = Comparable.class.isAssignableFrom( type )
-				? (Comparator<T>)ComparableComparator.INSTANCE
+				? (Comparator<T>) ComparableComparator.INSTANCE
 				: null;
+
+		JavaTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public MutabilityPlan<T> getMutabilityPlan() {
 		return mutabilityPlan;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Class<T> getJavaTypeClass() {
 		return type;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public int extractHashCode(T value) {
 		return value.hashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public boolean areEqual(T one, T another) {
 		return EqualsHelper.equals( one, another );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Comparator<T> getComparator() {
 		return comparator;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String extractLoggableRepresentation(T value) {
 		return (value == null) ? "null" : value.toString();
 	}

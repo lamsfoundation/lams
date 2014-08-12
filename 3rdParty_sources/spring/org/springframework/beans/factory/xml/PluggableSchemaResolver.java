@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,34 @@
 
 package org.springframework.beans.factory.xml;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
-import org.springframework.beans.FatalBeanException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * {@link EntityResolver} implementation that attempts to resolve schema URLs into
  * local {@link ClassPathResource classpath resources} using a set of mappings files.
  *
  * <p>By default, this class will look for mapping files in the classpath using the pattern:
- * <code>META-INF/spring.schemas</code> allowing for multiple files to exist on the
+ * {@code META-INF/spring.schemas} allowing for multiple files to exist on the
  * classpath at any one time.
  *
- * The format of <code>META-INF/spring.schemas</code> is a properties
- * file where each line should be of the form <code>systemId=schema-location</code>
- * where <code>schema-location</code> should also be a schema file in the classpath.
+ * The format of {@code META-INF/spring.schemas} is a properties
+ * file where each line should be of the form {@code systemId=schema-location}
+ * where {@code schema-location} should also be a schema file in the classpath.
  * Since systemId is commonly a URL, one must be careful to escape any ':' characters
  * which are treated as delimiters in properties files.
  *
@@ -67,14 +70,14 @@ public class PluggableSchemaResolver implements EntityResolver {
 	private final String schemaMappingsLocation;
 
 	/** Stores the mapping of schema URL -> local schema path */
-	private Properties schemaMappings;
+	private volatile Map<String, String> schemaMappings;
 
 
 	/**
 	 * Loads the schema URL -> schema file location mappings using the default
 	 * mapping file pattern "META-INF/spring.schemas".
 	 * @param classLoader the ClassLoader to use for loading
-	 * (can be <code>null</code>) to use the default ClassLoader)
+	 * (can be {@code null}) to use the default ClassLoader)
 	 * @see PropertiesLoaderUtils#loadAllProperties(String, ClassLoader)
 	 */
 	public PluggableSchemaResolver(ClassLoader classLoader) {
@@ -86,7 +89,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 * Loads the schema URL -> schema file location mappings using the given
 	 * mapping file pattern.
 	 * @param classLoader the ClassLoader to use for loading
-	 * (can be <code>null</code>) to use the default ClassLoader)
+	 * (can be {@code null}) to use the default ClassLoader)
 	 * @param schemaMappingsLocation the location of the file that defines schema mappings
 	 * (must not be empty)
 	 * @see PropertiesLoaderUtils#loadAllProperties(String, ClassLoader)
@@ -97,46 +100,70 @@ public class PluggableSchemaResolver implements EntityResolver {
 		this.schemaMappingsLocation = schemaMappingsLocation;
 	}
 
-
+	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Trying to resolve XML entity with public id [" + publicId +
 					"] and system id [" + systemId + "]");
 		}
+
 		if (systemId != null) {
-			String resourceLocation = getSchemaMapping(systemId);
+			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation != null) {
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
-				InputSource source = new InputSource(resource.getInputStream());
-				source.setPublicId(publicId);
-				source.setSystemId(systemId);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+				try {
+					InputSource source = new InputSource(resource.getInputStream());
+					source.setPublicId(publicId);
+					source.setSystemId(systemId);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Found XML schema [" + systemId + "] in classpath: " + resourceLocation);
+					}
+					return source;
 				}
-				return source;
+				catch (FileNotFoundException ex) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Couldn't find XML schema [" + systemId + "]: " + resource, ex);
+					}
+				}
 			}
 		}
 		return null;
 	}
 
-	protected String getSchemaMapping(String systemId) {
+	/**
+	 * Load the specified schema mappings lazily.
+	 */
+	private Map<String, String> getSchemaMappings() {
 		if (this.schemaMappings == null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
-			}
-			try {
-				this.schemaMappings =
-						PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Loaded schema mappings: " + this.schemaMappings);
+			synchronized (this) {
+				if (this.schemaMappings == null) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
+					}
+					try {
+						Properties mappings =
+								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
+						if (logger.isDebugEnabled()) {
+							logger.debug("Loaded schema mappings: " + mappings);
+						}
+						Map<String, String> schemaMappings = new ConcurrentHashMap<String, String>(mappings.size());
+						CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
+						this.schemaMappings = schemaMappings;
+					}
+					catch (IOException ex) {
+						throw new IllegalStateException(
+								"Unable to load schema mappings from location [" + this.schemaMappingsLocation + "]", ex);
+					}
 				}
 			}
-			catch (IOException ex) {
-				throw new FatalBeanException(
-						"Unable to load schema mappings from location [" + this.schemaMappingsLocation + "]", ex);
-			}
 		}
-		return this.schemaMappings.getProperty(systemId);
+		return this.schemaMappings;
+	}
+
+
+	@Override
+	public String toString() {
+		return "EntityResolver using mappings " + getSchemaMappings();
 	}
 
 }

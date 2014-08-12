@@ -23,13 +23,14 @@
  */
 package org.hibernate.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Lazy and proxy configuration of a particular class
+ * Lazy and proxy configuration of a particular class.
  *
  * @author Emmanuel Bernard
  */
@@ -37,12 +38,12 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Proxy {
 	/**
-	 * Whether this class is lazy or not (default to true)
+	 * Whether this class is lazy or not.  Default to true.
 	 */
 	boolean lazy() default true;
 
 	/**
-	 * Proxy class or interface used. Default entity class name.
+	 * Proxy class or interface used.  Default is to use the entity class name.
 	 */
 	Class proxyClass() default void.class;
 }

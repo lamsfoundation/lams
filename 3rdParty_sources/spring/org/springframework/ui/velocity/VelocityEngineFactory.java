@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.springframework.ui.velocity;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -28,11 +27,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.CommonsLogLogChute;
 
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -52,8 +53,8 @@ import org.springframework.util.StringUtils;
  * to the Spring application context.
  *
  * <p>If "overrideLogging" is true (the default), the VelocityEngine will be
- * configured to log via Commons Logging, that is, using the Spring-provided
- * {@link CommonsLoggingLogSystem} as log system.
+ * configured to log via Commons Logging, that is, using
+ * {@link CommonsLogLogChute} as log system.
  *
  * <p>The simplest way to use this class is to specify a
  * {@link #setResourceLoaderPath(String) "resourceLoaderPath"}; the
@@ -65,7 +66,6 @@ import org.springframework.util.StringUtils;
  * @see #setResourceLoaderPath
  * @see #setOverrideLogging
  * @see #createVelocityEngine
- * @see CommonsLoggingLogSystem
  * @see VelocityEngineFactoryBean
  * @see org.springframework.web.servlet.view.velocity.VelocityConfigurer
  * @see org.apache.velocity.app.VelocityEngine
@@ -76,7 +76,7 @@ public class VelocityEngineFactory {
 
 	private Resource configLocation;
 
-	private final Map velocityProperties = new HashMap();
+	private final Map<String, Object> velocityProperties = new HashMap<String, Object>();
 
 	private String resourceLoaderPath;
 
@@ -110,7 +110,7 @@ public class VelocityEngineFactory {
 	 * @see #setResourceLoaderPath
 	 */
 	public void setVelocityProperties(Properties velocityProperties) {
-		setVelocityPropertiesMap(velocityProperties);
+		CollectionUtils.mergePropertiesIntoMap(velocityProperties, this.velocityProperties);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class VelocityEngineFactory {
 	 * like "ds.resource.loader.instance".
 	 * @see #setVelocityProperties
 	 */
-	public void setVelocityPropertiesMap(Map velocityPropertiesMap) {
+	public void setVelocityPropertiesMap(Map<String, Object> velocityPropertiesMap) {
 		if (velocityPropertiesMap != null) {
 			this.velocityProperties.putAll(velocityPropertiesMap);
 		}
@@ -131,7 +131,7 @@ public class VelocityEngineFactory {
 	 * pseudo URLs are supported, as understood by ResourceLoader. Allows for
 	 * relative paths when running in an ApplicationContext.
 	 * <p>Will define a path for the default Velocity resource loader with the name
-	 * "file". If the specified resource cannot be resolved to a <code>java.io.File</code>,
+	 * "file". If the specified resource cannot be resolved to a {@code java.io.File},
 	 * a generic SpringResourceLoader will be used under the name "spring", without
 	 * modification detection.
 	 * <p>Note that resource caching will be enabled in any case. With the file
@@ -198,8 +198,7 @@ public class VelocityEngineFactory {
 
 	/**
 	 * Set whether Velocity should log via Commons Logging, i.e. whether Velocity's
-	 * log system should be set to CommonsLoggingLogSystem. Default value is true.
-	 * @see CommonsLoggingLogSystem
+	 * log system should be set to {@link CommonsLogLogChute}. Default is "true".
 	 */
 	public void setOverrideLogging(boolean overrideLogging) {
 		this.overrideLogging = overrideLogging;
@@ -214,14 +213,14 @@ public class VelocityEngineFactory {
 	 */
 	public VelocityEngine createVelocityEngine() throws IOException, VelocityException {
 		VelocityEngine velocityEngine = newVelocityEngine();
-		Properties props = new Properties();
+		Map<String, Object> props = new HashMap<String, Object>();
 
 		// Load config file if set.
 		if (this.configLocation != null) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Loading Velocity config from [" + this.configLocation + "]");
 			}
-			PropertiesLoaderUtils.fillProperties(props, this.configLocation);
+			CollectionUtils.mergePropertiesIntoMap(PropertiesLoaderUtils.loadProperties(this.configLocation), props);
 		}
 
 		// Merge local properties if set.
@@ -236,38 +235,18 @@ public class VelocityEngineFactory {
 
 		// Log via Commons Logging?
 		if (this.overrideLogging) {
-			velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new CommonsLoggingLogSystem());
+			velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new CommonsLogLogChute());
 		}
 
 		// Apply properties to VelocityEngine.
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
-			if (!(entry.getKey() instanceof String)) {
-				throw new IllegalArgumentException(
-						"Illegal property key [" + entry.getKey() + "]: only Strings allowed");
-			}
-			velocityEngine.setProperty((String) entry.getKey(), entry.getValue());
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			velocityEngine.setProperty(entry.getKey(), entry.getValue());
 		}
 
 		postProcessVelocityEngine(velocityEngine);
 
-		try {
-			// Perform actual initialization.
-			velocityEngine.init();
-		}
-		catch (IOException ex) {
-			throw ex;
-		}
-		catch (VelocityException ex) {
-			throw ex;
-		}
-		catch (RuntimeException ex) {
-			throw ex;
-		}
-		catch (Exception ex) {
-			logger.error("Why does VelocityEngine throw a generic checked exception, after all?", ex);
-			throw new VelocityException(ex.toString());
-		}
+		// Perform actual initialization.
+		velocityEngine.init();
 
 		return velocityEngine;
 	}
@@ -275,7 +254,7 @@ public class VelocityEngineFactory {
 	/**
 	 * Return a new VelocityEngine. Subclasses can override this for
 	 * custom initialization, or for using a mock object for testing.
-	 * <p>Called by <code>createVelocityEngine()</code>.
+	 * <p>Called by {@code createVelocityEngine()}.
 	 * @return the VelocityEngine instance
 	 * @throws IOException if a config file wasn't found
 	 * @throws VelocityException on Velocity initialization failure
@@ -288,7 +267,7 @@ public class VelocityEngineFactory {
 	/**
 	 * Initialize a Velocity resource loader for the given VelocityEngine:
 	 * either a standard Velocity FileResourceLoader or a SpringResourceLoader.
-	 * <p>Called by <code>createVelocityEngine()</code>.
+	 * <p>Called by {@code createVelocityEngine()}.
 	 * @param velocityEngine the VelocityEngine to configure
 	 * @param resourceLoaderPath the path to load Velocity resources from
 	 * @see org.apache.velocity.runtime.resource.loader.FileResourceLoader
@@ -301,7 +280,7 @@ public class VelocityEngineFactory {
 			// Try to load via the file system, fall back to SpringResourceLoader
 			// (for hot detection of template changes, if possible).
 			try {
-				StringBuffer resolvedPath = new StringBuffer();
+				StringBuilder resolvedPath = new StringBuilder();
 				String[] paths = StringUtils.commaDelimitedListToStringArray(resourceLoaderPath);
 				for (int i = 0; i < paths.length; i++) {
 					String path = paths[i];
@@ -339,7 +318,7 @@ public class VelocityEngineFactory {
 
 	/**
 	 * Initialize a SpringResourceLoader for the given VelocityEngine.
-	 * <p>Called by <code>initVelocityResourceLoader</code>.
+	 * <p>Called by {@code initVelocityResourceLoader}.
 	 * @param velocityEngine the VelocityEngine to configure
 	 * @param resourceLoaderPath the path to load Velocity resources from
 	 * @see SpringResourceLoader
@@ -362,7 +341,7 @@ public class VelocityEngineFactory {
 	 * To be implemented by subclasses that want to to perform custom
 	 * post-processing of the VelocityEngine after this FactoryBean
 	 * performed its default configuration (but before VelocityEngine.init).
-	 * <p>Called by <code>createVelocityEngine()</code>.
+	 * <p>Called by {@code createVelocityEngine()}.
 	 * @param velocityEngine the current VelocityEngine
 	 * @throws IOException if a config file wasn't found
 	 * @throws VelocityException on Velocity initialization failure

@@ -25,13 +25,13 @@ package org.hibernate.dialect;
 
 import java.sql.Types;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.DecodeCaseFragment;
 import org.hibernate.sql.JoinFragment;
 import org.hibernate.sql.OracleJoinFragment;
+
+import org.jboss.logging.Logger;
 
 /**
  * An SQL dialect for Oracle, compatible with Oracle 8.
@@ -39,13 +39,20 @@ import org.hibernate.sql.OracleJoinFragment;
  * @deprecated Use Oracle8iDialect instead.
  * @author Gavin King
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class OracleDialect extends Oracle9Dialect {
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			OracleDialect.class.getName()
+	);
 
-	private static final Logger log = LoggerFactory.getLogger( OracleDialect.class );
-
+	/**
+	 * Constructs a (DEPRECATED) Oracle9Dialect
+	 */
 	public OracleDialect() {
 		super();
-		log.warn( "The OracleDialect dialect has been deprecated; use Oracle8iDialect instead" );
+		LOG.deprecatedOracleDialect();
 		// Oracle8 and previous define only a "DATE" type which
 		//      is used to represent all aspects of date/time
 		registerColumnType( Types.TIMESTAMP, "date" );
@@ -53,44 +60,49 @@ public class OracleDialect extends Oracle9Dialect {
 		registerColumnType( Types.VARCHAR, 4000, "varchar2($l)" );
 	}
 
+	@Override
 	public JoinFragment createOuterJoinFragment() {
 		return new OracleJoinFragment();
 	}
+
+	@Override
 	public CaseFragment createCaseFragment() {
 		return new DecodeCaseFragment();
 	}
 
+	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
 
 		sql = sql.trim();
 		boolean isForUpdate = false;
-		if ( sql.toLowerCase().endsWith(" for update") ) {
+		if ( sql.toLowerCase().endsWith( " for update" ) ) {
 			sql = sql.substring( 0, sql.length()-11 );
 			isForUpdate = true;
 		}
-		
-		StringBuffer pagingSelect = new StringBuffer( sql.length()+100 );
+
+		final StringBuilder pagingSelect = new StringBuilder( sql.length()+100 );
 		if (hasOffset) {
-			pagingSelect.append("select * from ( select row_.*, rownum rownum_ from ( ");
+			pagingSelect.append( "select * from ( select row_.*, rownum rownum_ from ( " );
 		}
 		else {
-			pagingSelect.append("select * from ( ");
+			pagingSelect.append( "select * from ( " );
 		}
-		pagingSelect.append(sql);
+		pagingSelect.append( sql );
 		if (hasOffset) {
-			pagingSelect.append(" ) row_ ) where rownum_ <= ? and rownum_ > ?");
+			pagingSelect.append( " ) row_ ) where rownum_ <= ? and rownum_ > ?" );
 		}
 		else {
-			pagingSelect.append(" ) where rownum <= ?");
+			pagingSelect.append( " ) where rownum <= ?" );
 		}
 
 		if ( isForUpdate ) {
 			pagingSelect.append( " for update" );
 		}
-		
+
 		return pagingSelect.toString();
 	}
 
+	@Override
 	public String getSelectClauseNullString(int sqlType) {
 		switch(sqlType) {
 			case Types.VARCHAR:
@@ -105,10 +117,12 @@ public class OracleDialect extends Oracle9Dialect {
 		}
 	}
 
+	@Override
 	public String getCurrentTimestampSelectString() {
 		return "select sysdate from dual";
 	}
 
+	@Override
 	public String getCurrentTimestampSQLFunctionName() {
 		return "sysdate";
 	}

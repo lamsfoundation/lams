@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.context.weaving;
 
+import org.springframework.beans.factory.Aware;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 
 /**
@@ -23,10 +24,11 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
  * of the application context's default {@link LoadTimeWeaver}.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 2.5
  * @see org.springframework.context.ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME
  */
-public interface LoadTimeWeaverAware {
+public interface LoadTimeWeaverAware extends Aware {
 
 	/**
 	 * Set the {@link LoadTimeWeaver} of this object's containing
@@ -39,10 +41,10 @@ public interface LoadTimeWeaverAware {
 	 * {@link org.springframework.context.ApplicationContextAware ApplicationContextAware's}
 	 * {@link org.springframework.context.ApplicationContextAware#setApplicationContext setApplicationContext(..)}.
 	 * <p><b>NOTE:</b> This method will only be called if there actually is a
-	 * <code>LoadTimeWeaver</code> available in the application context. If
+	 * {@code LoadTimeWeaver} available in the application context. If
 	 * there is none, the method will simply not get invoked, assuming that the
 	 * implementing object is able to activate its weaving dependency accordingly.
-	 * @param loadTimeWeaver the <code>LoadTimeWeaver</code> instance (never <code>null</code>)
+	 * @param loadTimeWeaver the {@code LoadTimeWeaver} instance (never {@code null})
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext
 	 */

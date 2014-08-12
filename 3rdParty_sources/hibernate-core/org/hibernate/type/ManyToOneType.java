@@ -32,10 +32,11 @@ import java.util.Arrays;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.EntityKey;
-import org.hibernate.engine.ForeignKeys;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.internal.ForeignKeys;
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -66,9 +67,14 @@ public class ManyToOneType extends EntityType {
 	 * @param lazy Should the association be handled lazily
 	 */
 	public ManyToOneType(TypeFactory.TypeScope scope, String referencedEntityName, boolean lazy) {
-		this( scope, referencedEntityName, null, lazy, true, false, false, false );
+		this( scope, referencedEntityName, true, null, lazy, true, false, false );
 	}
 
+
+	/**
+	 * @deprecated Use {@link #ManyToOneType(TypeFactory.TypeScope, String, boolean, String, boolean, boolean, boolean, boolean ) } instead.
+	 */
+	@Deprecated
 	public ManyToOneType(
 			TypeFactory.TypeScope scope,
 			String referencedEntityName,
@@ -78,7 +84,35 @@ public class ManyToOneType extends EntityType {
 			boolean isEmbeddedInXML,
 			boolean ignoreNotFound,
 			boolean isLogicalOneToOne) {
-		super( scope, referencedEntityName, uniqueKeyPropertyName, !lazy, isEmbeddedInXML, unwrapProxy );
+		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
+	}
+
+	/**
+	 * @deprecated Use {@link #ManyToOneType(TypeFactory.TypeScope, String, boolean, String, boolean, boolean, boolean, boolean ) } instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
+	public ManyToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		this( scope, referencedEntityName, uniqueKeyPropertyName == null, uniqueKeyPropertyName, lazy, unwrapProxy, ignoreNotFound, isLogicalOneToOne );
+	}
+
+	public ManyToOneType(
+			TypeFactory.TypeScope scope,
+			String referencedEntityName,
+			boolean referenceToPrimaryKey,
+			String uniqueKeyPropertyName,
+			boolean lazy,
+			boolean unwrapProxy,
+			boolean ignoreNotFound,
+			boolean isLogicalOneToOne) {
+		super( scope, referencedEntityName, referenceToPrimaryKey, uniqueKeyPropertyName, !lazy, unwrapProxy );
 		this.ignoreNotFound = ignoreNotFound;
 		this.isLogicalOneToOne = isLogicalOneToOne;
 	}
@@ -112,6 +146,16 @@ public class ManyToOneType extends EntityType {
 		return getIdentifierOrUniqueKeyType( mapping ).sqlTypes( mapping );
 	}
 
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		return getIdentifierOrUniqueKeyType( mapping ).dictatedSizes( mapping );
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		return getIdentifierOrUniqueKeyType( mapping ).defaultSizes( mapping );
+	}
+
 	public void nullSafeSet(
 			PreparedStatement st,
 			Object value,
@@ -143,7 +187,7 @@ public class ManyToOneType extends EntityType {
 		// return the (fully resolved) identifier value, but do not resolve
 		// to the actual referenced entity instance
 		// NOTE: the owner of the association is not really the owner of the id!
-		Serializable id = (Serializable) getIdentifierOrUniqueKeyType( session.getFactory() )
+		final Serializable id = (Serializable) getIdentifierOrUniqueKeyType( session.getFactory() )
 				.nullSafeGet( rs, names, session, null );
 		scheduleBatchLoadIfNeeded( id, session );
 		return id;
@@ -156,14 +200,16 @@ public class ManyToOneType extends EntityType {
 	private void scheduleBatchLoadIfNeeded(Serializable id, SessionImplementor session) throws MappingException {
 		//cannot batch fetch by unique key (property-ref associations)
 		if ( uniqueKeyPropertyName == null && id != null ) {
-			EntityPersister persister = session.getFactory().getEntityPersister( getAssociatedEntityName() );
-			EntityKey entityKey = new EntityKey( id, persister, session.getEntityMode() );
-			if ( !session.getPersistenceContext().containsEntity( entityKey ) ) {
-				session.getPersistenceContext().getBatchFetchQueue().addBatchLoadableEntityKey( entityKey );
+			final EntityPersister persister = getAssociatedEntityPersister( session.getFactory() );
+			if ( persister.isBatchLoadable() ) {
+				final EntityKey entityKey = session.generateEntityKey( id, persister );
+				if ( !session.getPersistenceContext().containsEntity( entityKey ) ) {
+					session.getPersistenceContext().getBatchFetchQueue().addBatchLoadableEntityKey( entityKey );
+				}
 			}
 		}
 	}
-	
+
 	public boolean useLHSPrimaryKey() {
 		return false;
 	}
@@ -200,9 +246,9 @@ public class ManyToOneType extends EntityType {
 		else {
 			// cache the actual id of the object, not the value of the
 			// property-ref, which might not be initialized
-			Object id = ForeignKeys.getEntityIdentifierIfNotUnsaved( 
-					getAssociatedEntityName(), 
-					value, 
+			Object id = ForeignKeys.getEntityIdentifierIfNotUnsaved(
+					getAssociatedEntityName(),
+					value,
 					session
 			);
 			if ( id == null ) {
@@ -258,7 +304,7 @@ public class ManyToOneType extends EntityType {
 			Object old,
 			Object current,
 			SessionImplementor session) throws HibernateException {
-		if ( isSame( old, current, session.getEntityMode() ) ) {
+		if ( isSame( old, current ) ) {
 			return false;
 		}
 		Object oldid = getIdentifier( old, session );
@@ -275,7 +321,7 @@ public class ManyToOneType extends EntityType {
 			return isDirty( old, current, session );
 		}
 		else {
-			if ( isSame( old, current, session.getEntityMode() ) ) {
+			if ( isSame( old, current ) ) {
 				return false;
 			}
 			Object oldid = getIdentifier( old, session );

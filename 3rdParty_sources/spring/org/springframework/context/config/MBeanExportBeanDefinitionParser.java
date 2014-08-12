@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.JdkVersion;
-import org.springframework.jmx.support.MBeanRegistrationSupport;
+import org.springframework.jmx.export.annotation.AnnotationMBeanExporter;
+import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.StringUtils;
 
 /**
@@ -54,20 +54,19 @@ class MBeanExportBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	private static final String REGISTRATION_REPLACE_EXISTING = "replaceExisting";
 
 
+	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
 		return MBEAN_EXPORTER_BEAN_NAME;
 	}
 
+	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		String beanClassName = (JdkVersion.isAtLeastJava15() ?
-				"org.springframework.jmx.export.annotation.AnnotationMBeanExporter" :
-				"org.springframework.jmx.export.MBeanExporter");
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(beanClassName);
-		
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(AnnotationMBeanExporter.class);
+
 		// Mark as infrastructure bean and attach source location.
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
-		
+
 		String defaultDomain = element.getAttribute(DEFAULT_DOMAIN_ATTRIBUTE);
 		if (StringUtils.hasText(defaultDomain)) {
 			builder.addPropertyValue("defaultDomain", defaultDomain);
@@ -85,14 +84,14 @@ class MBeanExportBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		}
 
 		String registration = element.getAttribute(REGISTRATION_ATTRIBUTE);
-		int registrationBehavior = MBeanRegistrationSupport.REGISTRATION_FAIL_ON_EXISTING;
+		RegistrationPolicy registrationPolicy = RegistrationPolicy.FAIL_ON_EXISTING;
 		if (REGISTRATION_IGNORE_EXISTING.equals(registration)) {
-			registrationBehavior = MBeanRegistrationSupport.REGISTRATION_IGNORE_EXISTING;
+			registrationPolicy = RegistrationPolicy.IGNORE_EXISTING;
 		}
 		else if (REGISTRATION_REPLACE_EXISTING.equals(registration)) {
-			registrationBehavior = MBeanRegistrationSupport.REGISTRATION_REPLACE_EXISTING;
+			registrationPolicy = RegistrationPolicy.REPLACE_EXISTING;
 		}
-		builder.addPropertyValue("registrationBehavior", new Integer(registrationBehavior));
+		builder.addPropertyValue("registrationPolicy", registrationPolicy);
 
 		return builder.getBeanDefinition();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.transaction.interceptor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,13 +30,14 @@ import org.apache.commons.logging.LogFactory;
  * both positive and negative. If no rules are relevant to the exception, it
  * behaves like DefaultTransactionAttribute (rolling back on runtime exceptions).
  *
- * <p>TransactionAttributeEditor creates objects of this class.
+ * <p>{@link TransactionAttributeEditor} creates objects of this class.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 09.04.2003
  * @see TransactionAttributeEditor
  */
+@SuppressWarnings("serial")
 public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute implements Serializable {
 
 	/** Prefix for rollback-on-exception rules in description strings */
@@ -50,7 +50,7 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 	/** Static for optimal serializability */
 	private static final Log logger = LogFactory.getLog(RuleBasedTransactionAttribute.class);
 
-	private List rollbackRules;
+	private List<RollbackRuleAttribute> rollbackRules;
 
 
 	/**
@@ -78,7 +78,7 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 	 */
 	public RuleBasedTransactionAttribute(RuleBasedTransactionAttribute other) {
 		super(other);
-		this.rollbackRules = new ArrayList(other.rollbackRules);
+		this.rollbackRules = new ArrayList<RollbackRuleAttribute>(other.rollbackRules);
 	}
 
 	/**
@@ -91,29 +91,29 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 	 * @see #setTimeout
 	 * @see #setReadOnly
 	 */
-	public RuleBasedTransactionAttribute(int propagationBehavior, List rollbackRules) {
+	public RuleBasedTransactionAttribute(int propagationBehavior, List<RollbackRuleAttribute> rollbackRules) {
 		super(propagationBehavior);
 		this.rollbackRules = rollbackRules;
 	}
 
 
 	/**
-	 * Set the list of <code>RollbackRuleAttribute</code> objects
-	 * (and/or <code>NoRollbackRuleAttribute</code> objects) to apply.
+	 * Set the list of {@code RollbackRuleAttribute} objects
+	 * (and/or {@code NoRollbackRuleAttribute} objects) to apply.
 	 * @see RollbackRuleAttribute
 	 * @see NoRollbackRuleAttribute
 	 */
-	public void setRollbackRules(List rollbackRules) {
+	public void setRollbackRules(List<RollbackRuleAttribute> rollbackRules) {
 		this.rollbackRules = rollbackRules;
 	}
 
 	/**
-	 * Return the list of <code>RollbackRuleAttribute</code> objects
-	 * (never <code>null</code>).
+	 * Return the list of {@code RollbackRuleAttribute} objects
+	 * (never {@code null}).
 	 */
-	public List getRollbackRules() {
+	public List<RollbackRuleAttribute> getRollbackRules() {
 		if (this.rollbackRules == null) {
-			this.rollbackRules = new LinkedList();
+			this.rollbackRules = new LinkedList<RollbackRuleAttribute>();
 		}
 		return this.rollbackRules;
 	}
@@ -125,6 +125,7 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 	 * return false.
 	 * @see TransactionAttribute#rollbackOn(java.lang.Throwable)
 	 */
+	@Override
 	public boolean rollbackOn(Throwable ex) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Applying rules to determine whether transaction should rollback on " + ex);
@@ -134,8 +135,7 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 		int deepest = Integer.MAX_VALUE;
 
 		if (this.rollbackRules != null) {
-			for (Iterator it = this.rollbackRules.iterator(); it.hasNext();) {
-				RollbackRuleAttribute rule = (RollbackRuleAttribute) it.next();
+			for (RollbackRuleAttribute rule : this.rollbackRules) {
 				int depth = rule.getDepth(ex);
 				if (depth >= 0 && depth < deepest) {
 					deepest = depth;
@@ -153,16 +153,16 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 			logger.trace("No relevant rollback rule found: applying default rules");
 			return super.rollbackOn(ex);
 		}
-			
+
 		return !(winner instanceof NoRollbackRuleAttribute);
 	}
 
 
+	@Override
 	public String toString() {
-		StringBuffer result = getDefinitionDescription();
+		StringBuilder result = getAttributeDescription();
 		if (this.rollbackRules != null) {
-			for (Iterator it = this.rollbackRules.iterator(); it.hasNext();) {
-				RollbackRuleAttribute rule = (RollbackRuleAttribute) it.next();
+			for (RollbackRuleAttribute rule : this.rollbackRules) {
 				String sign = (rule instanceof NoRollbackRuleAttribute ? PREFIX_COMMIT_RULE : PREFIX_ROLLBACK_RULE);
 				result.append(',').append(sign).append(rule.getExceptionName());
 			}

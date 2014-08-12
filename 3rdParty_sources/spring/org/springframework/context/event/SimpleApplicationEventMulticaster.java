@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,18 @@
 
 package org.springframework.context.event;
 
-import java.util.Iterator;
+import java.util.concurrent.Executor;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 
 /**
  * Simple implementation of the {@link ApplicationEventMulticaster} interface.
  *
  * <p>Multicasts all events to all registered listeners, leaving it up to
  * the listeners to ignore events that they are not interested in.
- * Listeners will usually perform corresponding <code>instanceof</code>
+ * Listeners will usually perform corresponding {@code instanceof}
  * checks on the passed-in event object.
  *
  * <p>By default, all listeners are invoked in the calling thread.
@@ -39,11 +38,24 @@ import org.springframework.core.task.TaskExecutor;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #setTaskExecutor
- * @see #setConcurrentUpdates
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
-	private TaskExecutor taskExecutor = new SyncTaskExecutor();
+	private Executor taskExecutor;
+
+
+	/**
+	 * Create a new SimpleApplicationEventMulticaster.
+	 */
+	public SimpleApplicationEventMulticaster() {
+	}
+
+	/**
+	 * Create a new SimpleApplicationEventMulticaster for the given BeanFactory.
+	 */
+	public SimpleApplicationEventMulticaster(BeanFactory beanFactory) {
+		setBeanFactory(beanFactory);
+	}
 
 
 	/**
@@ -56,28 +68,35 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * transaction association) unless the TaskExecutor explicitly supports this.
 	 * @see org.springframework.core.task.SyncTaskExecutor
 	 * @see org.springframework.core.task.SimpleAsyncTaskExecutor
-	 * @see org.springframework.scheduling.timer.TimerTaskExecutor
 	 */
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		this.taskExecutor = (taskExecutor != null ? taskExecutor : new SyncTaskExecutor());
+	public void setTaskExecutor(Executor taskExecutor) {
+		this.taskExecutor = taskExecutor;
 	}
 
 	/**
 	 * Return the current TaskExecutor for this multicaster.
 	 */
-	protected TaskExecutor getTaskExecutor() {
+	protected Executor getTaskExecutor() {
 		return this.taskExecutor;
 	}
 
 
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void multicastEvent(final ApplicationEvent event) {
-		for (Iterator it = getApplicationListeners().iterator(); it.hasNext();) {
-			final ApplicationListener listener = (ApplicationListener) it.next();
-			getTaskExecutor().execute(new Runnable() {
-				public void run() {
-					listener.onApplicationEvent(event);
-				}
-			});
+		for (final ApplicationListener listener : getApplicationListeners(event)) {
+			Executor executor = getTaskExecutor();
+			if (executor != null) {
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						listener.onApplicationEvent(event);
+					}
+				});
+			}
+			else {
+				listener.onApplicationEvent(event);
+			}
 		}
 	}
 

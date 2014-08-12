@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,24 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.HashMap;
+import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.core.JdkVersion;
+import org.springframework.core.SpringProperties;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Internal class that caches JavaBeans {@link java.beans.PropertyDescriptor}
@@ -49,6 +53,18 @@ import org.springframework.util.ClassUtils;
  * implements the factory design pattern, using a private constructor and
  * a static {@link #forClass(Class)} factory method to obtain instances.
  *
+ * <p>Note that for caching to work effectively, some preconditions need to be met:
+ * Prefer an arrangement where the Spring jars live in the same ClassLoader as the
+ * application classes, which allows for clean caching along with the application's
+ * lifecycle in any case. For a web application, consider declaring a local
+ * {@link org.springframework.web.util.IntrospectorCleanupListener} in {@code web.xml}
+ * in case of a multi-ClassLoader layout, which will allow for effective caching as well.
+ *
+ * <p>In case of a non-clean ClassLoader arrangement without a cleanup listener having
+ * been set up, this class will fall back to a weak-reference-based caching model that
+ * recreates much-requested entries every time the garbage collector removed them. In
+ * such a scenario, consider the {@link #IGNORE_BEANINFO_PROPERTY_NAME} system property.
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 05 May 2001
@@ -58,20 +74,47 @@ import org.springframework.util.ClassUtils;
  */
 public class CachedIntrospectionResults {
 
+	/**
+	 * System property that instructs Spring to use the {@link Introspector#IGNORE_ALL_BEANINFO}
+	 * mode when calling the JavaBeans {@link Introspector}: "spring.beaninfo.ignore", with a
+	 * value of "true" skipping the search for {@code BeanInfo} classes (typically for scenarios
+	 * where no such classes are being defined for beans in the application in the first place).
+	 * <p>The default is "false", considering all {@code BeanInfo} metadata classes, like for
+	 * standard {@link Introspector#getBeanInfo(Class)} calls. Consider switching this flag to
+	 * "true" if you experience repeated ClassLoader access for non-existing {@code BeanInfo}
+	 * classes, in case such access is expensive on startup or on lazy loading.
+	 * <p>Note that such an effect may also indicate a scenario where caching doesn't work
+	 * effectively: Prefer an arrangement where the Spring jars live in the same ClassLoader
+	 * as the application classes, which allows for clean caching along with the application's
+	 * lifecycle in any case. For a web application, consider declaring a local
+	 * {@link org.springframework.web.util.IntrospectorCleanupListener} in {@code web.xml}
+	 * in case of a multi-ClassLoader layout, which will allow for effective caching as well.
+	 * @see Introspector#getBeanInfo(Class, int)
+	 */
+	public static final String IGNORE_BEANINFO_PROPERTY_NAME = "spring.beaninfo.ignore";
+
+
+	private static final boolean shouldIntrospectorIgnoreBeaninfoClasses =
+			SpringProperties.getFlag(IGNORE_BEANINFO_PROPERTY_NAME);
+
+	/** Stores the BeanInfoFactory instances */
+	private static List<BeanInfoFactory> beanInfoFactories = SpringFactoriesLoader.loadFactories(
+			BeanInfoFactory.class, CachedIntrospectionResults.class.getClassLoader());
+
 	private static final Log logger = LogFactory.getLog(CachedIntrospectionResults.class);
 
 	/**
 	 * Set of ClassLoaders that this CachedIntrospectionResults class will always
 	 * accept classes from, even if the classes do not qualify as cache-safe.
 	 */
-	static final Set acceptedClassLoaders = Collections.synchronizedSet(new HashSet());
+	static final Set<ClassLoader> acceptedClassLoaders = new HashSet<ClassLoader>();
 
 	/**
 	 * Map keyed by class containing CachedIntrospectionResults.
 	 * Needs to be a WeakHashMap with WeakReferences as values to allow
 	 * for proper garbage collection in case of multiple class loaders.
 	 */
-	static final Map classCache = Collections.synchronizedMap(new WeakHashMap());
+	static final Map<Class<?>, Object> classCache = new WeakHashMap<Class<?>, Object>();
 
 
 	/**
@@ -82,38 +125,36 @@ public class CachedIntrospectionResults {
 	 * whose lifecycle is not coupled to the application. In such a scenario,
 	 * CachedIntrospectionResults would by default not cache any of the application's
 	 * classes, since they would create a leak in the common ClassLoader.
-	 * <p>Any <code>acceptClassLoader</code> call at application startup should
+	 * <p>Any {@code acceptClassLoader} call at application startup should
 	 * be paired with a {@link #clearClassLoader} call at application shutdown.
 	 * @param classLoader the ClassLoader to accept
 	 */
 	public static void acceptClassLoader(ClassLoader classLoader) {
 		if (classLoader != null) {
-			acceptedClassLoaders.add(classLoader);
+			synchronized (acceptedClassLoaders) {
+				acceptedClassLoaders.add(classLoader);
+			}
 		}
 	}
 
 	/**
 	 * Clear the introspection cache for the given ClassLoader, removing the
-	 * introspection results for all classes underneath that ClassLoader,
-	 * and deregistering the ClassLoader (and any of its children) from the
-	 * acceptance list.
+	 * introspection results for all classes underneath that ClassLoader, and
+	 * removing the ClassLoader (and its children) from the acceptance list.
 	 * @param classLoader the ClassLoader to clear the cache for
 	 */
 	public static void clearClassLoader(ClassLoader classLoader) {
-		if (classLoader == null) {
-			return;
-		}
 		synchronized (classCache) {
-			for (Iterator it = classCache.keySet().iterator(); it.hasNext();) {
-				Class beanClass = (Class) it.next();
+			for (Iterator<Class<?>> it = classCache.keySet().iterator(); it.hasNext();) {
+				Class<?> beanClass = it.next();
 				if (isUnderneathClassLoader(beanClass.getClassLoader(), classLoader)) {
 					it.remove();
 				}
 			}
 		}
 		synchronized (acceptedClassLoaders) {
-			for (Iterator it = acceptedClassLoaders.iterator(); it.hasNext();) {
-				ClassLoader registeredLoader = (ClassLoader) it.next();
+			for (Iterator<ClassLoader> it = acceptedClassLoaders.iterator(); it.hasNext();) {
+				ClassLoader registeredLoader = it.next();
 				if (isUnderneathClassLoader(registeredLoader, classLoader)) {
 					it.remove();
 				}
@@ -123,34 +164,40 @@ public class CachedIntrospectionResults {
 
 	/**
 	 * Create CachedIntrospectionResults for the given bean class.
-	 * <P>We don't want to use synchronization here. Object references are atomic,
-	 * so we can live with doing the occasional unnecessary lookup at startup only.
 	 * @param beanClass the bean class to analyze
 	 * @return the corresponding CachedIntrospectionResults
 	 * @throws BeansException in case of introspection failure
 	 */
-	static CachedIntrospectionResults forClass(Class beanClass) throws BeansException {
-		CachedIntrospectionResults results = null;
-		Object value = classCache.get(beanClass);
+	@SuppressWarnings("unchecked")
+	static CachedIntrospectionResults forClass(Class<?> beanClass) throws BeansException {
+		CachedIntrospectionResults results;
+		Object value;
+		synchronized (classCache) {
+			value = classCache.get(beanClass);
+		}
 		if (value instanceof Reference) {
-			Reference ref = (Reference) value;
-			results = (CachedIntrospectionResults) ref.get();
+			Reference<CachedIntrospectionResults> ref = (Reference<CachedIntrospectionResults>) value;
+			results = ref.get();
 		}
 		else {
 			results = (CachedIntrospectionResults) value;
 		}
 		if (results == null) {
-			// can throw BeansException
-			results = new CachedIntrospectionResults(beanClass);
 			if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
 					isClassLoaderAccepted(beanClass.getClassLoader())) {
-				classCache.put(beanClass, results);
+				results = new CachedIntrospectionResults(beanClass);
+				synchronized (classCache) {
+					classCache.put(beanClass, results);
+				}
 			}
 			else {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Not strongly caching class [" + beanClass.getName() + "] because it is not cache-safe");
 				}
-				classCache.put(beanClass, new WeakReference(results));
+				results = new CachedIntrospectionResults(beanClass);
+				synchronized (classCache) {
+					classCache.put(beanClass, new SoftReference<CachedIntrospectionResults>(results));
+				}
 			}
 		}
 		return results;
@@ -166,10 +213,12 @@ public class CachedIntrospectionResults {
 	private static boolean isClassLoaderAccepted(ClassLoader classLoader) {
 		// Iterate over array copy in order to avoid synchronization for the entire
 		// ClassLoader check (avoiding a synchronized acceptedClassLoaders Iterator).
-		Object[] acceptedLoaderArray = acceptedClassLoaders.toArray();
-		for (int i = 0; i < acceptedLoaderArray.length; i++) {
-			ClassLoader registeredLoader = (ClassLoader) acceptedLoaderArray[i];
-			if (isUnderneathClassLoader(classLoader, registeredLoader)) {
+		ClassLoader[] acceptedLoaderArray;
+		synchronized (acceptedClassLoaders) {
+			acceptedLoaderArray = acceptedClassLoaders.toArray(new ClassLoader[acceptedClassLoaders.size()]);
+		}
+		for (ClassLoader acceptedLoader : acceptedLoaderArray) {
+			if (isUnderneathClassLoader(classLoader, acceptedLoader)) {
 				return true;
 			}
 		}
@@ -183,11 +232,11 @@ public class CachedIntrospectionResults {
 	 * @param parent the parent ClassLoader to check for
 	 */
 	private static boolean isUnderneathClassLoader(ClassLoader candidate, ClassLoader parent) {
-		if (candidate == null) {
-			return false;
-		}
 		if (candidate == parent) {
 			return true;
+		}
+		if (candidate == null) {
+			return false;
 		}
 		ClassLoader classLoaderToCheck = candidate;
 		while (classLoaderToCheck != null) {
@@ -204,7 +253,10 @@ public class CachedIntrospectionResults {
 	private final BeanInfo beanInfo;
 
 	/** PropertyDescriptor objects keyed by property name String */
-	private final Map propertyDescriptorCache;
+	private final Map<String, PropertyDescriptor> propertyDescriptorCache;
+
+	/** TypeDescriptor objects keyed by PropertyDescriptor */
+	private final Map<PropertyDescriptor, TypeDescriptor> typeDescriptorCache;
 
 
 	/**
@@ -212,49 +264,54 @@ public class CachedIntrospectionResults {
 	 * @param beanClass the bean class to analyze
 	 * @throws BeansException in case of introspection failure
 	 */
-	private CachedIntrospectionResults(Class beanClass) throws BeansException {
+	private CachedIntrospectionResults(Class<?> beanClass) throws BeansException {
 		try {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Getting BeanInfo for class [" + beanClass.getName() + "]");
 			}
-			this.beanInfo = Introspector.getBeanInfo(beanClass);
 
-			// Immediately remove class from Introspector cache, to allow for proper
-			// garbage collection on class loader shutdown - we cache it here anyway,
-			// in a GC-friendly manner. In contrast to CachedIntrospectionResults,
-			// Introspector does not use WeakReferences as values of its WeakHashMap!
-			Class classToFlush = beanClass;
-			do {
-				Introspector.flushFromCaches(classToFlush);
-				classToFlush = classToFlush.getSuperclass();
+			BeanInfo beanInfo = null;
+			for (BeanInfoFactory beanInfoFactory : beanInfoFactories) {
+				beanInfo = beanInfoFactory.getBeanInfo(beanClass);
+				if (beanInfo != null) {
+					break;
+				}
 			}
-			while (classToFlush != null);
+			if (beanInfo == null) {
+				// If none of the factories supported the class, fall back to the default
+				beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
+						Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
+						Introspector.getBeanInfo(beanClass));
+			}
+			this.beanInfo = beanInfo;
 
 			if (logger.isTraceEnabled()) {
 				logger.trace("Caching PropertyDescriptors for class [" + beanClass.getName() + "]");
 			}
-			this.propertyDescriptorCache = new HashMap();
+			this.propertyDescriptorCache = new LinkedHashMap<String, PropertyDescriptor>();
 
 			// This call is slow so we do it once.
 			PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
-			for (int i = 0; i < pds.length; i++) {
-				PropertyDescriptor pd = pds[i];
+			for (PropertyDescriptor pd : pds) {
+				if (Class.class.equals(beanClass) &&
+						("classLoader".equals(pd.getName()) ||  "protectionDomain".equals(pd.getName()))) {
+					// Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
+					continue;
+				}
 				if (logger.isTraceEnabled()) {
 					logger.trace("Found bean property '" + pd.getName() + "'" +
-							(pd.getPropertyType() != null ?
-							" of type [" + pd.getPropertyType().getName() + "]" : "") +
+							(pd.getPropertyType() != null ? " of type [" + pd.getPropertyType().getName() + "]" : "") +
 							(pd.getPropertyEditorClass() != null ?
-							"; editor [" + pd.getPropertyEditorClass().getName() + "]" : ""));
+									"; editor [" + pd.getPropertyEditorClass().getName() + "]" : ""));
 				}
-				if (JdkVersion.isAtLeastJava15()) {
-					pd = new GenericTypeAwarePropertyDescriptor(beanClass, pd.getName(),
-							pd.getReadMethod(), pd.getWriteMethod(), pd.getPropertyEditorClass());
-				}
+				pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
 				this.propertyDescriptorCache.put(pd.getName(), pd);
 			}
+
+			this.typeDescriptorCache = new ConcurrentHashMap<PropertyDescriptor, TypeDescriptor>();
 		}
 		catch (IntrospectionException ex) {
-			throw new FatalBeanException("Cannot get BeanInfo for object of class [" + beanClass.getName() + "]", ex);
+			throw new FatalBeanException("Failed to obtain BeanInfo for class [" + beanClass.getName() + "]", ex);
 		}
 	}
 
@@ -262,12 +319,50 @@ public class CachedIntrospectionResults {
 		return this.beanInfo;
 	}
 
-	Class getBeanClass() {
+	Class<?> getBeanClass() {
 		return this.beanInfo.getBeanDescriptor().getBeanClass();
 	}
 
-	PropertyDescriptor getPropertyDescriptor(String propertyName) {
-		return (PropertyDescriptor) this.propertyDescriptorCache.get(propertyName);
+	PropertyDescriptor getPropertyDescriptor(String name) {
+		PropertyDescriptor pd = this.propertyDescriptorCache.get(name);
+		if (pd == null && StringUtils.hasLength(name)) {
+			// Same lenient fallback checking as in PropertyTypeDescriptor...
+			pd = this.propertyDescriptorCache.get(name.substring(0, 1).toLowerCase() + name.substring(1));
+			if (pd == null) {
+				pd = this.propertyDescriptorCache.get(name.substring(0, 1).toUpperCase() + name.substring(1));
+			}
+		}
+		return (pd == null || pd instanceof GenericTypeAwarePropertyDescriptor ? pd :
+				buildGenericTypeAwarePropertyDescriptor(getBeanClass(), pd));
+	}
+
+	PropertyDescriptor[] getPropertyDescriptors() {
+		PropertyDescriptor[] pds = new PropertyDescriptor[this.propertyDescriptorCache.size()];
+		int i = 0;
+		for (PropertyDescriptor pd : this.propertyDescriptorCache.values()) {
+			pds[i] = (pd instanceof GenericTypeAwarePropertyDescriptor ? pd :
+					buildGenericTypeAwarePropertyDescriptor(getBeanClass(), pd));
+			i++;
+		}
+		return pds;
+	}
+
+	private PropertyDescriptor buildGenericTypeAwarePropertyDescriptor(Class<?> beanClass, PropertyDescriptor pd) {
+		try {
+			return new GenericTypeAwarePropertyDescriptor(beanClass, pd.getName(), pd.getReadMethod(),
+					pd.getWriteMethod(), pd.getPropertyEditorClass());
+		}
+		catch (IntrospectionException ex) {
+			throw new FatalBeanException("Failed to re-introspect class [" + beanClass.getName() + "]", ex);
+		}
+	}
+
+	void addTypeDescriptor(PropertyDescriptor pd, TypeDescriptor td) {
+		this.typeDescriptorCache.put(pd, td);
+	}
+
+	TypeDescriptor getTypeDescriptor(PropertyDescriptor pd) {
+		return this.typeDescriptorCache.get(pd);
 	}
 
 }

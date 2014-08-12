@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,6 +37,7 @@ import org.springframework.util.StringValueResolver;
  * contained in a BeanDefinition, resolving any placeholders found.
  *
  * @author Juergen Hoeller
+ * @author Sam Brannen
  * @since 1.2
  * @see BeanDefinition
  * @see BeanDefinition#getPropertyValues
@@ -116,7 +116,7 @@ public class BeanDefinitionVisitor {
 	}
 
 	protected void visitFactoryMethodName(BeanDefinition beanDefinition) {
-		String factoryMethodName = beanDefinition.getFactoryBeanName();
+		String factoryMethodName = beanDefinition.getFactoryMethodName();
 		if (factoryMethodName != null) {
 			String resolvedName = resolveStringValue(factoryMethodName);
 			if (!factoryMethodName.equals(resolvedName)) {
@@ -137,19 +137,16 @@ public class BeanDefinitionVisitor {
 
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
-		for (int i = 0; i < pvArray.length; i++) {
-			PropertyValue pv = pvArray[i];
+		for (PropertyValue pv : pvArray) {
 			Object newVal = resolveValue(pv.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, pv.getValue())) {
-				pvs.addPropertyValue(pv.getName(), newVal);
+				pvs.add(pv.getName(), newVal);
 			}
 		}
 	}
 
-	protected void visitIndexedArgumentValues(Map ias) {
-		for (Iterator it = ias.values().iterator(); it.hasNext();) {
-			ConstructorArgumentValues.ValueHolder valueHolder =
-					(ConstructorArgumentValues.ValueHolder) it.next();
+	protected void visitIndexedArgumentValues(Map<Integer, ConstructorArgumentValues.ValueHolder> ias) {
+		for (ConstructorArgumentValues.ValueHolder valueHolder : ias.values()) {
 			Object newVal = resolveValue(valueHolder.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, valueHolder.getValue())) {
 				valueHolder.setValue(newVal);
@@ -157,10 +154,8 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
-	protected void visitGenericArgumentValues(List gas) {
-		for (Iterator it = gas.iterator(); it.hasNext();) {
-			ConstructorArgumentValues.ValueHolder valueHolder =
-					(ConstructorArgumentValues.ValueHolder) it.next();
+	protected void visitGenericArgumentValues(List<ConstructorArgumentValues.ValueHolder> gas) {
+		for (ConstructorArgumentValues.ValueHolder valueHolder : gas) {
 			Object newVal = resolveValue(valueHolder.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, valueHolder.getValue())) {
 				valueHolder.setValue(newVal);
@@ -168,6 +163,7 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected Object resolveValue(Object value) {
 		if (value instanceof BeanDefinition) {
 			visitBeanDefinition((BeanDefinition) value);
@@ -176,11 +172,21 @@ public class BeanDefinitionVisitor {
 			visitBeanDefinition(((BeanDefinitionHolder) value).getBeanDefinition());
 		}
 		else if (value instanceof RuntimeBeanReference) {
-      RuntimeBeanReference ref = (RuntimeBeanReference) value;
-      String newBeanName = resolveStringValue(ref.getBeanName());
+			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			String newBeanName = resolveStringValue(ref.getBeanName());
 			if (!newBeanName.equals(ref.getBeanName())) {
 				return new RuntimeBeanReference(newBeanName);
 			}
+		}
+		else if (value instanceof RuntimeBeanNameReference) {
+			RuntimeBeanNameReference ref = (RuntimeBeanNameReference) value;
+			String newBeanName = resolveStringValue(ref.getBeanName());
+			if (!newBeanName.equals(ref.getBeanName())) {
+				return new RuntimeBeanNameReference(newBeanName);
+			}
+		}
+		else if (value instanceof Object[]) {
+			visitArray((Object[]) value);
 		}
 		else if (value instanceof List) {
 			visitList((List) value);
@@ -205,6 +211,17 @@ public class BeanDefinitionVisitor {
 		return value;
 	}
 
+	protected void visitArray(Object[] arrayVal) {
+		for (int i = 0; i < arrayVal.length; i++) {
+			Object elem = arrayVal[i];
+			Object newVal = resolveValue(elem);
+			if (!ObjectUtils.nullSafeEquals(newVal, elem)) {
+				arrayVal[i] = newVal;
+			}
+		}
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void visitList(List listVal) {
 		for (int i = 0; i < listVal.size(); i++) {
 			Object elem = listVal.get(i);
@@ -215,11 +232,11 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void visitSet(Set setVal) {
 		Set newContent = new LinkedHashSet();
 		boolean entriesModified = false;
-		for (Iterator it = setVal.iterator(); it.hasNext();) {
-			Object elem = it.next();
+		for (Object elem : setVal) {
 			int elemHash = (elem != null ? elem.hashCode() : 0);
 			Object newVal = resolveValue(elem);
 			int newValHash = (newVal != null ? newVal.hashCode() : 0);
@@ -232,11 +249,11 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
-	protected void visitMap(Map mapVal) {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	protected void visitMap(Map<?, ?> mapVal) {
 		Map newContent = new LinkedHashMap();
 		boolean entriesModified = false;
-		for (Iterator it = mapVal.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+		for (Map.Entry entry : mapVal.entrySet()) {
 			Object key = entry.getKey();
 			int keyHash = (key != null ? key.hashCode() : 0);
 			Object newKey = resolveValue(key);
@@ -262,7 +279,9 @@ public class BeanDefinitionVisitor {
 			throw new IllegalStateException("No StringValueResolver specified - pass a resolver " +
 					"object into the constructor or override the 'resolveStringValue' method");
 		}
-		return this.valueResolver.resolveStringValue(strVal);
+		String resolvedValue = this.valueResolver.resolveStringValue(strVal);
+		// Return original String if not modified.
+		return (strVal.equals(resolvedValue) ? strVal : resolvedValue);
 	}
 
 }

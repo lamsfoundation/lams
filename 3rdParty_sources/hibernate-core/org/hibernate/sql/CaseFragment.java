@@ -24,10 +24,10 @@
  */
 package org.hibernate.sql;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 /**
  * Abstract SQL case fragment renderer
@@ -51,7 +51,7 @@ public abstract class CaseFragment {
 	}
 
 	public CaseFragment addWhenColumnNotNull(String alias, String columnName, String value) {
-		cases.put( StringHelper.qualify(alias, columnName), value );
+		cases.put( StringHelper.qualify( alias, columnName ), value );
 		return this;
 	}
 }

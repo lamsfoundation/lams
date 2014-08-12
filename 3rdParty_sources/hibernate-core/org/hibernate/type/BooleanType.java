@@ -27,11 +27,10 @@ import java.io.Serializable;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.type.descriptor.java.BooleanTypeDescriptor;
-import org.hibernate.type.descriptor.sql.BitTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
- * A type that maps between {@link java.sql.Types#BIT BIT} and {@link Boolean}
+ * A type that maps between {@link java.sql.Types#BOOLEAN BOOLEAN} and {@link Boolean}
  *
  * @author Gavin King
  * @author Steve Ebersole
@@ -42,13 +41,13 @@ public class BooleanType
 	public static final BooleanType INSTANCE = new BooleanType();
 
 	public BooleanType() {
-		this( BitTypeDescriptor.INSTANCE, BooleanTypeDescriptor.INSTANCE );
+		this( org.hibernate.type.descriptor.sql.BooleanTypeDescriptor.INSTANCE, BooleanTypeDescriptor.INSTANCE );
 	}
 
 	protected BooleanType(SqlTypeDescriptor sqlTypeDescriptor, BooleanTypeDescriptor javaTypeDescriptor) {
 		super( sqlTypeDescriptor, javaTypeDescriptor );
 	}
-
+	@Override
 	public String getName() {
 		return "boolean";
 	}
@@ -57,22 +56,22 @@ public class BooleanType
 	public String[] getRegistrationKeys() {
 		return new String[] { getName(), boolean.class.getName(), Boolean.class.getName() };
 	}
-
+	@Override
 	public Class getPrimitiveClass() {
 		return boolean.class;
 	}
-
+	@Override
 	public Serializable getDefaultValue() {
 		return Boolean.FALSE;
 	}
-
+	@Override
 	public Boolean stringToObject(String string) {
 		return fromString( string );
 	}
 
-	@SuppressWarnings({ "UnnecessaryUnboxing" })
+	@Override
 	public String objectToSQLString(Boolean value, Dialect dialect) {
-		return dialect.toBooleanValueString( value.booleanValue() );
+		return dialect.toBooleanValueString( value );
 	}
 }
 

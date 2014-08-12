@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 
 /**
- * Support class for implementing custom {@link NamespaceHandler NamespaceHandlers}. Parsing and
- * decorating of individual {@link Node Nodes} is done via {@link BeanDefinitionParser} and
- * {@link BeanDefinitionDecorator} strategy interfaces respectively. Provides the
- * {@link #registerBeanDefinitionParser}, {@link #registerBeanDefinitionDecorator} methods
- * for registering a {@link BeanDefinitionParser} or {@link BeanDefinitionDecorator} to handle
- * a specific element.
+ * Support class for implementing custom {@link NamespaceHandler NamespaceHandlers}.
+ * Parsing and decorating of individual {@link Node Nodes} is done via {@link BeanDefinitionParser}
+ * and {@link BeanDefinitionDecorator} strategy interfaces, respectively.
+ *
+ * <p>Provides the {@link #registerBeanDefinitionParser} and {@link #registerBeanDefinitionDecorator}
+ * methods for registering a {@link BeanDefinitionParser} or {@link BeanDefinitionDecorator}
+ * to handle a specific element.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -46,26 +47,30 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * Stores the {@link BeanDefinitionParser} implementations keyed by the
 	 * local name of the {@link Element Elements} they handle.
 	 */
-	private final Map parsers = new HashMap();
+	private final Map<String, BeanDefinitionParser> parsers =
+			new HashMap<String, BeanDefinitionParser>();
 
 	/**
 	 * Stores the {@link BeanDefinitionDecorator} implementations keyed by the
 	 * local name of the {@link Element Elements} they handle.
 	 */
-	private final Map decorators = new HashMap();
+	private final Map<String, BeanDefinitionDecorator> decorators =
+			new HashMap<String, BeanDefinitionDecorator>();
 
 	/**
-	 * Stores the {@link BeanDefinitionParser} implementations keyed by the local
+	 * Stores the {@link BeanDefinitionDecorator} implementations keyed by the local
 	 * name of the {@link Attr Attrs} they handle.
 	 */
-	private final Map attributeDecorators = new HashMap();
+	private final Map<String, BeanDefinitionDecorator> attributeDecorators =
+			new HashMap<String, BeanDefinitionDecorator>();
 
 
 	/**
 	 * Parses the supplied {@link Element} by delegating to the {@link BeanDefinitionParser} that is
 	 * registered for that {@link Element}.
 	 */
-	public final BeanDefinition parse(Element element, ParserContext parserContext) {
+	@Override
+	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		return findParserForElement(element, parserContext).parse(element, parserContext);
 	}
 
@@ -74,24 +79,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * the local name of the supplied {@link Element}.
 	 */
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
-		BeanDefinitionParser parser = (BeanDefinitionParser) this.parsers.get(element.getLocalName());
+		String localName = parserContext.getDelegate().getLocalName(element);
+		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(
-					"Cannot locate BeanDefinitionParser for element [" + element.getLocalName() + "]", element);
-		}
-		return parser;
-	}
-
-	/**
-	 * Locate the {@link BeanDefinitionParser} from the register implementations using
-	 * the local name of the supplied {@link Element}.
-	 * @deprecated as of Spring 2.0.2; there should be no need to call this directly.
-	 */
-	protected final BeanDefinitionParser findParserForElement(Element element) {
-		BeanDefinitionParser parser = (BeanDefinitionParser) this.parsers.get(element.getLocalName());
-		if (parser == null) {
-			throw new IllegalStateException(
-					"Cannot locate BeanDefinitionParser for element [" + element.getLocalName() + "]");
+					"Cannot locate BeanDefinitionParser for element [" + localName + "]", element);
 		}
 		return parser;
 	}
@@ -100,7 +92,8 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * Decorates the supplied {@link Node} by delegating to the {@link BeanDefinitionDecorator} that
 	 * is registered to handle that {@link Node}.
 	 */
-	public final BeanDefinitionHolder decorate(
+	@Override
+	public BeanDefinitionHolder decorate(
 			Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 
 		return findDecoratorForNode(node, parserContext).decorate(node, definition, parserContext);
@@ -113,11 +106,12 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	private BeanDefinitionDecorator findDecoratorForNode(Node node, ParserContext parserContext) {
 		BeanDefinitionDecorator decorator = null;
+		String localName = parserContext.getDelegate().getLocalName(node);
 		if (node instanceof Element) {
-			decorator = (BeanDefinitionDecorator) this.decorators.get(node.getLocalName());
+			decorator = this.decorators.get(localName);
 		}
 		else if (node instanceof Attr) {
-			decorator = (BeanDefinitionDecorator) this.attributeDecorators.get(node.getLocalName());
+			decorator = this.attributeDecorators.get(localName);
 		}
 		else {
 			parserContext.getReaderContext().fatal(
@@ -125,32 +119,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 		}
 		if (decorator == null) {
 			parserContext.getReaderContext().fatal("Cannot locate BeanDefinitionDecorator for " +
-					(node instanceof Element ? "element" : "attribute") + " [" + node.getLocalName() + "]", node);
-		}
-		return decorator;
-	}
-
-	/**
-	 * Locate the {@link BeanDefinitionParser} from the register implementations using
-	 * the local name of the supplied {@link Node}. Supports both {@link Element Elements}
-	 * and {@link Attr Attrs}.
-	 * @deprecated as of Spring 2.0.2; there should be no need to call this directly.
-	 */
-	protected final BeanDefinitionDecorator findDecoratorForNode(Node node) {
-		BeanDefinitionDecorator decorator = null;
-		if (node instanceof Element) {
-			decorator = (BeanDefinitionDecorator) this.decorators.get(node.getLocalName());
-		}
-		else if (node instanceof Attr) {
-			decorator = (BeanDefinitionDecorator) this.attributeDecorators.get(node.getLocalName());
-		}
-		else {
-			throw new IllegalStateException(
-					"Cannot decorate based on Nodes of type [" + node.getClass().getName() + "]");
-		}
-		if (decorator == null) {
-			throw new IllegalStateException("Cannot locate BeanDefinitionDecorator for " +
-					(node instanceof Element ? "element" : "attribute") + " [" + node.getLocalName() + "]");
+					(node instanceof Element ? "element" : "attribute") + " [" + localName + "]", node);
 		}
 		return decorator;
 	}
@@ -170,8 +139,8 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * handle the specified element. The element name is the local (non-namespace qualified)
 	 * name.
 	 */
-	protected final void registerBeanDefinitionDecorator(String elementName, BeanDefinitionDecorator decorator) {
-		this.decorators.put(elementName, decorator);
+	protected final void registerBeanDefinitionDecorator(String elementName, BeanDefinitionDecorator dec) {
+		this.decorators.put(elementName, dec);
 	}
 
 	/**
@@ -179,10 +148,8 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * handle the specified attribute. The attribute name is the local (non-namespace qualified)
 	 * name.
 	 */
-	protected final void registerBeanDefinitionDecoratorForAttribute(
-			String attributeName, BeanDefinitionDecorator decorator) {
-
-		this.attributeDecorators.put(attributeName, decorator);
+	protected final void registerBeanDefinitionDecoratorForAttribute(String attrName, BeanDefinitionDecorator dec) {
+		this.attributeDecorators.put(attrName, dec);
 	}
 
 }

@@ -23,24 +23,24 @@
  *
  */
 package org.hibernate.tuple.entity;
-
 import java.io.Serializable;
 import java.util.Map;
 
-import org.hibernate.HibernateException;
-import org.hibernate.EntityNameResolver;
 import org.hibernate.EntityMode;
+import org.hibernate.EntityNameResolver;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.property.Getter;
 import org.hibernate.tuple.Tuplizer;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * Defines further responsibilities reagarding tuplization based on
  * a mapped entity.
  * <p/>
- * EntityTuplizer implementations should have the following constructor signature:
+ * EntityTuplizer implementations should have the following constructor signatures:
  *      (org.hibernate.tuple.entity.EntityMetamodel, org.hibernate.mapping.PersistentClass)
+ *      (org.hibernate.tuple.entity.EntityMetamodel, org.hibernate.metamodel.binding.EntityBinding)
  *
  * @author Gavin King
  * @author Steve Ebersole
@@ -61,8 +61,8 @@ public interface EntityTuplizer extends Tuplizer {
      * @throws HibernateException
 	 *
 	 * @deprecated Use {@link #instantiate(Serializable, SessionImplementor)} instead.
-	 * @noinspection JavaDoc
      */
+	@SuppressWarnings( {"JavaDoc"})
 	public Object instantiate(Serializable id) throws HibernateException;
 
     /**
@@ -108,8 +108,8 @@ public interface EntityTuplizer extends Tuplizer {
      * @param id The value to be injected as the identifier.
 	 *
 	 * @deprecated Use {@link #setIdentifier(Object, Serializable, SessionImplementor)} instead.
-	 * @noinspection JavaDoc
      */
+	@SuppressWarnings( {"JavaDoc"})
 	public void setIdentifier(Object entity, Serializable id) throws HibernateException;
 
     /**
@@ -133,6 +133,7 @@ public interface EntityTuplizer extends Tuplizer {
 	 *
 	 * @deprecated Use {@link #resetIdentifier(Object, Serializable, Object, SessionImplementor)} instead
 	 */
+	@SuppressWarnings( {"UnusedDeclaration"})
 	public void resetIdentifier(Object entity, Serializable currentId, Object currentVersion);
 
 	/**
@@ -151,7 +152,7 @@ public interface EntityTuplizer extends Tuplizer {
      *
      * @param entity The entity from which to extract the version value.
      * @return The value of the version property, or null if not versioned.
-     * @throws HibernateException
+	 * @throws HibernateException Indicates a problem accessing the version property
      */
 	public Object getVersion(Object entity) throws HibernateException;
 
@@ -161,7 +162,7 @@ public interface EntityTuplizer extends Tuplizer {
 	 * @param entity The entity into which to inject the value.
 	 * @param i The property's index.
 	 * @param value The property value to inject.
-	 * @throws HibernateException
+	 * @throws HibernateException Indicates a problem access the property
 	 */
 	public void setPropertyValue(Object entity, int i, Object value) throws HibernateException;
 
@@ -171,7 +172,7 @@ public interface EntityTuplizer extends Tuplizer {
 	 * @param entity The entity into which to inject the value.
 	 * @param propertyName The name of the property.
 	 * @param value The property value to inject.
-	 * @throws HibernateException
+	 * @throws HibernateException Indicates a problem access the property
 	 */
 	public void setPropertyValue(Object entity, String propertyName, Object value) throws HibernateException;
 
@@ -182,7 +183,7 @@ public interface EntityTuplizer extends Tuplizer {
 	 * @param mergeMap a map of instances being merged to merged instances
 	 * @param session The session in which the resuest is being made.
 	 * @return The insertable property values.
-	 * @throws HibernateException
+	 * @throws HibernateException Indicates a problem access the properties
 	 */
 	public Object[] getPropertyValuesToInsert(Object entity, Map mergeMap, SessionImplementor session)
 	throws HibernateException;
@@ -193,7 +194,7 @@ public interface EntityTuplizer extends Tuplizer {
 	 * @param entity The entity from which to extract the property value.
 	 * @param propertyName The name of the property for which to extract the value.
 	 * @return The current value of the given property on the given entity.
-	 * @throws HibernateException
+	 * @throws HibernateException Indicates a problem access the property
 	 */
 	public Object getPropertyValue(Object entity, String propertyName) throws HibernateException;
 
@@ -233,17 +234,9 @@ public interface EntityTuplizer extends Tuplizer {
 	public boolean isLifecycleImplementor();
 
 	/**
-	 * Does the {@link #getMappedClass() class} managed by this tuplizer implement
-	 * the {@link org.hibernate.classic.Validatable} interface.
-	 *
-	 * @return True if the Validatable interface is implemented; false otherwise.
-	 */
-	public boolean isValidatableImplementor();
-
-	/**
 	 * Returns the java class to which generated proxies will be typed.
 	 * <p/>
-	 * todo : look at fully encapsulating {@link org.hibernate.engine.PersistenceContext#narrowProxy} here,
+	 * todo : look at fully encapsulating {@link org.hibernate.engine.spi.PersistenceContext#narrowProxy} here,
 	 * since that is the only external use of this method
 	 *
 	 * @return The java class to which generated proxies will be typed
@@ -260,6 +253,8 @@ public interface EntityTuplizer extends Tuplizer {
 	
 	/**
 	 * Is it an instrumented POJO?
+	 *
+	 * @return {@code true} if the entity class is instrumented; {@code false} otherwise.
 	 */
 	public boolean isInstrumented();
 

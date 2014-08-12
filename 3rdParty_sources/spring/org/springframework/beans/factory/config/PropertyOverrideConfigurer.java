@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ package org.springframework.beans.factory.config;
 
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanInitializationException;
 
 /**
@@ -52,7 +53,7 @@ import org.springframework.beans.factory.BeanInitializationException;
  * the same bean property, the <i>last</i> one will win (due to the overriding mechanism).
  *
  * <p>Property values can be converted after reading them in, through overriding
- * the <code>convertPropertyValue</code> method. For example, encrypted values
+ * the {@code convertPropertyValue} method. For example, encrypted values
  * can be detected and decrypted accordingly before processing them.
  *
  * @author Juergen Hoeller
@@ -70,8 +71,10 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 
 	private boolean ignoreInvalidKeys = false;
 
-	/** Contains names of beans that have overrides */
-	private Set beanNames = Collections.synchronizedSet(new HashSet());
+	/**
+	 * Contains names of beans that have overrides
+	 */
+	private final Set<String> beanNames = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(16));
 
 
 	/**
@@ -84,19 +87,20 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 
 	/**
 	 * Set whether to ignore invalid keys. Default is "false".
-	 * <p>If you ignore invalid keys, keys that do not follow the
-	 * 'beanName.property' format will just be logged as warning.
-	 * This allows to have arbitrary other keys in a properties file.
+	 * <p>If you ignore invalid keys, keys that do not follow the 'beanName.property' format
+	 * (or refer to invalid bean names or properties) will just be logged at debug level.
+	 * This allows one to have arbitrary other keys in a properties file.
 	 */
 	public void setIgnoreInvalidKeys(boolean ignoreInvalidKeys) {
 		this.ignoreInvalidKeys = ignoreInvalidKeys;
 	}
 
 
+	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactory, Properties props)
 			throws BeansException {
 
-		for (Enumeration names = props.propertyNames(); names.hasMoreElements();) {
+		for (Enumeration<?> names = props.propertyNames(); names.hasMoreElements();) {
 			String key = (String) names.nextElement();
 			try {
 				processKey(beanFactory, key, props.getProperty(key));
@@ -137,13 +141,15 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	 * Apply the given property value to the corresponding bean.
 	 */
 	protected void applyPropertyValue(
-	    ConfigurableListableBeanFactory factory, String beanName, String property, String value) {
+			ConfigurableListableBeanFactory factory, String beanName, String property, String value) {
 
 		BeanDefinition bd = factory.getBeanDefinition(beanName);
 		while (bd.getOriginatingBeanDefinition() != null) {
 			bd = bd.getOriginatingBeanDefinition();
 		}
-		bd.getPropertyValues().addPropertyValue(property, value);
+		PropertyValue pv = new PropertyValue(property, value);
+		pv.setOptional(this.ignoreInvalidKeys);
+		bd.getPropertyValues().addPropertyValue(pv);
 	}
 
 

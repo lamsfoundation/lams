@@ -22,15 +22,17 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-
-import static java.lang.annotation.ElementType.*;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PACKAGE;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Generator annotation describing any kind of Hibernate
- * generator in a detyped manner
+ * Generator annotation describing any kind of Hibernate generator in a generic (de-typed) manner.
  *
  * @author Emmanuel Bernard
  */
@@ -38,16 +40,15 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface GenericGenerator {
 	/**
-	 * unique generator name
+	 * unique generator name.
 	 */
 	String name();
 	/**
-	 * Generator strategy either a predefined Hibernate
-	 * strategy or a fully qualified class name.
+	 * Generator strategy either a predefined Hibernate strategy or a fully qualified class name.
 	 */
 	String strategy();
 	/**
-	 * Optional generator parameters
+	 * Optional generator parameters.
 	 */
 	Parameter[] parameters() default {};
 }

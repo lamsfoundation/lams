@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ import org.springframework.util.ClassUtils;
  * <p>This is an SPI class, typically not used directly by applications.
  * Can be subclassed for additional invocation parameters.
  *
+ * <p>Both {@link RemoteInvocation} and {@link RemoteInvocationResult} are designed
+ * for use with standard Java serialization as well as JavaBean-style serialization.
+ *
  * @author Juergen Hoeller
  * @since 25.02.2004
  * @see RemoteInvocationResult
@@ -51,30 +54,12 @@ public class RemoteInvocation implements Serializable {
 
 	private String methodName;
 
-	private Class[] parameterTypes;
+	private Class<?>[] parameterTypes;
 
 	private Object[] arguments;
 
-	private Map attributes;
+	private Map<String, Serializable> attributes;
 
-
-	/**
-	 * Create a new RemoteInvocation for use as JavaBean.
-	 */
-	public RemoteInvocation() {
-	}
-
-	/**
-	 * Create a new RemoteInvocation for the given parameters.
-	 * @param methodName the name of the method to invoke
-	 * @param parameterTypes the parameter types of the method
-	 * @param arguments the arguments for the invocation
-	 */
-	public RemoteInvocation(String methodName, Class[] parameterTypes, Object[] arguments) {
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
-		this.arguments = arguments;
-	}
 
 	/**
 	 * Create a new RemoteInvocation for the given AOP method invocation.
@@ -86,9 +71,29 @@ public class RemoteInvocation implements Serializable {
 		this.arguments = methodInvocation.getArguments();
 	}
 
+	/**
+	 * Create a new RemoteInvocation for the given parameters.
+	 * @param methodName the name of the method to invoke
+	 * @param parameterTypes the parameter types of the method
+	 * @param arguments the arguments for the invocation
+	 */
+	public RemoteInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments) {
+		this.methodName = methodName;
+		this.parameterTypes = parameterTypes;
+		this.arguments = arguments;
+	}
+
+	/**
+	 * Create a new RemoteInvocation for JavaBean-style deserialization
+	 * (e.g. with Jackson).
+	 */
+	public RemoteInvocation() {
+	}
+
 
 	/**
 	 * Set the name of the target method.
+	 * <p>This setter is intended for JavaBean-style deserialization.
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
@@ -103,20 +108,22 @@ public class RemoteInvocation implements Serializable {
 
 	/**
 	 * Set the parameter types of the target method.
+	 * <p>This setter is intended for JavaBean-style deserialization.
 	 */
-	public void setParameterTypes(Class[] parameterTypes) {
+	public void setParameterTypes(Class<?>[] parameterTypes) {
 		this.parameterTypes = parameterTypes;
 	}
 
 	/**
 	 * Return the parameter types of the target method.
 	 */
-	public Class[] getParameterTypes() {
+	public Class<?>[] getParameterTypes() {
 		return this.parameterTypes;
 	}
 
 	/**
 	 * Set the arguments for the target method call.
+	 * <p>This setter is intended for JavaBean-style deserialization.
 	 */
 	public void setArguments(Object[] arguments) {
 		this.arguments = arguments;
@@ -143,7 +150,7 @@ public class RemoteInvocation implements Serializable {
 	 */
 	public void addAttribute(String key, Serializable value) throws IllegalStateException {
 		if (this.attributes == null) {
-			this.attributes = new HashMap();
+			this.attributes = new HashMap<String, Serializable>();
 		}
 		if (this.attributes.containsKey(key)) {
 			throw new IllegalStateException("There is already an attribute with key '" + key + "' bound");
@@ -156,13 +163,13 @@ public class RemoteInvocation implements Serializable {
 	 * <p>The implementation avoids to unnecessarily create the attributes
 	 * Map, to minimize serialization size.
 	 * @param key the attribute key
-	 * @return the attribute value, or <code>null</code> if not defined
+	 * @return the attribute value, or {@code null} if not defined
 	 */
 	public Serializable getAttribute(String key) {
 		if (this.attributes == null) {
 			return null;
 		}
-		return (Serializable) this.attributes.get(key);
+		return this.attributes.get(key);
 	}
 
 	/**
@@ -172,18 +179,18 @@ public class RemoteInvocation implements Serializable {
 	 * @see #addAttribute
 	 * @see #getAttribute
 	 */
-	public void setAttributes(Map attributes) {
+	public void setAttributes(Map<String, Serializable> attributes) {
 		this.attributes = attributes;
 	}
 
 	/**
 	 * Return the attributes Map. Mainly here for debugging purposes:
 	 * Preferably, use {@link #addAttribute} and {@link #getAttribute}.
-	 * @return the attributes Map, or <code>null</code> if none created
+	 * @return the attributes Map, or {@code null} if none created
 	 * @see #addAttribute
 	 * @see #getAttribute
 	 */
-	public Map getAttributes() {
+	public Map<String, Serializable> getAttributes() {
 		return this.attributes;
 	}
 
@@ -206,6 +213,7 @@ public class RemoteInvocation implements Serializable {
 	}
 
 
+	@Override
 	public String toString() {
 		return "RemoteInvocation: method name '" + this.methodName + "'; parameter types " +
 				ClassUtils.classNamesToString(this.parameterTypes);

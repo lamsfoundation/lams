@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.config;
 
 import java.beans.PropertyEditor;
+import java.security.AccessControlContext;
 
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.HierarchicalBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.util.StringValueResolver;
 
 /**
@@ -49,14 +51,14 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 
 	/**
 	 * Scope identifier for the standard singleton scope: "singleton".
-	 * Custom scopes can be added via <code>registerScope</code>.
+	 * Custom scopes can be added via {@code registerScope}.
 	 * @see #registerScope
 	 */
 	String SCOPE_SINGLETON = "singleton";
 
 	/**
 	 * Scope identifier for the standard prototype scope: "prototype".
-	 * Custom scopes can be added via <code>registerScope</code>.
+	 * Custom scopes can be added via {@code registerScope}.
 	 * @see #registerScope
 	 */
 	String SCOPE_PROTOTYPE = "prototype";
@@ -81,7 +83,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * Spring 2.0 by default: Bean definitions only carry bean class names,
 	 * to be resolved once the factory processes the bean definition.
 	 * @param beanClassLoader the class loader to use,
-	 * or <code>null</code> to suggest the default class loader
+	 * or {@code null} to suggest the default class loader
 	 */
 	void setBeanClassLoader(ClassLoader beanClassLoader);
 
@@ -97,12 +99,14 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * <i>load-time weaving</i> is involved, to make sure that actual bean
 	 * classes are loaded as lazily as possible. The temporary loader is
 	 * then removed once the BeanFactory completes its bootstrap phase.
+	 * @since 2.5
 	 */
 	void setTempClassLoader(ClassLoader tempClassLoader);
 
 	/**
 	 * Return the temporary ClassLoader to use for type matching purposes,
 	 * if any.
+	 * @since 2.5
 	 */
 	ClassLoader getTempClassLoader();
 
@@ -120,6 +124,34 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * (in merged fashion) and resolved bean classes.
 	 */
 	boolean isCacheBeanMetadata();
+
+	/**
+	 * Specify the resolution strategy for expressions in bean definition values.
+	 * <p>There is no expression support active in a BeanFactory by default.
+	 * An ApplicationContext will typically set a standard expression strategy
+	 * here, supporting "#{...}" expressions in a Unified EL compatible style.
+	 * @since 3.0
+	 */
+	void setBeanExpressionResolver(BeanExpressionResolver resolver);
+
+	/**
+	 * Return the resolution strategy for expressions in bean definition values.
+	 * @since 3.0
+	 */
+	BeanExpressionResolver getBeanExpressionResolver();
+
+	/**
+	 * Specify a Spring 3.0 ConversionService to use for converting
+	 * property values, as an alternative to JavaBeans PropertyEditors.
+	 * @since 3.0
+	 */
+	void setConversionService(ConversionService conversionService);
+
+	/**
+	 * Return the associated ConversionService, if any.
+	 * @since 3.0
+	 */
+	ConversionService getConversionService();
 
 	/**
 	 * Add a PropertyEditorRegistrar to be applied to all bean creation processes.
@@ -141,21 +173,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * @param requiredType type of the property
 	 * @param propertyEditorClass the {@link PropertyEditor} class to register
 	 */
-	void registerCustomEditor(Class requiredType, Class propertyEditorClass);
-
-	/**
-	 * Register the given custom property editor for all properties of the
-	 * given type. To be invoked during factory configuration.
-	 * <p>Note that this method will register a shared custom editor instance;
-	 * access to that instance will be synchronized for thread-safety. It is
-	 * generally preferable to use {@link #addPropertyEditorRegistrar} instead
-	 * of this method, to avoid for the need for synchronization on custom editors.
-	 * @param requiredType type of the property
-	 * @param propertyEditor editor to register
-	 * @deprecated as of Spring 2.0.7, in favor of {@link #addPropertyEditorRegistrar}
-	 * and {@link #registerCustomEditor(Class, Class)}
-	 */
-	void registerCustomEditor(Class requiredType, PropertyEditor propertyEditor);
+	void registerCustomEditor(Class<?> requiredType, Class<? extends PropertyEditor> propertyEditorClass);
 
 	/**
 	 * Initialize the given PropertyEditorRegistry with the custom editors
@@ -171,6 +189,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * any custom editors or custom editor registrars irrelevant.
 	 * @see #addPropertyEditorRegistrar
 	 * @see #registerCustomEditor
+	 * @since 2.5
 	 */
 	void setTypeConverter(TypeConverter typeConverter);
 
@@ -179,8 +198,24 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * instance for each call, since TypeConverters are usually <i>not</i> thread-safe.
 	 * <p>If the default PropertyEditor mechanism is active, the returned
 	 * TypeConverter will be aware of all custom editors that have been registered.
+	 * @since 2.5
 	 */
 	TypeConverter getTypeConverter();
+
+	/**
+	 * Add a String resolver for embedded values such as annotation attributes.
+	 * @param valueResolver the String resolver to apply to embedded values
+	 * @since 3.0
+	 */
+	void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+	/**
+	 * Resolve the given embedded value, e.g. an annotation attribute.
+	 * @param value the value to resolve
+	 * @return the resolved value (may be the original value as-is)
+	 * @since 3.0
+	 */
+	String resolveEmbeddedValue(String value);
 
 	/**
 	 * Add a new BeanPostProcessor that will get applied to beans created
@@ -220,10 +255,17 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * <p>This will only return explicitly registered scopes.
 	 * Built-in scopes such as "singleton" and "prototype" won't be exposed.
 	 * @param scopeName the name of the scope
-	 * @return the registered Scope implementation, or <code>null</code> if none
+	 * @return the registered Scope implementation, or {@code null} if none
 	 * @see #registerScope
 	 */
 	Scope getRegisteredScope(String scopeName);
+
+	/**
+	 * Provides a security access control context relevant to this factory.
+	 * @return the applicable AccessControlContext (never {@code null})
+	 * @since 3.0
+	 */
+	AccessControlContext getAccessControlContext();
 
 	/**
 	 * Copy all relevant configuration from the given other factory.
@@ -253,6 +295,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * <p>The value resolver may for example resolve placeholders
 	 * in target bean names and even in alias names.
 	 * @param valueResolver the StringValueResolver to apply
+	 * @since 2.5
 	 */
 	void resolveAliases(StringValueResolver valueResolver);
 
@@ -263,6 +306,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * @param beanName the name of the bean to retrieve the merged definition for
 	 * @return a (potentially merged) BeanDefinition for the given bean
 	 * @throws NoSuchBeanDefinitionException if there is no bean definition with the given name
+	 * @since 2.5
 	 */
 	BeanDefinition getMergedBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 
@@ -270,15 +314,26 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * Determine whether the bean with the given name is a FactoryBean.
 	 * @param name the name of the bean to check
 	 * @return whether the bean is a FactoryBean
-	 * (<code>false</code> means the bean exists but is not a FactoryBean)
+	 * ({@code false} means the bean exists but is not a FactoryBean)
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
+	 * @since 2.5
 	 */
 	boolean isFactoryBean(String name) throws NoSuchBeanDefinitionException;
+
+	/**
+	 * Explicitly control the current in-creation status of the specified bean.
+	 * For container-internal use only.
+	 * @param beanName the name of the bean
+	 * @param inCreation whether the bean is currently in creation
+	 * @since 3.1
+	 */
+	void setCurrentlyInCreation(String beanName, boolean inCreation);
 
 	/**
 	 * Determine whether the specified bean is currently in creation.
 	 * @param beanName the name of the bean
 	 * @return whether the bean is currently in creation
+	 * @since 2.5
 	 */
 	boolean isCurrentlyInCreation(String beanName);
 
@@ -287,6 +342,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * to be destroyed before the given bean is destroyed.
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
+	 * @since 2.5
 	 */
 	void registerDependentBean(String beanName, String dependentBeanName);
 
@@ -294,6 +350,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * Return the names of all beans which depend on the specified bean, if any.
 	 * @param beanName the name of the bean
 	 * @return the array of dependent bean names, or an empty array if none
+	 * @since 2.5
 	 */
 	String[] getDependentBeans(String beanName);
 
@@ -302,6 +359,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * @param beanName the name of the bean
 	 * @return the array of names of beans which the bean depends on,
 	 * or an empty array if none
+	 * @since 2.5
 	 */
 	String[] getDependenciesForBean(String beanName);
 

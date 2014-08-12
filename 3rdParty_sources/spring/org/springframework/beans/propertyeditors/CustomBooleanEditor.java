@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,11 @@ import org.springframework.util.StringUtils;
  * them in the UI form.
  *
  * <p>In web MVC code, this editor will typically be registered with
- * <code>binder.registerCustomEditor</code> calls in an implementation
- * of BaseCommandController's <code>initBinder</code> method.
+ * {@code binder.registerCustomEditor} calls.
  *
  * @author Juergen Hoeller
  * @since 10.06.2003
  * @see org.springframework.validation.DataBinder#registerCustomEditor
- * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
  */
 public class CustomBooleanEditor extends PropertyEditorSupport {
 
@@ -97,6 +95,7 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 		this.allowEmpty = allowEmpty;
 	}
 
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		String input = (text != null ? text.trim() : null);
 		if (this.allowEmpty && !StringUtils.hasLength(input)) {
@@ -124,6 +123,7 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 		}
 	}
 
+	@Override
 	public String getAsText() {
 		if (Boolean.TRUE.equals(getValue())) {
 			return (this.trueString != null ? this.trueString : VALUE_TRUE);

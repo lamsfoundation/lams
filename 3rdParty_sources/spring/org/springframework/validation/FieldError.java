@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,14 @@ import org.springframework.util.ObjectUtils;
  * field value.
  *
  * <p>See the {@link DefaultMessageCodesResolver} javadoc for details on
- * how a message code list is built for a <code>FieldError</code>.
+ * how a message code list is built for a {@code FieldError}.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 10.03.2003
  * @see DefaultMessageCodesResolver
  */
+@SuppressWarnings("serial")
 public class FieldError extends ObjectError {
 
 	private final String field;
@@ -96,11 +97,13 @@ public class FieldError extends ObjectError {
 	}
 
 
+	@Override
 	public String toString() {
 		return "Field error in object '" + getObjectName() + "' on field '" + this.field +
 				"': rejected value [" + this.rejectedValue + "]; " + resolvableToString();
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -114,6 +117,7 @@ public class FieldError extends ObjectError {
 				isBindingFailure() == otherError.isBindingFailure();
 	}
 
+	@Override
 	public int hashCode() {
 		int hashCode = super.hashCode();
 		hashCode = 29 * hashCode + getField().hashCode();

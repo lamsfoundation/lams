@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.ui.context.Theme;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.UiApplicationContextUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
+import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.ServletConfigAware;
 import org.springframework.web.context.ServletContextAware;
 
@@ -83,7 +85,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	/** Servlet config that this context runs in, if any */
 	private ServletConfig servletConfig;
 
-	/** Namespace of this context, or <code>null</code> if root */
+	/** Namespace of this context, or {@code null} if root */
 	private String namespace;
 
 	/** the ThemeSource for this ApplicationContext */
@@ -95,25 +97,30 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	}
 
 
+	@Override
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
 
+	@Override
 	public ServletContext getServletContext() {
 		return this.servletContext;
 	}
 
+	@Override
 	public void setServletConfig(ServletConfig servletConfig) {
 		this.servletConfig = servletConfig;
 		if (servletConfig != null && this.servletContext == null) {
-			this.servletContext = servletConfig.getServletContext();
+			setServletContext(servletConfig.getServletContext());
 		}
 	}
 
+	@Override
 	public ServletConfig getServletConfig() {
 		return this.servletConfig;
 	}
 
+	@Override
 	public void setNamespace(String namespace) {
 		this.namespace = namespace;
 		if (namespace != null) {
@@ -121,32 +128,48 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 		}
 	}
 
+	@Override
 	public String getNamespace() {
 		return this.namespace;
 	}
 
+	@Override
 	public String[] getConfigLocations() {
 		return super.getConfigLocations();
 	}
 
+	@Override
+	public String getApplicationName() {
+		return (this.servletContext != null ? this.servletContext.getContextPath() : "");
+	}
+
+	/**
+	 * Create and return a new {@link StandardServletEnvironment}. Subclasses may override
+	 * in order to configure the environment or specialize the environment type returned.
+	 */
+	@Override
+	protected ConfigurableEnvironment createEnvironment() {
+		return new StandardServletEnvironment();
+	}
 
 	/**
 	 * Register request/session scopes, a {@link ServletContextAwareProcessor}, etc.
 	 */
+	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		beanFactory.addBeanPostProcessor(new ServletContextAwareProcessor(this.servletContext, this.servletConfig));
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
 		beanFactory.ignoreDependencyInterface(ServletConfigAware.class);
-		beanFactory.registerResolvableDependency(ServletContext.class, this.servletContext);
-		beanFactory.registerResolvableDependency(ServletConfig.class, this.servletConfig);
 
-		WebApplicationContextUtils.registerWebApplicationScopes(beanFactory);
+		WebApplicationContextUtils.registerWebApplicationScopes(beanFactory, this.servletContext);
+		WebApplicationContextUtils.registerEnvironmentBeans(beanFactory, this.servletContext, this.servletConfig);
 	}
 
 	/**
 	 * This implementation supports file paths beneath the root of the ServletContext.
 	 * @see ServletContextResource
 	 */
+	@Override
 	protected Resource getResourceByPath(String path) {
 		return new ServletContextResource(this.servletContext, path);
 	}
@@ -155,6 +178,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	 * This implementation supports pattern matching in unexpanded WARs too.
 	 * @see ServletContextResourcePatternResolver
 	 */
+	@Override
 	protected ResourcePatternResolver getResourcePatternResolver() {
 		return new ServletContextResourcePatternResolver(this);
 	}
@@ -162,10 +186,24 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	/**
 	 * Initialize the theme capability.
 	 */
+	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Replace {@code Servlet}-related property sources.
+	 */
+	@Override
+	protected void initPropertySources() {
+		ConfigurableEnvironment env = getEnvironment();
+		if (env instanceof ConfigurableWebEnvironment) {
+			((ConfigurableWebEnvironment) env).initPropertySources(this.servletContext, this.servletConfig);
+		}
+	}
+
+	@Override
 	public Theme getTheme(String themeName) {
 		return this.themeSource.getTheme(themeName);
 	}

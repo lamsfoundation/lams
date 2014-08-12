@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package org.springframework.jca.work;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import javax.naming.NamingException;
 import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.work.ExecutionContext;
@@ -26,7 +29,7 @@ import javax.resource.spi.work.WorkManager;
 import javax.resource.spi.work.WorkRejectedException;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.core.task.TaskTimeoutException;
 import org.springframework.jca.context.BootstrapContextAware;
@@ -34,6 +37,8 @@ import org.springframework.jndi.JndiLocatorSupport;
 import org.springframework.scheduling.SchedulingException;
 import org.springframework.scheduling.SchedulingTaskExecutor;
 import org.springframework.util.Assert;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureTask;
 
 /**
  * {@link org.springframework.core.task.TaskExecutor} implementation
@@ -53,7 +58,7 @@ import org.springframework.util.Assert;
  * This is for example appropriate on the Geronimo application server, where
  * WorkManager GBeans (e.g. Geronimo's default "DefaultWorkManager" GBean)
  * can be linked into the J2EE environment through "gbean-ref" entries
- * in the <code>geronimo-web.xml</code> deployment descriptor.
+ * in the {@code geronimo-web.xml} deployment descriptor.
  *
  * <p><b>On JBoss and GlassFish, obtaining the default JCA WorkManager
  * requires special lookup steps.</b> See the
@@ -67,7 +72,7 @@ import org.springframework.util.Assert;
  * @see javax.resource.spi.work.WorkManager#scheduleWork
  */
 public class WorkManagerTaskExecutor extends JndiLocatorSupport
-		implements SchedulingTaskExecutor, AsyncTaskExecutor, WorkManager, BootstrapContextAware, InitializingBean {
+		implements AsyncListenableTaskExecutor, SchedulingTaskExecutor, WorkManager, BootstrapContextAware, InitializingBean {
 
 	private WorkManager workManager;
 
@@ -120,6 +125,7 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 	 * Specify the JCA BootstrapContext that contains the
 	 * WorkManager to delegate to.
 	 */
+	@Override
 	public void setBootstrapContext(BootstrapContext bootstrapContext) {
 		Assert.notNull(bootstrapContext, "BootstrapContext must not be null");
 		this.workManager = bootstrapContext.getWorkManager();
@@ -128,8 +134,8 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 	/**
 	 * Set whether to let {@link #execute} block until the work
 	 * has been actually started.
-	 * <p>Uses the JCA <code>startWork</code> operation underneath,
-	 * instead of the default <code>scheduleWork</code>.
+	 * <p>Uses the JCA {@code startWork} operation underneath,
+	 * instead of the default {@code scheduleWork}.
 	 * @see javax.resource.spi.work.WorkManager#startWork
 	 * @see javax.resource.spi.work.WorkManager#scheduleWork
 	 */
@@ -140,8 +146,8 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 	/**
 	 * Set whether to let {@link #execute} block until the work
 	 * has been completed.
-	 * <p>Uses the JCA <code>doWork</code> operation underneath,
-	 * instead of the default <code>scheduleWork</code>.
+	 * <p>Uses the JCA {@code doWork} operation underneath,
+	 * instead of the default {@code scheduleWork}.
 	 * @see javax.resource.spi.work.WorkManager#doWork
 	 * @see javax.resource.spi.work.WorkManager#scheduleWork
 	 */
@@ -158,10 +164,11 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 		this.workListener = workListener;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws NamingException {
 		if (this.workManager == null) {
 			if (this.workManagerName != null) {
-				this.workManager = (WorkManager) lookup(this.workManagerName, WorkManager.class);
+				this.workManager = lookup(this.workManagerName, WorkManager.class);
 			}
 			else {
 				this.workManager = getDefaultWorkManager();
@@ -184,10 +191,12 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 	// Implementation of the Spring SchedulingTaskExecutor interface
 	//-------------------------------------------------------------------------
 
+	@Override
 	public void execute(Runnable task) {
 		execute(task, TIMEOUT_INDEFINITE);
 	}
 
+	@Override
 	public void execute(Runnable task, long startTimeout) {
 		Assert.state(this.workManager != null, "No WorkManager specified");
 		Work work = new DelegatingWork(task);
@@ -230,9 +239,38 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 		}
 	}
 
+	@Override
+	public Future<?> submit(Runnable task) {
+		FutureTask<Object> future = new FutureTask<Object>(task, null);
+		execute(future, TIMEOUT_INDEFINITE);
+		return future;
+	}
+
+	@Override
+	public <T> Future<T> submit(Callable<T> task) {
+		FutureTask<T> future = new FutureTask<T>(task);
+		execute(future, TIMEOUT_INDEFINITE);
+		return future;
+	}
+
+	@Override
+	public ListenableFuture<?> submitListenable(Runnable task) {
+		ListenableFutureTask<Object> future = new ListenableFutureTask<Object>(task, null);
+		execute(future, TIMEOUT_INDEFINITE);
+		return future;
+	}
+
+	@Override
+	public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
+		ListenableFutureTask<T> future = new ListenableFutureTask<T>(task);
+		execute(future, TIMEOUT_INDEFINITE);
+		return future;
+	}
+
 	/**
 	 * This task executor prefers short-lived work units.
 	 */
+	@Override
 	public boolean prefersShortLivedTasks() {
 		return true;
 	}
@@ -242,30 +280,36 @@ public class WorkManagerTaskExecutor extends JndiLocatorSupport
 	// Implementation of the JCA WorkManager interface
 	//-------------------------------------------------------------------------
 
+	@Override
 	public void doWork(Work work) throws WorkException {
 		this.workManager.doWork(work);
 	}
 
+	@Override
 	public void doWork(Work work, long delay, ExecutionContext executionContext, WorkListener workListener)
 			throws WorkException {
 
 		this.workManager.doWork(work, delay, executionContext, workListener);
 	}
 
+	@Override
 	public long startWork(Work work) throws WorkException {
 		return this.workManager.startWork(work);
 	}
 
+	@Override
 	public long startWork(Work work, long delay, ExecutionContext executionContext, WorkListener workListener)
 			throws WorkException {
 
 		return this.workManager.startWork(work, delay, executionContext, workListener);
 	}
 
+	@Override
 	public void scheduleWork(Work work) throws WorkException {
 		this.workManager.scheduleWork(work);
 	}
 
+	@Override
 	public void scheduleWork(Work work, long delay, ExecutionContext executionContext, WorkListener workListener)
 			throws WorkException {
 

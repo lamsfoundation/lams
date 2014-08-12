@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.orm.hibernate3.support;
 
 import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +30,10 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.async.WebAsyncManager;
+import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -48,11 +50,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * as for non-transactional execution (if configured appropriately).
  *
  * <p><b>NOTE</b>: This filter will by default <i>not</i> flush the Hibernate Session,
- * with the flush mode set to <code>FlushMode.NEVER</code>. It assumes to be used
+ * with the flush mode set to {@code FlushMode.NEVER}. It assumes to be used
  * in combination with service layer transactions that care for the flushing: The
  * active transaction manager will temporarily change the flush mode to
- * <code>FlushMode.AUTO</code> during a read-write transaction, with the flush
- * mode reset to <code>FlushMode.NEVER</code> at the end of each transaction.
+ * {@code FlushMode.AUTO} during a read-write transaction, with the flush
+ * mode reset to {@code FlushMode.NEVER} at the end of each transaction.
  * If you intend to use this filter without transactions, consider changing
  * the default flush mode (through the "flushMode" property).
  *
@@ -69,13 +71,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * for deferred close, though, actually processed at request completion.
  *
  * <p>A single session per request allows for most efficient first-level caching,
- * but can cause side effects, for example on <code>saveOrUpdate</code> or when
+ * but can cause side effects, for example on {@code saveOrUpdate} or when
  * continuing after a rolled-back transaction. The deferred close strategy is as safe
  * as no Open Session in View in that respect, while still allowing for lazy loading
  * in views (but not providing a first-level cache for the entire request).
  *
  * <p>Looks up the SessionFactory in Spring's root web application context.
- * Supports a "sessionFactoryBeanName" filter init-param in <code>web.xml</code>;
+ * Supports a "sessionFactoryBeanName" filter init-param in {@code web.xml};
  * the default bean name is "sessionFactory". Looks up the SessionFactory on each
  * request, to avoid initialization order issues (when using ContextLoaderServlet,
  * the root application context will get initialized <i>after</i> this filter).
@@ -86,10 +88,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @see #setFlushMode
  * @see #lookupSessionFactory
  * @see OpenSessionInViewInterceptor
- * @see org.springframework.orm.hibernate3.HibernateInterceptor
+ * @see OpenSessionInterceptor
  * @see org.springframework.orm.hibernate3.HibernateTransactionManager
  * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
+ * @see org.hibernate.SessionFactory#getCurrentSession()
  */
 public class OpenSessionInViewFilter extends OncePerRequestFilter {
 
@@ -100,7 +103,7 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 
 	private boolean singleSession = true;
 
-	private FlushMode flushMode = FlushMode.NEVER;
+	private FlushMode flushMode = FlushMode.MANUAL;
 
 
 	/**
@@ -145,10 +148,10 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	 * {@link org.hibernate.Session}. Only applied in single session mode.
 	 * <p>Can be populated with the corresponding constant name in XML bean
 	 * definitions: e.g. "AUTO".
-	 * <p>The default is "NEVER". Specify "AUTO" if you intend to use
+	 * <p>The default is "MANUAL". Specify "AUTO" if you intend to use
 	 * this filter without service layer transactions.
 	 * @see org.hibernate.Session#setFlushMode
-	 * @see org.hibernate.FlushMode#NEVER
+	 * @see org.hibernate.FlushMode#MANUAL
 	 * @see org.hibernate.FlushMode#AUTO
 	 */
 	public void setFlushMode(FlushMode flushMode) {
@@ -163,13 +166,35 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 		return this.flushMode;
 	}
 
+	/**
+	 * Returns "false" so that the filter may re-bind the opened Hibernate
+	 * {@code Session} to each asynchronously dispatched thread and postpone
+	 * closing it until the very last asynchronous dispatch.
+	 */
+	@Override
+	protected boolean shouldNotFilterAsyncDispatch() {
+		return false;
+	}
 
+	/**
+	 * Returns "false" so that the filter may provide a Hibernate
+	 * {@code Session} to each error dispatches.
+	 */
+	@Override
+	protected boolean shouldNotFilterErrorDispatch() {
+		return false;
+	}
+
+	@Override
 	protected void doFilterInternal(
 			HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
 		SessionFactory sessionFactory = lookupSessionFactory(request);
 		boolean participate = false;
+
+		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		String key = getAlreadyFilteredAttributeName();
 
 		if (isSingleSession()) {
 			// single session mode
@@ -178,13 +203,22 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 				participate = true;
 			}
 			else {
-				logger.debug("Opening single Hibernate Session in OpenSessionInViewFilter");
-				Session session = getSession(sessionFactory);
-				TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
+				boolean isFirstRequest = !isAsyncDispatch(request);
+				if (isFirstRequest || !applySessionBindingInterceptor(asyncManager, key)) {
+					logger.debug("Opening single Hibernate Session in OpenSessionInViewFilter");
+					Session session = getSession(sessionFactory);
+					SessionHolder sessionHolder = new SessionHolder(session);
+					TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
+
+					AsyncRequestInterceptor interceptor = new AsyncRequestInterceptor(sessionFactory, sessionHolder);
+					asyncManager.registerCallableInterceptor(key, interceptor);
+					asyncManager.registerDeferredResultInterceptor(key, interceptor);
+				}
 			}
 		}
 		else {
 			// deferred close mode
+			Assert.state(!isAsyncStarted(request), "Deferred close mode is not supported on async dispatches");
 			if (SessionFactoryUtils.isDeferredCloseActive(sessionFactory)) {
 				// Do not modify deferred close: just set the participate flag.
 				participate = true;
@@ -197,15 +231,16 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 		try {
 			filterChain.doFilter(request, response);
 		}
-
 		finally {
 			if (!participate) {
 				if (isSingleSession()) {
 					// single session mode
 					SessionHolder sessionHolder =
 							(SessionHolder) TransactionSynchronizationManager.unbindResource(sessionFactory);
-					logger.debug("Closing single Hibernate Session in OpenSessionInViewFilter");
-					closeSession(sessionHolder.getSession(), sessionFactory);
+					if (!isAsyncStarted(request)) {
+						logger.debug("Closing single Hibernate Session in OpenSessionInViewFilter");
+						closeSession(sessionHolder.getSession(), sessionFactory);
+					}
 				}
 				else {
 					// deferred close mode
@@ -238,24 +273,23 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using SessionFactory '" + getSessionFactoryBeanName() + "' for OpenSessionInViewFilter");
 		}
-		WebApplicationContext wac =
-				WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		return (SessionFactory) wac.getBean(getSessionFactoryBeanName(), SessionFactory.class);
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		return wac.getBean(getSessionFactoryBeanName(), SessionFactory.class);
 	}
 
 	/**
 	 * Get a Session for the SessionFactory that this filter uses.
 	 * Note that this just applies in single session mode!
 	 * <p>The default implementation delegates to the
-	 * <code>SessionFactoryUtils.getSession</code> method and
-	 * sets the <code>Session</code>'s flush mode to "NEVER".
+	 * {@code SessionFactoryUtils.getSession} method and
+	 * sets the {@code Session}'s flush mode to "MANUAL".
 	 * <p>Can be overridden in subclasses for creating a Session with a
 	 * custom entity interceptor or JDBC exception translator.
 	 * @param sessionFactory the SessionFactory that this filter uses
 	 * @return the Session to use
 	 * @throws DataAccessResourceFailureException if the Session could not be created
 	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession(SessionFactory, boolean)
-	 * @see org.hibernate.FlushMode#NEVER
+	 * @see org.hibernate.FlushMode#MANUAL
 	 */
 	protected Session getSession(SessionFactory sessionFactory) throws DataAccessResourceFailureException {
 		Session session = SessionFactoryUtils.getSession(sessionFactory, true);
@@ -278,6 +312,14 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	 */
 	protected void closeSession(Session session, SessionFactory sessionFactory) {
 		SessionFactoryUtils.closeSession(session);
+	}
+
+	private boolean applySessionBindingInterceptor(WebAsyncManager asyncManager, String key) {
+		if (asyncManager.getCallableInterceptor(key) == null) {
+			return false;
+		}
+		((AsyncRequestInterceptor) asyncManager.getCallableInterceptor(key)).bindSession();
+		return true;
 	}
 
 }

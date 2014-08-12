@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.id;
-
 import java.util.Properties;
 
 import org.hibernate.MappingException;

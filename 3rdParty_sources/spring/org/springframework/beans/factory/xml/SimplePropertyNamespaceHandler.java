@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,23 +27,24 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.core.Conventions;
 
 /**
- * Simple <code>NamespaceHandler</code> implementation that maps custom attributes
+ * Simple {@code NamespaceHandler} implementation that maps custom attributes
  * directly through to bean properties. An important point to note is that this
- * <code>NamespaceHandler</code> does not have a corresponding schema since there
+ * {@code NamespaceHandler} does not have a corresponding schema since there
  * is no way to know in advance all possible attribute names.
  *
- * <p>An example of the usage of this <code>NamespaceHandler</code> is shown below:
+ * <p>An example of the usage of this {@code NamespaceHandler} is shown below:
  *
  * <pre class="code">
  * &lt;bean id=&quot;rob&quot; class=&quot;..TestBean&quot; p:name=&quot;Rob Harrop&quot; p:spouse-ref=&quot;sally&quot;/&gt;</pre>
  *
- * Here the '<code>p:name</code>' corresponds directly to the '<code>name</code>'
- * property on class '<code>TestBean</code>'. The '<code>p:spouse-ref</code>'
- * attributes corresponds to the '<code>spouse</code>' property and, rather
+ * Here the '{@code p:name}' corresponds directly to the '{@code name}'
+ * property on class '{@code TestBean}'. The '{@code p:spouse-ref}'
+ * attributes corresponds to the '{@code spouse}' property and, rather
  * than being the concrete value, it contains the name of the bean that will
  * be injected into that property.
  *
  * @author Rob Harrop
+ * @author Juergen Hoeller
  * @since 2.0
  */
 public class SimplePropertyNamespaceHandler implements NamespaceHandler {
@@ -51,19 +52,22 @@ public class SimplePropertyNamespaceHandler implements NamespaceHandler {
 	private static final String REF_SUFFIX = "-ref";
 
 
+	@Override
 	public void init() {
 	}
 
+	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		parserContext.getReaderContext().error(
 				"Class [" + getClass().getName() + "] does not support custom elements.", element);
 		return null;
 	}
 
+	@Override
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		if (node instanceof Attr) {
 			Attr attr = (Attr) node;
-			String propertyName = attr.getLocalName();
+			String propertyName = parserContext.getDelegate().getLocalName(attr);
 			String propertyValue = attr.getValue();
 			MutablePropertyValues pvs = definition.getBeanDefinition().getPropertyValues();
 			if (pvs.contains(propertyName)) {
@@ -72,11 +76,10 @@ public class SimplePropertyNamespaceHandler implements NamespaceHandler {
 			}
 			if (propertyName.endsWith(REF_SUFFIX)) {
 				propertyName = propertyName.substring(0, propertyName.length() - REF_SUFFIX.length());
-				pvs.addPropertyValue(
-						Conventions.attributeNameToPropertyName(propertyName), new RuntimeBeanReference(propertyValue));
+				pvs.add(Conventions.attributeNameToPropertyName(propertyName), new RuntimeBeanReference(propertyValue));
 			}
 			else {
-				pvs.addPropertyValue(Conventions.attributeNameToPropertyName(propertyName), propertyValue);
+				pvs.add(Conventions.attributeNameToPropertyName(propertyName), propertyValue);
 			}
 		}
 		return definition;

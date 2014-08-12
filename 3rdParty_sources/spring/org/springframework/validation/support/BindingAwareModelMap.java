@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.validation.support;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.validation.BindingResult;
@@ -34,15 +33,18 @@ import org.springframework.validation.BindingResult;
  * @since 2.5.6
  * @see org.springframework.validation.BindingResult
  */
+@SuppressWarnings("serial")
 public class BindingAwareModelMap extends ExtendedModelMap {
 
-	public Object put(Object key, Object value) {
+	@Override
+	public Object put(String key, Object value) {
 		removeBindingResultIfNecessary(key, value);
 		return super.put(key, value);
 	}
 
-	public void putAll(Map map) {
-		for (Map.Entry entry : (Set<Map.Entry>) map.entrySet()) {
+	@Override
+	public void putAll(Map<? extends String, ?> map) {
+		for (Map.Entry<? extends String, ?> entry : map.entrySet()) {
 			removeBindingResultIfNecessary(entry.getKey(), entry.getValue());
 		}
 		super.putAll(map);

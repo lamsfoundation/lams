@@ -55,19 +55,35 @@ public abstract class AbstractSelectLockingStrategy implements LockingStrategy {
 	protected abstract String generateLockString(int lockTimeout);
 
 	protected String determineSql(int timeout) {
-		return timeout == LockOptions.WAIT_FOREVER
-				? waitForeverSql
-				: timeout == LockOptions.NO_WAIT
-						? getNoWaitSql()
-						: generateLockString( timeout );
+		if ( timeout == LockOptions.WAIT_FOREVER) {
+			return waitForeverSql;
+		}
+		else if ( timeout == LockOptions.NO_WAIT) {
+			return getNoWaitSql();
+		}
+		else if ( timeout == LockOptions.SKIP_LOCKED) {
+			return getSkipLockedSql();
+		}
+		else {
+			return generateLockString( timeout );
+		}
 	}
 
 	private String noWaitSql;
 
-	public String getNoWaitSql() {
+	protected String getNoWaitSql() {
 		if ( noWaitSql == null ) {
 			noWaitSql = generateLockString( LockOptions.NO_WAIT );
 		}
 		return noWaitSql;
+	}
+
+	private String skipLockedSql;
+
+	protected String getSkipLockedSql() {
+		if ( skipLockedSql == null ) {
+			skipLockedSql = generateLockString( LockOptions.SKIP_LOCKED );
+		}
+		return skipLockedSql;
 	}
 }

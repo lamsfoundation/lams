@@ -26,15 +26,14 @@ package org.hibernate.type.descriptor.java;
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Clob;
-import java.sql.SQLException;
 import java.util.Arrays;
 
-import org.hibernate.HibernateException;
-import org.hibernate.type.descriptor.CharacterStream;
+import org.hibernate.engine.jdbc.CharacterStream;
+import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
- * TODO : javadoc
+ * Descriptor for {@code char[]} handling.
  *
  * @author Steve Ebersole
  */
@@ -103,12 +102,7 @@ public class PrimitiveCharacterArrayTypeDescriptor extends AbstractTypeDescripto
 			return ( (String) value ).toCharArray();
 		}
 		if ( Clob.class.isInstance( value ) ) {
-			try {
-				return DataHelper.extractString( ( (Clob) value ).getCharacterStream() ).toCharArray();
-			}
-			catch ( SQLException e ) {
-				throw new HibernateException( "Unable to access lob stream", e );
-			}
+			return DataHelper.extractString( ( (Clob) value ) ).toCharArray();
 		}
 		if ( Reader.class.isInstance( value ) ) {
 			return DataHelper.extractString( ( (Reader) value ) ).toCharArray();

@@ -24,15 +24,22 @@
 package org.hibernate.type;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 /**
  * Additional, optional contract for types whose values can be represented as XML text (either as attribute or
  * element value).
  *
  * @author Steve Ebersole
+ *
+ * @deprecated To be removed in 5.  Use {@link StringRepresentableType} instead.  See Jira issues
+ * <a href="https://hibernate.onjira.com/browse/HHH-7777">HHH-7777</a> and
+ * <a href="https://hibernate.onjira.com/browse/HHH-7776">HHH-7776</a> for details.
+ *
+ * @see StringRepresentableType
  */
+@Deprecated
 public interface XmlRepresentableType<T> {
 	public String toXMLString(T value, SessionFactoryImplementor factory) throws HibernateException;
 

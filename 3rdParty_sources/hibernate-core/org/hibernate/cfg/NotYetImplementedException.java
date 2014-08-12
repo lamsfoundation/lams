@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
-
 import org.hibernate.MappingException;
 
 /**
@@ -31,6 +30,9 @@ import org.hibernate.MappingException;
  * @author Emmanuel Bernard
  */
 public class NotYetImplementedException extends MappingException {
+	public NotYetImplementedException() {
+		this( "Not yet implemented!" );
+	}
 
 	public NotYetImplementedException(String msg, Throwable root) {
 		super( msg, root );

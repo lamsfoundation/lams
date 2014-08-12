@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.core.io.ResourceLoader;
 
 /**
  * Simple interface for bean definition readers.
- * Specifies load methods with Resource parameters.
+ * Specifies load methods with Resource and String location parameters.
  *
  * <p>Concrete bean definition readers can of course add additional
  * load and register methods for bean definitions, specific to
@@ -38,14 +38,6 @@ import org.springframework.core.io.ResourceLoader;
  */
 public interface BeanDefinitionReader {
 
-/**
-	 * Return the bean factory to register the bean definitions with.
-	 * <p>The factory is exposed through the BeanDefinitionRegistry interface,
-	 * encapsulating the methods that are relevant for bean definition handling.
-	 * @deprecated in favor of the uniformly named {@link #getRegistry()}
-	 */
-	BeanDefinitionRegistry getBeanFactory();
-
 	/**
 	 * Return the bean factory to register the bean definitions with.
 	 * <p>The factory is exposed through the BeanDefinitionRegistry interface,
@@ -53,7 +45,7 @@ public interface BeanDefinitionReader {
 	 */
 	BeanDefinitionRegistry getRegistry();
 
-		/**
+	/**
 	 * Return the resource loader to use for resource locations.
 	 * Can be checked for the <b>ResourcePatternResolver</b> interface and cast
 	 * accordingly, for loading multiple resources for a given resource pattern.
@@ -64,7 +56,7 @@ public interface BeanDefinitionReader {
 	 * tag in XML bean definitions. It is recommended, however, to apply
 	 * such imports relative to the defining resource; only explicit full
 	 * resource locations will trigger absolute resource loading.
-	 * <p>There is also a <code>loadBeanDefinitions(String)</code> method available,
+	 * <p>There is also a {@code loadBeanDefinitions(String)} method available,
 	 * for loading bean definitions from a resource location (or location pattern).
 	 * This is a convenience to avoid explicit ResourceLoader handling.
 	 * @see #loadBeanDefinitions(String)
@@ -74,7 +66,7 @@ public interface BeanDefinitionReader {
 
 	/**
 	 * Return the class loader to use for bean classes.
-	 * <p><code>null</code> suggests to not load bean classes eagerly
+	 * <p>{@code null} suggests to not load bean classes eagerly
 	 * but rather to just register bean definitions with class names,
 	 * with the corresponding Classes to be resolved later (or never).
 	 */
@@ -101,7 +93,7 @@ public interface BeanDefinitionReader {
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
-	int loadBeanDefinitions(Resource[] resources) throws BeanDefinitionStoreException;
+	int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException;
 
 	/**
 	 * Load bean definitions from the specified resource location.
@@ -124,6 +116,6 @@ public interface BeanDefinitionReader {
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
-	int loadBeanDefinitions(String[] locations) throws BeanDefinitionStoreException;
+	int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException;
 
 }

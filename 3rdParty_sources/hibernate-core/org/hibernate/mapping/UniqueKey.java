@@ -23,89 +23,60 @@
  */
 package org.hibernate.mapping;
 
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.Mapping;
-import org.hibernate.util.StringHelper;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.internal.util.StringHelper;
 
 /**
  * A relational unique key constraint
  *
- * @author Gavin King
+ * @author Brett Meyer
  */
 public class UniqueKey extends Constraint {
+	private java.util.Map<Column, String> columnOrderMap = new HashMap<Column, String>(  );
 
-	public String sqlConstraintString(Dialect dialect) {
-		StringBuffer buf = new StringBuffer( "unique (" );
-		boolean hadNullableColumn = false;
-		Iterator iter = getColumnIterator();
-		while ( iter.hasNext() ) {
-			Column column = (Column) iter.next();
-			if ( !hadNullableColumn && column.isNullable() ) {
-				hadNullableColumn = true;
-			}
-			buf.append( column.getQuotedName( dialect ) );
-			if ( iter.hasNext() ) {
-				buf.append( ", " );
-			}
-		}
-		//do not add unique constraint on DB not supporting unique and nullable columns
-		return !hadNullableColumn || dialect.supportsNotNullUnique() ?
-				buf.append( ')' ).toString() :
-				null;
-	}
-
-	public String sqlConstraintString(
+	@Override
+    public String sqlConstraintString(
 			Dialect dialect,
 			String constraintName,
 			String defaultCatalog,
 			String defaultSchema) {
-		StringBuffer buf = new StringBuffer(
-				dialect.getAddPrimaryKeyConstraintString( constraintName )
-		).append( '(' );
-		Iterator iter = getColumnIterator();
-		boolean nullable = false;
-		while ( iter.hasNext() ) {
-			Column column = (Column) iter.next();
-			if ( !nullable && column.isNullable() ) nullable = true;
-			buf.append( column.getQuotedName( dialect ) );
-			if ( iter.hasNext() ) buf.append( ", " );
-		}
-		return !nullable || dialect.supportsNotNullUnique() ?
-				StringHelper.replace( buf.append( ')' ).toString(), "primary key", "unique" ) :
-				//TODO: improve this hack!
-				null;
+//		return dialect.getUniqueDelegate().uniqueConstraintSql( this );
+		// Not used.
+		return "";
 	}
 
-	public String sqlCreateString(Dialect dialect, Mapping p, String defaultCatalog, String defaultSchema) {
-		if ( dialect.supportsUniqueConstraintInCreateAlterTable() ) {
-			return super.sqlCreateString( dialect, p, defaultCatalog, defaultSchema );
-		}
-		else {
-			return Index.buildSqlCreateIndexString( dialect, getName(), getTable(), getColumnIterator(), true,
-					defaultCatalog, defaultSchema );
-		}
+	@Override
+    public String sqlCreateString(Dialect dialect, Mapping p,
+    		String defaultCatalog, String defaultSchema) {
+		return dialect.getUniqueDelegate().getAlterTableToAddUniqueKeyCommand(
+				this, defaultCatalog, defaultSchema
+		);
 	}
 
-	public String sqlDropString(Dialect dialect, String defaultCatalog, String defaultSchema) {
-		if ( dialect.supportsUniqueConstraintInCreateAlterTable() ) {
-			return super.sqlDropString( dialect, defaultCatalog, defaultSchema );
-		}
-		else {
-			return Index.buildSqlDropIndexString( dialect, getTable(), getName(), defaultCatalog, defaultSchema );
+	@Override
+    public String sqlDropString(Dialect dialect, String defaultCatalog,
+    		String defaultSchema) {
+		return dialect.getUniqueDelegate().getAlterTableToDropUniqueKeyCommand(
+				this, defaultCatalog, defaultSchema
+		);
+	}
+
+	public void addColumn(Column column, String order) {
+		addColumn( column );
+		if ( StringHelper.isNotEmpty( order ) ) {
+			columnOrderMap.put( column, order );
 		}
 	}
 
-	public boolean isGenerated(Dialect dialect) {
-		if ( dialect.supportsNotNullUnique() ) return true;
-		Iterator iter = getColumnIterator();
-		while ( iter.hasNext() ) {
-			if ( ( (Column) iter.next() ).isNullable() ) {
-				return false;
-			}
-		}
-		return true;
+	public Map<Column, String> getColumnOrderMap() {
+		return columnOrderMap;
 	}
-
+	
+	public String generatedConstraintNamePrefix() {
+		return "UK_";
+	}
 }

@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008 Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,13 +20,8 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents a flushing strategy. The flush process synchronizes
@@ -39,21 +34,7 @@ import java.util.Map;
  *
  * @author Gavin King
  */
-public final class FlushMode implements Serializable {
-	private static final Map INSTANCES = new HashMap();
-
-	private final int level;
-	private final String name;
-
-	private FlushMode(int level, String name) {
-		this.level = level;
-		this.name = name;
-	}
-
-	public String toString() {
-		return name;
-	}
-
+public enum FlushMode {
 	/**
 	 * The {@link Session} is never flushed unless {@link Session#flush}
 	 * is explicitly called by the application. This mode is very
@@ -61,55 +42,87 @@ public final class FlushMode implements Serializable {
 	 *
 	 * @deprecated use {@link #MANUAL} instead.
 	 */
-	public static final FlushMode NEVER = new FlushMode( 0, "NEVER" );
+	@Deprecated
+	NEVER ( 0 ),
 
 	/**
 	 * The {@link Session} is only ever flushed when {@link Session#flush}
 	 * is explicitly called by the application. This mode is very
 	 * efficient for read only transactions.
 	 */
-	public static final FlushMode MANUAL = new FlushMode( 0, "MANUAL" );
+	MANUAL( 0 ),
 
 	/**
 	 * The {@link Session} is flushed when {@link Transaction#commit}
 	 * is called.
 	 */
-	public static final FlushMode COMMIT = new FlushMode(5, "COMMIT");
+	COMMIT(5 ),
 
 	/**
 	 * The {@link Session} is sometimes flushed before query execution
 	 * in order to ensure that queries never return stale state. This
 	 * is the default flush mode.
 	 */
-	public static final FlushMode AUTO = new FlushMode(10, "AUTO");
+	AUTO(10 ),
 
 	/**
 	 * The {@link Session} is flushed before every query. This is
 	 * almost always unnecessary and inefficient.
 	 */
-	public static final FlushMode ALWAYS = new FlushMode(20, "ALWAYS");
-	
+	ALWAYS(20 );
+
+	private final int level;
+
+	private FlushMode(int level) {
+		this.level = level;
+	}
+
+	/**
+	 * Checks to see if {@code this} flush mode is less than the given flush mode.
+	 *
+	 * @param other THe flush mode value to be checked against {@code this}
+	 *
+	 * @return {@code true} indicates {@code other} is less than {@code this}; {@code false} otherwise
+	 */
 	public boolean lessThan(FlushMode other) {
-		return this.level<other.level;
+		return this.level < other.level;
 	}
 
-	static {
-		INSTANCES.put( NEVER.name, NEVER );
-		INSTANCES.put( MANUAL.name, MANUAL );
-		INSTANCES.put( AUTO.name, AUTO );
-		INSTANCES.put( ALWAYS.name, ALWAYS );
-		INSTANCES.put( COMMIT.name, COMMIT );
-	}
-
+	/**
+	 * Checks to see if the given mode is the same as {@link #MANUAL}.
+	 *
+	 * @param mode The mode to check
+	 *
+	 * @return true/false
+	 *
+	 * @deprecated Just use equality check against {@link #MANUAL}.  Legacy from before this was an enum
+	 */
+	@Deprecated
 	public static boolean isManualFlushMode(FlushMode mode) {
 		return MANUAL.level == mode.level;
 	}
 
-	private Object readResolve() {
-		return INSTANCES.get( name );
-	}
+	/**
+	 * Interprets an external representation of the flush mode.  {@code null} is returned as {@code null}, otherwise
+	 * {@link FlushMode#valueOf(String)} is used with the upper-case version of the incoming value.  An unknown,
+	 * non-null value results in a MappingException being thrown.
+	 *
+	 * @param externalName The external representation
+	 *
+	 * @return The interpreted FlushMode value.
+	 *
+	 * @throws MappingException Indicates an unrecognized external representation
+	 */
+	public static FlushMode interpretExternalSetting(String externalName) {
+		if ( externalName == null ) {
+			return null;
+		}
 
-	public static FlushMode parse(String name) {
-		return ( FlushMode ) INSTANCES.get( name );
+		try {
+			return FlushMode.valueOf( externalName.toUpperCase() );
+		}
+		catch ( IllegalArgumentException e ) {
+			throw new MappingException( "unknown FlushMode : " + externalName );
+		}
 	}
 }

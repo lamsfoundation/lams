@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 package org.springframework.beans.factory.config;
 
+import java.io.Serializable;
+
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.Assert;
 
@@ -41,7 +44,7 @@ import org.springframework.util.Assert;
  * <pre class="code">&lt;beans&gt;
  *
  *   &lt;!-- Prototype bean since we have state --&gt;
- *   &lt;bean id="myService" class="a.b.c.MyService" singleton="false"/&gt;
+ *   &lt;bean id="myService" class="a.b.c.MyService" scope="prototype"/&gt;
  *
  *   &lt;bean id="myServiceFactory"
  *       class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean"&gt;
@@ -54,7 +57,7 @@ import org.springframework.util.Assert;
  *
  *&lt;/beans&gt;</pre>
  *
- * <p>The attendant <code>MyClientBean</code> class implementation might look
+ * <p>The attendant {@code MyClientBean} class implementation might look
  * something like this:
  *
  * <pre class="code">package a.b.c;
@@ -63,9 +66,9 @@ import org.springframework.util.Assert;
  *
  * public class MyClientBean {
  *
- *   private ObjectFactory myServiceFactory;
+ *   private ObjectFactory&lt;MyService&gt; myServiceFactory;
  *
- *   public void setMyServiceFactory(ObjectFactory myServiceFactory) {
+ *   public void setMyServiceFactory(ObjectFactory&lt;MyService&gt; myServiceFactory) {
  *     this.myServiceFactory = myServiceFactory;
  *   }
  *
@@ -91,51 +94,59 @@ import org.springframework.util.Assert;
  * @see org.springframework.beans.factory.ObjectFactory
  * @see ServiceLocatorFactoryBean
  */
-public class ObjectFactoryCreatingFactoryBean extends AbstractFactoryBean {
+public class ObjectFactoryCreatingFactoryBean extends AbstractFactoryBean<ObjectFactory<Object>> {
 
 	private String targetBeanName;
 
 
 	/**
 	 * Set the name of the target bean.
-	 * <p>The target does not <i>have</> to be a prototype bean, but realisticially
-	 * always will be (because if the target bean were a singleton, then said
-	 * singleton bean could simply be injected straight into the dependent object,
-	 * thus obviating the need for the extra level of indirection afforded by
-	 * the approach encapsulated by this class). Please note that no exception
-	 * will be thrown if the supplied <code>targetBeanName</code> does not
-	 * reference a prototype bean.
+	 * <p>The target does not <i>have</i> to be a non-singleton bean, but realistically
+	 * always will be (because if the target bean were a singleton, then said singleton
+	 * bean could simply be injected straight into the dependent object, thus obviating
+	 * the need for the extra level of indirection afforded by this factory approach).
 	 */
 	public void setTargetBeanName(String targetBeanName) {
 		this.targetBeanName = targetBeanName;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(this.targetBeanName, "Property 'targetBeanName' is required");
 		super.afterPropertiesSet();
 	}
 
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return ObjectFactory.class;
 	}
 
-	protected Object createInstance() {
-		return new ObjectFactory() {
-			public Object getObject() throws BeansException {
-				return getTargetBean(targetBeanName);
-			}
-		};
+	@Override
+	protected ObjectFactory<Object> createInstance() {
+		return new TargetBeanObjectFactory(getBeanFactory(), this.targetBeanName);
 	}
 
+
 	/**
-	 * Template method for obtaining a target bean instance.
-	 * Called by the exposed ObjectFactory's <code>getObject()</code> method.
-	 * @param targetBeanName the name of the target bean
-	 * @return the target bean instance
+	 * Independent inner class - for serialization purposes.
 	 */
-	protected Object getTargetBean(String targetBeanName) {
-		return getBeanFactory().getBean(targetBeanName);
+	@SuppressWarnings("serial")
+	private static class TargetBeanObjectFactory implements ObjectFactory<Object>, Serializable {
+
+		private final BeanFactory beanFactory;
+
+		private final String targetBeanName;
+
+		public TargetBeanObjectFactory(BeanFactory beanFactory, String targetBeanName) {
+			this.beanFactory = beanFactory;
+			this.targetBeanName = targetBeanName;
+		}
+
+		@Override
+		public Object getObject() throws BeansException {
+			return this.beanFactory.getBean(this.targetBeanName);
+		}
 	}
 
 }

@@ -22,13 +22,13 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.proxy.pojo.javassist;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.ProxyFactory;
 import org.hibernate.type.CompositeType;
@@ -48,13 +48,15 @@ public class JavassistProxyFactory implements ProxyFactory, Serializable {
 	private Method setIdentifierMethod;
 	private CompositeType componentIdType;
 	private Class factory;
+	private boolean overridesEquals;
 
+	@Override
 	public void postInstantiate(
 			final String entityName,
 			final Class persistentClass,
-	        final Set interfaces,
+			final Set interfaces,
 			final Method getIdentifierMethod,
-	        final Method setIdentifierMethod,
+			final Method setIdentifierMethod,
 			CompositeType componentIdType) throws HibernateException {
 		this.entityName = entityName;
 		this.persistentClass = persistentClass;
@@ -62,22 +64,25 @@ public class JavassistProxyFactory implements ProxyFactory, Serializable {
 		this.getIdentifierMethod = getIdentifierMethod;
 		this.setIdentifierMethod = setIdentifierMethod;
 		this.componentIdType = componentIdType;
-		factory = JavassistLazyInitializer.getProxyFactory( persistentClass, this.interfaces );
+		this.factory = JavassistLazyInitializer.getProxyFactory( persistentClass, this.interfaces );
+		this.overridesEquals = ReflectHelper.overridesEquals(persistentClass);
 	}
 
+	@Override
 	public HibernateProxy getProxy(
 			Serializable id,
-	        SessionImplementor session) throws HibernateException {
+			SessionImplementor session) throws HibernateException {
 		return JavassistLazyInitializer.getProxy(
 				factory,
-		        entityName,
+				entityName,
 				persistentClass,
-		        interfaces,
-		        getIdentifierMethod,
+				interfaces,
+				getIdentifierMethod,
 				setIdentifierMethod,
-		        componentIdType,
-		        id,
-		        session
+				componentIdType,
+				id,
+				session,
+				overridesEquals
 		);
 	}
 

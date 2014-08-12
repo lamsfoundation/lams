@@ -26,8 +26,6 @@ fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MP
 flagstone		  transform.jar												   BSD							 Flagstone Software Ltd.		  reading and writing Flash 
 				  translate.jar
 
-hibernate		  hibernate3.jar						3.6.10				   LGPL 2.1						 Red Hat						  Java objects to DB mapping framework
-
 jakarta-commons   commons-digester-2.1.jar              2.1                    Apache Software License 2.0   Apache Software Foundation       XML -> Java object mapping tool
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
                   commons-httpclient-3.0.jar			3.0					   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
@@ -57,10 +55,11 @@ reload			  reload-diva.jar						2.0.1				   MIT License					 Reload							  Suit
 				  reload-jdom.jar
 				  reload-moonunit.jar 
 
-spring            spring.jar                            1.2.8 				   Apache License 2.0		     VMware                           programming and configuration model for modern Java-based enterprise applications
-				  jboss-spring-int-vfs.jar				1.0.0				   					             Red Hat						  integration package, for beanRefContext.xml
-				  jboss-spring-int-deployers.jar		1.0.0				   								 Red Hat
-				  
+spring            spring-core-4.0.6.RELEASE.jar			4.0.6				  Apache License 2.0			GoPivotal						  programming and configuration model for modern Java-based enterprise applications
+				  spring-context-4.0.6.RELEASE.jar
+				  spring-orm-4.0.6.RELEASE.jar
+				  spring-web-4.0.6.RELEASE.jar
+
 struts            jakarta-oro.jar                       2.0.7                  Apache License 2.0            Apache						      regular expressions
 				  struts.jar                            1.2.7                  Apache License 2.0            Apache						      Struts Framework
 				  struts-el.jar                         1.2.9                  Apache License 2.0            Apache						      Struts extensions

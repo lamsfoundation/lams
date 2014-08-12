@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -30,9 +29,7 @@ import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.ForeignKeyDirection;
-import org.hibernate.type.SpecialOneToOneType;
 import org.hibernate.type.Type;
-import org.hibernate.type.TypeFactory;
 
 /**
  * A one-to-one association mapping
@@ -72,7 +69,8 @@ public class OneToOne extends ToOne {
 		if ( getColumnIterator().hasNext() ) {
 			return getMappings().getTypeResolver().getTypeFactory().specialOneToOne(
 					getReferencedEntityName(), 
-					foreignKeyType, 
+					foreignKeyType,
+					referenceToPrimaryKey, 
 					referencedPropertyName,
 					isLazy(),
 					isUnwrapProxy(),
@@ -83,11 +81,11 @@ public class OneToOne extends ToOne {
 		else {
 			return getMappings().getTypeResolver().getTypeFactory().oneToOne(
 					getReferencedEntityName(), 
-					foreignKeyType, 
+					foreignKeyType,
+					referenceToPrimaryKey, 
 					referencedPropertyName,
 					isLazy(),
 					isUnwrapProxy(),
-					isEmbedded(),
 					entityName,
 					propertyName
 			);

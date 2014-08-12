@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * FactoryBean which retrieves a static or non-static field value.
- * 
+ * {@link FactoryBean} which retrieves a static or non-static field value.
+ *
  * <p>Typically used for retrieving public static final constants. Usage example:
  *
  * <pre class="code">// standard definition for exposing a static field, specifying the "staticField" property
@@ -42,19 +42,20 @@ import org.springframework.util.StringUtils;
  * &lt;bean id="java.sql.Connection.TRANSACTION_SERIALIZABLE"
  *       class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean"/&gt;</pre>
  * </pre>
- * 
+ *
  * <p>If you are using Spring 2.0, you can also use the following style of configuration for
  * public static fields.
- * 
+ *
  * <pre class="code">&lt;util:constant static-field="java.sql.Connection.TRANSACTION_SERIALIZABLE"/&gt;</pre>
  *
  * @author Juergen Hoeller
  * @since 1.1
  * @see #setStaticField
  */
-public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, BeanClassLoaderAware, InitializingBean {
+public class FieldRetrievingFactoryBean
+		implements FactoryBean<Object>, BeanNameAware, BeanClassLoaderAware, InitializingBean {
 
-	private Class targetClass;
+	private Class<?> targetClass;
 
 	private Object targetObject;
 
@@ -77,14 +78,14 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 	 * @see #setTargetObject
 	 * @see #setTargetField
 	 */
-	public void setTargetClass(Class targetClass) {
+	public void setTargetClass(Class<?> targetClass) {
 		this.targetClass = targetClass;
 	}
 
 	/**
 	 * Return the target class on which the field is defined.
 	 */
-	public Class getTargetClass() {
+	public Class<?> getTargetClass() {
 		return targetClass;
 	}
 
@@ -141,15 +142,18 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 	 * nor "targetField" have been specified.
 	 * This allows for concise bean definitions with just an id/name.
 	 */
+	@Override
 	public void setBeanName(String beanName) {
 		this.beanName = StringUtils.trimAllWhitespace(BeanFactoryUtils.originalBeanName(beanName));
 	}
 
+	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
 
 
+	@Override
 	public void afterPropertiesSet() throws ClassNotFoundException, NoSuchFieldException {
 		if (this.targetClass != null && this.targetObject != null) {
 			throw new IllegalArgumentException("Specify either targetClass or targetObject, not both");
@@ -158,7 +162,7 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 		if (this.targetClass == null && this.targetObject == null) {
 			if (this.targetField != null) {
 				throw new IllegalArgumentException(
-				    "Specify targetClass or targetObject in combination with targetField");
+						"Specify targetClass or targetObject in combination with targetField");
 			}
 
 			// If no other property specified, consider bean name as static field expression.
@@ -170,7 +174,7 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 			int lastDotIndex = this.staticField.lastIndexOf('.');
 			if (lastDotIndex == -1 || lastDotIndex == this.staticField.length()) {
 				throw new IllegalArgumentException(
-						"staticField must be a fully qualified class plus method name: " +
+						"staticField must be a fully qualified class plus static field name: " +
 						"e.g. 'example.MyExampleClass.MY_EXAMPLE_FIELD'");
 			}
 			String className = this.staticField.substring(0, lastDotIndex);
@@ -185,11 +189,12 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 		}
 
 		// Try to get the exact method first.
-		Class targetClass = (this.targetObject != null) ? this.targetObject.getClass() : this.targetClass;
+		Class<?> targetClass = (this.targetObject != null) ? this.targetObject.getClass() : this.targetClass;
 		this.fieldObject = targetClass.getField(this.targetField);
 	}
 
 
+	@Override
 	public Object getObject() throws IllegalAccessException {
 		if (this.fieldObject == null) {
 			throw new FactoryBeanNotInitializedException();
@@ -205,10 +210,12 @@ public class FieldRetrievingFactoryBean implements FactoryBean, BeanNameAware, B
 		}
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return (this.fieldObject != null ? this.fieldObject.getType() : null);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return false;
 	}

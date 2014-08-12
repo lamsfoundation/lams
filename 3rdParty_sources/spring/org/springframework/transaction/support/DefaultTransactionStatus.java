@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ import org.springframework.transaction.SavepointManager;
  * <p>Supports delegating savepoint-related methods to a transaction object
  * that implements the {@link SavepointManager} interface.
  *
- * <p><b>NOTE:</b> This is <i>not</i> intended to be used for other
- * PlatformTransactionManager implementations, in particular not for
- * mock transaction managers. Use {@link SimpleTransactionStatus} or
- * a mock for the plain TransactionStatus interface instead.
+ * <p><b>NOTE:</b> This is <i>not</i> intended for use with other PlatformTransactionManager
+ * implementations, in particular not for mock transaction managers in testing environments.
+ * Use the alternative {@link SimpleTransactionStatus} class or a mock for the plain
+ * {@link org.springframework.transaction.TransactionStatus} interface instead.
  *
  * @author Juergen Hoeller
  * @since 19.01.2004
@@ -77,7 +77,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 	 * for this transaction, if any
 	 */
 	public DefaultTransactionStatus(
-	    Object transaction, boolean newTransaction, boolean newSynchronization,
+			Object transaction, boolean newTransaction, boolean newSynchronization,
 			boolean readOnly, boolean debug, Object suspendedResources) {
 
 		this.transaction = transaction;
@@ -87,6 +87,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 		this.debug = debug;
 		this.suspendedResources = suspendedResources;
 	}
+
 
 	/**
 	 * Return the underlying transaction object.
@@ -102,6 +103,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 		return (this.transaction != null);
 	}
 
+	@Override
 	public boolean isNewTransaction() {
 		return (hasTransaction() && this.newTransaction);
 	}
@@ -145,24 +147,37 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 
 	/**
 	 * Determine the rollback-only flag via checking both the transaction object,
-	 * provided that the latter implements the SmartTransactionObject interface.
+	 * provided that the latter implements the {@link SmartTransactionObject} interface.
 	 * <p>Will return "true" if the transaction itself has been marked rollback-only
 	 * by the transaction coordinator, for example in case of a timeout.
 	 * @see SmartTransactionObject#isRollbackOnly
 	 */
+	@Override
 	public boolean isGlobalRollbackOnly() {
 		return ((this.transaction instanceof SmartTransactionObject) &&
 				((SmartTransactionObject) this.transaction).isRollbackOnly());
 	}
 
 	/**
+	 * Delegate the flushing to the transaction object,
+	 * provided that the latter implements the {@link SmartTransactionObject} interface.
+	 */
+	@Override
+	public void flush() {
+		if (this.transaction instanceof SmartTransactionObject) {
+			((SmartTransactionObject) this.transaction).flush();
+		}
+	}
+
+	/**
 	 * This implementation exposes the SavepointManager interface
 	 * of the underlying transaction object, if any.
 	 */
+	@Override
 	protected SavepointManager getSavepointManager() {
 		if (!isTransactionSavepointManager()) {
 			throw new NestedTransactionNotSupportedException(
-			    "Transaction object [" + getTransaction() + "] does not support savepoints");
+				"Transaction object [" + getTransaction() + "] does not support savepoints");
 		}
 		return (SavepointManager) getTransaction();
 	}

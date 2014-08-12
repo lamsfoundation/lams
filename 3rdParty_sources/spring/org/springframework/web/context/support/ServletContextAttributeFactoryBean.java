@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.web.context.ServletContextAware;
 
 /**
- * FactoryBean that fetches a specific, existing ServletContext attribute.
+ * {@link FactoryBean} that fetches a specific, existing ServletContext attribute.
  * Exposes that ServletContext attribute when used as bean reference,
  * effectively making it available as named Spring bean instance.
  *
@@ -30,13 +30,18 @@ import org.springframework.web.context.ServletContextAware;
  * the startup of the Spring application context. Typically, such
  * attributes will have been put there by third-party web frameworks.
  * In a purely Spring-based web application, no such linking in of
- * ServletContext attrutes will be necessary.
+ * ServletContext attributes will be necessary.
+ *
+ * <p><b>NOTE:</b> As of Spring 3.0, you may also use the "contextAttributes" default
+ * bean which is of type Map, and dereference it using an "#{contextAttributes.myKey}"
+ * expression to access a specific attribute by name.
  *
  * @author Juergen Hoeller
  * @since 1.1.4
+ * @see org.springframework.web.context.WebApplicationContext#CONTEXT_ATTRIBUTES_BEAN_NAME
  * @see ServletContextParameterFactoryBean
  */
-public class ServletContextAttributeFactoryBean implements FactoryBean, ServletContextAware {
+public class ServletContextAttributeFactoryBean implements FactoryBean<Object>, ServletContextAware {
 
 	private String attributeName;
 
@@ -50,9 +55,10 @@ public class ServletContextAttributeFactoryBean implements FactoryBean, ServletC
 		this.attributeName = attributeName;
 	}
 
+	@Override
 	public void setServletContext(ServletContext servletContext) {
 		if (this.attributeName == null) {
-			throw new IllegalArgumentException("attributeName is required");
+			throw new IllegalArgumentException("Property 'attributeName' is required");
 		}
 		this.attribute = servletContext.getAttribute(this.attributeName);
 		if (this.attribute == null) {
@@ -61,14 +67,17 @@ public class ServletContextAttributeFactoryBean implements FactoryBean, ServletC
 	}
 
 
+	@Override
 	public Object getObject() throws Exception {
 		return this.attribute;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return (this.attribute != null ? this.attribute.getClass() : null);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.jca.endpoint;
 
 import java.lang.reflect.Method;
-
 import javax.resource.ResourceException;
 import javax.resource.spi.ApplicationServerInternalException;
 import javax.resource.spi.UnavailableException;
@@ -30,11 +29,12 @@ import javax.transaction.xa.XAResource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.transaction.jta.SimpleTransactionFactory;
 import org.springframework.transaction.jta.TransactionFactory;
 
 /**
- * Abstract base implementation of the JCA 1.5
+ * Abstract base implementation of the JCA 1.5/1.6/1.7
  * {@link javax.resource.spi.endpoint.MessageEndpointFactory} interface,
  * providing transaction management capabilities as well as ClassLoader
  * exposure for endpoint invocations.
@@ -43,7 +43,7 @@ import org.springframework.transaction.jta.TransactionFactory;
  * @since 2.5
  * @see #setTransactionManager
  */
-public abstract class AbstractMessageEndpointFactory implements MessageEndpointFactory {
+public abstract class AbstractMessageEndpointFactory implements MessageEndpointFactory, BeanNameAware {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -53,6 +53,8 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 	private String transactionName;
 
 	private int transactionTimeout = -1;
+
+	private String beanName;
 
 
 	/**
@@ -117,22 +119,54 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 		this.transactionTimeout = transactionTimeout;
 	}
 
+	/**
+	 * Set the name of this message endpoint. Populated with the bean name
+	 * automatically when defined within Spring's bean factory.
+	 */
+	@Override
+	public void setBeanName(String beanName) {
+		this.beanName = beanName;
+	}
+
 
 	/**
-	 * This implementation returns <code>true</code> if a transaction manager
-	 * has been specified; <code>false</code> otherwise.
+	 * Implementation of the JCA 1.7 {@code #getActivationName()} method,
+	 * returning the bean name as set on this MessageEndpointFactory.
+	 * @see #setBeanName
+	 */
+	public String getActivationName() {
+		return this.beanName;
+	}
+
+	/**
+	 * This implementation returns {@code true} if a transaction manager
+	 * has been specified; {@code false} otherwise.
 	 * @see #setTransactionManager
 	 * @see #setTransactionFactory
 	 */
+	@Override
 	public boolean isDeliveryTransacted(Method method) throws NoSuchMethodException {
 		return (this.transactionFactory != null);
 	}
 
 	/**
-	 * This implementation delegates to {@link #createEndpointInternal()},
+	 * The standard JCA 1.5 version of {@code createEndpoint}.
+	 * <p>This implementation delegates to {@link #createEndpointInternal()},
 	 * initializing the endpoint's XAResource before the endpoint gets invoked.
 	 */
+	@Override
 	public MessageEndpoint createEndpoint(XAResource xaResource) throws UnavailableException {
+		AbstractMessageEndpoint endpoint = createEndpointInternal();
+		endpoint.initXAResource(xaResource);
+		return endpoint;
+	}
+
+	/**
+	 * The alternative JCA 1.6 version of {@code createEndpoint}.
+	 * <p>This implementation delegates to {@link #createEndpointInternal()},
+	 * ignoring the specified timeout. It is only here for JCA 1.6 compliance.
+	 */
+	public MessageEndpoint createEndpoint(XAResource xaResource, long timeout) throws UnavailableException {
 		AbstractMessageEndpoint endpoint = createEndpointInternal();
 		endpoint.initXAResource(xaResource);
 		return endpoint;
@@ -141,11 +175,10 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 	/**
 	 * Create the actual endpoint instance, as a subclass of the
 	 * {@link AbstractMessageEndpoint} inner class of this factory.
-	 * @return the actual endpoint instance (never <code>null</code>)
+	 * @return the actual endpoint instance (never {@code null})
 	 * @throws UnavailableException if no endpoint is available at present
 	 */
-	protected abstract AbstractMessageEndpoint createEndpointInternal()
-			throws UnavailableException;
+	protected abstract AbstractMessageEndpoint createEndpointInternal() throws UnavailableException;
 
 
 	/**
@@ -169,15 +202,16 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 		}
 
 		/**
-		 * This <code>beforeDelivery</code> implementation starts a transaction,
+		 * This {@code beforeDelivery} implementation starts a transaction,
 		 * if necessary, and exposes the endpoint ClassLoader as current
 		 * thread context ClassLoader.
 		 * <p>Note that the JCA 1.5 specification does not require a ResourceAdapter
 		 * to call this method before invoking the concrete endpoint. If this method
 		 * has not been called (check {@link #hasBeforeDeliveryBeenCalled()}), the
-		 * concrete endpoint method should call <code>beforeDelivery</code> and its
+		 * concrete endpoint method should call {@code beforeDelivery} and its
 		 * sibling {@link #afterDelivery()} explicitly, as part of its own processing.
 		 */
+		@Override
 		public void beforeDelivery(Method method) throws ResourceException {
 			this.beforeDeliveryCalled = true;
 			try {
@@ -195,7 +229,7 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 		 * Template method for exposing the endpoint's ClassLoader
 		 * (typically the ClassLoader that the message listener class
 		 * has been loaded with).
-		 * @return the endpoint ClassLoader (never <code>null</code>)
+		 * @return the endpoint ClassLoader (never {@code null})
 		 */
 		protected abstract ClassLoader getEndpointClassLoader();
 
@@ -219,12 +253,13 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 		}
 
 		/**
-		 * This <code>afterDelivery</code> implementation resets the thread context
+		 * This {@code afterDelivery} implementation resets the thread context
 		 * ClassLoader and completes the transaction, if any.
 		 * <p>Note that the JCA 1.5 specification does not require a ResourceAdapter
 		 * to call this method after invoking the concrete endpoint. See the
 		 * explanation in {@link #beforeDelivery}'s javadoc.
 		 */
+		@Override
 		public void afterDelivery() throws ResourceException {
 			this.beforeDeliveryCalled = false;
 			Thread.currentThread().setContextClassLoader(this.previousContextClassLoader);
@@ -237,6 +272,7 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 			}
 		}
 
+		@Override
 		public void release() {
 			try {
 				this.transactionDelegate.setRollbackOnly();
@@ -255,22 +291,24 @@ public abstract class AbstractMessageEndpointFactory implements MessageEndpointF
 	 */
 	private class TransactionDelegate {
 
-		private XAResource xaResource;
+		private final XAResource xaResource;
 
 		private Transaction transaction;
 
 		private boolean rollbackOnly;
 
 		public TransactionDelegate(XAResource xaResource) {
-			if (transactionFactory != null && xaResource == null) {
-				throw new IllegalStateException("ResourceAdapter-provided XAResource is required for " +
-						"transaction management. Check your ResourceAdapter's configuration.");
+			if (xaResource == null) {
+				if (transactionFactory != null && !transactionFactory.supportsResourceAdapterManagedTransactions()) {
+					throw new IllegalStateException("ResourceAdapter-provided XAResource is required for " +
+							"transaction management. Check your ResourceAdapter's configuration.");
+				}
 			}
 			this.xaResource = xaResource;
 		}
 
 		public void beginTransaction() throws Exception {
-			if (transactionFactory != null) {
+			if (transactionFactory != null && this.xaResource != null) {
 				this.transaction = transactionFactory.createTransaction(transactionName, transactionTimeout);
 				this.transaction.enlistResource(this.xaResource);
 			}

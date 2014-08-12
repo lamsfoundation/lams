@@ -17,7 +17,6 @@
         <archive path="/lams_build/lib/reload/reload-diva.jar"/>
         <archive path="/lams_build/lib/reload/reload-jdom.jar"/>
         <archive path="/lams_build/lib/reload/reload-moonunit.jar"/>
-        <archive javadoc="http://static.springframework.org/spring/docs/2.5.6/api/" path="/lams_build/lib/spring/spring.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/struts/struts-el.jar"/>
         <archive javadoc="http://struts.apache.org/1.x/apidocs/" path="/lams_build/lib/struts/struts.jar" source="/3rdParty_sources/struts"/>
         <archive javadoc="http://academy.bhtafe.edu.au/hwiebell/Wddx_SDK/7__References/Java/JavaDoc/" path="/lams_build/lib/wddx/wddx.jar"/>
@@ -38,5 +37,12 @@
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/jboss/jbossweb.jar" source="/3rdParty_sources/jbossweb"/>
         <archive path="/lams_build/lib/quartz/quartz.jar" source="/3rdParty_sources/quartz"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-core-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-orm-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-web-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-tx-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-beans-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-support-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
     </library>
 </eclipse-userlibraries>

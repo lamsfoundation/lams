@@ -24,14 +24,10 @@
 package org.hibernate.type;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.jdbc.LobCreator;
-import org.hibernate.engine.jdbc.NonContextualLobCreator;
-import org.hibernate.type.descriptor.WrapperOptions;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
@@ -48,64 +44,16 @@ public abstract class AbstractSingleColumnStandardBasicType<T>
 		super( sqlTypeDescriptor, javaTypeDescriptor );
 	}
 
-	private static WrapperOptions NO_OPTIONS = new WrapperOptions() {
-		public boolean useStreamForLobBinding() {
-			return false;
-		}
-
-		public LobCreator getLobCreator() {
-			return NonContextualLobCreator.INSTANCE;
-		}
-	};
-
+	@Override
 	public final int sqlType() {
 		return getSqlTypeDescriptor().getSqlType();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @deprecated Use {@link #nullSafeGet(ResultSet, String, SessionImplementor)} instead
-	 */
-	public T nullSafeGet(ResultSet rs, String name) throws HibernateException, SQLException {
-		return nullSafeGet( rs, name, NO_OPTIONS );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @deprecated Use {@link #get(ResultSet, String, SessionImplementor)} instead.
-	 */
-	public Object get(ResultSet rs, String name) throws HibernateException, SQLException {
-		return nullSafeGet( rs, name );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public final void nullSafeSet(PreparedStatement st, Object value, int index, boolean[] settable, SessionImplementor session)
 			throws HibernateException, SQLException {
 		if ( settable[0] ) {
 			nullSafeSet( st, value, index, session );
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @deprecated Use {@link #nullSafeSet(PreparedStatement, Object, int, SessionImplementor)} instead.
-	 */
-	public void nullSafeSet(PreparedStatement st, T value, int index) throws HibernateException, SQLException {
-		nullSafeSet( st, value, index, NO_OPTIONS );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @deprecated Use {@link #set(PreparedStatement, Object, int, SessionImplementor)} instead.
-	 */
-	public void set(PreparedStatement st, T value, int index) throws HibernateException, SQLException {
-		nullSafeSet( st, value, index );
-	}
-
 }

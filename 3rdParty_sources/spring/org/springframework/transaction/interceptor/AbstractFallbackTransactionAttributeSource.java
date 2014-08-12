@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ package org.springframework.transaction.interceptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.core.BridgeMethodResolver;
-import org.springframework.core.CollectionFactory;
-import org.springframework.core.JdkVersion;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -55,7 +54,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * Canonical value held in cache to indicate no transaction attribute was
 	 * found for this method, and we don't need to look again.
 	 */
-	private final static Object NULL_TRANSACTION_ATTRIBUTE = new Object();
+	private final static TransactionAttribute NULL_TRANSACTION_ATTRIBUTE = new DefaultTransactionAttribute();
 
 
 	/**
@@ -70,18 +69,19 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
 	 */
-	final Map attributeCache = CollectionFactory.createConcurrentMapIfPossible(16);
+	final Map<Object, TransactionAttribute> attributeCache = new ConcurrentHashMap<Object, TransactionAttribute>(1024);
 
 
 	/**
 	 * Determine the transaction attribute for this method invocation.
 	 * <p>Defaults to the class's transaction attribute if no method attribute is found.
-	 * @param method the method for the current invocation (never <code>null</code>)
-	 * @param targetClass the target class for this invocation (may be <code>null</code>)
-	 * @return TransactionAttribute for this method, or <code>null</code> if the method
+	 * @param method the method for the current invocation (never {@code null})
+	 * @param targetClass the target class for this invocation (may be {@code null})
+	 * @return TransactionAttribute for this method, or {@code null} if the method
 	 * is not transactional
 	 */
-	public TransactionAttribute getTransactionAttribute(Method method, Class targetClass) {
+	@Override
+	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
 		// First, see if we have a cached value.
 		Object cacheKey = getCacheKey(method, targetClass);
 		Object cached = this.attributeCache.get(cacheKey);
@@ -104,7 +104,9 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 			}
 			else {
 				if (logger.isDebugEnabled()) {
-					logger.debug("Adding transactional method [" + method.getName() + "] with attribute [" + txAtt + "]");
+					Class<?> classToLog = (targetClass != null ? targetClass : method.getDeclaringClass());
+					logger.debug("Adding transactional method '" + classToLog.getSimpleName() + "." +
+							method.getName() + "' with attribute: " + txAtt);
 				}
 				this.attributeCache.put(cacheKey, txAtt);
 			}
@@ -116,11 +118,11 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * Determine a cache key for the given method and target class.
 	 * <p>Must not produce same key for overloaded methods.
 	 * Must produce same key for different instances of the same method.
-	 * @param method the method (never <code>null</code>)
-	 * @param targetClass the target class (may be <code>null</code>)
-	 * @return the cache key (never <code>null</code>)
+	 * @param method the method (never {@code null})
+	 * @param targetClass the target class (may be {@code null})
+	 * @return the cache key (never {@code null})
 	 */
-	protected Object getCacheKey(Method method, Class targetClass) {
+	protected Object getCacheKey(Method method, Class<?> targetClass) {
 		return new DefaultCacheKey(method, targetClass);
 	}
 
@@ -129,19 +131,19 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * {@link #getTransactionAttribute} is effectively a caching decorator for this method.
 	 * @see #getTransactionAttribute
 	 */
-	private TransactionAttribute computeTransactionAttribute(Method method, Class targetClass) {
+	private TransactionAttribute computeTransactionAttribute(Method method, Class<?> targetClass) {
 		// Don't allow no-public methods as required.
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
 
+		// Ignore CGLIB subclasses - introspect the actual user class.
+		Class<?> userClass = ClassUtils.getUserClass(targetClass);
 		// The method may be on an interface, but we need attributes from the target class.
 		// If the target class is null, the method will be unchanged.
-		Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
+		Method specificMethod = ClassUtils.getMostSpecificMethod(method, userClass);
 		// If we are dealing with method with generic parameters, find the original method.
-		if (JdkVersion.isAtLeastJava15()) {
-			specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
-		}
+		specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
 		// First try is the method in the target class.
 		TransactionAttribute txAtt = findTransactionAttribute(specificMethod);
@@ -173,7 +175,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * for the given method, if any.
 	 * @param method the method to retrieve the attribute for
 	 * @return all transaction attribute associated with this method
-	 * (or <code>null</code> if none)
+	 * (or {@code null} if none)
 	 */
 	protected abstract TransactionAttribute findTransactionAttribute(Method method);
 
@@ -182,14 +184,14 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * for the given class, if any.
 	 * @param clazz the class to retrieve the attribute for
 	 * @return all transaction attribute associated with this class
-	 * (or <code>null</code> if none)
+	 * (or {@code null} if none)
 	 */
-	protected abstract TransactionAttribute findTransactionAttribute(Class clazz);
+	protected abstract TransactionAttribute findTransactionAttribute(Class<?> clazz);
 
 
 	/**
 	 * Should only public methods be allowed to have transactional semantics?
-	 * <p>The default implementation returns <code>false</code>.
+	 * <p>The default implementation returns {@code false}.
 	 */
 	protected boolean allowPublicMethodsOnly() {
 		return false;
@@ -203,13 +205,14 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 
 		private final Method method;
 
-		private final Class targetClass;
+		private final Class<?> targetClass;
 
-		public DefaultCacheKey(Method method, Class targetClass) {
+		public DefaultCacheKey(Method method, Class<?> targetClass) {
 			this.method = method;
 			this.targetClass = targetClass;
 		}
 
+		@Override
 		public boolean equals(Object other) {
 			if (this == other) {
 				return true;
@@ -222,8 +225,9 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 					ObjectUtils.nullSafeEquals(this.targetClass, otherKey.targetClass));
 		}
 
+		@Override
 		public int hashCode() {
-			return this.method.hashCode() * 29 + (this.targetClass != null ? this.targetClass.hashCode() : 0);
+			return this.method.hashCode();
 		}
 	}
 

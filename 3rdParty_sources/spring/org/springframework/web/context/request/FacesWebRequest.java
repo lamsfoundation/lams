@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package org.springframework.web.context.request;
 
 import java.security.Principal;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
@@ -27,6 +27,8 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link WebRequest} adapter for a JSF {@link javax.faces.context.FacesContext}.
+ *
+ * <p>Requires JSF 2.0 or higher, as of Spring 4.0.
  *
  * @author Juergen Hoeller
  * @since 2.5.2
@@ -43,73 +45,136 @@ public class FacesWebRequest extends FacesRequestAttributes implements NativeWeb
 	}
 
 
+	@Override
 	public Object getNativeRequest() {
 		return getExternalContext().getRequest();
 	}
 
+	@Override
 	public Object getNativeResponse() {
 		return getExternalContext().getResponse();
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getNativeRequest(Class<T> requiredType) {
+		if (requiredType != null) {
+			Object request = getExternalContext().getRequest();
+			if (requiredType.isInstance(request)) {
+				return (T) request;
+			}
+		}
+		return null;
+	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getNativeResponse(Class<T> requiredType) {
+		if (requiredType != null) {
+			Object response = getExternalContext().getResponse();
+			if (requiredType.isInstance(response)) {
+				return (T) response;
+			}
+		}
+		return null;
+	}
+
+
+	@Override
+	public String getHeader(String headerName) {
+		return getExternalContext().getRequestHeaderMap().get(headerName);
+	}
+
+	@Override
+	public String[] getHeaderValues(String headerName) {
+		return getExternalContext().getRequestHeaderValuesMap().get(headerName);
+	}
+
+	@Override
+	public Iterator<String> getHeaderNames() {
+		return getExternalContext().getRequestHeaderMap().keySet().iterator();
+	}
+
+	@Override
 	public String getParameter(String paramName) {
-		return (String) getExternalContext().getRequestParameterMap().get(paramName);
+		return getExternalContext().getRequestParameterMap().get(paramName);
 	}
 
+	@Override
+	public Iterator<String> getParameterNames() {
+		return getExternalContext().getRequestParameterNames();
+	}
+
+	@Override
 	public String[] getParameterValues(String paramName) {
-		return (String[]) getExternalContext().getRequestParameterValuesMap().get(paramName);
+		return getExternalContext().getRequestParameterValuesMap().get(paramName);
 	}
 
-	public Map getParameterMap() {
-		return getExternalContext().getRequestParameterMap();
+	@Override
+	public Map<String, String[]> getParameterMap() {
+		return getExternalContext().getRequestParameterValuesMap();
 	}
 
+	@Override
 	public Locale getLocale() {
 		return getFacesContext().getExternalContext().getRequestLocale();
 	}
 
+	@Override
 	public String getContextPath() {
 		return getFacesContext().getExternalContext().getRequestContextPath();
 	}
 
+	@Override
 	public String getRemoteUser() {
 		return getFacesContext().getExternalContext().getRemoteUser();
 	}
 
+	@Override
 	public Principal getUserPrincipal() {
 		return getFacesContext().getExternalContext().getUserPrincipal();
 	}
 
+	@Override
 	public boolean isUserInRole(String role) {
 		return getFacesContext().getExternalContext().isUserInRole(role);
 	}
 
+	@Override
 	public boolean isSecure() {
 		return false;
 	}
 
+	@Override
 	public boolean checkNotModified(long lastModifiedTimestamp) {
 		return false;
 	}
 
+	@Override
+	public boolean checkNotModified(String eTag) {
+		return false;
+	}
 
+	@Override
 	public String getDescription(boolean includeClientInfo) {
 		ExternalContext externalContext = getExternalContext();
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("context=").append(externalContext.getRequestContextPath());
+		StringBuilder sb = new StringBuilder();
+		sb.append("context=").append(externalContext.getRequestContextPath());
 		if (includeClientInfo) {
 			Object session = externalContext.getSession(false);
 			if (session != null) {
-				buffer.append(";session=").append(getSessionId());
+				sb.append(";session=").append(getSessionId());
 			}
 			String user = externalContext.getRemoteUser();
 			if (StringUtils.hasLength(user)) {
-				buffer.append(";user=").append(user);
+				sb.append(";user=").append(user);
 			}
 		}
-		return buffer.toString();
+		return sb.toString();
 	}
 
+
+	@Override
 	public String toString() {
 		return "FacesWebRequest: " + getDescription(true);
 	}

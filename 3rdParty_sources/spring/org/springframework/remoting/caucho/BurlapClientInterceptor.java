@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,10 @@ import org.springframework.util.Assert;
  * @see BurlapProxyFactoryBean
  * @see com.caucho.burlap.client.BurlapProxyFactory
  * @see com.caucho.burlap.server.BurlapServlet
+ * @deprecated as of Spring 4.0, since Burlap hasn't evolved in years
+ * and is effectively retired (in contrast to its sibling Hessian)
  */
+@Deprecated
 public class BurlapClientInterceptor extends UrlBasedRemoteAccessor implements MethodInterceptor {
 
 	private BurlapProxyFactory proxyFactory = new BurlapProxyFactory();
@@ -105,6 +108,7 @@ public class BurlapClientInterceptor extends UrlBasedRemoteAccessor implements M
 	}
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		prepare();
@@ -136,6 +140,7 @@ public class BurlapClientInterceptor extends UrlBasedRemoteAccessor implements M
 	}
 
 
+	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (this.burlapProxy == null) {
 			throw new IllegalStateException("BurlapClientInterceptor is not properly initialized - " +
@@ -147,16 +152,18 @@ public class BurlapClientInterceptor extends UrlBasedRemoteAccessor implements M
 			return invocation.getMethod().invoke(this.burlapProxy, invocation.getArguments());
 		}
 		catch (InvocationTargetException ex) {
-			if (ex.getTargetException() instanceof BurlapRuntimeException) {
-				BurlapRuntimeException bre = (BurlapRuntimeException) ex.getTargetException();
-				Throwable rootCause = (bre.getRootCause() != null ? bre.getRootCause() : bre);
-				throw convertBurlapAccessException(rootCause);
+			Throwable targetEx = ex.getTargetException();
+			if (targetEx instanceof BurlapRuntimeException) {
+				Throwable cause = targetEx.getCause();
+				throw convertBurlapAccessException(cause != null ? cause : targetEx);
 			}
-			else if (ex.getTargetException() instanceof UndeclaredThrowableException) {
-				UndeclaredThrowableException utex = (UndeclaredThrowableException) ex.getTargetException();
+			else if (targetEx instanceof UndeclaredThrowableException) {
+				UndeclaredThrowableException utex = (UndeclaredThrowableException) targetEx;
 				throw convertBurlapAccessException(utex.getUndeclaredThrowable());
 			}
-			throw ex.getTargetException();
+			else {
+				throw targetEx;
+			}
 		}
 		catch (Throwable ex) {
 			throw new RemoteProxyFailureException(
@@ -180,7 +187,7 @@ public class BurlapClientInterceptor extends UrlBasedRemoteAccessor implements M
 		}
 		else {
 			return new RemoteAccessException(
-			    "Cannot access Burlap remote service at [" + getServiceUrl() + "]", ex);
+				"Cannot access Burlap remote service at [" + getServiceUrl() + "]", ex);
 		}
 	}
 

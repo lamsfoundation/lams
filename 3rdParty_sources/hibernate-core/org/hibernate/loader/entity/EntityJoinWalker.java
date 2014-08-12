@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.loader.entity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,15 +30,16 @@ import org.hibernate.FetchMode;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.MappingException;
-import org.hibernate.engine.CascadeStyle;
-import org.hibernate.engine.LoadQueryInfluencers;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.CascadeStyle;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.loader.AbstractEntityJoinWalker;
 import org.hibernate.loader.OuterJoinableAssociation;
 import org.hibernate.loader.PropertyPath;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.OuterJoinLoadable;
+import org.hibernate.sql.JoinType;
 import org.hibernate.type.AssociationType;
 import org.hibernate.type.CompositeType;
 import org.hibernate.type.EntityType;
@@ -67,7 +67,7 @@ public class EntityJoinWalker extends AbstractEntityJoinWalker {
 
 		this.lockOptions.setLockMode(lockMode);
 		
-		StringBuffer whereCondition = whereString( getAlias(), uniqueKey, batchSize )
+		StringBuilder whereCondition = whereString( getAlias(), uniqueKey, batchSize )
 				//include the discriminator and class-level where, but not filters
 				.append( persister.filterFragment( getAlias(), Collections.EMPTY_MAP ) );
 
@@ -86,7 +86,7 @@ public class EntityJoinWalker extends AbstractEntityJoinWalker {
 		super( persister, factory, loadQueryInfluencers );
 		LockOptions.copy(lockOptions, this.lockOptions);
 
-		StringBuffer whereCondition = whereString( getAlias(), uniqueKey, batchSize )
+		StringBuilder whereCondition = whereString( getAlias(), uniqueKey, batchSize )
 				//include the discriminator and class-level where, but not filters
 				.append( persister.filterFragment( getAlias(), Collections.EMPTY_MAP ) );
 
@@ -95,7 +95,7 @@ public class EntityJoinWalker extends AbstractEntityJoinWalker {
 		this.compositeKeyManyToOneTargetIndices = callback.resolve();
 	}
 
-	protected int getJoinType(
+	protected JoinType getJoinType(
 			OuterJoinLoadable persister,
 			PropertyPath path,
 			int propertyNumber,
@@ -110,18 +110,18 @@ public class EntityJoinWalker extends AbstractEntityJoinWalker {
 		// fetch profiles.
 		// TODO : how to best handle criteria queries?
 		if ( lockOptions.getLockMode().greaterThan( LockMode.READ ) ) {
-			return -1;
+			return JoinType.NONE;
 		}
 		if ( isTooDeep( currentDepth )
 				|| ( associationType.isCollectionType() && isTooManyCollections() ) ) {
-			return -1;
+			return JoinType.NONE;
 		}
 		if ( !isJoinedFetchEnabledInMapping( metadataFetchMode, associationType )
 				&& !isJoinFetchEnabledByProfile( persister, path, propertyNumber ) ) {
-			return -1;
+			return JoinType.NONE;
 		}
 		if ( isDuplicateAssociation( lhsTable, lhsColumns, associationType ) ) {
-			return -1;
+			return JoinType.NONE;
 		}
 		return getJoinType( nullable, currentDepth );
 	}

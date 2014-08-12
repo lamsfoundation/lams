@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,29 @@
 package org.springframework.beans.factory;
 
 import org.springframework.beans.BeansException;
+import org.springframework.util.StringUtils;
 
 /**
- * Exception thrown when a BeanFactory is asked for a bean
- * instance name for which it cannot find a definition.
+ * Exception thrown when a {@code BeanFactory} is asked for a bean instance
+ * for which it cannot find a definition.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * @see BeanFactory#getBean(String)
+ * @see BeanFactory#getBean(Class)
  */
+@SuppressWarnings("serial")
 public class NoSuchBeanDefinitionException extends BeansException {
 
-	/** Name of the missing bean */
+	/** Name of the missing bean. */
 	private String beanName;
 
-	/** Required bean type */
-	private Class beanType;
+	/** Required type of the missing bean. */
+	private Class<?> beanType;
 
 
 	/**
-	 * Create a new NoSuchBeanDefinitionException.
+	 * Create a new {@code NoSuchBeanDefinitionException}.
 	 * @param name the name of the missing bean
 	 */
 	public NoSuchBeanDefinitionException(String name) {
@@ -44,7 +48,7 @@ public class NoSuchBeanDefinitionException extends BeansException {
 	}
 
 	/**
-	 * Create a new NoSuchBeanDefinitionException.
+	 * Create a new {@code NoSuchBeanDefinitionException}.
 	 * @param name the name of the missing bean
 	 * @param message detailed message describing the problem
 	 */
@@ -54,42 +58,59 @@ public class NoSuchBeanDefinitionException extends BeansException {
 	}
 
 	/**
-	 * Create a new NoSuchBeanDefinitionException.
-	 * @param type required type of bean
-	 * @param message detailed message describing the problem
+	 * Create a new {@code NoSuchBeanDefinitionException}.
+	 * @param type required type of the missing bean
 	 */
-	public NoSuchBeanDefinitionException(Class type, String message) {
-		super("No unique bean of type [" + type.getName() + "] is defined: " + message);
+	public NoSuchBeanDefinitionException(Class<?> type) {
+		super("No qualifying bean of type [" + type.getName() + "] is defined");
 		this.beanType = type;
 	}
 
 	/**
-	 * Create a new NoSuchBeanDefinitionException.
-	 * @param type required type of bean
+	 * Create a new {@code NoSuchBeanDefinitionException}.
+	 * @param type required type of the missing bean
+	 * @param message detailed message describing the problem
+	 */
+	public NoSuchBeanDefinitionException(Class<?> type, String message) {
+		super("No qualifying bean of type [" + type.getName() + "] is defined: " + message);
+		this.beanType = type;
+	}
+
+	/**
+	 * Create a new {@code NoSuchBeanDefinitionException}.
+	 * @param type required type of the missing bean
 	 * @param dependencyDescription a description of the originating dependency
 	 * @param message detailed message describing the problem
 	 */
-	public NoSuchBeanDefinitionException(Class type, String dependencyDescription, String message) {
-		super("No matching bean of type [" + type.getName() + "] found for dependency [" +
-				dependencyDescription + "]: " + message);
+	public NoSuchBeanDefinitionException(Class<?> type, String dependencyDescription, String message) {
+		super("No qualifying bean of type [" + type.getName() + "] found for dependency" +
+				(StringUtils.hasLength(dependencyDescription) ? " [" + dependencyDescription + "]" : "") +
+				": " + message);
 		this.beanType = type;
 	}
 
 
 	/**
-	 * Return the name of the missing bean,
-	 * if it was a lookup by name that failed.
+	 * Return the name of the missing bean, if it was a lookup <em>by name</em> that failed.
 	 */
 	public String getBeanName() {
 		return this.beanName;
 	}
 
 	/**
-	 * Return the required type of bean,
-	 * if it was a lookup by type that failed.
+	 * Return the required type of the missing bean, if it was a lookup <em>by type</em> that failed.
 	 */
-	public Class getBeanType() {
+	public Class<?> getBeanType() {
 		return this.beanType;
+	}
+
+	/**
+	 * Return the number of beans found when only one matching bean was expected.
+	 * For a regular NoSuchBeanDefinitionException, this will always be 0.
+	 * @see NoUniqueBeanDefinitionException
+	 */
+	public int getNumberOfBeansFound() {
+		return 0;
 	}
 
 }

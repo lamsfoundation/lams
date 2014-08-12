@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 
+import com.caucho.hessian.HessianException;
+import com.caucho.hessian.client.HessianConnectionException;
+import com.caucho.hessian.client.HessianConnectionFactory;
 import com.caucho.hessian.client.HessianProxyFactory;
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.caucho.hessian.io.SerializerFactory;
@@ -42,6 +45,7 @@ import org.springframework.util.Assert;
  * <p>Hessian is a slim, binary RPC protocol.
  * For information on Hessian, see the
  * <a href="http://www.caucho.com/hessian">Hessian website</a>
+ * <b>Note: As of Spring 4.0, this client requires Hessian 4.0 or above.</b>
  *
  * <p>Note: There is no requirement for services accessed with this proxy factory
  * to have been exported using Spring's {@link HessianServiceExporter}, as there is
@@ -79,7 +83,7 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	/**
 	 * Specify the Hessian SerializerFactory to use.
 	 * <p>This will typically be passed in as an inner bean definition
-	 * of type <code>com.caucho.hessian.io.SerializerFactory</code>,
+	 * of type {@code com.caucho.hessian.io.SerializerFactory},
 	 * with custom bean property values applied.
 	 */
 	public void setSerializerFactory(SerializerFactory serializerFactory) {
@@ -92,6 +96,14 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	 */
 	public void setSendCollectionType(boolean sendCollectionType) {
 		this.proxyFactory.getSerializerFactory().setSendCollectionType(sendCollectionType);
+	}
+
+	/**
+	 * Set whether to allow non-serializable types as Hessian arguments
+	 * and return values. Default is "true".
+	 */
+	public void setAllowNonSerializable(boolean allowNonSerializable) {
+		this.proxyFactory.getSerializerFactory().setAllowNonSerializable(allowNonSerializable);
 	}
 
 	/**
@@ -141,6 +153,21 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	}
 
 	/**
+	 * Specify a custom HessianConnectionFactory to use for the Hessian client.
+	 */
+	public void setConnectionFactory(HessianConnectionFactory connectionFactory) {
+		this.proxyFactory.setConnectionFactory(connectionFactory);
+	}
+
+	/**
+	 * Set the socket connect timeout to use for the Hessian client.
+	 * @see com.caucho.hessian.client.HessianProxyFactory#setConnectTimeout
+	 */
+	public void setConnectTimeout(long timeout) {
+		this.proxyFactory.setConnectTimeout(timeout);
+	}
+
+	/**
 	 * Set the timeout to use when waiting for a reply from the Hessian service.
 	 * @see com.caucho.hessian.client.HessianProxyFactory#setReadTimeout
 	 */
@@ -177,6 +204,7 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	}
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		prepare();
@@ -204,10 +232,11 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	 */
 	protected Object createHessianProxy(HessianProxyFactory proxyFactory) throws MalformedURLException {
 		Assert.notNull(getServiceInterface(), "'serviceInterface' is required");
-		return proxyFactory.create(getServiceInterface(), getServiceUrl());
+		return proxyFactory.create(getServiceInterface(), getServiceUrl(), getBeanClassLoader());
 	}
 
 
+	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (this.hessianProxy == null) {
 			throw new IllegalStateException("HessianClientInterceptor is not properly initialized - " +
@@ -219,16 +248,25 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 			return invocation.getMethod().invoke(this.hessianProxy, invocation.getArguments());
 		}
 		catch (InvocationTargetException ex) {
-			if (ex.getTargetException() instanceof HessianRuntimeException) {
-				HessianRuntimeException hre = (HessianRuntimeException) ex.getTargetException();
-				Throwable rootCause = (hre.getRootCause() != null ? hre.getRootCause() : hre);
-				throw convertHessianAccessException(rootCause);
+			Throwable targetEx = ex.getTargetException();
+			// Hessian 4.0 check: another layer of InvocationTargetException.
+			if (targetEx instanceof InvocationTargetException) {
+				targetEx = ((InvocationTargetException) targetEx).getTargetException();
 			}
-			else if (ex.getTargetException() instanceof UndeclaredThrowableException) {
-				UndeclaredThrowableException utex = (UndeclaredThrowableException) ex.getTargetException();
+			if (targetEx instanceof HessianConnectionException) {
+				throw convertHessianAccessException(targetEx);
+			}
+			else if (targetEx instanceof HessianException || targetEx instanceof HessianRuntimeException) {
+				Throwable cause = targetEx.getCause();
+				throw convertHessianAccessException(cause != null ? cause : targetEx);
+			}
+			else if (targetEx instanceof UndeclaredThrowableException) {
+				UndeclaredThrowableException utex = (UndeclaredThrowableException) targetEx;
 				throw convertHessianAccessException(utex.getUndeclaredThrowable());
 			}
-			throw ex.getTargetException();
+			else {
+				throw targetEx;
+			}
 		}
 		catch (Throwable ex) {
 			throw new RemoteProxyFailureException(
@@ -246,13 +284,13 @@ public class HessianClientInterceptor extends UrlBasedRemoteAccessor implements 
 	 * @return the RemoteAccessException to throw
 	 */
 	protected RemoteAccessException convertHessianAccessException(Throwable ex) {
-		if (ex instanceof ConnectException) {
+		if (ex instanceof HessianConnectionException || ex instanceof ConnectException) {
 			return new RemoteConnectFailureException(
 					"Cannot connect to Hessian remote service at [" + getServiceUrl() + "]", ex);
 		}
 		else {
 			return new RemoteAccessException(
-			    "Cannot access Hessian remote service at [" + getServiceUrl() + "]", ex);
+				"Cannot access Hessian remote service at [" + getServiceUrl() + "]", ex);
 		}
 	}
 

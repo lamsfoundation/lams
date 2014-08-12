@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.beans.factory.access.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -30,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 
 /**
- * Unified EL <code>ELResolver</code> that delegates to a Spring BeanFactory,
+ * Unified EL {@code ELResolver} that delegates to a Spring BeanFactory,
  * resolving name references to Spring-defined beans.
  *
  * @author Juergen Hoeller
@@ -43,6 +42,7 @@ public abstract class SpringBeanELResolver extends ELResolver {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 
+	@Override
 	public Object getValue(ELContext elContext, Object base, Object property) throws ELException {
 		if (base == null) {
 			String beanName = property.toString();
@@ -58,6 +58,7 @@ public abstract class SpringBeanELResolver extends ELResolver {
 		return null;
 	}
 
+	@Override
 	public Class<?> getType(ELContext elContext, Object base, Object property) throws ELException {
 		if (base == null) {
 			String beanName = property.toString();
@@ -70,17 +71,25 @@ public abstract class SpringBeanELResolver extends ELResolver {
 		return null;
 	}
 
+	@Override
 	public void setValue(ELContext elContext, Object base, Object property, Object value) throws ELException {
 		if (base == null) {
 			String beanName = property.toString();
 			BeanFactory bf = getBeanFactory(elContext);
 			if (bf.containsBean(beanName)) {
-				throw new PropertyNotWritableException(
-						"Variable '" + beanName + "' refers to a Spring bean which by definition is not writable");
+				if (value == bf.getBean(beanName)) {
+					// Setting the bean reference to the same value is alright - can simply be ignored...
+					elContext.setPropertyResolved(true);
+				}
+				else {
+					throw new PropertyNotWritableException(
+							"Variable '" + beanName + "' refers to a Spring bean which by definition is not writable");
+				}
 			}
 		}
 	}
 
+	@Override
 	public boolean isReadOnly(ELContext elContext, Object base, Object property) throws ELException {
 		if (base == null) {
 			String beanName = property.toString();
@@ -92,10 +101,12 @@ public abstract class SpringBeanELResolver extends ELResolver {
 		return false;
 	}
 
+	@Override
 	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext elContext, Object base) {
 		return null;
 	}
 
+	@Override
 	public Class<?> getCommonPropertyType(ELContext elContext, Object base) {
 		return Object.class;
 	}
@@ -104,7 +115,7 @@ public abstract class SpringBeanELResolver extends ELResolver {
 	/**
 	 * Retrieve the Spring BeanFactory to delegate bean name resolution to.
 	 * @param elContext the current ELContext
-	 * @return the Spring BeanFactory (never <code>null</code>)
+	 * @return the Spring BeanFactory (never {@code null})
 	 */
 	protected abstract BeanFactory getBeanFactory(ELContext elContext);
 

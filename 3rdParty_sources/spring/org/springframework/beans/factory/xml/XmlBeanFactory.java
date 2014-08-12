@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ import org.springframework.core.io.Resource;
  * <p>This class registers each bean definition with the {@link DefaultListableBeanFactory}
  * superclass, and relies on the latter's implementation of the {@link BeanFactory} interface.
  * It supports singletons, prototypes, and references to either of these kinds of bean.
- * See "spring-beans-2.0.dtd" for details on options and configuration style.
+ * See {@code "spring-beans-3.x.xsd"} (or historically, {@code "spring-beans-2.0.dtd"}) for
+ * details on options and configuration style.
  *
  * <p><b>For advanced needs, consider using a {@link DefaultListableBeanFactory} with
  * an {@link XmlBeanDefinitionReader}.</b> The latter allows for reading from multiple XML
@@ -42,10 +43,15 @@ import org.springframework.core.io.Resource;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 15 April 2001
  * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
  * @see XmlBeanDefinitionReader
+ * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
+ * {@link XmlBeanDefinitionReader}
  */
+@Deprecated
+@SuppressWarnings({"serial", "all"})
 public class XmlBeanFactory extends DefaultListableBeanFactory {
 
 	private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this);

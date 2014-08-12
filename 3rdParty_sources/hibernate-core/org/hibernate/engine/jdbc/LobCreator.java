@@ -22,15 +22,15 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.engine.jdbc;
-
-import java.sql.Blob;
-import java.sql.Clob;
 import java.io.InputStream;
 import java.io.Reader;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.NClob;
 
 /**
  * Contract for creating various LOB references.
- *
+ * 
  * @author Steve Ebersole
  * @author Gail Badner
  */
@@ -50,6 +50,14 @@ public interface LobCreator {
 	 * @return The wrapped clob which will be castable to {@link Clob} as well as {@link WrappedClob}.
 	 */
 	public Clob wrap(Clob clob);
+
+	/**
+	 * Wrap the given nclob in a serializable wrapper.
+	 *
+	 * @param nclob The nclob to be wrapped.
+	 * @return The wrapped nclob which will be castable to {@link NClob} as well as {@link WrappedNClob}.
+	 */
+	public NClob wrap(NClob nclob);
 
 	/**
 	 * Create a BLOB reference encapsulating the given byte array.
@@ -92,7 +100,7 @@ public interface LobCreator {
 	 * @return The created NCLOB, castable as {@link Clob} as well as {@link NClobImplementer}.  In JDK 1.6
 	 * environments, also castable to java.sql.NClob
 	 */
-	public Clob createNClob(String string);
+	public NClob createNClob(String string);
 
 	/**
 	 * Create a NCLOB reference encapsulating the given character data.
@@ -102,5 +110,5 @@ public interface LobCreator {
 	 * @return The created NCLOB, castable as {@link Clob} as well as {@link NClobImplementer}.  In JDK 1.6
 	 * environments, also castable to java.sql.NClob
 	 */
-	public Clob createNClob(Reader reader, long length);
+	public NClob createNClob(Reader reader, long length);
 }

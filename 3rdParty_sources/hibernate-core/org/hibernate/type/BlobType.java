@@ -22,11 +22,10 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
-
 import java.sql.Blob;
 
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.descriptor.java.BlobTypeDescriptor;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
  * A type that maps between {@link java.sql.Types#BLOB BLOB} and {@link Blob}
@@ -34,25 +33,14 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class BlobType extends LobType<Blob> {
-
+public class BlobType extends AbstractSingleColumnStandardBasicType<Blob> {
 	public static final BlobType INSTANCE = new BlobType();
 
 	public BlobType() {
-		this(
-				org.hibernate.type.descriptor.sql.BlobTypeDescriptor.DEFAULT,
-				new AlternativeLobTypes.BlobTypes<Blob,BlobType>( BlobType.class )
-		);
+		super( org.hibernate.type.descriptor.sql.BlobTypeDescriptor.DEFAULT, BlobTypeDescriptor.INSTANCE );
 	}
 
-	protected BlobType(SqlTypeDescriptor sqlTypeDescriptor,
-					   AlternativeLobTypes.BlobTypes<Blob,BlobType> blobTypes) {
-		super( sqlTypeDescriptor, BlobTypeDescriptor.INSTANCE, blobTypes );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String getName() {
 		return "blob";
 	}
@@ -63,8 +51,8 @@ public class BlobType extends LobType<Blob> {
 	}
 
 	@Override
-	protected Blob getReplacement(Blob original, Blob target) {
-		return target;
+	protected Blob getReplacement(Blob original, Blob target, SessionImplementor session) {
+		return session.getFactory().getDialect().getLobMergeStrategy().mergeBlob( original, target, session );
 	}
 
 }

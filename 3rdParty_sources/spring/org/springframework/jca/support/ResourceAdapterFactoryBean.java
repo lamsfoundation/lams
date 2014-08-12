@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
  * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
  * @see javax.resource.spi.ResourceAdapter#stop()
  */
-public class ResourceAdapterFactoryBean implements FactoryBean, InitializingBean, DisposableBean {
+public class ResourceAdapterFactoryBean implements FactoryBean<ResourceAdapter>, InitializingBean, DisposableBean {
 
 	private ResourceAdapter resourceAdapter;
 
@@ -66,7 +66,7 @@ public class ResourceAdapterFactoryBean implements FactoryBean, InitializingBean
 	 * through the "resourceAdapter" property.
 	 * @see #setResourceAdapter
 	 */
-	public void setResourceAdapterClass(Class resourceAdapterClass) {
+	public void setResourceAdapterClass(Class<?> resourceAdapterClass) {
 		Assert.isAssignable(ResourceAdapter.class, resourceAdapterClass);
 		this.resourceAdapter = (ResourceAdapter) BeanUtils.instantiateClass(resourceAdapterClass);
 	}
@@ -113,6 +113,7 @@ public class ResourceAdapterFactoryBean implements FactoryBean, InitializingBean
 	 * Builds the BootstrapContext and starts the ResourceAdapter with it.
 	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
 	 */
+	@Override
 	public void afterPropertiesSet() throws ResourceException {
 		if (this.resourceAdapter == null) {
 			throw new IllegalArgumentException("'resourceAdapter' or 'resourceAdapterClass' is required");
@@ -124,14 +125,17 @@ public class ResourceAdapterFactoryBean implements FactoryBean, InitializingBean
 	}
 
 
-	public Object getObject() {
+	@Override
+	public ResourceAdapter getObject() {
 		return this.resourceAdapter;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<? extends ResourceAdapter> getObjectType() {
 		return (this.resourceAdapter != null ? this.resourceAdapter.getClass() : ResourceAdapter.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -141,6 +145,7 @@ public class ResourceAdapterFactoryBean implements FactoryBean, InitializingBean
 	 * Stops the ResourceAdapter.
 	 * @see javax.resource.spi.ResourceAdapter#stop()
 	 */
+	@Override
 	public void destroy() {
 		this.resourceAdapter.stop();
 	}

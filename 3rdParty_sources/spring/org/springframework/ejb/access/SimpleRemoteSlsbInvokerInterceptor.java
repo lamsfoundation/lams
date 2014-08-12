@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ public class SimpleRemoteSlsbInvokerInterceptor extends AbstractRemoteSlsbInvoke
 	 * {@link #releaseSessionBeanInstance} to change EJB instance creation,
 	 * for example to hold a single shared EJB component instance.
 	 */
+	@Override
 	protected Object doInvoke(MethodInvocation invocation) throws Throwable {
 		Object ejb = null;
 		try {
@@ -105,11 +106,11 @@ public class SimpleRemoteSlsbInvokerInterceptor extends AbstractRemoteSlsbInvoke
 			if (targetEx instanceof RemoteException) {
 				RemoteException rex = (RemoteException) targetEx;
 				throw RmiClientInterceptorUtils.convertRmiAccessException(
-				    invocation.getMethod(), rex, isConnectFailure(rex), getJndiName());
+					invocation.getMethod(), rex, isConnectFailure(rex), getJndiName());
 			}
 			else if (targetEx instanceof CreateException) {
 				throw RmiClientInterceptorUtils.convertRmiAccessException(
-				    invocation.getMethod(), targetEx, "Could not create remote EJB [" + getJndiName() + "]");
+					invocation.getMethod(), targetEx, "Could not create remote EJB [" + getJndiName() + "]");
 			}
 			throw targetEx;
 		}
@@ -157,6 +158,7 @@ public class SimpleRemoteSlsbInvokerInterceptor extends AbstractRemoteSlsbInvoke
 	/**
 	 * Reset the cached session bean instance, if necessary.
 	 */
+	@Override
 	protected void refreshHome() throws NamingException {
 		super.refreshHome();
 		if (this.cacheSessionBean) {
@@ -169,6 +171,7 @@ public class SimpleRemoteSlsbInvokerInterceptor extends AbstractRemoteSlsbInvoke
 	/**
 	 * Remove the cached session bean instance, if necessary.
 	 */
+	@Override
 	public void destroy() {
 		if (this.cacheSessionBean) {
 			synchronized (this.beanInstanceMonitor) {

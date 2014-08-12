@@ -31,16 +31,18 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.Index;
-import org.hibernate.cfg.Mappings;
-import org.hibernate.util.StringHelper;
-import org.hibernate.util.CollectionHelper;
 import org.hibernate.cfg.BinderHelper;
 import org.hibernate.cfg.Ejb3JoinColumn;
 import org.hibernate.cfg.IndexOrUniqueKeySecondPass;
+import org.hibernate.cfg.JPAIndexHolder;
+import org.hibernate.cfg.Mappings;
+import org.hibernate.cfg.NamingStrategy;
 import org.hibernate.cfg.ObjectNameNormalizer;
 import org.hibernate.cfg.ObjectNameSource;
-import org.hibernate.cfg.NamingStrategy;
 import org.hibernate.cfg.UniqueConstraintHolder;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.CollectionHelper;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.DependantValue;
@@ -51,8 +53,8 @@ import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.jboss.logging.Logger;
 
 /**
  * Table related operations
@@ -62,7 +64,8 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unchecked")
 public class TableBinder {
 	//TODO move it to a getter/setter strategy
-	private static Logger log = LoggerFactory.getLogger( TableBinder.class );
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, TableBinder.class.getName());
+
 	private String schema;
 	private String catalog;
 	private String name;
@@ -78,6 +81,7 @@ public class TableBinder {
 	private String ownerEntity;
 	private String associatedEntity;
 	private boolean isJPA2ElementCollection;
+	private List<JPAIndexHolder> jpaIndexHolders;
 
 	public void setSchema(String schema) {
 		this.schema = schema;
@@ -101,6 +105,10 @@ public class TableBinder {
 
 	public void setUniqueConstraints(UniqueConstraint[] uniqueConstraints) {
 		this.uniqueConstraints = TableBinder.buildUniqueConstraintHolders( uniqueConstraints );
+	}
+
+	public void setJpaIndex(javax.persistence.Index[] jpaIndex){
+		this.jpaIndexHolders = buildJpaIndexHolder( jpaIndex );
 	}
 
 	public void setConstraints(String constraints) {
@@ -147,7 +155,7 @@ public class TableBinder {
 		// ownerEntity can be null when the table name is explicitly set
 		final String ownerObjectName = isJPA2ElementCollection && ownerEntity != null ?
 				StringHelper.unqualify( ownerEntity ) : unquotedOwnerTable;
-		final ObjectNameSource nameSource = buildNameContext( 
+		final ObjectNameSource nameSource = buildNameContext(
 				ownerObjectName,
 				unquotedAssocTable );
 
@@ -181,12 +189,14 @@ public class TableBinder {
 				namingStrategyHelper,
 				isAbstract,
 				uniqueConstraints,
+				jpaIndexHolders,
 				constraints,
 				denormalizedSuperTable,
 				mappings,
 				null
 		);
 	}
+
 
 	private ObjectNameSource buildNameContext(String unquotedOwnerTable, String unquotedAssocTable) {
 		String logicalName = mappings.getNamingStrategy().logicalCollectionTableName(
@@ -201,7 +211,7 @@ public class TableBinder {
 
 		return new AssociationTableNameSource( name, logicalName );
 	}
- 
+
 	public static Table buildAndFillTable(
 			String schema,
 			String catalog,
@@ -209,10 +219,11 @@ public class TableBinder {
 			ObjectNameNormalizer.NamingStrategyHelper namingStrategyHelper,
 			boolean isAbstract,
 			List<UniqueConstraintHolder> uniqueConstraints,
+			List<JPAIndexHolder> jpaIndexHolders,
 			String constraints,
 			Table denormalizedSuperTable,
 			Mappings mappings,
-			String subselect) {
+			String subselect){
 		schema = BinderHelper.isEmptyAnnotationValue( schema ) ? mappings.getSchemaName() : schema;
 		catalog = BinderHelper.isEmptyAnnotationValue( catalog ) ? mappings.getCatalogName() : catalog;
 
@@ -228,7 +239,7 @@ public class TableBinder {
 					catalog,
 					realTableName,
 					isAbstract,
-					subselect, 
+					subselect,
 					denormalizedSuperTable
 			);
 		}
@@ -237,13 +248,17 @@ public class TableBinder {
 					schema,
 					catalog,
 					realTableName,
-					subselect, 
+					subselect,
 					isAbstract
 			);
 		}
 
-		if ( uniqueConstraints != null && uniqueConstraints.size() > 0 ) {
+		if ( CollectionHelper.isNotEmpty( uniqueConstraints ) ) {
 			mappings.addUniqueConstraintHolders( table, uniqueConstraints );
+		}
+
+		if ( CollectionHelper.isNotEmpty( jpaIndexHolders ) ) {
+			mappings.addJpaIndexHolders( table, jpaIndexHolders );
 		}
 
 		if ( constraints != null ) table.addCheckConstraint( constraints );
@@ -256,22 +271,28 @@ public class TableBinder {
 		return table;
 	}
 
+
+
+	public static Table buildAndFillTable(
+			String schema,
+			String catalog,
+			ObjectNameSource nameSource,
+			ObjectNameNormalizer.NamingStrategyHelper namingStrategyHelper,
+			boolean isAbstract,
+			List<UniqueConstraintHolder> uniqueConstraints,
+			String constraints,
+			Table denormalizedSuperTable,
+			Mappings mappings,
+			String subselect) {
+		return buildAndFillTable( schema, catalog, nameSource, namingStrategyHelper, isAbstract, uniqueConstraints, null, constraints
+		, denormalizedSuperTable, mappings, subselect);
+	}
+
 	/**
-	 *
-	 * @param schema
-	 * @param catalog
-	 * @param realTableName
-	 * @param logicalName
-	 * @param isAbstract
-	 * @param uniqueConstraints
-	 * @param constraints
-	 * @param denormalizedSuperTable
-	 * @param mappings
-	 * @return
-	 *
 	 * @deprecated Use {@link #buildAndFillTable} instead.
 	 */
-	@SuppressWarnings({ "JavaDoc" })
+	@Deprecated
+    @SuppressWarnings({ "JavaDoc" })
 	public static Table fillTable(
 			String schema,
 			String catalog,
@@ -338,7 +359,7 @@ public class TableBinder {
 			 * Get the columns of the mapped-by property
 			 * copy them and link the copy to the actual value
 			 */
-			log.debug("Retrieving property {}.{}", associatedClass.getEntityName(), mappedByProperty);
+			LOG.debugf( "Retrieving property %s.%s", associatedClass.getEntityName(), mappedByProperty );
 
 			final Property property = associatedClass.getRecursiveProperty( columns[0].getMappedBy() );
 			Iterator mappedByColumns;
@@ -411,7 +432,7 @@ public class TableBinder {
 							"No property ref found while expected"
 					);
 				}
-				Property synthProp = referencedEntity.getRecursiveProperty( referencedPropertyName );
+				Property synthProp = referencedEntity.getReferencedProperty( referencedPropertyName );
 				if ( synthProp == null ) {
 					throw new AssertionFailure(
 							"Cannot find synthProp: " + referencedEntity.getEntityName() + "." + referencedPropertyName
@@ -445,7 +466,9 @@ public class TableBinder {
 					Iterator idColItr = referencedEntity.getKey().getColumnIterator();
 					org.hibernate.mapping.Column col;
 					Table table = referencedEntity.getTable(); //works cause the pk has to be on the primary table
-					if ( !idColItr.hasNext() ) log.debug( "No column in the identifier!" );
+					if ( !idColItr.hasNext() ) {
+						LOG.debug( "No column in the identifier!" );
+					}
 					while ( idColItr.hasNext() ) {
 						boolean match = false;
 						//for each PK column, find the associated FK column.
@@ -491,7 +514,7 @@ public class TableBinder {
 			Ejb3JoinColumn[] columns,
 			SimpleValue value) {
 		for (Ejb3JoinColumn joinCol : columns) {
-			Column synthCol = (Column) columnIterator.next();					
+			Column synthCol = (Column) columnIterator.next();
 			if ( joinCol.isNameDeferred() ) {
 				//this has to be the default value
 				joinCol.linkValueUsingDefaultColumnNaming( synthCol, referencedEntity, value );
@@ -521,9 +544,22 @@ public class TableBinder {
 		}
 	}
 
+	public static void addIndexes(Table hibTable, javax.persistence.Index[] indexes, Mappings mappings) {
+		mappings.addJpaIndexHolders( hibTable, buildJpaIndexHolder( indexes ) );
+	}
+
+	public static List<JPAIndexHolder> buildJpaIndexHolder(javax.persistence.Index[] indexes){
+		List<JPAIndexHolder> holders = new ArrayList<JPAIndexHolder>( indexes.length );
+		for(javax.persistence.Index index : indexes){
+			holders.add( new JPAIndexHolder( index ) );
+		}
+		return holders;
+	}
+
 	/**
 	 * @deprecated Use {@link #buildUniqueConstraintHolders} instead
 	 */
+	@Deprecated
 	@SuppressWarnings({ "JavaDoc" })
 	public static List<String[]> buildUniqueConstraints(UniqueConstraint[] constraintsArray) {
 		List<String[]> result = new ArrayList<String[]>();

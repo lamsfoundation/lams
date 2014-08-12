@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
@@ -45,7 +44,7 @@ import org.springframework.util.ClassUtils;
  */
 public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
-	private Map scopes;
+	private Map<String, Object> scopes;
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
@@ -58,7 +57,7 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 	 * is expected to be the corresponding custom {@link Scope} instance
 	 * or class name.
 	 */
-	public void setScopes(Map scopes) {
+	public void setScopes(Map<String, Object> scopes) {
 		this.scopes = scopes;
 	}
 
@@ -66,42 +65,39 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 		this.order = order;
 	}
 
+	@Override
 	public int getOrder() {
 		return this.order;
 	}
 
+	@Override
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 	}
 
 
+	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.scopes != null) {
-			for (Iterator it = this.scopes.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				Object key = entry.getKey();
-				if (!(key instanceof String)) {
-					throw new IllegalArgumentException(
-							"Invalid scope key [" + key + "]: only Strings allowed");
-				}
-				String scopeName = (String) key;
+			for (Map.Entry<String, Object> entry : this.scopes.entrySet()) {
+				String scopeKey = entry.getKey();
 				Object value = entry.getValue();
 				if (value instanceof Scope) {
-					beanFactory.registerScope(scopeName, (Scope) value);
+					beanFactory.registerScope(scopeKey, (Scope) value);
 				}
 				else if (value instanceof Class) {
-					Class scopeClass = (Class) value;
+					Class<?> scopeClass = (Class<?>) value;
 					Assert.isAssignable(Scope.class, scopeClass);
-					beanFactory.registerScope(scopeName, (Scope) BeanUtils.instantiateClass(scopeClass));
+					beanFactory.registerScope(scopeKey, (Scope) BeanUtils.instantiateClass(scopeClass));
 				}
 				else if (value instanceof String) {
-					Class scopeClass = ClassUtils.resolveClassName((String) value, this.beanClassLoader);
+					Class<?> scopeClass = ClassUtils.resolveClassName((String) value, this.beanClassLoader);
 					Assert.isAssignable(Scope.class, scopeClass);
-					beanFactory.registerScope(scopeName, (Scope) BeanUtils.instantiateClass(scopeClass));
+					beanFactory.registerScope(scopeKey, (Scope) BeanUtils.instantiateClass(scopeClass));
 				}
 				else {
 					throw new IllegalArgumentException("Mapped value [" + value + "] for scope key [" +
-							key + "] is not an instance of required type [" + Scope.class.getName() +
+							scopeKey + "] is not an instance of required type [" + Scope.class.getName() +
 							"] or a corresponding Class or String value indicating a Scope implementation");
 				}
 			}

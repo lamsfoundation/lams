@@ -24,15 +24,15 @@
  */
 package org.hibernate.loader;
 
+import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.entity.Loadable;
-import org.hibernate.util.CollectionHelper;
-import org.hibernate.util.StringHelper;
 
 /**
  * EntityAliases which handles the logic of selecting user provided aliases (via return-property),
- * before using the default aliases. 
+ * before using the default aliases.
  *
  * @author max
  *
@@ -45,7 +45,7 @@ public class DefaultEntityAliases implements EntityAliases {
 	private final String suffixedDiscriminatorColumn;
 	private final String suffix;
 	private final String rowIdAlias;
-	private final Map userProvidedAliases;	
+	private final Map userProvidedAliases;
 
 	/**
 	 * Calculate and cache select-clause aliases
@@ -69,7 +69,7 @@ public class DefaultEntityAliases implements EntityAliases {
 	}
 
 	public DefaultEntityAliases(Loadable persister, String suffix) {
-		this( CollectionHelper.EMPTY_MAP, persister, suffix );
+		this( Collections.EMPTY_MAP, persister, suffix );
 	}
 
 	private String[] determineKeyAlias(Loadable persister, String suffix) {
@@ -111,16 +111,16 @@ public class DefaultEntityAliases implements EntityAliases {
 	protected String[] getIdentifierAliases(Loadable persister, String suffix) {
 		return persister.getIdentifierAliases(suffix);
 	}
-	
+
 	protected String[] getPropertyAliases(Loadable persister, int j) {
 		return persister.getPropertyAliases(suffix, j);
 	}
-	
+
 	private String[] getUserProvidedAliases(String propertyPath, String[] defaultAliases) {
 		String[] result = (String[]) userProvidedAliases.get(propertyPath);
 		if (result==null) {
-			return defaultAliases;			
-		} 
+			return defaultAliases;
+		}
 		else {
 			return result;
 		}
@@ -130,15 +130,13 @@ public class DefaultEntityAliases implements EntityAliases {
 		String[] columns = (String[]) userProvidedAliases.get(propertyPath);
 		if (columns==null) {
 			return defaultAlias;
-		} 
+		}
 		else {
 			return columns[0];
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String[][] getSuffixedPropertyAliases(Loadable persister) {
 		final int size = persister.getPropertyNames().length;
 		final String[][] suffixedPropertyAliases = new String[size][];
@@ -149,45 +147,40 @@ public class DefaultEntityAliases implements EntityAliases {
 			);
 			suffixedPropertyAliases[j] = StringHelper.unquote( suffixedPropertyAliases[j], persister.getFactory().getDialect() );
 			intern( suffixedPropertyAliases[j] );
-		}			
+		}
 		return suffixedPropertyAliases;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String[] getSuffixedVersionAliases() {
 		return suffixedVersionColumn;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String[][] getSuffixedPropertyAliases() {
 		return suffixedPropertyColumns;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String getSuffixedDiscriminatorAlias() {
 		return suffixedDiscriminatorColumn;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String[] getSuffixedKeyAliases() {
 		return suffixedKeyColumns;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String getRowIdAlias() {
 		return rowIdAlias;
 	}
-	
+
+	@Override
+	public String getSuffix() {
+		return suffix;
+	}
+
 	private static void intern(String[] strings) {
 		for (int i=0; i<strings.length; i++ ) {
 			strings[i] = strings[i].intern();

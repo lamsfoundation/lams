@@ -38,9 +38,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.hibernate.AnnotationException;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.ManyToAny;
@@ -48,7 +45,10 @@ import org.hibernate.annotations.Target;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * A helper class to keep the {@code XProperty}s of a class ordered by access type.
@@ -57,7 +57,11 @@ import org.hibernate.util.StringHelper;
  */
 class PropertyContainer {
 
-	private static final Logger log = LoggerFactory.getLogger( AnnotationBinder.class );
+    static {
+        System.setProperty("jboss.i18n.generate-proxies", "true");
+    }
+
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, PropertyContainer.class.getName());
 
 	private final AccessType explicitClassDefinedAccessType;
 
@@ -149,11 +153,11 @@ class PropertyContainer {
 			// the access type for this property is explicitly set to AccessType.FIELD, hence we have to
 			// use field access for this property even if the default access type for the class is AccessType.PROPERTY
 			AccessType accessType = AccessType.getAccessStrategy( access.value() );
-			if ( accessType == AccessType.FIELD ) {
-				propertyAccessMap.put( property.getName(), property );
+            if (accessType == AccessType.FIELD) {
+				propertyAccessMap.put(property.getName(), property);
 			}
-			else {   // AccessType.PROPERTY
-				log.warn( "Placing @Access(AccessType.PROPERTY) on a field does not have any effect." );
+            else {
+				LOG.debug( "Placing @Access(AccessType.FIELD) on a field does not have any effect." );
 			}
 		}
 
@@ -168,11 +172,11 @@ class PropertyContainer {
 			// see "2.3.2 Explicit Access Type" of JPA 2 spec
 			// the access type for this property is explicitly set to AccessType.PROPERTY, hence we have to
 			// return use method access even if the default class access type is AccessType.FIELD
-			if ( accessType == AccessType.PROPERTY ) {
-				fieldAccessMap.put( property.getName(), property );
+            if (accessType == AccessType.PROPERTY) {
+				fieldAccessMap.put(property.getName(), property);
 			}
-			else { // AccessType.FIELD
-				log.warn( "Placing @Access(AccessType.FIELD) on a property does not have any effect." );
+            else {
+				LOG.debug( "Placing @Access(AccessType.PROPERTY) on a field does not have any effect." );
 			}
 		}
 	}
@@ -187,7 +191,7 @@ class PropertyContainer {
 	 */
 	private TreeMap<String, XProperty> initProperties(AccessType access) {
 		if ( !( AccessType.PROPERTY.equals( access ) || AccessType.FIELD.equals( access ) ) ) {
-			throw new IllegalArgumentException( "Acces type has to be AccessType.FIELD or AccessType.Property" );
+			throw new IllegalArgumentException( "Access type has to be AccessType.FIELD or AccessType.Property" );
 		}
 
 		//order so that property are used in the same order when binding native query
@@ -278,7 +282,7 @@ class PropertyContainer {
 		//TODO make those hardcoded tests more portable (through the bytecode provider?)
 		return property.isAnnotationPresent( Transient.class )
 				|| "net.sf.cglib.transform.impl.InterceptFieldCallback".equals( property.getType().getName() )
-				|| "org.hibernate.bytecode.javassist.FieldHandler".equals( property.getType().getName() );
+				|| "org.hibernate.bytecode.internal.javassist.FieldHandler".equals( property.getType().getName() );
 	}
 }
 

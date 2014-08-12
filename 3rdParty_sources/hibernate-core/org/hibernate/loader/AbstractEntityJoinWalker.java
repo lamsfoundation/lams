@@ -27,16 +27,15 @@ package org.hibernate.loader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Iterator;
 
 import org.hibernate.FetchMode;
-import org.hibernate.MappingException;
 import org.hibernate.LockOptions;
-import org.hibernate.engine.CascadeStyle;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.LoadQueryInfluencers;
-import org.hibernate.engine.profile.FetchProfile;
+import org.hibernate.MappingException;
 import org.hibernate.engine.profile.Fetch;
+import org.hibernate.engine.profile.FetchProfile;
+import org.hibernate.engine.spi.CascadeStyle;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.sql.JoinFragment;
@@ -129,7 +128,7 @@ public abstract class AbstractEntityJoinWalker extends JoinWalker {
 								projection
 				)
 				.setFromClause(
-						getDialect().appendLockHint( lockOptions.getLockMode(), persister.fromTableFragment( alias ) ) +
+						getDialect().appendLockHint( lockOptions, persister.fromTableFragment( alias ) ) +
 								persister.fromJoinFragment( alias, true, true )
 				)
 				.setWhereClause( condition )
@@ -173,9 +172,7 @@ public abstract class AbstractEntityJoinWalker extends JoinWalker {
 				: rootPropertyName;
 		String fetchRole = persister.getEntityName() + "." + relativePropertyPath;
 
-		Iterator profiles = getLoadQueryInfluencers().getEnabledFetchProfileNames().iterator();
-		while ( profiles.hasNext() ) {
-			final String profileName = ( String ) profiles.next();
+		for ( String profileName : getLoadQueryInfluencers().getEnabledFetchProfileNames() ) {
 			final FetchProfile profile = getFactory().getFetchProfile( profileName );
 			final Fetch fetch = profile.getFetchByRole( fetchRole );
 			if ( fetch != null && Fetch.Style.JOIN == fetch.getStyle() ) {
@@ -188,10 +185,7 @@ public abstract class AbstractEntityJoinWalker extends JoinWalker {
 	public abstract String getComment();
 
 	@Override
-    protected boolean isDuplicateAssociation(
-		final String foreignKeyTable,
-		final String[] foreignKeyColumns
-	) {
+    protected boolean isDuplicateAssociation(final String foreignKeyTable, final String[] foreignKeyColumns) {
 		//disable a join back to this same association
 		final boolean isSameJoin =
 				persister.getTableName().equals( foreignKeyTable ) &&
@@ -202,12 +196,22 @@ public abstract class AbstractEntityJoinWalker extends JoinWalker {
 
 
 
-	protected final Loadable getPersister() {
+	public final Loadable getPersister() {
 		return persister;
 	}
 
-	protected final String getAlias() {
+	public final String getAlias() {
 		return alias;
+	}
+	
+	/**
+	 * For entities, orderings added by, for example, Criteria#addOrder need to come before the associations' @OrderBy
+	 * values.  However, other sub-classes of JoinWalker (BasicCollectionJoinWalker, OneToManyJoinWalker, etc.)
+	 * still need the other way around.  So, override here instead.  See HHH-7116.
+	 */
+	@Override
+	protected String orderBy(final List associations, final String orderBy) {
+		return mergeOrderings( orderBy, orderBy( associations ) );
 	}
 
 	public String toString() {

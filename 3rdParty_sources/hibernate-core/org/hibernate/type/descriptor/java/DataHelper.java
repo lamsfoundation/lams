@@ -28,58 +28,71 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.sql.Clob;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 import org.hibernate.HibernateException;
-import org.hibernate.type.descriptor.BinaryStream;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.engine.jdbc.BinaryStream;
+import org.hibernate.engine.jdbc.internal.BinaryStreamImpl;
+import org.hibernate.internal.CoreMessageLogger;
+
+import org.jboss.logging.Logger;
 
 /**
  * A help for dealing with BLOB and CLOB data
  *
  * @author Steve Ebersole
  */
-public class DataHelper {
-	private static final Logger log = LoggerFactory.getLogger( DataHelper.class );
-
-	private static Class nClobClass;
-	static {
-		try {
-			// NClobs are only JDBC 4 (JDK 1.6) and higher
-			nClobClass = ReflectHelper.classForName( "java.sql.NClob", DataHelper.class );
-		}
-		catch ( ClassNotFoundException e ) {
-			log.info( "Could not locate 'java.sql.NClob' class; assuming JDBC 3" );
-		}
+public final class DataHelper {
+	private DataHelper() {
 	}
 
-	public static boolean isNClob(Class type) {
-		return nClobClass != null && nClobClass.isAssignableFrom( type );
+	/** The size of the buffer we will use to deserialize larger streams */
+	private static final int BUFFER_SIZE = 1024 * 4;
+
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, DataHelper.class.getName() );
+
+	public static boolean isNClob(final Class type) {
+		return java.sql.NClob.class.isAssignableFrom( type );
 	}
 
 	/**
 	 * Extract the contents of the given reader/stream as a string.
+	 * The reader will be closed.
 	 *
 	 * @param reader The reader for the content
 	 *
 	 * @return The content as string
 	 */
 	public static String extractString(Reader reader) {
+		return extractString( reader, BUFFER_SIZE );
+	}
+
+	/**
+	 * Extract the contents of the given reader/stream as a string.
+	 * The reader will be closed.
+	 *
+	 * @param reader The reader for the content
+	 * @param lengthHint if the length is known in advance the implementation can be slightly more efficient
+	 *
+	 * @return The content as string
+	 */
+	public static String extractString(Reader reader, int lengthHint) {
 		// read the Reader contents into a buffer and return the complete string
-		final StringBuilder stringBuilder = new StringBuilder();
+		final int bufferSize = getSuggestedBufferSize( lengthHint );
+		final StringBuilder stringBuilder = new StringBuilder( bufferSize );
 		try {
-			char[] buffer = new char[2048];
+			char[] buffer = new char[bufferSize];
 			while (true) {
-				int amountRead = reader.read( buffer, 0, buffer.length );
+				int amountRead = reader.read( buffer, 0, bufferSize );
 				if ( amountRead == -1 ) {
 					break;
 				}
 				stringBuilder.append( buffer, 0, amountRead );
 			}
 		}
-		catch ( IOException ioe) {
+		catch ( IOException ioe ) {
 			throw new HibernateException( "IOException occurred reading text", ioe );
 		}
 		finally {
@@ -87,7 +100,7 @@ public class DataHelper {
 				reader.close();
 			}
 			catch (IOException e) {
-				log.warn( "IOException occurred closing stream", e );
+				LOG.unableToCloseStream( e );
 			}
 		}
 		return stringBuilder.toString();
@@ -103,21 +116,25 @@ public class DataHelper {
 	 * @return The content as string
 	 */
 	private static String extractString(Reader characterStream, long start, int length) {
+		if ( length == 0 ) {
+			return "";
+		}
 		StringBuilder stringBuilder = new StringBuilder( length );
 		try {
 			long skipped = characterStream.skip( start );
 			if ( skipped != start ) {
 				throw new HibernateException( "Unable to skip needed bytes" );
 			}
-			char[] buffer = new char[2048];
+			final int bufferSize = getSuggestedBufferSize( length );
+			char[] buffer = new char[bufferSize];
 			int charsRead = 0;
 			while ( true ) {
-				int amountRead = characterStream.read( buffer, 0, buffer.length );
+				int amountRead = characterStream.read( buffer, 0, bufferSize );
 				if ( amountRead == -1 ) {
 					break;
 				}
 				stringBuilder.append( buffer, 0, amountRead );
-				if ( amountRead < buffer.length ) {
+				if ( amountRead < bufferSize ) {
 					// we have read up to the end of stream
 					break;
 				}
@@ -159,9 +176,9 @@ public class DataHelper {
 		}
 
 		// read the stream contents into a buffer and return the complete byte[]
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(BUFFER_SIZE);
 		try {
-			byte[] buffer = new byte[2048];
+			byte[] buffer = new byte[BUFFER_SIZE];
 			while (true) {
 				int amountRead = inputStream.read( buffer );
 				if ( amountRead == -1 ) {
@@ -178,13 +195,13 @@ public class DataHelper {
 				inputStream.close();
 			}
 			catch ( IOException e ) {
-				log.warn( "IOException occurred closing input stream", e );
+				LOG.unableToCloseInputStream( e );
 			}
 			try {
 				outputStream.close();
 			}
 			catch ( IOException e ) {
-				log.warn( "IOException occurred closing output stream", e );
+				LOG.unableToCloseOutputStream( e );
 			}
 		}
 		return outputStream.toByteArray();
@@ -214,7 +231,7 @@ public class DataHelper {
 			if ( skipped != start ) {
 				throw new HibernateException( "Unable to skip needed bytes" );
 			}
-			byte[] buffer = new byte[2048];
+			byte[] buffer = new byte[BUFFER_SIZE];
 			int bytesRead = 0;
 			while ( true ) {
 				int amountRead = inputStream.read( buffer );
@@ -249,5 +266,54 @@ public class DataHelper {
 	 */
 	public static InputStream subStream(InputStream inputStream, long start, int length) {
 		return new BinaryStreamImpl( extractBytes( inputStream, start, length ) );
+	}
+
+	/**
+	 * Extract the contents of the given Clob as a string.
+	 *
+	 * @param value The clob to to be extracted from
+	 *
+	 * @return The content as string
+	 */
+	public static String extractString(final Clob value) {
+		try {
+			final Reader characterStream = value.getCharacterStream();
+			final long length = determineLengthForBufferSizing( value );
+			return length > Integer.MAX_VALUE
+					? extractString( characterStream, Integer.MAX_VALUE )
+					: extractString( characterStream, (int) length );
+		}
+		catch ( SQLException e ) {
+			throw new HibernateException( "Unable to access lob stream", e );
+		}
+	}
+
+	/**
+	 * Determine a buffer size for reading the underlying character stream.
+	 *
+	 * @param value The Clob value
+	 *
+	 * @return The appropriate buffer size ({@link java.sql.Clob#length()} by default.
+	 *
+	 * @throws SQLException
+	 */
+	private static long determineLengthForBufferSizing(Clob value) throws SQLException {
+		try {
+			return value.length();
+		}
+		catch ( SQLFeatureNotSupportedException e ) {
+			return BUFFER_SIZE;
+		}
+	}
+
+	/**
+	 * Make sure we allocate a buffer sized not bigger than 2048,
+	 * not higher than what is actually needed, and at least one.
+	 * 
+	 * @param lengthHint the expected size of the full value
+	 * @return the buffer size
+	 */
+	private static int getSuggestedBufferSize(final int lengthHint) {
+		return Math.max( 1, Math.min( lengthHint , BUFFER_SIZE ) );
 	}
 }

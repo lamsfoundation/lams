@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.dao.support;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -48,7 +47,11 @@ import org.springframework.util.ReflectionUtils;
 public class PersistenceExceptionTranslationInterceptor
 		implements MethodInterceptor, BeanFactoryAware, InitializingBean {
 
-	private PersistenceExceptionTranslator persistenceExceptionTranslator;
+	private volatile PersistenceExceptionTranslator persistenceExceptionTranslator;
+
+	private boolean alwaysTranslate = false;
+
+	private ListableBeanFactory beanFactory;
 
 
 	/**
@@ -62,10 +65,11 @@ public class PersistenceExceptionTranslationInterceptor
 	/**
 	 * Create a new PersistenceExceptionTranslationInterceptor
 	 * for the given PersistenceExceptionTranslator.
-	 * @param persistenceExceptionTranslator the PersistenceExceptionTranslator to use
+	 * @param pet the PersistenceExceptionTranslator to use
 	 */
-	public PersistenceExceptionTranslationInterceptor(PersistenceExceptionTranslator persistenceExceptionTranslator) {
-		setPersistenceExceptionTranslator(persistenceExceptionTranslator);
+	public PersistenceExceptionTranslationInterceptor(PersistenceExceptionTranslator pet) {
+		Assert.notNull(pet, "PersistenceExceptionTranslator must not be null");
+		this.persistenceExceptionTranslator = pet;
 	}
 
 	/**
@@ -75,7 +79,8 @@ public class PersistenceExceptionTranslationInterceptor
 	 * PersistenceExceptionTranslators from
 	 */
 	public PersistenceExceptionTranslationInterceptor(ListableBeanFactory beanFactory) {
-		this.persistenceExceptionTranslator = detectPersistenceExceptionTranslators(beanFactory);
+		Assert.notNull(beanFactory, "ListableBeanFactory must not be null");
+		this.beanFactory = beanFactory;
 	}
 
 
@@ -86,10 +91,26 @@ public class PersistenceExceptionTranslationInterceptor
 	 * @see #detectPersistenceExceptionTranslators
 	 */
 	public void setPersistenceExceptionTranslator(PersistenceExceptionTranslator pet) {
-		Assert.notNull(pet, "PersistenceExceptionTranslator must not be null");
 		this.persistenceExceptionTranslator = pet;
 	}
 
+	/**
+	 * Specify whether to always translate the exception ("true"), or whether throw the
+	 * raw exception when declared, i.e. when the originating method signature's exception
+	 * declarations allow for the raw exception to be thrown ("false").
+	 * <p>Default is "false". Switch this flag to "true" in order to always translate
+	 * applicable exceptions, independent from the originating method signature.
+	 * <p>Note that the originating method does not have to declare the specific exception.
+	 * Any base class will do as well, even {@code throws Exception}: As long as the
+	 * originating method does explicitly declare compatible exceptions, the raw exception
+	 * will be rethrown. If you would like to avoid throwing raw exceptions in any case,
+	 * switch this flag to "true".
+	 */
+	public void setAlwaysTranslate(boolean alwaysTranslate) {
+		this.alwaysTranslate = alwaysTranslate;
+	}
+
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		if (this.persistenceExceptionTranslator == null) {
 			// No explicit exception translator specified - perform autodetection.
@@ -97,17 +118,36 @@ public class PersistenceExceptionTranslationInterceptor
 				throw new IllegalArgumentException(
 						"Cannot use PersistenceExceptionTranslator autodetection without ListableBeanFactory");
 			}
-			this.persistenceExceptionTranslator =
-					detectPersistenceExceptionTranslators((ListableBeanFactory) beanFactory);
+			this.beanFactory = (ListableBeanFactory) beanFactory;
 		}
 	}
 
+	@Override
 	public void afterPropertiesSet() {
-		if (this.persistenceExceptionTranslator == null) {
+		if (this.persistenceExceptionTranslator == null && this.beanFactory == null) {
 			throw new IllegalArgumentException("Property 'persistenceExceptionTranslator' is required");
 		}
 	}
 
+
+	@Override
+	public Object invoke(MethodInvocation mi) throws Throwable {
+		try {
+			return mi.proceed();
+		}
+		catch (RuntimeException ex) {
+			// Let it throw raw if the type of the exception is on the throws clause of the method.
+			if (!this.alwaysTranslate && ReflectionUtils.declaresException(mi.getMethod(), ex.getClass())) {
+				throw ex;
+			}
+			else {
+				if (this.persistenceExceptionTranslator == null) {
+					this.persistenceExceptionTranslator = detectPersistenceExceptionTranslators(this.beanFactory);
+				}
+				throw DataAccessUtils.translateIfNecessary(ex, this.persistenceExceptionTranslator);
+			}
+		}
+	}
 
 	/**
 	 * Detect all PersistenceExceptionTranslators in the given BeanFactory.
@@ -119,33 +159,13 @@ public class PersistenceExceptionTranslationInterceptor
 	 */
 	protected PersistenceExceptionTranslator detectPersistenceExceptionTranslators(ListableBeanFactory beanFactory) {
 		// Find all translators, being careful not to activate FactoryBeans.
-		Map pets = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+		Map<String, PersistenceExceptionTranslator> pets = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				beanFactory, PersistenceExceptionTranslator.class, false, false);
-		if (pets.isEmpty()) {
-			throw new IllegalStateException(
-					"No persistence exception translators found in bean factory. Cannot perform exception translation.");
-		}
 		ChainedPersistenceExceptionTranslator cpet = new ChainedPersistenceExceptionTranslator();
-		for (Iterator it = pets.values().iterator(); it.hasNext();) {
-			cpet.addDelegate((PersistenceExceptionTranslator) it.next());
+		for (PersistenceExceptionTranslator pet : pets.values()) {
+			cpet.addDelegate(pet);
 		}
 		return cpet;
-	}
-
-
-	public Object invoke(MethodInvocation mi) throws Throwable {
-		try {
-			return mi.proceed();
-		}
-		catch (RuntimeException ex) {
-			// Let it throw raw if the type of the exception is on the throws clause of the method.
-			if (ReflectionUtils.declaresException(mi.getMethod(), ex.getClass())) {
-				throw ex;
-			}
-			else {
-				throw DataAccessUtils.translateIfNecessary(ex, this.persistenceExceptionTranslator);
-			}
-		}
 	}
 
 }

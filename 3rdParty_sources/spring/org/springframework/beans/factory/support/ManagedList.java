@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,12 @@ import org.springframework.beans.Mergeable;
  * @author Juergen Hoeller
  * @since 27.05.2003
  */
-public class ManagedList extends ArrayList implements Mergeable, BeanMetadataElement {
+@SuppressWarnings("serial")
+public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetadataElement {
 
 	private Object source;
+
+	private String elementTypeName;
 
 	private boolean mergeEnabled;
 
@@ -47,15 +50,30 @@ public class ManagedList extends ArrayList implements Mergeable, BeanMetadataEle
 
 
 	/**
-	 * Set the configuration source <code>Object</code> for this metadata element.
+	 * Set the configuration source {@code Object} for this metadata element.
 	 * <p>The exact type of the object will depend on the configuration mechanism used.
 	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
 
+	@Override
 	public Object getSource() {
 		return this.source;
+	}
+
+	/**
+	 * Set the default element type name (class name) to be used for this list.
+	 */
+	public void setElementTypeName(String elementTypeName) {
+		this.elementTypeName = elementTypeName;
+	}
+
+	/**
+	 * Return the default element type name (class name) to be used for this list.
+	 */
+	public String getElementTypeName() {
+		return this.elementTypeName;
 	}
 
 	/**
@@ -66,11 +84,14 @@ public class ManagedList extends ArrayList implements Mergeable, BeanMetadataEle
 		this.mergeEnabled = mergeEnabled;
 	}
 
+	@Override
 	public boolean isMergeEnabled() {
 		return this.mergeEnabled;
 	}
 
-	public Object merge(Object parent) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<E> merge(Object parent) {
 		if (!this.mergeEnabled) {
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
@@ -80,8 +101,8 @@ public class ManagedList extends ArrayList implements Mergeable, BeanMetadataEle
 		if (!(parent instanceof List)) {
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		List merged = new ManagedList();
-		merged.addAll((List) parent);
+		List<E> merged = new ManagedList<E>();
+		merged.addAll((List<E>) parent);
 		merged.addAll(this);
 		return merged;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.context.support;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -37,24 +36,44 @@ import org.springframework.util.Assert;
 public class StaticMessageSource extends AbstractMessageSource {
 
 	/** Map from 'code + locale' keys to message Strings */
-	private final Map messages = new HashMap();
+	private final Map<String, String> messages = new HashMap<String, String>();
+
+	private final Map<String, MessageFormat> cachedMessageFormats = new HashMap<String, MessageFormat>();
 
 
+	@Override
+	protected String resolveCodeWithoutArguments(String code, Locale locale) {
+		return this.messages.get(code + "_" + locale.toString());
+	}
+
+	@Override
 	protected MessageFormat resolveCode(String code, Locale locale) {
-		return (MessageFormat) this.messages.get(code + "_" + locale.toString());
+		String key = code + "_" + locale.toString();
+		String msg = this.messages.get(key);
+		if (msg == null) {
+			return null;
+		}
+		synchronized (this.cachedMessageFormats) {
+			MessageFormat messageFormat = this.cachedMessageFormats.get(key);
+			if (messageFormat == null) {
+				messageFormat = createMessageFormat(msg, locale);
+				this.cachedMessageFormats.put(key, messageFormat);
+			}
+			return messageFormat;
+		}
 	}
 
 	/**
 	 * Associate the given message with the given code.
 	 * @param code the lookup code
-   * @param locale the locale that the message should be found within
+	 * @param locale the locale that the message should be found within
 	 * @param msg the message associated with this lookup code
 	 */
 	public void addMessage(String code, Locale locale, String msg) {
 		Assert.notNull(code, "Code must not be null");
 		Assert.notNull(locale, "Locale must not be null");
 		Assert.notNull(msg, "Message must not be null");
-		this.messages.put(code + "_" + locale.toString(), createMessageFormat(msg, locale));
+		this.messages.put(code + "_" + locale.toString(), msg);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Added message [" + msg + "] for code [" + code + "] and Locale [" + locale + "]");
 		}
@@ -64,17 +83,17 @@ public class StaticMessageSource extends AbstractMessageSource {
 	 * Associate the given message values with the given keys as codes.
 	 * @param messages the messages to register, with messages codes
 	 * as keys and message texts as values
-   * @param locale the locale that the messages should be found within
+	 * @param locale the locale that the messages should be found within
 	 */
-	public void addMessages(Map messages, Locale locale) {
+	public void addMessages(Map<String, String> messages, Locale locale) {
 		Assert.notNull(messages, "Messages Map must not be null");
-		for (Iterator it = messages.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
-			addMessage(entry.getKey().toString(), locale, entry.getValue().toString());
+		for (Map.Entry<String, String> entry : messages.entrySet()) {
+			addMessage(entry.getKey(), locale, entry.getValue());
 		}
 	}
 
 
+	@Override
 	public String toString() {
 		return getClass().getName() + ": " + this.messages;
 	}

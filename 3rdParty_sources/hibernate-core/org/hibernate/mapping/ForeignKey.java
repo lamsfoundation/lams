@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +70,7 @@ public class ForeignKey extends Constraint {
 		return referencedTable;
 	}
 
-	private void appendColumns(StringBuffer buf, Iterator columns) {
+	private void appendColumns(StringBuilder buf, Iterator columns) {
 		while( columns.hasNext() ) {
 			Column column = (Column) columns.next();
 			buf.append( column.getName() );
@@ -89,7 +88,6 @@ public class ForeignKey extends Constraint {
 	 * Validates that columnspan of the foreignkey and the primarykey is the same.
 	 * 
 	 * Furthermore it aligns the length of the underlying tables columns.
-	 * @param referencedTable
 	 */
 	public void alignColumns() {
 		if ( isReferenceToPrimaryKey() ) alignColumns(referencedTable);
@@ -97,7 +95,7 @@ public class ForeignKey extends Constraint {
 	
 	private void alignColumns(Table referencedTable) {
 		if ( referencedTable.getPrimaryKey().getColumnSpan()!=getColumnSpan() ) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append("Foreign key (")
                 .append( getName() + ":")
 				.append( getTable().getName() )
@@ -129,10 +127,17 @@ public class ForeignKey extends Constraint {
 	}
 
 	public String sqlDropString(Dialect dialect, String defaultCatalog, String defaultSchema) {
-		return "alter table " + 
-			getTable().getQualifiedName(dialect, defaultCatalog, defaultSchema) + 
-			dialect.getDropForeignKeyString() + 
-			getName();
+		final StringBuilder buf = new StringBuilder( "alter table " );
+		buf.append( getTable().getQualifiedName(dialect, defaultCatalog, defaultSchema) );
+		buf.append( dialect.getDropForeignKeyString() );
+		if ( dialect.supportsIfExistsBeforeConstraintName() ) {
+			buf.append( "if exists " );
+		}
+		buf.append( dialect.quote( getName() ) );
+		if ( dialect.supportsIfExistsAfterConstraintName() ) {
+			buf.append( " if exists" );
+		}
+		return buf.toString();
 	}
 
 	public boolean isCascadeDeleteEnabled() {
@@ -172,7 +177,7 @@ public class ForeignKey extends Constraint {
 	
 	public String toString() {
 		if(!isReferenceToPrimaryKey() ) {
-			StringBuffer result = new StringBuffer(getClass().getName() + '(' + getTable().getName() + getColumns() );
+			StringBuilder result = new StringBuilder(getClass().getName() + '(' + getTable().getName() + getColumns() );
 			result.append( " ref-columns:" + '(' + getReferencedColumns() );
 			result.append( ") as " + getName() );
 			return result.toString();
@@ -181,5 +186,9 @@ public class ForeignKey extends Constraint {
 			return super.toString();
 		}
 		
+	}
+	
+	public String generatedConstraintNamePrefix() {
+		return "FK_";
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.beans.PropertyEditorSupport;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.SortedSet;
@@ -43,14 +42,15 @@ import java.util.TreeSet;
  */
 public class CustomCollectionEditor extends PropertyEditorSupport {
 
-	private final Class collectionType;
+	@SuppressWarnings("rawtypes")
+	private final Class<? extends Collection> collectionType;
 
 	private final boolean nullAsEmptyCollection;
 
 
 	/**
 	 * Create a new CustomCollectionEditor for the given target type,
-	 * keeping an incoming <code>null</code> as-is.
+	 * keeping an incoming {@code null} as-is.
 	 * @param collectionType the target type, which needs to be a
 	 * sub-interface of Collection or a concrete Collection class
 	 * @see java.util.Collection
@@ -58,7 +58,8 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	 * @see java.util.TreeSet
 	 * @see java.util.LinkedHashSet
 	 */
-	public CustomCollectionEditor(Class collectionType) {
+	@SuppressWarnings("rawtypes")
+	public CustomCollectionEditor(Class<? extends Collection> collectionType) {
 		this(collectionType, false);
 	}
 
@@ -73,14 +74,15 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	 * TreeSet for SortedSet, and LinkedHashSet for Set.
 	 * @param collectionType the target type, which needs to be a
 	 * sub-interface of Collection or a concrete Collection class
-	 * @param nullAsEmptyCollection whether to convert an incoming <code>null</code>
+	 * @param nullAsEmptyCollection whether to convert an incoming {@code null}
 	 * value to an empty Collection (of the appropriate type)
 	 * @see java.util.Collection
 	 * @see java.util.ArrayList
 	 * @see java.util.TreeSet
 	 * @see java.util.LinkedHashSet
 	 */
-	public CustomCollectionEditor(Class collectionType, boolean nullAsEmptyCollection) {
+	@SuppressWarnings("rawtypes")
+	public CustomCollectionEditor(Class<? extends Collection> collectionType, boolean nullAsEmptyCollection) {
 		if (collectionType == null) {
 			throw new IllegalArgumentException("Collection type is required");
 		}
@@ -96,6 +98,7 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	/**
 	 * Convert the given text value to a Collection with a single element.
 	 */
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		setValue(text);
 	}
@@ -103,6 +106,7 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	/**
 	 * Convert the given value to a Collection of the target type.
 	 */
+	@Override
 	public void setValue(Object value) {
 		if (value == null && this.nullAsEmptyCollection) {
 			super.setValue(createCollection(this.collectionType, 0));
@@ -113,17 +117,17 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 		}
 		else if (value instanceof Collection) {
 			// Convert Collection elements.
-			Collection source = (Collection) value;
-			Collection target = createCollection(this.collectionType, source.size());
-			for (Iterator it = source.iterator(); it.hasNext();) {
-				target.add(convertElement(it.next()));
+			Collection<?> source = (Collection<?>) value;
+			Collection<Object> target = createCollection(this.collectionType, source.size());
+			for (Object elem : source) {
+				target.add(convertElement(elem));
 			}
 			super.setValue(target);
 		}
 		else if (value.getClass().isArray()) {
 			// Convert array elements to Collection elements.
 			int length = Array.getLength(value);
-			Collection target = createCollection(this.collectionType, length);
+			Collection<Object> target = createCollection(this.collectionType, length);
 			for (int i = 0; i < length; i++) {
 				target.add(convertElement(Array.get(value, i)));
 			}
@@ -131,7 +135,7 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 		}
 		else {
 			// A plain value: convert it to a Collection with a single element.
-			Collection target = createCollection(this.collectionType, 1);
+			Collection<Object> target = createCollection(this.collectionType, 1);
 			target.add(convertElement(value));
 			super.setValue(target);
 		}
@@ -144,10 +148,11 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	 * @param initialCapacity the initial capacity
 	 * @return the new Collection instance
 	 */
-	protected Collection createCollection(Class collectionType, int initialCapacity) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected Collection<Object> createCollection(Class<? extends Collection> collectionType, int initialCapacity) {
 		if (!collectionType.isInterface()) {
 			try {
-				return (Collection) collectionType.newInstance();
+				return collectionType.newInstance();
 			}
 			catch (Exception ex) {
 				throw new IllegalArgumentException(
@@ -155,13 +160,13 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 			}
 		}
 		else if (List.class.equals(collectionType)) {
-			return new ArrayList(initialCapacity);
+			return new ArrayList<Object>(initialCapacity);
 		}
 		else if (SortedSet.class.equals(collectionType)) {
-			return new TreeSet();
+			return new TreeSet<Object>();
 		}
 		else {
-			return new LinkedHashSet(initialCapacity);
+			return new LinkedHashSet<Object>(initialCapacity);
 		}
 	}
 
@@ -196,9 +201,10 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * This implementation returns <code>null</code> to indicate that
+	 * This implementation returns {@code null} to indicate that
 	 * there is no appropriate text representation.
 	 */
+	@Override
 	public String getAsText() {
 		return null;
 	}

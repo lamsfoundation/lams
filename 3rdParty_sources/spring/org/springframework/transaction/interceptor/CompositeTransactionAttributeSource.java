@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0
  */
+@SuppressWarnings("serial")
 public class CompositeTransactionAttributeSource implements TransactionAttributeSource, Serializable {
 
 	private final TransactionAttributeSource[] transactionAttributeSources;
@@ -51,9 +52,9 @@ public class CompositeTransactionAttributeSource implements TransactionAttribute
 	}
 
 
-	public TransactionAttribute getTransactionAttribute(Method method, Class targetClass) {
-		for (int i = 0; i < this.transactionAttributeSources.length; i++) {
-			TransactionAttributeSource tas = this.transactionAttributeSources[i];
+	@Override
+	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
+		for (TransactionAttributeSource tas : this.transactionAttributeSources) {
 			TransactionAttribute ta = tas.getTransactionAttribute(method, targetClass);
 			if (ta != null) {
 				return ta;

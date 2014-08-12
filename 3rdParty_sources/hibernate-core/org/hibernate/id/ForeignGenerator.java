@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -31,8 +30,9 @@ import org.hibernate.MappingException;
 import org.hibernate.Session;
 import org.hibernate.TransientObjectException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.ForeignKeys;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.internal.ForeignKeys;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.loader.PropertyPath;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
@@ -79,9 +79,7 @@ public class ForeignGenerator implements IdentifierGenerator, Configurable {
 		return getEntityName() + '.' + getPropertyName();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void configure(Type type, Properties params, Dialect d) {
 		propertyName = params.getProperty( "property" );
 		entityName = params.getProperty( ENTITY_NAME );
@@ -90,14 +88,12 @@ public class ForeignGenerator implements IdentifierGenerator, Configurable {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Serializable generate(SessionImplementor sessionImplementor, Object object) {
 		Session session = ( Session ) sessionImplementor;
 
 		final EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
-		Object associatedObject = persister.getPropertyValue( object, propertyName, session.getEntityMode() );
+		Object associatedObject = persister.getPropertyValue( object, propertyName );
 		if ( associatedObject == null ) {
 			throw new IdentifierGenerationException(
 					"attempted to assign id from null one-to-one property [" + getRole() + "]"
@@ -112,14 +108,14 @@ public class ForeignGenerator implements IdentifierGenerator, Configurable {
 		}
 		else {
 			// try identifier mapper
-			foreignValueSourceType = (EntityType) persister.getPropertyType( "_identifierMapper." + propertyName );
+			foreignValueSourceType = (EntityType) persister.getPropertyType( PropertyPath.IDENTIFIER_MAPPER_PROPERTY + "." + propertyName );
 		}
 
 		Serializable id;
 		try {
 			id = ForeignKeys.getEntityIdentifierIfNotUnsaved(
 					foreignValueSourceType.getAssociatedEntityName(),
-					associatedObject, 
+					associatedObject,
 					sessionImplementor
 			);
 		}

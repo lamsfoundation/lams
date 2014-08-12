@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 import org.springframework.context.i18n.LocaleContext;
@@ -40,10 +41,35 @@ import org.springframework.util.StringUtils;
  *
  * @author Juergen Hoeller
  * @since 1.1
- * @see CommonsHttpInvokerRequestExecutor
  * @see java.net.HttpURLConnection
  */
 public class SimpleHttpInvokerRequestExecutor extends AbstractHttpInvokerRequestExecutor {
+
+	private int connectTimeout = -1;
+
+	private int readTimeout = -1;
+
+
+	/**
+	 * Set the underlying URLConnection's connect timeout (in milliseconds).
+	 * A timeout value of 0 specifies an infinite timeout.
+	 * <p>Default is the system's default timeout.
+	 * @see URLConnection#setConnectTimeout(int)
+	 */
+	public void setConnectTimeout(int connectTimeout) {
+		this.connectTimeout = connectTimeout;
+	}
+
+	/**
+	 * Set the underlying URLConnection's read timeout (in milliseconds).
+	 * A timeout value of 0 specifies an infinite timeout.
+	 * <p>Default is the system's default timeout.
+	 * @see URLConnection#setReadTimeout(int)
+	 */
+	public void setReadTimeout(int readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+
 
 	/**
 	 * Execute the given request through a standard J2SE HttpURLConnection.
@@ -55,6 +81,7 @@ public class SimpleHttpInvokerRequestExecutor extends AbstractHttpInvokerRequest
 	 * @see #validateResponse
 	 * @see #readResponseBody
 	 */
+	@Override
 	protected RemoteInvocationResult doExecuteRequest(
 			HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
 			throws IOException, ClassNotFoundException {
@@ -89,23 +116,33 @@ public class SimpleHttpInvokerRequestExecutor extends AbstractHttpInvokerRequest
 	 * <p>The default implementation specifies POST as method,
 	 * "application/x-java-serialized-object" as "Content-Type" header,
 	 * and the given content length as "Content-Length" header.
-	 * @param con the HTTP connection to prepare
+	 * @param connection the HTTP connection to prepare
 	 * @param contentLength the length of the content to send
 	 * @throws IOException if thrown by HttpURLConnection methods
 	 * @see java.net.HttpURLConnection#setRequestMethod
 	 * @see java.net.HttpURLConnection#setRequestProperty
 	 */
-	protected void prepareConnection(HttpURLConnection con, int contentLength) throws IOException {
-		con.setDoOutput(true);
-		con.setRequestMethod(HTTP_METHOD_POST);
-		con.setRequestProperty(HTTP_HEADER_CONTENT_TYPE, getContentType());
-		con.setRequestProperty(HTTP_HEADER_CONTENT_LENGTH, Integer.toString(contentLength));
-		LocaleContext locale = LocaleContextHolder.getLocaleContext();
-		if (locale != null) {
-			con.setRequestProperty(HTTP_HEADER_ACCEPT_LANGUAGE, StringUtils.toLanguageTag(locale.getLocale()));
+	protected void prepareConnection(HttpURLConnection connection, int contentLength) throws IOException {
+		if (this.connectTimeout >= 0) {
+			connection.setConnectTimeout(this.connectTimeout);
+		}
+		if (this.readTimeout >= 0) {
+			connection.setReadTimeout(this.readTimeout);
+		}
+		connection.setDoOutput(true);
+		connection.setRequestMethod(HTTP_METHOD_POST);
+		connection.setRequestProperty(HTTP_HEADER_CONTENT_TYPE, getContentType());
+		connection.setRequestProperty(HTTP_HEADER_CONTENT_LENGTH, Integer.toString(contentLength));
+
+		LocaleContext localeContext = LocaleContextHolder.getLocaleContext();
+		if (localeContext != null) {
+			Locale locale = localeContext.getLocale();
+			if (locale != null) {
+				connection.setRequestProperty(HTTP_HEADER_ACCEPT_LANGUAGE, StringUtils.toLanguageTag(locale));
+			}
 		}
 		if (isAcceptGzipEncoding()) {
-			con.setRequestProperty(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
+			connection.setRequestProperty(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		}
 	}
 
@@ -186,7 +223,7 @@ public class SimpleHttpInvokerRequestExecutor extends AbstractHttpInvokerRequest
 	 */
 	protected boolean isGzipResponse(HttpURLConnection con) {
 		String encodingHeader = con.getHeaderField(HTTP_HEADER_CONTENT_ENCODING);
-		return (encodingHeader != null && encodingHeader.toLowerCase().indexOf(ENCODING_GZIP) != -1);
+		return (encodingHeader != null && encodingHeader.toLowerCase().contains(ENCODING_GZIP));
 	}
 
 }

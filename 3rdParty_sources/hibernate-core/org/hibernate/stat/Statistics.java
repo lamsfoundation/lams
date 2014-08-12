@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,15 +20,12 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate.stat;
 
-
 /**
- * Statistics for a particular <tt>SessionFactory</tt>.
- * Beware of milliseconds metrics, they are depdendent of the JVM precision:
- * you may then encounter a 10 ms approximation dending on you OS platform.
+ * Exposes statistics for a particular {@link org.hibernate.SessionFactory}.  Beware of milliseconds metrics, they
+ * are dependent of the JVM precision: you may then encounter a 10 ms approximation depending on you OS platform.
  * Please refer to the JVM documentation for more information.
  * 
  * @author Emmanuel Bernard
@@ -61,6 +58,14 @@ public interface Statistics {
 	 * @return SecondLevelCacheStatistics
 	 */
 	public SecondLevelCacheStatistics getSecondLevelCacheStatistics(String regionName);
+
+    /**
+	 * Natural id cache statistics per region
+	 * 
+	 * @param regionName region name
+	 * @return NaturalIdCacheStatistics
+	 */
+	public NaturalIdCacheStatistics getNaturalIdCacheStatistics(String regionName);
 
     /**
 	 * Query statistics from query string (HQL or SQL)
@@ -126,6 +131,42 @@ public interface Statistics {
      * Get the global number of cacheable queries put in cache
      */
 	public long getQueryCachePutCount();
+	/**
+	 * Get the global number of naturalId queries executed against the database
+	 */
+	public long getNaturalIdQueryExecutionCount();
+	/**
+	 * Get the global maximum query time for naturalId queries executed against the database
+	 */
+	public long getNaturalIdQueryExecutionMaxTime();
+	/**
+	 * Get the region for the maximum naturalId query time 
+	 */
+	public String getNaturalIdQueryExecutionMaxTimeRegion();
+    /**
+     * Get the global number of cached naturalId lookups successfully retrieved from cache
+     */
+	public long getNaturalIdCacheHitCount();
+    /**
+     * Get the global number of cached naturalId lookups *not* found in cache
+     */
+	public long getNaturalIdCacheMissCount();
+    /**
+     * Get the global number of cacheable naturalId lookups put in cache
+     */
+	public long getNaturalIdCachePutCount();
+    /**
+     * Get the global number of timestamps successfully retrieved from cache
+     */
+	public long getUpdateTimestampsCacheHitCount();
+    /**
+     * Get the global number of tables for which no update timestamps was *not* found in cache
+     */
+	public long getUpdateTimestampsCacheMissCount();
+    /**
+     * Get the global number of timestamps put in cache
+     */
+	public long getUpdateTimestampsCachePutCount();
 	/**
      * Get the global number of flush executed by sessions (either implicit or explicit)
      */

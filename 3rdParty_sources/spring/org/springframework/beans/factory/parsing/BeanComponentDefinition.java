@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 	 * Create a new BeanComponentDefinition for the given bean.
 	 * @param beanDefinition the BeanDefinition
 	 * @param beanName the name of the bean
-	 * @param aliases alias names for the bean, or <code>null</code> if none
+	 * @param aliases alias names for the bean, or {@code null} if none
 	 */
 	public BeanComponentDefinition(BeanDefinition beanDefinition, String beanName, String[] aliases) {
 		super(beanDefinition, beanName, aliases);
@@ -73,8 +73,8 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 
 
 	private void findInnerBeanDefinitionsAndBeanReferences(BeanDefinition beanDefinition) {
-		List innerBeans = new ArrayList();
-		List references = new ArrayList();
+		List<BeanDefinition> innerBeans = new ArrayList<BeanDefinition>();
+		List<BeanReference> references = new ArrayList<BeanReference>();
 		PropertyValues propertyValues = beanDefinition.getPropertyValues();
 		for (int i = 0; i < propertyValues.getPropertyValues().length; i++) {
 			PropertyValue propertyValue = propertyValues.getPropertyValues()[i];
@@ -83,33 +83,38 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 				innerBeans.add(((BeanDefinitionHolder) value).getBeanDefinition());
 			}
 			else if (value instanceof BeanDefinition) {
-				innerBeans.add(value);
+				innerBeans.add((BeanDefinition) value);
 			}
 			else if (value instanceof BeanReference) {
-				references.add(value);
+				references.add((BeanReference) value);
 			}
 		}
-		this.innerBeanDefinitions = (BeanDefinition[]) innerBeans.toArray(new BeanDefinition[innerBeans.size()]);
-		this.beanReferences = (BeanReference[]) references.toArray(new BeanReference[references.size()]);
+		this.innerBeanDefinitions = innerBeans.toArray(new BeanDefinition[innerBeans.size()]);
+		this.beanReferences = references.toArray(new BeanReference[references.size()]);
 	}
 
 
+	@Override
 	public String getName() {
 		return getBeanName();
 	}
 
+	@Override
 	public String getDescription() {
 		return getShortDescription();
 	}
 
+	@Override
 	public BeanDefinition[] getBeanDefinitions() {
 		return new BeanDefinition[] {getBeanDefinition()};
 	}
 
+	@Override
 	public BeanDefinition[] getInnerBeanDefinitions() {
 		return this.innerBeanDefinitions;
 	}
 
+	@Override
 	public BeanReference[] getBeanReferences() {
 		return this.beanReferences;
 	}
@@ -119,6 +124,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 	 * This implementation returns this ComponentDefinition's description.
 	 * @see #getDescription()
 	 */
+	@Override
 	public String toString() {
 		return getDescription();
 	}
@@ -127,6 +133,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 	 * This implementations expects the other object to be of type BeanComponentDefinition
 	 * as well, in addition to the superclass's equality requirements.
 	 */
+	@Override
 	public boolean equals(Object other) {
 		return (this == other || (other instanceof BeanComponentDefinition && super.equals(other)));
 	}

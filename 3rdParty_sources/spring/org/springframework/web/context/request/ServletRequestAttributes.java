@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,10 @@
 
 package org.springframework.web.context.request;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -55,7 +50,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 
 	private volatile HttpSession session;
 
-	private final Map sessionAttributesToUpdate = new HashMap();
+	private final Map<String, Object> sessionAttributesToUpdate = new ConcurrentHashMap<String, Object>(1);
 
 
 	/**
@@ -94,6 +89,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	}
 
 
+	@Override
 	public Object getAttribute(String name, int scope) {
 		if (scope == SCOPE_REQUEST) {
 			if (!isRequestActive()) {
@@ -108,9 +104,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 				try {
 					Object value = session.getAttribute(name);
 					if (value != null) {
-						synchronized (this.sessionAttributesToUpdate) {
-							this.sessionAttributesToUpdate.put(name, value);
-						}
+						this.sessionAttributesToUpdate.put(name, value);
 					}
 					return value;
 				}
@@ -122,6 +116,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	@Override
 	public void setAttribute(String name, Object value, int scope) {
 		if (scope == SCOPE_REQUEST) {
 			if (!isRequestActive()) {
@@ -132,13 +127,12 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 		else {
 			HttpSession session = getSession(true);
-			synchronized (this.sessionAttributesToUpdate) {
-				this.sessionAttributesToUpdate.remove(name);
-			}
+			this.sessionAttributesToUpdate.remove(name);
 			session.setAttribute(name, value);
 		}
 	}
 
+	@Override
 	public void removeAttribute(String name, int scope) {
 		if (scope == SCOPE_REQUEST) {
 			if (isRequestActive()) {
@@ -149,9 +143,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		else {
 			HttpSession session = getSession(false);
 			if (session != null) {
-				synchronized (this.sessionAttributesToUpdate) {
-					this.sessionAttributesToUpdate.remove(name);
-				}
+				this.sessionAttributesToUpdate.remove(name);
 				try {
 					session.removeAttribute(name);
 					// Remove any registered destruction callback as well.
@@ -164,6 +156,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	@Override
 	public String[] getAttributeNames(int scope) {
 		if (scope == SCOPE_REQUEST) {
 			if (!isRequestActive()) {
@@ -186,6 +179,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	@Override
 	public void registerDestructionCallback(String name, Runnable callback, int scope) {
 		if (scope == SCOPE_REQUEST) {
 			registerRequestDestructionCallback(name, callback);
@@ -195,79 +189,74 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	@Override
+	public Object resolveReference(String key) {
+		if (REFERENCE_REQUEST.equals(key)) {
+			return this.request;
+		}
+		else if (REFERENCE_SESSION.equals(key)) {
+			return getSession(true);
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
 	public String getSessionId() {
 		return getSession(true).getId();
 	}
 
+	@Override
 	public Object getSessionMutex() {
 		return WebUtils.getSessionMutex(getSession(true));
 	}
 
 
 	/**
-	 * Update all accessed session attributes through <code>session.setAttribute</code>
+	 * Update all accessed session attributes through {@code session.setAttribute}
 	 * calls, explicitly indicating to the container that they might have been modified.
 	 */
+	@Override
 	protected void updateAccessedSessionAttributes() {
 		// Store session reference for access after request completion.
 		this.session = this.request.getSession(false);
 		// Update all affected session attributes.
-		synchronized (this.sessionAttributesToUpdate) {
-			if (this.session != null) {
-				try {
-					for (Iterator it = this.sessionAttributesToUpdate.entrySet().iterator(); it.hasNext();) {
-						Map.Entry entry = (Map.Entry) it.next();
-						String name = (String) entry.getKey();
-						Object newValue = entry.getValue();
-						Object oldValue = this.session.getAttribute(name);
-						if (oldValue == newValue) {
-							this.session.setAttribute(name, newValue);
-						}
+		if (this.session != null) {
+			try {
+				for (Map.Entry<String, Object> entry : this.sessionAttributesToUpdate.entrySet()) {
+					String name = entry.getKey();
+					Object newValue = entry.getValue();
+					Object oldValue = this.session.getAttribute(name);
+					if (oldValue == newValue) {
+						this.session.setAttribute(name, newValue);
 					}
 				}
-				catch (IllegalStateException ex) {
-					// Session invalidated - shouldn't usually happen.
-				}
 			}
-			this.sessionAttributesToUpdate.clear();
+			catch (IllegalStateException ex) {
+				// Session invalidated - shouldn't usually happen.
+			}
 		}
+		this.sessionAttributesToUpdate.clear();
 	}
 
 	/**
 	 * Register the given callback as to be executed after session termination.
+	 * <p>Note: The callback object should be serializable in order to survive
+	 * web app restarts.
 	 * @param name the name of the attribute to register the callback for
 	 * @param callback the callback to be executed for destruction
 	 */
-	private void registerSessionDestructionCallback(String name, Runnable callback) {
+	protected void registerSessionDestructionCallback(String name, Runnable callback) {
 		HttpSession session = getSession(true);
 		session.setAttribute(DESTRUCTION_CALLBACK_NAME_PREFIX + name,
 				new DestructionCallbackBindingListener(callback));
 	}
 
 
+	@Override
 	public String toString() {
 		return this.request.toString();
-	}
-
-
-	/**
-	 * Adapter that implements the Servlet 2.3 HttpSessionBindingListener
-	 * interface, wrapping a session destruction callback.
-	 */
-	private static class DestructionCallbackBindingListener implements HttpSessionBindingListener, Serializable {
-
-		private final Runnable destructionCallback;
-
-		public DestructionCallbackBindingListener(Runnable destructionCallback) {
-			this.destructionCallback = destructionCallback;
-		}
-
-		public void valueBound(HttpSessionBindingEvent event) {
-		}
-
-		public void valueUnbound(HttpSessionBindingEvent event) {
-			this.destructionCallback.run();
-		}
 	}
 
 }

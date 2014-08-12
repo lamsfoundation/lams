@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,12 +77,14 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
 	 */
-	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
+	@Override
+	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
+		beanDefinitionReader.setEnvironment(getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
@@ -110,18 +112,17 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * therefore this method is just supposed to load and/or register bean definitions.
 	 * <p>Delegates to a ResourcePatternResolver for resolving location patterns
 	 * into Resource instances.
-	 * @throws org.springframework.beans.BeansException in case of bean registration errors
 	 * @throws java.io.IOException if the required XML document isn't found
 	 * @see #refreshBeanFactory
 	 * @see #getConfigLocations
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
 	 */
-	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
-			for (int i = 0; i < configLocations.length; i++) {
-				reader.loadBeanDefinitions(configLocations[i]);
+			for (String configLocation : configLocations) {
+				reader.loadBeanDefinitions(configLocation);
 			}
 		}
 	}
@@ -131,6 +132,7 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * and "/WEB-INF/test-servlet.xml" for a context with the namespace "test-servlet"
 	 * (like for a DispatcherServlet instance with the servlet-name "test").
 	 */
+	@Override
 	protected String[] getDefaultConfigLocations() {
 		if (getNamespace() != null) {
 			return new String[] {DEFAULT_CONFIG_LOCATION_PREFIX + getNamespace() + DEFAULT_CONFIG_LOCATION_SUFFIX};

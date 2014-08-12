@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Holder class to expose the web request in the form of a thread-bound
- * {@link RequestAttributes} object.
+ * {@link RequestAttributes} object. The request will be inherited
+ * by any child threads spawned by the current thread if the
+ * {@code inheritable} flag is set to {@code true}.
  *
  * <p>Use {@link RequestContextListener} or
  * {@link org.springframework.web.filter.RequestContextFilter} to expose
@@ -42,22 +44,23 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.web.portlet.DispatcherPortlet
  */
 public abstract class RequestContextHolder  {
-	
+
 	private static final boolean jsfPresent =
 			ClassUtils.isPresent("javax.faces.context.FacesContext", RequestContextHolder.class.getClassLoader());
 
-	private static final ThreadLocal requestAttributesHolder = new NamedThreadLocal("Request attributes");
+	private static final ThreadLocal<RequestAttributes> requestAttributesHolder =
+			new NamedThreadLocal<RequestAttributes>("Request attributes");
 
-	private static final ThreadLocal inheritableRequestAttributesHolder =
-			new NamedInheritableThreadLocal("Request context");
+	private static final ThreadLocal<RequestAttributes> inheritableRequestAttributesHolder =
+			new NamedInheritableThreadLocal<RequestAttributes>("Request context");
 
 
 	/**
 	 * Reset the RequestAttributes for the current thread.
 	 */
 	public static void resetRequestAttributes() {
-		requestAttributesHolder.set(null);
-		inheritableRequestAttributesHolder.set(null);
+		requestAttributesHolder.remove();
+		inheritableRequestAttributesHolder.remove();
 	}
 
 	/**
@@ -72,30 +75,36 @@ public abstract class RequestContextHolder  {
 
 	/**
 	 * Bind the given RequestAttributes to the current thread.
-	 * @param attributes the RequestAttributes to expose
+	 * @param attributes the RequestAttributes to expose,
+	 * or {@code null} to reset the thread-bound context
 	 * @param inheritable whether to expose the RequestAttributes as inheritable
-	 * for child threads (using an {@link java.lang.InheritableThreadLocal})
+	 * for child threads (using an {@link InheritableThreadLocal})
 	 */
 	public static void setRequestAttributes(RequestAttributes attributes, boolean inheritable) {
-		if (inheritable) {
-			inheritableRequestAttributesHolder.set(attributes);
-			requestAttributesHolder.set(null);
+		if (attributes == null) {
+			resetRequestAttributes();
 		}
 		else {
-			requestAttributesHolder.set(attributes);
-			inheritableRequestAttributesHolder.set(null);
+			if (inheritable) {
+				inheritableRequestAttributesHolder.set(attributes);
+				requestAttributesHolder.remove();
+			}
+			else {
+				requestAttributesHolder.set(attributes);
+				inheritableRequestAttributesHolder.remove();
+			}
 		}
 	}
 
 	/**
 	 * Return the RequestAttributes currently bound to the thread.
 	 * @return the RequestAttributes currently bound to the thread,
-	 * or <code>null</code> if none bound
+	 * or {@code null} if none bound
 	 */
 	public static RequestAttributes getRequestAttributes() {
-		RequestAttributes attributes = (RequestAttributes) requestAttributesHolder.get();
+		RequestAttributes attributes = requestAttributesHolder.get();
 		if (attributes == null) {
-			attributes = (RequestAttributes) inheritableRequestAttributesHolder.get();
+			attributes = inheritableRequestAttributesHolder.get();
 		}
 		return attributes;
 	}

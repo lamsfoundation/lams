@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ import javax.persistence.spi.PersistenceProvider;
  * shared JPA EntityManagerFactory in a Spring application context; the
  * EntityManagerFactory can then be passed to JPA-based DAOs via
  * dependency injection. Note that switching to a JNDI lookup or to a
- * {@link org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean}
+ * {@link LocalContainerEntityManagerFactoryBean}
  * definition is just a matter of configuration!
  *
- * <p>Configuration settings are usually read from a <code>META-INF/persistence.xml</code>
+ * <p>Configuration settings are usually read from a {@code META-INF/persistence.xml}
  * config file, residing in the class path, according to the JPA standalone bootstrap
  * contract. Additionally, most JPA providers will require a special VM agent
  * (specified on JVM startup) that allows them to instrument application classes.
@@ -52,12 +52,13 @@ import javax.persistence.spi.PersistenceProvider;
  * to the JPA provider, consider using Spring's more powerful
  * {@link LocalContainerEntityManagerFactoryBean} instead.
  *
+ * <p><b>NOTE: Spring's JPA support requires JPA 2.0 or higher, as of Spring 4.0.</b>
+ *
  * @author Juergen Hoeller
  * @author Rod Johnson
  * @since 2.0
  * @see #setJpaProperties
  * @see #setJpaVendorAdapter
- * @see JpaTemplate#setEntityManagerFactory
  * @see JpaTransactionManager#setEntityManagerFactory
  * @see LocalContainerEntityManagerFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
@@ -65,12 +66,14 @@ import javax.persistence.spi.PersistenceProvider;
  * @see javax.persistence.Persistence#createEntityManagerFactory
  * @see javax.persistence.spi.PersistenceProvider#createEntityManagerFactory
  */
+@SuppressWarnings("serial")
 public class LocalEntityManagerFactoryBean extends AbstractEntityManagerFactoryBean {
 
 	/**
 	 * Initialize the EntityManagerFactory for the given configuration.
 	 * @throws javax.persistence.PersistenceException in case of JPA initialization errors
 	 */
+	@Override
 	protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Building JPA EntityManagerFactory for persistence unit '" + getPersistenceUnitName() + "'");

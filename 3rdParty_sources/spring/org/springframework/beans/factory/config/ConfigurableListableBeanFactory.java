@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public interface ConfigurableListableBeanFactory
 	 * for example, String. Default is none.
 	 * @param type the dependency type to ignore
 	 */
-	void ignoreDependencyType(Class type);
+	void ignoreDependencyType(Class<?> type);
 
 	/**
 	 * Ignore the given dependency interface for autowiring.
@@ -57,7 +57,7 @@ public interface ConfigurableListableBeanFactory
 	 * @see org.springframework.beans.factory.BeanFactoryAware
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
-	void ignoreDependencyInterface(Class ifc);
+	void ignoreDependencyInterface(Class<?> ifc);
 
 	/**
 	 * Register a special dependency type with corresponding autowired value.
@@ -75,7 +75,7 @@ public interface ConfigurableListableBeanFactory
 	 * implementation of the {@link org.springframework.beans.factory.ObjectFactory}
 	 * interface, which allows for lazy resolution of the actual target value.
 	 */
-	void registerResolvableDependency(Class dependencyType, Object autowiredValue);
+	void registerResolvableDependency(Class<?> dependencyType, Object autowiredValue);
 
 	/**
 	 * Determine whether the specified bean qualifies as an autowire candidate,
@@ -115,7 +115,7 @@ public interface ConfigurableListableBeanFactory
 	/**
 	 * Return whether this factory's bean definitions are frozen,
 	 * i.e. are not supposed to be modified or post-processed any further.
-	 * @return <code>true</code> if the factory's configuration is considered frozen
+	 * @return {@code true} if the factory's configuration is considered frozen
 	 */
 	boolean isConfigurationFrozen();
 

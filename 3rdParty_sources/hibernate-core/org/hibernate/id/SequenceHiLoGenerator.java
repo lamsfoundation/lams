@@ -22,17 +22,16 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
 import java.util.Properties;
 
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.enhanced.AccessCallback;
-import org.hibernate.id.enhanced.OptimizerFactory;
+import org.hibernate.id.enhanced.LegacyHiLoAlgorithmOptimizer;
+import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.type.Type;
-import org.hibernate.util.PropertiesHelper;
 
 /**
  * <b>seqhilo</b><br>
@@ -41,12 +40,8 @@ import org.hibernate.util.PropertiesHelper;
  * oracle-style sequence that generates hi values. The user may specify a
  * maximum lo value to determine how often new hi values are fetched.<br>
  * <br>
- * If sequences are not available, <tt>TableHiLoGenerator</tt> might be an
- * alternative.<br>
- * <br>
  * Mapping parameters supported: sequence, max_lo, parameters.
  *
- * @see TableHiLoGenerator
  * @author Gavin King
  */
 public class SequenceHiLoGenerator extends SequenceGenerator {
@@ -54,15 +49,15 @@ public class SequenceHiLoGenerator extends SequenceGenerator {
 
 	private int maxLo;
 
-	private OptimizerFactory.LegacyHiLoAlgorithmOptimizer hiloOptimizer;
+	private LegacyHiLoAlgorithmOptimizer hiloOptimizer;
 
 	public void configure(Type type, Properties params, Dialect d) throws MappingException {
 		super.configure(type, params, d);
 
-		maxLo = PropertiesHelper.getInt( MAX_LO, params, 9 );
+		maxLo = ConfigurationHelper.getInt( MAX_LO, params, 9 );
 
 		if ( maxLo >= 1 ) {
-			hiloOptimizer = new OptimizerFactory.LegacyHiLoAlgorithmOptimizer(
+			hiloOptimizer = new LegacyHiLoAlgorithmOptimizer(
 					getIdentifierType().getReturnedClass(),
 					maxLo
 			);
@@ -85,6 +80,11 @@ public class SequenceHiLoGenerator extends SequenceGenerator {
 					public IntegralDataTypeHolder getNextValue() {
 						return generateHolder( session );
 					}
+
+					@Override
+					public String getTenantIdentifier() {
+						return session.getTenantIdentifier();
+					}
 				}
 		);
 	}
@@ -94,7 +94,7 @@ public class SequenceHiLoGenerator extends SequenceGenerator {
 	 *
 	 * @return The optimizer
 	 */
-	OptimizerFactory.LegacyHiLoAlgorithmOptimizer getHiloOptimizer() {
+	LegacyHiLoAlgorithmOptimizer getHiloOptimizer() {
 		return hiloOptimizer;
 	}
 }

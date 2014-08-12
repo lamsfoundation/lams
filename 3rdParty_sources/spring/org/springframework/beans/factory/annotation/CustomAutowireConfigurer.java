@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.beans.factory.annotation;
 
 import java.lang.annotation.Annotation;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
@@ -51,7 +50,7 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
 
-	private Set customQualifierTypes;
+	private Set<?> customQualifierTypes;
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -60,10 +59,12 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 		this.order = order;
 	}
 
+	@Override
 	public int getOrder() {
 		return this.order;
 	}
 
+	@Override
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 	}
@@ -78,11 +79,13 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 	 * does not require explicit registration.
 	 * @param customQualifierTypes the custom types to register
 	 */
-	public void setCustomQualifierTypes(Set customQualifierTypes) {
+	public void setCustomQualifierTypes(Set<?> customQualifierTypes) {
 		this.customQualifierTypes = customQualifierTypes;
 	}
 
 
+	@Override
+	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.customQualifierTypes != null) {
 			if (!(beanFactory instanceof DefaultListableBeanFactory)) {
@@ -91,20 +94,18 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 			}
 			DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory) beanFactory;
 			if (!(dlbf.getAutowireCandidateResolver() instanceof QualifierAnnotationAutowireCandidateResolver)) {
-				throw new IllegalStateException(
-						"CustomAutowireConfigurer needs to operate on a QualifierAnnotationAutowireCandidateResolver");
+				dlbf.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 			}
 			QualifierAnnotationAutowireCandidateResolver resolver =
 					(QualifierAnnotationAutowireCandidateResolver) dlbf.getAutowireCandidateResolver();
-			for (Iterator it = this.customQualifierTypes.iterator(); it.hasNext();) {
-				Class customType = null;
-				Object value = it.next();
+			for (Object value : this.customQualifierTypes) {
+				Class<? extends Annotation> customType = null;
 				if (value instanceof Class) {
-					customType = (Class) value;
+					customType = (Class<? extends Annotation>) value;
 				}
 				else if (value instanceof String) {
 					String className = (String) value;
-					customType = ClassUtils.resolveClassName(className, this.beanClassLoader);
+					customType = (Class<? extends Annotation>) ClassUtils.resolveClassName(className, this.beanClassLoader);
 				}
 				else {
 					throw new IllegalArgumentException(

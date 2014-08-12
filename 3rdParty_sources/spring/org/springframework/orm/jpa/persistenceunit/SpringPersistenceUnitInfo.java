@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ class SpringPersistenceUnitInfo extends MutablePersistenceUnitInfo {
 	 * This implementation returns the LoadTimeWeaver's instrumentable ClassLoader,
 	 * if specified.
 	 */
+	@Override
 	public ClassLoader getClassLoader() {
 		return this.classLoader;
 	}
@@ -73,6 +74,7 @@ class SpringPersistenceUnitInfo extends MutablePersistenceUnitInfo {
 	/**
 	 * This implementation delegates to the LoadTimeWeaver, if specified.
 	 */
+	@Override
 	public void addTransformer(ClassTransformer classTransformer) {
 		if (this.loadTimeWeaver == null) {
 			throw new IllegalStateException("Cannot apply class transformer without LoadTimeWeaver specified");
@@ -83,6 +85,7 @@ class SpringPersistenceUnitInfo extends MutablePersistenceUnitInfo {
 	/**
 	 * This implementation delegates to the LoadTimeWeaver, if specified.
 	 */
+	@Override
 	public ClassLoader getNewTempClassLoader() {
 		ClassLoader tcl = (this.loadTimeWeaver != null ? this.loadTimeWeaver.getThrowawayClassLoader() :
 				new SimpleThrowawayClassLoader(this.classLoader));

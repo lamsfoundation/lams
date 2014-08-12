@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ public class HttpInvokerClientInterceptor extends RemoteInvocationBasedAccessor
 	/**
 	 * Return the codebase URL to download classes from if not found locally.
 	 */
+	@Override
 	public String getCodebaseUrl() {
 		return this.codebaseUrl;
 	}
@@ -99,10 +100,10 @@ public class HttpInvokerClientInterceptor extends RemoteInvocationBasedAccessor
 	 * Set the HttpInvokerRequestExecutor implementation to use for executing
 	 * remote invocations.
 	 * <p>Default is {@link SimpleHttpInvokerRequestExecutor}. Alternatively,
-	 * consider using {@link CommonsHttpInvokerRequestExecutor} for more
+	 * consider using {@link HttpComponentsHttpInvokerRequestExecutor} for more
 	 * sophisticated needs.
 	 * @see SimpleHttpInvokerRequestExecutor
-	 * @see CommonsHttpInvokerRequestExecutor
+	 * @see HttpComponentsHttpInvokerRequestExecutor
 	 */
 	public void setHttpInvokerRequestExecutor(HttpInvokerRequestExecutor httpInvokerRequestExecutor) {
 		this.httpInvokerRequestExecutor = httpInvokerRequestExecutor;
@@ -122,6 +123,7 @@ public class HttpInvokerClientInterceptor extends RemoteInvocationBasedAccessor
 		return this.httpInvokerRequestExecutor;
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
@@ -130,13 +132,14 @@ public class HttpInvokerClientInterceptor extends RemoteInvocationBasedAccessor
 	}
 
 
+	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
 			return "HTTP invoker proxy for service URL [" + getServiceUrl() + "]";
 		}
 
 		RemoteInvocation invocation = createRemoteInvocation(methodInvocation);
-		RemoteInvocationResult result = null;
+		RemoteInvocationResult result;
 		try {
 			result = executeRequest(invocation, methodInvocation);
 		}
@@ -199,18 +202,18 @@ public class HttpInvokerClientInterceptor extends RemoteInvocationBasedAccessor
 	 */
 	protected RemoteAccessException convertHttpInvokerAccessException(Throwable ex) {
 		if (ex instanceof ConnectException) {
-			throw new RemoteConnectFailureException(
+			return new RemoteConnectFailureException(
 					"Could not connect to HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
 		}
-		else if (ex instanceof ClassNotFoundException || ex instanceof NoClassDefFoundError ||
+
+		if (ex instanceof ClassNotFoundException || ex instanceof NoClassDefFoundError ||
 				ex instanceof InvalidClassException) {
-			throw new RemoteAccessException(
+			return new RemoteAccessException(
 					"Could not deserialize result from HTTP invoker remote service [" + getServiceUrl() + "]", ex);
 		}
-		else {
-			throw new RemoteAccessException(
-			    "Could not access HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
-		}
+
+		return new RemoteAccessException(
+					"Could not access HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
 	}
 
 }

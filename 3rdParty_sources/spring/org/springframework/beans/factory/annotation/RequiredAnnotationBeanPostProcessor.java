@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,21 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
+import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.core.Conventions;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -52,7 +59,7 @@ import org.springframework.util.Assert;
  * still be desirable), because all that this class does is enforce that a
  * 'required' property has actually been configured with a value. It does
  * <b>not</b> check anything else... In particular, it does not check that a
- * configured value is not <code>null</code>.
+ * configured value is not {@code null}.
  *
  * <p>Note: A default RequiredAnnotationBeanPostProcessor will be registered
  * by the "context:annotation-config" and "context:component-scan" XML tags.
@@ -66,14 +73,28 @@ import org.springframework.util.Assert;
  * @see Required
  */
 public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
-		implements PriorityOrdered {
+		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
+
+	/**
+	 * Bean definition attribute that may indicate whether a given bean is supposed
+	 * to be skipped when performing this post-processor's required property check.
+	 * @see #shouldSkip
+	 */
+	public static final String SKIP_REQUIRED_CHECK_ATTRIBUTE =
+			Conventions.getQualifiedAttributeName(RequiredAnnotationBeanPostProcessor.class, "skipRequiredCheck");
+
 
 	private Class<? extends Annotation> requiredAnnotationType = Required.class;
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 1;
 
-	/** Cache for validated bean names, skipping re-validation for the same bean */
-	private final Set<String> validatedBeanNames = Collections.synchronizedSet(new HashSet<String>());
+	private ConfigurableListableBeanFactory beanFactory;
+
+	/**
+	 * Cache for validated bean names, skipping re-validation for the same bean
+	 */
+	private final Set<String> validatedBeanNames =
+			Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(64));
 
 
 	/**
@@ -97,28 +118,43 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 		return this.requiredAnnotationType;
 	}
 
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		if (beanFactory instanceof ConfigurableListableBeanFactory) {
+			this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
+		}
+	}
+
 	public void setOrder(int order) {
-	  this.order = order;
+		this.order = order;
 	}
 
+	@Override
 	public int getOrder() {
-	  return this.order;
+		return this.order;
 	}
 
 
+	@Override
+	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+	}
+
+	@Override
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
 			throws BeansException {
 
 		if (!this.validatedBeanNames.contains(beanName)) {
-			List<String> invalidProperties = new ArrayList<String>();
-			for (PropertyDescriptor pd : pds) {
-				if (isRequiredProperty(pd) && !pvs.contains(pd.getName())) {
-					invalidProperties.add(pd.getName());
+			if (!shouldSkip(this.beanFactory, beanName)) {
+				List<String> invalidProperties = new ArrayList<String>();
+				for (PropertyDescriptor pd : pds) {
+					if (isRequiredProperty(pd) && !pvs.contains(pd.getName())) {
+						invalidProperties.add(pd.getName());
+					}
 				}
-			}
-			if (!invalidProperties.isEmpty()) {
-				throw new BeanInitializationException(buildExceptionMessage(invalidProperties, beanName));
+				if (!invalidProperties.isEmpty()) {
+					throw new BeanInitializationException(buildExceptionMessage(invalidProperties, beanName));
+				}
 			}
 			this.validatedBeanNames.add(beanName);
 		}
@@ -126,13 +162,36 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 	}
 
 	/**
+	 * Check whether the given bean definition is not subject to the annotation-based
+	 * required property check as performed by this post-processor.
+	 * <p>The default implementations check for the presence of the
+	 * {@link #SKIP_REQUIRED_CHECK_ATTRIBUTE} attribute in the bean definition, if any.
+	 * It also suggests skipping in case of a bean definition with a "factory-bean"
+	 * reference set, assuming that instance-based factories pre-populate the bean.
+	 * @param beanFactory the BeanFactory to check against
+	 * @param beanName the name of the bean to check against
+	 * @return {@code true} to skip the bean; {@code false} to process it
+	 */
+	protected boolean shouldSkip(ConfigurableListableBeanFactory beanFactory, String beanName) {
+		if (beanFactory == null || !beanFactory.containsBeanDefinition(beanName)) {
+			return false;
+		}
+		BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+		if (beanDefinition.getFactoryBeanName() != null) {
+			return true;
+		}
+		Object value = beanDefinition.getAttribute(SKIP_REQUIRED_CHECK_ATTRIBUTE);
+		return (value != null && (Boolean.TRUE.equals(value) || Boolean.valueOf(value.toString())));
+	}
+
+	/**
 	 * Is the supplied property required to have a value (that is, to be dependency-injected)?
 	 * <p>This implementation looks for the existence of a
 	 * {@link #setRequiredAnnotationType "required" annotation}
 	 * on the supplied {@link PropertyDescriptor property}.
-	 * @param propertyDescriptor the target PropertyDescriptor (never <code>null</code>)
-	 * @return <code>true</code> if the supplied property has been marked as being required;
-	 * <code>false</code> if not, or if the supplied property does not have a setter method
+	 * @param propertyDescriptor the target PropertyDescriptor (never {@code null})
+	 * @return {@code true} if the supplied property has been marked as being required;
+	 * {@code false} if not, or if the supplied property does not have a setter method
 	 */
 	protected boolean isRequiredProperty(PropertyDescriptor propertyDescriptor) {
 		Method setter = propertyDescriptor.getWriteMethod();

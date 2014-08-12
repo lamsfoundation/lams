@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.context;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.Aware;
 
 /**
  * Interface to be implemented by any object that wishes to be notified
@@ -28,7 +29,7 @@ import org.springframework.beans.BeansException;
  * for bean lookup purposes.
  *
  * <p>This interface can also be implemented if an object needs access to file
- * resources, i.e. wants to call <code>getResource</code>, wants to publish
+ * resources, i.e. wants to call {@code getResource}, wants to publish
  * an application event, or requires access to the MessageSource. However,
  * it is preferable to implement the more specific {@link ResourceLoaderAware},
  * {@link ApplicationEventPublisherAware} or {@link MessageSourceAware} interface
@@ -48,15 +49,16 @@ import org.springframework.beans.BeansException;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @see ResourceLoaderAware
  * @see ApplicationEventPublisherAware
  * @see MessageSourceAware
  * @see org.springframework.context.support.ApplicationObjectSupport
  * @see org.springframework.beans.factory.BeanFactoryAware
  */
-public interface ApplicationContextAware {
-	
-	/** 
+public interface ApplicationContextAware extends Aware {
+
+	/**
 	 * Set the ApplicationContext that this object runs in.
 	 * Normally this call will be used to initialize the object.
 	 * <p>Invoked after population of normal bean properties but before an init callback such

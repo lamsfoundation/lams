@@ -33,6 +33,10 @@ import java.sql.Types;
 public class LongVarbinaryTypeDescriptor extends VarbinaryTypeDescriptor {
 	public static final LongVarbinaryTypeDescriptor INSTANCE = new LongVarbinaryTypeDescriptor();
 
+	public LongVarbinaryTypeDescriptor() {
+		SqlTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
+	}
+
 	@Override
 	public int getSqlType() {
 		return Types.LONGVARBINARY;

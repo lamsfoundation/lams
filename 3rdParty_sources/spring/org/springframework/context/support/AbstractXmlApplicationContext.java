@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ import org.springframework.core.io.Resource;
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
+	private boolean validating = true;
+
+
 	/**
 	 * Create a new AbstractXmlApplicationContext with no parent.
 	 */
@@ -60,17 +63,27 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 
 	/**
+	 * Set whether to use XML validation. Default is {@code true}.
+	 */
+	public void setValidating(boolean validating) {
+		this.validating = validating;
+	}
+
+
+	/**
 	 * Loads the bean definitions via an XmlBeanDefinitionReader.
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
 	 */
-	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
+	@Override
+	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
+		beanDefinitionReader.setEnvironment(this.getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
@@ -85,10 +98,11 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * definitions of this context. Default implementation is empty.
 	 * <p>Can be overridden in subclasses, e.g. for turning off XML validation
 	 * or using a different XmlBeanDefinitionParser implementation.
-	 * @param beanDefinitionReader the bean definition reader used by this context
+	 * @param reader the bean definition reader used by this context
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader#setDocumentReaderClass
 	 */
-	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
+	protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
+		reader.setValidating(this.validating);
 	}
 
 	/**
@@ -117,9 +131,9 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	/**
 	 * Return an array of Resource objects, referring to the XML bean definition
 	 * files that this context should be built with.
-	 * <p>The default implementation returns <code>null</code>. Subclasses can override
+	 * <p>The default implementation returns {@code null}. Subclasses can override
 	 * this to provide pre-built Resource objects rather than location Strings.
-	 * @return an array of Resource objects, or <code>null</code> if none
+	 * @return an array of Resource objects, or {@code null} if none
 	 * @see #getConfigLocations()
 	 */
 	protected Resource[] getConfigResources() {

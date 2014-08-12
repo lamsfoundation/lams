@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import org.springframework.context.ApplicationEvent;
  * @author Juergen Hoeller
  * @since January 17, 2001
  * @see ServletRequestHandledEvent
- * @see PerformanceMonitorListener
  * @see org.springframework.web.servlet.FrameworkServlet
  * @see org.springframework.context.ApplicationContext#publishEvent
  */
+@SuppressWarnings("serial")
 public class RequestHandledEvent extends ApplicationEvent {
 
 	/** Session id that applied to the request, if any */
@@ -124,7 +124,7 @@ public class RequestHandledEvent extends ApplicationEvent {
 	 * the most important context data.
 	 */
 	public String getShortDescription() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("session=[").append(this.sessionId).append("]; ");
 		sb.append("user=[").append(this.userName).append("]; ");
 		return sb.toString();
@@ -135,7 +135,7 @@ public class RequestHandledEvent extends ApplicationEvent {
 	 * all available context data.
 	 */
 	public String getDescription() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("session=[").append(this.sessionId).append("]; ");
 		sb.append("user=[").append(this.userName).append("]; ");
 		sb.append("time=[").append(this.processingTimeMillis).append("ms]; ");
@@ -150,6 +150,7 @@ public class RequestHandledEvent extends ApplicationEvent {
 		return sb.toString();
 	}
 
+	@Override
 	public String toString() {
 		return ("RequestHandledEvent: " + getDescription());
 	}

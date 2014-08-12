@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.ClassUtils;
 
 /**
- * Factory bean for RMI proxies from JNDI.
- * 
+ * {@link FactoryBean} for RMI proxies from JNDI.
+ *
  * <p>Typically used for RMI-IIOP (CORBA), but can also be used for EJB home objects
  * (for example, a Stateful Session Bean home). In contrast to a plain JNDI lookup,
  * this accessor also performs narrowing through {@link javax.rmi.PortableRemoteObject}.
@@ -38,7 +38,7 @@ import org.springframework.util.ClassUtils;
  * Spring's unchecked RemoteAccessException.
  *
  * <p>The JNDI environment can be specified as "jndiEnvironment" property,
- * or be configured in a <code>jndi.properties</code> file or as system properties.
+ * or be configured in a {@code jndi.properties} file or as system properties.
  * For example:
  *
  * <pre class="code">&lt;property name="jndiEnvironment"&gt;
@@ -61,17 +61,20 @@ import org.springframework.util.ClassUtils;
  * @see java.rmi.Remote
  * @see javax.rmi.PortableRemoteObject#narrow
  */
-public class JndiRmiProxyFactoryBean extends JndiRmiClientInterceptor implements FactoryBean, BeanClassLoaderAware {
+public class JndiRmiProxyFactoryBean extends JndiRmiClientInterceptor
+		implements FactoryBean<Object>, BeanClassLoaderAware {
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
 	private Object serviceProxy;
 
 
+	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws NamingException {
 		super.afterPropertiesSet();
 		if (getServiceInterface() == null) {
@@ -81,14 +84,17 @@ public class JndiRmiProxyFactoryBean extends JndiRmiClientInterceptor implements
 	}
 
 
+	@Override
 	public Object getObject() {
 		return this.serviceProxy;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return getServiceInterface();
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

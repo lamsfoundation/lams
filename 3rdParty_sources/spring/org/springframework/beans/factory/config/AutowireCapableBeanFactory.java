@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,10 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * through introspection of the bean class.
 	 * @see #createBean
 	 * @see #autowire
+	 * @deprecated as of Spring 3.0: If you are using mixed autowiring strategies,
+	 * prefer annotation-based autowiring for clearer demarcation of autowiring needs.
 	 */
+	@Deprecated
 	int AUTOWIRE_AUTODETECT = 4;
 
 
@@ -118,7 +121,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @return the new bean instance
 	 * @throws BeansException if instantiation or wiring failed
 	 */
-	Object createBean(Class beanClass) throws BeansException;
+	<T> T createBean(Class<T> beanClass) throws BeansException;
 
 	/**
 	 * Populate the given bean instance through applying after-instantiation callbacks
@@ -134,8 +137,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
 	 * Configure the given raw bean: autowiring bean properties, applying
-	 * bean property values, applying factory callbacks such as <code>setBeanName</code>
-	 * and <code>setBeanFactory</code>, and also applying all bean post processors
+	 * bean property values, applying factory callbacks such as {@code setBeanName}
+	 * and {@code setBeanFactory}, and also applying all bean post processors
 	 * (including ones which might wrap the given raw bean).
 	 * <p>This is effectively a superset of what {@link #initializeBean} provides,
 	 * fully applying the configuration specified by the corresponding bean definition.
@@ -155,7 +158,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * Resolve the specified dependency against the beans defined in this factory.
 	 * @param descriptor the descriptor for the dependency
 	 * @param beanName the name of the bean which declares the present dependency
-	 * @return the resolved object, or <code>null</code> if none found
+	 * @return the resolved object, or {@code null} if none found
 	 * @throws BeansException in dependency resolution failed
 	 */
 	Object resolveDependency(DependencyDescriptor descriptor, String beanName) throws BeansException;
@@ -181,14 +184,13 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @see #AUTOWIRE_BY_NAME
 	 * @see #AUTOWIRE_BY_TYPE
 	 * @see #AUTOWIRE_CONSTRUCTOR
-	 * @see #AUTOWIRE_AUTODETECT
 	 */
-	Object createBean(Class beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
+	Object createBean(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
 
 	/**
 	 * Instantiate a new bean instance of the given class with the specified autowire
 	 * strategy. All constants defined in this interface are supported here.
-	 * Can also be invoked with <code>AUTOWIRE_NO</code> in order to just apply
+	 * Can also be invoked with {@code AUTOWIRE_NO} in order to just apply
 	 * before-instantiation callbacks (e.g. for annotation-driven injection).
 	 * <p>Does <i>not</i> apply standard {@link BeanPostProcessor BeanPostProcessors}
 	 * callbacks or perform any further initialization of the bean. This interface
@@ -211,11 +213,11 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @see #applyBeanPostProcessorsBeforeInitialization
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
-	Object autowire(Class beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
+	Object autowire(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
 
 	/**
 	 * Autowire the bean properties of the given bean instance by name or type.
-	 * Can also be invoked with <code>AUTOWIRE_NO</code> in order to just apply
+	 * Can also be invoked with {@code AUTOWIRE_NO} in order to just apply
 	 * after-instantiation callbacks (e.g. for annotation-driven injection).
 	 * <p>Does <i>not</i> apply standard {@link BeanPostProcessor BeanPostProcessors}
 	 * callbacks or perform any further initialization of the bean. This interface
@@ -260,7 +262,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
 	 * Initialize the given raw bean, applying factory callbacks
-	 * such as <code>setBeanName</code> and <code>setBeanFactory</code>,
+	 * such as {@code setBeanName} and {@code setBeanFactory},
 	 * also applying all bean post processors (including ones which
 	 * might wrap the given raw bean).
 	 * <p>Note that no bean definition of the given name has to exist
@@ -276,7 +278,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
 	 * Apply {@link BeanPostProcessor BeanPostProcessors} to the given existing bean
-	 * instance, invoking their <code>postProcessBeforeInitialization</code> methods.
+	 * instance, invoking their {@code postProcessBeforeInitialization} methods.
 	 * The returned bean instance may be a wrapper around the original.
 	 * @param existingBean the new bean instance
 	 * @param beanName the name of the bean
@@ -289,7 +291,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
 	 * Apply {@link BeanPostProcessor BeanPostProcessors} to the given existing bean
-	 * instance, invoking their <code>postProcessAfterInitialization</code> methods.
+	 * instance, invoking their {@code postProcessAfterInitialization} methods.
 	 * The returned bean instance may be a wrapper around the original.
 	 * @param existingBean the new bean instance
 	 * @param beanName the name of the bean
@@ -301,6 +303,16 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 			throws BeansException;
 
 	/**
+	 * Destroy the given bean instance (typically coming from {@link #createBean}),
+	 * applying the {@link org.springframework.beans.factory.DisposableBean} contract as well as
+	 * registered {@link DestructionAwareBeanPostProcessor DestructionAwareBeanPostProcessors}.
+	 * <p>Any exception that arises during destruction should be caught
+	 * and logged instead of propagated to the caller of this method.
+	 * @param existingBean the bean instance to destroy
+	 */
+	void destroyBean(Object existingBean);
+
+	/**
 	 * Resolve the specified dependency against the beans defined in this factory.
 	 * @param descriptor the descriptor for the dependency
 	 * @param beanName the name of the bean which declares the present dependency
@@ -308,10 +320,10 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * resolving the present dependency) are supposed to be added to
 	 * @param typeConverter the TypeConverter to use for populating arrays and
 	 * collections
-	 * @return the resolved object, or <code>null</code> if none found
+	 * @return the resolved object, or {@code null} if none found
 	 * @throws BeansException in dependency resolution failed
 	 */
 	Object resolveDependency(DependencyDescriptor descriptor, String beanName,
-			Set autowiredBeanNames, TypeConverter typeConverter) throws BeansException;
+			Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException;
 
 }

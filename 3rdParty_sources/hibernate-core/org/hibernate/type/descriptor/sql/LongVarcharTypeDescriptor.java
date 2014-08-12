@@ -33,6 +33,10 @@ import java.sql.Types;
 public class LongVarcharTypeDescriptor extends VarcharTypeDescriptor {
 	public static final LongVarcharTypeDescriptor INSTANCE = new LongVarcharTypeDescriptor();
 
+	public LongVarcharTypeDescriptor() {
+		SqlTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
+	}
+
 	@Override
 	public int getSqlType() {
 		return Types.LONGVARCHAR;

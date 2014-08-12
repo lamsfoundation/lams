@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,13 @@ public class StaticApplicationContext extends GenericApplicationContext {
 
 
 	/**
+	 * Overridden to turn it into a no-op, to be more lenient towards test cases.
+	 */
+	@Override
+	protected void assertBeanFactoryActive() {
+	}
+
+	/**
 	 * Return the internal StaticMessageSource used by this context.
 	 * Can be used to register messages on it.
 	 * @see #addMessage
@@ -77,13 +84,12 @@ public class StaticApplicationContext extends GenericApplicationContext {
 		return this.staticMessageSource;
 	}
 
-
 	/**
 	 * Register a singleton bean with the underlying bean factory.
 	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
 	 * @see #getDefaultListableBeanFactory
 	 */
-	public void registerSingleton(String name, Class clazz) throws BeansException {
+	public void registerSingleton(String name, Class<?> clazz) throws BeansException {
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClass(clazz);
 		getDefaultListableBeanFactory().registerBeanDefinition(name, bd);
@@ -94,7 +100,7 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
 	 * @see #getDefaultListableBeanFactory
 	 */
-	public void registerSingleton(String name, Class clazz, MutablePropertyValues pvs) throws BeansException {
+	public void registerSingleton(String name, Class<?> clazz, MutablePropertyValues pvs) throws BeansException {
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClass(clazz);
 		bd.setPropertyValues(pvs);
@@ -106,7 +112,7 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
 	 * @see #getDefaultListableBeanFactory
 	 */
-	public void registerPrototype(String name, Class clazz) throws BeansException {
+	public void registerPrototype(String name, Class<?> clazz) throws BeansException {
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setScope(GenericBeanDefinition.SCOPE_PROTOTYPE);
 		bd.setBeanClass(clazz);
@@ -118,7 +124,7 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
 	 * @see #getDefaultListableBeanFactory
 	 */
-	public void registerPrototype(String name, Class clazz, MutablePropertyValues pvs) throws BeansException {
+	public void registerPrototype(String name, Class<?> clazz, MutablePropertyValues pvs) throws BeansException {
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setScope(GenericBeanDefinition.SCOPE_PROTOTYPE);
 		bd.setBeanClass(clazz);

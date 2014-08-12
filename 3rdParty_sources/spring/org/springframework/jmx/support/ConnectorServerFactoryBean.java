@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package org.springframework.jmx.support;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -27,32 +27,34 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.MBeanServerForwarder;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.JmxException;
+import org.springframework.util.CollectionUtils;
 
 /**
- * <code>FactoryBean</code> that creates a JSR-160 <code>JMXConnectorServer</code>,
- * optionally registers it with the <code>MBeanServer</code> and then starts it.
+ * {@link FactoryBean} that creates a JSR-160 {@link JMXConnectorServer},
+ * optionally registers it with the {@link MBeanServer} and then starts it.
  *
- * <p>The <code>JMXConnectorServer</code> can be started in a separate thread by setting the
- * <code>threaded</code> property to <code>true</code>. You can configure this thread to be a
- * daemon thread by setting the <code>daemon</code> property to <code>true</code>.
+ * <p>The {@code JMXConnectorServer} can be started in a separate thread by setting the
+ * {@code threaded} property to {@code true}. You can configure this thread to be a
+ * daemon thread by setting the {@code daemon} property to {@code true}.
  *
- * <p>The <code>JMXConnectorServer</code> is correctly shutdown when an instance of this
- * class is destroyed on shutdown of the containing <code>ApplicationContext</code>.
+ * <p>The {@code JMXConnectorServer} is correctly shutdown when an instance of this
+ * class is destroyed on shutdown of the containing {@code ApplicationContext}.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 1.2
- * @see	FactoryBean
+ * @see    FactoryBean
  * @see JMXConnectorServer
  * @see MBeanServer
  */
 public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
-		implements FactoryBean, InitializingBean, DisposableBean {
+		implements FactoryBean<JMXConnectorServer>, InitializingBean, DisposableBean {
 
 	/** The default service URL */
 	public static final String DEFAULT_SERVICE_URL = "service:jmx:jmxmp://localhost:9875";
@@ -60,7 +62,9 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 
 	private String serviceUrl = DEFAULT_SERVICE_URL;
 
-	private Map environment;
+	private Map<String, Object> environment = new HashMap<String, Object>();
+
+	private MBeanServerForwarder forwarder;
 
 	private ObjectName objectName;
 
@@ -72,47 +76,56 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 
 
 	/**
-	 * Set the service URL for the <code>JMXConnectorServer</code>.
+	 * Set the service URL for the {@code JMXConnectorServer}.
 	 */
 	public void setServiceUrl(String serviceUrl) {
 		this.serviceUrl = serviceUrl;
 	}
 
 	/**
-	 * Set the environment properties used to construct the <code>JMXConnectorServer</code>
-	 * as <code>java.util.Properties</code> (String key/value pairs).
+	 * Set the environment properties used to construct the {@code JMXConnectorServer}
+	 * as {@code java.util.Properties} (String key/value pairs).
 	 */
 	public void setEnvironment(Properties environment) {
-		this.environment = environment;
+		CollectionUtils.mergePropertiesIntoMap(environment, this.environment);
 	}
 
 	/**
-	 * Set the environment properties used to construct the <code>JMXConnector</code>
-	 * as a <code>Map</code> of String keys and arbitrary Object values.
+	 * Set the environment properties used to construct the {@code JMXConnector}
+	 * as a {@code Map} of String keys and arbitrary Object values.
 	 */
-	public void setEnvironmentMap(Map environment) {
-		this.environment = environment;
+	public void setEnvironmentMap(Map<String, ?> environment) {
+		if (environment != null) {
+			this.environment.putAll(environment);
+		}
 	}
 
 	/**
-	 * Set the <code>ObjectName</code> used to register the <code>JMXConnectorServer</code>
-	 * itself with the <code>MBeanServer</code>, as <code>ObjectName</code> instance
-	 * or as <code>String</code>.
-	 * @throws MalformedObjectNameException if the <code>ObjectName</code> is malformed
+	 * Set an MBeanServerForwarder to be applied to the {@code JMXConnectorServer}.
+	 */
+	public void setForwarder(MBeanServerForwarder forwarder) {
+		this.forwarder = forwarder;
+	}
+
+	/**
+	 * Set the {@code ObjectName} used to register the {@code JMXConnectorServer}
+	 * itself with the {@code MBeanServer}, as {@code ObjectName} instance
+	 * or as {@code String}.
+	 * @throws MalformedObjectNameException if the {@code ObjectName} is malformed
 	 */
 	public void setObjectName(Object objectName) throws MalformedObjectNameException {
 		this.objectName = ObjectNameManager.getInstance(objectName);
 	}
 
 	/**
-	 * Set whether the <code>JMXConnectorServer</code> should be started in a separate thread.
+	 * Set whether the {@code JMXConnectorServer} should be started in a separate thread.
 	 */
 	public void setThreaded(boolean threaded) {
 		this.threaded = threaded;
 	}
 
 	/**
-	 * Set whether any threads started for the <code>JMXConnectorServer</code> should be
+	 * Set whether any threads started for the {@code JMXConnectorServer} should be
 	 * started as daemon threads.
 	 */
 	public void setDaemon(boolean daemon) {
@@ -121,14 +134,15 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 
 
 	/**
-	 * Start the connector server. If the <code>threaded</code> flag is set to <code>true</code>,
-	 * the <code>JMXConnectorServer</code> will be started in a separate thread.
-	 * If the <code>daemon</code> flag is set to <code>true</code>, that thread will be
+	 * Start the connector server. If the {@code threaded} flag is set to {@code true},
+	 * the {@code JMXConnectorServer} will be started in a separate thread.
+	 * If the {@code daemon} flag is set to {@code true}, that thread will be
 	 * started as a daemon thread.
 	 * @throws JMException if a problem occured when registering the connector server
-	 * with the <code>MBeanServer</code>
+	 * with the {@code MBeanServer}
 	 * @throws IOException if there is a problem starting the connector server
 	 */
+	@Override
 	public void afterPropertiesSet() throws JMException, IOException {
 		if (this.server == null) {
 			this.server = JmxUtils.locateMBeanServer();
@@ -140,6 +154,11 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 		// Create the connector server now.
 		this.connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, this.environment, this.server);
 
+		// Set the given MBeanServerForwarder, if any.
+		if (this.forwarder != null) {
+			this.connectorServer.setMBeanServerForwarder(this.forwarder);
+		}
+
 		// Do we want to register the connector with the MBean server?
 		if (this.objectName != null) {
 			doRegister(this.connectorServer, this.objectName);
@@ -149,6 +168,7 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 			if (this.threaded) {
 				// Start the connector server asynchronously (in a separate thread).
 				Thread connectorThread = new Thread() {
+					@Override
 					public void run() {
 						try {
 							connectorServer.start();
@@ -181,24 +201,28 @@ public class ConnectorServerFactoryBean extends MBeanRegistrationSupport
 	}
 
 
-	public Object getObject() {
+	@Override
+	public JMXConnectorServer getObject() {
 		return this.connectorServer;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<? extends JMXConnectorServer> getObjectType() {
 		return (this.connectorServer != null ? this.connectorServer.getClass() : JMXConnectorServer.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
 
 
 	/**
-	 * Stop the <code>JMXConnectorServer</code> managed by an instance of this class.
-	 * Automatically called on <code>ApplicationContext</code> shutdown.
+	 * Stop the {@code JMXConnectorServer} managed by an instance of this class.
+	 * Automatically called on {@code ApplicationContext} shutdown.
 	 * @throws IOException if there is an error stopping the connector server
 	 */
+	@Override
 	public void destroy() throws IOException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Stopping JMX connector server: " + this.connectorServer);

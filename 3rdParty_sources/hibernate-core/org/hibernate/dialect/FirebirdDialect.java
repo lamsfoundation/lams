@@ -29,24 +29,26 @@ package org.hibernate.dialect;
  * @author Reha CENANI
  */
 public class FirebirdDialect extends InterbaseDialect {
-
+	@Override
 	public String getDropSequenceString(String sequenceName) {
 		return "drop generator " + sequenceName;
 	}
 
+	@Override
 	public String getLimitString(String sql, boolean hasOffset) {
-		return new StringBuffer( sql.length() + 20 )
+		return new StringBuilder( sql.length() + 20 )
 				.append( sql )
 				.insert( 6, hasOffset ? " first ? skip ?" : " first ?" )
 				.toString();
 	}
 
+	@Override
 	public boolean bindLimitParametersFirst() {
 		return true;
 	}
 
+	@Override
 	public boolean bindLimitParametersInReverseOrder() {
 		return true;
 	}
-
 }

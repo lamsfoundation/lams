@@ -26,11 +26,9 @@ package org.hibernate.dialect.lock;
 import java.io.Serializable;
 
 import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.engine.EntityEntry;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.Lockable;
 
@@ -61,21 +59,14 @@ public class PessimisticForceIncrementLockingStrategy implements LockingStrategy
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void lock(
-			Serializable id,
-			Object version,
-			Object object,
-			int timeout,
-			SessionImplementor session) throws StaleObjectStateException, JDBCException {
+	@Override
+	public void lock(Serializable id, Object version, Object object, int timeout, SessionImplementor session) {
 		if ( !lockable.isVersioned() ) {
 			throw new HibernateException( "[" + lockMode + "] not supported for non-versioned entities [" + lockable.getEntityName() + "]" );
 		}
-		EntityEntry entry = session.getPersistenceContext().getEntry( object );
+		final EntityEntry entry = session.getPersistenceContext().getEntry( object );
 		final EntityPersister persister = entry.getPersister();
-		Object nextVersion = persister.forceVersionIncrement( entry.getId(), entry.getVersion(), session );
+		final Object nextVersion = persister.forceVersionIncrement( entry.getId(), entry.getVersion(), session );
 		entry.forceLocked( object, nextVersion );
 	}
 

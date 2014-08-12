@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,11 @@
 package org.springframework.jmx.support;
 
 import java.util.Hashtable;
-
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.springframework.util.ClassUtils;
-
 /**
  * Helper class for the creation of {@link javax.management.ObjectName} instances.
- *
- * <p><code>ObjectName</code> instances will be cached on JMX 1.2,
- * whereas they will be recreated for each request on JMX 1.0.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -36,16 +30,11 @@ import org.springframework.util.ClassUtils;
  */
 public class ObjectNameManager {
 
-	// Determine whether the JMX 1.2 <code>ObjectName.getInstance</code> method is available.
-	private static final boolean getInstanceAvailable =
-			ClassUtils.hasMethod(ObjectName.class, "getInstance", new Class[] {String.class});
-
-
 	/**
-	 * Retrieve the <code>ObjectName</code> instance corresponding to the supplied name.
-	 * @param objectName the <code>ObjectName</code> in <code>ObjectName</code> or
-	 * <code>String</code> format
-	 * @return the <code>ObjectName</code> instance
+	 * Retrieve the {@code ObjectName} instance corresponding to the supplied name.
+	 * @param objectName the {@code ObjectName} in {@code ObjectName} or
+	 * {@code String} format
+	 * @return the {@code ObjectName} instance
 	 * @throws MalformedObjectNameException in case of an invalid object name specification
 	 * @see ObjectName#ObjectName(String)
 	 * @see ObjectName#getInstance(String)
@@ -62,29 +51,24 @@ public class ObjectNameManager {
 	}
 
 	/**
-	 * Retrieve the <code>ObjectName</code> instance corresponding to the supplied name.
-	 * @param objectName the <code>ObjectName</code> in <code>String</code> format
-	 * @return the <code>ObjectName</code> instance
+	 * Retrieve the {@code ObjectName} instance corresponding to the supplied name.
+	 * @param objectName the {@code ObjectName} in {@code String} format
+	 * @return the {@code ObjectName} instance
 	 * @throws MalformedObjectNameException in case of an invalid object name specification
 	 * @see ObjectName#ObjectName(String)
 	 * @see ObjectName#getInstance(String)
 	 */
 	public static ObjectName getInstance(String objectName) throws MalformedObjectNameException {
-		if (getInstanceAvailable) {
-			return ObjectName.getInstance(objectName);
-		}
-		else {
-			return new ObjectName(objectName);
-		}
+		return ObjectName.getInstance(objectName);
 	}
 
 	/**
-	 * Retrieve an <code>ObjectName</code> instance for the specified domain and a
+	 * Retrieve an {@code ObjectName} instance for the specified domain and a
 	 * single property with the supplied key and value.
-	 * @param domainName the domain name for the <code>ObjectName</code>
-	 * @param key the key for the single property in the <code>ObjectName</code>
-	 * @param value the value for the single property in the <code>ObjectName</code>
-	 * @return the <code>ObjectName</code> instance
+	 * @param domainName the domain name for the {@code ObjectName}
+	 * @param key the key for the single property in the {@code ObjectName}
+	 * @param value the value for the single property in the {@code ObjectName}
+	 * @return the {@code ObjectName} instance
 	 * @throws MalformedObjectNameException in case of an invalid object name specification
 	 * @see ObjectName#ObjectName(String, String, String)
 	 * @see ObjectName#getInstance(String, String, String)
@@ -92,33 +76,23 @@ public class ObjectNameManager {
 	public static ObjectName getInstance(String domainName, String key, String value)
 			throws MalformedObjectNameException {
 
-		if (getInstanceAvailable) {
-			return ObjectName.getInstance(domainName, key, value);
-		}
-		else {
-			return new ObjectName(domainName, key, value);
-		}
+		return ObjectName.getInstance(domainName, key, value);
 	}
 
 	/**
-	 * Retrieve an <code>ObjectName</code> instance with the specified domain name
+	 * Retrieve an {@code ObjectName} instance with the specified domain name
 	 * and the supplied key/name properties.
-	 * @param domainName the domain name for the <code>ObjectName</code>
-	 * @param properties the properties for the <code>ObjectName</code>
-	 * @return the <code>ObjectName</code> instance
+	 * @param domainName the domain name for the {@code ObjectName}
+	 * @param properties the properties for the {@code ObjectName}
+	 * @return the {@code ObjectName} instance
 	 * @throws MalformedObjectNameException in case of an invalid object name specification
 	 * @see ObjectName#ObjectName(String, java.util.Hashtable)
 	 * @see ObjectName#getInstance(String, java.util.Hashtable)
 	 */
-	public static ObjectName getInstance(String domainName, Hashtable properties)
+	public static ObjectName getInstance(String domainName, Hashtable<String, String> properties)
 			throws MalformedObjectNameException {
 
-		if (getInstanceAvailable) {
-			return ObjectName.getInstance(domainName, properties);
-		}
-		else {
-			return new ObjectName(domainName, properties);
-		}
+		return ObjectName.getInstance(domainName, properties);
 	}
 
 }

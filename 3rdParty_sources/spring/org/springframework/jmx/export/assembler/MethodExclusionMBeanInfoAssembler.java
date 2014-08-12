@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,22 +28,22 @@ import java.util.Set;
 import org.springframework.util.StringUtils;
 
 /**
- * <code>AbstractReflectiveMBeanInfoAssembler</code> subclass that allows
+ * {@code AbstractReflectiveMBeanInfoAssembler} subclass that allows
  * method names to be explicitly excluded as MBean operations and attributes.
- * 
+ *
  * <p>Any method not explicitly excluded from the management interface will be exposed to
  * JMX. JavaBean getters and setters will automatically be exposed as JMX attributes.
  *
- * <p>You can supply an array of method names via the <code>ignoredMethods</code>
+ * <p>You can supply an array of method names via the {@code ignoredMethods}
  * property. If you have multiple beans and you wish each bean to use a different
  * set of method names, then you can map bean keys (that is the name used to pass
- * the bean to the <code>MBeanExporter</code>) to a list of method names using the
- * <code>ignoredMethodMappings</code> property.
+ * the bean to the {@code MBeanExporter}) to a list of method names using the
+ * {@code ignoredMethodMappings} property.
  *
- * <p>If you specify values for both <code>ignoredMethodMappings</code> and
- * <code>ignoredMethods</code>, Spring will attempt to find method names in the
+ * <p>If you specify values for both {@code ignoredMethodMappings} and
+ * {@code ignoredMethods}, Spring will attempt to find method names in the
  * mappings first. If no method names for the bean are found, it will use the
- * method names defined by <code>ignoredMethods</code>.
+ * method names defined by {@code ignoredMethods}.
  *
  * @author Rob Harrop
  * @author Seth Ladd
@@ -57,19 +57,19 @@ import org.springframework.util.StringUtils;
  */
 public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBeanInfoAssembler {
 
-	private Set ignoredMethods;
+	private Set<String> ignoredMethods;
 
-	private Map ignoredMethodMappings;
+	private Map<String, Set<String>> ignoredMethodMappings;
 
 
 	/**
 	 * Set the array of method names to be <b>ignored</b> when creating the management info.
 	 * <p>These method names will be used for a bean if no entry corresponding to
-	 * that bean is found in the <code>ignoredMethodsMappings</code> property.
+	 * that bean is found in the {@code ignoredMethodsMappings} property.
 	 * @see #setIgnoredMethodMappings(java.util.Properties)
 	 */
 	public void setIgnoredMethods(String[] ignoredMethodNames) {
-		this.ignoredMethods = new HashSet(Arrays.asList(ignoredMethodNames));
+		this.ignoredMethods = new HashSet<String>(Arrays.asList(ignoredMethodNames));
 	}
 
 	/**
@@ -80,23 +80,26 @@ public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBean
 	 * Spring will check these mappings first.
 	 */
 	public void setIgnoredMethodMappings(Properties mappings) {
-		this.ignoredMethodMappings = new HashMap();
-		for (Enumeration en = mappings.keys(); en.hasMoreElements();) {
+		this.ignoredMethodMappings = new HashMap<String, Set<String>>();
+		for (Enumeration<?> en = mappings.keys(); en.hasMoreElements();) {
 			String beanKey = (String) en.nextElement();
 			String[] methodNames = StringUtils.commaDelimitedListToStringArray(mappings.getProperty(beanKey));
-			this.ignoredMethodMappings.put(beanKey, new HashSet(Arrays.asList(methodNames)));
+			this.ignoredMethodMappings.put(beanKey, new HashSet<String>(Arrays.asList(methodNames)));
 		}
 	}
 
 
+	@Override
 	protected boolean includeReadAttribute(Method method, String beanKey) {
 		return isNotIgnored(method, beanKey);
 	}
 
+	@Override
 	protected boolean includeWriteAttribute(Method method, String beanKey) {
 		return isNotIgnored(method, beanKey);
 	}
 
+	@Override
 	protected boolean includeOperation(Method method, String beanKey) {
 		return isNotIgnored(method, beanKey);
 	}
@@ -106,11 +109,11 @@ public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBean
 	 * that is, not configured as to be ignored.
 	 * @param method the operation method
 	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the <code>MBeanExporter</code>
+	 * of the {@code MBeanExporter}
 	 */
 	protected boolean isNotIgnored(Method method, String beanKey) {
 		if (this.ignoredMethodMappings != null) {
-			Set methodNames = (Set) this.ignoredMethodMappings.get(beanKey);
+			Set<String> methodNames = this.ignoredMethodMappings.get(beanKey);
 			if (methodNames != null) {
 				return !methodNames.contains(method.getName());
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public interface BindingResult extends Errors {
 	 * Adding things to the map and then re-calling this method will not work.
 	 * <p>The attributes in the model Map returned by this method are usually
 	 * included in the {@link org.springframework.web.servlet.ModelAndView}
-	 * for a form view that uses Spring's <code>bind</code> tag in a JSP,
+	 * for a form view that uses Spring's {@code bind} tag in a JSP,
 	 * which needs access to the BindingResult instance. Spring's pre-built
 	 * form controllers will do this for you when rendering a form view.
 	 * When building the ModelAndView instance yourself, you need to include
@@ -73,32 +73,31 @@ public interface BindingResult extends Errors {
 	 * @see #MODEL_KEY_PREFIX
 	 * @see org.springframework.web.servlet.ModelAndView
 	 * @see org.springframework.web.servlet.tags.BindTag
-	 * @see org.springframework.web.servlet.mvc.SimpleFormController
 	 */
-	Map getModel();
+	Map<String, Object> getModel();
 
 	/**
 	 * Extract the raw field value for the given field.
 	 * Typically used for comparison purposes.
 	 * @param field the field to check
 	 * @return the current value of the field in its raw form,
-	 * or <code>null</code> if not known
+	 * or {@code null} if not known
 	 */
 	Object getRawFieldValue(String field);
 
 	/**
 	 * Find a custom property editor for the given type and property.
-	 * @param valueType the type of the property (can be <code>null</code> if a property
-	 * is given but should be specified in any case for consistency checking)
 	 * @param field the path of the property (name or nested path), or
-	 * <code>null</code> if looking for an editor for all properties of the given type
-	 * @return the registered editor, or <code>null</code> if none
+	 * {@code null} if looking for an editor for all properties of the given type
+	 * @param valueType the type of the property (can be {@code null} if a property
+	 * is given but should be specified in any case for consistency checking)
+	 * @return the registered editor, or {@code null} if none
 	 */
-	PropertyEditor findEditor(String field, Class valueType);
+	PropertyEditor findEditor(String field, Class<?> valueType);
 
 	/**
 	 * Return the underlying PropertyEditorRegistry.
-	 * @return the PropertyEditorRegistry, or <code>null</code> if none
+	 * @return the PropertyEditorRegistry, or {@code null} if none
 	 * available for this BindingResult
 	 */
 	PropertyEditorRegistry getPropertyEditorRegistry();
@@ -111,6 +110,14 @@ public interface BindingResult extends Errors {
 	 * @see BindingErrorProcessor
 	 */
 	void addError(ObjectError error);
+
+	/**
+	 * Resolve the given error code into message codes.
+	 * <p>Calls the configured {@link MessageCodesResolver} with appropriate parameters.
+	 * @param errorCode the error code to resolve into message codes
+	 * @return the resolved message codes
+	 */
+	String[] resolveMessageCodes(String errorCode);
 
 	/**
 	 * Resolve the given error code into message codes for the given field.

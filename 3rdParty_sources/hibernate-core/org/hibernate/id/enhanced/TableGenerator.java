@@ -23,37 +23,40 @@
  */
 package org.hibernate.id.enhanced;
 
-import java.sql.Types;
+import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Properties;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collections;
 import java.util.Map;
-import java.io.Serializable;
+import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
+import org.hibernate.MappingException;
 import org.hibernate.cfg.Environment;
-import org.hibernate.engine.TransactionHelper;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.cfg.ObjectNameNormalizer;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.internal.FormatStyle;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
+import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
+import org.hibernate.engine.spi.SessionEventListenerManager;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGeneratorHelper;
 import org.hibernate.id.IntegralDataTypeHolder;
 import org.hibernate.id.PersistentIdentifierGenerator;
-import org.hibernate.id.Configurable;
-import org.hibernate.type.Type;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.HibernateException;
-import org.hibernate.MappingException;
-import org.hibernate.LockOptions;
-import org.hibernate.LockMode;
-import org.hibernate.cfg.ObjectNameNormalizer;
-import org.hibernate.jdbc.util.FormatStyle;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.config.ConfigurationHelper;
+import org.hibernate.jdbc.AbstractReturningWork;
 import org.hibernate.mapping.Table;
-import org.hibernate.util.PropertiesHelper;
-import org.hibernate.util.StringHelper;
+import org.hibernate.type.Type;
+
+import org.jboss.logging.Logger;
 
 /**
  * An enhanced version of table-based id generation.
@@ -128,32 +131,96 @@ import org.hibernate.util.StringHelper;
  *
  * @author Steve Ebersole
  */
-public class TableGenerator extends TransactionHelper implements PersistentIdentifierGenerator, Configurable {
-	private static final Logger log = LoggerFactory.getLogger( TableGenerator.class );
+public class TableGenerator implements PersistentIdentifierGenerator, Configurable {
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			TableGenerator.class.getName()
+	);
 
+	/**
+	 * By default (in the absence of a {@link #SEGMENT_VALUE_PARAM} setting) we use a single row for all
+	 * generators.  This setting can be used to change that to instead default to using a row for each entity name.
+	 */
 	public static final String CONFIG_PREFER_SEGMENT_PER_ENTITY = "prefer_entity_table_as_segment_value";
 
+	/**
+	 * Configures the name of the table to use.  The default value is {@link #DEF_TABLE}
+	 */
 	public static final String TABLE_PARAM = "table_name";
+
+	/**
+	 * The default {@link #TABLE_PARAM} value
+	 */
 	public static final String DEF_TABLE = "hibernate_sequences";
 
+	/**
+	 * The name of column which holds the sequence value.  The default value is {@link #DEF_VALUE_COLUMN}
+	 */
 	public static final String VALUE_COLUMN_PARAM = "value_column_name";
+
+	/**
+	 * The default {@link #VALUE_COLUMN_PARAM} value
+	 */
 	public static final String DEF_VALUE_COLUMN = "next_val";
 
+	/**
+	 * The name of the column which holds the segment key.  The segment defines the different buckets (segments)
+	 * of values currently tracked in the table.  The default value is {@link #DEF_SEGMENT_COLUMN}
+	 */
 	public static final String SEGMENT_COLUMN_PARAM = "segment_column_name";
+
+	/**
+	 * The default {@link #SEGMENT_COLUMN_PARAM} value
+	 */
 	public static final String DEF_SEGMENT_COLUMN = "sequence_name";
 
+	/**
+	 * The value indicating which segment is used by this generator, as indicated by the actual value stored in the
+	 * column indicated by {@link #SEGMENT_COLUMN_PARAM}.  The default value for setting is {@link #DEF_SEGMENT_VALUE},
+	 * although {@link #CONFIG_PREFER_SEGMENT_PER_ENTITY} effects the default as well.
+	 */
 	public static final String SEGMENT_VALUE_PARAM = "segment_value";
+
+	/**
+	 * The default {@link #SEGMENT_VALUE_PARAM} value, unless {@link #CONFIG_PREFER_SEGMENT_PER_ENTITY} is specified
+	 */
 	public static final String DEF_SEGMENT_VALUE = "default";
 
+	/**
+	 * Indicates the length of the column defined by {@link #SEGMENT_COLUMN_PARAM}.  Used in schema export.  The
+	 * default value is {@link #DEF_SEGMENT_LENGTH}
+	 */
 	public static final String SEGMENT_LENGTH_PARAM = "segment_value_length";
+
+	/**
+	 * The default {@link #SEGMENT_LENGTH_PARAM} value
+	 */
 	public static final int DEF_SEGMENT_LENGTH = 255;
 
+	/**
+	 * Indicates the initial value to use.  The default value is {@link #DEFAULT_INITIAL_VALUE}
+	 */
 	public static final String INITIAL_PARAM = "initial_value";
+
+	/**
+	 * The default {@link #INITIAL_PARAM} value
+	 */
 	public static final int DEFAULT_INITIAL_VALUE = 1;
 
+	/**
+	 * Indicates the increment size to use.  The default value is {@link #DEFAULT_INCREMENT_SIZE}
+	 */
 	public static final String INCREMENT_PARAM = "increment_size";
+
+	/**
+	 * The default {@link #INCREMENT_PARAM} value
+	 */
 	public static final int DEFAULT_INCREMENT_SIZE = 1;
 
+	/**
+	 * Indicates the optimizer to use, either naming a {@link Optimizer} implementation class or by naming
+	 * a {@link StandardOptimizerDescriptor} by name
+	 */
 	public static final String OPT_PARAM = "optimizer";
 
 
@@ -174,11 +241,9 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	private String updateQuery;
 
 	private Optimizer optimizer;
-	private long accessCount = 0;
+	private long accessCount;
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Object generatorKey() {
 		return tableName;
 	}
@@ -283,9 +348,7 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 		return accessCount;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
 		identifierType = type;
 
@@ -305,18 +368,18 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 
 		// if the increment size is greater than one, we prefer pooled optimization; but we
 		// need to see if the user prefers POOL or POOL_LO...
-		String defaultPooledOptimizerStrategy = PropertiesHelper.getBoolean( Environment.PREFER_POOLED_VALUES_LO, params, false )
-				? OptimizerFactory.StandardOptimizerDescriptor.POOLED_LO.getExternalName()
-				: OptimizerFactory.StandardOptimizerDescriptor.POOLED.getExternalName();
+		final String defaultPooledOptimizerStrategy = ConfigurationHelper.getBoolean( Environment.PREFER_POOLED_VALUES_LO, params, false )
+				? StandardOptimizerDescriptor.POOLED_LO.getExternalName()
+				: StandardOptimizerDescriptor.POOLED.getExternalName();
 		final String defaultOptimizerStrategy = incrementSize <= 1
-				? OptimizerFactory.StandardOptimizerDescriptor.NONE.getExternalName()
+				? StandardOptimizerDescriptor.NONE.getExternalName()
 				: defaultPooledOptimizerStrategy;
-		final String optimizationStrategy = PropertiesHelper.getString( OPT_PARAM, params, defaultOptimizerStrategy );
+		final String optimizationStrategy = ConfigurationHelper.getString( OPT_PARAM, params, defaultOptimizerStrategy );
 		optimizer = OptimizerFactory.buildOptimizer(
 				optimizationStrategy,
 				identifierType.getReturnedClass(),
 				incrementSize,
-				PropertiesHelper.getInt( INITIAL_PARAM, params, -1 )
+				ConfigurationHelper.getInt( INITIAL_PARAM, params, -1 )
 		);
 	}
 
@@ -331,24 +394,23 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	 * @return The table name to use.
 	 */
 	protected String determineGeneratorTableName(Properties params, Dialect dialect) {
-		String name = PropertiesHelper.getString( TABLE_PARAM, params, DEF_TABLE );
-		boolean isGivenNameUnqualified = name.indexOf( '.' ) < 0;
+		String name = ConfigurationHelper.getString( TABLE_PARAM, params, DEF_TABLE );
+		final boolean isGivenNameUnqualified = name.indexOf( '.' ) < 0;
 		if ( isGivenNameUnqualified ) {
-			ObjectNameNormalizer normalizer = ( ObjectNameNormalizer ) params.get( IDENTIFIER_NORMALIZER );
+			final ObjectNameNormalizer normalizer = (ObjectNameNormalizer) params.get( IDENTIFIER_NORMALIZER );
 			name = normalizer.normalizeIdentifierQuoting( name );
 			// if the given name is un-qualified we may neen to qualify it
-			String schemaName = normalizer.normalizeIdentifierQuoting( params.getProperty( SCHEMA ) );
-			String catalogName = normalizer.normalizeIdentifierQuoting( params.getProperty( CATALOG ) );
+			final String schemaName = normalizer.normalizeIdentifierQuoting( params.getProperty( SCHEMA ) );
+			final String catalogName = normalizer.normalizeIdentifierQuoting( params.getProperty( CATALOG ) );
 			name = Table.qualify(
 					dialect.quote( catalogName ),
 					dialect.quote( schemaName ),
 					dialect.quote( name)
 			);
 		}
-		else {
-			// if already qualified there is not much we can do in a portable manner so we pass it
-			// through and assume the user has set up the name correctly.
-		}
+		// if already qualified there is not much we can do in a portable manner so we pass it
+		// through and assume the user has set up the name correctly.
+
 		return name;
 	}
 
@@ -364,8 +426,8 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	 * @return The name of the segment column
 	 */
 	protected String determineSegmentColumnName(Properties params, Dialect dialect) {
-		ObjectNameNormalizer normalizer = ( ObjectNameNormalizer ) params.get( IDENTIFIER_NORMALIZER );
-		String name = PropertiesHelper.getString( SEGMENT_COLUMN_PARAM, params, DEF_SEGMENT_COLUMN );
+		final ObjectNameNormalizer normalizer = (ObjectNameNormalizer) params.get( IDENTIFIER_NORMALIZER );
+		final String name = ConfigurationHelper.getString( SEGMENT_COLUMN_PARAM, params, DEF_SEGMENT_COLUMN );
 		return dialect.quote( normalizer.normalizeIdentifierQuoting( name ) );
 	}
 
@@ -380,8 +442,8 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	 * @return The name of the value column
 	 */
 	protected String determineValueColumnName(Properties params, Dialect dialect) {
-		ObjectNameNormalizer normalizer = ( ObjectNameNormalizer ) params.get( IDENTIFIER_NORMALIZER );
-		String name = PropertiesHelper.getString( VALUE_COLUMN_PARAM, params, DEF_VALUE_COLUMN );
+		final ObjectNameNormalizer normalizer = (ObjectNameNormalizer) params.get( IDENTIFIER_NORMALIZER );
+		final String name = ConfigurationHelper.getString( VALUE_COLUMN_PARAM, params, DEF_VALUE_COLUMN );
 		return dialect.quote( normalizer.normalizeIdentifierQuoting( name ) );
 	}
 
@@ -410,9 +472,9 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	 * @return The default segment value to use.
 	 */
 	protected String determineDefaultSegmentValue(Properties params) {
-		boolean preferSegmentPerEntity = PropertiesHelper.getBoolean( CONFIG_PREFER_SEGMENT_PER_ENTITY, params, false );
-		String defaultToUse = preferSegmentPerEntity ? params.getProperty( TABLE ) : DEF_SEGMENT_VALUE;
-		log.info( "explicit segment value for id generator [" + tableName + '.' + segmentColumnName + "] suggested; using default [" + defaultToUse + "]" );
+		final boolean preferSegmentPerEntity = ConfigurationHelper.getBoolean( CONFIG_PREFER_SEGMENT_PER_ENTITY, params, false );
+		final String defaultToUse = preferSegmentPerEntity ? params.getProperty( TABLE ) : DEF_SEGMENT_VALUE;
+		LOG.usingDefaultIdGeneratorSegmentValue( tableName, segmentColumnName, defaultToUse );
 		return defaultToUse;
 	}
 
@@ -426,25 +488,25 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 	 * @return The size of the segment column
 	 */
 	protected int determineSegmentColumnSize(Properties params) {
-		return PropertiesHelper.getInt( SEGMENT_LENGTH_PARAM, params, DEF_SEGMENT_LENGTH );
+		return ConfigurationHelper.getInt( SEGMENT_LENGTH_PARAM, params, DEF_SEGMENT_LENGTH );
 	}
 
 	protected int determineInitialValue(Properties params) {
-		return PropertiesHelper.getInt( INITIAL_PARAM, params, DEFAULT_INITIAL_VALUE );
+		return ConfigurationHelper.getInt( INITIAL_PARAM, params, DEFAULT_INITIAL_VALUE );
 	}
 
 	protected int determineIncrementSize(Properties params) {
-		return PropertiesHelper.getInt( INCREMENT_PARAM, params, DEFAULT_INCREMENT_SIZE );
+		return ConfigurationHelper.getInt( INCREMENT_PARAM, params, DEFAULT_INCREMENT_SIZE );
 	}
 
 	protected String buildSelectQuery(Dialect dialect) {
 		final String alias = "tbl";
-		String query = "select " + StringHelper.qualify( alias, valueColumnName ) +
+		final String query = "select " + StringHelper.qualify( alias, valueColumnName ) +
 				" from " + tableName + ' ' + alias +
 				" where " + StringHelper.qualify( alias, segmentColumnName ) + "=?";
-		LockOptions lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE );
+		final LockOptions lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE );
 		lockOptions.setAliasSpecificLockMode( alias, LockMode.PESSIMISTIC_WRITE );
-		Map updateTargetColumnsMap = Collections.singletonMap( alias, new String[] { valueColumnName } );
+		final Map updateTargetColumnsMap = Collections.singletonMap( alias, new String[] { valueColumnName } );
 		return dialect.applyLocksToSql( query, lockOptions, updateTargetColumnsMap );
 	}
 
@@ -458,127 +520,149 @@ public class TableGenerator extends TransactionHelper implements PersistentIdent
 		return "insert into " + tableName + " (" + segmentColumnName + ", " + valueColumnName + ") " + " values (?,?)";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public synchronized Serializable generate(final SessionImplementor session, Object obj) {
+	private IntegralDataTypeHolder makeValue() {
+		return IdentifierGeneratorHelper.getIntegralDataTypeHolder( identifierType.getReturnedClass() );
+	}
+
+	@Override
+	public Serializable generate(final SessionImplementor session, final Object obj) {
+		final SqlStatementLogger statementLogger = session.getFactory().getServiceRegistry()
+				.getService( JdbcServices.class )
+				.getSqlStatementLogger();
+		final SessionEventListenerManager statsCollector = session.getEventListenerManager();
+
 		return optimizer.generate(
 				new AccessCallback() {
+					@Override
 					public IntegralDataTypeHolder getNextValue() {
-						return ( IntegralDataTypeHolder ) doWorkInNewTransaction( session );
+						return session.getTransactionCoordinator().getTransaction().createIsolationDelegate().delegateWork(
+								new AbstractReturningWork<IntegralDataTypeHolder>() {
+									@Override
+									public IntegralDataTypeHolder execute(Connection connection) throws SQLException {
+										final IntegralDataTypeHolder value = makeValue();
+										int rows;
+										do {
+											final PreparedStatement selectPS = prepareStatement( connection, selectQuery, statementLogger, statsCollector );
+
+											try {
+												selectPS.setString( 1, segmentValue );
+												final ResultSet selectRS = executeQuery( selectPS, statsCollector );
+												if ( !selectRS.next() ) {
+													value.initialize( initialValue );
+
+													final PreparedStatement insertPS = prepareStatement( connection, insertQuery, statementLogger, statsCollector );
+													try {
+														insertPS.setString( 1, segmentValue );
+														value.bind( insertPS, 2 );
+														executeUpdate( insertPS, statsCollector );
+													}
+													finally {
+														insertPS.close();
+													}
+												}
+												else {
+													value.initialize( selectRS, 1 );
+												}
+												selectRS.close();
+											}
+											catch (SQLException e) {
+												LOG.unableToReadOrInitHiValue( e );
+												throw e;
+											}
+											finally {
+												selectPS.close();
+											}
+
+
+											final PreparedStatement updatePS = prepareStatement( connection, updateQuery, statementLogger, statsCollector );
+											try {
+												final IntegralDataTypeHolder updateValue = value.copy();
+												if ( optimizer.applyIncrementSizeToSourceValues() ) {
+													updateValue.add( incrementSize );
+												}
+												else {
+													updateValue.increment();
+												}
+												updateValue.bind( updatePS, 1 );
+												value.bind( updatePS, 2 );
+												updatePS.setString( 3, segmentValue );
+												rows = executeUpdate( updatePS, statsCollector );
+											}
+											catch (SQLException e) {
+												LOG.unableToUpdateQueryHiValue( tableName, e );
+												throw e;
+											}
+											finally {
+												updatePS.close();
+											}
+										}
+										while ( rows == 0 );
+
+										accessCount++;
+
+										return value;
+									}
+								},
+								true
+						);
+					}
+
+					@Override
+					public String getTenantIdentifier() {
+						return session.getTenantIdentifier();
 					}
 				}
 		);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Serializable doWorkInCurrentTransaction(Connection conn, String sql) throws SQLException {
-		IntegralDataTypeHolder value = IdentifierGeneratorHelper.getIntegralDataTypeHolder( identifierType.getReturnedClass() );
-		int rows;
-		do {
-			SQL_STATEMENT_LOGGER.logStatement( selectQuery, FormatStyle.BASIC );
-			PreparedStatement selectPS = conn.prepareStatement( selectQuery );
-			try {
-				selectPS.setString( 1, segmentValue );
-				ResultSet selectRS = selectPS.executeQuery();
-				if ( !selectRS.next() ) {
-					value.initialize( initialValue );
-					PreparedStatement insertPS = null;
-					try {
-						SQL_STATEMENT_LOGGER.logStatement( insertQuery, FormatStyle.BASIC );
-						insertPS = conn.prepareStatement( insertQuery );
-						insertPS.setString( 1, segmentValue );
-						value.bind( insertPS, 2 );
-						insertPS.execute();
-					}
-					finally {
-						if ( insertPS != null ) {
-							insertPS.close();
-						}
-					}
-				}
-				else {
-					value.initialize( selectRS, 1 );
-				}
-				selectRS.close();
-			}
-			catch ( SQLException sqle ) {
-				log.error( "could not read or init a hi value", sqle );
-				throw sqle;
-			}
-			finally {
-				selectPS.close();
-			}
-
-			SQL_STATEMENT_LOGGER.logStatement( updateQuery, FormatStyle.BASIC );
-			PreparedStatement updatePS = conn.prepareStatement( updateQuery );
-			try {
-				final IntegralDataTypeHolder updateValue = value.copy();
-				if ( optimizer.applyIncrementSizeToSourceValues() ) {
-					updateValue.add( incrementSize );
-				}
-				else {
-					updateValue.increment();
-				}
-				updateValue.bind( updatePS, 1 );
-				value.bind( updatePS, 2 );
-				updatePS.setString( 3, segmentValue );
-				rows = updatePS.executeUpdate();
-			}
-			catch ( SQLException sqle ) {
-				log.error( "could not updateQuery hi value in: " + tableName, sqle );
-				throw sqle;
-			}
-			finally {
-				updatePS.close();
-			}
+	private PreparedStatement prepareStatement(
+			Connection connection,
+			String sql,
+			SqlStatementLogger statementLogger,
+			SessionEventListenerManager statsCollector) throws SQLException {
+		statementLogger.logStatement( sql, FormatStyle.BASIC.getFormatter() );
+		try {
+			statsCollector.jdbcPrepareStatementStart();
+			return connection.prepareStatement( sql );
 		}
-		while ( rows == 0 );
-
-		accessCount++;
-
-		return value;
+		finally {
+			statsCollector.jdbcPrepareStatementEnd();
+		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	private int executeUpdate(PreparedStatement ps, SessionEventListenerManager statsCollector) throws SQLException {
+		try {
+			statsCollector.jdbcExecuteStatementStart();
+			return ps.executeUpdate();
+		}
+		finally {
+			statsCollector.jdbcExecuteStatementEnd();
+		}
+
+	}
+
+	private ResultSet executeQuery(PreparedStatement ps, SessionEventListenerManager statsCollector) throws SQLException {
+		try {
+			statsCollector.jdbcExecuteStatementStart();
+			return ps.executeQuery();
+		}
+		finally {
+			statsCollector.jdbcExecuteStatementEnd();
+		}
+	}
+
+	@Override
 	public String[] sqlCreateStrings(Dialect dialect) throws HibernateException {
 		return new String[] {
-				new StringBuffer()
-						.append( dialect.getCreateTableString() )
-						.append( ' ' )
-						.append( tableName )
-						.append( " ( " )
-						.append( segmentColumnName )
-						.append( ' ' )
-						.append( dialect.getTypeName( Types.VARCHAR, segmentValueLength, 0, 0 ) )
-						.append( " not null " )
-						.append( ",  " )
-						.append( valueColumnName )
-						.append( ' ' )
-						.append( dialect.getTypeName( Types.BIGINT ) )
-						.append( ", primary key ( " )
-						.append( segmentColumnName )
-						.append( " ) ) " )
-						.toString()
+				dialect.getCreateTableString() + ' ' + tableName + " ( "
+						+ segmentColumnName + ' ' + dialect.getTypeName( Types.VARCHAR, segmentValueLength, 0, 0 ) + " not null "
+						+ ", " + valueColumnName + ' ' + dialect.getTypeName( Types.BIGINT )
+						+ ", primary key ( " + segmentColumnName + " ) )" + dialect.getTableTypeString()
 		};
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String[] sqlDropStrings(Dialect dialect) throws HibernateException {
-		StringBuilder sqlDropString = new StringBuilder().append( "drop table " );
-		if ( dialect.supportsIfExistsBeforeTableName() ) {
-			sqlDropString.append( "if exists " );
-		}
-		sqlDropString.append( tableName ).append( dialect.getCascadeConstraintsString() );
-		if ( dialect.supportsIfExistsAfterTableName() ) {
-			sqlDropString.append( " if exists" );
-		}
-		return new String[] { sqlDropString.toString() };
+		return new String[] { dialect.getDropTableString( tableName ) };
 	}
 }

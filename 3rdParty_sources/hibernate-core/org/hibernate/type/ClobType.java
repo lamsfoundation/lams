@@ -22,11 +22,10 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
-
 import java.sql.Clob;
 
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.descriptor.java.ClobTypeDescriptor;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
  * A type that maps between {@link java.sql.Types#CLOB CLOB} and {@link Clob}
@@ -34,20 +33,11 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * @author Gavin King
  * @author Steve Ebersole
  */
-public class ClobType extends LobType<Clob> {
-
+public class ClobType extends AbstractSingleColumnStandardBasicType<Clob> {
 	public static final ClobType INSTANCE = new ClobType();
 
 	public ClobType() {
-		this(
-				org.hibernate.type.descriptor.sql.ClobTypeDescriptor.DEFAULT,
-				new AlternativeLobTypes.ClobTypes<Clob,ClobType>( ClobType.class )
-		);
-	}
-
-	protected ClobType(SqlTypeDescriptor sqlTypeDescriptor,
-					   AlternativeLobTypes.ClobTypes<Clob,ClobType> clobTypes) {
-		super( sqlTypeDescriptor, ClobTypeDescriptor.INSTANCE, clobTypes );
+		super( org.hibernate.type.descriptor.sql.ClobTypeDescriptor.DEFAULT, ClobTypeDescriptor.INSTANCE );
 	}
 
 	public String getName() {
@@ -60,7 +50,8 @@ public class ClobType extends LobType<Clob> {
 	}
 
 	@Override
-	protected Clob getReplacement(Clob original, Clob target) {
-		return target;
+	protected Clob getReplacement(Clob original, Clob target, SessionImplementor session) {
+		return session.getFactory().getDialect().getLobMergeStrategy().mergeClob( original, target, session );
 	}
+
 }

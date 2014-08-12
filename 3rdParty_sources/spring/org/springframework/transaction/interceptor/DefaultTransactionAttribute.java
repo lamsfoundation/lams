@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,11 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  * @author Rod Johnson
  * @since 16.03.2003
  */
+@SuppressWarnings("serial")
 public class DefaultTransactionAttribute extends DefaultTransactionDefinition implements TransactionAttribute {
+
+	private String qualifier;
+
 
 	/**
 	 * Create a new DefaultTransactionAttribute, with default settings.
@@ -67,12 +71,43 @@ public class DefaultTransactionAttribute extends DefaultTransactionDefinition im
 
 
 	/**
-	 * Default behavior is as with EJB: rollback on unchecked exception.
-	 * Additionally attempt to rollback on Error.
-	 * Consistent with TransactionTemplate's behavior.
+	 * Associate a qualifier value with this transaction attribute.
+	 * <p>This may be used for choosing a corresponding transaction manager
+	 * to process this specific transaction.
 	 */
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
+	}
+
+	/**
+	 * Return a qualifier value associated with this transaction attribute.
+	 */
+	@Override
+	public String getQualifier() {
+		return this.qualifier;
+	}
+
+	/**
+	 * The default behavior is as with EJB: rollback on unchecked exception.
+	 * Additionally attempt to rollback on Error.
+	 * <p>This is consistent with TransactionTemplate's default behavior.
+	 */
+	@Override
 	public boolean rollbackOn(Throwable ex) {
 		return (ex instanceof RuntimeException || ex instanceof Error);
+	}
+
+
+	/**
+	 * Return an identifying description for this transaction attribute.
+	 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
+	 */
+	protected final StringBuilder getAttributeDescription() {
+		StringBuilder result = getDefinitionDescription();
+		if (this.qualifier != null) {
+			result.append("; '").append(this.qualifier).append("'");
+		}
+		return result;
 	}
 
 }

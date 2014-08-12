@@ -26,10 +26,9 @@ package org.hibernate.type.descriptor.java;
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Clob;
-import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
-import org.hibernate.type.descriptor.CharacterStream;
+import org.hibernate.engine.jdbc.CharacterStream;
+import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
@@ -61,10 +60,10 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 			return (X) value;
 		}
 		if ( Reader.class.isAssignableFrom( type ) ) {
-			return (X) new StringReader( (String) value );
+			return (X) new StringReader( value );
 		}
 		if ( CharacterStream.class.isAssignableFrom( type ) ) {
-			return (X) new CharacterStreamImpl( (String) value );
+			return (X) new CharacterStreamImpl( value );
 		}
 		if ( Clob.class.isAssignableFrom( type ) ) {
 			return (X) options.getLobCreator().createClob( value );
@@ -86,13 +85,8 @@ public class StringTypeDescriptor extends AbstractTypeDescriptor<String> {
 		if ( Reader.class.isInstance( value ) ) {
 			return DataHelper.extractString( (Reader) value );
 		}
-		if ( Clob.class.isInstance( value ) || DataHelper.isNClob( value.getClass() ) ) {
-			try {
-				return DataHelper.extractString( ( (Clob) value ).getCharacterStream() );
-			}
-			catch ( SQLException e ) {
-				throw new HibernateException( "Unable to access lob stream", e );
-			}
+		if ( Clob.class.isInstance( value ) ) {
+			return DataHelper.extractString( (Clob) value );
 		}
 
 		throw unknownWrap( value.getClass() );

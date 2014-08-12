@@ -34,12 +34,17 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.SimpleValue;
+
+import org.jboss.logging.Logger;
 
 /**
  * @author Emmanuel Bernard
  */
 public class CopyIdentifierComponentSecondPass implements SecondPass {
+	private static final Logger log = Logger.getLogger( CopyIdentifierComponentSecondPass.class );
+
 	private final String referencedEntityName;
 	private final Component component;
 	private final Mappings mappings;
@@ -114,7 +119,7 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 				final SimpleValue referencedValue = (SimpleValue) referencedProperty.getValue();
 				value.setTypeName( referencedValue.getTypeName() );
 				value.setTypeParameters( referencedValue.getTypeParameters() );
-				final Iterator<Column> columns = referencedValue.getColumnIterator();
+				final Iterator<Selectable> columns = referencedValue.getColumnIterator();
 
 				if ( joinColumns[0].isNameDeferred() ) {
 					joinColumns[0].copyReferencedStructureAndCreateDefaultJoinColumns(
@@ -125,7 +130,12 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 				else {
 					//FIXME take care of Formula
 					while ( columns.hasNext() ) {
-						Column column = columns.next();
+						final Selectable selectable = columns.next();
+						if ( ! Column.class.isInstance( selectable ) ) {
+							log.debug( "Encountered formula definition; skipping" );
+							continue;
+						}
+						final Column column = (Column) selectable;
 						final Ejb3JoinColumn joinColumn;
 						String logicalColumnName = null;
 						if ( isExplicitReference ) {

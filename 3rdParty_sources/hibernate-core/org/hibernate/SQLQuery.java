@@ -22,63 +22,53 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate;
+import java.util.List;
 
+import org.hibernate.engine.query.spi.sql.NativeSQLQueryReturn;
 import org.hibernate.type.Type;
 
 /**
- * Represents a "native sql" query and allows the user to define certain aspects about its execution, such as:<ul>
- * <li>result-set value mapping (see below)</li>
- * <li>
- * 	Tables used via {@link #addSynchronizedQuerySpace}, {@link #addSynchronizedEntityName} and
- *  {@link #addSynchronizedEntityClass}.  This allows Hibernate to properly know how to deal with auto-flush checking
- *  as well as cached query results if the results of the query are being cached.
- * </li>
- * </ul>
- * <p/>
- * In terms of result-set mapping, there are 3 approaches to defining:<ul>
- * <li>If this represents a named sql query, the mapping could be associated with the query as part of its metadata</li>
- * <li>A pre-defined (defined in metadata and named) mapping can be associated with {@link #setResultSetMapping}</li>
- * <li>Defined locally per the various {@link #addEntity}, {@link #addRoot}, {@link #addJoin}, {@link #addFetch} and {@link #addScalar} methods</li>
+ * Represents a "native sql" query.
  *
+ * Allows the user to define certain aspects about its execution, such as:<ul>
+ *     <li>
+ *         result-set value mapping (see below)
+ *     </li>
+ *     <li>
+ *         Tables used via {@link #addSynchronizedQuerySpace}, {@link #addSynchronizedEntityName} and
+ *         {@link #addSynchronizedEntityClass}.  This allows Hibernate to know how to properly deal with
+ *         auto-flush checking as well as cached query results if the results of the query are being
+ *         cached.
+ *     </li>
+ * </ul>
+ *
+ * In terms of result-set mapping, there are 3 approaches to defining:<ul>
+ *     <li>
+ *         If this represents a named sql query, the mapping could be associated with the query as part
+ *         of its metadata
+ *     </li>
+ *     <li>
+ *         A pre-defined (defined in metadata and named) mapping can be associated with
+ *         {@link #setResultSetMapping}
+ *     </li>
+ *     <li>
+ *         Defined locally per the various {@link #addEntity}, {@link #addRoot}, {@link #addJoin},
+ *         {@link #addFetch} and {@link #addScalar} methods
+ *     </li>
  * </ul>
  * 
  * @author Gavin King
  * @author Steve Ebersole
  */
-public interface SQLQuery extends Query {
+public interface SQLQuery extends Query, SynchronizeableQuery {
+	@Override
+	SQLQuery addSynchronizedQuerySpace(String querySpace);
 
-	/**
-	 * Adds a query space (table name) for (a) auto-flush checking and (b) query result cache invalidation checking
-	 *
-	 * @param querySpace The query space to be auto-flushed for this query.
-	 *
-	 * @return this, for method chaining
-	 */
-	public SQLQuery addSynchronizedQuerySpace(String querySpace);
+	@Override
+	SQLQuery addSynchronizedEntityName(String entityName) throws MappingException;
 
-	/**
-	 * Adds an entity name for (a) auto-flush checking and (b) query result cache invalidation checking.  Same as
-	 * {@link #addSynchronizedQuerySpace} for all tables associated with the given entity.
-	 *
-	 * @param entityName The name of the entity upon whose defined query spaces we should additionally synchronize.
-	 *
-	 * @return this, for method chaining
-	 *
-	 * @throws MappingException Indicates the given name could not be resolved as an entity
-	 */
-	public SQLQuery addSynchronizedEntityName(String entityName) throws MappingException;
-
-	/**
-	 * Adds an entity for (a) auto-flush checking and (b) query result cache invalidation checking.  Same as
-	 * {@link #addSynchronizedQuerySpace} for all tables associated with the given entity.
-	 *
-	 * @param entityClass The class of the entity upon whose defined query spaces we should additionally synchronize.
-	 *
-	 * @return this, for method chaining
-	 *
-	 * @throws MappingException Indicates the given class could not be resolved as an entity
-	 */
-	public SQLQuery addSynchronizedEntityClass(Class entityClass) throws MappingException;
+	@Override
+	SQLQuery addSynchronizedEntityClass(Class entityClass) throws MappingException;
 
 	/**
 	 * Use a predefined named result-set mapping.  This might be defined by a {@code <result-set/>} element in a
@@ -89,6 +79,20 @@ public interface SQLQuery extends Query {
 	 * @return this, for method chaining
 	 */
 	public SQLQuery setResultSetMapping(String name);
+
+	/**
+	 * Is this native-SQL query known to be callable?
+	 *
+	 * @return {@code true} if the query is known to be callable; {@code false} otherwise.
+	 */
+	public boolean isCallable();
+
+	/**
+	 * Retrieve the returns associated with this query.
+	 *
+	 * @return The return descriptors
+	 */
+	public List<NativeSQLQueryReturn> getQueryReturns();
 
 	/**
 	 * Declare a scalar query result. Hibernate will attempt to automatically detect the underlying type.
@@ -114,7 +118,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addScalar(String columnAlias, Type type);
 
 	/**
-	 * Add a new root return mapping, returning a {@link RootReturn} to allow further definition
+	 * Add a new root return mapping, returning a {@link RootReturn} to allow further definition.
 	 *
 	 * @param tableAlias The SQL table alias to map to this entity
 	 * @param entityName The name of the entity.
@@ -126,7 +130,7 @@ public interface SQLQuery extends Query {
 	public RootReturn addRoot(String tableAlias, String entityName);
 
 	/**
-	 * Add a new root return mapping, returning a {@link RootReturn} to allow further definition
+	 * Add a new root return mapping, returning a {@link RootReturn} to allow further definition.
 	 *
 	 * @param tableAlias The SQL table alias to map to this entity
 	 * @param entityType The java type of the entity.
@@ -150,7 +154,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addEntity(String entityName);
 
 	/**
-	 * Declare a "root" entity
+	 * Declare a "root" entity.
 	 *
 	 * @param tableAlias The SQL table alias
 	 * @param entityName The entity name
@@ -160,7 +164,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addEntity(String tableAlias, String entityName);
 
 	/**
-	 * Declare a "root" entity, specifying a lock mode
+	 * Declare a "root" entity, specifying a lock mode.
 	 *
 	 * @param tableAlias The SQL table alias
 	 * @param entityName The entity name
@@ -181,7 +185,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addEntity(Class entityType);
 
 	/**
-	 * Declare a "root" entity
+	 * Declare a "root" entity.
 	 *
 	 * @param tableAlias The SQL table alias
 	 * @param entityType The java type of the entity to add as a root
@@ -191,7 +195,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addEntity(String tableAlias, Class entityType);
 
 	/**
-	 * Declare a "root" entity, specifying a lock mode
+	 * Declare a "root" entity, specifying a lock mode.
 	 *
 	 * @param tableAlias The SQL table alias
 	 * @param entityName The entity name
@@ -240,7 +244,7 @@ public interface SQLQuery extends Query {
 	public SQLQuery addJoin(String tableAlias, String ownerTableAlias, String joinPropertyName);
 
 	/**
-	 * Declare a join fetch result, specifying a lock mode
+	 * Declare a join fetch result, specifying a lock mode.
 	 *
 	 * @param tableAlias The SQL table alias for the data to be mapped to this fetch
 	 * @param path The association path ([owner-alias].[property-name]).
@@ -266,11 +270,11 @@ public interface SQLQuery extends Query {
 	}
 
 	/**
-	 * Allows access to further control how root returns are mapped back from result sets
+	 * Allows access to further control how root returns are mapped back from result sets.
 	 */
 	public static interface RootReturn {
 		/**
-		 * Set the lock mode for this return
+		 * Set the lock mode for this return.
 		 *
 		 * @param lockMode The new lock mode.
 		 *
@@ -279,7 +283,7 @@ public interface SQLQuery extends Query {
 		public RootReturn setLockMode(LockMode lockMode);
 
 		/**
-		 * Name the column alias that identifies the entity's discriminator
+		 * Name the column alias that identifies the entity's discriminator.
 		 *
 		 * @param columnAlias The discriminator column alias
 		 *
@@ -288,7 +292,7 @@ public interface SQLQuery extends Query {
 		public RootReturn setDiscriminatorAlias(String columnAlias);
 
 		/**
-		 * Add a simple property-to-one-column mapping
+		 * Add a simple property-to-one-column mapping.
 		 *
 		 * @param propertyName The name of the property.
 		 * @param columnAlias The name of the column
@@ -308,11 +312,11 @@ public interface SQLQuery extends Query {
 	}
 
 	/**
-	 * Allows access to further control how join fetch returns are mapped back from result sets
+	 * Allows access to further control how join fetch returns are mapped back from result sets.
 	 */
 	public static interface FetchReturn {
 		/**
-		 * Set the lock mode for this return
+		 * Set the lock mode for this return.
 		 *
 		 * @param lockMode The new lock mode.
 		 *
@@ -321,7 +325,7 @@ public interface SQLQuery extends Query {
 		public FetchReturn setLockMode(LockMode lockMode);
 
 		/**
-		 * Add a simple property-to-one-column mapping
+		 * Add a simple property-to-one-column mapping.
 		 *
 		 * @param propertyName The name of the property.
 		 * @param columnAlias The name of the column

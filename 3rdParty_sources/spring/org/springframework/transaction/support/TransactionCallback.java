@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.springframework.transaction.TransactionStatus;
 
 /**
  * Callback interface for transactional code. Used with {@link TransactionTemplate}'s
- * <code>execute</code> method, often as anonymous class within a method implementation.
+ * {@code execute} method, often as anonymous class within a method implementation.
  *
  * <p>Typically used to assemble various calls to transaction-unaware data access
  * services into a higher-level service method with transaction demarcation. As an
@@ -32,7 +32,7 @@ import org.springframework.transaction.TransactionStatus;
  * @see TransactionTemplate
  * @see CallbackPreferringPlatformTransactionManager
  */
-public interface TransactionCallback {
+public interface TransactionCallback<T> {
 
 	/**
 	 * Gets called by {@link TransactionTemplate#execute} within a transactional context.
@@ -43,13 +43,15 @@ public interface TransactionCallback {
 	 * <p>Allows for returning a result object created within the transaction, i.e.
 	 * a domain object or a collection of domain objects. A RuntimeException thrown
 	 * by the callback is treated as application exception that enforces a rollback.
-	 * An exception gets propagated to the caller of the template.
+	 * Any such exception will be propagated to the caller of the template, unless
+	 * there is a problem rolling back, in which case a TransactionException will be
+	 * thrown.
 	 *
 	 * @param status associated transaction status
-	 * @return a result object, or <code>null</code>
+	 * @return a result object, or {@code null}
 	 * @see TransactionTemplate#execute
 	 * @see CallbackPreferringPlatformTransactionManager#execute
 	 */
-	Object doInTransaction(TransactionStatus status);
+	T doInTransaction(TransactionStatus status);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,29 +54,34 @@ public class BlobByteArrayType extends AbstractLobType  {
 
 	/**
 	 * Constructor used for testing: takes an explicit LobHandler
-	 * and an explicit JTA TransactionManager (can be <code>null</code>).
+	 * and an explicit JTA TransactionManager (can be {@code null}).
 	 */
 	protected BlobByteArrayType(LobHandler lobHandler, TransactionManager jtaTransactionManager) {
 		super(lobHandler, jtaTransactionManager);
 	}
 
+	@Override
 	public int[] sqlTypes() {
 		return new int[] {Types.BLOB};
 	}
 
-	public Class returnedClass() {
+	@Override
+	public Class<?> returnedClass() {
 		return byte[].class;
 	}
 
+	@Override
 	public boolean isMutable() {
 		return true;
 	}
 
+	@Override
 	public boolean equals(Object x, Object y) {
 		return (x == y) ||
 				(x instanceof byte[] && y instanceof byte[] && Arrays.equals((byte[]) x, (byte[]) y));
 	}
 
+	@Override
 	public Object deepCopy(Object value) {
 		if (value == null) {
 			return null;
@@ -87,6 +92,7 @@ public class BlobByteArrayType extends AbstractLobType  {
 		return copy;
 	}
 
+	@Override
 	protected Object nullSafeGetInternal(
 			ResultSet rs, String[] names, Object owner, LobHandler lobHandler)
 			throws SQLException {
@@ -94,6 +100,7 @@ public class BlobByteArrayType extends AbstractLobType  {
 		return lobHandler.getBlobAsBytes(rs, names[0]);
 	}
 
+	@Override
 	protected void nullSafeSetInternal(
 			PreparedStatement ps, int index, Object value, LobCreator lobCreator)
 			throws SQLException {

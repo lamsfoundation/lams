@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,13 @@ public class TypedStringValue implements BeanMetadataElement {
 
 	private String value;
 
-	private Object targetType;
+	private volatile Object targetType;
 
 	private Object source;
+
+	private String specifiedTypeName;
+
+	private volatile boolean dynamic;
 
 
 	/**
@@ -57,7 +61,7 @@ public class TypedStringValue implements BeanMetadataElement {
 	 * @param value the String value
 	 * @param targetType the type to convert to
 	 */
-	public TypedStringValue(String value, Class targetType) {
+	public TypedStringValue(String value, Class<?> targetType) {
 		setValue(value);
 		setTargetType(targetType);
 	}
@@ -97,7 +101,7 @@ public class TypedStringValue implements BeanMetadataElement {
 	 * for example in BeanFactoryPostProcessors.
 	 * @see PropertyPlaceholderConfigurer
 	 */
-	public void setTargetType(Class targetType) {
+	public void setTargetType(Class<?> targetType) {
 		Assert.notNull(targetType, "'targetType' must not be null");
 		this.targetType = targetType;
 	}
@@ -105,11 +109,12 @@ public class TypedStringValue implements BeanMetadataElement {
 	/**
 	 * Return the type to convert to.
 	 */
-	public Class getTargetType() {
-		if (!(this.targetType instanceof Class)) {
+	public Class<?> getTargetType() {
+		Object targetTypeValue = this.targetType;
+		if (!(targetTypeValue instanceof Class)) {
 			throw new IllegalStateException("Typed String value does not carry a resolved target type");
 		}
-		return (Class) this.targetType;
+		return (Class<?>) targetTypeValue;
 	}
 
 	/**
@@ -124,11 +129,12 @@ public class TypedStringValue implements BeanMetadataElement {
 	 * Return the type to convert to.
 	 */
 	public String getTargetTypeName() {
-		if (this.targetType instanceof Class) {
-			return ((Class) this.targetType).getName();
+		Object targetTypeValue = this.targetType;
+		if (targetTypeValue instanceof Class) {
+			return ((Class<?>) targetTypeValue).getName();
 		}
 		else {
-			return (String) this.targetType;
+			return (String) targetTypeValue;
 		}
 	}
 
@@ -147,29 +153,60 @@ public class TypedStringValue implements BeanMetadataElement {
 	 * @return the resolved type to convert to
 	 * @throws ClassNotFoundException if the type cannot be resolved
 	 */
-	public Class resolveTargetType(ClassLoader classLoader) throws ClassNotFoundException {
+	public Class<?> resolveTargetType(ClassLoader classLoader) throws ClassNotFoundException {
 		if (this.targetType == null) {
 			return null;
 		}
-		Class resolvedClass = ClassUtils.forName(getTargetTypeName(), classLoader);
+		Class<?> resolvedClass = ClassUtils.forName(getTargetTypeName(), classLoader);
 		this.targetType = resolvedClass;
 		return resolvedClass;
 	}
 
 
 	/**
-	 * Set the configuration source <code>Object</code> for this metadata element.
+	 * Set the configuration source {@code Object} for this metadata element.
 	 * <p>The exact type of the object will depend on the configuration mechanism used.
 	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
 
+	@Override
 	public Object getSource() {
 		return this.source;
 	}
 
+	/**
+	 * Set the type name as actually specified for this particular value, if any.
+	 */
+	public void setSpecifiedTypeName(String specifiedTypeName) {
+		this.specifiedTypeName = specifiedTypeName;
+	}
 
+	/**
+	 * Return the type name as actually specified for this particular value, if any.
+	 */
+	public String getSpecifiedTypeName() {
+		return this.specifiedTypeName;
+	}
+
+	/**
+	 * Mark this value as dynamic, i.e. as containing an expression
+	 * and hence not being subject to caching.
+	 */
+	public void setDynamic() {
+		this.dynamic = true;
+	}
+
+	/**
+	 * Return whether this value has been marked as dynamic.
+	 */
+	public boolean isDynamic() {
+		return this.dynamic;
+	}
+
+
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -182,10 +219,12 @@ public class TypedStringValue implements BeanMetadataElement {
 				ObjectUtils.nullSafeEquals(this.targetType, otherValue.targetType));
 	}
 
+	@Override
 	public int hashCode() {
 		return ObjectUtils.nullSafeHashCode(this.value) * 29 + ObjectUtils.nullSafeHashCode(this.targetType);
 	}
 
+	@Override
 	public String toString() {
 		return "TypedStringValue: value [" + this.value + "], target type [" + this.targetType + "]";
 	}

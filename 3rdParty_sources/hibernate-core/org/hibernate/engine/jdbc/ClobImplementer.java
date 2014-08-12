@@ -29,4 +29,10 @@ package org.hibernate.engine.jdbc;
  * @author Steve Ebersole
  */
 public interface ClobImplementer {
+	/**
+	 * Gets access to the data underlying this CLOB.
+	 *
+	 * @return Access to the underlying data.
+	 */
+	public CharacterStream getUnderlyingStream();
 }

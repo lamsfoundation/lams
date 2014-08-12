@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * FactoryBean for Hessian proxies. Exposes the proxied service for
- * use as a bean reference, using the specified service interface.
+ * {@link FactoryBean} for Hessian proxies. Exposes the proxied service
+ * for use as a bean reference, using the specified service interface.
  *
  * <p>Hessian is a slim, binary RPC protocol.
  * For information on Hessian, see the
  * <a href="http://www.caucho.com/hessian">Hessian website</a>
+ * <b>Note: As of Spring 4.0, this proxy factory requires Hessian 4.0 or above.</b>
  *
  * <p>The service URL must be an HTTP URL exposing a Hessian service.
  * For details, see the {@link HessianClientInterceptor} javadoc.
@@ -36,29 +37,32 @@ import org.springframework.beans.factory.FactoryBean;
  * @see #setServiceUrl
  * @see HessianClientInterceptor
  * @see HessianServiceExporter
- * @see org.springframework.remoting.caucho.BurlapProxyFactoryBean
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
  */
-public class HessianProxyFactoryBean extends HessianClientInterceptor implements FactoryBean {
+public class HessianProxyFactoryBean extends HessianClientInterceptor implements FactoryBean<Object> {
 
 	private Object serviceProxy;
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy(getBeanClassLoader());
 	}
 
 
+	@Override
 	public Object getObject() {
 		return this.serviceProxy;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return getServiceInterface();
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

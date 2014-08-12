@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.jndi;
 
 import java.util.Hashtable;
 import java.util.Properties;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
@@ -40,7 +39,7 @@ import org.springframework.util.CollectionUtils;
  * @see #execute
  */
 public class JndiTemplate {
-	
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private Properties environment;
@@ -78,11 +77,11 @@ public class JndiTemplate {
 	/**
 	 * Execute the given JNDI context callback implementation.
 	 * @param contextCallback JndiCallback implementation
-	 * @return a result object returned by the callback, or <code>null</code>
+	 * @return a result object returned by the callback, or {@code null}
 	 * @throws NamingException thrown by the callback implementation
 	 * @see #createInitialContext
 	 */
-	public Object execute(JndiCallback contextCallback) throws NamingException {
+	public <T> T execute(JndiCallback<T> contextCallback) throws NamingException {
 		Context ctx = getContext();
 		try {
 			return contextCallback.doInContext(ctx);
@@ -96,7 +95,7 @@ public class JndiTemplate {
 	 * Obtain a JNDI context corresponding to this template's configuration.
 	 * Called by {@link #execute}; may also be called directly.
 	 * <p>The default implementation delegates to {@link #createInitialContext()}.
-	 * @return the JNDI context (never <code>null</code>)
+	 * @return the JNDI context (never {@code null})
 	 * @throws NamingException if context retrieval failed
 	 * @see #releaseContext
 	 */
@@ -106,7 +105,7 @@ public class JndiTemplate {
 
 	/**
 	 * Release a JNDI context as obtained from {@link #getContext()}.
-	 * @param ctx the JNDI context to release (may be <code>null</code>)
+	 * @param ctx the JNDI context to release (may be {@code null})
 	 * @see #getContext
 	 */
 	public void releaseContext(Context ctx) {
@@ -128,10 +127,10 @@ public class JndiTemplate {
 	 * @throws NamingException in case of initialization errors
 	 */
 	protected Context createInitialContext() throws NamingException {
-		Hashtable icEnv = null;
+		Hashtable<?, ?> icEnv = null;
 		Properties env = getEnvironment();
 		if (env != null) {
-			icEnv = new Hashtable(env.size());
+			icEnv = new Hashtable<Object, Object>(env.size());
 			CollectionUtils.mergePropertiesIntoMap(env, icEnv);
 		}
 		return new InitialContext(icEnv);
@@ -141,7 +140,7 @@ public class JndiTemplate {
 	/**
 	 * Look up the object with the given name in the current JNDI context.
 	 * @param name the JNDI name of the object
-	 * @return object found (cannot be <code>null</code>; if a not so well-behaved
+	 * @return object found (cannot be {@code null}; if a not so well-behaved
 	 * JNDI implementations returns null, a NamingException gets thrown)
 	 * @throws NamingException if there is no object with the given
 	 * name bound to JNDI
@@ -150,7 +149,8 @@ public class JndiTemplate {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking up JNDI object with name [" + name + "]");
 		}
-		return execute(new JndiCallback() {
+		return execute(new JndiCallback<Object>() {
+			@Override
 			public Object doInContext(Context ctx) throws NamingException {
 				Object located = ctx.lookup(name);
 				if (located == null) {
@@ -166,21 +166,22 @@ public class JndiTemplate {
 	 * Look up the object with the given name in the current JNDI context.
 	 * @param name the JNDI name of the object
 	 * @param requiredType type the JNDI object must match. Can be an interface or
-	 * superclass of the actual class, or <code>null</code> for any match. For example,
-	 * if the value is <code>Object.class</code>, this method will succeed whatever
+	 * superclass of the actual class, or {@code null} for any match. For example,
+	 * if the value is {@code Object.class}, this method will succeed whatever
 	 * the class of the returned instance.
-	 * @return object found (cannot be <code>null</code>; if a not so well-behaved
+	 * @return object found (cannot be {@code null}; if a not so well-behaved
 	 * JNDI implementations returns null, a NamingException gets thrown)
 	 * @throws NamingException if there is no object with the given
 	 * name bound to JNDI
 	 */
-	public Object lookup(String name, Class requiredType) throws NamingException {
+	@SuppressWarnings("unchecked")
+	public <T> T lookup(String name, Class<T> requiredType) throws NamingException {
 		Object jndiObject = lookup(name);
 		if (requiredType != null && !requiredType.isInstance(jndiObject)) {
 			throw new TypeMismatchNamingException(
 					name, requiredType, (jndiObject != null ? jndiObject.getClass() : null));
 		}
-		return jndiObject;
+		return (T) jndiObject;
 	}
 
 	/**
@@ -193,14 +194,15 @@ public class JndiTemplate {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Binding JNDI object with name [" + name + "]");
 		}
-		execute(new JndiCallback() {
+		execute(new JndiCallback<Object>() {
+			@Override
 			public Object doInContext(Context ctx) throws NamingException {
 				ctx.bind(name, object);
 				return null;
 			}
 		});
 	}
-	
+
 	/**
 	 * Rebind the given object to the current JNDI context, using the given name.
 	 * Overwrites any existing binding.
@@ -212,7 +214,8 @@ public class JndiTemplate {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rebinding JNDI object with name [" + name + "]");
 		}
-		execute(new JndiCallback() {
+		execute(new JndiCallback<Object>() {
+			@Override
 			public Object doInContext(Context ctx) throws NamingException {
 				ctx.rebind(name, object);
 				return null;
@@ -229,12 +232,13 @@ public class JndiTemplate {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Unbinding JNDI object with name [" + name + "]");
 		}
-		execute(new JndiCallback() {
+		execute(new JndiCallback<Object>() {
+			@Override
 			public Object doInContext(Context ctx) throws NamingException {
 				ctx.unbind(name);
 				return null;
 			}
 		});
 	}
-	
+
 }

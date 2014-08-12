@@ -31,12 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.collection.PersistentArrayHolder;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentArrayHolder;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 /**
@@ -48,8 +47,19 @@ public class ArrayType extends CollectionType {
 	private final Class elementClass;
 	private final Class arrayClass;
 
+	/**
+	 * @deprecated Use {@link #ArrayType(TypeFactory.TypeScope, String, String, Class )} instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public ArrayType(TypeFactory.TypeScope typeScope, String role, String propertyRef, Class elementClass, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
+		this.elementClass = elementClass;
+		arrayClass = Array.newInstance(elementClass, 0).getClass();
+	}
+
+	public ArrayType(TypeFactory.TypeScope typeScope, String role, String propertyRef, Class elementClass) {
+		super( typeScope, role, propertyRef );
 		this.elementClass = elementClass;
 		arrayClass = Array.newInstance(elementClass, 0).getClass();
 	}
@@ -58,7 +68,7 @@ public class ArrayType extends CollectionType {
 		return arrayClass;
 	}
 
-	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) 
+	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key)
 	throws HibernateException {
 		return new PersistentArrayHolder(session, persister);
 	}
@@ -126,18 +136,19 @@ public class ArrayType extends CollectionType {
 		int length = Array.getLength(array);
 		for ( int i=0; i<length; i++ ) {
 			//TODO: proxies!
-			if ( Array.get(array, i)==element ) return new Integer(i);
+			if ( Array.get(array, i)==element ) return i;
 		}
 		return null;
 	}
 
-	protected boolean initializeImmediately(EntityMode entityMode) {
+	@Override
+	protected boolean initializeImmediately() {
 		return true;
 	}
 
-	public boolean hasHolder(EntityMode entityMode) {
+	@Override
+	public boolean hasHolder() {
 		return true;
 	}
-	
 
 }

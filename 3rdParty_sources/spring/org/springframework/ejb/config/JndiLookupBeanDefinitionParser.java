@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Simple {@link org.springframework.beans.factory.xml.BeanDefinitionParser} implementation that
- * translates <code>jndi-lookup</code> tag into {@link JndiObjectFactoryBean} definitions.
+ * translates {@code jndi-lookup} tag into {@link JndiObjectFactoryBean} definitions.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -42,15 +42,18 @@ class JndiLookupBeanDefinitionParser extends AbstractJndiLocatingBeanDefinitionP
 	public static final String DEFAULT_OBJECT = "defaultObject";
 
 
-	protected Class getBeanClass(Element element) {
+	@Override
+	protected Class<?> getBeanClass(Element element) {
 		return JndiObjectFactoryBean.class;
 	}
 
+	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
 		return (super.isEligibleAttribute(attributeName) &&
 				!DEFAULT_VALUE.equals(attributeName) && !DEFAULT_REF.equals(attributeName));
 	}
 
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
 

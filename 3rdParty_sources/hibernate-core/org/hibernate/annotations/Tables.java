@@ -23,19 +23,22 @@
  */
 package org.hibernate.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Plural of Table
+ * A grouping of tables.
  *
  * @author Emmanuel Bernard
- * @see Table
  */
 @Target({TYPE})
 @Retention(RUNTIME)
 public @interface Tables {
+	/**
+	 * The table grouping.
+	 */
 	Table[] value();
 }

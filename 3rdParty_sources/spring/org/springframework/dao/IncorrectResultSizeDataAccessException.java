@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ package org.springframework.dao;
  * for example when expecting a single row but getting 0 or more than 1 rows.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 1.0.2
  * @see EmptyResultDataAccessException
  */
+@SuppressWarnings("serial")
 public class IncorrectResultSizeDataAccessException extends DataRetrievalFailureException {
 
 	private int expectedSize;
@@ -67,10 +69,35 @@ public class IncorrectResultSizeDataAccessException extends DataRetrievalFailure
 	 * Constructor for IncorrectResultSizeDataAccessException.
 	 * @param msg the detail message
 	 * @param expectedSize the expected result size
+	 * @param ex the wrapped exception
+	 */
+	public IncorrectResultSizeDataAccessException(String msg, int expectedSize, Throwable ex) {
+		super(msg, ex);
+		this.expectedSize = expectedSize;
+		this.actualSize = -1;
+	}
+
+	/**
+	 * Constructor for IncorrectResultSizeDataAccessException.
+	 * @param msg the detail message
+	 * @param expectedSize the expected result size
 	 * @param actualSize the actual result size (or -1 if unknown)
 	 */
 	public IncorrectResultSizeDataAccessException(String msg, int expectedSize, int actualSize) {
 		super(msg);
+		this.expectedSize = expectedSize;
+		this.actualSize = actualSize;
+	}
+
+	/**
+	 * Constructor for IncorrectResultSizeDataAccessException.
+	 * @param msg the detail message
+	 * @param expectedSize the expected result size
+	 * @param actualSize the actual result size (or -1 if unknown)
+	 * @param ex the wrapped exception
+	 */
+	public IncorrectResultSizeDataAccessException(String msg, int expectedSize, int actualSize, Throwable ex) {
+		super(msg, ex);
 		this.expectedSize = expectedSize;
 		this.actualSize = actualSize;
 	}
@@ -80,14 +107,14 @@ public class IncorrectResultSizeDataAccessException extends DataRetrievalFailure
 	 * Return the expected result size.
 	 */
 	public int getExpectedSize() {
-		return expectedSize;
+		return this.expectedSize;
 	}
 
 	/**
 	 * Return the actual result size (or -1 if unknown).
 	 */
 	public int getActualSize() {
-		return actualSize;
+		return this.actualSize;
 	}
 
 }

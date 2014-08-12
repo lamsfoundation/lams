@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,14 @@ import javax.servlet.http.HttpServletResponse;
  * Plain handler interface for components that process HTTP requests,
  * analogous to a Servlet. Only declares {@link javax.servlet.ServletException}
  * and {@link java.io.IOException}, to allow for usage within any
- * {@link javax.servlet.http.HttpServlet}}. This interface is ssentially the
+ * {@link javax.servlet.http.HttpServlet}}. This interface is essentially the
  * direct equivalent of an HttpServlet, reduced to a central handle method.
  *
  * <p>The easiest way to expose an HttpRequestHandler bean in Spring style
  * is to define it in Spring's root web application context and define
  * an {@link org.springframework.web.context.support.HttpRequestHandlerServlet}
- * in <code>web.xml</code>, pointing at the target HttpRequestHandler bean
- * through its <code>servlet-name</code> which needs to match the target bean name.
+ * in {@code web.xml}, pointing at the target HttpRequestHandler bean
+ * through its {@code servlet-name} which needs to match the target bean name.
  *
  * <p>Supported as a handler type within Spring's
  * {@link org.springframework.web.servlet.DispatcherServlet}, being able
@@ -61,7 +61,7 @@ import javax.servlet.http.HttpServletResponse;
  * DispatcherServlet</i>. However, this is usually not necessary, since
  * HttpRequestHandlers typically only support POST requests to begin with.
  * Alternatively, a handler may implement the "If-Modified-Since" HTTP
- * header processing manually within its <code>handle</code> method.
+ * header processing manually within its {@code handle} method.
  *
  * @author Juergen Hoeller
  * @since 2.0

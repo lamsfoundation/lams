@@ -33,6 +33,10 @@ import java.sql.Types;
 public class NumericTypeDescriptor extends DecimalTypeDescriptor {
 	public static final NumericTypeDescriptor INSTANCE = new NumericTypeDescriptor();
 
+	public NumericTypeDescriptor() {
+		SqlTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
+	}
+
 	@Override
 	public int getSqlType() {
 		return Types.NUMERIC;

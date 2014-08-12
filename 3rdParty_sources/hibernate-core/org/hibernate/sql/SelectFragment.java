@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 /**
  * A fragment of an SQL <tt>SELECT</tt> clause
@@ -44,7 +44,7 @@ public class SelectFragment {
 	private List columnAliases = new ArrayList();
 	private String extraSelectList;
 	private String[] usedAliases;
-	
+
 	public SelectFragment() {}
 
 	public List getColumns() {
@@ -59,12 +59,12 @@ public class SelectFragment {
 		usedAliases = aliases;
 		return this;
 	}
-	
+
 	public SelectFragment setExtraSelectList(String extraSelectList) {
 		this.extraSelectList = extraSelectList;
 		return this;
 	}
-	
+
 	public SelectFragment setExtraSelectList(CaseFragment caseFragment, String fragmentAlias) {
 		setExtraSelectList( caseFragment.setReturnColumnName(fragmentAlias, suffix).toFragmentString() );
 		return this;
@@ -117,23 +117,23 @@ public class SelectFragment {
 	}
 
 	public SelectFragment addFormula(String tableAlias, String formula, String formulaAlias) {
-		columns.add( StringHelper.replace(formula, Template.TEMPLATE, tableAlias) );
+		columns.add( StringHelper.replace( formula, Template.TEMPLATE, tableAlias ) );
 		columnAliases.add(formulaAlias);
 		return this;
 	}
-	
+
 	public SelectFragment addColumnTemplate(String tableAlias, String columnTemplate, String columnAlias) {
 		// In this context, there's no difference between a column template and a formula.
 		return addFormula( tableAlias, columnTemplate, columnAlias );
 	}
 
-	public SelectFragment addColumnTemplates(String tableAlias, String[] columnTemplates, String columnAliases[]) {
+	public SelectFragment addColumnTemplates(String tableAlias, String[] columnTemplates, String[] columnAliases) {
 		// In this context, there's no difference between a column template and a formula.
 		return addFormulas( tableAlias, columnTemplates, columnAliases );
-	}	
-	
+	}
+
 	public String toFragmentString() {
-		StringBuffer buf = new StringBuffer( columns.size() * 10 );
+		StringBuilder buf = new StringBuilder( columns.size() * 10 );
 		Iterator iter = columns.iterator();
 		Iterator columnAliasIter = columnAliases.iterator();
 		//HashMap columnsUnique = new HashMap();

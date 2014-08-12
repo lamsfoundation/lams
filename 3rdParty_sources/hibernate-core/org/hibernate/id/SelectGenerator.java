@@ -30,14 +30,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.hibernate.MappingException;
 import org.hibernate.HibernateException;
-import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
-import org.hibernate.id.insert.IdentifierGeneratingInsert;
-import org.hibernate.id.insert.AbstractSelectingDelegate;
+import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.ValueInclusion;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.insert.AbstractSelectingDelegate;
+import org.hibernate.id.insert.IdentifierGeneratingInsert;
+import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
 import org.hibernate.type.Type;
 
 /**
@@ -81,8 +80,7 @@ public class SelectGenerator extends AbstractPostInsertGenerator implements Conf
 					"natural-id properties; need to specify [key] in generator parameters"
 			);
 		}
-		ValueInclusion inclusion = persister.getPropertyInsertGenerationInclusions() [ naturalIdPropertyIndices[0] ];
-		if ( inclusion != ValueInclusion.NONE ) {
+		if ( persister.getEntityMetamodel().isNaturalIdentifierInsertGenerated() ) {
 			throw new IdentifierGenerationException(
 					"natural-id also defined as insert-generated; need to specify [key] " +
 					"in generator parameters"
@@ -136,7 +134,7 @@ public class SelectGenerator extends AbstractPostInsertGenerator implements Conf
 				SessionImplementor session,
 		        PreparedStatement ps,
 		        Object entity) throws SQLException {
-			Object uniqueKeyValue = persister.getPropertyValue( entity, uniqueKeyPropertyName, session.getEntityMode() );
+			Object uniqueKeyValue = persister.getPropertyValue( entity, uniqueKeyPropertyName );
 			uniqueKeyType.nullSafeSet( ps, uniqueKeyValue, 1, session );
 		}
 

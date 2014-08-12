@@ -25,9 +25,6 @@ package org.hibernate.cfg.annotations;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.hibernate.AnnotationException;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.OrderBy;
@@ -41,13 +38,16 @@ import org.hibernate.cfg.Mappings;
 import org.hibernate.cfg.PropertyHolder;
 import org.hibernate.cfg.PropertyHolderBuilder;
 import org.hibernate.cfg.SecondPass;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.IndexBackref;
 import org.hibernate.mapping.List;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.SimpleValue;
-import org.hibernate.util.StringHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * Bind a list to the underlying Hibernate configuration
@@ -57,21 +57,27 @@ import org.hibernate.util.StringHelper;
  */
 @SuppressWarnings({"unchecked", "serial"})
 public class ListBinder extends CollectionBinder {
-	private Logger log = LoggerFactory.getLogger( ListBinder.class );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, ListBinder.class.getName() );
 
 	public ListBinder() {
+		super( false );
 	}
 
+	@Override
 	protected Collection createCollection(PersistentClass persistentClass) {
 		return new org.hibernate.mapping.List( getMappings(), persistentClass );
 	}
 
+	@Override
 	public void setSqlOrderBy(OrderBy orderByAnn) {
-		if ( orderByAnn != null ) log.warn( "@OrderBy not allowed for a indexed collection, annotation ignored." );
+		if ( orderByAnn != null )
+			LOG.orderByAnnotationIndexedCollection();
 	}
 
+	@Override
 	public void setSort(Sort sortAnn) {
-		if ( sortAnn != null ) log.warn( "@Sort not allowed for a indexed collection, annotation ignored." );
+		if ( sortAnn != null )
+			LOG.sortAnnotationIndexedCollection();
 	}
 
 	@Override
@@ -90,7 +96,8 @@ public class ListBinder extends CollectionBinder {
 			final TableBinder assocTableBinder,
 			final Mappings mappings) {
 		return new CollectionSecondPass( mappings, ListBinder.this.collection ) {
-			public void secondPass(Map persistentClasses, Map inheritedMetas)
+			@Override
+            public void secondPass(Map persistentClasses, Map inheritedMetas)
 					throws MappingException {
 				bindStarToManySecondPass(
 						persistentClasses, collType, fkJoinColumns, keyColumns, inverseColumns, elementColumns,
@@ -106,8 +113,8 @@ public class ListBinder extends CollectionBinder {
 			PropertyHolder valueHolder = PropertyHolderBuilder.buildPropertyHolder(
 					this.collection,
 					StringHelper.qualify( this.collection.getRole(), "key" ),
-					(XClass) null,
-					(XProperty) null, propertyHolder, mappings
+					null,
+					null, propertyHolder, mappings
 			);
 			List list = (List) this.collection;
 			if ( !list.isOneToMany() ) indexColumn.forceNotNull();

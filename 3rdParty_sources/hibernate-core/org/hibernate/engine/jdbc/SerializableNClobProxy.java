@@ -23,8 +23,9 @@
  */
 package org.hibernate.engine.jdbc;
 
-import java.sql.Clob;
 import java.lang.reflect.Proxy;
+import java.sql.Clob;
+import java.sql.NClob;
 
 /**
  * Manages aspects of proxying java.sql.NClobs to add serializability.
@@ -32,27 +33,20 @@ import java.lang.reflect.Proxy;
  * @author Steve Ebersole
  */
 public class SerializableNClobProxy extends SerializableClobProxy {
-	private static final Class NCLOB_CLASS = loadNClobClassIfAvailable();
+	private static final Class[] PROXY_INTERFACES = new Class[] { NClob.class, WrappedNClob.class };
 
-	private static Class loadNClobClassIfAvailable() {
-		try {
-			return getProxyClassLoader().loadClass( "java.sql.NClob" );
-		}
-		catch ( ClassNotFoundException e ) {
-			return null;
-		}
-	}
-
-	private static final Class[] PROXY_INTERFACES = new Class[] { determineNClobInterface(), WrappedClob.class };
-
-	private static Class determineNClobInterface() {
-		// java.sql.NClob is a simple marker interface extending java.sql.Clob.  So if java.sql.NClob is not available
-		// on the classloader, just use java.sql.Clob
-		return NCLOB_CLASS == null ? Clob.class : NCLOB_CLASS;
-	}
-
+	/**
+	 * Deprecated.
+	 *
+	 * @param clob The possible NClob reference
+	 *
+	 * @return {@code true} if the the Clob is a NClob as well
+	 *
+	 * @deprecated ORM baselines on JDK 1.6, so optional support for NClob (JDK 1,6 addition) is no longer needed.
+	 */
+	@Deprecated
 	public static boolean isNClob(Clob clob) {
-		return NCLOB_CLASS != null && NCLOB_CLASS.isInstance( clob );
+		return NClob.class.isInstance( clob );
 	}
 
 	/**
@@ -67,17 +61,13 @@ public class SerializableNClobProxy extends SerializableClobProxy {
 	}
 
 	/**
-	 * Generates a SerializableClobProxy proxy wrapping the provided Clob object.
+	 * Generates a SerializableNClobProxy proxy wrapping the provided NClob object.
 	 *
-	 * @param clob The Clob to wrap.
+	 * @param nclob The NClob to wrap.
 	 * @return The generated proxy.
 	 */
-	public static Clob generateProxy(Clob clob) {
-		return ( Clob ) Proxy.newProxyInstance(
-				getProxyClassLoader(),
-				PROXY_INTERFACES,
-				new SerializableNClobProxy( clob )
-		);
+	public static NClob generateProxy(NClob nclob) {
+		return (NClob) Proxy.newProxyInstance( getProxyClassLoader(), PROXY_INTERFACES, new SerializableNClobProxy( nclob ) );
 	}
 
 	/**

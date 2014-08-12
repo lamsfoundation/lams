@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public abstract class BshScriptUtils {
 
 	/**
 	 * Create a new BeanShell-scripted object from the given script source.
-	 * <p>With this <code>createBshObject</code> variant, the script needs to
+	 * <p>With this {@code createBshObject} variant, the script needs to
 	 * declare a full class or return an actual instance of the scripted object.
 	 * @param scriptSource the script source text
 	 * @return the scripted Java object
@@ -60,13 +60,13 @@ public abstract class BshScriptUtils {
 	 * specified interfaces, if any, need to be implemented by that class/instance).
 	 * @param scriptSource the script source text
 	 * @param scriptInterfaces the interfaces that the scripted Java object is
-	 * supposed to implement (may be <code>null</code> or empty if the script itself
+	 * supposed to implement (may be {@code null} or empty if the script itself
 	 * declares a full class or returns an actual instance of the scripted object)
 	 * @return the scripted Java object
 	 * @throws EvalError in case of BeanShell parsing failure
 	 * @see #createBshObject(String, Class[], ClassLoader)
 	 */
-	public static Object createBshObject(String scriptSource, Class[] scriptInterfaces) throws EvalError {
+	public static Object createBshObject(String scriptSource, Class<?>... scriptInterfaces) throws EvalError {
 		return createBshObject(scriptSource, scriptInterfaces, ClassUtils.getDefaultClassLoader());
 	}
 
@@ -78,18 +78,18 @@ public abstract class BshScriptUtils {
 	 * specified interfaces, if any, need to be implemented by that class/instance).
 	 * @param scriptSource the script source text
 	 * @param scriptInterfaces the interfaces that the scripted Java object is
-	 * supposed to implement (may be <code>null</code> or empty if the script itself
+	 * supposed to implement (may be {@code null} or empty if the script itself
 	 * declares a full class or returns an actual instance of the scripted object)
-	 * @param classLoader the ClassLoader to create the script proxy with
+	 * @param classLoader the ClassLoader to use for evaluating the script
 	 * @return the scripted Java object
 	 * @throws EvalError in case of BeanShell parsing failure
 	 */
-	public static Object createBshObject(String scriptSource, Class[] scriptInterfaces, ClassLoader classLoader)
+	public static Object createBshObject(String scriptSource, Class<?>[] scriptInterfaces, ClassLoader classLoader)
 			throws EvalError {
 
 		Object result = evaluateBshScript(scriptSource, scriptInterfaces, classLoader);
 		if (result instanceof Class) {
-			Class clazz = (Class) result;
+			Class<?> clazz = (Class<?>) result;
 			try {
 				return clazz.newInstance();
 			}
@@ -108,17 +108,19 @@ public abstract class BshScriptUtils {
 	 * returning the Class defined by the script.
 	 * <p>The script may either declare a full class or return an actual instance of
 	 * the scripted object (in which case the Class of the object will be returned).
-	 * In any other case, the returned Class will be <code>null</code>.
+	 * In any other case, the returned Class will be {@code null}.
 	 * @param scriptSource the script source text
-	 * @return the scripted Java class, or <code>null</code> if none could be determined
+	 * @param classLoader the ClassLoader to use for evaluating the script
+	 * @return the scripted Java class, or {@code null} if none could be determined
 	 * @throws EvalError in case of BeanShell parsing failure
 	 */
-	static Class determineBshObjectType(String scriptSource) throws EvalError {
+	static Class<?> determineBshObjectType(String scriptSource, ClassLoader classLoader) throws EvalError {
 		Assert.hasText(scriptSource, "Script source must not be empty");
 		Interpreter interpreter = new Interpreter();
+		interpreter.setClassLoader(classLoader);
 		Object result = interpreter.eval(scriptSource);
 		if (result instanceof Class) {
-			return (Class) result;
+			return (Class<?>) result;
 		}
 		else if (result != null) {
 			return result.getClass();
@@ -137,17 +139,18 @@ public abstract class BshScriptUtils {
 	 * specified interfaces, if any, need to be implemented by that class/instance).
 	 * @param scriptSource the script source text
 	 * @param scriptInterfaces the interfaces that the scripted Java object is
-	 * supposed to implement (may be <code>null</code> or empty if the script itself
+	 * supposed to implement (may be {@code null} or empty if the script itself
 	 * declares a full class or returns an actual instance of the scripted object)
-	 * @param classLoader the ClassLoader to create the script proxy with
+	 * @param classLoader the ClassLoader to use for evaluating the script
 	 * @return the scripted Java class or Java object
 	 * @throws EvalError in case of BeanShell parsing failure
 	 */
-	static Object evaluateBshScript(String scriptSource, Class[] scriptInterfaces, ClassLoader classLoader)
+	static Object evaluateBshScript(String scriptSource, Class<?>[] scriptInterfaces, ClassLoader classLoader)
 			throws EvalError {
 
 		Assert.hasText(scriptSource, "Script source must not be empty");
 		Interpreter interpreter = new Interpreter();
+		interpreter.setClassLoader(classLoader);
 		Object result = interpreter.eval(scriptSource);
 		if (result != null) {
 			return result;
@@ -173,12 +176,13 @@ public abstract class BshScriptUtils {
 			this.xt = xt;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (ReflectionUtils.isEqualsMethod(method)) {
-				return (isProxyForSameBshObject(args[0]) ? Boolean.TRUE : Boolean.FALSE);
+				return (isProxyForSameBshObject(args[0]));
 			}
 			else if (ReflectionUtils.isHashCodeMethod(method)) {
-				return new Integer(this.xt.hashCode());
+				return this.xt.hashCode();
 			}
 			else if (ReflectionUtils.isToStringMethod(method)) {
 				return "BeanShell object [" + this.xt + "]";
@@ -212,6 +216,7 @@ public abstract class BshScriptUtils {
 	/**
 	 * Exception to be thrown on script execution failure.
 	 */
+	@SuppressWarnings("serial")
 	public static class BshExecutionException extends NestedRuntimeException {
 
 		private BshExecutionException(EvalError ex) {

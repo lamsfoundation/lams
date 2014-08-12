@@ -22,11 +22,10 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.dialect;
-
-import java.sql.Types;
-import java.sql.SQLException;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.NvlFunction;
@@ -38,8 +37,11 @@ import org.hibernate.type.StandardBasicTypes;
  *
  * @author Jim Mlodgenski
  */
+@SuppressWarnings("deprecation")
 public class PostgresPlusDialect extends PostgreSQLDialect {
-
+	/**
+	 * Constructs a PostgresPlusDialect
+	 */
 	public PostgresPlusDialect() {
 		super();
 
@@ -66,25 +68,30 @@ public class PostgresPlusDialect extends PostgreSQLDialect {
 		registerFunction( "next_day", new StandardSQLFunction( "next_day", StandardBasicTypes.DATE ) );
 	}
 
+	@Override
 	public String getCurrentTimestampSelectString() {
 		return "select sysdate";
 	}
 
+	@Override
 	public String getCurrentTimestampSQLFunctionName() {
 		return "sysdate";
 	}
 
+	@Override
 	public int registerResultSetOutParameter(CallableStatement statement, int col) throws SQLException {
 		statement.registerOutParameter( col, Types.REF );
 		col++;
 		return col;
 	}
 
+	@Override
 	public ResultSet getResultSet(CallableStatement ps) throws SQLException {
 		ps.execute();
-		return ( ResultSet ) ps.getObject( 1 );
+		return (ResultSet) ps.getObject( 1 );
 	}
 
+	@Override
 	public String getSelectGUIDString() {
 		return "select uuid_generate_v1";
 	}

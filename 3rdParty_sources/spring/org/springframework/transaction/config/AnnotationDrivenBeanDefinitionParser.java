@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,45 +30,49 @@ import org.springframework.transaction.interceptor.BeanFactoryTransactionAttribu
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 /**
- * {@link org.springframework.beans.factory.xml.BeanDefinitionParser}
- * implementation that allows users to easily configure all the infrastructure
- * beans required to enable annotation-driven transaction demarcation.
+ * {@link org.springframework.beans.factory.xml.BeanDefinitionParser
+ * BeanDefinitionParser} implementation that allows users to easily configure
+ * all the infrastructure beans required to enable annotation-driven transaction
+ * demarcation.
  *
  * <p>By default, all proxies are created as JDK proxies. This may cause some
  * problems if you are injecting objects as concrete classes rather than
  * interfaces. To overcome this restriction you can set the
- * '<code>proxy-target-class</code>' attribute to '<code>true</code>', which
+ * '{@code proxy-target-class}' attribute to '{@code true}', which
  * will result in class-based proxies being created.
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
+ * @author Chris Beams
  * @since 2.0
  */
 class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
-	public static final String DEFAULT_TRANSACTION_MANAGER_BEAN_NAME = "transactionManager";
-
 	/**
 	 * The bean name of the internally managed transaction advisor (mode="proxy").
+	 * @deprecated as of Spring 3.1 in favor of
+	 * {@link TransactionManagementConfigUtils#TRANSACTION_ADVISOR_BEAN_NAME}
 	 */
+	@Deprecated
 	public static final String TRANSACTION_ADVISOR_BEAN_NAME =
-			"org.springframework.transaction.config.internalTransactionAdvisor";
+			TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;
 
 	/**
 	 * The bean name of the internally managed transaction aspect (mode="aspectj").
+	 * @deprecated as of Spring 3.1 in favor of
+	 * {@link TransactionManagementConfigUtils#TRANSACTION_ASPECT_BEAN_NAME}
 	 */
+	@Deprecated
 	public static final String TRANSACTION_ASPECT_BEAN_NAME =
-			"org.springframework.transaction.config.internalTransactionAspect";
-
-	private static final String TRANSACTION_ASPECT_CLASS_NAME =
-			"org.springframework.transaction.aspectj.AnnotationTransactionAspect";
+			TransactionManagementConfigUtils.TRANSACTION_ASPECT_BEAN_NAME;
 
 
 	/**
-	 * Parses the '<code>&lt;tx:annotation-driven/&gt;</code>' tag. Will
+	 * Parses the {@code <tx:annotation-driven/>} tag. Will
 	 * {@link AopNamespaceUtils#registerAutoProxyCreatorIfNecessary register an AutoProxyCreator}
 	 * with the container as necessary.
 	 */
+	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
@@ -83,20 +87,20 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	private void registerTransactionAspect(Element element, ParserContext parserContext) {
-		if (!parserContext.getRegistry().containsBeanDefinition(TRANSACTION_ASPECT_BEAN_NAME)) {
+		String txAspectBeanName = TransactionManagementConfigUtils.TRANSACTION_ASPECT_BEAN_NAME;
+		String txAspectClassName = TransactionManagementConfigUtils.TRANSACTION_ASPECT_CLASS_NAME;
+		if (!parserContext.getRegistry().containsBeanDefinition(txAspectBeanName)) {
 			RootBeanDefinition def = new RootBeanDefinition();
-			def.setBeanClassName(TRANSACTION_ASPECT_CLASS_NAME);
+			def.setBeanClassName(txAspectClassName);
 			def.setFactoryMethodName("aspectOf");
 			registerTransactionManager(element, def);
-			parserContext.registerBeanComponent(new BeanComponentDefinition(def, TRANSACTION_ASPECT_BEAN_NAME));
+			parserContext.registerBeanComponent(new BeanComponentDefinition(def, txAspectBeanName));
 		}
 	}
 
 	private static void registerTransactionManager(Element element, BeanDefinition def) {
-		String transactionManagerName = (element.hasAttribute(TxNamespaceUtils.TRANSACTION_MANAGER_ATTRIBUTE) ?
-				element.getAttribute(TxNamespaceUtils.TRANSACTION_MANAGER_ATTRIBUTE) : DEFAULT_TRANSACTION_MANAGER_BEAN_NAME);
-		def.getPropertyValues().addPropertyValue(
-				TxNamespaceUtils.TRANSACTION_MANAGER_PROPERTY, new RuntimeBeanReference(transactionManagerName));
+		def.getPropertyValues().add("transactionManagerBeanName",
+				TxNamespaceHandler.getTransactionManagerName(element));
 	}
 
 
@@ -108,12 +112,13 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
-			if (!parserContext.getRegistry().containsBeanDefinition(TRANSACTION_ADVISOR_BEAN_NAME)) {
+			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;
+			if (!parserContext.getRegistry().containsBeanDefinition(txAdvisorBeanName)) {
 				Object eleSource = parserContext.extractSource(element);
 
 				// Create the TransactionAttributeSource definition.
-				Class sourceClass = TxNamespaceUtils.getAnnotationTransactionAttributeSourceClass();
-				RootBeanDefinition sourceDef = new RootBeanDefinition(sourceClass);
+				RootBeanDefinition sourceDef = new RootBeanDefinition(
+						"org.springframework.transaction.annotation.AnnotationTransactionAttributeSource");
 				sourceDef.setSource(eleSource);
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
@@ -123,26 +128,24 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				registerTransactionManager(element, interceptorDef);
-				interceptorDef.getPropertyValues().addPropertyValue(TxNamespaceUtils.TRANSACTION_ATTRIBUTE_SOURCE,
-						new RuntimeBeanReference(sourceName));
+				interceptorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
 				// Create the TransactionAttributeSourceAdvisor definition.
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryTransactionAttributeSourceAdvisor.class);
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				advisorDef.getPropertyValues().addPropertyValue(TxNamespaceUtils.TRANSACTION_ATTRIBUTE_SOURCE,
-						new RuntimeBeanReference(sourceName));
-				advisorDef.getPropertyValues().addPropertyValue("adviceBeanName", interceptorName);
+				advisorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
+				advisorDef.getPropertyValues().add("adviceBeanName", interceptorName);
 				if (element.hasAttribute("order")) {
-					advisorDef.getPropertyValues().addPropertyValue("order", element.getAttribute("order"));
+					advisorDef.getPropertyValues().add("order", element.getAttribute("order"));
 				}
-				parserContext.getRegistry().registerBeanDefinition(TRANSACTION_ADVISOR_BEAN_NAME, advisorDef);
+				parserContext.getRegistry().registerBeanDefinition(txAdvisorBeanName, advisorDef);
 
 				CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), eleSource);
 				compositeDef.addNestedComponent(new BeanComponentDefinition(sourceDef, sourceName));
 				compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));
-				compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, TRANSACTION_ADVISOR_BEAN_NAME));
+				compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, txAdvisorBeanName));
 				parserContext.registerComponent(compositeDef);
 			}
 		}

@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2006 the original author or authors.
- * 
+ * Copyright 2002-2012 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,24 +48,28 @@ import org.springframework.context.ResourceLoaderAware;
  * @see org.springframework.web.servlet.view.velocity.VelocityConfigurer
  */
 public class VelocityEngineFactoryBean extends VelocityEngineFactory
-		implements FactoryBean, InitializingBean, ResourceLoaderAware {
+		implements FactoryBean<VelocityEngine>, InitializingBean, ResourceLoaderAware {
 
 	private VelocityEngine velocityEngine;
 
 
+	@Override
 	public void afterPropertiesSet() throws IOException, VelocityException {
 		this.velocityEngine = createVelocityEngine();
 	}
 
 
-	public Object getObject() {
+	@Override
+	public VelocityEngine getObject() {
 		return this.velocityEngine;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<? extends VelocityEngine> getObjectType() {
 		return VelocityEngine.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

@@ -22,44 +22,52 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.dialect.function;
-
 import java.util.List;
 
 import org.hibernate.QueryException;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 /**
  * Emulation of <tt>locate()</tt> on Sybase
+ *
  * @author Nathan Moon
  */
 public class CharIndexFunction implements SQLFunction {
+	@Override
 	public boolean hasArguments() {
 		return true;
 	}
 
+	@Override
 	public boolean hasParenthesesIfNoArguments() {
 		return true;
 	}
 
+	@Override
 	public Type getReturnType(Type columnType, Mapping mapping) throws QueryException {
 		return StandardBasicTypes.INTEGER;
 	}
 
+	@Override
 	public String render(Type columnType, List args, SessionFactoryImplementor factory) throws QueryException {
-		boolean threeArgs = args.size() > 2;
-		Object pattern = args.get(0);
-		Object string = args.get(1);
-		Object start = threeArgs ? args.get(2) : null;
+		final boolean threeArgs = args.size() > 2;
+		final Object pattern = args.get( 0 );
+		final Object string = args.get( 1 );
+		final Object start = threeArgs ? args.get( 2 ) : null;
 
-		StringBuffer buf = new StringBuffer();
-		buf.append("charindex(").append( pattern ).append(", ");
-		if (threeArgs) buf.append( "right(");
+		final StringBuilder buf = new StringBuilder();
+		buf.append( "charindex(" ).append( pattern ).append( ", " );
+		if (threeArgs) {
+			buf.append( "right(" );
+		}
 		buf.append( string );
-		if (threeArgs) buf.append( ", char_length(" ).append( string ).append(")-(").append( start ).append("-1))");
-		buf.append(')');
+		if (threeArgs) {
+			buf.append( ", char_length(" ).append( string ).append( ")-(" ).append( start ).append( "-1))" );
+		}
+		buf.append( ')' );
 		return buf.toString();
 	}
 

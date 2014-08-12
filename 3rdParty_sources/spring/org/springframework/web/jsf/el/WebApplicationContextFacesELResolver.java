@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.web.jsf.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -32,9 +31,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
- * Special JSF 1.2 <code>ELResolver</code> that exposes the Spring
- * <code>WebApplicationContext</code> instance under a variable named
- * "webApplicationContext".
+ * Special JSF {@code ELResolver} that exposes the Spring {@code WebApplicationContext}
+ * instance under a variable named "webApplicationContext".
  *
  * <p>In contrast to {@link SpringBeanFacesELResolver}, this ELResolver variant
  * does <i>not</i> resolve JSF variable names as Spring bean names. It rather
@@ -42,9 +40,9 @@ import org.springframework.web.jsf.FacesContextUtils;
  * and is able to resolve "webApplicationContext.mySpringManagedBusinessObject"
  * dereferences to Spring-defined beans in that application context.
  *
- * <p>Configure this resolver in your <code>faces-config.xml</code> file as follows:
+ * <p>Configure this resolver in your {@code faces-config.xml} file as follows:
  *
- * <pre>
+ * <pre class="code">
  * &lt;application>
  *   ...
  *   &lt;el-resolver>org.springframework.web.jsf.el.WebApplicationContextFacesELResolver&lt;/el-resolver>
@@ -67,6 +65,7 @@ public class WebApplicationContextFacesELResolver extends ELResolver {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 
+	@Override
 	public Object getValue(ELContext elContext, Object base, Object property) throws ELException {
 		if (base != null) {
 			if (base instanceof WebApplicationContext) {
@@ -103,6 +102,7 @@ public class WebApplicationContextFacesELResolver extends ELResolver {
 		return null;
 	}
 
+	@Override
 	public Class<?> getType(ELContext elContext, Object base, Object property) throws ELException {
 		if (base != null) {
 			if (base instanceof WebApplicationContext) {
@@ -139,9 +139,11 @@ public class WebApplicationContextFacesELResolver extends ELResolver {
 		return null;
 	}
 
+	@Override
 	public void setValue(ELContext elContext, Object base, Object property, Object value) throws ELException {
 	}
 
+	@Override
 	public boolean isReadOnly(ELContext elContext, Object base, Object property) throws ELException {
 		if (base instanceof WebApplicationContext) {
 			elContext.setPropertyResolved(true);
@@ -150,10 +152,12 @@ public class WebApplicationContextFacesELResolver extends ELResolver {
 		return false;
 	}
 
+	@Override
 	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext elContext, Object base) {
 		return null;
 	}
 
+	@Override
 	public Class<?> getCommonPropertyType(ELContext elContext, Object base) {
 		return Object.class;
 	}
@@ -162,7 +166,7 @@ public class WebApplicationContextFacesELResolver extends ELResolver {
 	/**
 	 * Retrieve the WebApplicationContext reference to expose.
 	 * <p>The default implementation delegates to FacesContextUtils,
-	 * returning <code>null</code> if no WebApplicationContext found.
+	 * returning {@code null} if no WebApplicationContext found.
 	 * @param elContext the current JSF ELContext
 	 * @return the Spring web application context
 	 * @see org.springframework.web.jsf.FacesContextUtils#getWebApplicationContext

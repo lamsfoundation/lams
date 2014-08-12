@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.util.Assert;
+
 /**
  * Helper class for cookie generation, carrying cookie descriptor settings
  * as bean properties and being able to add and remove cookie to/from a
  * given response.
  *
  * <p>Can serve as base class for components that generate specific cookies,
- * like CookieLocaleResolcer and CookieThemeResolver.
+ * such as CookieLocaleResolver and CookieThemeResolver.
  *
  * @author Juergen Hoeller
  * @since 1.1.4
@@ -46,7 +48,9 @@ public class CookieGenerator {
 
 	/**
 	 * Default maximum age of cookies: maximum integer value, i.e. forever.
+	 * @deprecated in favor of setting no max age value at all in such a case
 	 */
+	@Deprecated
 	public static final int DEFAULT_COOKIE_MAX_AGE = Integer.MAX_VALUE;
 
 
@@ -58,13 +62,16 @@ public class CookieGenerator {
 
 	private String cookiePath = DEFAULT_COOKIE_PATH;
 
-	private int cookieMaxAge = DEFAULT_COOKIE_MAX_AGE;
+	private Integer cookieMaxAge = null;
 
 	private boolean cookieSecure = false;
+
+	private boolean cookieHttpOnly = false;
 
 
 	/**
 	 * Use the given name for cookies created by this generator.
+	 * @see javax.servlet.http.Cookie#getName()
 	 */
 	public void setCookieName(String cookieName) {
 		this.cookieName = cookieName;
@@ -74,12 +81,13 @@ public class CookieGenerator {
 	 * Return the given name for cookies created by this generator.
 	 */
 	public String getCookieName() {
-		return cookieName;
+		return this.cookieName;
 	}
 
 	/**
 	 * Use the given domain for cookies created by this generator.
 	 * The cookie is only visible to servers in this domain.
+	 * @see javax.servlet.http.Cookie#setDomain
 	 */
 	public void setCookieDomain(String cookieDomain) {
 		this.cookieDomain = cookieDomain;
@@ -89,12 +97,13 @@ public class CookieGenerator {
 	 * Return the domain for cookies created by this generator, if any.
 	 */
 	public String getCookieDomain() {
-		return cookieDomain;
+		return this.cookieDomain;
 	}
 
 	/**
 	 * Use the given path for cookies created by this generator.
 	 * The cookie is only visible to URLs in this path and below.
+	 * @see javax.servlet.http.Cookie#setPath
 	 */
 	public void setCookiePath(String cookiePath) {
 		this.cookiePath = cookiePath;
@@ -104,28 +113,30 @@ public class CookieGenerator {
 	 * Return the path for cookies created by this generator.
 	 */
 	public String getCookiePath() {
-		return cookiePath;
+		return this.cookiePath;
 	}
 
 	/**
 	 * Use the given maximum age (in seconds) for cookies created by this generator.
 	 * Useful special value: -1 ... not persistent, deleted when client shuts down
+	 * @see javax.servlet.http.Cookie#setMaxAge
 	 */
-	public void setCookieMaxAge(int cookieMaxAge) {
+	public void setCookieMaxAge(Integer cookieMaxAge) {
 		this.cookieMaxAge = cookieMaxAge;
 	}
 
 	/**
 	 * Return the maximum age for cookies created by this generator.
 	 */
-	public int getCookieMaxAge() {
-		return cookieMaxAge;
+	public Integer getCookieMaxAge() {
+		return this.cookieMaxAge;
 	}
 
 	/**
 	 * Set whether the cookie should only be sent using a secure protocol,
 	 * such as HTTPS (SSL). This is an indication to the receiving browser,
 	 * not processed by the HTTP server itself. Default is "false".
+	 * @see javax.servlet.http.Cookie#setSecure
 	 */
 	public void setCookieSecure(boolean cookieSecure) {
 		this.cookieSecure = cookieSecure;
@@ -136,27 +147,49 @@ public class CookieGenerator {
 	 * such as HTTPS (SSL).
 	 */
 	public boolean isCookieSecure() {
-		return cookieSecure;
+		return this.cookieSecure;
+	}
+
+	/**
+	 * Set whether the cookie is supposed to be marked with the "HttpOnly" attribute.
+	 * <p>Note that this feature is only available on Servlet 3.0 and higher.
+	 * @see javax.servlet.http.Cookie#setHttpOnly
+	 */
+	public void setCookieHttpOnly(boolean cookieHttpOnly) {
+		this.cookieHttpOnly = cookieHttpOnly;
+	}
+
+	/**
+	 * Return whether the cookie is supposed to be marked with the "HttpOnly" attribute.
+	 */
+	public boolean isCookieHttpOnly() {
+		return this.cookieHttpOnly;
 	}
 
 
 	/**
 	 * Add a cookie with the given value to the response,
 	 * using the cookie descriptor settings of this generator.
-	 * <p>Delegates to <code>createCookie</code> for cookie creation.
+	 * <p>Delegates to {@link #createCookie} for cookie creation.
 	 * @param response the HTTP response to add the cookie to
 	 * @param cookieValue the value of the cookie to add
 	 * @see #setCookieName
 	 * @see #setCookieDomain
 	 * @see #setCookiePath
 	 * @see #setCookieMaxAge
-	 * @see #createCookie
 	 */
 	public void addCookie(HttpServletResponse response, String cookieValue) {
+		Assert.notNull(response, "HttpServletResponse must not be null");
 		Cookie cookie = createCookie(cookieValue);
-		cookie.setMaxAge(getCookieMaxAge());
+		Integer maxAge = getCookieMaxAge();
+		if (maxAge != null) {
+			cookie.setMaxAge(maxAge);
+		}
 		if (isCookieSecure()) {
 			cookie.setSecure(true);
+		}
+		if (isCookieHttpOnly()) {
+			cookie.setHttpOnly(true);
 		}
 		response.addCookie(cookie);
 		if (logger.isDebugEnabled()) {
@@ -167,14 +200,14 @@ public class CookieGenerator {
 	/**
 	 * Remove the cookie that this generator describes from the response.
 	 * Will generate a cookie with empty value and max age 0.
-	 * <p>Delegates to <code>createCookie</code> for cookie creation.
+	 * <p>Delegates to {@link #createCookie} for cookie creation.
 	 * @param response the HTTP response to remove the cookie from
 	 * @see #setCookieName
 	 * @see #setCookieDomain
 	 * @see #setCookiePath
-	 * @see #createCookie
 	 */
 	public void removeCookie(HttpServletResponse response) {
+		Assert.notNull(response, "HttpServletResponse must not be null");
 		Cookie cookie = createCookie("");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);

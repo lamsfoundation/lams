@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ public abstract class PropertyAccessorUtils {
 	 * @return the actual property name, without any key elements
 	 */
 	public static String getPropertyName(String propertyPath) {
-		int separatorIndex = propertyPath.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX_CHAR);
+		int separatorIndex = (propertyPath.endsWith(PropertyAccessor.PROPERTY_KEY_SUFFIX) ?
+				propertyPath.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX_CHAR) : -1);
 		return (separatorIndex != -1 ? propertyPath.substring(0, separatorIndex) : propertyPath);
 	}
 
@@ -131,8 +132,8 @@ public abstract class PropertyAccessorUtils {
 	/**
 	 * Determine the canonical name for the given property path.
 	 * Removes surrounding quotes from map keys:<br>
-	 * <code>map['key']</code> -> <code>map[key]</code><br>
-	 * <code>map["key"]</code> -> <code>map[key]</code>
+	 * {@code map['key']} -> {@code map[key]}<br>
+	 * {@code map["key"]} -> {@code map[key]}
 	 * @param propertyName the bean property path
 	 * @return the canonical representation of the property path
 	 */
@@ -141,26 +142,26 @@ public abstract class PropertyAccessorUtils {
 			return "";
 		}
 
-		StringBuffer buf = new StringBuffer(propertyName);
+		StringBuilder sb = new StringBuilder(propertyName);
 		int searchIndex = 0;
 		while (searchIndex != -1) {
-			int keyStart = buf.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX, searchIndex);
+			int keyStart = sb.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX, searchIndex);
 			searchIndex = -1;
 			if (keyStart != -1) {
-				int keyEnd = buf.indexOf(
+				int keyEnd = sb.indexOf(
 						PropertyAccessor.PROPERTY_KEY_SUFFIX, keyStart + PropertyAccessor.PROPERTY_KEY_PREFIX.length());
 				if (keyEnd != -1) {
-					String key = buf.substring(keyStart + PropertyAccessor.PROPERTY_KEY_PREFIX.length(), keyEnd);
+					String key = sb.substring(keyStart + PropertyAccessor.PROPERTY_KEY_PREFIX.length(), keyEnd);
 					if ((key.startsWith("'") && key.endsWith("'")) || (key.startsWith("\"") && key.endsWith("\""))) {
-						buf.delete(keyStart + 1, keyStart + 2);
-						buf.delete(keyEnd - 2, keyEnd - 1);
+						sb.delete(keyStart + 1, keyStart + 2);
+						sb.delete(keyEnd - 2, keyEnd - 1);
 						keyEnd = keyEnd - 2;
 					}
 					searchIndex = keyEnd + PropertyAccessor.PROPERTY_KEY_SUFFIX.length();
 				}
 			}
 		}
-		return buf.toString();
+		return sb.toString();
 	}
 
 	/**

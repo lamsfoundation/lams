@@ -22,12 +22,11 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
-
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
 
 /**
  * Indexed collections include Lists, Maps, arrays and

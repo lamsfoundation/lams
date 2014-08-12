@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,14 +52,16 @@ public class ResourceAdapterApplicationContext extends GenericApplicationContext
 	}
 
 
+	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		beanFactory.addBeanPostProcessor(new BootstrapContextAwareProcessor(this.bootstrapContext));
 		beanFactory.ignoreDependencyInterface(BootstrapContextAware.class);
 		beanFactory.registerResolvableDependency(BootstrapContext.class, this.bootstrapContext);
 
 		// JCA WorkManager resolved lazily - may not be available.
-		beanFactory.registerResolvableDependency(WorkManager.class, new ObjectFactory() {
-			public Object getObject() {
+		beanFactory.registerResolvableDependency(WorkManager.class, new ObjectFactory<WorkManager>() {
+			@Override
+			public WorkManager getObject() {
 				return bootstrapContext.getWorkManager();
 			}
 		});

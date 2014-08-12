@@ -23,21 +23,22 @@
  */
 package org.hibernate.engine.jdbc;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Clob;
 import java.sql.SQLException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.InputStream;
-import java.io.IOException;
 
+import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
+import org.hibernate.internal.util.ClassLoaderHelper;
 import org.hibernate.type.descriptor.java.DataHelper;
 
 /**
  * Manages aspects of proxying {@link Clob Clobs} for non-contextual creation, including proxy creation and
- * handling proxy invocations.
+ * handling proxy invocations.  We use proxies here solely to avoid JDBC version incompatibilities.
  *
  * @author Gavin King
  * @author Steve Ebersole
@@ -46,11 +47,8 @@ import org.hibernate.type.descriptor.java.DataHelper;
 public class ClobProxy implements InvocationHandler {
 	private static final Class[] PROXY_INTERFACES = new Class[] { Clob.class, ClobImplementer.class };
 
-	private String string;
-	private Reader reader;
-	private long length;
-	private boolean needsReset = false;
-
+	private final CharacterStream characterStream;
+	private boolean needsReset;
 
 	/**
 	 * Constructor used to build {@link Clob} from string data.
@@ -59,9 +57,7 @@ public class ClobProxy implements InvocationHandler {
 	 * @see #generateProxy(String)
 	 */
 	protected ClobProxy(String string) {
-		this.string = string;
-		reader = new StringReader(string);
-		length = string.length();
+		this.characterStream = new CharacterStreamImpl( string );
 	}
 
 	/**
@@ -72,46 +68,51 @@ public class ClobProxy implements InvocationHandler {
 	 * @see #generateProxy(java.io.Reader, long)
 	 */
 	protected ClobProxy(Reader reader, long length) {
-		this.reader = reader;
-		this.length = length;
+		this.characterStream = new CharacterStreamImpl( reader, length );
 	}
 
 	protected long getLength() {
-		return length;
+		return characterStream.getLength();
 	}
 
 	protected InputStream getAsciiStream() throws SQLException {
-		resetIfNeeded();
-		return new ReaderInputStream( reader );
+		return new ReaderInputStream( getCharacterStream() );
 	}
 
 	protected Reader getCharacterStream() throws SQLException {
+		return getUnderlyingStream().asReader();
+	}
+
+	protected CharacterStream getUnderlyingStream() throws SQLException {
 		resetIfNeeded();
-		return reader;
+		return characterStream;
 	}
 
 	protected String getSubString(long start, int length) {
-		if ( string == null ) {
-			throw new UnsupportedOperationException( "Clob was not created from string; cannot substring" );
-		}
+		final String string = characterStream.asString();
 		// semi-naive implementation
-		int endIndex = Math.min( ((int)start)+length, string.length() );
-		return string.substring( (int)start, endIndex );
+		final int endIndex = Math.min( ( (int) start ) + length, string.length() );
+		return string.substring( (int) start, endIndex );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @throws UnsupportedOperationException if any methods other than {@link Clob#length()},
-	 * {@link Clob#getAsciiStream()}, or {@link Clob#getCharacterStream()} are invoked.
+	 * @throws UnsupportedOperationException if any methods other than {@link Clob#length},
+	 * {@link Clob#getAsciiStream}, {@link Clob#getCharacterStream},
+	 * {@link ClobImplementer#getUnderlyingStream}, {@link Clob#getSubString},
+	 * {@link Clob#free}, or toString/equals/hashCode are invoked.
 	 */
-	@SuppressWarnings({ "UnnecessaryBoxing" })
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		final String methodName = method.getName();
 		final int argCount = method.getParameterTypes().length;
 
 		if ( "length".equals( methodName ) && argCount == 0 ) {
-			return Long.valueOf( getLength() );
+			return getLength();
+		}
+		if ( "getUnderlyingStream".equals( methodName ) ) {
+			return getUnderlyingStream(); // Reset stream if needed.
 		}
 		if ( "getAsciiStream".equals( methodName ) && argCount == 0 ) {
 			return getAsciiStream();
@@ -121,14 +122,14 @@ public class ClobProxy implements InvocationHandler {
 				return getCharacterStream();
 			}
 			else if ( argCount == 2 ) {
-				long start = (Long) args[0];
+				final long start = (Long) args[0];
 				if ( start < 1 ) {
 					throw new SQLException( "Start position 1-based; must be 1 or more." );
 				}
 				if ( start > getLength() ) {
 					throw new SQLException( "Start position [" + start + "] cannot exceed overall CLOB length [" + getLength() + "]" );
 				}
-				int length = (Integer) args[1];
+				final int length = (Integer) args[1];
 				if ( length < 0 ) {
 					// java docs specifically say for getCharacterStream(long,int) that the start+length must not exceed the
 					// total length, however that is at odds with the getSubString(long,int) behavior.
@@ -138,31 +139,31 @@ public class ClobProxy implements InvocationHandler {
 			}
 		}
 		if ( "getSubString".equals( methodName ) && argCount == 2 ) {
-			long start = (Long) args[0];
+			final long start = (Long) args[0];
 			if ( start < 1 ) {
 				throw new SQLException( "Start position 1-based; must be 1 or more." );
 			}
 			if ( start > getLength() ) {
 				throw new SQLException( "Start position [" + start + "] cannot exceed overall CLOB length [" + getLength() + "]" );
 			}
-			int length = (Integer) args[1];
+			final int length = (Integer) args[1];
 			if ( length < 0 ) {
 				throw new SQLException( "Length must be great-than-or-equal to zero." );
 			}
 			return getSubString( start-1, length );
 		}
 		if ( "free".equals( methodName ) && argCount == 0 ) {
-			reader.close();
+			characterStream.release();
 			return null;
 		}
 		if ( "toString".equals( methodName ) && argCount == 0 ) {
 			return this.toString();
 		}
 		if ( "equals".equals( methodName ) && argCount == 1 ) {
-			return Boolean.valueOf( proxy == args[0] );
+			return proxy == args[0];
 		}
 		if ( "hashCode".equals( methodName ) && argCount == 0 ) {
-			return new Integer( this.hashCode() );
+			return this.hashCode();
 		}
 
 		throw new UnsupportedOperationException( "Clob may not be manipulated from creating session" );
@@ -171,11 +172,11 @@ public class ClobProxy implements InvocationHandler {
 	protected void resetIfNeeded() throws SQLException {
 		try {
 			if ( needsReset ) {
-				reader.reset();
+				characterStream.asReader().reset();
 			}
 		}
 		catch ( IOException ioe ) {
-			throw new SQLException( "could not reset reader" );
+			throw new SQLException( "could not reset reader", ioe );
 		}
 		needsReset = true;
 	}
@@ -188,11 +189,7 @@ public class ClobProxy implements InvocationHandler {
 	 * @return The generated proxy.
 	 */
 	public static Clob generateProxy(String string) {
-		return ( Clob ) Proxy.newProxyInstance(
-				getProxyClassLoader(),
-				PROXY_INTERFACES,
-				new ClobProxy( string )
-		);
+		return (Clob) Proxy.newProxyInstance( getProxyClassLoader(), PROXY_INTERFACES, new ClobProxy( string ) );
 	}
 
 	/**
@@ -204,11 +201,7 @@ public class ClobProxy implements InvocationHandler {
 	 * @return The generated proxy.
 	 */
 	public static Clob generateProxy(Reader reader, long length) {
-		return ( Clob ) Proxy.newProxyInstance(
-				getProxyClassLoader(),
-				PROXY_INTERFACES,
-				new ClobProxy( reader, length )
-		);
+		return (Clob) Proxy.newProxyInstance( getProxyClassLoader(), PROXY_INTERFACES, new ClobProxy( reader, length ) );
 	}
 
 	/**
@@ -218,7 +211,7 @@ public class ClobProxy implements InvocationHandler {
 	 * @return The class loader appropriate for proxy construction.
 	 */
 	protected static ClassLoader getProxyClassLoader() {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		ClassLoader cl = ClassLoaderHelper.getContextClassLoader();
 		if ( cl == null ) {
 			cl = ClobImplementer.class.getClassLoader();
 		}

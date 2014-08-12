@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.orm.jdo.support;
 
 import java.io.IOException;
-
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.servlet.FilterChain;
@@ -45,7 +44,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * as for non-transactional read-only execution.
  *
  * <p>Looks up the PersistenceManagerFactory in Spring's root web application context.
- * Supports a "persistenceManagerFactoryBeanName" filter init-param in <code>web.xml</code>;
+ * Supports a "persistenceManagerFactoryBeanName" filter init-param in {@code web.xml};
  * the default bean name is "persistenceManagerFactory". Looks up the PersistenceManagerFactory
  * on each request, to avoid initialization order issues (when using ContextLoaderServlet,
  * the root application context will get initialized <i>after</i> this filter).
@@ -53,7 +52,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author Juergen Hoeller
  * @since 1.1
  * @see OpenPersistenceManagerInViewInterceptor
- * @see org.springframework.orm.jdo.JdoInterceptor
  * @see org.springframework.orm.jdo.JdoTransactionManager
  * @see org.springframework.orm.jdo.PersistenceManagerFactoryUtils#getPersistenceManager
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
@@ -83,6 +81,7 @@ public class OpenPersistenceManagerInViewFilter extends OncePerRequestFilter {
 	}
 
 
+	@Override
 	protected void doFilterInternal(
 			HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -117,7 +116,7 @@ public class OpenPersistenceManagerInViewFilter extends OncePerRequestFilter {
 	/**
 	 * Look up the PersistenceManagerFactory that this filter should use,
 	 * taking the current HTTP request as argument.
-	 * <p>Default implementation delegates to the <code>lookupPersistenceManagerFactory</code>
+	 * <p>Default implementation delegates to the {@code lookupPersistenceManagerFactory}
 	 * without arguments.
 	 * @return the PersistenceManagerFactory to use
 	 * @see #lookupPersistenceManagerFactory()
@@ -138,10 +137,8 @@ public class OpenPersistenceManagerInViewFilter extends OncePerRequestFilter {
 			logger.debug("Using PersistenceManagerFactory '" + getPersistenceManagerFactoryBeanName() +
 					"' for OpenPersistenceManagerInViewFilter");
 		}
-		WebApplicationContext wac =
-				WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		return (PersistenceManagerFactory)
-				wac.getBean(getPersistenceManagerFactoryBeanName(), PersistenceManagerFactory.class);
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		return wac.getBean(getPersistenceManagerFactoryBeanName(), PersistenceManagerFactory.class);
 	}
 
 }

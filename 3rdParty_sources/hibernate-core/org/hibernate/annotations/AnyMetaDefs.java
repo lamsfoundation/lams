@@ -23,19 +23,23 @@
  */
 package org.hibernate.annotations;
 
+import java.lang.annotation.Retention;
+
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Defines @Any and @ManyToAny set of metadata.
- * Can be defined at the entity level or the package level
+ * Used to group together {@link AnyMetaDef} annotations.  Can be defined at the entity or package level
  *
  * @author Emmanuel Bernard
+ * @author Steve Ebersole
  */
 @java.lang.annotation.Target( { PACKAGE, TYPE } )
 @Retention( RUNTIME )
 public @interface AnyMetaDefs {
+	/**
+	 * The collective set of any meta-defs.
+	 */
 	AnyMetaDef[] value();
 }

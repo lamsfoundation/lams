@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Convenience subclass of Quartz' JobDetail class that eases bean-style
- * usage.
+ * Convenience subclass of Quartz's {@link org.quartz.JobDetail} class,
+ * making bean-style usage easier.
  *
- * <p><code>JobDetail</code> itself is already a JavaBean but lacks
+ * <p>{@code JobDetail} itself is already a JavaBean but lacks
  * sensible defaults. This class uses the Spring bean name as job name,
  * and the Quartz default group ("DEFAULT") as job group if not specified.
+ *
+ * <p><b>NOTE: This convenience subclass does not work against Quartz 2.0.</b>
+ * Use Quartz 2.0's native {@code JobDetailImpl} class or the new Quartz 2.0
+ * builder API instead. Alternatively, switch to Spring's {@link JobDetailFactoryBean}
+ * which largely is a drop-in replacement for this class and its properties and
+ * consistently works against Quartz 1.x as well as Quartz 2.x.
  *
  * @author Juergen Hoeller
  * @since 18.02.2004
@@ -42,10 +48,11 @@ import org.springframework.context.ApplicationContextAware;
  * @see org.springframework.beans.factory.BeanNameAware
  * @see org.quartz.Scheduler#DEFAULT_GROUP
  */
+@SuppressWarnings({"serial", "rawtypes"})
 public class JobDetailBean extends JobDetail
-    implements BeanNameAware, ApplicationContextAware, InitializingBean {
+		implements BeanNameAware, ApplicationContextAware, InitializingBean {
 
-	private Class actualJobClass;
+	private Class<?> actualJobClass;
 
 	private String beanName;
 
@@ -59,6 +66,7 @@ public class JobDetailBean extends JobDetail
 	 * to adapt the given job class to the Quartz Job interface.
 	 * @see SchedulerFactoryBean#setJobFactory
 	 */
+	@Override
 	public void setJobClass(Class jobClass) {
 		if (jobClass != null && !Job.class.isAssignableFrom(jobClass)) {
 			super.setJobClass(DelegatingJob.class);
@@ -73,6 +81,7 @@ public class JobDetailBean extends JobDetail
 	 * Overridden to support any job class, to allow a custom JobFactory
 	 * to adapt the given job class to the Quartz Job interface.
 	 */
+	@Override
 	public Class getJobClass() {
 		return (this.actualJobClass != null ? this.actualJobClass : super.getJobClass());
 	}
@@ -88,7 +97,7 @@ public class JobDetailBean extends JobDetail
 	 * (for example Spring-managed beans)
 	 * @see SchedulerFactoryBean#setSchedulerContextAsMap
 	 */
-	public void setJobDataAsMap(Map jobDataAsMap) {
+	public void setJobDataAsMap(Map<String, ?> jobDataAsMap) {
 		getJobDataMap().putAll(jobDataAsMap);
 	}
 
@@ -99,17 +108,21 @@ public class JobDetailBean extends JobDetail
 	 * by the JobListener implementation.
 	 * @see SchedulerFactoryBean#setJobListeners
 	 * @see org.quartz.JobListener#getName
+	 * @deprecated as of Spring 4.0, since it only works on Quartz 1.x
 	 */
-	public void setJobListenerNames(String[] names) {
-		for (int i = 0; i < names.length; i++) {
-			addJobListener(names[i]);
+	@Deprecated
+	public void setJobListenerNames(String... names) {
+		for (String name : names) {
+			addJobListener(name);
 		}
 	}
 
+	@Override
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
 	}
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
@@ -135,6 +148,7 @@ public class JobDetailBean extends JobDetail
 	}
 
 
+	@Override
 	public void afterPropertiesSet() {
 		if (getName() == null) {
 			setName(this.beanName);
@@ -145,8 +159,8 @@ public class JobDetailBean extends JobDetail
 		if (this.applicationContextJobDataKey != null) {
 			if (this.applicationContext == null) {
 				throw new IllegalStateException(
-				    "JobDetailBean needs to be set up in an ApplicationContext " +
-				    "to be able to handle an 'applicationContextJobDataKey'");
+					"JobDetailBean needs to be set up in an ApplicationContext " +
+					"to be able to handle an 'applicationContextJobDataKey'");
 			}
 			getJobDataMap().put(this.applicationContextJobDataKey, this.applicationContext);
 		}

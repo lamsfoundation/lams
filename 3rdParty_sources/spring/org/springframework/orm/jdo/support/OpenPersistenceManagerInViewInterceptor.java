@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,14 +44,11 @@ import org.springframework.web.context.request.WebRequestInterceptor;
  *
  * <p>In contrast to {@link OpenPersistenceManagerInViewFilter}, this interceptor
  * is set up in a Spring application context and can thus take advantage of
- * bean wiring. It inherits common JDO configuration properties from
- * {@link org.springframework.orm.jdo.JdoAccessor}, to be configured in a
- * bean definition.
+ * bean wiring.
  *
  * @author Juergen Hoeller
  * @since 1.1
  * @see OpenPersistenceManagerInViewFilter
- * @see org.springframework.orm.jdo.JdoInterceptor
  * @see org.springframework.orm.jdo.JdoTransactionManager
  * @see org.springframework.orm.jdo.PersistenceManagerFactoryUtils#getPersistenceManager
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
@@ -89,13 +86,14 @@ public class OpenPersistenceManagerInViewInterceptor implements WebRequestInterc
 	}
 
 
+	@Override
 	public void preHandle(WebRequest request) throws DataAccessException {
 		if (TransactionSynchronizationManager.hasResource(getPersistenceManagerFactory())) {
 			// Do not modify the PersistenceManager: just mark the request accordingly.
 			String participateAttributeName = getParticipateAttributeName();
 			Integer count = (Integer) request.getAttribute(participateAttributeName, WebRequest.SCOPE_REQUEST);
-			int newCount = (count != null) ? count.intValue() + 1 : 1;
-			request.setAttribute(getParticipateAttributeName(), new Integer(newCount), WebRequest.SCOPE_REQUEST);
+			int newCount = (count != null ? count + 1 : 1);
+			request.setAttribute(getParticipateAttributeName(), newCount, WebRequest.SCOPE_REQUEST);
 		}
 		else {
 			logger.debug("Opening JDO PersistenceManager in OpenPersistenceManagerInViewInterceptor");
@@ -106,16 +104,18 @@ public class OpenPersistenceManagerInViewInterceptor implements WebRequestInterc
 		}
 	}
 
+	@Override
 	public void postHandle(WebRequest request, ModelMap model) {
 	}
 
+	@Override
 	public void afterCompletion(WebRequest request, Exception ex) throws DataAccessException {
 		String participateAttributeName = getParticipateAttributeName();
 		Integer count = (Integer) request.getAttribute(participateAttributeName, WebRequest.SCOPE_REQUEST);
 		if (count != null) {
 			// Do not modify the PersistenceManager: just clear the marker.
-			if (count.intValue() > 1) {
-				request.setAttribute(participateAttributeName, new Integer(count.intValue() - 1), WebRequest.SCOPE_REQUEST);
+			if (count > 1) {
+				request.setAttribute(participateAttributeName, count - 1, WebRequest.SCOPE_REQUEST);
 			}
 			else {
 				request.removeAttribute(participateAttributeName, WebRequest.SCOPE_REQUEST);

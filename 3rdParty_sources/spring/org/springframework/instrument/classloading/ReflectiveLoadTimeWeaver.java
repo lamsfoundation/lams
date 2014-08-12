@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ import org.springframework.util.ReflectionUtils;
  * support the following weaving methods (as defined in the {@link LoadTimeWeaver}
  * interface):
  * <ul>
- * <li><code>public void addTransformer(java.lang.instrument.ClassFileTransformer)</code>:
+ * <li>{@code public void addTransformer(java.lang.instrument.ClassFileTransformer)}:
  * for registering the given ClassFileTransformer on this ClassLoader
- * <li><code>public ClassLoader getThrowawayClassLoader()</code>:
+ * <li>{@code public ClassLoader getThrowawayClassLoader()}:
  * for obtaining a throwaway class loader for this ClassLoader (optional;
  * ReflectiveLoadTimeWeaver will fall back to a SimpleThrowawayClassLoader if
  * that method isn't available)
@@ -88,9 +88,9 @@ public class ReflectiveLoadTimeWeaver implements LoadTimeWeaver {
 
 	/**
 	 * Create a new SimpleLoadTimeWeaver for the given class loader.
-	 * @param classLoader the <code>ClassLoader</code> to delegate to for
+	 * @param classLoader the {@code ClassLoader} to delegate to for
 	 * weaving (<i>must</i> support the required weaving methods).
-	 * @throws IllegalStateException if the supplied <code>ClassLoader</code>
+	 * @throws IllegalStateException if the supplied {@code ClassLoader}
 	 * does not support the required weaving methods
 	 */
 	public ReflectiveLoadTimeWeaver(ClassLoader classLoader) {
@@ -98,15 +98,14 @@ public class ReflectiveLoadTimeWeaver implements LoadTimeWeaver {
 		this.classLoader = classLoader;
 		this.addTransformerMethod = ClassUtils.getMethodIfAvailable(
 				this.classLoader.getClass(), ADD_TRANSFORMER_METHOD_NAME,
-				new Class [] {ClassFileTransformer.class});
+				new Class<?>[] {ClassFileTransformer.class});
 		if (this.addTransformerMethod == null) {
 			throw new IllegalStateException(
 					"ClassLoader [" + classLoader.getClass().getName() + "] does NOT provide an " +
 					"'addTransformer(ClassFileTransformer)' method.");
 		}
 		this.getThrowawayClassLoaderMethod = ClassUtils.getMethodIfAvailable(
-				this.classLoader.getClass(), GET_THROWAWAY_CLASS_LOADER_METHOD_NAME,
-				new Class[0]);
+				this.classLoader.getClass(), GET_THROWAWAY_CLASS_LOADER_METHOD_NAME, new Class<?>[0]);
 		// getThrowawayClassLoader method is optional
 		if (this.getThrowawayClassLoaderMethod == null) {
 			if (logger.isInfoEnabled()) {
@@ -117,19 +116,21 @@ public class ReflectiveLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 
+	@Override
 	public void addTransformer(ClassFileTransformer transformer) {
 		Assert.notNull(transformer, "Transformer must not be null");
-		ReflectionUtils.invokeMethod(this.addTransformerMethod, this.classLoader, new Object[] {transformer});
+		ReflectionUtils.invokeMethod(this.addTransformerMethod, this.classLoader, transformer);
 	}
 
+	@Override
 	public ClassLoader getInstrumentableClassLoader() {
 		return this.classLoader;
 	}
 
+	@Override
 	public ClassLoader getThrowawayClassLoader() {
 		if (this.getThrowawayClassLoaderMethod != null) {
-			return (ClassLoader) ReflectionUtils.invokeMethod(this.getThrowawayClassLoaderMethod, this.classLoader,
-					new Object[0]);
+			return (ClassLoader) ReflectionUtils.invokeMethod(this.getThrowawayClassLoaderMethod, this.classLoader);
 		}
 		else {
 			return new SimpleThrowawayClassLoader(this.classLoader);

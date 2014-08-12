@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ package org.springframework.context;
 import org.springframework.beans.factory.HierarchicalBeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-/** 
+/**
  * Central interface to provide configuration for an application.
  * This is read-only while the application is running, but may be
  * reloaded if the implementation supports this.
@@ -53,19 +54,25 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
  */
-public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory,
+public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
 
 	/**
 	 * Return the unique id of this application context.
-	 * @return the unique id of the context
+	 * @return the unique id of the context, or {@code null} if none
 	 */
 	String getId();
 
 	/**
+	 * Return a name for the deployed application that this context belongs to.
+	 * @return a name for the deployed application, or the empty String by default
+	 */
+	String getApplicationName();
+
+	/**
 	 * Return a friendly name for this context.
-	 * @return a display name for this context
-	*/
+	 * @return a display name for this context (never {@code null})
+	 */
 	String getDisplayName();
 
 	/**
@@ -75,9 +82,9 @@ public interface ApplicationContext extends ListableBeanFactory, HierarchicalBea
 	long getStartupDate();
 
 	/**
-	 * Return the parent context, or <code>null</code> if there is no parent
+	 * Return the parent context, or {@code null} if there is no parent
 	 * and this is the root of the context hierarchy.
-	 * @return the parent context, or <code>null</code> if there is no parent
+	 * @return the parent context, or {@code null} if there is no parent
 	 */
 	ApplicationContext getParent();
 
@@ -94,7 +101,7 @@ public interface ApplicationContext extends ListableBeanFactory, HierarchicalBea
 	 * @return the AutowireCapableBeanFactory for this context
 	 * @throws IllegalStateException if the context does not support
 	 * the AutowireCapableBeanFactory interface or does not hold an autowire-capable
-	 * bean factory yet (usually if <code>refresh()</code> has never been called)
+	 * bean factory yet (usually if {@code refresh()} has never been called)
 	 * @see ConfigurableApplicationContext#refresh()
 	 * @see ConfigurableApplicationContext#getBeanFactory()
 	 */

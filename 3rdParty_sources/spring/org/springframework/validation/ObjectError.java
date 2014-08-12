@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,16 @@ import org.springframework.util.Assert;
 /**
  * Encapsulates an object error, that is, a global reason for rejecting
  * an object.
- * 
+ *
  * <p>See the {@link DefaultMessageCodesResolver} javadoc for details on
- * how a message code list is built for an <code>ObjectError</code>.
+ * how a message code list is built for an {@code ObjectError}.
  *
  * @author Juergen Hoeller
  * @see FieldError
  * @see DefaultMessageCodesResolver
  * @since 10.03.2003
  */
+@SuppressWarnings("serial")
 public class ObjectError extends DefaultMessageSourceResolvable {
 
 	private final String objectName;
@@ -67,10 +68,12 @@ public class ObjectError extends DefaultMessageSourceResolvable {
 	}
 
 
+	@Override
 	public String toString() {
 		return "Error in object '" + this.objectName + "': " + resolvableToString();
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -82,6 +85,7 @@ public class ObjectError extends DefaultMessageSourceResolvable {
 		return getObjectName().equals(otherError.getObjectName());
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() * 29 + getObjectName().hashCode();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package org.springframework.orm.hibernate3;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.hibernate.engine.FilterDefinition;
-import org.hibernate.type.TypeFactory;
+import org.hibernate.type.Type;
+import org.hibernate.type.TypeResolver;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -36,7 +35,7 @@ import org.springframework.beans.factory.InitializingBean;
  * definition, as the list element for the "filterDefinitions" bean property.
  * For example:
  *
- * <pre>
+ * <pre class="code">
  * &lt;bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"&gt;
  *   ...
  *   &lt;property name="filterDefinitions"&gt;
@@ -44,10 +43,10 @@ import org.springframework.beans.factory.InitializingBean;
  *       &lt;bean class="org.springframework.orm.hibernate3.FilterDefinitionFactoryBean"&gt;
  *         &lt;property name="filterName" value="myFilter"/&gt;
  *         &lt;property name="parameterTypes"&gt;
- *           &lt;props&gt;
- *             &lt;prop key="myParam"&gt;string&lt;/prop&gt;
- *             &lt;prop key="myOtherParam"&gt;long&lt;/prop&gt;
- *           &lt;/props&gt;
+ *           &lt;map&gt;
+ *             &lt;entry key="myParam" value="string"/&gt;
+ *             &lt;entry key="myOtherParam" value="long"/&gt;
+ *           &lt;/map&gt;
  *         &lt;/property&gt;
  *       &lt;/bean&gt;
  *     &lt;/list&gt;
@@ -63,11 +62,13 @@ import org.springframework.beans.factory.InitializingBean;
  * @see org.hibernate.engine.FilterDefinition
  * @see LocalSessionFactoryBean#setFilterDefinitions
  */
-public class FilterDefinitionFactoryBean implements FactoryBean, BeanNameAware, InitializingBean {
+public class FilterDefinitionFactoryBean implements FactoryBean<FilterDefinition>, BeanNameAware, InitializingBean {
+
+	private final TypeResolver typeResolver = new TypeResolver();
 
 	private String filterName;
 
-	private Map parameterTypeMap = new HashMap();
+	private Map<String, Type> parameterTypeMap = new HashMap<String, Type>();
 
 	private String defaultFilterCondition;
 
@@ -84,19 +85,17 @@ public class FilterDefinitionFactoryBean implements FactoryBean, BeanNameAware, 
 	/**
 	 * Set the parameter types for the filter,
 	 * with parameter names as keys and type names as values.
-	 * @see org.hibernate.type.TypeFactory#heuristicType(String)
+	 * See {@code org.hibernate.type.TypeResolver#heuristicType(String)}.
 	 */
-	public void setParameterTypes(Properties parameterTypes) {
+	public void setParameterTypes(Map<String, String> parameterTypes) {
 		if (parameterTypes != null) {
-			this.parameterTypeMap = new HashMap(parameterTypes.size());
-			for (Enumeration names = parameterTypes.propertyNames(); names.hasMoreElements();) {
-				String paramName = (String) names.nextElement();
-				String typeName = parameterTypes.getProperty(paramName);
-				this.parameterTypeMap.put(paramName, TypeFactory.heuristicType(typeName));
+			this.parameterTypeMap = new HashMap<String, Type>(parameterTypes.size());
+			for (Map.Entry<String, String> entry : parameterTypes.entrySet()) {
+				this.parameterTypeMap.put(entry.getKey(), this.typeResolver.heuristicType(entry.getValue()));
 			}
 		}
 		else {
-			this.parameterTypeMap = new HashMap();
+			this.parameterTypeMap = new HashMap<String, Type>();
 		}
 	}
 
@@ -112,26 +111,31 @@ public class FilterDefinitionFactoryBean implements FactoryBean, BeanNameAware, 
 	 * the FilterDefinitionFactoryBean will be used.
 	 * @see #setFilterName
 	 */
+	@Override
 	public void setBeanName(String name) {
 		if (this.filterName == null) {
 			this.filterName = name;
 		}
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		this.filterDefinition =
 				new FilterDefinition(this.filterName, this.defaultFilterCondition, this.parameterTypeMap);
 	}
 
 
-	public Object getObject() {
+	@Override
+	public FilterDefinition getObject() {
 		return this.filterDefinition;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<FilterDefinition> getObjectType() {
 		return FilterDefinition.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

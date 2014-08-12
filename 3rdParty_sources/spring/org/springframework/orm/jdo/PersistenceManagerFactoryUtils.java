@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,18 +38,17 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
-import org.springframework.transaction.support.ResourceHolder;
 import org.springframework.transaction.support.ResourceHolderSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
- * Helper class featuring methods for JDO PersistenceManager handling,
+ * Helper class featuring methods for JDO {@link PersistenceManager} handling,
  * allowing for reuse of PersistenceManager instances within transactions.
  * Also provides support for exception translation.
  *
- * <p>Used internally by {@link JdoTemplate}, {@link JdoInterceptor} and
- * {@link JdoTransactionManager}. Can also be used directly in application code.
+ * <p>Used internally by {@link JdoTransactionManager}.
+ * Can also be used directly in application code.
  *
  * @author Juergen Hoeller
  * @since 03.06.2003
@@ -76,8 +75,8 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * <p>If a DataSource is found, creates a SQLErrorCodeSQLExceptionTranslator for the
 	 * DataSource; else, falls back to a SQLStateSQLExceptionTranslator.
 	 * @param connectionFactory the connection factory of the PersistenceManagerFactory
-	 * (may be <code>null</code>)
-	 * @return the SQLExceptionTranslator (never <code>null</code>)
+	 * (may be {@code null})
+	 * @return the SQLExceptionTranslator (never {@code null})
 	 * @see javax.jdo.PersistenceManagerFactory#getConnectionFactory()
 	 * @see org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator
 	 * @see org.springframework.jdbc.support.SQLStateSQLExceptionTranslator
@@ -96,18 +95,18 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * Obtain a JDO PersistenceManager via the given factory. Is aware of a
 	 * corresponding PersistenceManager bound to the current thread,
 	 * for example when using JdoTransactionManager. Will create a new
-	 * PersistenceManager else, if "allowCreate" is <code>true</code>.
+	 * PersistenceManager else, if "allowCreate" is {@code true}.
 	 * @param pmf PersistenceManagerFactory to create the PersistenceManager with
 	 * @param allowCreate if a non-transactional PersistenceManager should be created
 	 * when no transactional PersistenceManager can be found for the current thread
 	 * @return the PersistenceManager
 	 * @throws DataAccessResourceFailureException if the PersistenceManager couldn't be obtained
 	 * @throws IllegalStateException if no thread-bound PersistenceManager found and
-	 * "allowCreate" is <code>false</code>
+	 * "allowCreate" is {@code false}
 	 * @see JdoTransactionManager
 	 */
 	public static PersistenceManager getPersistenceManager(PersistenceManagerFactory pmf, boolean allowCreate)
-	    throws DataAccessResourceFailureException, IllegalStateException {
+		throws DataAccessResourceFailureException, IllegalStateException {
 
 		try {
 			return doGetPersistenceManager(pmf, allowCreate);
@@ -121,20 +120,20 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * Obtain a JDO PersistenceManager via the given factory. Is aware of a
 	 * corresponding PersistenceManager bound to the current thread,
 	 * for example when using JdoTransactionManager. Will create a new
-	 * PersistenceManager else, if "allowCreate" is <code>true</code>.
-	 * <p>Same as <code>getPersistenceManager</code>, but throwing the original JDOException.
+	 * PersistenceManager else, if "allowCreate" is {@code true}.
+	 * <p>Same as {@code getPersistenceManager}, but throwing the original JDOException.
 	 * @param pmf PersistenceManagerFactory to create the PersistenceManager with
 	 * @param allowCreate if a non-transactional PersistenceManager should be created
 	 * when no transactional PersistenceManager can be found for the current thread
 	 * @return the PersistenceManager
 	 * @throws JDOException if the PersistenceManager couldn't be created
 	 * @throws IllegalStateException if no thread-bound PersistenceManager found and
-	 * "allowCreate" is <code>false</code>
+	 * "allowCreate" is {@code false}
 	 * @see #getPersistenceManager(javax.jdo.PersistenceManagerFactory, boolean)
 	 * @see JdoTransactionManager
 	 */
 	public static PersistenceManager doGetPersistenceManager(PersistenceManagerFactory pmf, boolean allowCreate)
-	    throws JDOException, IllegalStateException {
+		throws JDOException, IllegalStateException {
 
 		Assert.notNull(pmf, "No PersistenceManagerFactory specified");
 
@@ -177,7 +176,7 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * bound to the current thread by Spring's transaction facilities.
 	 * @param pm the JDO PersistenceManager to check
 	 * @param pmf JDO PersistenceManagerFactory that the PersistenceManager
-	 * was created with (can be <code>null</code>)
+	 * was created with (can be {@code null})
 	 * @return whether the PersistenceManager is transactional
 	 */
 	public static boolean isPersistenceManagerTransactional(
@@ -195,32 +194,28 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * Apply the current transaction timeout, if any, to the given JDO Query object.
 	 * @param query the JDO Query object
 	 * @param pmf JDO PersistenceManagerFactory that the Query was created for
-	 * @param jdoDialect the JdoDialect to use for applying a query timeout
-	 * (must not be <code>null</code>)
 	 * @throws JDOException if thrown by JDO methods
-	 * @see JdoDialect#applyQueryTimeout
 	 */
-	public static void applyTransactionTimeout(
-			Query query, PersistenceManagerFactory pmf, JdoDialect jdoDialect) throws JDOException {
-
+	public static void applyTransactionTimeout(Query query, PersistenceManagerFactory pmf) throws JDOException {
 		Assert.notNull(query, "No Query object specified");
 		PersistenceManagerHolder pmHolder =
-		    (PersistenceManagerHolder) TransactionSynchronizationManager.getResource(pmf);
-		if (pmHolder != null && pmHolder.hasTimeout()) {
-			jdoDialect.applyQueryTimeout(query, pmHolder.getTimeToLiveInSeconds());
+				(PersistenceManagerHolder) TransactionSynchronizationManager.getResource(pmf);
+		if (pmHolder != null && pmHolder.hasTimeout() &&
+				pmf.supportedOptions().contains("javax.jdo.option.DatastoreTimeout")) {
+			int timeout = (int) pmHolder.getTimeToLiveInMillis();
+			query.setDatastoreReadTimeoutMillis(timeout);
+			query.setDatastoreWriteTimeoutMillis(timeout);
 		}
 	}
 
 	/**
 	 * Convert the given JDOException to an appropriate exception from the
-	 * <code>org.springframework.dao</code> hierarchy.
-	 * <p>The most important cases like object not found or optimistic locking
-	 * failure are covered here. For more fine-granular conversion, JdoAccessor and
-	 * JdoTransactionManager support sophisticated translation of exceptions via a
-	 * JdoDialect.
+	 * {@code org.springframework.dao} hierarchy.
+	 * <p>The most important cases like object not found or optimistic locking failure
+	 * are covered here. For more fine-granular conversion, JdoTransactionManager
+	 * supports sophisticated translation of exceptions via a JdoDialect.
 	 * @param ex JDOException that occured
 	 * @return the corresponding DataAccessException instance
-	 * @see JdoAccessor#convertJdoAccessException
 	 * @see JdoTransactionManager#convertJdoAccessException
 	 * @see JdoDialect#translateException
 	 */
@@ -252,7 +247,7 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * if it is not managed externally (i.e. not bound to the thread).
 	 * @param pm PersistenceManager to close
 	 * @param pmf PersistenceManagerFactory that the PersistenceManager was created with
-	 * (can be <code>null</code>)
+	 * (can be {@code null})
 	 */
 	public static void releasePersistenceManager(PersistenceManager pm, PersistenceManagerFactory pmf) {
 		try {
@@ -268,10 +263,10 @@ public abstract class PersistenceManagerFactoryUtils {
 
 	/**
 	 * Actually release a PersistenceManager for the given factory.
-	 * Same as <code>releasePersistenceManager</code>, but throwing the original JDOException.
+	 * Same as {@code releasePersistenceManager}, but throwing the original JDOException.
 	 * @param pm PersistenceManager to close
 	 * @param pmf PersistenceManagerFactory that the PersistenceManager was created with
-	 * (can be <code>null</code>)
+	 * (can be {@code null})
 	 * @throws JDOException if thrown by JDO methods
 	 */
 	public static void doReleasePersistenceManager(PersistenceManager pm, PersistenceManagerFactory pmf)
@@ -293,7 +288,8 @@ public abstract class PersistenceManagerFactoryUtils {
 	 * (e.g. when participating in a JtaTransactionManager transaction).
 	 * @see org.springframework.transaction.jta.JtaTransactionManager
 	 */
-	private static class PersistenceManagerSynchronization extends ResourceHolderSynchronization
+	private static class PersistenceManagerSynchronization
+			extends ResourceHolderSynchronization<PersistenceManagerHolder, PersistenceManagerFactory>
 			implements Ordered {
 
 		private final boolean newPersistenceManager;
@@ -304,17 +300,34 @@ public abstract class PersistenceManagerFactoryUtils {
 			this.newPersistenceManager = newPersistenceManager;
 		}
 
+		@Override
 		public int getOrder() {
 			return PERSISTENCE_MANAGER_SYNCHRONIZATION_ORDER;
 		}
 
+		@Override
+		public void flushResource(PersistenceManagerHolder resourceHolder) {
+			try {
+				resourceHolder.getPersistenceManager().flush();
+			}
+			catch (JDOException ex) {
+				throw convertJdoAccessException(ex);
+			}
+		}
+
+		@Override
 		protected boolean shouldUnbindAtCompletion() {
 			return this.newPersistenceManager;
 		}
 
-		protected void releaseResource(ResourceHolder resourceHolder, Object resourceKey) {
-			releasePersistenceManager(((PersistenceManagerHolder) resourceHolder).getPersistenceManager(),
-					(PersistenceManagerFactory) resourceKey);
+		@Override
+		protected boolean shouldReleaseAfterCompletion(PersistenceManagerHolder resourceHolder) {
+			return !resourceHolder.getPersistenceManager().isClosed();
+		}
+
+		@Override
+		protected void releaseResource(PersistenceManagerHolder resourceHolder, PersistenceManagerFactory resourceKey) {
+			releasePersistenceManager(resourceHolder.getPersistenceManager(), resourceKey);
 		}
 	}
 

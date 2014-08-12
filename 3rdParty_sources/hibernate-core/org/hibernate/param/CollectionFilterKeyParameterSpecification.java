@@ -23,12 +23,11 @@
  *
  */
 package org.hibernate.param;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -47,7 +46,7 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 	 *
 	 * @param collectionRole The collection role being filtered.
 	 * @param keyType The mapped collection-key type.
-	 * @param queryParameterPosition The position within {@link org.hibernate.engine.QueryParameters} where
+	 * @param queryParameterPosition The position within {@link org.hibernate.engine.spi.QueryParameters} where
 	 * we can find the appropriate param value to bind.
 	 */
 	public CollectionFilterKeyParameterSpecification(String collectionRole, Type keyType, int queryParameterPosition) {
@@ -56,9 +55,7 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 		this.queryParameterPosition = queryParameterPosition;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public int bind(
 			PreparedStatement statement,
 			QueryParameters qp,
@@ -69,23 +66,17 @@ public class CollectionFilterKeyParameterSpecification implements ParameterSpeci
 		return keyType.getColumnSpan( session.getFactory() );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Type getExpectedType() {
 		return keyType;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void setExpectedType(Type expectedType) {
 		// todo : throw exception?
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public String renderDisplayInfo() {
 		return "collection-filter-key=" + collectionRole;
 	}

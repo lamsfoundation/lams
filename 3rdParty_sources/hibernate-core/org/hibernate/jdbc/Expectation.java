@@ -23,11 +23,10 @@
  *
  */
 package org.hibernate.jdbc;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
-
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
 /**
  * Defines an expected DML operation outcome.

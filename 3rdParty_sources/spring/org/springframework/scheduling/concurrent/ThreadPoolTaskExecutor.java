@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 package org.springframework.scheduling.concurrent;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -26,50 +29,46 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.SchedulingTaskExecutor;
 import org.springframework.util.Assert;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureTask;
 
 /**
- * JavaBean that allows for configuring a JDK 1.5 {@link java.util.concurrent.ThreadPoolExecutor}
+ * JavaBean that allows for configuring a {@link java.util.concurrent.ThreadPoolExecutor}
  * in bean style (through its "corePoolSize", "maxPoolSize", "keepAliveSeconds", "queueCapacity"
- * properties), exposing it as a Spring {@link org.springframework.core.task.TaskExecutor}.
- * This is an alternative to configuring a ThreadPoolExecutor instance directly using
- * constructor injection, with a separate {@link ConcurrentTaskExecutor} adapter wrapping it.
+ * properties) and exposing it as a Spring {@link org.springframework.core.task.TaskExecutor}.
+ * This class is also well suited for management and monitoring (e.g. through JMX),
+ * providing several useful attributes: "corePoolSize", "maxPoolSize", "keepAliveSeconds"
+ * (all supporting updates at runtime); "poolSize", "activeCount" (for introspection only).
  *
- * <p>For any custom needs, in particular for defining a
- * {@link java.util.concurrent.ScheduledThreadPoolExecutor}, it is recommended to
- * use a straight definition of the Executor instance or a factory method definition
- * that points to the JDK 1.5 {@link java.util.concurrent.Executors} class.
- * To expose such a raw Executor as a Spring {@link org.springframework.core.task.TaskExecutor},
- * simply wrap it with a {@link ConcurrentTaskExecutor} adapter.
+ * <p>For an alternative, you may set up a ThreadPoolExecutor instance directly using
+ * constructor injection, or use a factory method definition that points to the
+ * {@link java.util.concurrent.Executors} class. To expose such a raw Executor as a
+ * Spring {@link org.springframework.core.task.TaskExecutor}, simply wrap it with a
+ * {@link org.springframework.scheduling.concurrent.ConcurrentTaskExecutor} adapter.
  *
  * <p><b>NOTE:</b> This class implements Spring's
- * {@link org.springframework.core.task.TaskExecutor} interface as well as the JDK 1.5
+ * {@link org.springframework.core.task.TaskExecutor} interface as well as the
  * {@link java.util.concurrent.Executor} interface, with the former being the primary
  * interface, the other just serving as secondary convenience. For this reason, the
  * exception handling follows the TaskExecutor contract rather than the Executor contract,
  * in particular regarding the {@link org.springframework.core.task.TaskRejectedException}.
  *
+ * <p><b>If you prefer native {@link java.util.concurrent.ExecutorService} exposure instead,
+ * consider {@link ThreadPoolExecutorFactoryBean} as an alternative to this class.</b>
+ *
  * @author Juergen Hoeller
  * @since 2.0
  * @see org.springframework.core.task.TaskExecutor
- * @see java.util.concurrent.Executor
  * @see java.util.concurrent.ThreadPoolExecutor
- * @see java.util.concurrent.ScheduledThreadPoolExecutor
- * @see java.util.concurrent.Executors
  * @see ConcurrentTaskExecutor
  */
-public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
-		implements SchedulingTaskExecutor, Executor, BeanNameAware, InitializingBean, DisposableBean {
-
-	protected final Log logger = LogFactory.getLog(getClass());
+@SuppressWarnings("serial")
+public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
+		implements AsyncListenableTaskExecutor, SchedulingTaskExecutor {
 
 	private final Object poolSizeMonitor = new Object();
 
@@ -82,16 +81,6 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 	private boolean allowCoreThreadTimeOut = false;
 
 	private int queueCapacity = Integer.MAX_VALUE;
-
-	private ThreadFactory threadFactory = this;
-
-	private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
-
-	private boolean waitForTasksToCompleteOnShutdown = false;
-
-	private boolean threadNamePrefixSet = false;
-
-	private String beanName;
 
 	private ThreadPoolExecutor threadPoolExecutor;
 
@@ -121,7 +110,7 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 
 	/**
 	 * Set the ThreadPoolExecutor's maximum pool size.
-	 * Default is <code>Integer.MAX_VALUE</code>.
+	 * Default is {@code Integer.MAX_VALUE}.
 	 * <p><b>This setting can be modified at runtime, for example through JMX.</b>
 	 */
 	public void setMaxPoolSize(int maxPoolSize) {
@@ -169,9 +158,7 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 	 * Specify whether to allow core threads to time out. This enables dynamic
 	 * growing and shrinking even in combination with a non-zero queue (since
 	 * the max pool size will only grow once the queue is full).
-	 * <p>Default is "false". Note that this feature is only available on Java 6
-	 * or above. On Java 5, consider switching to the backport-concurrent
-	 * version of ThreadPoolTaskExecutor which also supports this feature.
+	 * <p>Default is "false".
 	 * @see java.util.concurrent.ThreadPoolExecutor#allowCoreThreadTimeOut(boolean)
 	 */
 	public void setAllowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
@@ -180,7 +167,7 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 
 	/**
 	 * Set the capacity for the ThreadPoolExecutor's BlockingQueue.
-	 * Default is <code>Integer.MAX_VALUE</code>.
+	 * Default is {@code Integer.MAX_VALUE}.
 	 * <p>Any positive value will lead to a LinkedBlockingQueue instance;
 	 * any other value will lead to a SynchronousQueue instance.
 	 * @see java.util.concurrent.LinkedBlockingQueue
@@ -190,75 +177,21 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 		this.queueCapacity = queueCapacity;
 	}
 
-	/**
-	 * Set the ThreadFactory to use for the ThreadPoolExecutor's thread pool.
-	 * <p>Default is this executor itself (i.e. the factory that this executor
-	 * inherits from). See {@link org.springframework.util.CustomizableThreadCreator}'s
-	 * javadoc for available bean properties.
-	 * @see #setThreadPriority
-	 * @see #setDaemon
-	 */
-	public void setThreadFactory(ThreadFactory threadFactory) {
-		this.threadFactory = (threadFactory != null ? threadFactory : this);
-	}
 
-	/**
-	 * Set the RejectedExecutionHandler to use for the ThreadPoolExecutor.
-	 * Default is the ThreadPoolExecutor's default abort policy.
-	 * @see java.util.concurrent.ThreadPoolExecutor.AbortPolicy
-	 */
-	public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
-		this.rejectedExecutionHandler =
-				(rejectedExecutionHandler != null ? rejectedExecutionHandler : new ThreadPoolExecutor.AbortPolicy());
-	}
+	@Override
+	protected ExecutorService initializeExecutor(
+			ThreadFactory threadFactory, RejectedExecutionHandler rejectedExecutionHandler) {
 
-	/**
-	 * Set whether to wait for scheduled tasks to complete on shutdown.
-	 * <p>Default is "false". Switch this to "true" if you prefer
-	 * fully completed tasks at the expense of a longer shutdown phase.
-	 * @see java.util.concurrent.ThreadPoolExecutor#shutdown()
-	 * @see java.util.concurrent.ThreadPoolExecutor#shutdownNow()
-	 */
-	public void setWaitForTasksToCompleteOnShutdown(boolean waitForJobsToCompleteOnShutdown) {
-		this.waitForTasksToCompleteOnShutdown = waitForJobsToCompleteOnShutdown;
-	}
-
-	public void setThreadNamePrefix(String threadNamePrefix) {
-		super.setThreadNamePrefix(threadNamePrefix);
-		this.threadNamePrefixSet = true;
-	}
-
-	public void setBeanName(String name) {
-		this.beanName = name;
-	}
-
-
-	/**
-	 * Calls <code>initialize()</code> after the container applied all property values.
-	 * @see #initialize()
-	 */
-	public void afterPropertiesSet() {
-		initialize();
-	}
-
-	/**
-	 * Creates the BlockingQueue and the ThreadPoolExecutor.
-	 * @see #createQueue
-	 */
-	public void initialize() {
-		if (logger.isInfoEnabled()) {
-			logger.info("Initializing ThreadPoolExecutor" + (this.beanName != null ? " '" + this.beanName + "'" : ""));
-		}
-		if (!this.threadNamePrefixSet && this.beanName != null) {
-			setThreadNamePrefix(this.beanName + "-");
-		}
-		BlockingQueue queue = createQueue(this.queueCapacity);
-		this.threadPoolExecutor = new ThreadPoolExecutor(
+		BlockingQueue<Runnable> queue = createQueue(this.queueCapacity);
+		ThreadPoolExecutor executor  = new ThreadPoolExecutor(
 				this.corePoolSize, this.maxPoolSize, this.keepAliveSeconds, TimeUnit.SECONDS,
-				queue, this.threadFactory, this.rejectedExecutionHandler);
+				queue, threadFactory, rejectedExecutionHandler);
 		if (this.allowCoreThreadTimeOut) {
-			this.threadPoolExecutor.allowCoreThreadTimeOut(true);
+			executor.allowCoreThreadTimeOut(true);
 		}
+
+		this.threadPoolExecutor = executor;
+		return executor;
 	}
 
 	/**
@@ -270,18 +203,18 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 	 * @see java.util.concurrent.LinkedBlockingQueue
 	 * @see java.util.concurrent.SynchronousQueue
 	 */
-	protected BlockingQueue createQueue(int queueCapacity) {
+	protected BlockingQueue<Runnable> createQueue(int queueCapacity) {
 		if (queueCapacity > 0) {
-			return new LinkedBlockingQueue(queueCapacity);
+			return new LinkedBlockingQueue<Runnable>(queueCapacity);
 		}
 		else {
-			return new SynchronousQueue();
+			return new SynchronousQueue<Runnable>();
 		}
 	}
 
 	/**
 	 * Return the underlying ThreadPoolExecutor for native access.
-	 * @return the underlying ThreadPoolExecutor (never <code>null</code>)
+	 * @return the underlying ThreadPoolExecutor (never {@code null})
 	 * @throws IllegalStateException if the ThreadPoolTaskExecutor hasn't been initialized yet
 	 */
 	public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
@@ -289,13 +222,32 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 		return this.threadPoolExecutor;
 	}
 
+	/**
+	 * Return the current pool size.
+	 * @see java.util.concurrent.ThreadPoolExecutor#getPoolSize()
+	 */
+	public int getPoolSize() {
+		if (this.threadPoolExecutor == null) {
+			// Not initialized yet: assume core pool size.
+			return this.corePoolSize;
+		}
+		return this.threadPoolExecutor.getPoolSize();
+	}
 
 	/**
-	 * Implementation of both the JDK 1.5 Executor interface and the Spring
-	 * TaskExecutor interface, delegating to the ThreadPoolExecutor instance.
-	 * @see java.util.concurrent.Executor#execute(Runnable)
-	 * @see org.springframework.core.task.TaskExecutor#execute(Runnable)
+	 * Return the number of currently active threads.
+	 * @see java.util.concurrent.ThreadPoolExecutor#getActiveCount()
 	 */
+	public int getActiveCount() {
+		if (this.threadPoolExecutor == null) {
+			// Not initialized yet: assume no active threads.
+			return 0;
+		}
+		return this.threadPoolExecutor.getActiveCount();
+	}
+
+
+	@Override
 	public void execute(Runnable task) {
 		Executor executor = getThreadPoolExecutor();
 		try {
@@ -306,54 +258,65 @@ public class ThreadPoolTaskExecutor extends CustomizableThreadFactory
 		}
 	}
 
+	@Override
+	public void execute(Runnable task, long startTimeout) {
+		execute(task);
+	}
+
+	@Override
+	public Future<?> submit(Runnable task) {
+		ExecutorService executor = getThreadPoolExecutor();
+		try {
+			return executor.submit(task);
+		}
+		catch (RejectedExecutionException ex) {
+			throw new TaskRejectedException("Executor [" + executor + "] did not accept task: " + task, ex);
+		}
+	}
+
+	@Override
+	public <T> Future<T> submit(Callable<T> task) {
+		ExecutorService executor = getThreadPoolExecutor();
+		try {
+			return executor.submit(task);
+		}
+		catch (RejectedExecutionException ex) {
+			throw new TaskRejectedException("Executor [" + executor + "] did not accept task: " + task, ex);
+		}
+	}
+
+	@Override
+	public ListenableFuture<?> submitListenable(Runnable task) {
+		ExecutorService executor = getThreadPoolExecutor();
+		try {
+			ListenableFutureTask<Object> future = new ListenableFutureTask<Object>(task, null);
+			executor.execute(future);
+			return future;
+		}
+		catch (RejectedExecutionException ex) {
+			throw new TaskRejectedException("Executor [" + executor + "] did not accept task: " + task, ex);
+		}
+	}
+
+	@Override
+	public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
+		ExecutorService executor = getThreadPoolExecutor();
+		try {
+			ListenableFutureTask<T> future = new ListenableFutureTask<T>(task);
+			executor.execute(future);
+			return future;
+		}
+		catch (RejectedExecutionException ex) {
+			throw new TaskRejectedException("Executor [" + executor + "] did not accept task: " + task, ex);
+		}
+	}
+
 	/**
 	 * This task executor prefers short-lived work units.
 	 */
+	@Override
 	public boolean prefersShortLivedTasks() {
 		return true;
-	}
-
-
-	/**
-	 * Return the current pool size.
-	 * @see java.util.concurrent.ThreadPoolExecutor#getPoolSize()
-	 */
-	public int getPoolSize() {
-		return getThreadPoolExecutor().getPoolSize();
-	}
-
-	/**
-	 * Return the number of currently active threads.
-	 * @see java.util.concurrent.ThreadPoolExecutor#getActiveCount()
-	 */
-	public int getActiveCount() {
-		return getThreadPoolExecutor().getActiveCount();
-	}
-
-
-	/**
-	 * Calls <code>shutdown</code> when the BeanFactory destroys
-	 * the task executor instance.
-	 * @see #shutdown()
-	 */
-	public void destroy() {
-		shutdown();
-	}
-
-	/**
-	 * Perform a shutdown on the ThreadPoolExecutor.
-	 * @see java.util.concurrent.ThreadPoolExecutor#shutdown()
-	 */
-	public void shutdown() {
-		if (logger.isInfoEnabled()) {
-			logger.info("Shutting down ThreadPoolExecutor" + (this.beanName != null ? " '" + this.beanName + "'" : ""));
-		}
-		if (this.waitForTasksToCompleteOnShutdown) {
-			this.threadPoolExecutor.shutdown();
-		}
-		else {
-			this.threadPoolExecutor.shutdownNow();
-		}
 	}
 
 }

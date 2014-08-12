@@ -32,14 +32,13 @@ import org.hibernate.property.PropertyAccessor;
 public class IndexBackref extends Property {
 	private String collectionRole;
 	private String entityName;
-	
+
+	@Override
 	public boolean isBackRef() {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public boolean isSynthetic() {
 		return true;
 	}
@@ -52,10 +51,12 @@ public class IndexBackref extends Property {
 		this.collectionRole = collectionRole;
 	}
 
+	@Override
 	public boolean isBasicPropertyAccessor() {
 		return false;
 	}
 
+	@Override
 	public PropertyAccessor getPropertyAccessor(Class clazz) {
 		return new IndexPropertyAccessor(collectionRole, entityName);
 	}

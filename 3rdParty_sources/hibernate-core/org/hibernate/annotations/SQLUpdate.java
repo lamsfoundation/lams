@@ -23,29 +23,29 @@
  */
 package org.hibernate.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * SqlUpdate Annotation for overwriting Hibernate default UPDATE method
+ * Custom SQL statement for update of an entity/collection.
  *
  * @author L�szl� Benke
  */
 @Target( {TYPE, FIELD, METHOD} )
 @Retention( RUNTIME )
 public @interface SQLUpdate {
-
 	/**
-	 * Procedure name or UPDATE STATEMENT
+	 * Procedure name or SQL UPDATE statement.
 	 */
 	String sql();
 
 	/**
-	 * Is the statement using stored procedure or not
+	 * Is the statement callable (aka a {@link java.sql.CallableStatement})?
 	 */
 	boolean callable() default false;
 

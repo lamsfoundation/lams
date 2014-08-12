@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * FactoryBean for Burlap proxies. Exposes the proxied service for
- * use as a bean reference, using the specified service interface.
+ * {@link FactoryBean} for Burlap proxies. Exposes the proxied service
+ * for use as a bean reference, using the specified service interface.
  *
  * <p>Burlap is a slim, XML-based RPC protocol.
  * For information on Burlap, see the
@@ -39,26 +39,33 @@ import org.springframework.beans.factory.FactoryBean;
  * @see org.springframework.remoting.caucho.HessianProxyFactoryBean
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
+ * @deprecated as of Spring 4.0, since Burlap hasn't evolved in years
+ * and is effectively retired (in contrast to its sibling Hessian)
  */
-public class BurlapProxyFactoryBean extends BurlapClientInterceptor implements FactoryBean {
+@Deprecated
+public class BurlapProxyFactoryBean extends BurlapClientInterceptor implements FactoryBean<Object> {
 
 	private Object serviceProxy;
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy(getBeanClassLoader());
 	}
 
 
+	@Override
 	public Object getObject() {
 		return this.serviceProxy;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return getServiceInterface();
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

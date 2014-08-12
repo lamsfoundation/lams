@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,32 @@
 package org.springframework.cache.ehcache;
 
 import java.io.IOException;
+import java.util.Set;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.bootstrap.BootstrapCacheLoader;
+import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.constructs.blocking.BlockingCache;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import net.sf.ehcache.constructs.blocking.UpdatingCacheEntryFactory;
 import net.sf.ehcache.constructs.blocking.UpdatingSelfPopulatingCache;
-import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
+import net.sf.ehcache.event.CacheEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
- * FactoryBean that creates a named EHCache {@link net.sf.ehcache.Cache} instance
+ * {@link FactoryBean} that creates a named EhCache {@link net.sf.ehcache.Cache} instance
  * (or a decorator that implements the {@link net.sf.ehcache.Ehcache} interface),
- * representing a cache region within an EHCache {@link net.sf.ehcache.CacheManager}.
+ * representing a cache region within an EhCache {@link net.sf.ehcache.CacheManager}.
  *
  * <p>If the specified named cache is not configured in the cache configuration descriptor,
  * this FactoryBean will construct an instance of a Cache with the provided name and the
@@ -49,58 +52,64 @@ import org.springframework.util.Assert;
  * <p>Note: If the named Cache instance is found, the properties will be ignored and the
  * Cache instance will be retrieved from the CacheManager.
  *
- * @author Dmitriy Kopylenko
+ * <p>Note: As of Spring 4.0, Spring's EhCache support requires EhCache 2.1 or higher.
+ * We recommend the use of EhCache 2.5 or higher.
+
  * @author Juergen Hoeller
+ * @author Dmitriy Kopylenko
  * @since 1.1.1
  * @see #setCacheManager
  * @see EhCacheManagerFactoryBean
  * @see net.sf.ehcache.Cache
  */
-public class EhCacheFactoryBean implements FactoryBean, BeanNameAware, InitializingBean {
+public class EhCacheFactoryBean extends CacheConfiguration implements FactoryBean<Ehcache>, BeanNameAware, InitializingBean {
+
+	// EhCache's setStatisticsEnabled(boolean) available? Not anymore as of EhCache 2.7...
+	private static final boolean setStatisticsAvailable =
+			ClassUtils.hasMethod(Ehcache.class, "setStatisticsEnabled", boolean.class);
+
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private CacheManager cacheManager;
 
-	private String cacheName;
-
-	private int maxElementsInMemory = 10000;
-
-	private int maxElementsOnDisk = 10000000;
-
-	private MemoryStoreEvictionPolicy memoryStoreEvictionPolicy = MemoryStoreEvictionPolicy.LRU;
-
-	private boolean overflowToDisk = true;
-
-	private String diskStorePath;
-
-	private boolean eternal = false;
-
-	private int timeToLive = 120;
-
-	private int timeToIdle = 120;
-
-	private boolean diskPersistent = false;
-
-	private int diskExpiryThreadIntervalSeconds = 120;
-
 	private boolean blocking = false;
 
 	private CacheEntryFactory cacheEntryFactory;
+
+	private BootstrapCacheLoader bootstrapCacheLoader;
+
+	private Set<CacheEventListener> cacheEventListeners;
+
+	private boolean statisticsEnabled = false;
+
+	private boolean sampledStatisticsEnabled = false;
+
+	private boolean disabled = false;
 
 	private String beanName;
 
 	private Ehcache cache;
 
 
+	@SuppressWarnings("deprecation")
+	public EhCacheFactoryBean() {
+		// Using deprecated setMaxElementsInMemory method for EhCache 2.1-2.4 compatibility
+		setMaxElementsInMemory(10000);
+		setMaxElementsOnDisk(10000000);
+		setTimeToLiveSeconds(120);
+		setTimeToIdleSeconds(120);
+	}
+
+
 	/**
 	 * Set a CacheManager from which to retrieve a named Cache instance.
-	 * By default, <code>CacheManager.getInstance()</code> will be called.
+	 * By default, {@code CacheManager.getInstance()} will be called.
 	 * <p>Note that in particular for persistent caches, it is advisable to
 	 * properly handle the shutdown of the CacheManager: Set up a separate
 	 * EhCacheManagerFactoryBean and pass a reference to this bean property.
 	 * <p>A separate EhCacheManagerFactoryBean is also necessary for loading
-	 * EHCache configuration from a non-default config location.
+	 * EhCache configuration from a non-default config location.
 	 * @see EhCacheManagerFactoryBean
 	 * @see net.sf.ehcache.CacheManager#getInstance
 	 */
@@ -113,84 +122,28 @@ public class EhCacheFactoryBean implements FactoryBean, BeanNameAware, Initializ
 	 * Default is the bean name of this EhCacheFactoryBean.
 	 */
 	public void setCacheName(String cacheName) {
-		this.cacheName = cacheName;
+		setName(cacheName);
 	}
 
 	/**
-	 * Specify the maximum number of cached objects in memory.
-	 * Default is 10000 elements.
-	 */
-	public void setMaxElementsInMemory(int maxElementsInMemory) {
-		this.maxElementsInMemory = maxElementsInMemory;
-	}
-
-	/**
-	 * Specify the maximum number of cached objects on disk.
-	 * Default is 10000000 elements.
-	 */
-	public void setMaxElementsOnDisk(int maxElementsOnDisk) {
-		this.maxElementsOnDisk = maxElementsOnDisk;
-	}
-
-	/**
-	 * Set the memory style eviction policy for this cache.
-	 * Supported values are "LRU", "LFU" and "FIFO", according to the
-	 * constants defined in EHCache's MemoryStoreEvictionPolicy class.
-	 * Default is "LRU".
-	 */
-	public void setMemoryStoreEvictionPolicy(MemoryStoreEvictionPolicy memoryStoreEvictionPolicy) {
-		Assert.notNull(memoryStoreEvictionPolicy, "memoryStoreEvictionPolicy must not be null");
-		this.memoryStoreEvictionPolicy = memoryStoreEvictionPolicy;
-	}
-
-	/**
-	 * Set whether elements can overflow to disk when the in-memory cache
-	 * has reached the maximum size limit. Default is "true".
-	 */
-	public void setOverflowToDisk(boolean overflowToDisk) {
-		this.overflowToDisk = overflowToDisk;
-	}
-
-	/**
-	 * Set whether elements are considered as eternal. If "true", timeouts
-	 * are ignored and the element is never expired. Default is "false".
-	 */
-	public void setEternal(boolean eternal) {
-		this.eternal = eternal;
-	}
-
-	/**
-	 * Set t he time in seconds to live for an element before it expires,
-	 * i.e. the maximum time between creation time and when an element expires.
-	 * It is only used if the element is not eternal. Default is 120 seconds.
+	 * @see #setTimeToLiveSeconds(long)
 	 */
 	public void setTimeToLive(int timeToLive) {
-		this.timeToLive = timeToLive;
+		setTimeToLiveSeconds(timeToLive);
 	}
 
 	/**
-	 * Set the time in seconds to idle for an element before it expires, that is,
-	 * the maximum amount of time between accesses before an element expires.
-	 * This is only used if the element is not eternal. Default is 120 seconds.
+	 * @see #setTimeToIdleSeconds(long)
 	 */
 	public void setTimeToIdle(int timeToIdle) {
-		this.timeToIdle = timeToIdle;
+		setTimeToIdleSeconds(timeToIdle);
 	}
 
 	/**
-	 * Set whether the disk store persists between restarts of the Virtual Machine.
-	 * The default is "false".
+	 * @see #setDiskSpoolBufferSizeMB(int)
 	 */
-	public void setDiskPersistent(boolean diskPersistent) {
-		this.diskPersistent = diskPersistent;
-	}
-
-	/**
-	 * Set the number of seconds between runs of the disk expiry thread.
-	 * The default is 120 seconds.
-	 */
-	public void setDiskExpiryThreadIntervalSeconds(int diskExpiryThreadIntervalSeconds) {
-		this.diskExpiryThreadIntervalSeconds = diskExpiryThreadIntervalSeconds;
+	public void setDiskSpoolBufferSize(int diskSpoolBufferSize) {
+		setDiskSpoolBufferSizeMB(diskSpoolBufferSize);
 	}
 
 	/**
@@ -206,9 +159,9 @@ public class EhCacheFactoryBean implements FactoryBean, BeanNameAware, Initializ
 	}
 
 	/**
-	 * Set an EHCache {@link net.sf.ehcache.constructs.blocking.CacheEntryFactory}
+	 * Set an EhCache {@link net.sf.ehcache.constructs.blocking.CacheEntryFactory}
 	 * to use for a self-populating cache. If such a factory is specified,
-	 * the cache will be decorated with EHCache's
+	 * the cache will be decorated with EhCache's
 	 * {@link net.sf.ehcache.constructs.blocking.SelfPopulatingCache}.
 	 * <p>The specified factory can be of type
 	 * {@link net.sf.ehcache.constructs.blocking.UpdatingCacheEntryFactory},
@@ -223,58 +176,129 @@ public class EhCacheFactoryBean implements FactoryBean, BeanNameAware, Initializ
 		this.cacheEntryFactory = cacheEntryFactory;
 	}
 
+	/**
+	 * Set an EhCache {@link net.sf.ehcache.bootstrap.BootstrapCacheLoader}
+	 * for this cache, if any.
+	 */
+	public void setBootstrapCacheLoader(BootstrapCacheLoader bootstrapCacheLoader) {
+		this.bootstrapCacheLoader = bootstrapCacheLoader;
+	}
+
+	/**
+	 * Specify EhCache {@link net.sf.ehcache.event.CacheEventListener cache event listeners}
+	 * to registered with this cache.
+	 */
+	public void setCacheEventListeners(Set<CacheEventListener> cacheEventListeners) {
+		this.cacheEventListeners = cacheEventListeners;
+	}
+
+	/**
+	 * Set whether to enable EhCache statistics on this cache.
+	 * <p>Note: As of EhCache 2.7, statistics are enabled by default, and cannot be turned off.
+	 * This setter therefore has no effect in such a scenario.
+	 * @see net.sf.ehcache.Ehcache#setStatisticsEnabled
+	 */
+	public void setStatisticsEnabled(boolean statisticsEnabled) {
+		this.statisticsEnabled = statisticsEnabled;
+	}
+
+	/**
+	 * Set whether to enable EhCache's sampled statistics on this cache.
+	 * <p>Note: As of EhCache 2.7, statistics are enabled by default, and cannot be turned off.
+	 * This setter therefore has no effect in such a scenario.
+	 * @see net.sf.ehcache.Ehcache#setSampledStatisticsEnabled
+	 */
+	public void setSampledStatisticsEnabled(boolean sampledStatisticsEnabled) {
+		this.sampledStatisticsEnabled = sampledStatisticsEnabled;
+	}
+
+	/**
+	 * Set whether this cache should be marked as disabled.
+	 * @see net.sf.ehcache.Cache#setDisabled
+	 */
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+	}
+
+	@Override
 	public void setBeanName(String name) {
 		this.beanName = name;
 	}
 
 
+	@Override
 	public void afterPropertiesSet() throws CacheException, IOException {
+		// If no cache name given, use bean name as cache name.
+		String cacheName = getName();
+		if (cacheName == null) {
+			cacheName = this.beanName;
+			setName(cacheName);
+		}
+
 		// If no CacheManager given, fetch the default.
 		if (this.cacheManager == null) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Using default EHCache CacheManager for cache region '" + this.cacheName + "'");
+				logger.debug("Using default EhCache CacheManager for cache region '" + cacheName + "'");
 			}
 			this.cacheManager = CacheManager.getInstance();
 		}
 
-		// If no cache name given, use bean name as cache name.
-		if (this.cacheName == null) {
-			this.cacheName = this.beanName;
-		}
+		synchronized (this.cacheManager) {
+			// Fetch cache region: If none with the given name exists, create one on the fly.
+			Ehcache rawCache;
+			boolean cacheExists = this.cacheManager.cacheExists(cacheName);
 
-		// Fetch cache region: If none with the given name exists,
-		// create one on the fly.
-		Ehcache rawCache = null;
-		if (this.cacheManager.cacheExists(this.cacheName)) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Using existing EHCache cache region '" + this.cacheName + "'");
+			if (cacheExists) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Using existing EhCache cache region '" + cacheName + "'");
+				}
+				rawCache = this.cacheManager.getEhcache(cacheName);
 			}
-			rawCache = this.cacheManager.getEhcache(this.cacheName);
-		}
-		else {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Creating new EHCache cache region '" + this.cacheName + "'");
+			else {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Creating new EhCache cache region '" + cacheName + "'");
+				}
+				rawCache = createCache();
+				rawCache.setBootstrapCacheLoader(this.bootstrapCacheLoader);
 			}
-			rawCache = createCache();
-			this.cacheManager.addCache(rawCache);
-		}
 
-		// Decorate cache if necessary.
-		Ehcache decoratedCache = decorateCache(rawCache);
-		if (decoratedCache != rawCache) {
-			this.cacheManager.replaceCacheWithDecoratedCache(rawCache, decoratedCache);
+			if (this.cacheEventListeners != null) {
+				for (CacheEventListener listener : this.cacheEventListeners) {
+					rawCache.getCacheEventNotificationService().registerListener(listener);
+				}
+			}
+
+			// Needs to happen after listener registration but before setStatisticsEnabled
+			if (!cacheExists) {
+				this.cacheManager.addCache(rawCache);
+			}
+
+			// Only necessary on EhCache <2.7: As of 2.7, statistics are on by default.
+			if (setStatisticsAvailable) {
+				if (this.statisticsEnabled) {
+					rawCache.setStatisticsEnabled(true);
+				}
+				if (this.sampledStatisticsEnabled) {
+					rawCache.setSampledStatisticsEnabled(true);
+				}
+			}
+			if (this.disabled) {
+				rawCache.setDisabled(true);
+			}
+
+			Ehcache decoratedCache = decorateCache(rawCache);
+			if (decoratedCache != rawCache) {
+				this.cacheManager.replaceCacheWithDecoratedCache(rawCache, decoratedCache);
+			}
+			this.cache = decoratedCache;
 		}
-		this.cache = decoratedCache;
 	}
 
 	/**
 	 * Create a raw Cache object based on the configuration of this FactoryBean.
 	 */
-	private Cache createCache() {
-		return new Cache(
-				this.cacheName, this.maxElementsInMemory, this.memoryStoreEvictionPolicy,
-				this.overflowToDisk, null, this.eternal, this.timeToLive, this.timeToIdle,
-				this.diskPersistent, this.diskExpiryThreadIntervalSeconds, null, null, this.maxElementsOnDisk);
+	protected Cache createCache() {
+		return new Cache(this);
 	}
 
 	/**
@@ -298,14 +322,36 @@ public class EhCacheFactoryBean implements FactoryBean, BeanNameAware, Initializ
 	}
 
 
-	public Object getObject() {
+	@Override
+	public Ehcache getObject() {
 		return this.cache;
 	}
 
-	public Class getObjectType() {
-		return (this.cache != null ? this.cache.getClass() : Ehcache.class);
+	/**
+	 * Predict the particular {@code Ehcache} implementation that will be returned from
+	 * {@link #getObject()} based on logic in {@link #createCache()} and
+	 * {@link #decorateCache(Ehcache)} as orchestrated by {@link #afterPropertiesSet()}.
+	 */
+	@Override
+	public Class<? extends Ehcache> getObjectType() {
+		if (this.cache != null) {
+			return this.cache.getClass();
+		}
+		if (this.cacheEntryFactory != null) {
+			if (this.cacheEntryFactory instanceof UpdatingCacheEntryFactory) {
+				return UpdatingSelfPopulatingCache.class;
+			}
+			else {
+				return SelfPopulatingCache.class;
+			}
+		}
+		if (this.blocking) {
+			return BlockingCache.class;
+		}
+		return Cache.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

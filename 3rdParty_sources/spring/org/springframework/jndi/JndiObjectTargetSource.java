@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.aop.TargetSource;
 
 /**
  * AOP {@link org.springframework.aop.TargetSource} that provides
- * configurable JNDI lookups for <code>getTarget()</code> calls.
+ * configurable JNDI lookups for {@code getTarget()} calls.
  *
  * <p>Can be used as alternative to {@link JndiObjectFactoryBean}, to allow for
  * relocating a JNDI object lazily or for each operation (see "lookupOnStartup"
@@ -31,7 +31,7 @@ import org.springframework.aop.TargetSource;
  *
  * <p>Example:
  *
- * <pre>
+ * <pre class="code">
  * &lt;bean id="queueConnectionFactoryTarget" class="org.springframework.jndi.JndiObjectTargetSource"&gt;
  *   &lt;property name="jndiName" value="JmsQueueConnectionFactory"/&gt;
  *   &lt;property name="lookupOnStartup" value="false"/&gt;
@@ -42,9 +42,9 @@ import org.springframework.aop.TargetSource;
  *   &lt;property name="targetSource" ref="queueConnectionFactoryTarget"/&gt;
  * &lt;/bean&gt;</pre>
  *
- * A <code>createQueueConnection</code> call on the "queueConnectionFactory" proxy will
+ * A {@code createQueueConnection} call on the "queueConnectionFactory" proxy will
  * cause a lazy JNDI lookup for "JmsQueueConnectionFactory" and a subsequent delegating
- * call to the retrieved QueueConnectionFactory's <code>createQueueConnection</code>.
+ * call to the retrieved QueueConnectionFactory's {@code createQueueConnection}.
  *
  * <p><b>Alternatively, use a {@link JndiObjectFactoryBean} with a "proxyInterface".</b>
  * "lookupOnStartup" and "cache" can then be specified on the JndiObjectFactoryBean,
@@ -66,7 +66,7 @@ public class JndiObjectTargetSource extends JndiObjectLocator implements TargetS
 
 	private Object cachedObject;
 
-	private Class targetClass;
+	private Class<?> targetClass;
 
 
 	/**
@@ -90,6 +90,7 @@ public class JndiObjectTargetSource extends JndiObjectLocator implements TargetS
 		this.cache = cache;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws NamingException {
 		super.afterPropertiesSet();
 		if (this.lookupOnStartup) {
@@ -104,7 +105,8 @@ public class JndiObjectTargetSource extends JndiObjectLocator implements TargetS
 	}
 
 
-	public Class getTargetClass() {
+	@Override
+	public Class<?> getTargetClass() {
 		if (this.cachedObject != null) {
 			return this.cachedObject.getClass();
 		}
@@ -116,10 +118,12 @@ public class JndiObjectTargetSource extends JndiObjectLocator implements TargetS
 		}
 	}
 
+	@Override
 	public boolean isStatic() {
 		return (this.cachedObject != null);
 	}
 
+	@Override
 	public Object getTarget() {
 		try {
 			if (this.lookupOnStartup || !this.cache) {
@@ -139,6 +143,7 @@ public class JndiObjectTargetSource extends JndiObjectLocator implements TargetS
 		}
 	}
 
+	@Override
 	public void releaseTarget(Object target) {
 	}
 

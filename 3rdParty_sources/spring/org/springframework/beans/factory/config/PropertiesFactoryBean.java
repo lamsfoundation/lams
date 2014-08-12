@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ import org.springframework.core.io.support.PropertiesLoaderSupport;
  * @see java.util.Properties
  */
 public class PropertiesFactoryBean extends PropertiesLoaderSupport
-		implements FactoryBean, InitializingBean {
+		implements FactoryBean<Properties>, InitializingBean {
 
 	private boolean singleton = true;
 
-	private Object singletonInstance;
+	private Properties singletonInstance;
 
 
 	/**
@@ -59,27 +59,31 @@ public class PropertiesFactoryBean extends PropertiesLoaderSupport
 		this.singleton = singleton;
 	}
 
+	@Override
 	public final boolean isSingleton() {
 		return this.singleton;
 	}
 
 
+	@Override
 	public final void afterPropertiesSet() throws IOException {
 		if (this.singleton) {
-			this.singletonInstance = createInstance();
+			this.singletonInstance = createProperties();
 		}
 	}
 
-	public final Object getObject() throws IOException {
+	@Override
+	public final Properties getObject() throws IOException {
 		if (this.singleton) {
 			return this.singletonInstance;
 		}
 		else {
-			return createInstance();
+			return createProperties();
 		}
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<Properties> getObjectType() {
 		return Properties.class;
 	}
 
@@ -94,7 +98,7 @@ public class PropertiesFactoryBean extends PropertiesLoaderSupport
 	 * @throws IOException if an exception occured during properties loading
 	 * @see #mergeProperties()
 	 */
-	protected Object createInstance() throws IOException {
+	protected Properties createProperties() throws IOException {
 		return mergeProperties();
 	}
 

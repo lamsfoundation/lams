@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
 
 package org.springframework.web;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.servlet.ServletException;
+
+import org.springframework.http.HttpMethod;
 
 /**
  * Exception thrown when a request handler does not support a
@@ -25,6 +31,7 @@ import javax.servlet.ServletException;
  * @author Juergen Hoeller
  * @since 2.0
  */
+@SuppressWarnings("serial")
 public class HttpRequestMethodNotSupportedException extends ServletException {
 
 	private String method;
@@ -47,6 +54,15 @@ public class HttpRequestMethodNotSupportedException extends ServletException {
 	 */
 	public HttpRequestMethodNotSupportedException(String method, String[] supportedMethods) {
 		this(method, supportedMethods, "Request method '" + method + "' not supported");
+	}
+
+	/**
+	 * Create a new HttpRequestMethodNotSupportedException.
+	 * @param method the unsupported HTTP request method
+	 * @param supportedMethods the actually supported HTTP methods
+	 */
+	public HttpRequestMethodNotSupportedException(String method, Collection<String> supportedMethods) {
+		this(method, supportedMethods.toArray(new String[supportedMethods.size()]));
 	}
 
 	/**
@@ -83,6 +99,17 @@ public class HttpRequestMethodNotSupportedException extends ServletException {
 	 */
 	public String[] getSupportedMethods() {
 		return this.supportedMethods;
+	}
+
+	/**
+	 * Return the actually supported HTTP methods, if known, as {@link HttpMethod} instances.
+	 */
+	public Set<HttpMethod> getSupportedHttpMethods() {
+		Set<HttpMethod> supportedMethods = new LinkedHashSet<HttpMethod>();
+		for (String value : this.supportedMethods) {
+			supportedMethods.add(HttpMethod.valueOf(value));
+		}
+		return Collections.unmodifiableSet(supportedMethods);
 	}
 
 }

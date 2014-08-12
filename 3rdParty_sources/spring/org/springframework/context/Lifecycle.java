@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,14 @@ package org.springframework.context;
  * restricting the visibility of activity-controlled components to the Lifecycle
  * interface.
  *
+ * <p>Note that the Lifecycle interface is only supported on <b>top-level singleton beans</b>.
+ * On any other component, the Lifecycle interface will remain undetected and hence ignored.
+ * Also, note that the extended {@link SmartLifecycle} interface provides more sophisticated
+ * integration with the container's startup and shutdown phases.
+ *
  * @author Juergen Hoeller
  * @since 2.0
+ * @see SmartLifecycle
  * @see ConfigurableApplicationContext
  * @see org.springframework.jms.listener.AbstractMessageListenerContainer
  * @see org.springframework.scheduling.quartz.SchedulerFactoryBean
@@ -49,16 +55,20 @@ public interface Lifecycle {
 	void start();
 
 	/**
-	 * Stop this component.
-	 * Should not throw an exception if the component isn't started yet.
+	 * Stop this component, typically in a synchronous fashion, such that
+	 * the component is fully stopped upon return of this method. Consider
+	 * implementing {@link SmartLifecycle} and its {@code stop(Runnable)}
+	 * variant in cases where asynchronous stop behavior is necessary.
+	 * <p>Should not throw an exception if the component isn't started yet.
 	 * <p>In the case of a container, this will propagate the stop signal
 	 * to all components that apply.
+	 * @see SmartLifecycle#stop(Runnable)
 	 */
 	void stop();
 
 	/**
 	 * Check whether this component is currently running.
-	 * <p>In the case of a container, this will return <code>true</code>
+	 * <p>In the case of a container, this will return {@code true}
 	 * only if <i>all</i> components that apply are currently running.
 	 * @return whether the component is currently running
 	 */

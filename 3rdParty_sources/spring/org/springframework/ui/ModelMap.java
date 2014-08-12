@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.ui;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -39,16 +38,17 @@ import org.springframework.util.Assert;
  * @see org.springframework.web.servlet.ModelAndView
  * @see org.springframework.web.portlet.ModelAndView
  */
-public class ModelMap extends LinkedHashMap {
+@SuppressWarnings("serial")
+public class ModelMap extends LinkedHashMap<String, Object> {
 
 	/**
-	 * Construct a new, empty <code>ModelMap</code>.
+	 * Construct a new, empty {@code ModelMap}.
 	 */
 	public ModelMap() {
 	}
 
 	/**
-	 * Construct a new <code>ModelMap</code> containing the supplied attribute
+	 * Construct a new {@code ModelMap} containing the supplied attribute
 	 * under the supplied name.
 	 * @see #addAttribute(String, Object)
 	 */
@@ -57,7 +57,7 @@ public class ModelMap extends LinkedHashMap {
 	}
 
 	/**
-	 * Construct a new <code>ModelMap</code> containing the supplied attribute.
+	 * Construct a new {@code ModelMap} containing the supplied attribute.
 	 * Uses attribute name generation to generate the key for the supplied model
 	 * object.
 	 * @see #addAttribute(Object)
@@ -69,8 +69,8 @@ public class ModelMap extends LinkedHashMap {
 
 	/**
 	 * Add the supplied attribute under the supplied name.
-	 * @param attributeName the name of the model attribute (never <code>null</code>)
-	 * @param attributeValue the model attribute value (can be <code>null</code>)
+	 * @param attributeName the name of the model attribute (never {@code null})
+	 * @param attributeValue the model attribute value (can be {@code null})
 	 */
 	public ModelMap addAttribute(String attributeName, Object attributeValue) {
 		Assert.notNull(attributeName, "Model attribute name must not be null");
@@ -79,41 +79,41 @@ public class ModelMap extends LinkedHashMap {
 	}
 
 	/**
-	 * Add the supplied attribute to this <code>Map</code> using a
+	 * Add the supplied attribute to this {@code Map} using a
 	 * {@link org.springframework.core.Conventions#getVariableName generated name}.
-	 * <p/><emphasis>Note: Empty {@link Collection Collections} are not added to
+	 * <p><emphasis>Note: Empty {@link Collection Collections} are not added to
 	 * the model when using this method because we cannot correctly determine
-	 * the true convention name. View code should check for <code>null</code> rather
+	 * the true convention name. View code should check for {@code null} rather
 	 * than for empty collections as is already done by JSTL tags.</emphasis>
-	 * @param attributeValue the model attribute value (never <code>null</code>)
+	 * @param attributeValue the model attribute value (never {@code null})
 	 */
 	public ModelMap addAttribute(Object attributeValue) {
 		Assert.notNull(attributeValue, "Model object must not be null");
-		if (attributeValue instanceof Collection && ((Collection) attributeValue).isEmpty()) {
+		if (attributeValue instanceof Collection && ((Collection<?>) attributeValue).isEmpty()) {
 			return this;
 		}
 		return addAttribute(Conventions.getVariableName(attributeValue), attributeValue);
 	}
 
 	/**
-	 * Copy all attributes in the supplied <code>Collection</code> into this
-	 * <code>Map</code>, using attribute name generation for each element.
+	 * Copy all attributes in the supplied {@code Collection} into this
+	 * {@code Map}, using attribute name generation for each element.
 	 * @see #addAttribute(Object)
 	 */
-	public ModelMap addAllAttributes(Collection attributeValues) {
+	public ModelMap addAllAttributes(Collection<?> attributeValues) {
 		if (attributeValues != null) {
-			for (Iterator it = attributeValues.iterator(); it.hasNext();) {
-				addAttribute(it.next());
+			for (Object attributeValue : attributeValues) {
+				addAttribute(attributeValue);
 			}
 		}
 		return this;
 	}
 
 	/**
-	 * Copy all attributes in the supplied <code>Map</code> into this <code>Map</code>.
+	 * Copy all attributes in the supplied {@code Map} into this {@code Map}.
 	 * @see #addAttribute(String, Object)
 	 */
-	public ModelMap addAllAttributes(Map attributes) {
+	public ModelMap addAllAttributes(Map<String, ?> attributes) {
 		if (attributes != null) {
 			putAll(attributes);
 		}
@@ -121,14 +121,13 @@ public class ModelMap extends LinkedHashMap {
 	}
 
 	/**
-	 * Copy all attributes in the supplied <code>Map</code> into this <code>Map</code>,
+	 * Copy all attributes in the supplied {@code Map} into this {@code Map},
 	 * with existing objects of the same name taking precedence (i.e. not getting
 	 * replaced).
 	 */
-	public ModelMap mergeAttributes(Map attributes) {
+	public ModelMap mergeAttributes(Map<String, ?> attributes) {
 		if (attributes != null) {
-			for (Iterator it = attributes.keySet().iterator(); it.hasNext();) {
-				Object key = it.next();
+			for (String key : attributes.keySet()) {
 				if (!containsKey(key)) {
 					put(key, attributes.get(key));
 				}
@@ -139,40 +138,11 @@ public class ModelMap extends LinkedHashMap {
 
 	/**
 	 * Does this model contain an attribute of the given name?
-	 * @param attributeName the name of the model attribute (never <code>null</code>)
+	 * @param attributeName the name of the model attribute (never {@code null})
 	 * @return whether this model contains a corresponding attribute
 	 */
 	public boolean containsAttribute(String attributeName) {
 		return containsKey(attributeName);
-	}
-
-
-	/**
-	 * @deprecated as of Spring 2.5, in favor of {@link #addAttribute(String, Object)}
-	 */
-	public ModelMap addObject(String modelName, Object modelObject) {
-		return addAttribute(modelName, modelObject);
-	}
-
-	/**
-	 * @deprecated as of Spring 2.5, in favor of {@link #addAttribute(Object)}
-	 */
-	public ModelMap addObject(Object modelObject) {
-		return addAttribute(modelObject);
-	}
-
-	/**
-	 * @deprecated as of Spring 2.5, in favor of {@link #addAllAttributes(Collection)}
-	 */
-	public ModelMap addAllObjects(Collection objects) {
-		return addAllAttributes(objects);
-	}
-
-	/**
-	 * @deprecated as of Spring 2.5, in favor of {@link #addAllAttributes(Map)}
-	 */
-	public ModelMap addAllObjects(Map objects) {
-		return addAllAttributes(objects);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,25 @@
 
 package org.springframework.beans;
 
-import org.springframework.core.MethodParameter;
-
 /**
- * Simple implementation of the TypeConverter interface that does not operate
- * on any specific target object. This is an alternative to using a full-blown
- * BeanWrapperImpl instance for arbitrary type conversion needs.
+ * Simple implementation of the {@link TypeConverter} interface that does not operate on
+ * a specific target object. This is an alternative to using a full-blown BeanWrapperImpl
+ * instance for arbitrary type conversion needs, while using the very same conversion
+ * algorithm (including delegation to {@link java.beans.PropertyEditor} and
+ * {@link org.springframework.core.convert.ConversionService}) underneath.
+ *
+ * <p><b>Note:</b> Due to its reliance on {@link java.beans.PropertyEditor PropertyEditors},
+ * SimpleTypeConverter is <em>not</em> thread-safe. Use a separate instance for each thread.
  *
  * @author Juergen Hoeller
  * @since 2.0
  * @see BeanWrapperImpl
  */
-public class SimpleTypeConverter extends PropertyEditorRegistrySupport implements TypeConverter {
-
-	private final TypeConverterDelegate typeConverterDelegate = new TypeConverterDelegate(this);
-
+public class SimpleTypeConverter extends TypeConverterSupport {
 
 	public SimpleTypeConverter() {
+		this.typeConverterDelegate = new TypeConverterDelegate(this);
 		registerDefaultEditors();
-	}
-
-
-	public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
-		return convertIfNecessary(value, requiredType, null);
-	}
-
-	public Object convertIfNecessary(
-			Object value, Class requiredType, MethodParameter methodParam) throws TypeMismatchException {
-		try {
-			return this.typeConverterDelegate.convertIfNecessary(value, requiredType, methodParam);
-		}
-		catch (IllegalArgumentException ex) {
-			throw new TypeMismatchException(value, requiredType, ex);
-		}
 	}
 
 }

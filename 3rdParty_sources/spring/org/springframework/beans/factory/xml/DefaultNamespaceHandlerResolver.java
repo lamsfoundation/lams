@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package org.springframework.beans.factory.xml;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +29,7 @@ import org.springframework.beans.FatalBeanException;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Default implementation of the {@link NamespaceHandlerResolver} interface.
@@ -36,7 +37,7 @@ import org.springframework.util.ClassUtils;
  * contained in mapping file.
  *
  * <p>By default, this implementation looks for the mapping file at
- * <code>META-INF/spring.handlers</code>, but this can be changed using the
+ * {@code META-INF/spring.handlers}, but this can be changed using the
  * {@link #DefaultNamespaceHandlerResolver(ClassLoader, String)} constructor.
  *
  * @author Rob Harrop
@@ -63,11 +64,11 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	private final String handlerMappingsLocation;
 
 	/** Stores the mappings from namespace URI to NamespaceHandler class name / instance */
-	private Map handlerMappings;
+	private volatile Map<String, Object> handlerMappings;
 
 
 	/**
-	 * Create a new <code>DefaultNamespaceHandlerResolver</code> using the
+	 * Create a new {@code DefaultNamespaceHandlerResolver} using the
 	 * default mapping file location.
 	 * <p>This constructor will result in the thread context ClassLoader being used
 	 * to load resources.
@@ -78,10 +79,10 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	}
 
 	/**
-	 * Create a new <code>DefaultNamespaceHandlerResolver</code> using the
+	 * Create a new {@code DefaultNamespaceHandlerResolver} using the
 	 * default mapping file location.
 	 * @param classLoader the {@link ClassLoader} instance used to load mapping resources
-	 * (may be <code>null</code>, in which case the thread context ClassLoader will be used)
+	 * (may be {@code null}, in which case the thread context ClassLoader will be used)
 	 * @see #DEFAULT_HANDLER_MAPPINGS_LOCATION
 	 */
 	public DefaultNamespaceHandlerResolver(ClassLoader classLoader) {
@@ -89,10 +90,10 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	}
 
 	/**
-	 * Create a new <code>DefaultNamespaceHandlerResolver</code> using the
+	 * Create a new {@code DefaultNamespaceHandlerResolver} using the
 	 * supplied mapping file location.
 	 * @param classLoader the {@link ClassLoader} instance used to load mapping resources
-	 * may be <code>null</code>, in which case the thread context ClassLoader will be used)
+	 * may be {@code null}, in which case the thread context ClassLoader will be used)
 	 * @param handlerMappingsLocation the mapping file location
 	 */
 	public DefaultNamespaceHandlerResolver(ClassLoader classLoader, String handlerMappingsLocation) {
@@ -106,10 +107,11 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	 * Locate the {@link NamespaceHandler} for the supplied namespace URI
 	 * from the configured mappings.
 	 * @param namespaceUri the relevant namespace URI
-	 * @return the located {@link NamespaceHandler}, or <code>null</code> if none found
+	 * @return the located {@link NamespaceHandler}, or {@code null} if none found
 	 */
+	@Override
 	public NamespaceHandler resolve(String namespaceUri) {
-		Map handlerMappings = getHandlerMappings();
+		Map<String, Object> handlerMappings = getHandlerMappings();
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
 		if (handlerOrClassName == null) {
 			return null;
@@ -120,7 +122,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		else {
 			String className = (String) handlerOrClassName;
 			try {
-				Class handlerClass = ClassUtils.forName(className, this.classLoader);
+				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);
 				if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) {
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
@@ -144,24 +146,34 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	/**
 	 * Load the specified NamespaceHandler mappings lazily.
 	 */
-	private Map getHandlerMappings() {
+	private Map<String, Object> getHandlerMappings() {
 		if (this.handlerMappings == null) {
-			try {
-				Properties mappings =
-						PropertiesLoaderUtils.loadAllProperties(this.handlerMappingsLocation, this.classLoader);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Loaded mappings [" + mappings + "]");
+			synchronized (this) {
+				if (this.handlerMappings == null) {
+					try {
+						Properties mappings =
+								PropertiesLoaderUtils.loadAllProperties(this.handlerMappingsLocation, this.classLoader);
+						if (logger.isDebugEnabled()) {
+							logger.debug("Loaded NamespaceHandler mappings: " + mappings);
+						}
+						Map<String, Object> handlerMappings = new ConcurrentHashMap<String, Object>(mappings.size());
+						CollectionUtils.mergePropertiesIntoMap(mappings, handlerMappings);
+						this.handlerMappings = handlerMappings;
+					}
+					catch (IOException ex) {
+						throw new IllegalStateException(
+								"Unable to load NamespaceHandler mappings from location [" + this.handlerMappingsLocation + "]", ex);
+					}
 				}
-				this.handlerMappings = new HashMap(mappings);
-			}
-			catch (IOException ex) {
-				IllegalStateException ise = new IllegalStateException(
-						"Unable to load NamespaceHandler mappings from location [" + this.handlerMappingsLocation + "]");
-				ise.initCause(ex);
-				throw ise;
 			}
 		}
 		return this.handlerMappings;
+	}
+
+
+	@Override
+	public String toString() {
+		return "NamespaceHandlerResolver using mappings " + getHandlerMappings();
 	}
 
 }

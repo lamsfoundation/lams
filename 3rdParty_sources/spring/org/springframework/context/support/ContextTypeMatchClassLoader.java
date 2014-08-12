@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.util.ReflectionUtils;
 /**
  * Special variant of an overriding ClassLoader, used for temporary type
  * matching in {@link AbstractApplicationContext}. Redefines classes from
- * a cached byte array for every <code>loadClass</code> call in order to
+ * a cached byte array for every {@code loadClass} call in order to
  * pick up recently loaded types in the parent ClassLoader.
  *
  * @author Juergen Hoeller
@@ -42,7 +42,7 @@ class ContextTypeMatchClassLoader extends DecoratingClassLoader implements Smart
 
 	static {
 		try {
-			findLoadedClassMethod = ClassLoader.class.getDeclaredMethod("findLoadedClass", new Class[] {String.class});
+			findLoadedClassMethod = ClassLoader.class.getDeclaredMethod("findLoadedClass", new Class<?>[] {String.class});
 		}
 		catch (NoSuchMethodException ex) {
 			throw new IllegalStateException("Invalid [java.lang.ClassLoader] class: no 'findLoadedClass' method defined!");
@@ -51,18 +51,20 @@ class ContextTypeMatchClassLoader extends DecoratingClassLoader implements Smart
 
 
 	/** Cache for byte array per class name */
-	private final Map bytesCache = new HashMap();
+	private final Map<String, byte[]> bytesCache = new HashMap<String, byte[]>();
 
 
 	public ContextTypeMatchClassLoader(ClassLoader parent) {
 		super(parent);
 	}
 
-	public Class loadClass(String name) throws ClassNotFoundException {
+	@Override
+	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		return new ContextOverridingClassLoader(getParent()).loadClass(name);
 	}
 
-	public boolean isClassReloadable(Class clazz) {
+	@Override
+	public boolean isClassReloadable(Class<?> clazz) {
 		return (clazz.getClassLoader() instanceof ContextOverridingClassLoader);
 	}
 
@@ -77,6 +79,7 @@ class ContextTypeMatchClassLoader extends DecoratingClassLoader implements Smart
 			super(parent);
 		}
 
+		@Override
 		protected boolean isEligibleForOverriding(String className) {
 			if (isExcluded(className) || ContextTypeMatchClassLoader.this.isExcluded(className)) {
 				return false;
@@ -84,7 +87,7 @@ class ContextTypeMatchClassLoader extends DecoratingClassLoader implements Smart
 			ReflectionUtils.makeAccessible(findLoadedClassMethod);
 			ClassLoader parent = getParent();
 			while (parent != null) {
-				if (ReflectionUtils.invokeMethod(findLoadedClassMethod, parent, new Object[] {className}) != null) {
+				if (ReflectionUtils.invokeMethod(findLoadedClassMethod, parent, className) != null) {
 					return false;
 				}
 				parent = parent.getParent();
@@ -92,8 +95,9 @@ class ContextTypeMatchClassLoader extends DecoratingClassLoader implements Smart
 			return true;
 		}
 
-		protected Class loadClassForOverriding(String name) throws ClassNotFoundException {
-			byte[] bytes = (byte[]) bytesCache.get(name);
+		@Override
+		protected Class<?> loadClassForOverriding(String name) throws ClassNotFoundException {
+			byte[] bytes = bytesCache.get(name);
 			if (bytes == null) {
 				bytes = loadBytesForClass(name);
 				if (bytes != null) {

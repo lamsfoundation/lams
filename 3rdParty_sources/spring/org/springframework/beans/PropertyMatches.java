@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ final class PropertyMatches {
 	 * @param propertyName the name of the property to find possible matches for
 	 * @param beanClass the bean class to search for matches
 	 */
-	public static PropertyMatches forProperty(String propertyName, Class beanClass) {
+	public static PropertyMatches forProperty(String propertyName, Class<?> beanClass) {
 		return forProperty(propertyName, beanClass, DEFAULT_MAX_DISTANCE);
 	}
 
@@ -59,7 +59,7 @@ final class PropertyMatches {
 	 * @param beanClass the bean class to search for matches
 	 * @param maxDistance the maximum property distance allowed for matches
 	 */
-	public static PropertyMatches forProperty(String propertyName, Class beanClass, int maxDistance) {
+	public static PropertyMatches forProperty(String propertyName, Class<?> beanClass, int maxDistance) {
 		return new PropertyMatches(propertyName, beanClass, maxDistance);
 	}
 
@@ -76,7 +76,7 @@ final class PropertyMatches {
 	/**
 	 * Create a new PropertyMatches instance for the given property.
 	 */
-	private PropertyMatches(String propertyName, Class beanClass, int maxDistance) {
+	private PropertyMatches(String propertyName, Class<?> beanClass, int maxDistance) {
 		this.propertyName = propertyName;
 		this.possibleMatches = calculateMatches(BeanUtils.getPropertyDescriptors(beanClass), maxDistance);
 	}
@@ -94,45 +94,45 @@ final class PropertyMatches {
 	 * indicating the possible property matches.
 	 */
 	public String buildErrorMessage() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("Bean property '");
-		buf.append(this.propertyName);
-		buf.append("' is not writable or has an invalid setter method. ");
+		StringBuilder msg = new StringBuilder();
+		msg.append("Bean property '");
+		msg.append(this.propertyName);
+		msg.append("' is not writable or has an invalid setter method. ");
 
 		if (ObjectUtils.isEmpty(this.possibleMatches)) {
-			buf.append("Does the parameter type of the setter match the return type of the getter?");
+			msg.append("Does the parameter type of the setter match the return type of the getter?");
 		}
 		else {
-			buf.append("Did you mean ");
+			msg.append("Did you mean ");
 			for (int i = 0; i < this.possibleMatches.length; i++) {
-				buf.append('\'');
-				buf.append(this.possibleMatches[i]);
+				msg.append('\'');
+				msg.append(this.possibleMatches[i]);
 				if (i < this.possibleMatches.length - 2) {
-					buf.append("', ");
+					msg.append("', ");
 				}
 				else if (i == this.possibleMatches.length - 2){
-					buf.append("', or ");
+					msg.append("', or ");
 				}
 	 		}
-			buf.append("'?");
+			msg.append("'?");
 		}
-		return buf.toString();
+		return msg.toString();
 	}
 
 
 	/**
 	 * Generate possible property alternatives for the given property and
-	 * class. Internally uses the <code>getStringDistance</code> method, which
+	 * class. Internally uses the {@code getStringDistance} method, which
 	 * in turn uses the Levenshtein algorithm to determine the distance between
 	 * two Strings.
 	 * @param propertyDescriptors the JavaBeans property descriptors to search
 	 * @param maxDistance the maximum distance to accept
 	 */
 	private String[] calculateMatches(PropertyDescriptor[] propertyDescriptors, int maxDistance) {
-		List candidates = new ArrayList();
-		for (int i = 0; i < propertyDescriptors.length; i++) {
-			if (propertyDescriptors[i].getWriteMethod() != null) {
-				String possibleAlternative = propertyDescriptors[i].getName();
+		List<String> candidates = new ArrayList<String>();
+		for (PropertyDescriptor pd : propertyDescriptors) {
+			if (pd.getWriteMethod() != null) {
+				String possibleAlternative = pd.getName();
 				if (calculateStringDistance(this.propertyName, possibleAlternative) <= maxDistance) {
 					candidates.add(possibleAlternative);
 				}

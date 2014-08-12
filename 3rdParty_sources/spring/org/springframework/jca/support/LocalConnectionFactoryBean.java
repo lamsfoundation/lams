@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @see javax.resource.cci.Connection#getLocalTransaction
  * @see org.springframework.jca.cci.connection.CciLocalTransactionManager
  */
-public class LocalConnectionFactoryBean implements FactoryBean, InitializingBean {
+public class LocalConnectionFactoryBean implements FactoryBean<Object>, InitializingBean {
 
 	private ManagedConnectionFactory managedConnectionFactory;
 
@@ -109,6 +109,7 @@ public class LocalConnectionFactoryBean implements FactoryBean, InitializingBean
 		this.connectionManager = connectionManager;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws ResourceException {
 		if (this.managedConnectionFactory == null) {
 			throw new IllegalArgumentException("Property 'managedConnectionFactory' is required");
@@ -122,14 +123,17 @@ public class LocalConnectionFactoryBean implements FactoryBean, InitializingBean
 	}
 
 
+	@Override
 	public Object getObject() {
 		return this.connectionFactory;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return (this.connectionFactory != null ? this.connectionFactory.getClass() : null);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public abstract class RemoteExporter extends RemotingSupport {
 
 	private Object service;
 
-	private Class serviceInterface;
+	private Class<?> serviceInterface;
 
 	private Boolean registerTraceInterceptor;
 
@@ -62,7 +62,7 @@ public abstract class RemoteExporter extends RemotingSupport {
 	 * Set the interface of the service to export.
 	 * The interface must be suitable for the particular service and remoting strategy.
 	 */
-	public void setServiceInterface(Class serviceInterface) {
+	public void setServiceInterface(Class<?> serviceInterface) {
 		if (serviceInterface != null && !serviceInterface.isInterface()) {
 			throw new IllegalArgumentException("'serviceInterface' must be an interface");
 		}
@@ -72,13 +72,13 @@ public abstract class RemoteExporter extends RemotingSupport {
 	/**
 	 * Return the interface of the service to export.
 	 */
-	public Class getServiceInterface() {
+	public Class<?> getServiceInterface() {
 		return this.serviceInterface;
 	}
 
 	/**
 	 * Set whether to register a RemoteInvocationTraceInterceptor for exported
-	 * services. Only applied when a subclass uses <code>getProxyForService</code>
+	 * services. Only applied when a subclass uses {@code getProxyForService}
 	 * for creating the proxy to expose.
 	 * <p>Default is "true". RemoteInvocationTraceInterceptor's most important value
 	 * is that it logs exception stacktraces on the server, before propagating an
@@ -122,7 +122,7 @@ public abstract class RemoteExporter extends RemotingSupport {
 	 * @see #setService
 	 */
 	protected void checkServiceInterface() throws IllegalArgumentException {
-		Class serviceInterface = getServiceInterface();
+		Class<?> serviceInterface = getServiceInterface();
 		Object service = getService();
 		if (serviceInterface == null) {
 			throw new IllegalArgumentException("Property 'serviceInterface' is required");
@@ -166,6 +166,7 @@ public abstract class RemoteExporter extends RemotingSupport {
 			}
 		}
 		proxyFactory.setTarget(getService());
+		proxyFactory.setOpaque(true);
 		return proxyFactory.getProxy(getBeanClassLoader());
 	}
 

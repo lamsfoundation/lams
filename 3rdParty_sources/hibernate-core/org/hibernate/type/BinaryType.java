@@ -25,7 +25,7 @@ package org.hibernate.type;
 
 import java.util.Comparator;
 
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.descriptor.java.PrimitiveByteArrayTypeDescriptor;
 import org.hibernate.type.descriptor.sql.VarbinaryTypeDescriptor;
 
@@ -54,9 +54,7 @@ public class BinaryType
 		return new String[] { getName(), "byte[]", byte[].class.getName() };
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public byte[] seed(SessionImplementor session) {
 		// Note : simply returns null for seed() and next() as the only known
 		// 		application of binary types for versioning is for use with the
@@ -65,16 +63,12 @@ public class BinaryType
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public byte[] next(byte[] current, SessionImplementor session) {
 		return current;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public Comparator<byte[]> getComparator() {
 		return PrimitiveByteArrayTypeDescriptor.INSTANCE.getComparator();
 	}

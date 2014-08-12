@@ -23,16 +23,20 @@
  */
 package org.hibernate.annotations;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Specify a custom persister.
  *
  * @author Shawn Clowater
  */
-@java.lang.annotation.Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
-@Retention( RetentionPolicy.RUNTIME )
+@java.lang.annotation.Target( { ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Persister {
-	/** Custom persister */
-	Class impl();
+	/**
+	 * The custom persister class.
+	 */
+	Class<?> impl();
 }

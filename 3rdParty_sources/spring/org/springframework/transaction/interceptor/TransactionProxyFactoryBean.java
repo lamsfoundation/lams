@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.springframework.aop.framework.AbstractSingletonProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -34,9 +33,18 @@ import org.springframework.transaction.PlatformTransactionManager;
  * {@link org.springframework.aop.framework.ProxyFactoryBean}
  * with a separate {@link TransactionInterceptor} definition.
  *
- * <p>This class is intended to cover the <i>typical</i> case of declarative
- * transaction demarcation: namely, wrapping a singleton target object with a
- * transactional proxy, proxying all the interfaces that the target implements.
+ * <p><strong>HISTORICAL NOTE:</strong> This class was originally designed to cover the
+ * typical case of declarative transaction demarcation: namely, wrapping a singleton
+ * target object with a transactional proxy, proxying all the interfaces that the target
+ * implements. However, in Spring versions 2.0 and beyond, the functionality provided here
+ * is superseded by the more convenient {@code tx:} XML namespace. See the <a
+ * href="http://bit.ly/qUwvwz">declarative transaction management</a> section of the
+ * Spring reference documentation to understand the modern options for managing
+ * transactions in Spring applications. For these reasons, <strong>users should favor of
+ * the {@code tx:} XML namespace as well as
+ * the @{@link org.springframework.transaction.annotation.Transactional Transactional}
+ * and @{@link org.springframework.transaction.annotation.EnableTransactionManagement
+ * EnableTransactionManagement} annotations.</strong>
  *
  * <p>There are three main properties that need to be specified:
  * <ul>
@@ -61,9 +69,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * <p>The "preInterceptors" and "postInterceptors" properties can be set to add
  * additional interceptors to the mix, like
- * {@link org.springframework.aop.interceptor.PerformanceMonitorInterceptor} or
- * {@link org.springframework.orm.hibernate3.HibernateInterceptor} /
- * {@link org.springframework.orm.jdo.JdoInterceptor}.
+ * {@link org.springframework.aop.interceptor.PerformanceMonitorInterceptor}.
  *
  * <p><b>HINT:</b> This class is often used with parent / child bean definitions.
  * Typically, you will define the transaction manager and default transaction
@@ -72,29 +78,31 @@ import org.springframework.transaction.PlatformTransactionManager;
  * This reduces the per-bean definition effort to a minimum.
  *
  * <pre code="class">
- * &lt;bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
- *     abstract="true"&gt;
- *   &lt;property name="transactionManager" ref="transactionManager"/&gt;
- *   &lt;property name="transactionAttributes"&gt;
- *     &lt;props&gt;
- *       &lt;prop key="insert*"&gt;PROPAGATION_REQUIRED&lt;/prop&gt;
- *       &lt;prop key="update*"&gt;PROPAGATION_REQUIRED&lt;/prop&gt;
- *       &lt;prop key="*"&gt;PROPAGATION_REQUIRED,readOnly&lt;/prop&gt;
- *     &lt;/props&gt;
- *   &lt;/property&gt;
- * &lt;/bean&gt;
+ * {@code
+ * <bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+ *     abstract="true">
+ *   <property name="transactionManager" ref="transactionManager"/>
+ *   <property name="transactionAttributes">
+ *     <props>
+ *       <prop key="insert*">PROPAGATION_REQUIRED</prop>
+ *       <prop key="update*">PROPAGATION_REQUIRED</prop>
+ *       <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+ *     </props>
+ *   </property>
+ * </bean>
  *
- * &lt;bean id="myProxy" parent="baseTransactionProxy"&gt;
- *   &lt;property name="target" ref="myTarget"/&gt;
- * &lt;/bean&gt;
+ * <bean id="myProxy" parent="baseTransactionProxy">
+ *   <property name="target" ref="myTarget"/>
+ * </bean>
  *
- * &lt;bean id="yourProxy" parent="baseTransactionProxy"&gt;
- *   &lt;property name="target" ref="yourTarget"/&gt;
- * &lt;/bean&gt;</pre>
+ * <bean id="yourProxy" parent="baseTransactionProxy">
+ *   <property name="target" ref="yourTarget"/>
+ * </bean>}</pre>
  *
  * @author Juergen Hoeller
  * @author Dmitriy Kopylenko
  * @author Rod Johnson
+ * @author Chris Beams
  * @since 21.08.2003
  * @see #setTransactionManager
  * @see #setTarget
@@ -102,8 +110,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @see TransactionInterceptor
  * @see org.springframework.aop.framework.ProxyFactoryBean
  */
+@SuppressWarnings("serial")
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
-		implements FactoryBean, BeanFactoryAware {
+		implements BeanFactoryAware {
 
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
@@ -145,7 +154,6 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	 * @see TransactionAttributeSourceEditor
 	 * @see MethodMapTransactionAttributeSource
 	 * @see NameMatchTransactionAttributeSource
-	 * @see AttributesTransactionAttributeSource
 	 * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
 	 */
 	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
@@ -166,24 +174,20 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	/**
 	 * This callback is optional: If running in a BeanFactory and no transaction
 	 * manager has been set explicitly, a single matching bean of type
-	 * PlatformTransactionManager will be fetched from the BeanFactory.
-	 * @see org.springframework.beans.factory.BeanFactoryUtils#beanOfTypeIncludingAncestors
+	 * {@link PlatformTransactionManager} will be fetched from the BeanFactory.
+	 * @see org.springframework.beans.factory.BeanFactory#getBean(Class)
 	 * @see org.springframework.transaction.PlatformTransactionManager
 	 */
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
-		if (this.transactionInterceptor.getTransactionManager() == null &&
-				beanFactory instanceof ListableBeanFactory) {
-			ListableBeanFactory lbf = (ListableBeanFactory) beanFactory;
-			PlatformTransactionManager ptm = (PlatformTransactionManager)
-					BeanFactoryUtils.beanOfTypeIncludingAncestors(lbf, PlatformTransactionManager.class);
-			this.transactionInterceptor.setTransactionManager(ptm);
-		}
+		this.transactionInterceptor.setBeanFactory(beanFactory);
 	}
 
 
 	/**
 	 * Creates an advisor for this FactoryBean's TransactionInterceptor.
 	 */
+	@Override
 	protected Object createMainInterceptor() {
 		this.transactionInterceptor.afterPropertiesSet();
 		if (this.pointcut != null) {

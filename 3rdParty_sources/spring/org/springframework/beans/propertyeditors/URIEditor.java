@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,16 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Editor for <code>java.net.URI</code>, to directly populate a URI property
+ * Editor for {@code java.net.URI}, to directly populate a URI property
  * instead of using a String property as bridge.
  *
  * <p>Supports Spring-style URI notation: any fully qualified standard URI
  * ("file:", "http:", etc) and Spring's special "classpath:" pseudo-URL,
  * which will be resolved to a corresponding URI.
+ *
+ * <p>By default, this editor will encode Strings into URIs. For instance,
+ * a space will be encoded into {@code %20}. This behavior can be changed
+ * by calling the {@link #URIEditor(boolean)} constructor.
  *
  * <p>Note: A URI is more relaxed than a URL in that it does not require
  * a valid protocol to be specified. Any scheme within a valid URI syntax
@@ -47,26 +51,55 @@ public class URIEditor extends PropertyEditorSupport {
 
 	private final ClassLoader classLoader;
 
+	private final boolean encode;
+
+
 
 	/**
-	 * Create a new URIEditor, converting "classpath:" locations into
+	 * Create a new, encoding URIEditor, converting "classpath:" locations into
 	 * standard URIs (not trying to resolve them into physical resources).
 	 */
 	public URIEditor() {
 		this.classLoader = null;
+		this.encode = true;
+	}
+
+	/**
+	 * Create a new URIEditor, converting "classpath:" locations into
+	 * standard URIs (not trying to resolve them into physical resources).
+	 * @param encode indicates whether Strings will be encoded or not
+	 */
+	public URIEditor(boolean encode) {
+		this.classLoader = null;
+		this.encode = encode;
+	}
+
+
+	/**
+	 * Create a new URIEditor, using the given ClassLoader to resolve
+	 * "classpath:" locations into physical resource URLs.
+	 * @param classLoader the ClassLoader to use for resolving "classpath:" locations
+	 * (may be {@code null} to indicate the default ClassLoader)
+	 */
+	public URIEditor(ClassLoader classLoader) {
+		this.classLoader = (classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader());
+		this.encode = true;
 	}
 
 	/**
 	 * Create a new URIEditor, using the given ClassLoader to resolve
 	 * "classpath:" locations into physical resource URLs.
 	 * @param classLoader the ClassLoader to use for resolving "classpath:" locations
-	 * (may be <code>null</code> to indicate the default ClassLoader)
+	 * (may be {@code null} to indicate the default ClassLoader)
+	 * @param encode indicates whether Strings will be encoded or not
 	 */
-	public URIEditor(ClassLoader classLoader) {
+	public URIEditor(ClassLoader classLoader, boolean encode) {
 		this.classLoader = (classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader());
+		this.encode = encode;
 	}
 
 
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		if (StringUtils.hasText(text)) {
 			String uri = text.trim();
@@ -100,17 +133,29 @@ public class URIEditor extends PropertyEditorSupport {
 
 	/**
 	 * Create a URI instance for the given (resolved) String value.
-	 * <p>The default implementation uses the <code>URI(String)</code>
-	 * constructor, replacing spaces with "%20" quotes first.
+	 * <p>The default implementation encodes the value into a RFC
+	 * 2396 compliant URI.
 	 * @param value the value to convert into a URI instance
 	 * @return the URI instance
-	 * @throws URISyntaxException if URI conversion failed
+	 * @throws java.net.URISyntaxException if URI conversion failed
 	 */
 	protected URI createURI(String value) throws URISyntaxException {
-		return new URI(StringUtils.replace(value, " ", "%20"));
+		int colonIndex = value.indexOf(':');
+		if (this.encode && colonIndex != -1) {
+			int fragmentIndex = value.indexOf('#', colonIndex + 1);
+			String scheme = value.substring(0, colonIndex);
+			String ssp = value.substring(colonIndex + 1, (fragmentIndex > 0 ? fragmentIndex : value.length()));
+			String fragment = (fragmentIndex > 0 ? value.substring(fragmentIndex + 1) : null);
+			return new URI(scheme, ssp, fragment);
+		}
+		else {
+			// not encoding or the value contains no scheme - fallback to default
+			return new URI(value);
+		}
 	}
 
 
+	@Override
 	public String getAsText() {
 		URI value = (URI) getValue();
 		return (value != null ? value.toString() : "");

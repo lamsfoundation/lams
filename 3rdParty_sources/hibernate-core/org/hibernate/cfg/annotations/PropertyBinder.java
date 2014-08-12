@@ -23,19 +23,19 @@
  */
 package org.hibernate.cfg.annotations;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.persistence.Lob;
 
 import org.hibernate.AnnotationException;
+import org.hibernate.HibernateException;
 import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.OptimisticLock;
+import org.hibernate.annotations.ValueGenerationType;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
@@ -47,20 +47,29 @@ import org.hibernate.cfg.InheritanceState;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.cfg.PropertyHolder;
 import org.hibernate.cfg.PropertyPreloadedData;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
+import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.Property;
-import org.hibernate.mapping.PropertyGeneration;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.mapping.SimpleValue;
+import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
-import org.hibernate.util.StringHelper;
+import org.hibernate.tuple.AnnotationValueGeneration;
+import org.hibernate.tuple.GenerationTiming;
+import org.hibernate.tuple.ValueGeneration;
+import org.hibernate.tuple.ValueGenerator;
+
+import org.jboss.logging.Logger;
 
 /**
  * @author Emmanuel Bernard
  */
 public class PropertyBinder {
-	private Logger log = LoggerFactory.getLogger( PropertyBinder.class );
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, PropertyBinder.class.getName());
+
 	private String name;
 	private String returnedClassName;
 	private boolean lazy;
@@ -172,19 +181,26 @@ public class PropertyBinder {
 
 	private Property makePropertyAndValue() {
 		validateBind();
-		log.debug( "binding property {} with lazy={}", name, lazy );
-		String containerClassName = holder == null ?
-				null :
-				holder.getClassName();
+
+		LOG.debugf( "MetadataSourceProcessor property %s with lazy=%s", name, lazy );
+		final String containerClassName = holder.getClassName();
+		holder.startingProperty( property );
+
 		simpleValueBinder = new SimpleValueBinder();
 		simpleValueBinder.setMappings( mappings );
 		simpleValueBinder.setPropertyName( name );
 		simpleValueBinder.setReturnedClassName( returnedClassName );
 		simpleValueBinder.setColumns( columns );
 		simpleValueBinder.setPersistentClassName( containerClassName );
-		simpleValueBinder.setType( property, returnedClass );
+		simpleValueBinder.setType(
+				property,
+				returnedClass,
+				containerClassName,
+				holder.resolveAttributeConverterDefinition( property )
+		);
 		simpleValueBinder.setMappings( mappings );
 		simpleValueBinder.setReferencedEntityName( referencedEntityName );
+		simpleValueBinder.setAccessType( accessType );
 		SimpleValue propertyValue = simpleValueBinder.make();
 		setValue( propertyValue );
 		return makeProperty();
@@ -252,7 +268,7 @@ public class PropertyBinder {
 	//used when the value is provided and the binding is done elsewhere
 	public Property makeProperty() {
 		validateMake();
-		log.debug( "Building property " + name );
+		LOG.debugf( "Building property %s", name );
 		Property prop = new Property();
 		prop.setName( name );
 		prop.setNodeName( name );
@@ -260,58 +276,200 @@ public class PropertyBinder {
 		prop.setLazy( lazy );
 		prop.setCascade( cascade );
 		prop.setPropertyAccessorName( accessType.getType() );
-		Generated ann = property != null ?
-				property.getAnnotation( Generated.class ) :
-				null;
-		GenerationTime generated = ann != null ?
-				ann.value() :
-				null;
-		if ( generated != null ) {
-			if ( !GenerationTime.NEVER.equals( generated ) ) {
-				if ( property.isAnnotationPresent( javax.persistence.Version.class )
-						&& GenerationTime.INSERT.equals( generated ) ) {
-					throw new AnnotationException(
-							"@Generated(INSERT) on a @Version property not allowed, use ALWAYS: "
-									+ StringHelper.qualify( holder.getPath(), name )
-					);
-				}
-				insertable = false;
-				if ( GenerationTime.ALWAYS.equals( generated ) ) {
-					updatable = false;
-				}
-				prop.setGeneration( PropertyGeneration.parse( generated.toString().toLowerCase() ) );
-			}
+
+		if ( property != null ) {
+			prop.setValueGenerationStrategy( determineValueGenerationStrategy( property ) );
 		}
-		NaturalId naturalId = property != null ?
-				property.getAnnotation( NaturalId.class ) :
-				null;
+
+		NaturalId naturalId = property != null ? property.getAnnotation( NaturalId.class ) : null;
 		if ( naturalId != null ) {
-			if ( !naturalId.mutable() ) {
+			if ( ! entityBinder.isRootEntity() ) {
+				throw new AnnotationException( "@NaturalId only valid on root entity (or its @MappedSuperclasses)" );
+			}
+			if ( ! naturalId.mutable() ) {
 				updatable = false;
 			}
 			prop.setNaturalIdentifier( true );
 		}
+
+		// HHH-4635 -- needed for dialect-specific property ordering
+		Lob lob = property != null ? property.getAnnotation( Lob.class ) : null;
+		prop.setLob( lob != null );
+
 		prop.setInsertable( insertable );
 		prop.setUpdateable( updatable );
-		OptimisticLock lockAnn = property != null ?
-				property.getAnnotation( OptimisticLock.class ) :
-				null;
-		if ( lockAnn != null ) {
-			prop.setOptimisticLocked( !lockAnn.excluded() );
-			//TODO this should go to the core as a mapping validation checking
-			if ( lockAnn.excluded() && (
-					property.isAnnotationPresent( javax.persistence.Version.class )
-							|| property.isAnnotationPresent( Id.class )
-							|| property.isAnnotationPresent( EmbeddedId.class ) ) ) {
-				throw new AnnotationException(
-						"@OptimisticLock.exclude=true incompatible with @Id, @EmbeddedId and @Version: "
-								+ StringHelper.qualify( holder.getPath(), name )
-				);
-			}
+
+		// this is already handled for collections in CollectionBinder...
+		if ( Collection.class.isInstance( value ) ) {
+			prop.setOptimisticLocked( ( (Collection) value ).isOptimisticLocked() );
 		}
-		log.trace( "Cascading " + name + " with " + cascade );
+		else {
+			final OptimisticLock lockAnn = property != null
+					? property.getAnnotation( OptimisticLock.class )
+					: null;
+			if ( lockAnn != null ) {
+				//TODO this should go to the core as a mapping validation checking
+				if ( lockAnn.excluded() && (
+						property.isAnnotationPresent( javax.persistence.Version.class )
+								|| property.isAnnotationPresent( Id.class )
+								|| property.isAnnotationPresent( EmbeddedId.class ) ) ) {
+					throw new AnnotationException(
+							"@OptimisticLock.exclude=true incompatible with @Id, @EmbeddedId and @Version: "
+									+ StringHelper.qualify( holder.getPath(), name )
+					);
+				}
+			}
+			final boolean isOwnedValue = !isToOneValue( value ) || insertable; // && updatable as well???
+			final boolean includeInOptimisticLockChecks = ( lockAnn != null )
+					? ! lockAnn.excluded()
+					: isOwnedValue;
+			prop.setOptimisticLocked( includeInOptimisticLockChecks );
+		}
+
+		LOG.tracev( "Cascading {0} with {1}", name, cascade );
 		this.mappingProperty = prop;
 		return prop;
+	}
+
+	private ValueGeneration determineValueGenerationStrategy(XProperty property) {
+		ValueGeneration valueGeneration = getValueGenerationFromAnnotations( property );
+
+		if ( valueGeneration == null ) {
+			return NoValueGeneration.INSTANCE;
+		}
+
+		final GenerationTiming when = valueGeneration.getGenerationTiming();
+
+		if ( valueGeneration.getValueGenerator() == null ) {
+			insertable = false;
+			if ( when == GenerationTiming.ALWAYS ) {
+				updatable = false;
+			}
+		}
+
+		return valueGeneration;
+	}
+
+	/**
+	 * Returns the value generation strategy for the given property, if any.
+	 */
+	private ValueGeneration getValueGenerationFromAnnotations(XProperty property) {
+		AnnotationValueGeneration<?> valueGeneration = null;
+
+		for ( Annotation annotation : property.getAnnotations() ) {
+			AnnotationValueGeneration<?> candidate = getValueGenerationFromAnnotation( property, annotation );
+
+			if ( candidate != null ) {
+				if ( valueGeneration != null ) {
+					throw new AnnotationException(
+							"Only one generator annotation is allowed:" + StringHelper.qualify(
+									holder.getPath(),
+									name
+							)
+					);
+				}
+				else {
+					valueGeneration = candidate;
+				}
+			}
+		}
+
+		return valueGeneration;
+	}
+
+	/**
+	 * In case the given annotation is a value generator annotation, the corresponding value generation strategy to be
+	 * applied to the given property is returned, {@code null} otherwise.
+	 */
+	private <A extends Annotation> AnnotationValueGeneration<A> getValueGenerationFromAnnotation(
+			XProperty property,
+			A annotation) {
+		ValueGenerationType generatorAnnotation = annotation.annotationType()
+				.getAnnotation( ValueGenerationType.class );
+
+		if ( generatorAnnotation == null ) {
+			return null;
+		}
+
+		Class<? extends AnnotationValueGeneration<?>> generationType = generatorAnnotation.generatedBy();
+		AnnotationValueGeneration<A> valueGeneration = instantiateAndInitializeValueGeneration(
+				annotation, generationType, property
+		);
+
+		if ( annotation.annotationType() == Generated.class &&
+				property.isAnnotationPresent( javax.persistence.Version.class ) &&
+				valueGeneration.getGenerationTiming() == GenerationTiming.INSERT ) {
+
+			throw new AnnotationException(
+					"@Generated(INSERT) on a @Version property not allowed, use ALWAYS (or NEVER): "
+							+ StringHelper.qualify( holder.getPath(), name )
+			);
+		}
+
+		return valueGeneration;
+	}
+
+	/**
+	 * Instantiates the given generator annotation type, initializing it with the given instance of the corresponding
+	 * generator annotation and the property's type.
+	 */
+	private <A extends Annotation> AnnotationValueGeneration<A> instantiateAndInitializeValueGeneration(
+			A annotation,
+			Class<? extends AnnotationValueGeneration<?>> generationType,
+			XProperty property) {
+
+		try {
+			// This will cause a CCE in case the generation type doesn't match the annotation type; As this would be a
+			// programming error of the generation type developer and thus should show up during testing, we don't
+			// check this explicitly; If required, this could be done e.g. using ClassMate
+			@SuppressWarnings( "unchecked" )
+			AnnotationValueGeneration<A> valueGeneration = (AnnotationValueGeneration<A>) generationType.newInstance();
+			valueGeneration.initialize( annotation, mappings.getReflectionManager().toClass(property.getType() ) );
+
+			return valueGeneration;
+		}
+		catch (HibernateException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw new AnnotationException(
+					"Exception occurred during processing of generator annotation:" + StringHelper.qualify(
+							holder.getPath(),
+							name
+					), e
+			);
+		}
+	}
+
+	private static class NoValueGeneration implements ValueGeneration {
+		/**
+		 * Singleton access
+		 */
+		public static final NoValueGeneration INSTANCE = new NoValueGeneration();
+
+		@Override
+		public GenerationTiming getGenerationTiming() {
+			return GenerationTiming.NEVER;
+		}
+
+		@Override
+		public ValueGenerator<?> getValueGenerator() {
+			return null;
+		}
+
+		@Override
+		public boolean referenceColumnInSql() {
+			return true;
+		}
+
+		@Override
+		public String getDatabaseGeneratedReferencedColumnValue() {
+			return null;
+		}
+	}
+
+	private boolean isToOneValue(Value value) {
+		return ToOne.class.isInstance( value );
 	}
 
 	public void setProperty(XProperty property) {

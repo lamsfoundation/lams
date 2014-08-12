@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @param configLocations array of resource locations
 	 * @throws BeansException if context creation failed
 	 */
-	public ClassPathXmlApplicationContext(String[] configLocations) throws BeansException {
+	public ClassPathXmlApplicationContext(String... configLocations) throws BeansException {
 		this(configLocations, true, null);
 	}
 
@@ -154,7 +154,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @see org.springframework.context.support.GenericApplicationContext
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 */
-	public ClassPathXmlApplicationContext(String path, Class clazz) throws BeansException {
+	public ClassPathXmlApplicationContext(String path, Class<?> clazz) throws BeansException {
 		this(new String[] {path}, clazz);
 	}
 
@@ -168,7 +168,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @see org.springframework.context.support.GenericApplicationContext
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 */
-	public ClassPathXmlApplicationContext(String[] paths, Class clazz) throws BeansException {
+	public ClassPathXmlApplicationContext(String[] paths, Class<?> clazz) throws BeansException {
 		this(paths, clazz, null);
 	}
 
@@ -184,7 +184,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @see org.springframework.context.support.GenericApplicationContext
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 */
-	public ClassPathXmlApplicationContext(String[] paths, Class clazz, ApplicationContext parent)
+	public ClassPathXmlApplicationContext(String[] paths, Class<?> clazz, ApplicationContext parent)
 			throws BeansException {
 
 		super(parent);
@@ -198,6 +198,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 
+	@Override
 	protected Resource[] getConfigResources() {
 		return this.configResources;
 	}

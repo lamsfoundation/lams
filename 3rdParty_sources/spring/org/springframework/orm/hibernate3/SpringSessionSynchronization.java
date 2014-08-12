@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,10 +106,12 @@ class SpringSessionSynchronization implements TransactionSynchronization, Ordere
 	}
 
 
+	@Override
 	public int getOrder() {
 		return SessionFactoryUtils.SESSION_SYNCHRONIZATION_ORDER;
 	}
 
+	@Override
 	public void suspend() {
 		if (this.holderActive) {
 			TransactionSynchronizationManager.unbindResource(this.sessionFactory);
@@ -118,12 +120,25 @@ class SpringSessionSynchronization implements TransactionSynchronization, Ordere
 		}
 	}
 
+	@Override
 	public void resume() {
 		if (this.holderActive) {
 			TransactionSynchronizationManager.bindResource(this.sessionFactory, this.sessionHolder);
 		}
 	}
 
+	@Override
+	public void flush() {
+		try {
+			SessionFactoryUtils.logger.debug("Flushing Hibernate Session on explicit request");
+			getCurrentSession().flush();
+		}
+		catch (HibernateException ex) {
+			throw translateException(ex);
+		}
+	}
+
+	@Override
 	public void beforeCommit(boolean readOnly) throws DataAccessException {
 		if (!readOnly) {
 			Session session = getCurrentSession();
@@ -135,17 +150,22 @@ class SpringSessionSynchronization implements TransactionSynchronization, Ordere
 					session.flush();
 				}
 				catch (HibernateException ex) {
-					if (this.jdbcExceptionTranslator != null && ex instanceof JDBCException) {
-						JDBCException jdbcEx = (JDBCException) ex;
-						throw this.jdbcExceptionTranslator.translate(
-								"Hibernate flushing: " + jdbcEx.getMessage(), jdbcEx.getSQL(), jdbcEx.getSQLException());
-					}
-					throw SessionFactoryUtils.convertHibernateAccessException(ex);
+					throw translateException(ex);
 				}
 			}
 		}
 	}
 
+	private DataAccessException translateException(HibernateException ex) {
+		if (this.jdbcExceptionTranslator != null && ex instanceof JDBCException) {
+			JDBCException jdbcEx = (JDBCException) ex;
+			return this.jdbcExceptionTranslator.translate(
+					"Hibernate flushing: " + jdbcEx.getMessage(), jdbcEx.getSQL(), jdbcEx.getSQLException());
+		}
+		return SessionFactoryUtils.convertHibernateAccessException(ex);
+	}
+
+	@Override
 	public void beforeCompletion() {
 		if (this.jtaTransaction != null) {
 			// Typically in case of a suspended JTA transaction:
@@ -200,36 +220,46 @@ class SpringSessionSynchronization implements TransactionSynchronization, Ordere
 		}
 	}
 
+	@Override
 	public void afterCommit() {
 	}
 
+	@Override
 	public void afterCompletion(int status) {
-		if (!this.hibernateTransactionCompletion || !this.newSession) {
-			// No Hibernate TransactionManagerLookup: apply afterTransactionCompletion callback.
-			// Always perform explicit afterTransactionCompletion callback for pre-bound Session,
-			// even with Hibernate TransactionManagerLookup (which only applies to new Sessions).
-			Session session = this.sessionHolder.getSession();
-			// Provide correct transaction status for releasing the Session's cache locks,
-			// if possible. Else, closing will release all cache locks assuming a rollback.
-			if (session instanceof SessionImplementor) {
-				((SessionImplementor) session).afterTransactionCompletion(status == STATUS_COMMITTED, null);
+		try {
+			if (!this.hibernateTransactionCompletion || !this.newSession) {
+				// No Hibernate TransactionManagerLookup: apply afterTransactionCompletion callback.
+				// Always perform explicit afterTransactionCompletion callback for pre-bound Session,
+				// even with Hibernate TransactionManagerLookup (which only applies to new Sessions).
+				Session session = this.sessionHolder.getSession();
+				// Provide correct transaction status for releasing the Session's cache locks,
+				// if possible. Else, closing will release all cache locks assuming a rollback.
+				try {
+					if (session instanceof SessionImplementor) {
+						((SessionImplementor) session).afterTransactionCompletion(status == STATUS_COMMITTED, null);
+					}
+				}
+				finally {
+					// Close the Hibernate Session here if necessary
+					// (closed in beforeCompletion in case of TransactionManagerLookup).
+					if (this.newSession) {
+						SessionFactoryUtils.closeSessionOrRegisterDeferredClose(session, this.sessionFactory);
+					}
+					else if (!this.hibernateTransactionCompletion) {
+						session.disconnect();
+					}
+				}
 			}
-			// Close the Hibernate Session here if necessary
-			// (closed in beforeCompletion in case of TransactionManagerLookup).
-			if (this.newSession) {
-				SessionFactoryUtils.closeSessionOrRegisterDeferredClose(session, this.sessionFactory);
-			}
-			else if (!this.hibernateTransactionCompletion) {
-				session.disconnect();
+			if (!this.newSession && status != STATUS_COMMITTED) {
+				// Clear all pending inserts/updates/deletes in the Session.
+				// Necessary for pre-bound Sessions, to avoid inconsistent state.
+				this.sessionHolder.getSession().clear();
 			}
 		}
-		if (!this.newSession && status != STATUS_COMMITTED) {
-			// Clear all pending inserts/updates/deletes in the Session.
-			// Necessary for pre-bound Sessions, to avoid inconsistent state.
-			this.sessionHolder.getSession().clear();
-		}
-		if (this.sessionHolder.doesNotHoldNonDefaultSession()) {
-			this.sessionHolder.setSynchronizedWithTransaction(false);
+		finally {
+			if (this.sessionHolder.doesNotHoldNonDefaultSession()) {
+				this.sessionHolder.setSynchronizedWithTransaction(false);
+			}
 		}
 	}
 

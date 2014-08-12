@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.web.context.request;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
-
 import org.springframework.ui.ModelMap;
 
 /**
@@ -31,7 +30,7 @@ import org.springframework.ui.ModelMap;
  * @see org.apache.log4j.NDC#push(String)
  * @see org.apache.log4j.NDC#pop()
  */
-public class Log4jNestedDiagnosticContextInterceptor implements WebRequestInterceptor {
+public class Log4jNestedDiagnosticContextInterceptor implements AsyncWebRequestInterceptor {
 
 	/** Logger available to subclasses */
 	protected final Logger log4jLogger = Logger.getLogger(getClass());
@@ -59,13 +58,14 @@ public class Log4jNestedDiagnosticContextInterceptor implements WebRequestInterc
 	/**
 	 * Adds a message the Log4J NDC before the request is processed.
 	 */
+	@Override
 	public void preHandle(WebRequest request) throws Exception {
 		NDC.push(getNestedDiagnosticContextMessage(request));
 	}
 
 	/**
 	 * Determine the message to be pushed onto the Log4J nested diagnostic context.
-	 * <p>Default is the request object's <code>getDescription</code> result.
+	 * <p>Default is the request object's {@code getDescription} result.
 	 * @param request current HTTP request
 	 * @return the message to be pushed onto the Log4J NDC
 	 * @see WebRequest#getDescription
@@ -75,13 +75,27 @@ public class Log4jNestedDiagnosticContextInterceptor implements WebRequestInterc
 		return request.getDescription(isIncludeClientInfo());
 	}
 
+	@Override
 	public void postHandle(WebRequest request, ModelMap model) throws Exception {
 	}
 
 	/**
 	 * Removes the log message from the Log4J NDC after the request is processed.
 	 */
+	@Override
 	public void afterCompletion(WebRequest request, Exception ex) throws Exception {
+		NDC.pop();
+		if (NDC.getDepth() == 0) {
+			NDC.remove();
+		}
+	}
+
+	/**
+	 * Removes the log message from the Log4J NDC when the processing thread is
+	 * exited after the start of asynchronous request handling.
+	 */
+	@Override
+	public void afterConcurrentHandlingStarted(WebRequest request) {
 		NDC.pop();
 		if (NDC.getDepth() == 0) {
 			NDC.remove();

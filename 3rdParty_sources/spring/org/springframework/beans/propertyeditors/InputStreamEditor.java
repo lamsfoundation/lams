@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.beans.propertyeditors;
 
 import java.beans.PropertyEditorSupport;
@@ -25,9 +24,9 @@ import org.springframework.core.io.ResourceEditor;
 import org.springframework.util.Assert;
 
 /**
- * One-way PropertyEditor, which can convert from a text string to a
- * <code>java.io.InputStream</code>, allowing InputStream properties
- * to be set directly as a text string.
+ * One-way PropertyEditor which can convert from a text String to a
+ * {@code java.io.InputStream}, interpreting the given String
+ * as Spring resource location (e.g. a URL String).
  *
  * <p>Supports Spring-style URL notation: any fully qualified standard URL
  * ("file:", "http:", etc) and Spring's special "classpath:" pseudo-URL.
@@ -66,6 +65,7 @@ public class InputStreamEditor extends PropertyEditorSupport {
 	}
 
 
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		this.resourceEditor.setAsText(text);
 		Resource resource = (Resource) this.resourceEditor.getValue();
@@ -79,9 +79,10 @@ public class InputStreamEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * This implementation returns <code>null</code> to indicate that
+	 * This implementation returns {@code null} to indicate that
 	 * there is no appropriate text representation.
 	 */
+	@Override
 	public String getAsText() {
 		return null;
 	}

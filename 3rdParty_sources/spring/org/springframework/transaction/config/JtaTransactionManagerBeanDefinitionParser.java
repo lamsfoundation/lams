@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Parser for the &lt;tx:jta-transaction-manager/&gt; element,
- * autodetecting BEA WebLogic, IBM WebSphere and Oracle OC4J.
+ * autodetecting BEA WebLogic and IBM WebSphere.
  *
  * @author Juergen Hoeller
  * @author Christian Dupuis
@@ -39,14 +39,8 @@ public class JtaTransactionManagerBeanDefinitionParser extends AbstractSingleBea
 	private static final String WEBSPHERE_TRANSACTION_MANAGER_CLASS_NAME =
 			"org.springframework.transaction.jta.WebSphereUowTransactionManager";
 
-	private static final String OC4J_TRANSACTION_MANAGER_CLASS_NAME =
-			"org.springframework.transaction.jta.OC4JJtaTransactionManager";
-
 	private static final String JTA_TRANSACTION_MANAGER_CLASS_NAME =
 			"org.springframework.transaction.jta.JtaTransactionManager";
-
-	public static final String DEFAULT_TRANSACTION_MANAGER_BEAN_NAME =
-			AnnotationDrivenBeanDefinitionParser.DEFAULT_TRANSACTION_MANAGER_BEAN_NAME;
 
 
 	private static final boolean weblogicPresent = ClassUtils.isPresent(
@@ -55,10 +49,8 @@ public class JtaTransactionManagerBeanDefinitionParser extends AbstractSingleBea
 	private static final boolean webspherePresent = ClassUtils.isPresent(
 			"com.ibm.wsspi.uow.UOWManager", JtaTransactionManagerBeanDefinitionParser.class.getClassLoader());
 
-	private static final boolean oc4jPresent = ClassUtils.isPresent(
-			"oracle.j2ee.transaction.OC4JTransactionManager", JtaTransactionManagerBeanDefinitionParser.class.getClassLoader());
 
-
+	@Override
 	protected String getBeanClassName(Element element) {
 		if (weblogicPresent) {
 			return WEBLOGIC_JTA_TRANSACTION_MANAGER_CLASS_NAME;
@@ -66,16 +58,14 @@ public class JtaTransactionManagerBeanDefinitionParser extends AbstractSingleBea
 		else if (webspherePresent) {
 			return WEBSPHERE_TRANSACTION_MANAGER_CLASS_NAME;
 		}
-		else if (oc4jPresent) {
-			return OC4J_TRANSACTION_MANAGER_CLASS_NAME;
-		}
 		else {
 			return JTA_TRANSACTION_MANAGER_CLASS_NAME;
 		}
 	}
 
+	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
-		return DEFAULT_TRANSACTION_MANAGER_BEAN_NAME;
+		return TxNamespaceHandler.DEFAULT_TRANSACTION_MANAGER_BEAN_NAME;
 	}
 
 }

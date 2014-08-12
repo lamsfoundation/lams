@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.weaving.AspectJWeavingEnabler;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -39,8 +40,6 @@ class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	private static final String ASPECTJ_WEAVING_ATTRIBUTE = "aspectj-weaving";
 
-	private static final String ASPECTJ_AOP_XML_RESOURCE = "META-INF/aop.xml";
-
 	private static final String DEFAULT_LOAD_TIME_WEAVER_CLASS_NAME =
 			"org.springframework.context.weaving.DefaultContextLoadTimeWeaver";
 
@@ -48,6 +47,7 @@ class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 			"org.springframework.context.weaving.AspectJWeavingEnabler";
 
 
+	@Override
 	protected String getBeanClassName(Element element) {
 		if (element.hasAttribute(WEAVER_CLASS_ATTRIBUTE)) {
 			return element.getAttribute(WEAVER_CLASS_ATTRIBUTE);
@@ -55,10 +55,12 @@ class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		return DEFAULT_LOAD_TIME_WEAVER_CLASS_NAME;
 	}
 
+	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
 		return ConfigurableApplicationContext.LOAD_TIME_WEAVER_BEAN_NAME;
 	}
 
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
@@ -83,7 +85,7 @@ class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		else {
 			// Determine default...
 			ClassLoader cl = parserContext.getReaderContext().getResourceLoader().getClassLoader();
-			return (cl.getResource(ASPECTJ_AOP_XML_RESOURCE) != null);
+			return (cl.getResource(AspectJWeavingEnabler.ASPECTJ_AOP_XML_RESOURCE) != null);
 		}
 	}
 

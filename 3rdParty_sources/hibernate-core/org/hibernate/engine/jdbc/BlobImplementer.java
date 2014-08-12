@@ -29,4 +29,10 @@ package org.hibernate.engine.jdbc;
  * @author Steve Ebersole
  */
 public interface BlobImplementer {
+	/**
+	 * Gets access to the data underlying this BLOB.
+	 *
+	 * @return Access to the underlying data.
+	 */
+	public BinaryStream getUnderlyingStream();
 }

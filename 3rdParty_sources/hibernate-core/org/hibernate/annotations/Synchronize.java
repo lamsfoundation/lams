@@ -23,17 +23,17 @@
  */
 package org.hibernate.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Ensures that auto-flush happens correctly and that queries against the derived 
  * entity do not return stale data.
  * 
- * Mostly used with Subselect.
+ * Mostly used with {@link Subselect}.
  * 
  * @author Sharath Reddy
  */
@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Synchronize {
 	/**
-	 * Table names
+	 * Table names.
 	 */
-	String [] value();
+	String[] value();
 }

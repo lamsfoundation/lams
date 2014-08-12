@@ -22,20 +22,26 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
-
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Parameter (basically key/value pattern)
+ * Generic parameter (basically a key/value combination) used to parametrize other annotations.
  *
  * @author Emmanuel Bernard
  */
 @Target({})
 @Retention(RUNTIME)
 public @interface Parameter {
+	/**
+	 * The parameter name.
+	 */
 	String name();
 
+	/**
+	 * The parameter value.
+	 */
 	String value();
 }

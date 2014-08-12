@@ -55,16 +55,18 @@ class MBeanServerBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			"com.ibm.websphere.management.AdminServiceFactory", MBeanServerBeanDefinitionParser.class.getClassLoader());
 
 
+	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
 		String id = element.getAttribute(ID_ATTRIBUTE);
 		return (StringUtils.hasText(id) ? id : MBEAN_SERVER_BEAN_NAME);
 	}
 
+	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		String agentId = element.getAttribute(AGENT_ID_ATTRIBUTE);
 		if (StringUtils.hasText(agentId)) {
 			RootBeanDefinition bd = new RootBeanDefinition(MBeanServerFactoryBean.class);
-			bd.getPropertyValues().addPropertyValue("agentId", agentId);
+			bd.getPropertyValues().add("agentId", agentId);
 			return bd;
 		}
 		AbstractBeanDefinition specialServer = findServerForSpecialEnvironment();
@@ -72,7 +74,7 @@ class MBeanServerBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			return specialServer;
 		}
 		RootBeanDefinition bd = new RootBeanDefinition(MBeanServerFactoryBean.class);
-		bd.getPropertyValues().addPropertyValue("locateExistingServerIfPossible", Boolean.TRUE);
+		bd.getPropertyValues().add("locateExistingServerIfPossible", Boolean.TRUE);
 
 		// Mark as infrastructure bean and attach source location.
 		bd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -83,7 +85,7 @@ class MBeanServerBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	static AbstractBeanDefinition findServerForSpecialEnvironment() {
 		if (weblogicPresent) {
 			RootBeanDefinition bd = new RootBeanDefinition(JndiObjectFactoryBean.class);
-			bd.getPropertyValues().addPropertyValue("jndiName", "java:comp/env/jmx/runtime");
+			bd.getPropertyValues().add("jndiName", "java:comp/env/jmx/runtime");
 			return bd;
 		}
 		else if (webspherePresent) {

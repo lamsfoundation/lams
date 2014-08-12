@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,20 @@
 package org.springframework.scheduling.quartz;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.StatefulJob;
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -36,6 +41,7 @@ import org.springframework.beans.support.ArgumentConvertingMethodInvoker;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} that exposes a
@@ -61,6 +67,9 @@ import org.springframework.util.MethodInvoker;
  * You need to implement your own Quartz Job as a thin wrapper for each case
  * where you want a persistent job to delegate to a specific service method.
  *
+ * <p>Compatible with Quartz 1.8 as well as Quartz 2.0-2.2, as of Spring 4.0.
+ * <b>Note:</b> Quartz 1.x support is deprecated - please upgrade to Quartz 2.0+.
+ *
  * @author Juergen Hoeller
  * @author Alef Arendsen
  * @since 18.02.2004
@@ -70,7 +79,30 @@ import org.springframework.util.MethodInvoker;
  * @see #setConcurrent
  */
 public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethodInvoker
-    implements FactoryBean, BeanNameAware, BeanClassLoaderAware, BeanFactoryAware, InitializingBean {
+		implements FactoryBean<JobDetail>, BeanNameAware, BeanClassLoaderAware, BeanFactoryAware, InitializingBean {
+
+	private static Class<?> jobDetailImplClass;
+
+	private static Method setResultMethod;
+
+	static {
+		try {
+			jobDetailImplClass = ClassUtils.forName("org.quartz.impl.JobDetailImpl",
+					MethodInvokingJobDetailFactoryBean.class.getClassLoader());
+		}
+		catch (ClassNotFoundException ex) {
+			jobDetailImplClass = null;
+		}
+		try {
+			Class<?> jobExecutionContextClass = ClassUtils.forName("org.quartz.JobExecutionContext",
+					MethodInvokingJobDetailFactoryBean.class.getClassLoader());
+			setResultMethod = jobExecutionContextClass.getMethod("setResult", Object.class);
+		}
+		catch (Exception ex) {
+			throw new IllegalStateException("Incompatible Quartz API: " + ex);
+		}
+	}
+
 
 	private String name;
 
@@ -109,13 +141,13 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 	public void setGroup(String group) {
 		this.group = group;
 	}
-	
+
 	/**
 	 * Specify whether or not multiple jobs should be run in a concurrent
 	 * fashion. The behavior when one does not want concurrent jobs to be
 	 * executed is realized through adding the {@link StatefulJob} interface.
 	 * More information on stateful versus stateless jobs can be found
-	 * <a href="http://www.opensymphony.com/quartz/tutorial.html#jobsMore">here</a>.
+	 * <a href="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/tutorial-lesson-03">here</a>.
 	 * <p>The default setting is to run jobs concurrently.
 	 */
 	public void setConcurrent(boolean concurrent) {
@@ -141,28 +173,35 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 	 * by the JobListener implementation.
 	 * @see SchedulerFactoryBean#setJobListeners
 	 * @see org.quartz.JobListener#getName
+	 * @deprecated as of Spring 4.0, since it only works on Quartz 1.x
 	 */
-	public void setJobListenerNames(String[] names) {
+	@Deprecated
+	public void setJobListenerNames(String... names) {
 		this.jobListenerNames = names;
 	}
 
+	@Override
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
 	}
 
+	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
 
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
-	protected Class resolveClassName(String className) throws ClassNotFoundException {
+	@Override
+	protected Class<?> resolveClassName(String className) throws ClassNotFoundException {
 		return ClassUtils.forName(className, this.beanClassLoader);
 	}
 
 
+	@Override
 	public void afterPropertiesSet() throws ClassNotFoundException, NoSuchMethodException {
 		prepare();
 
@@ -170,18 +209,35 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 		String name = (this.name != null ? this.name : this.beanName);
 
 		// Consider the concurrent flag to choose between stateful and stateless job.
-		Class jobClass = (this.concurrent ? (Class) MethodInvokingJob.class : StatefulMethodInvokingJob.class);
+		Class<?> jobClass = (this.concurrent ? MethodInvokingJob.class : StatefulMethodInvokingJob.class);
 
 		// Build JobDetail instance.
-		this.jobDetail = new JobDetail(name, this.group, jobClass);
-		this.jobDetail.getJobDataMap().put("methodInvoker", this);
-		this.jobDetail.setVolatility(true);
-		this.jobDetail.setDurability(true);
+		if (jobDetailImplClass != null) {
+			// Using Quartz 2.0 JobDetailImpl class...
+			this.jobDetail = (JobDetail) BeanUtils.instantiate(jobDetailImplClass);
+			BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this.jobDetail);
+			bw.setPropertyValue("name", name);
+			bw.setPropertyValue("group", this.group);
+			bw.setPropertyValue("jobClass", jobClass);
+			bw.setPropertyValue("durability", true);
+			((JobDataMap) bw.getPropertyValue("jobDataMap")).put("methodInvoker", this);
+		}
+		else {
+			// Using Quartz 1.x JobDetail class...
+			this.jobDetail = new JobDetail(name, this.group, jobClass);
+			this.jobDetail.setVolatility(true);
+			this.jobDetail.setDurability(true);
+			this.jobDetail.getJobDataMap().put("methodInvoker", this);
+		}
 
 		// Register job listener names.
 		if (this.jobListenerNames != null) {
-			for (int i = 0; i < this.jobListenerNames.length; i++) {
-				this.jobDetail.addJobListener(this.jobListenerNames[i]);
+			for (String jobListenerName : this.jobListenerNames) {
+				if (jobDetailImplClass != null) {
+					throw new IllegalStateException("Non-global JobListeners not supported on Quartz 2 - " +
+							"manually register a Matcher against the Quartz ListenerManager instead");
+				}
+				this.jobDetail.addJobListener(jobListenerName);
 			}
 		}
 
@@ -200,8 +256,9 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 	/**
 	 * Overridden to support the {@link #setTargetBeanName "targetBeanName"} feature.
 	 */
-	public Class getTargetClass() {
-		Class targetClass = super.getTargetClass();
+	@Override
+	public Class<?> getTargetClass() {
+		Class<?> targetClass = super.getTargetClass();
 		if (targetClass == null && this.targetBeanName != null) {
 			Assert.state(this.beanFactory != null, "BeanFactory must be set when using 'targetBeanName'");
 			targetClass = this.beanFactory.getType(this.targetBeanName);
@@ -212,6 +269,7 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 	/**
 	 * Overridden to support the {@link #setTargetBeanName "targetBeanName"} feature.
 	 */
+	@Override
 	public Object getTargetObject() {
 		Object targetObject = super.getTargetObject();
 		if (targetObject == null && this.targetBeanName != null) {
@@ -222,14 +280,17 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 	}
 
 
-	public Object getObject() {
+	@Override
+	public JobDetail getObject() {
 		return this.jobDetail;
 	}
 
-	public Class getObjectType() {
-		return JobDetail.class;
+	@Override
+	public Class<? extends JobDetail> getObjectType() {
+		return (this.jobDetail != null ? this.jobDetail.getClass() : JobDetail.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -255,9 +316,10 @@ public class MethodInvokingJobDetailFactoryBean extends ArgumentConvertingMethod
 		/**
 		 * Invoke the method via the MethodInvoker.
 		 */
+		@Override
 		protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 			try {
-				this.methodInvoker.invoke();
+				ReflectionUtils.invokeMethod(setResultMethod, context, this.methodInvoker.invoke());
 			}
 			catch (InvocationTargetException ex) {
 				if (ex.getTargetException() instanceof JobExecutionException) {

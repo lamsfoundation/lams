@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package org.springframework.orm.jpa.vendor;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
-
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
 
@@ -31,16 +30,13 @@ import org.springframework.orm.jpa.JpaDialect;
 
 /**
  * {@link org.springframework.orm.jpa.JpaVendorAdapter} implementation for Eclipse
- * Persistence Services (EclipseLink). Developed and tested against EclipseLink 1.0.
+ * Persistence Services (EclipseLink). Developed and tested against EclipseLink 2.4.
  *
  * <p>Exposes EclipseLink's persistence provider and EntityManager extension interface,
  * and supports {@link AbstractJpaVendorAdapter}'s common configuration settings.
  *
- * <p>This class is very analogous to {@link TopLinkJpaVendorAdapter}, since
- * EclipseLink is effectively the next generation of the TopLink product.
- * Thanks to Mike Keith for the original EclipseLink support prototype!
- *
  * @author Juergen Hoeller
+ * @author Thomas Risberg
  * @since 2.5.2
  * @see org.eclipse.persistence.jpa.PersistenceProvider
  * @see org.eclipse.persistence.jpa.JpaEntityManager
@@ -52,35 +48,33 @@ public class EclipseLinkJpaVendorAdapter extends AbstractJpaVendorAdapter {
 	private final JpaDialect jpaDialect = new EclipseLinkJpaDialect();
 
 
+	@Override
 	public PersistenceProvider getPersistenceProvider() {
 		return this.persistenceProvider;
 	}
 
-	public String getPersistenceProviderRootPackage() {
-		return "org.eclipse.persistence";
-	}
-
-	public Map getJpaPropertyMap() {
-		Properties jpaProperties = new Properties();
+	@Override
+	public Map<String, Object> getJpaPropertyMap() {
+		Map<String, Object> jpaProperties = new HashMap<String, Object>();
 
 		if (getDatabasePlatform() != null) {
-			jpaProperties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, getDatabasePlatform());
+			jpaProperties.put(PersistenceUnitProperties.TARGET_DATABASE, getDatabasePlatform());
 		}
 		else if (getDatabase() != null) {
 			String targetDatabase = determineTargetDatabaseName(getDatabase());
 			if (targetDatabase != null) {
-				jpaProperties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, targetDatabase);
+				jpaProperties.put(PersistenceUnitProperties.TARGET_DATABASE, targetDatabase);
 			}
 		}
 
 		if (isGenerateDdl()) {
-			jpaProperties.setProperty(PersistenceUnitProperties.DDL_GENERATION,
+			jpaProperties.put(PersistenceUnitProperties.DDL_GENERATION,
 					PersistenceUnitProperties.CREATE_ONLY);
-			jpaProperties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
+			jpaProperties.put(PersistenceUnitProperties.DDL_GENERATION_MODE,
 					PersistenceUnitProperties.DDL_DATABASE_GENERATION);
 		}
 		if (isShowSql()) {
-			jpaProperties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Level.FINE.toString());
+			jpaProperties.put(PersistenceUnitProperties.LOGGING_LEVEL, Level.FINE.toString());
 		}
 
 		return jpaProperties;
@@ -89,7 +83,7 @@ public class EclipseLinkJpaVendorAdapter extends AbstractJpaVendorAdapter {
 	/**
 	 * Determine the EclipseLink target database name for the given database.
 	 * @param database the specified database
-	 * @return the EclipseLink target database name, or <code>null<code> if none found
+	 * @return the EclipseLink target database name, or {@code null} if none found
 	 */
 	protected String determineTargetDatabaseName(Database database) {
 		switch (database) {
@@ -106,10 +100,12 @@ public class EclipseLinkJpaVendorAdapter extends AbstractJpaVendorAdapter {
 		}
 	}
 
+	@Override
 	public JpaDialect getJpaDialect() {
 		return this.jpaDialect;
 	}
 
+	@Override
 	public Class<? extends EntityManager> getEntityManagerInterface() {
 		return JpaEntityManager.class;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import org.springframework.util.ClassUtils;
  * {@link org.springframework.scripting.support.ScriptFactoryPostProcessor};
  * see the latter's javadoc for a configuration example.
  *
+ * <p>Note: Spring 4.0 supports JRuby 1.5 and higher.
+ *
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 2.0
@@ -47,7 +49,7 @@ public class JRubyScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 
 	private final String scriptSourceLocator;
 
-	private final Class[] scriptInterfaces;
+	private final Class<?>[] scriptInterfaces;
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -59,7 +61,7 @@ public class JRubyScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	 * @param scriptInterfaces the Java interfaces that the scripted object
 	 * is supposed to implement
 	 */
-	public JRubyScriptFactory(String scriptSourceLocator, Class[] scriptInterfaces) {
+	public JRubyScriptFactory(String scriptSourceLocator, Class<?>... scriptInterfaces) {
 		Assert.hasText(scriptSourceLocator, "'scriptSourceLocator' must not be empty");
 		Assert.notEmpty(scriptInterfaces, "'scriptInterfaces' must not be empty");
 		this.scriptSourceLocator = scriptSourceLocator;
@@ -67,22 +69,26 @@ public class JRubyScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	}
 
 
+	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
 
 
+	@Override
 	public String getScriptSourceLocator() {
 		return this.scriptSourceLocator;
 	}
 
-	public Class[] getScriptInterfaces() {
+	@Override
+	public Class<?>[] getScriptInterfaces() {
 		return this.scriptInterfaces;
 	}
 
 	/**
 	 * JRuby scripts do require a config interface.
 	 */
+	@Override
 	public boolean requiresConfigInterface() {
 		return true;
 	}
@@ -91,7 +97,8 @@ public class JRubyScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	 * Load and parse the JRuby script via JRubyScriptUtils.
 	 * @see JRubyScriptUtils#createJRubyObject(String, Class[], ClassLoader)
 	 */
-	public Object getScriptedObject(ScriptSource scriptSource, Class[] actualInterfaces)
+	@Override
+	public Object getScriptedObject(ScriptSource scriptSource, Class<?>... actualInterfaces)
 			throws IOException, ScriptCompilationException {
 		try {
 			return JRubyScriptUtils.createJRubyObject(
@@ -108,17 +115,20 @@ public class JRubyScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 		}
 	}
 
-	public Class getScriptedObjectType(ScriptSource scriptSource)
+	@Override
+	public Class<?> getScriptedObjectType(ScriptSource scriptSource)
 			throws IOException, ScriptCompilationException {
 
 		return null;
 	}
 
+	@Override
 	public boolean requiresScriptedObjectRefresh(ScriptSource scriptSource) {
 		return scriptSource.isModified();
 	}
 
 
+	@Override
 	public String toString() {
 		return "JRubyScriptFactory: script source locator [" + this.scriptSourceLocator + "]";
 	}

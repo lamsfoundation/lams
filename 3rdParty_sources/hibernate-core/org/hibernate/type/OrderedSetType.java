@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
-
 import java.util.LinkedHashSet;
 
 /**
@@ -38,14 +37,21 @@ public class OrderedSetType extends SetType {
 	 * @param role The collection role name.
 	 * @param propertyRef The property ref name.
 	 * @param isEmbeddedInXML Is this collection to embed itself in xml
+	 *
+	 * @deprecated Use {@link #OrderedSetType(org.hibernate.type.TypeFactory.TypeScope, String, String)}
+	 * instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
 	 */
+	@Deprecated
 	public OrderedSetType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	public OrderedSetType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
+		super( typeScope, role, propertyRef );
+	}
+
+	@Override
 	public Object instantiate(int anticipatedSize) {
 		return anticipatedSize > 0
 				? new LinkedHashSet( anticipatedSize )

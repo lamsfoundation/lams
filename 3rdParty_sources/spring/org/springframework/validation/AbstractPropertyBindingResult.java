@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.ConfigurablePropertyAccessor;
 import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.support.ConvertingPropertyEditorAdapter;
+import org.springframework.util.Assert;
 
 /**
  * Abstract base class for {@link BindingResult} implementations that work with
@@ -35,7 +39,11 @@ import org.springframework.beans.PropertyEditorRegistry;
  * @see org.springframework.beans.PropertyAccessor
  * @see org.springframework.beans.ConfigurablePropertyAccessor
  */
+@SuppressWarnings("serial")
 public abstract class AbstractPropertyBindingResult extends AbstractBindingResult {
+
+	private ConversionService conversionService;
+
 
 	/**
 	 * Create a new AbstractPropertyBindingResult instance.
@@ -47,10 +55,19 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 	}
 
 
+	public void initConversion(ConversionService conversionService) {
+		Assert.notNull(conversionService, "ConversionService must not be null");
+		this.conversionService = conversionService;
+		if (getTarget() != null) {
+			getPropertyAccessor().setConversionService(conversionService);
+		}
+	}
+
 	/**
 	 * Returns the underlying PropertyAccessor.
 	 * @see #getPropertyAccessor()
 	 */
+	@Override
 	public PropertyEditorRegistry getPropertyEditorRegistry() {
 		return getPropertyAccessor();
 	}
@@ -59,6 +76,7 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 	 * Returns the canonical property name.
 	 * @see org.springframework.beans.PropertyAccessorUtils#canonicalPropertyName
 	 */
+	@Override
 	protected String canonicalFieldName(String field) {
 		return PropertyAccessorUtils.canonicalPropertyName(field);
 	}
@@ -67,7 +85,8 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 	 * Determines the field type from the property type.
 	 * @see #getPropertyAccessor()
 	 */
-	public Class getFieldType(String field) {
+	@Override
+	public Class<?> getFieldType(String field) {
 		return getPropertyAccessor().getPropertyType(fixedField(field));
 	}
 
@@ -75,6 +94,7 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 	 * Fetches the field value from the PropertyAccessor.
 	 * @see #getPropertyAccessor()
 	 */
+	@Override
 	protected Object getActualFieldValue(String field) {
 		return getPropertyAccessor().getPropertyValue(field);
 	}
@@ -83,8 +103,11 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 	 * Formats the field value based on registered PropertyEditors.
 	 * @see #getCustomEditor
 	 */
+	@Override
 	protected Object formatFieldValue(String field, Object value) {
-		PropertyEditor customEditor = getCustomEditor(field);
+		String fixedField = fixedField(field);
+		// Try custom editor...
+		PropertyEditor customEditor = getCustomEditor(fixedField);
 		if (customEditor != null) {
 			customEditor.setValue(value);
 			String textValue = customEditor.getAsText();
@@ -94,20 +117,56 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 				return textValue;
 			}
 		}
+		if (this.conversionService != null) {
+			// Try custom converter...
+			TypeDescriptor fieldDesc = getPropertyAccessor().getPropertyTypeDescriptor(fixedField);
+			TypeDescriptor strDesc = TypeDescriptor.valueOf(String.class);
+			if (fieldDesc != null && this.conversionService.canConvert(fieldDesc, strDesc)) {
+				return this.conversionService.convert(value, fieldDesc, strDesc);
+			}
+		}
 		return value;
 	}
 
 	/**
 	 * Retrieve the custom PropertyEditor for the given field, if any.
-	 * @param field the field name
-	 * @return the custom PropertyEditor, or <code>null</code>
+	 * @param fixedField the fully qualified field name
+	 * @return the custom PropertyEditor, or {@code null}
 	 */
-	protected PropertyEditor getCustomEditor(String field) {
-		String fixedField = fixedField(field);
-		Class targetType = getPropertyAccessor().getPropertyType(fixedField);
+	protected PropertyEditor getCustomEditor(String fixedField) {
+		Class<?> targetType = getPropertyAccessor().getPropertyType(fixedField);
 		PropertyEditor editor = getPropertyAccessor().findCustomEditor(targetType, fixedField);
 		if (editor == null) {
 			editor = BeanUtils.findEditorByConvention(targetType);
+		}
+		return editor;
+	}
+
+	/**
+	 * This implementation exposes a PropertyEditor adapter for a Formatter,
+	 * if applicable.
+	 */
+	@Override
+	public PropertyEditor findEditor(String field, Class<?> valueType) {
+		Class<?> valueTypeForLookup = valueType;
+		if (valueTypeForLookup == null) {
+			valueTypeForLookup = getFieldType(field);
+		}
+		PropertyEditor editor = super.findEditor(field, valueTypeForLookup);
+		if (editor == null && this.conversionService != null) {
+			TypeDescriptor td = null;
+			if (field != null) {
+				TypeDescriptor ptd = getPropertyAccessor().getPropertyTypeDescriptor(fixedField(field));
+				if (valueType == null || valueType.isAssignableFrom(ptd.getType())) {
+					td = ptd;
+				}
+			}
+			if (td == null) {
+				td = TypeDescriptor.valueOf(valueTypeForLookup);
+			}
+			if (this.conversionService.canConvert(TypeDescriptor.valueOf(String.class), td)) {
+				editor = new ConvertingPropertyEditorAdapter(this.conversionService, td);
+			}
 		}
 		return editor;
 	}

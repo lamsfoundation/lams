@@ -26,21 +26,21 @@ package org.hibernate.persister.entity;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
-
-import org.dom4j.Node;
 
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.internal.util.compare.EqualsHelper;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.type.AbstractType;
 import org.hibernate.type.Type;
-import org.hibernate.util.ArrayHelper;
-import org.hibernate.util.EqualsHelper;
+
+import org.dom4j.Node;
 
 /**
  * TODO : javadoc
@@ -86,12 +86,8 @@ public class DiscriminatorType extends AbstractType {
 		if ( entityName == null ) {
 			throw new HibernateException( "Unable to resolve discriminator value [" + discriminatorValue + "] to entity name" );
 		}
-		if ( EntityMode.POJO.equals( session.getEntityMode() ) ) {
-			return session.getEntityPersister( entityName, null ).getMappedClass( session.getEntityMode() );
-		}
-		else {
-			return entityName;
-		}
+		final EntityPersister entityPersister = session.getEntityPersister( entityName, null );
+        return ( EntityMode.POJO == entityPersister.getEntityMode() ) ? entityPersister.getMappedClass() : entityName;
 	}
 
 	public void nullSafeSet(
@@ -108,16 +104,16 @@ public class DiscriminatorType extends AbstractType {
 			Object value,
 			int index,
 			SessionImplementor session) throws HibernateException, SQLException {
-		throw new UnsupportedOperationException(
-				"At the moment this type is not the one actually used to map the discriminator."
-		);
+		String entityName = session.getFactory().getClassMetadata((Class) value).getEntityName();
+		Loadable entityPersister = (Loadable) session.getFactory().getEntityPersister(entityName);
+		underlyingType.nullSafeSet(st, entityPersister.getDiscriminatorValue(), index, session);
 	}
 
 	public String toLoggableString(Object value, SessionFactoryImplementor factory) throws HibernateException {
 		return value == null ? "[null]" : value.toString();
 	}
 
-	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory)
+	public Object deepCopy(Object value, SessionFactoryImplementor factory)
 			throws HibernateException {
 		return value;
 	}
@@ -143,6 +139,16 @@ public class DiscriminatorType extends AbstractType {
 
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
 		return underlyingType.sqlTypes( mapping );
+	}
+
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		return underlyingType.dictatedSizes( mapping );
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		return underlyingType.defaultSizes( mapping );
 	}
 
 	public int getColumnSpan(Mapping mapping) throws MappingException {

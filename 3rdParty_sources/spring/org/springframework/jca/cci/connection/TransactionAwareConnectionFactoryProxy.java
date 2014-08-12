@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import javax.resource.cci.ConnectionFactory;
  *
  * <p>Delegates to {@link ConnectionFactoryUtils} for automatically participating in
  * thread-bound transactions, for example managed by {@link CciLocalTransactionManager}.
- * <code>getConnection</code> calls and <code>close</code> calls on returned Connections
+ * {@code getConnection} calls and {@code close} calls on returned Connections
  * will behave properly within a transaction, i.e. always operate on the transactional
  * Connection. If not within a transaction, normal ConnectionFactory behavior applies.
  *
@@ -61,9 +61,10 @@ import javax.resource.cci.ConnectionFactory;
  * @since 1.2
  * @see javax.resource.cci.ConnectionFactory#getConnection
  * @see javax.resource.cci.Connection#close
- * @see org.springframework.jca.cci.connection.ConnectionFactoryUtils#doGetConnection
- * @see org.springframework.jca.cci.connection.ConnectionFactoryUtils#doReleaseConnection
+ * @see ConnectionFactoryUtils#doGetConnection
+ * @see ConnectionFactoryUtils#doReleaseConnection
  */
+@SuppressWarnings("serial")
 public class TransactionAwareConnectionFactoryProxy extends DelegatingConnectionFactory {
 
 	/**
@@ -89,6 +90,7 @@ public class TransactionAwareConnectionFactoryProxy extends DelegatingConnection
 	 * @return a transactional Connection if any, a new one else
 	 * @see org.springframework.jca.cci.connection.ConnectionFactoryUtils#doGetConnection
 	 */
+	@Override
 	public Connection getConnection() throws ResourceException {
 		Connection con = ConnectionFactoryUtils.doGetConnection(getTargetConnectionFactory());
 		return getTransactionAwareConnectionProxy(con, getTargetConnectionFactory());
@@ -96,17 +98,17 @@ public class TransactionAwareConnectionFactoryProxy extends DelegatingConnection
 
 	/**
 	 * Wrap the given Connection with a proxy that delegates every method call to it
-	 * but delegates <code>close</code> calls to ConnectionFactoryUtils.
+	 * but delegates {@code close} calls to ConnectionFactoryUtils.
 	 * @param target the original Connection to wrap
 	 * @param cf ConnectionFactory that the Connection came from
 	 * @return the wrapped Connection
 	 * @see javax.resource.cci.Connection#close()
-	 * @see org.springframework.jca.cci.connection.ConnectionFactoryUtils#doReleaseConnection
+	 * @see ConnectionFactoryUtils#doReleaseConnection
 	 */
 	protected Connection getTransactionAwareConnectionProxy(Connection target, ConnectionFactory cf) {
 		return (Connection) Proxy.newProxyInstance(
 				Connection.class.getClassLoader(),
-				new Class[] {Connection.class},
+				new Class<?>[] {Connection.class},
 				new TransactionAwareInvocationHandler(target, cf));
 	}
 
@@ -126,16 +128,17 @@ public class TransactionAwareConnectionFactoryProxy extends DelegatingConnection
 			this.connectionFactory = cf;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on Connection interface coming in...
 
 			if (method.getName().equals("equals")) {
 				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				return (proxy == args[0]);
 			}
 			else if (method.getName().equals("hashCode")) {
 				// Use hashCode of Connection proxy.
-				return new Integer(System.identityHashCode(proxy));
+				return System.identityHashCode(proxy);
 			}
 			else if (method.getName().equals("getLocalTransaction")) {
 				if (ConnectionFactoryUtils.isConnectionTransactional(this.target, this.connectionFactory)) {

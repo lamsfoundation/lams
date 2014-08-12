@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,8 @@ import org.springframework.util.Assert;
  * to beans that implement the {@link LoadTimeWeaverAware} interface.
  *
  * <p>{@link org.springframework.context.ApplicationContext Application contexts}
- * will automatically register this with their underlying
- * {@link BeanFactory bean factory}, provided that a default
- * <code>LoadTimeWeaver</code> is actually available.
+ * will automatically register this with their underlying {@link BeanFactory bean factory},
+ * provided that a default {@code LoadTimeWeaver} is actually available.
  *
  * <p>Applications should not use this class directly.
  *
@@ -49,7 +48,7 @@ public class LoadTimeWeaverAwareProcessor implements BeanPostProcessor, BeanFact
 
 
 	/**
-	 * Create a new <code>LoadTimeWeaverAwareProcessor</code> that will
+	 * Create a new {@code LoadTimeWeaverAwareProcessor} that will
 	 * auto-retrieve the {@link LoadTimeWeaver} from the containing
 	 * {@link BeanFactory}, expecting a bean named
 	 * {@link ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME "loadTimeWeaver"}.
@@ -58,31 +57,44 @@ public class LoadTimeWeaverAwareProcessor implements BeanPostProcessor, BeanFact
 	}
 
 	/**
-	 * Create a new <code>LoadTimeWeaverAwareProcessor</code> for the given
+	 * Create a new {@code LoadTimeWeaverAwareProcessor} for the given
 	 * {@link LoadTimeWeaver}.
-	 * <p>If the given <code>loadTimeWeaver</code> is <code>null</code>, then a
-	 * <code>LoadTimeWeaver</code> will be auto-retrieved from the containing
+	 * <p>If the given {@code loadTimeWeaver} is {@code null}, then a
+	 * {@code LoadTimeWeaver} will be auto-retrieved from the containing
 	 * {@link BeanFactory}, expecting a bean named
 	 * {@link ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME "loadTimeWeaver"}.
-	 * @param loadTimeWeaver the specific <code>LoadTimeWeaver</code> that is to be used; can be <code>null</code>
+	 * @param loadTimeWeaver the specific {@code LoadTimeWeaver} that is to be used
 	 */
 	public LoadTimeWeaverAwareProcessor(LoadTimeWeaver loadTimeWeaver) {
 		this.loadTimeWeaver = loadTimeWeaver;
 	}
 
+	/**
+	 * Create a new {@code LoadTimeWeaverAwareProcessor}.
+	 * <p>The {@code LoadTimeWeaver} will be auto-retrieved from
+	 * the given {@link BeanFactory}, expecting a bean named
+	 * {@link ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME "loadTimeWeaver"}.
+	 * @param beanFactory the BeanFactory to retrieve the LoadTimeWeaver from
+	 */
+	public LoadTimeWeaverAwareProcessor(BeanFactory beanFactory) {
+		this.beanFactory = beanFactory;
+	}
 
+
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
 
+	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof LoadTimeWeaverAware) {
 			LoadTimeWeaver ltw = this.loadTimeWeaver;
 			if (ltw == null) {
 				Assert.state(this.beanFactory != null,
 						"BeanFactory required if no LoadTimeWeaver explicitly specified");
-				ltw = (LoadTimeWeaver) this.beanFactory.getBean(
+				ltw = this.beanFactory.getBean(
 						ConfigurableApplicationContext.LOAD_TIME_WEAVER_BEAN_NAME, LoadTimeWeaver.class);
 			}
 			((LoadTimeWeaverAware) bean).setLoadTimeWeaver(ltw);
@@ -90,6 +102,7 @@ public class LoadTimeWeaverAwareProcessor implements BeanPostProcessor, BeanFact
 		return bean;
 	}
 
+	@Override
 	public Object postProcessAfterInitialization(Object bean, String name) {
 		return bean;
 	}

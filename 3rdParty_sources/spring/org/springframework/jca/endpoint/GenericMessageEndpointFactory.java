@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ public class GenericMessageEndpointFactory extends AbstractMessageEndpointFactor
 	 * exposing the message listener's interfaces as well as the
 	 * endpoint SPI through an AOP introduction.
 	 */
+	@Override
 	public MessageEndpoint createEndpoint(XAResource xaResource) throws UnavailableException {
 		GenericMessageEndpoint endpoint = (GenericMessageEndpoint) super.createEndpoint(xaResource);
 		ProxyFactory proxyFactory = new ProxyFactory(this.messageListener);
@@ -81,6 +82,7 @@ public class GenericMessageEndpointFactory extends AbstractMessageEndpointFactor
 	/**
 	 * Creates a concrete generic message endpoint, internal to this factory.
 	 */
+	@Override
 	protected AbstractMessageEndpoint createEndpointInternal() throws UnavailableException {
 		return new GenericMessageEndpoint();
 	}
@@ -92,6 +94,7 @@ public class GenericMessageEndpointFactory extends AbstractMessageEndpointFactor
 	 */
 	private class GenericMessageEndpoint extends AbstractMessageEndpoint implements MethodInterceptor {
 
+		@Override
 		public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 			boolean applyDeliveryCalls = !hasBeforeDeliveryBeenCalled();
 			if (applyDeliveryCalls) {
@@ -131,6 +134,7 @@ public class GenericMessageEndpointFactory extends AbstractMessageEndpointFactor
 			}
 		}
 
+		@Override
 		protected ClassLoader getEndpointClassLoader() {
 			return messageListener.getClass().getClassLoader();
 		}
@@ -138,13 +142,14 @@ public class GenericMessageEndpointFactory extends AbstractMessageEndpointFactor
 
 
 	/**
-	 * Internal exception thrown when a ResourceExeption has been encountered
+	 * Internal exception thrown when a ResourceException has been encountered
 	 * during the endpoint invocation.
 	 * <p>Will only be used if the ResourceAdapter does not invoke the
-	 * endpoint's <code>beforeDelivery</code> and <code>afterDelivery</code>
-	 * directly, leavng it up to the concrete endpoint to apply those -
+	 * endpoint's {@code beforeDelivery} and {@code afterDelivery}
+	 * directly, leaving it up to the concrete endpoint to apply those -
 	 * and to handle any ResourceExceptions thrown from them.
 	 */
+	@SuppressWarnings("serial")
 	public static class InternalResourceException extends RuntimeException {
 
 		protected InternalResourceException(ResourceException cause) {

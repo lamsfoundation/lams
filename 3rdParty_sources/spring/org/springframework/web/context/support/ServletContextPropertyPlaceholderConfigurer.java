@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.web.context.ServletContextAware;
 
 /**
- * Subclass of PropertyPlaceholderConfigurer that resolves placeholders as
- * ServletContext init parameters (that is, <code>web.xml</code> context-param
+ * Subclass of {@link PropertyPlaceholderConfigurer} that resolves placeholders as
+ * ServletContext init parameters (that is, {@code web.xml} context-param
  * entries).
  *
  * <p>Can be combined with "locations" and/or "properties" values in addition
  * to web.xml context-params. Alternatively, can be defined without local
- * properties, to resolve all placeholders as <code>web.xml</code> context-params
+ * properties, to resolve all placeholders as {@code web.xml} context-params
  * (or JVM system properties).
  *
  * <p>If a placeholder could not be resolved against the provided local
@@ -57,7 +57,10 @@ import org.springframework.web.context.ServletContextAware;
  * @see #setSearchContextAttributes
  * @see javax.servlet.ServletContext#getInitParameter(String)
  * @see javax.servlet.ServletContext#getAttribute(String)
+ * @deprecated in Spring 3.1 in favor of {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer}
+ * in conjunction with {@link StandardServletEnvironment}.
  */
+@Deprecated
 public class ServletContextPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer
 		implements ServletContextAware {
 
@@ -89,7 +92,7 @@ public class ServletContextPropertyPlaceholderConfigurer extends PropertyPlaceho
 	 * <p>If turned on, the configurer will look for a ServletContext attribute with
 	 * the same name as the placeholder, and use its stringified value if found.
 	 * Exposure of such ServletContext attributes can be used to dynamically override
-	 * init parameters defined in <code>web.xml</code>, for example in a custom
+	 * init parameters defined in {@code web.xml}, for example in a custom
 	 * context listener.
 	 * @see javax.servlet.ServletContext#getInitParameter(String)
 	 * @see javax.servlet.ServletContext#getAttribute(String)
@@ -105,11 +108,13 @@ public class ServletContextPropertyPlaceholderConfigurer extends PropertyPlaceho
 	 * against the ServletContext: It will effectively behave like a plain
 	 * PropertyPlaceholderConfigurer in such a scenario.
 	 */
+	@Override
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
 
 
+	@Override
 	protected String resolvePlaceholder(String placeholder, Properties props) {
 		String value = null;
 		if (this.contextOverride && this.servletContext != null) {

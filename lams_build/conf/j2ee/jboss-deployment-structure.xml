@@ -20,14 +20,12 @@
       <module name="org.apache.poi" export="true" />
       <module name="org.apache.aspirin" export="true" />
       <module name="com.tacitknowledge.autopatch" export="true" />
-      <module name="org.apache.axis" export="true" /> <!-- depends on: javax.xml.rpc.api,
-      																   javax.wsdl4j.api:1.5 -->
+      <module name="org.apache.axis" export="true" />
       <module name="org.apache.batik" export="true" />
       <module name="net.sf.cglib" export="true" />
       <module name="net.fckeditor" export="true" />
       <module name="com.flagstone" export="true" />
-      <module name="org.apache.commons.beanutils" export="true" /> <!-- depends on: org.apache.commons.logging,
-      																				org.apache.commons.collections -->
+      <module name="org.apache.commons.beanutils" export="true" />
       <module name="org.apache.commons.io" export="true" />
       <module name="org.apache.commons.lang" export="true" />
       <module name="org.apache.commons.codec" export="true" />
@@ -35,7 +33,7 @@
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
-      <module name="org.hibernate" slot="3" export="true" />
+      <module name="org.hibernate" export="true" />
       <module name="org.hibernate.cache" export="true" />
       <module name="org.jboss.cache" export="true" />
       <module name="org.jgroups" export="true" />
@@ -46,20 +44,12 @@
       <module name="org.apache.lucene" slot="2.4" export="true" />
       <module name="org.quartz" export="true" />
       <module name="uk.ac.reload" export="true" />
-      <module name="org.springframework" export="true" /> <!-- depends on: org.apache.xmlcommons -->
-      <module name="org.apache.struts" export="true" /> <!-- depends on: org.antlr,
-      																	 org.apache.oro,
-      																	 javax.servlet.jsp.api,
-      																	 org.apache.commons.validator,
-      																	 org.apache.commons.logging,
-      																	 org.apache.xmlcommons,
-      																	 org.apache.commons.digester -->
-      <module name="org.apache.strutsel" export="true" /> <!-- depends on: org.apache.struts, javax.servlet.jsp.api -->
+      <module name="org.springframework" export="true" />
+      <module name="org.apache.struts" export="true" />
+      <module name="org.apache.strutsel" export="true" />
       <module name="org.tuckey.urlrewrite" export="true" />
       <module name="com.allaire.wddx" export="true" />
-      <module name="com.thoughtworks.xstream" export="true" /> <!-- depends on: nu.xom,
-																				org.xmlpull (xpp),
-																				org.joda.time:2.1 -->
+      <module name="com.thoughtworks.xstream" export="true" />
       <module name="org.lamsfoundation.lams.session" export="true" />
       <module name="org.lamsfoundation.lams.valve" export="true" />
       

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,15 @@ import java.util.Locale;
  *
  * @author Juergen Hoeller
  * @since 1.2
- * @see LocaleContextHolder
- * @see java.util.Locale
+ * @see LocaleContextHolder#getLocale()
+ * @see TimeZoneAwareLocaleContext
  */
 public interface LocaleContext {
 
 	/**
 	 * Return the current Locale, which can be fixed or determined dynamically,
 	 * depending on the implementation strategy.
+	 * @return the current Locale, or {@code null} if no specific Locale associated
 	 */
 	Locale getLocale();
 

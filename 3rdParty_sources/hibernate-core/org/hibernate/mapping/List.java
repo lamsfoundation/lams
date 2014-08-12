@@ -22,11 +22,9 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
-
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.type.CollectionType;
-import org.hibernate.type.TypeFactory;
 
 /**
  * A list mapping has a primary key consisting of the key columns + index column.
@@ -48,7 +46,7 @@ public class List extends IndexedCollection {
 	public CollectionType getDefaultCollectionType() throws MappingException {
 		return getMappings().getTypeResolver()
 				.getTypeFactory()
-				.list( getRole(), getReferencedPropertyName(), isEmbedded() );
+				.list( getRole(), getReferencedPropertyName() );
 	}
 	
 	public Object accept(ValueVisitor visitor) {

@@ -23,7 +23,6 @@
  *
  */
 package org.hibernate.tuple;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;

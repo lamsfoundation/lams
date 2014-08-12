@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -67,7 +66,7 @@ import org.springframework.util.StringUtils;
  * ceo.$0(ref)=secretary          // inject 'secretary' bean as 0th constructor arg
  * ceo.$1=1000000                 // inject value '1000000' at 1st constructor arg
  * </pre>
- * 
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -89,48 +88,42 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	public static final String SEPARATOR = ".";
 
 	/**
-	 * Special key to distinguish <code>owner.(class)=com.myapp.MyClass</code>-
+	 * Special key to distinguish {@code owner.(class)=com.myapp.MyClass}-
 	 */
 	public static final String CLASS_KEY = "(class)";
 
 	/**
-	 * Special key to distinguish <code>owner.class=com.myapp.MyClass</code>.
-	 * Deprecated in favor of .(class)=
-	 */
-	private static final String DEPRECATED_CLASS_KEY = "class";
-
-	/**
-	 * Special key to distinguish <code>owner.(parent)=parentBeanName</code>.
+	 * Special key to distinguish {@code owner.(parent)=parentBeanName}.
 	 */
 	public static final String PARENT_KEY = "(parent)";
 
 	/**
-	 * Special key to distinguish <code>owner.(scope)=prototype</code>.
+	 * Special key to distinguish {@code owner.(scope)=prototype}.
 	 * Default is "true".
 	 */
 	public static final String SCOPE_KEY = "(scope)";
 
 	/**
-	 * Special key to distinguish <code>owner.(singleton)=false</code>.
+	 * Special key to distinguish {@code owner.(singleton)=false}.
 	 * Default is "true".
 	 */
 	public static final String SINGLETON_KEY = "(singleton)";
 
 	/**
-	 * Special key to distinguish <code>owner.(abstract)=true</code>
+	 * Special key to distinguish {@code owner.(abstract)=true}
 	 * Default is "false".
 	 */
 	public static final String ABSTRACT_KEY = "(abstract)";
 
 	/**
-	 * Special key to distinguish <code>owner.(lazy-init)=true</code>
+	 * Special key to distinguish {@code owner.(lazy-init)=true}
 	 * Default is "false".
 	 */
 	public static final String LAZY_INIT_KEY = "(lazy-init)";
 
 	/**
 	 * Property suffix for references to other beans in the current
-	 * BeanFactory: e.g. <code>owner.dog(ref)=fido</code>.
+	 * BeanFactory: e.g. {@code owner.dog(ref)=fido}.
 	 * Whether this is a reference to a singleton or a prototype
 	 * will depend on the definition of the target bean.
 	 */
@@ -172,7 +165,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * class can still override this.
 	 * <p>Strictly speaking, the rule that a default parent setting does
 	 * not apply to a bean definition that carries a class is there for
-	 * backwards compatiblity reasons. It still matches the typical use case.
+	 * backwards compatibility reasons. It still matches the typical use case.
 	 */
 	public void setDefaultParentBean(String defaultParentBean) {
 		this.defaultParentBean = defaultParentBean;
@@ -211,6 +204,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource, String)
 	 */
+	@Override
 	public int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(new EncodedResource(resource), null);
 	}
@@ -219,7 +213,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * Load bean definitions from the specified properties file.
 	 * @param resource the resource descriptor for the properties file
 	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 * (can be empty or <code>null</code>)
+	 * (can be empty or {@code null})
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
@@ -243,7 +237,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * @param encodedResource the resource descriptor for the properties file,
 	 * allowing to specify an encoding to use for parsing the file
 	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 * (can be empty or <code>null</code>)
+	 * (can be empty or {@code null})
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
@@ -289,16 +283,16 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * standard Java internationalization support.
 	 * @param rb the ResourceBundle to load from
 	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 * (can be empty or <code>null</code>)
+	 * (can be empty or {@code null})
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
 	public int registerBeanDefinitions(ResourceBundle rb, String prefix) throws BeanDefinitionStoreException {
 		// Simply create a map and call overloaded method.
-		Map map = new HashMap();
-		Enumeration keys = rb.getKeys();
+		Map<String, Object> map = new HashMap<String, Object>();
+		Enumeration<String> keys = rb.getKeys();
 		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
+			String key = keys.nextElement();
 			map.put(key, rb.getObject(key));
 		}
 		return registerBeanDefinitions(map, prefix);
@@ -315,7 +309,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * @throws BeansException in case of loading or parsing errors
 	 * @see #registerBeanDefinitions(java.util.Map, String, String)
 	 */
-	public int registerBeanDefinitions(Map map) throws BeansException {
+	public int registerBeanDefinitions(Map<?, ?> map) throws BeansException {
 		return registerBeanDefinitions(map, null);
 	}
 
@@ -326,11 +320,11 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * will be strings if coming from a Properties file etc. Property names
 	 * (keys) <b>must</b> be Strings. Class keys must be Strings.
 	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 * (can be empty or <code>null</code>)
+	 * (can be empty or {@code null})
 	 * @return the number of bean definitions found
 	 * @throws BeansException in case of loading or parsing errors
 	 */
-	public int registerBeanDefinitions(Map map, String prefix) throws BeansException {
+	public int registerBeanDefinitions(Map<?, ?> map, String prefix) throws BeansException {
 		return registerBeanDefinitions(map, prefix, "Map " + map);
 	}
 
@@ -341,14 +335,14 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * will be strings if coming from a Properties file etc. Property names
 	 * (keys) <b>must</b> be strings. Class keys must be Strings.
 	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 * (can be empty or <code>null</code>)
+	 * (can be empty or {@code null})
 	 * @param resourceDescription description of the resource that the
 	 * Map came from (for logging purposes)
 	 * @return the number of bean definitions found
 	 * @throws BeansException in case of loading or parsing errors
 	 * @see #registerBeanDefinitions(Map, String)
 	 */
-	public int registerBeanDefinitions(Map map, String prefix, String resourceDescription)
+	public int registerBeanDefinitions(Map<?, ?> map, String prefix, String resourceDescription)
 			throws BeansException {
 
 		if (prefix == null) {
@@ -356,8 +350,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 		}
 		int beanCount = 0;
 
-		for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-			Object key = it.next();
+		for (Object key : map.keySet()) {
 			if (!(key instanceof String)) {
 				throw new IllegalArgumentException("Illegal key [" + key + "]: only Strings allowed");
 			}
@@ -408,7 +401,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	 * Map came from (for logging purposes)
 	 * @throws BeansException if the bean definition could not be parsed or registered
 	 */
-	protected void registerBeanDefinition(String beanName, Map map, String prefix, String resourceDescription)
+	protected void registerBeanDefinition(String beanName, Map<?, ?> map, String prefix, String resourceDescription)
 			throws BeansException {
 
 		String className = null;
@@ -420,12 +413,11 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 		ConstructorArgumentValues cas = new ConstructorArgumentValues();
 		MutablePropertyValues pvs = new MutablePropertyValues();
 
-		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
 			String key = StringUtils.trimWhitespace((String) entry.getKey());
 			if (key.startsWith(prefix + SEPARATOR)) {
 				String property = key.substring(prefix.length() + SEPARATOR.length());
-				if (isClassKey(property)) {
+				if (CLASS_KEY.equals(property)) {
 					className = StringUtils.trimWhitespace((String) entry.getValue());
 				}
 				else if (PARENT_KEY.equals(property)) {
@@ -442,8 +434,8 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 				else if (SINGLETON_KEY.equals(property)) {
 					// Spring 1.2 style
 					String val = StringUtils.trimWhitespace((String) entry.getValue());
-					scope = ((val == null || TRUE_VALUE.equals(val) ?
-							GenericBeanDefinition.SCOPE_SINGLETON : GenericBeanDefinition.SCOPE_PROTOTYPE));
+					scope = ((val == null || TRUE_VALUE.equals(val) ? GenericBeanDefinition.SCOPE_SINGLETON :
+							GenericBeanDefinition.SCOPE_PROTOTYPE));
 				}
 				else if (LAZY_INIT_KEY.equals(property)) {
 					String val = StringUtils.trimWhitespace((String) entry.getValue());
@@ -468,11 +460,11 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 					// It doesn't matter if the referenced bean hasn't yet been registered:
 					// this will ensure that the reference is resolved at runtime.
 					Object val = new RuntimeBeanReference(ref);
-					pvs.addPropertyValue(property, val);
+					pvs.add(property, val);
 				}
-				else{
+				else {
 					// It's a normal bean property.
-					pvs.addPropertyValue(property, readValue(entry));
+					pvs.add(property, readValue(entry));
 				}
 			}
 		}
@@ -507,27 +499,10 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Indicates whether the supplied property matches the class property of
-	 * the bean definition.
-	 */
-	private boolean isClassKey(String property) {
-		if (CLASS_KEY.equals(property)) {
-			return true;
-		}
-		else if (DEPRECATED_CLASS_KEY.equals(property)) {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Use of 'class' property in [" + getClass().getName() + "] is deprecated in favor of '(class)'");
-			}
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Reads the value of the entry. Correctly interprets bean references for
 	 * values that are prefixed with an asterisk.
 	 */
-	private Object readValue(Map.Entry entry) {
+	private Object readValue(Map.Entry<? ,?> entry) {
 		Object val = entry.getValue();
 		if (val instanceof String) {
 			String strVal = (String) val;

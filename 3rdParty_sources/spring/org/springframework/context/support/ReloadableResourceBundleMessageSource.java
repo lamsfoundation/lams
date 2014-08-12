@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,12 +37,16 @@ import org.springframework.util.PropertiesPersister;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link org.springframework.context.MessageSource} implementation that
- * accesses resource bundles using specified basenames. This class uses
- * {@link java.util.Properties} instances as its custom data structure for
- * messages, loading them via a {@link org.springframework.util.PropertiesPersister}
- * strategy: The default strategy is capable of loading properties files
- * with a specific character encoding, if desired.
+ * Spring-specific {@link org.springframework.context.MessageSource} implementation
+ * that accesses resource bundles using specified basenames, participating in the
+ * Spring {@link org.springframework.context.ApplicationContext}'s resource loading.
+ *
+ * <p>In contrast to the JDK-based {@link ResourceBundleMessageSource}, this class uses
+ * {@link java.util.Properties} instances as its custom data structure for messages,
+ * loading them via a {@link org.springframework.util.PropertiesPersister} strategy
+ * from Spring {@link Resource} handles. This strategy is not only capable of
+ * reloading files based on timestamp changes, but also of loading properties files
+ * with a specific character encoding. It will detect XML property files as well.
  *
  * <p>In contrast to {@link ResourceBundleMessageSource}, this class supports
  * reloading of properties files through the {@link #setCacheSeconds "cacheSeconds"}
@@ -90,7 +93,7 @@ import org.springframework.util.StringUtils;
  * @see java.util.ResourceBundle
  */
 public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
-    implements ResourceLoaderAware {
+		implements ResourceLoaderAware {
 
 	private static final String PROPERTIES_SUFFIX = ".properties";
 
@@ -112,13 +115,14 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
 	/** Cache to hold filename lists per Locale */
-	private final Map cachedFilenames = new HashMap();
+	private final Map<String, Map<Locale, List<String>>> cachedFilenames =
+			new HashMap<String, Map<Locale, List<String>>>();
 
 	/** Cache to hold already loaded properties per filename */
-	private final Map cachedProperties = new HashMap();
+	private final Map<String, PropertiesHolder> cachedProperties = new HashMap<String, PropertiesHolder>();
 
-	/** Cache to hold merged loaded properties per basename */
-	private final Map cachedMergedProperties = new HashMap();
+	/** Cache to hold merged loaded properties per locale */
+	private final Map<Locale, PropertiesHolder> cachedMergedProperties = new HashMap<Locale, PropertiesHolder>();
 
 
 	/**
@@ -127,17 +131,15 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * {@link ResourceBundleMessageSource} referring to a Spring resource location:
 	 * e.g. "WEB-INF/messages" for "WEB-INF/messages.properties",
 	 * "WEB-INF/messages_en.properties", etc.
-	 * <p>As of Spring 1.2.2, XML properties files are also supported:
-	 * e.g. "WEB-INF/messages" will find and load "WEB-INF/messages.xml",
-	 * "WEB-INF/messages_en.xml", etc as well. Note that this will only
-	 * work on JDK 1.5+.
+	 * <p>XML properties files are also supported: .g. "WEB-INF/messages" will find
+	 * and load "WEB-INF/messages.xml", "WEB-INF/messages_en.xml", etc as well.
 	 * @param basename the single basename
 	 * @see #setBasenames
 	 * @see org.springframework.core.io.ResourceEditor
 	 * @see java.util.ResourceBundle
 	 */
 	public void setBasename(String basename) {
-		setBasenames(new String[] {basename});
+		setBasenames(basename);
 	}
 
 	/**
@@ -146,19 +148,16 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * {@link ResourceBundleMessageSource} referring to a Spring resource location:
 	 * e.g. "WEB-INF/messages" for "WEB-INF/messages.properties",
 	 * "WEB-INF/messages_en.properties", etc.
-	 * <p>As of Spring 1.2.2, XML properties files are also supported:
-	 * e.g. "WEB-INF/messages" will find and load "WEB-INF/messages.xml",
-	 * "WEB-INF/messages_en.xml", etc as well. Note that this will only
-	 * work on JDK 1.5+.
-	 * <p>The associated resource bundles will be checked sequentially
-	 * when resolving a message code. Note that message definitions in a
-	 * <i>previous</i> resource bundle will override ones in a later bundle,
-	 * due to the sequential lookup.
+	 * <p>XML properties files are also supported: .g. "WEB-INF/messages" will find
+	 * and load "WEB-INF/messages.xml", "WEB-INF/messages_en.xml", etc as well.
+	 * <p>The associated resource bundles will be checked sequentially when resolving
+	 * a message code. Note that message definitions in a <i>previous</i> resource
+	 * bundle will override ones in a later bundle, due to the sequential lookup.
 	 * @param basenames an array of basenames
 	 * @see #setBasename
 	 * @see java.util.ResourceBundle
 	 */
-	public void setBasenames(String[] basenames) {
+	public void setBasenames(String... basenames) {
 		if (basenames != null) {
 			this.basenames = new String[basenames.length];
 			for (int i = 0; i < basenames.length; i++) {
@@ -175,8 +174,8 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	/**
 	 * Set the default charset to use for parsing properties files.
 	 * Used if no file-specific charset is specified for a file.
-	 * <p>Default is none, using the <code>java.util.Properties</code>
-	 * default encoding.
+	 * <p>Default is none, using the {@code java.util.Properties}
+	 * default encoding: ISO-8859-1.
 	 * <p>Only applies to classic properties files, not to XML files.
 	 * @param defaultEncoding the default charset
 	 * @see #setFileEncodings
@@ -206,10 +205,9 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * fallback will be the default file (e.g. "messages.properties" for
 	 * basename "messages").
 	 * <p>Falling back to the system Locale is the default behavior of
-	 * <code>java.util.ResourceBundle</code>. However, this is often not
-	 * desirable in an application server environment, where the system Locale
-	 * is not relevant to the application at all: Set this flag to "false"
-	 * in such a scenario.
+	 * {@code java.util.ResourceBundle}. However, this is often not desirable
+	 * in an application server environment, where the system Locale is not relevant
+	 * to the application at all: Set this flag to "false" in such a scenario.
 	 */
 	public void setFallbackToSystemLocale(boolean fallbackToSystemLocale) {
 		this.fallbackToSystemLocale = fallbackToSystemLocale;
@@ -219,7 +217,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * Set the number of seconds to cache loaded properties files.
 	 * <ul>
 	 * <li>Default is "-1", indicating to cache forever (just like
-	 * <code>java.util.ResourceBundle</code>).
+	 * {@code java.util.ResourceBundle}).
 	 * <li>A positive number will cache loaded properties files for the given
 	 * number of seconds. This is essentially the interval between refresh checks.
 	 * Note that a refresh attempt will first check the last-modified timestamp
@@ -252,6 +250,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * @see org.springframework.core.io.DefaultResourceLoader
 	 * @see org.springframework.context.ResourceLoaderAware
 	 */
+	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = (resourceLoader != null ? resourceLoader : new DefaultResourceLoader());
 	}
@@ -261,6 +260,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * Resolves the given message code as key in the retrieved bundle files,
 	 * returning the value found in the bundle as-is (without MessageFormat parsing).
 	 */
+	@Override
 	protected String resolveCodeWithoutArguments(String code, Locale locale) {
 		if (this.cacheMillis < 0) {
 			PropertiesHolder propHolder = getMergedProperties(locale);
@@ -270,10 +270,9 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 			}
 		}
 		else {
-			for (int i = 0; i < this.basenames.length; i++) {
-				List filenames = calculateAllFilenames(this.basenames[i], locale);
-				for (int j = 0; j < filenames.size(); j++) {
-					String filename = (String) filenames.get(j);
+			for (String basename : this.basenames) {
+				List<String> filenames = calculateAllFilenames(basename, locale);
+				for (String filename : filenames) {
 					PropertiesHolder propHolder = getProperties(filename);
 					String result = propHolder.getProperty(code);
 					if (result != null) {
@@ -289,6 +288,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * Resolves the given message code as key in the retrieved bundle files,
 	 * using a cached MessageFormat instance per message code.
 	 */
+	@Override
 	protected MessageFormat resolveCode(String code, Locale locale) {
 		if (this.cacheMillis < 0) {
 			PropertiesHolder propHolder = getMergedProperties(locale);
@@ -298,10 +298,9 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 			}
 		}
 		else {
-			for (int i = 0; i < this.basenames.length; i++) {
-				List filenames = calculateAllFilenames(this.basenames[i], locale);
-				for (int j = 0; j < filenames.size(); j++) {
-					String filename = (String) filenames.get(j);
+			for (String basename : this.basenames) {
+				List<String> filenames = calculateAllFilenames(basename, locale);
+				for (String filename : filenames) {
 					PropertiesHolder propHolder = getProperties(filename);
 					MessageFormat result = propHolder.getMessageFormat(code, locale);
 					if (result != null) {
@@ -324,16 +323,16 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 */
 	protected PropertiesHolder getMergedProperties(Locale locale) {
 		synchronized (this.cachedMergedProperties) {
-			PropertiesHolder mergedHolder = (PropertiesHolder) this.cachedMergedProperties.get(locale);
+			PropertiesHolder mergedHolder = this.cachedMergedProperties.get(locale);
 			if (mergedHolder != null) {
 				return mergedHolder;
 			}
 			Properties mergedProps = new Properties();
 			mergedHolder = new PropertiesHolder(mergedProps, -1);
 			for (int i = this.basenames.length - 1; i >= 0; i--) {
-				List filenames = calculateAllFilenames(this.basenames[i], locale);
+				List<String> filenames = calculateAllFilenames(this.basenames[i], locale);
 				for (int j = filenames.size() - 1; j >= 0; j--) {
-					String filename = (String) filenames.get(j);
+					String filename = filenames.get(j);
 					PropertiesHolder propHolder = getProperties(filename);
 					if (propHolder.getProperties() != null) {
 						mergedProps.putAll(propHolder.getProperties());
@@ -355,21 +354,20 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * @see #setFallbackToSystemLocale
 	 * @see #calculateFilenamesForLocale
 	 */
-	protected List calculateAllFilenames(String basename, Locale locale) {
+	protected List<String> calculateAllFilenames(String basename, Locale locale) {
 		synchronized (this.cachedFilenames) {
-			Map localeMap = (Map) this.cachedFilenames.get(basename);
+			Map<Locale, List<String>> localeMap = this.cachedFilenames.get(basename);
 			if (localeMap != null) {
-				List filenames = (List) localeMap.get(locale);
+				List<String> filenames = localeMap.get(locale);
 				if (filenames != null) {
 					return filenames;
 				}
 			}
-			List filenames = new ArrayList(7);
+			List<String> filenames = new ArrayList<String>(7);
 			filenames.addAll(calculateFilenamesForLocale(basename, locale));
 			if (this.fallbackToSystemLocale && !locale.equals(Locale.getDefault())) {
-				List fallbackFilenames = calculateFilenamesForLocale(basename, Locale.getDefault());
-				for (Iterator it = fallbackFilenames.iterator(); it.hasNext();) {
-					String fallbackFilename = (String) it.next();
+				List<String> fallbackFilenames = calculateFilenamesForLocale(basename, Locale.getDefault());
+				for (String fallbackFilename : fallbackFilenames) {
 					if (!filenames.contains(fallbackFilename)) {
 						// Entry for fallback locale that isn't already in filenames list.
 						filenames.add(fallbackFilename);
@@ -381,7 +379,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 				localeMap.put(locale, filenames);
 			}
 			else {
-				localeMap = new HashMap();
+				localeMap = new HashMap<Locale, List<String>>();
 				localeMap.put(locale, filenames);
 				this.cachedFilenames.put(basename, localeMap);
 			}
@@ -394,28 +392,31 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 * appending language code, country code, and variant code.
 	 * E.g.: basename "messages", Locale "de_AT_oo" -> "messages_de_AT_OO",
 	 * "messages_de_AT", "messages_de".
+	 * <p>Follows the rules defined by {@link java.util.Locale#toString()}.
 	 * @param basename the basename of the bundle
 	 * @param locale the locale
 	 * @return the List of filenames to check
 	 */
-	protected List calculateFilenamesForLocale(String basename, Locale locale) {
-		List result = new ArrayList(3);
+	protected List<String> calculateFilenamesForLocale(String basename, Locale locale) {
+		List<String> result = new ArrayList<String>(3);
 		String language = locale.getLanguage();
 		String country = locale.getCountry();
 		String variant = locale.getVariant();
-		StringBuffer temp = new StringBuffer(basename);
+		StringBuilder temp = new StringBuilder(basename);
 
+		temp.append('_');
 		if (language.length() > 0) {
-			temp.append('_').append(language);
+			temp.append(language);
 			result.add(0, temp.toString());
 		}
 
+		temp.append('_');
 		if (country.length() > 0) {
-			temp.append('_').append(country);
+			temp.append(country);
 			result.add(0, temp.toString());
 		}
 
-		if (variant.length() > 0) {
+		if (variant.length() > 0 && (language.length() > 0 || country.length() > 0)) {
 			temp.append('_').append(variant);
 			result.add(0, temp.toString());
 		}
@@ -432,7 +433,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	 */
 	protected PropertiesHolder getProperties(String filename) {
 		synchronized (this.cachedProperties) {
-			PropertiesHolder propHolder = (PropertiesHolder) this.cachedProperties.get(filename);
+			PropertiesHolder propHolder = this.cachedProperties.get(filename);
 			if (propHolder != null &&
 					(propHolder.getRefreshTimestamp() < 0 ||
 					 propHolder.getRefreshTimestamp() > System.currentTimeMillis() - this.cacheMillis)) {
@@ -445,13 +446,13 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 
 	/**
 	 * Refresh the PropertiesHolder for the given bundle filename.
-	 * The holder can be <code>null</code> if not cached before, or a timed-out cache entry
+	 * The holder can be {@code null} if not cached before, or a timed-out cache entry
 	 * (potentially getting re-validated against the current last-modified timestamp).
 	 * @param filename the bundle filename (basename + Locale)
 	 * @param propHolder the current PropertiesHolder for the bundle
 	 */
 	protected PropertiesHolder refreshProperties(String filename, PropertiesHolder propHolder) {
-		long refreshTimestamp = (this.cacheMillis < 0) ? -1 : System.currentTimeMillis();
+		long refreshTimestamp = (this.cacheMillis < 0 ? -1 : System.currentTimeMillis());
 
 		Resource resource = this.resourceLoader.getResource(filename + PROPERTIES_SUFFIX);
 		if (!resource.exists()) {
@@ -580,6 +581,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 	}
 
 
+	@Override
 	public String toString() {
 		return getClass().getName() + ": basenames=[" + StringUtils.arrayToCommaDelimitedString(this.basenames) + "]";
 	}
@@ -600,7 +602,8 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 		private long refreshTimestamp = -1;
 
 		/** Cache to hold already generated MessageFormats per message code */
-		private final Map cachedMessageFormats = new HashMap();
+		private final Map<String, Map<Locale, MessageFormat>> cachedMessageFormats =
+				new HashMap<String, Map<Locale, MessageFormat>>();
 
 		public PropertiesHolder(Properties properties, long fileTimestamp) {
 			this.properties = properties;
@@ -638,9 +641,9 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 				return null;
 			}
 			synchronized (this.cachedMessageFormats) {
-				Map localeMap = (Map) this.cachedMessageFormats.get(code);
+				Map<Locale, MessageFormat> localeMap = this.cachedMessageFormats.get(code);
 				if (localeMap != null) {
-					MessageFormat result = (MessageFormat) localeMap.get(locale);
+					MessageFormat result = localeMap.get(locale);
 					if (result != null) {
 						return result;
 					}
@@ -648,7 +651,7 @@ public class ReloadableResourceBundleMessageSource extends AbstractMessageSource
 				String msg = this.properties.getProperty(code);
 				if (msg != null) {
 					if (localeMap == null) {
-						localeMap = new HashMap();
+						localeMap = new HashMap<Locale, MessageFormat>();
 						this.cachedMessageFormats.put(code, localeMap);
 					}
 					MessageFormat result = createMessageFormat(msg, locale);

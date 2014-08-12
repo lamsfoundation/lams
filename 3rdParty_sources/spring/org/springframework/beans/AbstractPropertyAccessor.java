@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.beans;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,45 +31,50 @@ import java.util.Map;
  * @see #getPropertyValue
  * @see #setPropertyValue
  */
-public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySupport
-		implements ConfigurablePropertyAccessor {
+public abstract class AbstractPropertyAccessor extends TypeConverterSupport implements ConfigurablePropertyAccessor {
 
 	private boolean extractOldValueForEditor = false;
 
 
+	@Override
 	public void setExtractOldValueForEditor(boolean extractOldValueForEditor) {
 		this.extractOldValueForEditor = extractOldValueForEditor;
 	}
 
+	@Override
 	public boolean isExtractOldValueForEditor() {
 		return this.extractOldValueForEditor;
 	}
 
 
+	@Override
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
 		setPropertyValue(pv.getName(), pv.getValue());
 	}
 
-	public void setPropertyValues(Map map) throws BeansException {
+	@Override
+	public void setPropertyValues(Map<?, ?> map) throws BeansException {
 		setPropertyValues(new MutablePropertyValues(map));
 	}
 
+	@Override
 	public void setPropertyValues(PropertyValues pvs) throws BeansException {
 		setPropertyValues(pvs, false, false);
 	}
 
+	@Override
 	public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown) throws BeansException {
 		setPropertyValues(pvs, ignoreUnknown, false);
 	}
 
+	@Override
 	public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean ignoreInvalid)
 			throws BeansException {
 
-		List propertyAccessExceptions = null;
-		List propertyValues = (pvs instanceof MutablePropertyValues ?
+		List<PropertyAccessException> propertyAccessExceptions = null;
+		List<PropertyValue> propertyValues = (pvs instanceof MutablePropertyValues ?
 				((MutablePropertyValues) pvs).getPropertyValueList() : Arrays.asList(pvs.getPropertyValues()));
-		for (Iterator it = propertyValues.iterator(); it.hasNext();) {
-			PropertyValue pv = (PropertyValue) it.next();
+		for (PropertyValue pv : propertyValues) {
 			try {
 				// This method may throw any BeansException, which won't be caught
 				// here, if there is a critical failure such as no matching field.
@@ -91,7 +95,7 @@ public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySup
 			}
 			catch (PropertyAccessException ex) {
 				if (propertyAccessExceptions == null) {
-					propertyAccessExceptions = new LinkedList();
+					propertyAccessExceptions = new LinkedList<PropertyAccessException>();
 				}
 				propertyAccessExceptions.add(ex);
 			}
@@ -99,19 +103,16 @@ public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySup
 
 		// If we encountered individual exceptions, throw the composite exception.
 		if (propertyAccessExceptions != null) {
-			PropertyAccessException[] paeArray = (PropertyAccessException[])
+			PropertyAccessException[] paeArray =
 					propertyAccessExceptions.toArray(new PropertyAccessException[propertyAccessExceptions.size()]);
 			throw new PropertyBatchUpdateException(paeArray);
 		}
 	}
 
-	public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
-		return convertIfNecessary(value, requiredType, null);
-	}
-
 
 	// Redefined with public visibility.
-	public Class getPropertyType(String propertyPath) {
+	@Override
+	public Class<?> getPropertyType(String propertyPath) {
 		return null;
 	}
 
@@ -124,6 +125,7 @@ public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySup
 	 * @throws PropertyAccessException if the property was valid but the
 	 * accessor method failed
 	 */
+	@Override
 	public abstract Object getPropertyValue(String propertyName) throws BeansException;
 
 	/**
@@ -135,6 +137,7 @@ public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySup
 	 * @throws PropertyAccessException if the property was valid but the
 	 * accessor method failed or a type mismatch occured
 	 */
+	@Override
 	public abstract void setPropertyValue(String propertyName, Object value) throws BeansException;
 
 }

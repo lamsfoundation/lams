@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.core.task.support.ConcurrentExecutorAdapter;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} that creates a simple
@@ -53,7 +51,7 @@ import org.springframework.core.task.support.ConcurrentExecutorAdapter;
  * @see #setPort
  * @see #setContexts
  */
-public class SimpleHttpServerFactoryBean implements FactoryBean, InitializingBean, DisposableBean {
+public class SimpleHttpServerFactoryBean implements FactoryBean<HttpServer>, InitializingBean, DisposableBean {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -116,14 +114,6 @@ public class SimpleHttpServerFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	/**
-	 * Set the Spring TaskExecutor to use for dispatching incoming requests.
-	 * @see com.sun.net.httpserver.HttpServer#setExecutor
-	 */
-	public void setTaskExecutor(TaskExecutor executor) {
-		this.executor = new ConcurrentExecutorAdapter(executor);
-	}
-
-	/**
 	 * Register {@link com.sun.net.httpserver.HttpHandler HttpHandlers}
 	 * for specific context paths.
 	 * @param contexts a Map with context paths as keys and HttpHandler
@@ -153,6 +143,7 @@ public class SimpleHttpServerFactoryBean implements FactoryBean, InitializingBea
 	}
 
 
+	@Override
 	public void afterPropertiesSet() throws IOException {
 		InetSocketAddress address = (this.hostname != null ?
 				new InetSocketAddress(this.hostname, this.port) : new InetSocketAddress(this.port));
@@ -177,18 +168,22 @@ public class SimpleHttpServerFactoryBean implements FactoryBean, InitializingBea
 		this.server.start();
 	}
 
-	public Object getObject() {
+	@Override
+	public HttpServer getObject() {
 		return this.server;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<? extends HttpServer> getObjectType() {
 		return (this.server != null ? this.server.getClass() : HttpServer.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
 
+	@Override
 	public void destroy() {
 		logger.info("Stopping HttpServer");
 		this.server.stop(this.shutdownDelay);

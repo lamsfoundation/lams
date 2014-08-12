@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,15 @@ import org.springframework.util.Assert;
  * @see #getPageList()
  * @see org.springframework.beans.support.MutableSortDefinition
  */
-public class PagedListHolder implements Serializable {
+@SuppressWarnings("serial")
+public class PagedListHolder<E> implements Serializable {
 
 	public static final int DEFAULT_PAGE_SIZE = 10;
 
 	public static final int DEFAULT_MAX_LINKED_PAGES = 10;
 
 
-	private List source;
+	private List<E> source;
 
 	private Date refreshDate;
 
@@ -77,7 +78,7 @@ public class PagedListHolder implements Serializable {
 	 * @see #setSource
 	 */
 	public PagedListHolder() {
-		this(new ArrayList(0));
+		this(new ArrayList<E>(0));
 	}
 
 	/**
@@ -86,7 +87,7 @@ public class PagedListHolder implements Serializable {
 	 * @param source the source List
 	 * @see MutableSortDefinition#setToggleAscendingOnProperty
 	 */
-	public PagedListHolder(List source) {
+	public PagedListHolder(List<E> source) {
 		this(source, new MutableSortDefinition(true));
 	}
 
@@ -95,7 +96,7 @@ public class PagedListHolder implements Serializable {
 	 * @param source the source List
 	 * @param sort the SortDefinition to start with
 	 */
-	public PagedListHolder(List source, SortDefinition sort) {
+	public PagedListHolder(List<E> source, SortDefinition sort) {
 		setSource(source);
 		setSort(sort);
 	}
@@ -104,7 +105,7 @@ public class PagedListHolder implements Serializable {
 	/**
 	 * Set the source list for this holder.
 	 */
-	public void setSource(List source) {
+	public void setSource(List<E> source) {
 		Assert.notNull(source, "Source List must not be null");
 		this.source = source;
 		this.refreshDate = new Date();
@@ -114,7 +115,7 @@ public class PagedListHolder implements Serializable {
 	/**
 	 * Return the source list for this holder.
 	 */
-	public List getSource() {
+	public List<E> getSource() {
 		return this.source;
 	}
 
@@ -268,7 +269,7 @@ public class PagedListHolder implements Serializable {
 	/**
 	 * Return a sub-list representing the current page.
 	 */
-	public List getPageList() {
+	public List<E> getPageList() {
 		return getSource().subList(getFirstElementOnPage(), getLastElementOnPage() + 1);
 	}
 
@@ -288,9 +289,9 @@ public class PagedListHolder implements Serializable {
 
 
 	/**
-	 * Resort the list if necessary, i.e. if the current <code>sort</code> instance
-	 * isn't equal to the backed-up <code>sortUsed</code> instance.
-	 * <p>Calls <code>doSort</code> to trigger actual sorting.
+	 * Resort the list if necessary, i.e. if the current {@code sort} instance
+	 * isn't equal to the backed-up {@code sortUsed} instance.
+	 * <p>Calls {@code doSort} to trigger actual sorting.
 	 * @see #doSort
 	 */
 	public void resort() {
@@ -309,7 +310,7 @@ public class PagedListHolder implements Serializable {
 	 * Can be overridden in subclasses, in particular in case of custom
 	 * extensions to the SortDefinition interface. Is allowed to return
 	 * null, which means that no sort state will be held, triggering
-	 * actual sorting for each <code>resort</code> call.
+	 * actual sorting for each {@code resort} call.
 	 * @param sort the current SortDefinition object
 	 * @return a deep copy of the SortDefinition object
 	 * @see MutableSortDefinition#MutableSortDefinition(SortDefinition)
@@ -325,7 +326,7 @@ public class PagedListHolder implements Serializable {
 	 * Can be overridden in subclasses.
 	 * @see PropertyComparator#sort(java.util.List, SortDefinition)
 	 */
-	protected void doSort(List source, SortDefinition sort) {
+	protected void doSort(List<E> source, SortDefinition sort) {
 		PropertyComparator.sort(source, sort);
 	}
 

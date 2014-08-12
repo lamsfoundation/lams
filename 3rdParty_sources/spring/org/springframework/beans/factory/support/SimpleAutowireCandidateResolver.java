@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 
 /**
- * {@link AutowireCandidateResolver} implementation to use when Java version
- * is less than 1.5 and therefore no annotation support is available. This
- * implementation checks the bean definition only.
+ * {@link AutowireCandidateResolver} implementation to use when no annotation
+ * support is available. This implementation checks the bean definition only.
  *
  * @author Mark Fisher
+ * @author Juergen Hoeller
  * @since 2.5
  * @see BeanDefinition#isAutowireCandidate()
  */
@@ -36,10 +36,19 @@ public class SimpleAutowireCandidateResolver implements AutowireCandidateResolve
 	 * <p>To be considered a candidate the bean's <em>autowire-candidate</em>
 	 * attribute must not have been set to 'false'.
 	 */
-	public boolean isAutowireCandidate(
-			BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
-
+	@Override
+	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
 		return bdHolder.getBeanDefinition().isAutowireCandidate();
+	}
+
+	@Override
+	public Object getSuggestedValue(DependencyDescriptor descriptor) {
+		return null;
+	}
+
+	@Override
+	public Object getLazyResolutionProxyIfNecessary(DependencyDescriptor descriptor, String beanName) {
+		return null;
 	}
 
 }

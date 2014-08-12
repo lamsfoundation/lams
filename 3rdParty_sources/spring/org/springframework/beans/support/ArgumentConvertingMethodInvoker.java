@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 	 * @see #setTypeConverter
 	 * @see org.springframework.beans.PropertyEditorRegistry#registerCustomEditor
 	 */
-	public void registerCustomEditor(Class requiredType, PropertyEditor propertyEditor) {
+	public void registerCustomEditor(Class<?> requiredType, PropertyEditor propertyEditor) {
 		TypeConverter converter = getTypeConverter();
 		if (!(converter instanceof PropertyEditorRegistry)) {
 			throw new IllegalStateException(
@@ -106,6 +106,7 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 	 * This implementation looks for a method with matching parameter types.
 	 * @see #doFindMatchingMethod
 	 */
+	@Override
 	protected Method findMatchingMethod() {
 		Method matchingMethod = super.findMatchingMethod();
 		// Second pass: look for method where arguments can be converted to parameter types.
@@ -124,7 +125,7 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 	 * Actually find a method with matching parameter type, i.e. where each
 	 * argument value is assignable to the corresponding parameter type.
 	 * @param arguments the argument values to match against method parameters
-	 * @return a matching method, or <code>null</code> if none
+	 * @return a matching method, or {@code null} if none
 	 */
 	protected Method doFindMatchingMethod(Object[] arguments) {
 		TypeConverter converter = getTypeConverter();
@@ -135,12 +136,10 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 			Method[] candidates = ReflectionUtils.getAllDeclaredMethods(getTargetClass());
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Object[] argumentsToUse = null;
-
-			for (int i = 0; i < candidates.length; i++) {
-				Method candidate = candidates[i];
+			for (Method candidate : candidates) {
 				if (candidate.getName().equals(targetMethod)) {
 					// Check if the inspected method has the correct number of parameters.
-					Class[] paramTypes = candidate.getParameterTypes();
+					Class<?>[] paramTypes = candidate.getParameterTypes();
 					if (paramTypes.length == argCount) {
 						Object[] convertedArguments = new Object[argCount];
 						boolean match = true;
@@ -165,13 +164,11 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 					}
 				}
 			}
-
 			if (matchingMethod != null) {
 				setArguments(argumentsToUse);
 				return matchingMethod;
 			}
 		}
-
 		return null;
 	}
 

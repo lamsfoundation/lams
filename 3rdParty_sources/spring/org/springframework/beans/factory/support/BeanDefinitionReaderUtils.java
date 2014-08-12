@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package org.springframework.beans.factory.support;
 
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -46,36 +44,12 @@ public class BeanDefinitionReaderUtils {
 
 
 	/**
-	 * Create a new GenericBeanDefinition for the given
-	 * class name, parent, constructor arguments, and property values.
-	 * @param className the name of the bean class, if any
-	 * @param parentName the name of the parent bean, if any
-	 * @param cargs the constructor arguments, if any
-	 * @param pvs the property values, if any
-	 * @param classLoader the ClassLoader to use for loading bean classes
-	 * (can be <code>null</code> to just register bean classes by name)
-	 * @return the bean definition
-	 * @throws ClassNotFoundException if the bean class could not be loaded
-	 * @deprecated in favor of <code>createBeanDefinition(String, String, ClassLoader)</code>
-	 * @see #createBeanDefinition(String, String, ClassLoader)
-	 */
-	public static AbstractBeanDefinition createBeanDefinition(
-			String className, String parentName, ConstructorArgumentValues cargs,
-			MutablePropertyValues pvs, ClassLoader classLoader) throws ClassNotFoundException {
-
-		AbstractBeanDefinition bd = createBeanDefinition(parentName, className, classLoader);
-		bd.setConstructorArgumentValues(cargs);
-		bd.setPropertyValues(pvs);
-		return bd;
-	}
-
-	/**
 	 * Create a new GenericBeanDefinition for the given parent name and class name,
 	 * eagerly loading the bean class if a ClassLoader has been specified.
 	 * @param parentName the name of the parent bean, if any
 	 * @param className the name of the bean class, if any
 	 * @param classLoader the ClassLoader to use for loading bean classes
-	 * (can be <code>null</code> to just register bean classes by name)
+	 * (can be {@code null} to just register bean classes by name)
 	 * @return the bean definition
 	 * @throws ClassNotFoundException if the bean class could not be loaded
 	 */
@@ -176,8 +150,8 @@ public class BeanDefinitionReaderUtils {
 		// Register aliases for bean name, if any.
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
-			for (int i = 0; i < aliases.length; i++) {
-				registry.registerAlias(beanName, aliases[i]);
+			for (String aliase : aliases) {
+				registry.registerAlias(beanName, aliase);
 			}
 		}
 	}

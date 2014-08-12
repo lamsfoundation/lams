@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.jpa.EntityManagerFactoryAccessor;
 import org.springframework.orm.jpa.EntityManagerFactoryInfo;
-import org.springframework.orm.jpa.EntityManagerPlus;
-import org.springframework.orm.jpa.JpaDialect;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
 import org.springframework.util.Assert;
 
@@ -50,34 +48,45 @@ import org.springframework.util.Assert;
  * @see org.springframework.orm.jpa.LocalEntityManagerFactoryBean
  * @see org.springframework.orm.jpa.JpaTransactionManager
  */
-public class SharedEntityManagerBean extends EntityManagerFactoryAccessor implements FactoryBean, InitializingBean {
+public class SharedEntityManagerBean extends EntityManagerFactoryAccessor
+		implements FactoryBean<EntityManager>, InitializingBean {
 
-	private Class entityManagerInterface;
+	private Class<? extends EntityManager> entityManagerInterface;
+
+	private boolean synchronizedWithTransaction = true;
 
 	private EntityManager shared;
 
 
 	/**
 	 * Specify the EntityManager interface to expose.
-	 * <p>Default is the the EntityManager interface as defined by the
+	 * <p>Default is the EntityManager interface as defined by the
 	 * EntityManagerFactoryInfo, if available. Else, the standard
-	 * <code>javax.persistence.EntityManager</code> interface will be used.
+	 * {@code javax.persistence.EntityManager} interface will be used.
 	 * @see org.springframework.orm.jpa.EntityManagerFactoryInfo#getEntityManagerInterface()
 	 * @see javax.persistence.EntityManager
 	 */
-	public void setEntityManagerInterface(Class entityManagerInterface) {
-		Assert.notNull(entityManagerInterface, "entityManagerInterface must not be null");
+	public void setEntityManagerInterface(Class<? extends EntityManager> entityManagerInterface) {
+		Assert.notNull(entityManagerInterface, "'entityManagerInterface' must not be null");
 		Assert.isAssignable(EntityManager.class, entityManagerInterface);
 		this.entityManagerInterface = entityManagerInterface;
 	}
 
+	/**
+	 * Set whether to automatically join ongoing transactions (according
+	 * to the JPA 2.1 SynchronizationType rules). Default is "true".
+	 */
+	public void setSynchronizedWithTransaction(boolean synchronizedWithTransaction) {
+		this.synchronizedWithTransaction = synchronizedWithTransaction;
+	}
 
+
+	@Override
 	public final void afterPropertiesSet() {
 		EntityManagerFactory emf = getEntityManagerFactory();
 		if (emf == null) {
-			throw new IllegalArgumentException("entityManagerFactory is required");
+			throw new IllegalArgumentException("'entityManagerFactory' or 'persistenceUnitName' is required");
 		}
-		Class[] ifcs = null;
 		if (emf instanceof EntityManagerFactoryInfo) {
 			EntityManagerFactoryInfo emfInfo = (EntityManagerFactoryInfo) emf;
 			if (this.entityManagerInterface == null) {
@@ -86,32 +95,28 @@ public class SharedEntityManagerBean extends EntityManagerFactoryAccessor implem
 					this.entityManagerInterface = EntityManager.class;
 				}
 			}
-			JpaDialect jpaDialect = emfInfo.getJpaDialect();
-			if (jpaDialect != null && jpaDialect.supportsEntityManagerPlusOperations()) {
-				ifcs = new Class[] {this.entityManagerInterface, EntityManagerPlus.class};
-			}
-			else {
-				ifcs = new Class[] {this.entityManagerInterface};
-			}
 		}
 		else {
 			if (this.entityManagerInterface == null) {
 				this.entityManagerInterface = EntityManager.class;
 			}
-			ifcs = new Class[] {this.entityManagerInterface};
 		}
-		this.shared = SharedEntityManagerCreator.createSharedEntityManager(emf, getJpaPropertyMap(), ifcs);
+		this.shared = SharedEntityManagerCreator.createSharedEntityManager(
+				emf, getJpaPropertyMap(), this.synchronizedWithTransaction, this.entityManagerInterface);
 	}
 
 
+	@Override
 	public EntityManager getObject() {
 		return this.shared;
 	}
 
-	public Class getObjectType() {
-		return this.entityManagerInterface;
+	@Override
+	public Class<? extends EntityManager> getObjectType() {
+		return (this.entityManagerInterface != null ? this.entityManagerInterface : EntityManager.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

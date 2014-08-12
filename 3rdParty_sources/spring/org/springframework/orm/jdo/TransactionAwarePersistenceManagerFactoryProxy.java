@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 
@@ -31,12 +30,12 @@ import org.springframework.util.ClassUtils;
 /**
  * Proxy for a target JDO {@link javax.jdo.PersistenceManagerFactory},
  * returning the current thread-bound PersistenceManager (the Spring-managed
- * transactional PersistenceManager or a the single OpenPersistenceManagerInView
- * PersistenceManager) on <code>getPersistenceManager()</code>, if any.
+ * transactional PersistenceManager or the single OpenPersistenceManagerInView
+ * PersistenceManager) on {@code getPersistenceManager()}, if any.
  *
- * <p>Essentially, <code>getPersistenceManager()</code> calls get seamlessly
+ * <p>Essentially, {@code getPersistenceManager()} calls get seamlessly
  * forwarded to {@link PersistenceManagerFactoryUtils#getPersistenceManager}.
- * Furthermore, <code>PersistenceManager.close</code> calls get forwarded to
+ * Furthermore, {@code PersistenceManager.close} calls get forwarded to
  * {@link PersistenceManagerFactoryUtils#releasePersistenceManager}.
  *
  * <p>The main advantage of this proxy is that it allows DAOs to work with a
@@ -51,12 +50,6 @@ import org.springframework.util.ClassUtils;
  * receiving the reference through Dependency Injection. This will work without
  * any Spring API dependencies in the DAO code!
  *
- * <p>It is usually preferable to write your JDO-based DAOs with Spring's
- * {@link JdoTemplate}, offering benefits such as consistent data access
- * exceptions instead of JDOExceptions at the DAO layer. However, Spring's
- * resource and transaction management (and Dependency	Injection) will work
- * for DAOs written against the plain JDO API as well.
- *
  * <p>Of course, you can still access the target PersistenceManagerFactory
  * even when your DAOs go through this proxy, by defining a bean reference
  * that points directly at your target PersistenceManagerFactory bean.
@@ -68,7 +61,7 @@ import org.springframework.util.ClassUtils;
  * @see PersistenceManagerFactoryUtils#getPersistenceManager
  * @see PersistenceManagerFactoryUtils#releasePersistenceManager
  */
-public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBean {
+public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBean<PersistenceManagerFactory> {
 
 	private PersistenceManagerFactory target;
 
@@ -86,9 +79,9 @@ public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBe
 	public void setTargetPersistenceManagerFactory(PersistenceManagerFactory target) {
 		Assert.notNull(target, "Target PersistenceManagerFactory must not be null");
 		this.target = target;
-		Class[] ifcs = ClassUtils.getAllInterfacesForClass(target.getClass(), getClass().getClassLoader());
+		Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(target.getClass(), target.getClass().getClassLoader());
 		this.proxy = (PersistenceManagerFactory) Proxy.newProxyInstance(
-				target.getClass().getClassLoader(), ifcs, new TransactionAwareFactoryInvocationHandler());
+				target.getClass().getClassLoader(), ifcs, new PersistenceManagerFactoryInvocationHandler());
 	}
 
 	/**
@@ -105,8 +98,8 @@ public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBe
 	 * <p>Default is "true". Can be turned off to enforce access to
 	 * transactional PersistenceManagers, which safely allows for DAOs
 	 * written to get a PersistenceManager without explicit closing
-	 * (i.e. a <code>PersistenceManagerFactory.getPersistenceManager()</code>
-	 * call without corresponding <code>PersistenceManager.close()</code> call).
+	 * (i.e. a {@code PersistenceManagerFactory.getPersistenceManager()}
+	 * call without corresponding {@code PersistenceManager.close()} call).
 	 * @see PersistenceManagerFactoryUtils#getPersistenceManager(javax.jdo.PersistenceManagerFactory, boolean)
 	 */
 	public void setAllowCreate(boolean allowCreate) {
@@ -123,14 +116,17 @@ public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBe
 	}
 
 
-	public Object getObject() {
+	@Override
+	public PersistenceManagerFactory getObject() {
 		return this.proxy;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<? extends PersistenceManagerFactory> getObjectType() {
 		return PersistenceManagerFactory.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -141,26 +137,27 @@ public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBe
 	 * PersistenceManagerFactory proxy to PersistenceManagerFactoryUtils
 	 * for being aware of thread-bound transactions.
 	 */
-	private class TransactionAwareFactoryInvocationHandler implements InvocationHandler {
+	private class PersistenceManagerFactoryInvocationHandler implements InvocationHandler {
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on PersistenceManagerFactory interface coming in...
 
 			if (method.getName().equals("equals")) {
 				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				return (proxy == args[0]);
 			}
 			else if (method.getName().equals("hashCode")) {
 				// Use hashCode of PersistenceManagerFactory proxy.
-				return new Integer(System.identityHashCode(proxy));
+				return System.identityHashCode(proxy);
 			}
 			else if (method.getName().equals("getPersistenceManager")) {
 				PersistenceManagerFactory target = getTargetPersistenceManagerFactory();
 				PersistenceManager pm =
 						PersistenceManagerFactoryUtils.doGetPersistenceManager(target, isAllowCreate());
-				Class[] ifcs = ClassUtils.getAllInterfacesForClass(pm.getClass(), getClass().getClassLoader());
-				return (PersistenceManager) Proxy.newProxyInstance(
-						pm.getClass().getClassLoader(), ifcs, new TransactionAwareInvocationHandler(pm, target));
+				Class<?>[] ifcs = ClassUtils.getAllInterfacesForClass(pm.getClass(), pm.getClass().getClassLoader());
+				return Proxy.newProxyInstance(
+						pm.getClass().getClassLoader(), ifcs, new PersistenceManagerInvocationHandler(pm, target));
 			}
 
 			// Invoke method on target PersistenceManagerFactory.
@@ -178,34 +175,33 @@ public class TransactionAwarePersistenceManagerFactoryProxy implements FactoryBe
 	 * Invocation handler that delegates close calls on PersistenceManagers to
 	 * PersistenceManagerFactoryUtils for being aware of thread-bound transactions.
 	 */
-	private static class TransactionAwareInvocationHandler implements InvocationHandler {
+	private static class PersistenceManagerInvocationHandler implements InvocationHandler {
 
 		private final PersistenceManager target;
 
 		private final PersistenceManagerFactory persistenceManagerFactory;
 
-		public TransactionAwareInvocationHandler(PersistenceManager target, PersistenceManagerFactory pmf) {
+		public PersistenceManagerInvocationHandler(PersistenceManager target, PersistenceManagerFactory pmf) {
 			this.target = target;
 			this.persistenceManagerFactory = pmf;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on PersistenceManager interface coming in...
 
 			if (method.getName().equals("equals")) {
 				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				return (proxy == args[0]);
 			}
 			else if (method.getName().equals("hashCode")) {
 				// Use hashCode of PersistenceManager proxy.
-				return new Integer(System.identityHashCode(proxy));
+				return System.identityHashCode(proxy);
 			}
 			else if (method.getName().equals("close")) {
 				// Handle close method: only close if not within a transaction.
-				if (this.persistenceManagerFactory != null) {
-					PersistenceManagerFactoryUtils.doReleasePersistenceManager(
-							this.target, this.persistenceManagerFactory);
-				}
+				PersistenceManagerFactoryUtils.doReleasePersistenceManager(
+						this.target, this.persistenceManagerFactory);
 				return null;
 			}
 

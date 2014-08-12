@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * {@link org.springframework.transaction.PlatformTransactionManager} implementation
@@ -60,6 +60,7 @@ import org.springframework.transaction.support.ResourceTransactionManager;
  * @see TransactionAwareConnectionFactoryProxy
  * @see org.springframework.jca.cci.core.CciTemplate
  */
+@SuppressWarnings("serial")
 public class CciLocalTransactionManager extends AbstractPlatformTransactionManager
 		implements ResourceTransactionManager, InitializingBean {
 
@@ -108,6 +109,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		return this.connectionFactory;
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		if (getConnectionFactory() == null) {
 			throw new IllegalArgumentException("Property 'connectionFactory' is required");
@@ -115,27 +117,30 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 	}
 
 
+	@Override
 	public Object getResourceFactory() {
 		return getConnectionFactory();
 	}
 
+	@Override
 	protected Object doGetTransaction() {
 		CciLocalTransactionObject txObject = new CciLocalTransactionObject();
 		ConnectionHolder conHolder =
-		    (ConnectionHolder) TransactionSynchronizationManager.getResource(getConnectionFactory());
+			(ConnectionHolder) TransactionSynchronizationManager.getResource(getConnectionFactory());
 		txObject.setConnectionHolder(conHolder);
 		return txObject;
 	}
 
+	@Override
 	protected boolean isExistingTransaction(Object transaction) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) transaction;
 		// Consider a pre-bound connection as transaction.
 		return (txObject.getConnectionHolder() != null);
 	}
 
+	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) transaction;
-
 		Connection con = null;
 
 		try {
@@ -163,18 +168,20 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 			ConnectionFactoryUtils.releaseConnection(con, getConnectionFactory());
 			throw new CannotCreateTransactionException("Could not begin local CCI transaction", ex);
 		}
-		catch (ResourceException ex) {
+		catch (Throwable ex) {
 			ConnectionFactoryUtils.releaseConnection(con, getConnectionFactory());
 			throw new TransactionSystemException("Unexpected failure on begin of CCI local transaction", ex);
 		}
 	}
 
+	@Override
 	protected Object doSuspend(Object transaction) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) transaction;
 		txObject.setConnectionHolder(null);
 		return TransactionSynchronizationManager.unbindResource(getConnectionFactory());
 	}
 
+	@Override
 	protected void doResume(Object transaction, Object suspendedResources) {
 		ConnectionHolder conHolder = (ConnectionHolder) suspendedResources;
 		TransactionSynchronizationManager.bindResource(getConnectionFactory(), conHolder);
@@ -185,6 +192,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		return txObject.getConnectionHolder().isRollbackOnly();
 	}
 
+	@Override
 	protected void doCommit(DefaultTransactionStatus status) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) status.getTransaction();
 		Connection con = txObject.getConnectionHolder().getConnection();
@@ -202,6 +210,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		}
 	}
 
+	@Override
 	protected void doRollback(DefaultTransactionStatus status) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) status.getTransaction();
 		Connection con = txObject.getConnectionHolder().getConnection();
@@ -219,6 +228,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		}
 	}
 
+	@Override
 	protected void doSetRollbackOnly(DefaultTransactionStatus status) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) status.getTransaction();
 		if (status.isDebug()) {
@@ -228,6 +238,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		txObject.getConnectionHolder().setRollbackOnly();
 	}
 
+	@Override
 	protected void doCleanupAfterCompletion(Object transaction) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) transaction;
 

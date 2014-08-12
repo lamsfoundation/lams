@@ -26,33 +26,42 @@ package org.hibernate.dialect.function;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.CoreMessageLogger;
 
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.jboss.logging.Logger;
 
 /**
- * Delegate for handling function "templates". 
+ * Delegate for handling function "templates".
  *
  * @author Steve Ebersole
  */
 public class TemplateRenderer {
-	private static final Logger log = LoggerFactory.getLogger( TemplateRenderer.class );
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			TemplateRenderer.class.getName()
+	);
 
 	private final String template;
 	private final String[] chunks;
 	private final int[] paramIndexes;
 
-	@SuppressWarnings({ "UnnecessaryUnboxing" })
+	/**
+	 * Constructs a template renderer
+	 *
+	 * @param template The template
+	 */
 	public TemplateRenderer(String template) {
 		this.template = template;
 
-		List<String> chunkList = new ArrayList<String>();
-		List<Integer> paramList = new ArrayList<Integer>();
-		StringBuffer chunk = new StringBuffer( 10 );
-		StringBuffer index = new StringBuffer( 2 );
+		final List<String> chunkList = new ArrayList<String>();
+		final List<Integer> paramList = new ArrayList<Integer>();
+		final StringBuilder chunk = new StringBuilder( 10 );
+		final StringBuilder index = new StringBuilder( 2 );
 
-		for ( int i = 0; i < template.length(); ++i ) {
+		int i = 0;
+		final int len = template.length();
+		while ( i < len ) {
 			char c = template.charAt( i );
 			if ( c == '?' ) {
 				chunkList.add( chunk.toString() );
@@ -75,6 +84,7 @@ public class TemplateRenderer {
 			else {
 				chunk.append( c );
 			}
+			i++;
 		}
 
 		if ( chunk.length() > 0 ) {
@@ -83,8 +93,8 @@ public class TemplateRenderer {
 
 		chunks = chunkList.toArray( new String[chunkList.size()] );
 		paramIndexes = new int[paramList.size()];
-		for ( int i = 0; i < paramIndexes.length; ++i ) {
-			paramIndexes[i] = paramList.get( i ).intValue();
+		for ( i = 0; i < paramIndexes.length; ++i ) {
+			paramIndexes[i] = paramList.get( i );
 		}
 	}
 
@@ -96,14 +106,21 @@ public class TemplateRenderer {
 		return paramIndexes.length;
 	}
 
+	/**
+	 * The rendering code.
+	 *
+	 * @param args The arguments to inject into the template
+	 * @param factory The SessionFactory
+	 *
+	 * @return The rendered template with replacements
+	 */
 	@SuppressWarnings({ "UnusedDeclaration" })
 	public String render(List args, SessionFactoryImplementor factory) {
-		int numberOfArguments = args.size();
+		final int numberOfArguments = args.size();
 		if ( getAnticipatedNumberOfArguments() > 0 && numberOfArguments != getAnticipatedNumberOfArguments() ) {
-			log.warn( "Function template anticipated {} arguments, but {} arguments encountered",
-					getAnticipatedNumberOfArguments(), numberOfArguments );
+			LOG.missingArguments( getAnticipatedNumberOfArguments(), numberOfArguments );
 		}
-		StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		for ( int i = 0; i < chunks.length; ++i ) {
 			if ( i < paramIndexes.length ) {
 				final int index = paramIndexes[i] - 1;

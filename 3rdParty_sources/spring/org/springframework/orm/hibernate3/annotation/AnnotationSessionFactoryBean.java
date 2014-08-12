@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 package org.springframework.orm.hibernate3.annotation;
 
 import java.io.IOException;
-
+import java.util.Set;
+import java.util.TreeSet;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 
 import org.springframework.context.ResourceLoaderAware;
@@ -43,10 +43,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Subclass of Spring's standard LocalSessionFactoryBean for Hibernate,
- * supporting JDK 1.5+ annotation metadata for mappings.
- *
- * <p>Note: This class requires Hibernate 3.2 or higher, with the
- * Java Persistence API and the Hibernate Annotations add-on present.
+ * supporting annotation metadata for mappings.
  *
  * <p>Example for an AnnotationSessionFactoryBean bean definition:
  *
@@ -69,6 +66,8 @@ import org.springframework.util.ClassUtils;
  *   &lt;property name="packagesToScan" value="test.package"/&gt;
  * &lt;/bean&gt;</pre>
  *
+ * <p>Requires Hibernate 3.6.x, as of Spring 4.0.
+ *
  * @author Juergen Hoeller
  * @since 1.2.2
  * @see #setDataSource
@@ -78,10 +77,12 @@ import org.springframework.util.ClassUtils;
  */
 public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implements ResourceLoaderAware {
 
-	private static final String RESOURCE_PATTERN = "**/*.class";
+	private static final String RESOURCE_PATTERN = "/**/*.class";
+
+	private static final String PACKAGE_INFO_SUFFIX = ".package-info";
 
 
-	private Class[] annotatedClasses;
+	private Class<?>[] annotatedClasses;
 
 	private String[] annotatedPackages;
 
@@ -90,68 +91,56 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 	private TypeFilter[] entityTypeFilters = new TypeFilter[] {
 			new AnnotationTypeFilter(Entity.class, false),
 			new AnnotationTypeFilter(Embeddable.class, false),
-			new AnnotationTypeFilter(MappedSuperclass.class, false)};
+			new AnnotationTypeFilter(MappedSuperclass.class, false),
+			new AnnotationTypeFilter(org.hibernate.annotations.Entity.class, false)};
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 
-	public AnnotationSessionFactoryBean() {
-		setConfigurationClass(AnnotationConfiguration.class);
-	}
-
-
-	public void setConfigurationClass(Class configurationClass) {
-		if (configurationClass == null || !AnnotationConfiguration.class.isAssignableFrom(configurationClass)) {
-			throw new IllegalArgumentException(
-					"AnnotationSessionFactoryBean only supports AnnotationConfiguration or subclasses");
-		}
-		super.setConfigurationClass(configurationClass);
-	}
-
 	/**
 	 * Specify annotated classes, for which mappings will be read from
-	 * class-level JDK 1.5+ annotation metadata.
-	 * @see org.hibernate.cfg.AnnotationConfiguration#addAnnotatedClass(Class)
+	 * class-level annotation metadata.
+	 * @see org.hibernate.cfg.Configuration#addAnnotatedClass(Class)
 	 */
-	public void setAnnotatedClasses(Class[] annotatedClasses) {
+	public void setAnnotatedClasses(Class<?>... annotatedClasses) {
 		this.annotatedClasses = annotatedClasses;
 	}
 
 	/**
 	 * Specify the names of annotated packages, for which package-level
-	 * JDK 1.5+ annotation metadata will be read.
-	 * @see org.hibernate.cfg.AnnotationConfiguration#addPackage(String)
+	 * annotation metadata will be read.
+	 * @see org.hibernate.cfg.Configuration#addPackage(String)
 	 */
-	public void setAnnotatedPackages(String[] annotatedPackages) {
+	public void setAnnotatedPackages(String... annotatedPackages) {
 		this.annotatedPackages = annotatedPackages;
 	}
 
 	/**
-	 * Set whether to use Spring-based scanning for entity classes in the classpath
-	 * instead of listing annotated classes explicitly.
+	 * Specify packages to search using Spring-based scanning for entity classes in
+	 * the classpath. This is an alternative to listing annotated classes explicitly.
 	 * <p>Default is none. Specify packages to search for autodetection of your entity
 	 * classes in the classpath. This is analogous to Spring's component-scan feature
 	 * ({@link org.springframework.context.annotation.ClassPathBeanDefinitionScanner}).
 	 */
-	public void setPackagesToScan(String[] packagesToScan) {
+	public void setPackagesToScan(String... packagesToScan) {
 		this.packagesToScan = packagesToScan;
 	}
 
 	/**
 	 * Specify custom type filters for Spring-based scanning for entity classes.
 	 * <p>Default is to search all specified packages for classes annotated with
-	 * <code>@javax.persistence.Entity</code>, <code>@javax.persistence.Embeddable</code>
-	 * or <code>@javax.persistence.MappedSuperclass</code>.
+	 * {@code @javax.persistence.Entity}, {@code @javax.persistence.Embeddable}
+	 * or {@code @javax.persistence.MappedSuperclass}, as well as for
+	 * Hibernate's special {@code @org.hibernate.annotations.Entity}.
 	 * @see #setPackagesToScan
 	 */
-	public void setEntityTypeFilters(TypeFilter[] entityTypeFilters) {
+	public void setEntityTypeFilters(TypeFilter... entityTypeFilters) {
 		this.entityTypeFilters = entityTypeFilters;
 	}
 
+	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourcePatternResolver = (resourceLoader != null ?
-				ResourcePatternUtils.getResourcePatternResolver(resourceLoader) :
-				new PathMatchingResourcePatternResolver());
+		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 	}
 
 
@@ -159,27 +148,29 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 	 * Reads metadata from annotated classes and packages into the
 	 * AnnotationConfiguration instance.
 	 */
+	@Override
 	protected void postProcessMappings(Configuration config) throws HibernateException {
-		AnnotationConfiguration annConfig = (AnnotationConfiguration) config;
 		if (this.annotatedClasses != null) {
-			for (int i = 0; i < this.annotatedClasses.length; i++) {
-				annConfig.addAnnotatedClass(this.annotatedClasses[i]);
+			for (Class<?> annotatedClass : this.annotatedClasses) {
+				config.addAnnotatedClass(annotatedClass);
 			}
 		}
 		if (this.annotatedPackages != null) {
-			for (int i = 0; i < this.annotatedPackages.length; i++) {
-				annConfig.addPackage(this.annotatedPackages[i]);
+			for (String annotatedPackage : this.annotatedPackages) {
+				config.addPackage(annotatedPackage);
 			}
 		}
-		scanPackages(annConfig);
+		scanPackages(config);
 	}
 
 	/**
 	 * Perform Spring-based scanning for entity classes.
 	 * @see #setPackagesToScan
 	 */
-	protected void scanPackages(AnnotationConfiguration config) {
+	protected void scanPackages(Configuration config) {
 		if (this.packagesToScan != null) {
+			Set<String> classNames = new TreeSet<String>();
+			Set<String> packageNames = new TreeSet<String>();
 			try {
 				for (String pkg : this.packagesToScan) {
 					String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
@@ -190,8 +181,11 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 						if (resource.isReadable()) {
 							MetadataReader reader = readerFactory.getMetadataReader(resource);
 							String className = reader.getClassMetadata().getClassName();
-							if (matchesFilter(reader, readerFactory)) {
-								config.addAnnotatedClass(this.resourcePatternResolver.getClassLoader().loadClass(className));
+							if (matchesEntityTypeFilter(reader, readerFactory)) {
+								classNames.add(className);
+							}
+							else if (className.endsWith(PACKAGE_INFO_SUFFIX)) {
+								packageNames.add(className.substring(0, className.length() - PACKAGE_INFO_SUFFIX.length()));
 							}
 						}
 					}
@@ -199,6 +193,14 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 			}
 			catch (IOException ex) {
 				throw new MappingException("Failed to scan classpath for unlisted classes", ex);
+			}
+			try {
+				for (String className : classNames) {
+					config.addAnnotatedClass(this.resourcePatternResolver.getClassLoader().loadClass(className));
+				}
+				for (String packageName : packageNames) {
+					config.addPackage(packageName);
+				}
 			}
 			catch (ClassNotFoundException ex) {
 				throw new MappingException("Failed to load annotated classes from classpath", ex);
@@ -210,7 +212,7 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 	 * Check whether any of the configured entity type filters matches
 	 * the current class descriptor contained in the metadata reader.
 	 */
-	private boolean matchesFilter(MetadataReader reader, MetadataReaderFactory readerFactory) throws IOException {
+	private boolean matchesEntityTypeFilter(MetadataReader reader, MetadataReaderFactory readerFactory) throws IOException {
 		if (this.entityTypeFilters != null) {
 			for (TypeFilter filter : this.entityTypeFilters) {
 				if (filter.match(reader, readerFactory)) {
@@ -219,25 +221,6 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 			}
 		}
 		return false;
-	}
-
-
-	/**
-	 * Delegates to {@link #postProcessAnnotationConfiguration}.
-	 */
-	protected final void postProcessConfiguration(Configuration config) throws HibernateException {
-		postProcessAnnotationConfiguration((AnnotationConfiguration) config);
-	}
-
-	/**
-	 * To be implemented by subclasses that want to to perform custom
-	 * post-processing of the AnnotationConfiguration object after this
-	 * FactoryBean performed its default initialization.
-	 * @param config the current AnnotationConfiguration object
-	 * @throws HibernateException in case of Hibernate initialization errors
-	 */
-	protected void postProcessAnnotationConfiguration(AnnotationConfiguration config)
-			throws HibernateException {
 	}
 
 }

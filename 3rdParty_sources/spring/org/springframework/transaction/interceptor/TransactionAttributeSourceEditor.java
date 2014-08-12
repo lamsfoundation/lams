@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.springframework.transaction.interceptor;
 
 import java.beans.PropertyEditorSupport;
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.springframework.beans.propertyeditors.PropertiesEditor;
@@ -29,10 +29,10 @@ import org.springframework.util.StringUtils;
  * {@link TransactionAttributeEditor} in this package.
  *
  * <p>Strings are in property syntax, with the form:<br>
- * <code>FQCN.methodName=&lt;transaction attribute string&gt;</code>
+ * {@code FQCN.methodName=&lt;transaction attribute string&gt;}
  *
  * <p>For example:<br>
- * <code>com.mycompany.mycode.MyClass.myMethod=PROPAGATION_MANDATORY,ISOLATION_DEFAULT</code>
+ * {@code com.mycompany.mycode.MyClass.myMethod=PROPAGATION_MANDATORY,ISOLATION_DEFAULT}
  *
  * <p><b>NOTE:</b> The specified class must be the one where the methods are
  * defined; in case of implementing an interface, the interface class name.
@@ -44,10 +44,11 @@ import org.springframework.util.StringUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 26.04.2003
- * @see org.springframework.transaction.interceptor.TransactionAttributeEditor
+ * @see TransactionAttributeEditor
  */
 public class TransactionAttributeSourceEditor extends PropertyEditorSupport {
 
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		MethodMapTransactionAttributeSource source = new MethodMapTransactionAttributeSource();
 		if (StringUtils.hasLength(text)) {
@@ -58,14 +59,13 @@ public class TransactionAttributeSourceEditor extends PropertyEditorSupport {
 
 			// Now we have properties, process each one individually.
 			TransactionAttributeEditor tae = new TransactionAttributeEditor();
-			for (Iterator iter = props.keySet().iterator(); iter.hasNext();) {
-				String name = (String) iter.next();
+			Enumeration<?> propNames = props.propertyNames();
+			while (propNames.hasMoreElements()) {
+				String name = (String) propNames.nextElement();
 				String value = props.getProperty(name);
-
 				// Convert value to a transaction attribute.
 				tae.setAsText(value);
 				TransactionAttribute attr = (TransactionAttribute) tae.getValue();
-
 				// Register name and attribute.
 				source.addTransactionalMethod(name, attr);
 			}

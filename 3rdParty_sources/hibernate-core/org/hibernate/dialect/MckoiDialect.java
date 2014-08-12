@@ -26,10 +26,17 @@ package org.hibernate.dialect;
 import java.sql.Types;
 
 import org.hibernate.LockMode;
-import org.hibernate.persister.entity.Lockable;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.StandardSQLFunction;
-import org.hibernate.dialect.lock.*;
+import org.hibernate.dialect.lock.LockingStrategy;
+import org.hibernate.dialect.lock.OptimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.OptimisticLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticReadUpdateLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticWriteUpdateLockingStrategy;
+import org.hibernate.dialect.lock.SelectLockingStrategy;
+import org.hibernate.dialect.lock.UpdateLockingStrategy;
+import org.hibernate.persister.entity.Lockable;
 import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.MckoiCaseFragment;
 import org.hibernate.type.StandardBasicTypes;
@@ -41,6 +48,9 @@ import org.hibernate.type.StandardBasicTypes;
  * @author Gabe Hicks
  */
 public class MckoiDialect extends Dialect {
+	/**
+	 * Constructs a MckoiDialect
+	 */
 	public MckoiDialect() {
 		super();
 		registerColumnType( Types.BIT, "bit" );
@@ -72,41 +82,50 @@ public class MckoiDialect extends Dialect {
 		registerFunction( "user", new StandardSQLFunction( "user", StandardBasicTypes.STRING ) );
 		registerFunction( "concat", new StandardSQLFunction( "concat", StandardBasicTypes.STRING ) );
 
-		getDefaultProperties().setProperty(Environment.STATEMENT_BATCH_SIZE, NO_BATCH);
+		getDefaultProperties().setProperty( Environment.STATEMENT_BATCH_SIZE, NO_BATCH );
 	}
 
+	@Override
 	public String getAddColumnString() {
 		return "add column";
 	}
 
+	@Override
 	public String getSequenceNextValString(String sequenceName) {
 		return "select " + getSelectSequenceNextValString( sequenceName );
 	}
 
+	@Override
 	public String getSelectSequenceNextValString(String sequenceName) {
 		return "nextval('" + sequenceName + "')";
 	}
 
+	@Override
 	public String getCreateSequenceString(String sequenceName) {
 		return "create sequence " + sequenceName;
 	}
 
+	@Override
 	public String getDropSequenceString(String sequenceName) {
 		return "drop sequence " + sequenceName;
 	}
 
+	@Override
 	public String getForUpdateString() {
 		return "";
 	}
 
+	@Override
 	public boolean supportsSequences() {
 		return true;
 	}
 
+	@Override
 	public CaseFragment createCaseFragment() {
 		return new MckoiCaseFragment();
 	}
 
+	@Override
 	public LockingStrategy getLockingStrategy(Lockable lockable, LockMode lockMode) {
 		// Mckoi has no known variation of a "SELECT ... FOR UPDATE" syntax...
 		if ( lockMode==LockMode.PESSIMISTIC_FORCE_INCREMENT) {

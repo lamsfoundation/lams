@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * Servlet 2.3 Filter that exposes the request to the current thread,
  * through both {@link org.springframework.context.i18n.LocaleContextHolder} and
- * {@link RequestContextHolder}. To be registered as filter in <code>web.xml</code>.
+ * {@link RequestContextHolder}. To be registered as filter in {@code web.xml}.
  *
  * <p>Alternatively, Spring's {@link org.springframework.web.context.request.RequestContextListener}
  * and Spring's {@link org.springframework.web.servlet.DispatcherServlet} also expose
@@ -41,6 +41,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
+ * @author Rossen Stoyanchev
  * @since 2.0
  * @see org.springframework.context.i18n.LocaleContextHolder
  * @see org.springframework.web.context.request.RequestContextHolder
@@ -68,28 +69,55 @@ public class RequestContextFilter extends OncePerRequestFilter {
 		this.threadContextInheritable = threadContextInheritable;
 	}
 
+	/**
+	 * Returns "false" so that the filter may set up the request context in each
+	 * asynchronously dispatched thread.
+	 */
+	@Override
+	protected boolean shouldNotFilterAsyncDispatch() {
+		return false;
+	}
 
+	/**
+	 * Returns "false" so that the filter may set up the request context in an
+	 * error dispatch.
+	 */
+	@Override
+	protected boolean shouldNotFilterErrorDispatch() {
+		return false;
+	}
+
+	@Override
 	protected void doFilterInternal(
 			HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
 		ServletRequestAttributes attributes = new ServletRequestAttributes(request);
-		LocaleContextHolder.setLocale(request.getLocale(), this.threadContextInheritable);
-		RequestContextHolder.setRequestAttributes(attributes, this.threadContextInheritable);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Bound request context to thread: " + request);
-		}
+		initContextHolders(request, attributes);
+
 		try {
 			filterChain.doFilter(request, response);
 		}
 		finally {
-			RequestContextHolder.resetRequestAttributes();
-			LocaleContextHolder.resetLocaleContext();
-			attributes.requestCompleted();
+			resetContextHolders();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Cleared thread-bound request context: " + request);
 			}
+			attributes.requestCompleted();
 		}
+	}
+
+	private void initContextHolders(HttpServletRequest request, ServletRequestAttributes requestAttributes) {
+		LocaleContextHolder.setLocale(request.getLocale(), this.threadContextInheritable);
+		RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Bound request context to thread: " + request);
+		}
+	}
+
+	private void resetContextHolders() {
+		LocaleContextHolder.resetLocaleContext();
+		RequestContextHolder.resetRequestAttributes();
 	}
 
 }

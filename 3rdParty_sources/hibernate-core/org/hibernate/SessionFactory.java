@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
 
@@ -28,13 +27,14 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.Referenceable;
 
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.engine.spi.FilterDefinition;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metadata.CollectionMetadata;
+import org.hibernate.proxy.EntityNotFoundDelegate;
 import org.hibernate.stat.Statistics;
-import org.hibernate.engine.FilterDefinition;
 
 /**
  * The main contract here is the creation of {@link Session} instances.  Usually
@@ -54,80 +54,79 @@ import org.hibernate.engine.FilterDefinition;
  */
 public interface SessionFactory extends Referenceable, Serializable {
 	/**
+	 * Aggregator of special options used to build the SessionFactory.
+	 */
+	public interface SessionFactoryOptions {
+		/**
+		 * The service registry to use in building the factory.
+		 *
+		 * @return The service registry to use.
+		 */
+		public StandardServiceRegistry getServiceRegistry();
+
+		/**
+		 * Get the interceptor to use by default for all sessions opened from this factory.
+		 *
+		 * @return The interceptor to use factory wide.  May be {@code null}
+		 */
+		public Interceptor getInterceptor();
+
+		/**
+		 * Get the delegate for handling entity-not-found exception conditions.
+		 *
+		 * @return The specific EntityNotFoundDelegate to use,  May be {@code null}
+		 */
+		public EntityNotFoundDelegate getEntityNotFoundDelegate();
+	}
+
+	/**
+	 * Get the special options used to build the factory.
+	 *
+	 * @return The special options used to build the factory.
+	 */
+	public SessionFactoryOptions getSessionFactoryOptions();
+
+	/**
+	 * Obtain a {@link Session} builder.
+	 *
+	 * @return The session builder
+	 */
+	public SessionBuilder withOptions();
+
+	/**
 	 * Open a {@link Session}.
 	 * <p/>
 	 * JDBC {@link Connection connection(s} will be obtained from the
-	 * configured {@link org.hibernate.connection.ConnectionProvider} as needed
+	 * configured {@link org.hibernate.engine.jdbc.connections.spi.ConnectionProvider} as needed
 	 * to perform requested work.
 	 *
 	 * @return The created session.
 	 *
-	 * @throws HibernateException Indicates a peroblem opening the session; pretty rare here.
+	 * @throws HibernateException Indicates a problem opening the session; pretty rare here.
 	 */
-	public org.hibernate.classic.Session openSession() throws HibernateException;
-
-	/**
-	 * Open a {@link Session}, utilizing the specified {@link Interceptor}.
-	 * <p/>
-	 * JDBC {@link Connection connection(s} will be obtained from the
-	 * configured {@link org.hibernate.connection.ConnectionProvider} as needed
-	 * to perform requested work.
-	 *
-	 * @param interceptor a session-scoped interceptor
-	 *
-	 * @return The created session.
-	 *
-	 * @throws HibernateException Indicates a peroblem opening the session; pretty rare here.
-	 */
-	public org.hibernate.classic.Session openSession(Interceptor interceptor) throws HibernateException;
-
-	/**
-	 * Open a {@link Session}, utilizing the specfied JDBC {@link Connection}.
-	 * <p>
-	 * Note that the second-level cache will be disabled if you supply a JDBC
-	 * connection. Hibernate will not be able to track any statements you might
-	 * have executed in the same transaction.  Consider implementing your own
-	 * {@link org.hibernate.connection.ConnectionProvider} instead as a highly
-	 * recommended alternative.
-	 *
-	 * @param connection a connection provided by the application.
-	 *
-	 * @return The created session.
-	 */
-	public org.hibernate.classic.Session openSession(Connection connection);
-
-	/**
-	 * Open a {@link Session}, utilizing the specfied JDBC {@link Connection} and
-	 * specified {@link Interceptor}.
-	 * <p>
-	 * Note that the second-level cache will be disabled if you supply a JDBC
-	 * connection. Hibernate will not be able to track any statements you might
-	 * have executed in the same transaction.  Consider implementing your own
-	 * {@link org.hibernate.connection.ConnectionProvider} instead as a highly
-	 * recommended alternative.
-	 *
-	 * @param connection a connection provided by the application.
-	 * @param interceptor a session-scoped interceptor
-	 *
-	 * @return The created session.
-	 */
-	public org.hibernate.classic.Session openSession(Connection connection, Interceptor interceptor);
+	public Session openSession() throws HibernateException;
 
 	/**
 	 * Obtains the current session.  The definition of what exactly "current"
-	 * means controlled by the {@link org.hibernate.context.CurrentSessionContext} impl configured
+	 * means controlled by the {@link org.hibernate.context.spi.CurrentSessionContext} impl configured
 	 * for use.
 	 * <p/>
-	 * Note that for backwards compatibility, if a {@link org.hibernate.context.CurrentSessionContext}
-	 * is not configured but a JTA {@link org.hibernate.transaction.TransactionManagerLookup}
-	 * is configured this will default to the {@link org.hibernate.context.JTASessionContext}
+	 * Note that for backwards compatibility, if a {@link org.hibernate.context.spi.CurrentSessionContext}
+	 * is not configured but JTA is configured this will default to the {@link org.hibernate.context.internal.JTASessionContext}
 	 * impl.
 	 *
 	 * @return The current session.
 	 *
 	 * @throws HibernateException Indicates an issue locating a suitable current session.
 	 */
-	public org.hibernate.classic.Session getCurrentSession() throws HibernateException;
+	public Session getCurrentSession() throws HibernateException;
+
+	/**
+	 * Obtain a {@link StatelessSession} builder.
+	 *
+	 * @return The stateless session builder
+	 */
+	public StatelessSessionBuilder withStatelessOptions();
 
 	/**
 	 * Open a new stateless session.
@@ -196,7 +195,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	public Map<String,ClassMetadata> getAllClassMetadata();
 
 	/**
-	 * Get the {@link CollectionMetadata} for all mapped collections
+	 * Get the {@link CollectionMetadata} for all mapped collections.
 	 *
 	 * @return a map from <tt>String</tt> to <tt>CollectionMetadata</tt>
 	 *
@@ -253,6 +252,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictEntityRegion(Class)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evict(Class persistentClass) throws HibernateException;
 
 	/**
@@ -270,6 +270,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#containsEntity(Class, Serializable)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evict(Class persistentClass, Serializable id) throws HibernateException;
 
 	/**
@@ -286,6 +287,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictEntityRegion(String)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictEntity(String entityName) throws HibernateException;
 
 	/**
@@ -303,6 +305,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictEntity(String,Serializable)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictEntity(String entityName, Serializable id) throws HibernateException;
 
 	/**
@@ -319,6 +322,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictCollectionRegion(String)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictCollection(String roleName) throws HibernateException;
 
 	/**
@@ -336,6 +340,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictCollection(String,Serializable)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictCollection(String roleName, Serializable id) throws HibernateException;
 
 	/**
@@ -349,6 +354,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictQueryRegion(String)} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictQueries(String cacheRegion) throws HibernateException;
 
 	/**
@@ -360,6 +366,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	 * @deprecated Use {@link Cache#evictQueryRegions} accessed through
 	 * {@link #getCache()} instead.
 	 */
+	@Deprecated
 	public void evictQueries() throws HibernateException;
 
 	/**
@@ -388,7 +395,7 @@ public interface SessionFactory extends Referenceable, Serializable {
 	public boolean containsFetchProfileDefinition(String name);
 
 	/**
-	 * Retrieve this factory's {@link TypeHelper}
+	 * Retrieve this factory's {@link TypeHelper}.
 	 *
 	 * @return The factory's {@link TypeHelper}
 	 */

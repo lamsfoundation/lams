@@ -24,16 +24,14 @@
 package org.hibernate.type;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.hibernate.MappingException;
 import org.hibernate.classic.Lifecycle;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.usertype.CompositeUserType;
 import org.hibernate.usertype.UserType;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * Acts as the contract for getting types and as the mediator between {@link BasicTypeRegistry} and {@link TypeFactory}.
@@ -44,65 +42,30 @@ public class TypeResolver implements Serializable {
 	private final BasicTypeRegistry basicTypeRegistry;
 	private final TypeFactory typeFactory;
 
-	// Need to keep track of the "global" type overrides in case there are dialect-specific overrides.
-	// Dialect-specific types must be applied before "global" overrides are applied.
-	// Unfortunately, dialect-specific types are not known until this TypeResolver is scoped...
-	private final List<BasicType> typeOverrides;
-
-	// If this TypeResolver is scoped to a SessionFactoryImplementor with
-	// dialect-specific type overrides, scopedTypeRegistry will be initialized,
-	// dialect-specific type overrides will be applied, followed by "global"
-	// type overrides.
-	private BasicTypeRegistry scopedTypeRegistry;
-
 	public TypeResolver() {
 		this(  new BasicTypeRegistry(), new TypeFactory() );
 	}
 
 	public TypeResolver(BasicTypeRegistry basicTypeRegistry, TypeFactory typeFactory) {
 		this.basicTypeRegistry = basicTypeRegistry;
-		this.typeOverrides = new ArrayList<BasicType>();
 		this.typeFactory = typeFactory;
 	}
 
 	public TypeResolver scope(SessionFactoryImplementor factory) {
 		typeFactory.injectSessionFactory( factory );
-		// if there was a scopedTypeRegistry left from the last time this
-		// TypeResolver was scoped, then set it to null;
-		scopedTypeRegistry = null;
-		BasicTypeRegistry registry = basicTypeRegistry;
-		List<BasicType> dialectTypeOverrides = factory.getDialect().getTypeOverrides();
-		if ( factory != null && ! dialectTypeOverrides.isEmpty() ) {
-			// scoping to a factory with dialect-specific type overrides;
-			// create a new scopedTypeRegistry and override dialect-specific types
-			// before overriding the "global" type overrides;
-			scopedTypeRegistry = new BasicTypeRegistry();
-			registerTypeOverrides( scopedTypeRegistry, dialectTypeOverrides );
-			registerTypeOverrides( scopedTypeRegistry, typeOverrides );
-			registry = scopedTypeRegistry;
-		}
-		return new TypeResolver( registry.shallowCopy(), typeFactory );
+		return new TypeResolver( basicTypeRegistry.shallowCopy(), typeFactory );
 	}
 
 	public void registerTypeOverride(BasicType type) {
 		basicTypeRegistry.register( type );
-		typeOverrides.add( type );
 	}
 
 	public void registerTypeOverride(UserType type, String[] keys) {
 		basicTypeRegistry.register( type, keys );
-		typeOverrides.add( new CustomType( type, keys ) );
 	}
 
 	public void registerTypeOverride(CompositeUserType type, String[] keys) {
 		basicTypeRegistry.register( type, keys );
-		typeOverrides.add( new CompositeCustomType( type, keys ) );
-	}
-
-	private static void registerTypeOverrides(BasicTypeRegistry typeRegistry, List<BasicType> typeOverrides) {
-		for ( BasicType typeOverride : typeOverrides ) {
-			typeRegistry.register( typeOverride );
-		}
 	}
 
 	public TypeFactory getTypeFactory() {
@@ -110,24 +73,21 @@ public class TypeResolver implements Serializable {
 	}
 
 	/**
-	 * Locate a Hibernate {@linkplain BasicType basic type} given (one of) its registration names;
-	 * if scoped to a {@link SessionFactoryImplementor}, the scoped type is returned.
+	 * Locate a Hibernate {@linkplain BasicType basic type} given (one of) its registration names.
 	 *
 	 * @param name The registration name
 	 *
 	 * @return The registered type
 	 */
 	public BasicType basic(String name) {
-		return scopedTypeRegistry == null ?
-				basicTypeRegistry.getRegisteredType( name ) :
-				scopedTypeRegistry.getRegisteredType( name );
+		return basicTypeRegistry.getRegisteredType( name );
 	}
 
 	/**
 	 * See {@link #heuristicType(String, Properties)}
 	 *
 	 * @param typeName The name (see heuristic algorithm discussion on {@link #heuristicType(String, Properties)}).
-	 * 
+	 *
 	 * @return The deduced type; may be null.
 	 *
 	 * @throws MappingException Can be thrown from {@link #heuristicType(String, Properties)}

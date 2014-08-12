@@ -26,9 +26,9 @@ package org.hibernate.cfg;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-import java.util.Map;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Properties;
 
 import org.hibernate.AnnotationException;
 import org.hibernate.DuplicateMappingException;
@@ -36,22 +36,23 @@ import org.hibernate.MappingException;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.id.factory.DefaultIdentifierGeneratorFactory;
-import org.hibernate.engine.FilterDefinition;
-import org.hibernate.engine.NamedQueryDefinition;
-import org.hibernate.engine.NamedSQLQueryDefinition;
+import org.hibernate.cfg.annotations.NamedEntityGraphDefinition;
+import org.hibernate.cfg.annotations.NamedProcedureCallDefinition;
 import org.hibernate.engine.ResultSetMappingDefinition;
+import org.hibernate.engine.spi.FilterDefinition;
+import org.hibernate.engine.spi.NamedQueryDefinition;
+import org.hibernate.engine.spi.NamedSQLQueryDefinition;
+import org.hibernate.id.factory.spi.MutableIdentifierGeneratorFactory;
+import org.hibernate.mapping.AuxiliaryDatabaseObject;
 import org.hibernate.mapping.Collection;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.FetchProfile;
 import org.hibernate.mapping.IdGenerator;
 import org.hibernate.mapping.Join;
 import org.hibernate.mapping.MetadataSource;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.TypeDef;
-import org.hibernate.mapping.AuxiliaryDatabaseObject;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.FetchProfile;
-import org.hibernate.persister.PersisterClassProvider;
 import org.hibernate.type.TypeResolver;
 
 /**
@@ -89,16 +90,6 @@ public interface Mappings {
 	 * @param namingStrategy The naming strategy to use.
 	 */
 	public void setNamingStrategy(NamingStrategy namingStrategy);
-
-	/**
-	 * Get the current persister class provider implementation
-	 */
-	public PersisterClassProvider getPersisterClassProvider();
-
-	/**
-	 * Set the current persister class provider implementation
-	 */
-	public void setPersisterClassProvider(PersisterClassProvider persisterClassProvider);
 
 	/**
 	 * Returns the currently bound default schema name.
@@ -349,6 +340,35 @@ public interface Mappings {
 	public void addSQLQuery(String name, NamedSQLQueryDefinition query) throws DuplicateMappingException;
 
 	/**
+	 * Adds metadata for a named stored procedure call to this repository.
+	 *
+	 * @param definition The procedure call information
+	 *
+	 * @throws DuplicateMappingException If a query already exists with that name.
+	 */
+	public void addNamedProcedureCallDefinition(NamedProcedureCallDefinition definition) throws DuplicateMappingException;
+
+	/**
+	 * Adds metadata for a named stored procedure call to this repository.
+	 *
+	 * @param definition The procedure call information
+	 *
+	 * @throws DuplicateMappingException If a query already exists with that name.
+	 */
+	public void addDefaultNamedProcedureCallDefinition(NamedProcedureCallDefinition definition) throws DuplicateMappingException;
+
+
+
+	/**
+	 * Adds metadata for a named entity graph to this repository
+	 *
+	 * @param namedEntityGraphDefinition The procedure call information
+	 *
+	 * @throws DuplicateMappingException If an entity graph already exists with that name.
+	 */
+	public void addNamedEntityGraphDefintion(NamedEntityGraphDefinition namedEntityGraphDefinition);
+
+	/**
 	 * Get the metadata for a named SQL result set mapping.
 	 *
 	 * @param name The mapping name.
@@ -521,6 +541,23 @@ public interface Mappings {
 	public void addSecondPass(SecondPass sp, boolean onTopOfTheQueue);
 
 	/**
+	 * Locate the AttributeConverterDefinition corresponding to the given AttributeConverter Class.
+	 *
+	 * @param attributeConverterClass The AttributeConverter Class for which to get the definition
+	 *
+	 * @return The corresponding AttributeConverter definition; will return {@code null} if no corresponding
+	 * definition found.
+	 */
+	public AttributeConverterDefinition locateAttributeConverter(Class attributeConverterClass);
+
+	/**
+	 * All all AttributeConverter definitions
+	 *
+	 * @return The collection of all AttributeConverter definitions.
+	 */
+	public java.util.Collection<AttributeConverterDefinition> getAttributeConverters();
+
+	/**
 	 * Represents a property-ref mapping.
 	 * <p/>
 	 * TODO : currently needs to be exposed because Configuration needs access to it for second-pass processing
@@ -565,7 +602,7 @@ public interface Mappings {
 	 *
 	 * @return The IdentifierGeneratorFactory
 	 */
-	public DefaultIdentifierGeneratorFactory getIdentifierGeneratorFactory();
+	public MutableIdentifierGeneratorFactory getIdentifierGeneratorFactory();
 
 	/**
 	 * add a new MappedSuperclass
@@ -699,7 +736,8 @@ public interface Mappings {
 	/**
 	 * @deprecated Use {@link #getUniqueConstraintHoldersByTable} instead
 	 */
-	@SuppressWarnings({ "JavaDoc" })
+	@Deprecated
+    @SuppressWarnings({ "JavaDoc" })
 	public Map<Table, List<String[]>> getTableUniqueConstraints();
 
 	public Map<Table, List<UniqueConstraintHolder>> getUniqueConstraintHoldersByTable();
@@ -707,10 +745,13 @@ public interface Mappings {
 	/**
 	 * @deprecated Use {@link #addUniqueConstraintHolders} instead
 	 */
-	@SuppressWarnings({ "JavaDoc" })
+	@Deprecated
+    @SuppressWarnings({ "JavaDoc" })
 	public void addUniqueConstraints(Table table, List uniqueConstraints);
 
 	public void addUniqueConstraintHolders(Table table, List<UniqueConstraintHolder> uniqueConstraintHolders);
+
+	public void addJpaIndexHolders(Table table, List<JPAIndexHolder> jpaIndexHolders);
 
 	public void addMappedBy(String entityName, String propertyName, String inversePropertyName);
 
@@ -750,11 +791,40 @@ public interface Mappings {
 
 	/**
 	 * Should we use the new generator strategy mappings.  This is controlled by the
-	 * {@link Configuration#USE_NEW_ID_GENERATOR_MAPPINGS} setting.
+	 * {@link AvailableSettings#USE_NEW_ID_GENERATOR_MAPPINGS} setting.
 	 *
 	 * @return True if the new generators should be used, false otherwise.
 	 */
 	public boolean useNewGeneratorMappings();
+
+	/**
+	 * Should we handle absent DiscriminatorColumn mappings for joined inheritance by implicitly mapping a
+	 * discriminator column?
+	 *
+	 * @return {@code true} indicates we should infer DiscriminatorColumn implicitly (aka, map to a discriminator
+	 * column even without a DiscriminatorColumn annotation); {@code false} (the default) indicates that we should not.
+	 *
+	 * @see AvailableSettings#IMPLICIT_DISCRIMINATOR_COLUMNS_FOR_JOINED_SUBCLASS
+	 */
+	public boolean useImplicitDiscriminatorColumnForJoinedInheritance();
+
+	/**
+	 * Should we ignore explicit DiscriminatorColumn annotations when combined with joined inheritance?
+	 *
+	 * @return {@code true} indicates we should ignore explicit DiscriminatorColumn annotations; {@code false} (the
+	 * default) indicates we should not ignore them
+	 *
+	 * @see AvailableSettings#IGNORE_EXPLICIT_DISCRIMINATOR_COLUMNS_FOR_JOINED_SUBCLASS
+	 */
+	public boolean ignoreExplicitDiscriminatorColumnForJoinedInheritance();
+
+	/**
+	 * Should we use nationalized variants of character data by default?  This is controlled by the
+	 * {@link AvailableSettings#USE_NATIONALIZED_CHARACTER_DATA} setting.
+	 *
+	 * @return {@code true} if nationalized character data should be used by default; {@code false} otherwise.
+	 */
+	public boolean useNationalizedCharacterData();
 
 	/**
 	 * Return the property annotated with @ToOne and @Id if any.
@@ -763,4 +833,6 @@ public interface Mappings {
 	public PropertyData getPropertyAnnotatedWithIdAndToOne(XClass entityType, String propertyName);
 
 	void addToOneAndIdProperty(XClass entity, PropertyData property);
+
+	public boolean forceDiscriminatorInSelectsByDefault();
 }

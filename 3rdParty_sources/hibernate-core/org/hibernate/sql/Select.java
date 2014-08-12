@@ -23,11 +23,10 @@
  *
  */
 package org.hibernate.sql;
-
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.util.StringHelper;
+import org.hibernate.internal.util.StringHelper;
 
 
 /**
@@ -57,7 +56,7 @@ public class Select {
 	 * Construct an SQL <tt>SELECT</tt> statement from the given clauses
 	 */
 	public String toStatementString() {
-		StringBuffer buf = new StringBuffer(guesstimatedBufferSize);
+		StringBuilder buf = new StringBuilder(guesstimatedBufferSize);
 		if ( StringHelper.isNotEmpty(comment) ) {
 			buf.append("/* ").append(comment).append(" */ ");
 		}
@@ -79,7 +78,7 @@ public class Select {
 					buf.append( " and " );
 				}
 			}
-			if ( StringHelper.isNotEmpty(whereClause) ) {
+			if ( StringHelper.isNotEmpty( whereClause ) ) {
 				buf.append(whereClause);
 			}
 		}
@@ -152,6 +151,11 @@ public class Select {
 		return this;
 	}
 
+	public Select setSelectClause(SelectFragment selectFragment) {
+		setSelectClause( selectFragment.toFragmentString().substring( 2 ) );
+		return this;
+	}
+
 	/**
 	 * Sets the whereClause.
 	 * @param whereClause The whereClause to set
@@ -205,5 +209,4 @@ public class Select {
 		LockOptions.copy(lockOptions, this.lockOptions);
 		return this;
 	}
-
 }

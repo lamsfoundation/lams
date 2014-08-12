@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.cfg;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.mapping.SimpleValue;

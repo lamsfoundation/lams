@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import org.springframework.util.Assert;
 
 /**
  * A CCI ConnectionFactory adapter that returns the same Connection on all
- * <code>getConnection</code> calls, and ignores calls to
- * <code>Connection.close()</code>.
+ * {@code getConnection} calls, and ignores calls to
+ * {@code Connection.close()}.
  *
  * <p>Useful for testing and standalone environments, to keep using the same
  * Connection for multiple CciTemplate calls, without having a pooling
@@ -51,6 +51,7 @@ import org.springframework.util.Assert;
  * @see javax.resource.cci.Connection#close()
  * @see org.springframework.jca.cci.core.CciTemplate
  */
+@SuppressWarnings("serial")
 public class SingleConnectionFactory extends DelegatingConnectionFactory implements DisposableBean {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -98,6 +99,7 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 	/**
 	 * Make sure a Connection or ConnectionFactory has been set.
 	 */
+	@Override
 	public void afterPropertiesSet() {
 		if (this.connection == null && getTargetConnectionFactory() == null) {
 			throw new IllegalArgumentException("Connection or 'targetConnectionFactory' is required");
@@ -105,6 +107,7 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 	}
 
 
+	@Override
 	public Connection getConnection() throws ResourceException {
 		synchronized (this.connectionMonitor) {
 			if (this.connection == null) {
@@ -114,6 +117,7 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 		}
 	}
 
+	@Override
 	public Connection getConnection(ConnectionSpec connectionSpec) throws ResourceException {
 		throw new NotSupportedException(
 				"SingleConnectionFactory does not support custom ConnectionSpec");
@@ -125,6 +129,7 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 	 * <p>As this bean implements DisposableBean, a bean factory will
 	 * automatically invoke this on destruction of its cached singletons.
 	 */
+	@Override
 	public void destroy() {
 		resetConnection();
 	}
@@ -208,7 +213,7 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 	protected Connection getCloseSuppressingConnectionProxy(Connection target) {
 		return (Connection) Proxy.newProxyInstance(
 				Connection.class.getClassLoader(),
-				new Class[] {Connection.class},
+				new Class<?>[] {Connection.class},
 				new CloseSuppressingInvocationHandler(target));
 	}
 
@@ -224,14 +229,15 @@ public class SingleConnectionFactory extends DelegatingConnectionFactory impleme
 			this.target = target;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (method.getName().equals("equals")) {
 				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				return (proxy == args[0]);
 			}
 			else if (method.getName().equals("hashCode")) {
 				// Use hashCode of Connection proxy.
-				return new Integer(System.identityHashCode(proxy));
+				return System.identityHashCode(proxy);
 			}
 			else if (method.getName().equals("close")) {
 				// Handle close method: don't pass the call on.

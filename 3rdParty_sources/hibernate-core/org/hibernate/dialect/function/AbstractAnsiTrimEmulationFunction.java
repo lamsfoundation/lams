@@ -23,14 +23,14 @@
  */
 package org.hibernate.dialect.function;
 
-import org.hibernate.Hibernate;
-import org.hibernate.QueryException;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.type.Type;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.QueryException;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.Type;
 
 /**
  * A {@link org.hibernate.dialect.function.SQLFunction} providing support for implementing TRIM functionality
@@ -43,30 +43,22 @@ import java.util.ArrayList;
  * @author Steve Ebersole
  */
 public abstract class AbstractAnsiTrimEmulationFunction implements SQLFunction {
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public final boolean hasArguments() {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public final boolean hasParenthesesIfNoArguments() {
 		return false;
 	}
 
-	/**
-	 * {@inheritDoc} 
-	 */
+	@Override
 	public final Type getReturnType(Type argumentType, Mapping mapping) throws QueryException {
-		return Hibernate.STRING;
+		return StandardBasicTypes.STRING;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public final String render(Type argumentType, List args, SessionFactoryImplementor factory) throws QueryException {
 		// According to both the ANSI-SQL and JPA specs, trim takes a variable number of parameters between 1 and 4.
 		// at least one paramer (trimSource) is required.  From the SQL spec:
@@ -87,27 +79,32 @@ public abstract class AbstractAnsiTrimEmulationFunction implements SQLFunction {
 		if ( args.size() == 1 ) {
 			// we have the form: trim(trimSource)
 			//      so we trim leading and trailing spaces
-			return resolveBothSpaceTrimFunction().render( argumentType, args, factory );			// EARLY EXIT!!!!
+			return resolveBothSpaceTrimFunction().render( argumentType, args, factory );
 		}
-		else if ( "from".equalsIgnoreCase( ( String ) args.get( 0 ) ) ) {
+		else if ( "from".equalsIgnoreCase( (String) args.get( 0 ) ) ) {
 			// we have the form: trim(from trimSource).
 			//      This is functionally equivalent to trim(trimSource)
-			return resolveBothSpaceTrimFromFunction().render( argumentType, args, factory );  		// EARLY EXIT!!!!
+			return resolveBothSpaceTrimFromFunction().render( argumentType, args, factory );
 		}
 		else {
 			// otherwise, a trim-specification and/or a trim-character
 			// have been specified;  we need to decide which options
 			// are present and "do the right thing"
-			boolean leading = true;         // should leading trim-characters be trimmed?
-			boolean trailing = true;        // should trailing trim-characters be trimmed?
-			String trimCharacter;    		// the trim-character (what is to be trimmed off?)
-			String trimSource;       		// the trim-source (from where should it be trimmed?)
+
+			// should leading trim-characters be trimmed?
+			boolean leading = true;
+			// should trailing trim-characters be trimmed?
+			boolean trailing = true;
+			// the trim-character (what is to be trimmed off?)
+			String trimCharacter;
+			// the trim-source (from where should it be trimmed?)
+			String trimSource;
 
 			// potentialTrimCharacterArgIndex = 1 assumes that a
 			// trim-specification has been specified.  we handle the
 			// exception to that explicitly
 			int potentialTrimCharacterArgIndex = 1;
-			String firstArg = ( String ) args.get( 0 );
+			final String firstArg = (String) args.get( 0 );
 			if ( "leading".equalsIgnoreCase( firstArg ) ) {
 				trailing = false;
 			}
@@ -115,15 +112,16 @@ public abstract class AbstractAnsiTrimEmulationFunction implements SQLFunction {
 				leading = false;
 			}
 			else if ( "both".equalsIgnoreCase( firstArg ) ) {
+				// nothing to do here
 			}
 			else {
 				potentialTrimCharacterArgIndex = 0;
 			}
 
-			String potentialTrimCharacter = ( String ) args.get( potentialTrimCharacterArgIndex );
+			final String potentialTrimCharacter = (String) args.get( potentialTrimCharacterArgIndex );
 			if ( "from".equalsIgnoreCase( potentialTrimCharacter ) ) { 
 				trimCharacter = "' '";
-				trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 1 );
+				trimSource = (String) args.get( potentialTrimCharacterArgIndex + 1 );
 			}
 			else if ( potentialTrimCharacterArgIndex + 1 >= args.size() ) {
 				trimCharacter = "' '";
@@ -131,15 +129,15 @@ public abstract class AbstractAnsiTrimEmulationFunction implements SQLFunction {
 			}
 			else {
 				trimCharacter = potentialTrimCharacter;
-				if ( "from".equalsIgnoreCase( ( String ) args.get( potentialTrimCharacterArgIndex + 1 ) ) ) {
-					trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 2 );
+				if ( "from".equalsIgnoreCase( (String) args.get( potentialTrimCharacterArgIndex + 1 ) ) ) {
+					trimSource = (String) args.get( potentialTrimCharacterArgIndex + 2 );
 				}
 				else {
-					trimSource = ( String ) args.get( potentialTrimCharacterArgIndex + 1 );
+					trimSource = (String) args.get( potentialTrimCharacterArgIndex + 1 );
 				}
 			}
 
-			List argsToUse = new ArrayList();
+			final List<String> argsToUse = new ArrayList<String>();
 			argsToUse.add( trimSource );
 			argsToUse.add( trimCharacter );
 

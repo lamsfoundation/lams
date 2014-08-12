@@ -24,14 +24,30 @@
 
 <module xmlns="urn:jboss:module:1.3" name="org.springframework">
   <resources>
-    <resource-root path="jboss-spring-int-deployers.jar"/>
-    <resource-root path="jboss-spring-int-vfs.jar"/>
-    <resource-root path="spring.jar"/>
+    <resource-root path="spring-core-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-beans-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-context-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-context-support-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-orm-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-tx-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-web-4.0.6.RELEASE.jar"/>
   </resources>
+  <!-- 
   <dependencies>
+  	<system>
+  		<paths>
+  			<path name="javax/naming"/>
+  			<path name="javax/sql"/>
+  		</paths>
+  	</system>
   	<module name="javax.servlet.api" />
-  	<module name="org.hibernate" />
+  	<module name="javax.transaction.api" />
+  	<module name="org.hibernate" slot="3" />
   	<module name="org.apache.commons.logging" />
   	<module name="org.apache.xmlcommons" />
+  	<module name="org.jboss.logging" />
+  	<module name="org.jboss.vfs" slot="2" />
+  	<module name="org.quartz" />
   </dependencies>
+  -->
 </module>

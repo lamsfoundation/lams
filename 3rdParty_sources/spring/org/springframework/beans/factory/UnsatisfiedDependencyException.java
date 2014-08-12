@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 03.09.2003
  */
+@SuppressWarnings("serial")
 public class UnsatisfiedDependencyException extends BeanCreationException {
 
 	/**
@@ -68,7 +69,7 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 	 * @param msg the detail message
 	 */
 	public UnsatisfiedDependencyException(
-			String resourceDescription, String beanName, int ctorArgIndex, Class ctorArgType, String msg) {
+			String resourceDescription, String beanName, int ctorArgIndex, Class<?> ctorArgType, String msg) {
 
 		super(resourceDescription, beanName,
 				"Unsatisfied dependency expressed through constructor argument with index " +
@@ -85,7 +86,7 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 	 * @param ex the bean creation exception that indicated the unsatisfied dependency
 	 */
 	public UnsatisfiedDependencyException(
-			String resourceDescription, String beanName, int ctorArgIndex, Class ctorArgType, BeansException ex) {
+			String resourceDescription, String beanName, int ctorArgIndex, Class<?> ctorArgType, BeansException ex) {
 
 		this(resourceDescription, beanName, ctorArgIndex, ctorArgType, (ex != null ? ": " + ex.getMessage() : ""));
 		initCause(ex);

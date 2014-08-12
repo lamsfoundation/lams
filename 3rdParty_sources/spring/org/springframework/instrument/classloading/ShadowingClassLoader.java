@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,15 +48,15 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	/** Packages that are excluded by default */
 	public static final String[] DEFAULT_EXCLUDED_PACKAGES =
 			new String[] {"java.", "javax.", "sun.", "oracle.", "com.sun.", "com.ibm.", "COM.ibm.",
-					"org.w3c.", "org.xml.", "org.dom4j.", "org.eclipse", "org.aspectj.", "net.sf.cglib.",
-					"org.apache.xerces.", "org.apache.commons.logging."};
+					"org.w3c.", "org.xml.", "org.dom4j.", "org.eclipse", "org.aspectj.", "net.sf.cglib",
+					"org.springframework.cglib", "org.apache.xerces.", "org.apache.commons.logging."};
 
 
 	private final ClassLoader enclosingClassLoader;
 
 	private final List<ClassFileTransformer> classFileTransformers = new LinkedList<ClassFileTransformer>();
 
-	private final Map<String, Class> classCache = new HashMap<String, Class>();
+	private final Map<String, Class<?>> classCache = new HashMap<String, Class<?>>();
 
 
 	/**
@@ -66,8 +66,8 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	public ShadowingClassLoader(ClassLoader enclosingClassLoader) {
 		Assert.notNull(enclosingClassLoader, "Enclosing ClassLoader must not be null");
 		this.enclosingClassLoader = enclosingClassLoader;
-		for (int i = 0; i < DEFAULT_EXCLUDED_PACKAGES.length; i++) {
-			excludePackage(DEFAULT_EXCLUDED_PACKAGES[i]);
+		for (String excludedPackage : DEFAULT_EXCLUDED_PACKAGES) {
+			excludePackage(excludedPackage);
 		}
 	}
 
@@ -93,9 +93,10 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 
+	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		if (shouldShadow(name)) {
-			Class cls = this.classCache.get(name);
+			Class<?> cls = this.classCache.get(name);
 			if (cls != null) {
 				return cls;
 			}
@@ -112,8 +113,8 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	 * @return whether the specified class should be shadowed
 	 */
 	private boolean shouldShadow(String className) {
-		return (!className.equals(getClass().getName()) && !className.endsWith("ShadowingClassLoader")
-				&& isEligibleForShadowing(className) && !isClassNameExcludedFromShadowing(className));
+		return (!className.equals(getClass().getName()) && !className.endsWith("ShadowingClassLoader") &&
+				isEligibleForShadowing(className));
 	}
 
 	/**
@@ -127,19 +128,8 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 		return !isExcluded(className);
 	}
 
-	/**
-	 * Subclasses can override this method to specify whether or not a
-	 * particular class should be excluded from shadowing.
-	 * @param className the class name to test
-	 * @return whether the specified class is excluded
-	 * @deprecated in favor of {@link #isEligibleForShadowing}
-	 */
-	protected boolean isClassNameExcludedFromShadowing(String className) {
-		return false;
-	}
 
-
-	private Class doLoadClass(String name) throws ClassNotFoundException {
+	private Class<?> doLoadClass(String name) throws ClassNotFoundException {
 		String internalName = StringUtils.replace(name, ".", "/") + ".class";
 		InputStream is = this.enclosingClassLoader.getResourceAsStream(internalName);
 		if (is == null) {
@@ -148,7 +138,7 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 		try {
 			byte[] bytes = FileCopyUtils.copyToByteArray(is);
 			bytes = applyTransformers(name, bytes);
-			Class cls = defineClass(name, bytes, 0, bytes.length);
+			Class<?> cls = defineClass(name, bytes, 0, bytes.length);
 			// Additional check for defining the package, if not defined yet.
 			if (cls.getPackage() == null) {
 				int packageSeparator = name.lastIndexOf('.');
@@ -180,14 +170,17 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 
+	@Override
 	public URL getResource(String name) {
 		return this.enclosingClassLoader.getResource(name);
 	}
 
+	@Override
 	public InputStream getResourceAsStream(String name) {
 		return this.enclosingClassLoader.getResourceAsStream(name);
 	}
 
+	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
 		return this.enclosingClassLoader.getResources(name);
 	}

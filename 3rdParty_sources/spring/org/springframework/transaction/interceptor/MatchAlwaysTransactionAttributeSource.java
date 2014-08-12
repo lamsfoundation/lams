@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.transaction.interceptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -33,8 +34,9 @@ import org.springframework.util.ObjectUtils;
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean
  * @see org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator
  */
+@SuppressWarnings("serial")
 public class MatchAlwaysTransactionAttributeSource implements TransactionAttributeSource, Serializable {
-  
+
 	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
 
@@ -49,11 +51,13 @@ public class MatchAlwaysTransactionAttributeSource implements TransactionAttribu
 	}
 
 
-	public TransactionAttribute getTransactionAttribute(Method method, Class targetClass) {
-		return this.transactionAttribute;
+	@Override
+	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
+		return (method == null || ClassUtils.isUserLevelMethod(method) ? this.transactionAttribute : null);
 	}
 
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -65,10 +69,12 @@ public class MatchAlwaysTransactionAttributeSource implements TransactionAttribu
 		return ObjectUtils.nullSafeEquals(this.transactionAttribute, otherTas.transactionAttribute);
 	}
 
+	@Override
 	public int hashCode() {
 		return MatchAlwaysTransactionAttributeSource.class.hashCode();
 	}
 
+	@Override
 	public String toString() {
 		return getClass().getName() + ": " + this.transactionAttribute;
 	}

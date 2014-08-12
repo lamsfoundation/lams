@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.TypeConverter;
 import org.springframework.core.GenericCollectionTypeResolver;
-import org.springframework.core.JdkVersion;
 
 /**
  * Simple factory for shared Set instances. Allows for central setup
@@ -34,17 +32,18 @@ import org.springframework.core.JdkVersion;
  * @see ListFactoryBean
  * @see MapFactoryBean
  */
-public class SetFactoryBean extends AbstractFactoryBean {
+public class SetFactoryBean extends AbstractFactoryBean<Set<Object>> {
 
-	private Set sourceSet;
+	private Set<?> sourceSet;
 
-	private Class targetSetClass;
+	@SuppressWarnings("rawtypes")
+	private Class<? extends Set> targetSetClass;
 
 
 	/**
 	 * Set the source Set, typically populated via XML "set" elements.
 	 */
-	public void setSourceSet(Set sourceSet) {
+	public void setSourceSet(Set<?> sourceSet) {
 		this.sourceSet = sourceSet;
 	}
 
@@ -54,7 +53,8 @@ public class SetFactoryBean extends AbstractFactoryBean {
 	 * <p>Default is a linked HashSet, keeping the registration order.
 	 * @see java.util.LinkedHashSet
 	 */
-	public void setTargetSetClass(Class targetSetClass) {
+	@SuppressWarnings("rawtypes")
+	public void setTargetSetClass(Class<? extends Set> targetSetClass) {
 		if (targetSetClass == null) {
 			throw new IllegalArgumentException("'targetSetClass' must not be null");
 		}
@@ -65,29 +65,33 @@ public class SetFactoryBean extends AbstractFactoryBean {
 	}
 
 
-	public Class getObjectType() {
+	@Override
+	@SuppressWarnings("rawtypes")
+	public Class<Set> getObjectType() {
 		return Set.class;
 	}
 
-	protected Object createInstance() {
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Set<Object> createInstance() {
 		if (this.sourceSet == null) {
 			throw new IllegalArgumentException("'sourceSet' is required");
 		}
-		Set result = null;
+		Set<Object> result = null;
 		if (this.targetSetClass != null) {
-			result = (Set) BeanUtils.instantiateClass(this.targetSetClass);
+			result = BeanUtils.instantiateClass(this.targetSetClass);
 		}
 		else {
-			result = new LinkedHashSet(this.sourceSet.size());
+			result = new LinkedHashSet<Object>(this.sourceSet.size());
 		}
-		Class valueType = null;
-		if (this.targetSetClass != null && JdkVersion.isAtLeastJava15()) {
+		Class<?> valueType = null;
+		if (this.targetSetClass != null) {
 			valueType = GenericCollectionTypeResolver.getCollectionType(this.targetSetClass);
 		}
 		if (valueType != null) {
 			TypeConverter converter = getBeanTypeConverter();
-			for (Iterator it = this.sourceSet.iterator(); it.hasNext();) {
-				result.add(converter.convertIfNecessary(it.next(), valueType));
+			for (Object elem : this.sourceSet) {
+				result.add(converter.convertIfNecessary(elem, valueType));
 			}
 		}
 		else {

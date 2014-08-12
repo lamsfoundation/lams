@@ -23,19 +23,18 @@
  */
 package org.hibernate.type;
 
-import java.sql.Timestamp;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
-import org.hibernate.engine.SessionImplementor;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.exception.JDBCExceptionHelper;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreMessageLogger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 /**
  * <tt>dbtimestamp</tt>: An extension of {@link TimestampType} which
@@ -51,8 +50,9 @@ import org.slf4j.LoggerFactory;
 public class DbTimestampType extends TimestampType {
 	public static final DbTimestampType INSTANCE = new DbTimestampType();
 
-	private static final Logger log = LoggerFactory.getLogger( DbTimestampType.class );
-	
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger( CoreMessageLogger.class, DbTimestampType.class.getName() );
+
+	@Override
 	public String getName() {
 		return "dbtimestamp";
 	}
@@ -62,13 +62,14 @@ public class DbTimestampType extends TimestampType {
 		return new String[] { getName() };
 	}
 
+	@Override
 	public Date seed(SessionImplementor session) {
 		if ( session == null ) {
-			log.trace( "incoming session was null; using current jvm time" );
+			LOG.trace( "Incoming session was null; using current jvm time" );
 			return super.seed( session );
 		}
 		else if ( !session.getFactory().getDialect().supportsCurrentTimestampSelection() ) {
-			log.debug( "falling back to vm-based timestamp, as dialect does not support current timestamp selection" );
+			LOG.debug( "Falling back to vm-based timestamp, as dialect does not support current timestamp selection" );
 			return super.seed( session );
 		}
 		else {
@@ -79,46 +80,35 @@ public class DbTimestampType extends TimestampType {
 	private Date getCurrentTimestamp(SessionImplementor session) {
 		Dialect dialect = session.getFactory().getDialect();
 		String timestampSelectString = dialect.getCurrentTimestampSelectString();
-		if ( dialect.isCurrentTimestampSelectStringCallable() ) {
-			return useCallableStatement( timestampSelectString, session );
-		}
-		else {
-			return usePreparedStatement( timestampSelectString, session );
-		}
+        if (dialect.isCurrentTimestampSelectStringCallable()) return useCallableStatement(timestampSelectString, session);
+        return usePreparedStatement(timestampSelectString, session);
 	}
 
 	private Timestamp usePreparedStatement(String timestampSelectString, SessionImplementor session) {
 		PreparedStatement ps = null;
 		try {
-			ps = session.getBatcher().prepareStatement( timestampSelectString );
-			ResultSet rs = session.getBatcher().getResultSet( ps );
+			ps = session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( timestampSelectString, false );
+			ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( ps );
 			rs.next();
 			Timestamp ts = rs.getTimestamp( 1 );
-			if ( log.isTraceEnabled() ) {
-				log.trace(
-				        "current timestamp retreived from db : " + ts +
-				        " (nanos=" + ts.getNanos() +
-				        ", time=" + ts.getTime() + ")"
-					);
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracev( "Current timestamp retreived from db : {0} (nanos={1}, time={2})", ts, ts.getNanos(), ts.getTime() );
 			}
 			return ts;
 		}
-		catch( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-			        session.getFactory().getSQLExceptionConverter(),
-			        sqle,
+		catch( SQLException e ) {
+			throw session.getFactory().getSQLExceptionHelper().convert(
+			        e,
 			        "could not select current db timestamp",
 			        timestampSelectString
-				);
+			);
 		}
 		finally {
 			if ( ps != null ) {
-				try {
-					session.getBatcher().closeStatement( ps );
-				}
-				catch( SQLException sqle ) {
-					log.warn( "unable to clean up prepared statement", sqle );
-				}
+				session.getTransactionCoordinator().getJdbcCoordinator().release( ps );
 			}
 		}
 	}
@@ -126,35 +116,28 @@ public class DbTimestampType extends TimestampType {
 	private Timestamp useCallableStatement(String callString, SessionImplementor session) {
 		CallableStatement cs = null;
 		try {
-			cs = session.getBatcher().prepareCallableStatement( callString );
+			cs = (CallableStatement) session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( callString, true );
 			cs.registerOutParameter( 1, java.sql.Types.TIMESTAMP );
-			cs.execute();
+			session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().execute( cs );
 			Timestamp ts = cs.getTimestamp( 1 );
-			if ( log.isTraceEnabled() ) {
-				log.trace(
-				        "current timestamp retreived from db : " + ts +
-				        " (nanos=" + ts.getNanos() +
-				        ", time=" + ts.getTime() + ")"
-					);
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracev( "Current timestamp retreived from db : {0} (nanos={1}, time={2})", ts, ts.getNanos(), ts.getTime() );
 			}
 			return ts;
 		}
-		catch( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-			        session.getFactory().getSQLExceptionConverter(),
-			        sqle,
+		catch( SQLException e ) {
+			throw session.getFactory().getSQLExceptionHelper().convert(
+			        e,
 			        "could not call current db timestamp function",
 			        callString
-				);
+			);
 		}
 		finally {
 			if ( cs != null ) {
-				try {
-					session.getBatcher().closeStatement( cs );
-				}
-				catch( SQLException sqle ) {
-					log.warn( "unable to clean up callable statement", sqle );
-				}
+				session.getTransactionCoordinator().getJdbcCoordinator().release( cs );
 			}
 		}
 	}

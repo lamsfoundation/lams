@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ public abstract class BindingResultUtils {
 	 * Find the BindingResult for the given name in the given model.
 	 * @param model the model to search
 	 * @param name the name of the target object to find a BindingResult for
-	 * @return the BindingResult, or <code>null</code> if none found
+	 * @return the BindingResult, or {@code null} if none found
 	 * @throws IllegalStateException if the attribute found is not of type BindingResult
 	 */
-	public static BindingResult getBindingResult(Map model, String name) {
+	public static BindingResult getBindingResult(Map<?, ?> model, String name) {
 		Assert.notNull(model, "Model map must not be null");
 		Assert.notNull(name, "Name must not be null");
 		Object attr = model.get(BindingResult.MODEL_KEY_PREFIX + name);
@@ -50,10 +50,10 @@ public abstract class BindingResultUtils {
 	 * Find a required BindingResult for the given name in the given model.
 	 * @param model the model to search
 	 * @param name the name of the target object to find a BindingResult for
-	 * @return the BindingResult (never <code>null</code>)
+	 * @return the BindingResult (never {@code null})
 	 * @throws IllegalStateException if no BindingResult found
 	 */
-	public static BindingResult getRequiredBindingResult(Map model, String name) {
+	public static BindingResult getRequiredBindingResult(Map<?, ?> model, String name) {
 		BindingResult bindingResult = getBindingResult(model, name);
 		if (bindingResult == null) {
 			throw new IllegalStateException("No BindingResult attribute found for name '" + name +

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.transaction.interceptor;
 
-import org.springframework.util.Assert;
-
 import java.io.Serializable;
+
+import org.springframework.util.Assert;
 
 /**
  * Rule determining whether or not a given exception (and any subclasses)
@@ -31,6 +31,7 @@ import java.io.Serializable;
  * @since 09.04.2003
  * @see NoRollbackRuleAttribute
  */
+@SuppressWarnings("serial")
 public class RollbackRuleAttribute implements Serializable{
 
 	/**
@@ -50,16 +51,16 @@ public class RollbackRuleAttribute implements Serializable{
 
 
 	/**
-	 * Create a new instance of the <code>RollbackRuleAttribute</code> class.
+	 * Create a new instance of the {@code RollbackRuleAttribute} class.
 	 * <p>This is the preferred way to construct a rollback rule that matches
 	 * the supplied {@link Exception} class (and subclasses).
 	 * @param clazz throwable class; must be {@link Throwable} or a subclass
-	 * of <code>Throwable</code>
-	 * @throws IllegalArgumentException if the supplied <code>clazz</code> is
-	 * not a <code>Throwable</code> type or is <code>null</code>
+	 * of {@code Throwable}
+	 * @throws IllegalArgumentException if the supplied {@code clazz} is
+	 * not a {@code Throwable} type or is {@code null}
 	 */
-	public RollbackRuleAttribute(Class clazz) {
-		Assert.notNull(clazz, "'clazz' cannot be null.");
+	public RollbackRuleAttribute(Class<?> clazz) {
+		Assert.notNull(clazz, "'clazz' cannot be null");
 		if (!Throwable.class.isAssignableFrom(clazz)) {
 			throw new IllegalArgumentException(
 					"Cannot construct rollback rule from [" + clazz.getName() + "]: it's not a Throwable");
@@ -68,11 +69,11 @@ public class RollbackRuleAttribute implements Serializable{
 	}
 
 	/**
-	 * Create a new instance of the <code>RollbackRuleAttribute</code> class
-	 * for the given <code>exceptionName</code>.
+	 * Create a new instance of the {@code RollbackRuleAttribute} class
+	 * for the given {@code exceptionName}.
 	 * <p>This can be a substring, with no wildcard support at present. A value
 	 * of "ServletException" would match
-	 * <code>javax.servlet.ServletException</code> and subclasses, for example.
+	 * {@code javax.servlet.ServletException} and subclasses, for example.
 	 * <p><b>NB:</b> Consider carefully how specific the pattern is, and
 	 * whether to include package information (which is not mandatory). For
 	 * example, "Exception" will match nearly anything, and will probably hide
@@ -83,10 +84,10 @@ public class RollbackRuleAttribute implements Serializable{
 	 * @param exceptionName the exception name pattern; can also be a fully
 	 * package-qualified class name
 	 * @throws IllegalArgumentException if the supplied
-	 * <code>exceptionName</code> is <code>null</code> or empty
+	 * {@code exceptionName} is {@code null} or empty
 	 */
 	public RollbackRuleAttribute(String exceptionName) {
-		Assert.hasText(exceptionName, "'exceptionName' cannot be null or empty.");
+		Assert.hasText(exceptionName, "'exceptionName' cannot be null or empty");
 		this.exceptionName = exceptionName;
 	}
 
@@ -100,8 +101,8 @@ public class RollbackRuleAttribute implements Serializable{
 
 	/**
 	 * Return the depth of the superclass matching.
-	 * <p><code>0</code> means <code>ex</code> matches exactly. Returns
-	 * <code>-1</code> if there is no match. Otherwise, returns depth with the
+	 * <p>{@code 0} means {@code ex} matches exactly. Returns
+	 * {@code -1} if there is no match. Otherwise, returns depth with the
 	 * lowest depth winning.
 	 */
 	public int getDepth(Throwable ex) {
@@ -109,8 +110,8 @@ public class RollbackRuleAttribute implements Serializable{
 	}
 
 
-	private int getDepth(Class exceptionClass, int depth) {
-		if (exceptionClass.getName().indexOf(this.exceptionName) != -1) {
+	private int getDepth(Class<?> exceptionClass, int depth) {
+		if (exceptionClass.getName().contains(this.exceptionName)) {
 			// Found it!
 			return depth;
 		}
@@ -122,6 +123,7 @@ public class RollbackRuleAttribute implements Serializable{
 	}
 
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -132,11 +134,13 @@ public class RollbackRuleAttribute implements Serializable{
 		RollbackRuleAttribute rhs = (RollbackRuleAttribute) other;
 		return this.exceptionName.equals(rhs.exceptionName);
 	}
-	
+
+	@Override
 	public int hashCode() {
 		return this.exceptionName.hashCode();
 	}
 
+	@Override
 	public String toString() {
 		return "RollbackRuleAttribute with pattern [" + this.exceptionName + "]";
 	}

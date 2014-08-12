@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2005 the original author or authors.
- * 
+ * Copyright 2002-2012 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ package org.springframework.beans.factory.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -30,40 +31,48 @@ import org.springframework.beans.factory.InitializingBean;
  * one Log instance per class name, e.g. for common log topics.
  *
  * @author Juergen Hoeller
- * @see org.apache.commons.logging.Log
  * @since 16.11.2003
+ * @see org.apache.commons.logging.Log
+ * @deprecated as of Spring 3.2, in favor of a bean definition that points
+ * to the bean class "org.apache.commons.logging.LogFactory" and the factory
+ * method "getLog", passing in the log name as constructor argument
  */
-public class CommonsLogFactoryBean implements FactoryBean, InitializingBean {
+@Deprecated
+public class CommonsLogFactoryBean implements FactoryBean<Log>, InitializingBean {
 
-    private Log log;
-
-
-    /**
-     * The name of the log.
-     * <p>This property is required.
-     * @param logName the name of the log
-     */
-    public void setLogName(String logName) {
-        this.log = LogFactory.getLog(logName);
-    }
+	private Log log;
 
 
-    public void afterPropertiesSet() {
-        if (this.log == null) {
-            throw new IllegalArgumentException("logName is required");
-        }
-    }
+	/**
+	 * The name of the log.
+	 * <p>This property is required.
+	 * @param logName the name of the log
+	 */
+	public void setLogName(String logName) {
+		this.log = LogFactory.getLog(logName);
+	}
 
-    public Object getObject() {
-        return log;
-    }
 
-    public Class getObjectType() {
-        return (this.log != null ? this.log.getClass() : Log.class);
-    }
+	@Override
+	public void afterPropertiesSet() {
+		if (this.log == null) {
+			throw new IllegalArgumentException("'logName' is required");
+		}
+	}
 
-    public boolean isSingleton() {
-        return true;
-    }
+	@Override
+	public Log getObject() {
+		return this.log;
+	}
+
+	@Override
+	public Class<? extends Log> getObjectType() {
+		return (this.log != null ? this.log.getClass() : Log.class);
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
 
 }

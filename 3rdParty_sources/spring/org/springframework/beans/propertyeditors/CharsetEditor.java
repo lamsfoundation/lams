@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@ import java.nio.charset.Charset;
 import org.springframework.util.StringUtils;
 
 /**
- * Editor for {@link Charset}, to directly populate a Charset property.
+ * Editor for {@code java.nio.charset.Charset}, translating charset
+ * String representations into Charset objects and back.
  *
  * <p>Expects the same syntax as Charset's {@link java.nio.charset.Charset#name()},
- * e.g. <code>UTF-8</code>, <code>ISO-8859-16</code>, etc.
+ * e.g. {@code UTF-8}, {@code ISO-8859-16}, etc.
  *
  * @author Arjen Poutsma
  * @since 2.5.4
@@ -33,6 +34,7 @@ import org.springframework.util.StringUtils;
  */
 public class CharsetEditor extends PropertyEditorSupport {
 
+	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		if (StringUtils.hasText(text)) {
 			setValue(Charset.forName(text));
@@ -42,6 +44,7 @@ public class CharsetEditor extends PropertyEditorSupport {
 		}
 	}
 
+	@Override
 	public String getAsText() {
 		Charset value = (Charset) getValue();
 		return (value != null ? value.name() : "");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 package org.springframework.context.annotation;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
 
 /**
- * A {@link ScopeMetadataResolver} implementation that (by default) checks for
- * the presence of the {@link Scope} annotation on the bean class.
+ * A {@link ScopeMetadataResolver} implementation that by default checks for
+ * the presence of Spring's {@link Scope} annotation on the bean class.
  *
  * <p>The exact type of annotation that is checked for is configurable via the
  * {@link #setScopeAnnotationType(Class)} property.
@@ -33,31 +33,31 @@ import org.springframework.util.Assert;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 2.5
- * @see Scope
+ * @see org.springframework.context.annotation.Scope
  */
 public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
-	private Class<? extends Annotation> scopeAnnotationType = Scope.class;
-	
-	private ScopedProxyMode scopedProxyMode;
+	private final ScopedProxyMode defaultProxyMode;
+
+	protected Class<? extends Annotation> scopeAnnotationType = Scope.class;
 
 
 	/**
-	 * Create a new instance of the <code>AnnotationScopeMetadataResolver</code> class.
+	 * Create a new instance of the {@code AnnotationScopeMetadataResolver} class.
 	 * @see #AnnotationScopeMetadataResolver(ScopedProxyMode)
 	 * @see ScopedProxyMode#NO
 	 */
 	public AnnotationScopeMetadataResolver() {
-		this(ScopedProxyMode.NO);
+		this.defaultProxyMode = ScopedProxyMode.NO;
 	}
 
 	/**
-	 * Create a new instance of the <code>AnnotationScopeMetadataResolver</code> class.
-	 * @param scopedProxyMode the desired scoped-proxy mode
+	 * Create a new instance of the {@code AnnotationScopeMetadataResolver} class.
+	 * @param defaultProxyMode the desired scoped-proxy mode
 	 */
-	public AnnotationScopeMetadataResolver(ScopedProxyMode scopedProxyMode) {
-		Assert.notNull(scopedProxyMode, "'scopedProxyMode' must not be null");
-		this.scopedProxyMode = scopedProxyMode;
+	public AnnotationScopeMetadataResolver(ScopedProxyMode defaultProxyMode) {
+		Assert.notNull(defaultProxyMode, "'defaultProxyMode' must not be null");
+		this.defaultProxyMode = defaultProxyMode;
 	}
 
 
@@ -70,19 +70,21 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 		Assert.notNull(scopeAnnotationType, "'scopeAnnotationType' must not be null");
 		this.scopeAnnotationType = scopeAnnotationType;
 	}
-	
 
+
+	@Override
 	public ScopeMetadata resolveScopeMetadata(BeanDefinition definition) {
 		ScopeMetadata metadata = new ScopeMetadata();
 		if (definition instanceof AnnotatedBeanDefinition) {
 			AnnotatedBeanDefinition annDef = (AnnotatedBeanDefinition) definition;
-			Map<String, Object> attributes =
-					annDef.getMetadata().getAnnotationAttributes(this.scopeAnnotationType.getName());
+			AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(annDef.getMetadata(), this.scopeAnnotationType);
 			if (attributes != null) {
-				metadata.setScopeName((String) attributes.get("value"));
-			}
-			if (!metadata.getScopeName().equals(BeanDefinition.SCOPE_SINGLETON)) {
-				metadata.setScopedProxyMode(this.scopedProxyMode);
+				metadata.setScopeName(attributes.getString("value"));
+				ScopedProxyMode proxyMode = attributes.getEnum("proxyMode");
+				if (proxyMode == null || proxyMode == ScopedProxyMode.DEFAULT) {
+					proxyMode = this.defaultProxyMode;
+				}
+				metadata.setScopedProxyMode(proxyMode);
 			}
 		}
 		return metadata;

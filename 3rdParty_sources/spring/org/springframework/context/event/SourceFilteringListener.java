@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.context.event;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.Ordered;
 
 /**
  * {@link org.springframework.context.ApplicationListener} decorator that filters
@@ -30,11 +31,11 @@ import org.springframework.context.ApplicationListener;
  * @author Juergen Hoeller
  * @since 2.0.5
  */
-public class SourceFilteringListener implements ApplicationListener {
+public class SourceFilteringListener implements SmartApplicationListener {
 
 	private final Object source;
 
-	private ApplicationListener delegate;
+	private SmartApplicationListener delegate;
 
 
 	/**
@@ -44,9 +45,10 @@ public class SourceFilteringListener implements ApplicationListener {
 	 * @param delegate the delegate listener to invoke with event
 	 * from the specified source
 	 */
-	public SourceFilteringListener(Object source, ApplicationListener delegate) {
+	public SourceFilteringListener(Object source, ApplicationListener<?> delegate) {
 		this.source = source;
-		this.delegate = delegate;
+		this.delegate = (delegate instanceof SmartApplicationListener ?
+				(SmartApplicationListener) delegate : new GenericApplicationListenerAdapter(delegate));
 	}
 
 	/**
@@ -61,11 +63,28 @@ public class SourceFilteringListener implements ApplicationListener {
 	}
 
 
+	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (event.getSource() == this.source) {
 			onApplicationEventInternal(event);
 		}
 	}
+
+	@Override
+	public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
+		return (this.delegate == null || this.delegate.supportsEventType(eventType));
+	}
+
+	@Override
+	public boolean supportsSourceType(Class<?> sourceType) {
+		return (sourceType != null && sourceType.isInstance(this.source));
+	}
+
+	@Override
+	public int getOrder() {
+		return (this.delegate != null ? this.delegate.getOrder() : Ordered.LOWEST_PRECEDENCE);
+	}
+
 
 	/**
 	 * Actually process the event, after having filtered according to the

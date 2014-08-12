@@ -28,29 +28,30 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.dom4j.Element;
-import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentMap;
-import org.hibernate.collection.PersistentMapElementHolder;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.internal.PersistentMap;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 
 
 public class MapType extends CollectionType {
 
+	/**
+	 * @deprecated Use {@link #MapType(TypeFactory.TypeScope, String, String ) } instead.
+	 * See Jira issue: <a href="https://hibernate.onjira.com/browse/HHH-7771">HHH-7771</a>
+	 */
+	@Deprecated
 	public MapType(TypeFactory.TypeScope typeScope, String role, String propertyRef, boolean isEmbeddedInXML) {
 		super( typeScope, role, propertyRef, isEmbeddedInXML );
 	}
 
+	public MapType(TypeFactory.TypeScope typeScope, String role, String propertyRef) {
+		super( typeScope, role, propertyRef );
+	}
+
 	public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister, Serializable key) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentMapElementHolder(session, persister, key);
-		}
-		else {
-			return new PersistentMap(session);
-		}
+		return new PersistentMap(session);
 	}
 
 	public Class getReturnedClass() {
@@ -62,12 +63,7 @@ public class MapType extends CollectionType {
 	}
 
 	public PersistentCollection wrap(SessionImplementor session, Object collection) {
-		if ( session.getEntityMode()==EntityMode.DOM4J ) {
-			return new PersistentMapElementHolder( session, (Element) collection );
-		}
-		else {
-			return new PersistentMap( session, (java.util.Map) collection );
-		}
+		return new PersistentMap( session, (java.util.Map) collection );
 	}
 	
 	public Object instantiate(int anticipatedSize) {

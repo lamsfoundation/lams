@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package org.springframework.context.i18n;
 
 import java.util.Locale;
 
-import org.springframework.util.Assert;
-
 /**
  * Simple implementation of the {@link LocaleContext} interface,
- * always returning a specified <code>Locale</code>.
+ * always returning a specified {@code Locale}.
  *
  * @author Juergen Hoeller
  * @since 1.2
+ * @see LocaleContextHolder#setLocaleContext
+ * @see LocaleContextHolder#getLocale()
+ * @see SimpleTimeZoneAwareLocaleContext
  */
 public class SimpleLocaleContext implements LocaleContext {
 
@@ -34,20 +35,21 @@ public class SimpleLocaleContext implements LocaleContext {
 
 	/**
 	 * Create a new SimpleLocaleContext that exposes the specified Locale.
-	 * Every <code>getLocale()</code> will return this Locale.
+	 * Every {@link #getLocale()} call will return this Locale.
 	 * @param locale the Locale to expose
 	 */
 	public SimpleLocaleContext(Locale locale) {
-		Assert.notNull(locale, "Locale must not be null");
 		this.locale = locale;
 	}
 
+	@Override
 	public Locale getLocale() {
 		return this.locale;
 	}
 
+	@Override
 	public String toString() {
-		return this.locale.toString();
+		return (this.locale != null ? this.locale.toString() : "-");
 	}
 
 }

@@ -22,10 +22,8 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.type;
-
 import org.hibernate.type.descriptor.java.ByteArrayTypeDescriptor;
 import org.hibernate.type.descriptor.sql.BlobTypeDescriptor;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
  * A type that maps JDBC {@link java.sql.Types#BLOB BLOB} and {@code Byte[]}.
@@ -33,25 +31,15 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  *
  * @author Strong Liu
  */
-public class WrappedMaterializedBlobType extends LobType<Byte[]> {
-
+public class WrappedMaterializedBlobType extends AbstractSingleColumnStandardBasicType<Byte[]> {
 	public static final WrappedMaterializedBlobType INSTANCE = new WrappedMaterializedBlobType();
 
 	public WrappedMaterializedBlobType() {
-		this(
-				BlobTypeDescriptor.DEFAULT,
-				new AlternativeLobTypes.BlobTypes<Byte[],WrappedMaterializedBlobType>(
-						WrappedMaterializedBlobType.class
-				)
-		);
-	}
-
-	protected WrappedMaterializedBlobType(SqlTypeDescriptor sqlTypeDescriptor,
-										  AlternativeLobTypes.BlobTypes<Byte[],WrappedMaterializedBlobType> clobTypes) {
-		super( sqlTypeDescriptor, ByteArrayTypeDescriptor.INSTANCE, clobTypes );
+		super( BlobTypeDescriptor.DEFAULT, ByteArrayTypeDescriptor.INSTANCE );
 	}
 
 	public String getName() {
-		return "wrapper_materialized_blob";
+		// todo name these annotation types for addition to the registry
+		return null;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.mail;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,9 +30,10 @@ import org.springframework.util.ObjectUtils;
  * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
  */
+@SuppressWarnings("serial")
 public class MailSendException extends MailException {
 
-	private transient Map failedMessages;
+	private transient final Map<Object, Exception> failedMessages;
 
 	private Exception[] messageExceptions;
 
@@ -43,7 +43,7 @@ public class MailSendException extends MailException {
 	 * @param msg the detail message
 	 */
 	public MailSendException(String msg) {
-		super(msg);
+		this(msg, null);
 	}
 
 	/**
@@ -53,6 +53,23 @@ public class MailSendException extends MailException {
 	 */
 	public MailSendException(String msg, Throwable cause) {
 		super(msg, cause);
+		this.failedMessages = new LinkedHashMap<Object, Exception>();
+	}
+
+	/**
+	 * Constructor for registration of failed messages, with the
+	 * messages that failed as keys, and the thrown exceptions as values.
+	 * <p>The messages should be the same that were originally passed
+	 * to the invoked send method.
+	 * @param msg the detail message
+	 * @param cause the root cause from the mail API in use
+	 * @param failedMessages Map of failed messages as keys and thrown
+	 * exceptions as values
+	 */
+	public MailSendException(String msg, Throwable cause, Map<Object, Exception> failedMessages) {
+		super(msg, cause);
+		this.failedMessages = new LinkedHashMap<Object, Exception>(failedMessages);
+		this.messageExceptions = failedMessages.values().toArray(new Exception[failedMessages.size()]);
 	}
 
 	/**
@@ -63,10 +80,8 @@ public class MailSendException extends MailException {
 	 * @param failedMessages Map of failed messages as keys and thrown
 	 * exceptions as values
 	 */
-	public MailSendException(Map failedMessages) {
-		super(null);
-		this.failedMessages = new LinkedHashMap(failedMessages);
-		this.messageExceptions = (Exception[]) failedMessages.values().toArray(new Exception[failedMessages.size()]);
+	public MailSendException(Map<Object, Exception> failedMessages) {
+		this(null, null, failedMessages);
 	}
 
 
@@ -84,13 +99,12 @@ public class MailSendException extends MailException {
 	 * <p><b>NOTE:</b> This Map will not be available after serialization.
 	 * Use {@link #getMessageExceptions()} in such a scenario, which will
 	 * be available after serialization as well.
-	 * @return the Map of failed messages as keys and thrown exceptions as
-	 * values, or an empty Map if no failed messages
+	 * @return the Map of failed messages as keys and thrown exceptions as values
 	 * @see SimpleMailMessage
 	 * @see javax.mail.internet.MimeMessage
 	 */
-	public final Map getFailedMessages() {
-		return (this.failedMessages != null ? this.failedMessages : Collections.EMPTY_MAP);
+	public final Map<Object, Exception> getFailedMessages() {
+		return this.failedMessages;
 	}
 
 	/**
@@ -106,12 +120,18 @@ public class MailSendException extends MailException {
 	}
 
 
+	@Override
 	public String getMessage() {
 		if (ObjectUtils.isEmpty(this.messageExceptions)) {
 			return super.getMessage();
 		}
 		else {
-			StringBuffer sb = new StringBuffer("Failed messages: ");
+			StringBuilder sb = new StringBuilder();
+			String baseMessage = super.getMessage();
+			if (baseMessage != null) {
+				sb.append(baseMessage).append(". ");
+			}
+			sb.append("Failed messages: ");
 			for (int i = 0; i < this.messageExceptions.length; i++) {
 				Exception subEx = this.messageExceptions[i];
 				sb.append(subEx.toString());
@@ -123,13 +143,14 @@ public class MailSendException extends MailException {
 		}
 	}
 
+	@Override
 	public String toString() {
 		if (ObjectUtils.isEmpty(this.messageExceptions)) {
 			return super.toString();
 		}
 		else {
-			StringBuffer sb = new StringBuffer(getClass().getName());
-			sb.append("; nested exceptions (").append(this.messageExceptions.length).append(") are:");
+			StringBuilder sb = new StringBuilder(super.toString());
+			sb.append("; message exceptions (").append(this.messageExceptions.length).append(") are:");
 			for (int i = 0; i < this.messageExceptions.length; i++) {
 				Exception subEx = this.messageExceptions[i];
 				sb.append('\n').append("Failed message ").append(i + 1).append(": ");
@@ -139,12 +160,13 @@ public class MailSendException extends MailException {
 		}
 	}
 
+	@Override
 	public void printStackTrace(PrintStream ps) {
 		if (ObjectUtils.isEmpty(this.messageExceptions)) {
 			super.printStackTrace(ps);
 		}
 		else {
-			ps.println(getClass().getName() + "; nested exception details (" +
+			ps.println(super.toString() + "; message exception details (" +
 					this.messageExceptions.length + ") are:");
 			for (int i = 0; i < this.messageExceptions.length; i++) {
 				Exception subEx = this.messageExceptions[i];
@@ -154,12 +176,13 @@ public class MailSendException extends MailException {
 		}
 	}
 
+	@Override
 	public void printStackTrace(PrintWriter pw) {
 		if (ObjectUtils.isEmpty(this.messageExceptions)) {
 			super.printStackTrace(pw);
 		}
 		else {
-			pw.println(getClass().getName() + "; nested exception details (" +
+			pw.println(super.toString() + "; message exception details (" +
 					this.messageExceptions.length + ") are:");
 			for (int i = 0; i < this.messageExceptions.length; i++) {
 				Exception subEx = this.messageExceptions[i];

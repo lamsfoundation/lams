@@ -23,14 +23,14 @@
  */
 package org.hibernate.tuple.component;
 
-import java.util.Map;
-import java.lang.reflect.Constructor;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.mapping.Component;
 
 /**
@@ -135,14 +135,11 @@ public class ComponentTuplizerFactory implements Serializable {
 		Constructor<? extends ComponentTuplizer> constructor = null;
 		try {
 			constructor = clazz.getDeclaredConstructor( COMPONENT_TUP_CTOR_SIG );
-			if ( ! ReflectHelper.isPublic( constructor ) ) {
-				try {
-					// found a constructor, but it was not publicly accessible so try to request accessibility
-					constructor.setAccessible( true );
-				}
-				catch ( SecurityException e ) {
-					constructor = null;
-				}
+			try {
+				constructor.setAccessible( true );
+			}
+			catch ( SecurityException e ) {
+				constructor = null;
 			}
 		}
 		catch ( NoSuchMethodException ignore ) {
@@ -154,7 +151,6 @@ public class ComponentTuplizerFactory implements Serializable {
 	private static Map<EntityMode,Class<? extends ComponentTuplizer>> buildBaseMapping() {
 		Map<EntityMode,Class<? extends ComponentTuplizer>> map = new ConcurrentHashMap<EntityMode,Class<? extends ComponentTuplizer>>();
 		map.put( EntityMode.POJO, PojoComponentTuplizer.class );
-		map.put( EntityMode.DOM4J, Dom4jComponentTuplizer.class );
 		map.put( EntityMode.MAP, DynamicMapComponentTuplizer.class );
 		return map;
 	}

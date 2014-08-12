@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * FactoryBean for RMI proxies, supporting both conventional RMI services and
- * RMI invokers. Exposes the proxied service for use as a bean reference,
+ * {@link FactoryBean} for RMI proxies, supporting both conventional RMI services
+ * and RMI invokers. Exposes the proxied service for use as a bean reference,
  * using the specified service interface. Proxies will throw Spring's unchecked
  * RemoteAccessException on remote invocation failure instead of RMI's RemoteException.
  *
  * <p>The service URL must be a valid RMI URL like "rmi://localhost:1099/myservice".
  * RMI invokers work at the RmiInvocationHandler level, using the same invoker stub
- * for any service. Service interfaces do not have to extend <code>java.rmi.Remote</code>
- * or throw <code>java.rmi.RemoteException</code>. Of course, in and out parameters
+ * for any service. Service interfaces do not have to extend {@code java.rmi.Remote}
+ * or throw {@code java.rmi.RemoteException}. Of course, in and out parameters
  * have to be serializable.
  *
  * <p>With conventional RMI services, this proxy factory is typically used with the
@@ -58,11 +58,12 @@ import org.springframework.beans.factory.FactoryBean;
  * @see org.springframework.remoting.caucho.BurlapProxyFactoryBean
  * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  */
-public class RmiProxyFactoryBean extends RmiClientInterceptor implements FactoryBean, BeanClassLoaderAware {
+public class RmiProxyFactoryBean extends RmiClientInterceptor implements FactoryBean<Object>, BeanClassLoaderAware {
 
 	private Object serviceProxy;
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		if (getServiceInterface() == null) {
@@ -72,14 +73,17 @@ public class RmiProxyFactoryBean extends RmiClientInterceptor implements Factory
 	}
 
 
+	@Override
 	public Object getObject() {
 		return this.serviceProxy;
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return getServiceInterface();
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

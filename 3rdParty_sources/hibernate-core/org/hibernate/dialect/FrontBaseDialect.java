@@ -22,12 +22,18 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.dialect;
-
-import org.hibernate.dialect.lock.*;
-import org.hibernate.persister.entity.Lockable;
-import org.hibernate.LockMode;
-
 import java.sql.Types;
+
+import org.hibernate.LockMode;
+import org.hibernate.dialect.lock.LockingStrategy;
+import org.hibernate.dialect.lock.OptimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.OptimisticLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticForceIncrementLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticReadUpdateLockingStrategy;
+import org.hibernate.dialect.lock.PessimisticWriteUpdateLockingStrategy;
+import org.hibernate.dialect.lock.SelectLockingStrategy;
+import org.hibernate.dialect.lock.UpdateLockingStrategy;
+import org.hibernate.persister.entity.Lockable;
 
 /**
  * An SQL Dialect for Frontbase.  Assumes you're using the latest version
@@ -47,6 +53,9 @@ import java.sql.Types;
  */
 public class FrontBaseDialect extends Dialect {
 
+	/**
+	 * Constructs a FrontBaseDialect
+	 */
 	public FrontBaseDialect() {
 		super();
 
@@ -68,37 +77,43 @@ public class FrontBaseDialect extends Dialect {
 		registerColumnType( Types.CLOB, "clob" );
 	}
 
+	@Override
 	public String getAddColumnString() {
 		return "add column";
 	}
 
+	@Override
 	public String getCascadeConstraintsString() {
 		return " cascade";
 	}
 
+	@Override
 	public boolean dropConstraints() {
 		return false;
 	}
 
 	/**
-	 * Does this dialect support the <tt>FOR UPDATE</tt> syntax. No!
-	 *
-	 * @return false always. FrontBase doesn't support this syntax,
-	 * which was dropped with SQL92
+	 * FrontBase doesn't support this syntax, which was dropped with SQL92.
+	 * <p/>
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getForUpdateString() {
 		return "";
 	}
 
-	public String getCurrentTimestampCallString() {
+	@Override
+	public String getCurrentTimestampSelectString() {
 		// TODO : not sure this is correct, could not find docs on how to do this.
 		return "{?= call current_timestamp}";
 	}
 
+	@Override
 	public boolean isCurrentTimestampSelectStringCallable() {
 		return true;
 	}
 
+	@Override
 	public LockingStrategy getLockingStrategy(Lockable lockable, LockMode lockMode) {
 		// Frontbase has no known variation of a "SELECT ... FOR UPDATE" syntax...
 		if ( lockMode==LockMode.PESSIMISTIC_FORCE_INCREMENT) {

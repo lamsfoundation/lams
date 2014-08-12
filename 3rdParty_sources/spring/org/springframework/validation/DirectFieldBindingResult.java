@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
  * @see DataBinder#initDirectFieldAccess()
  * @see BeanPropertyBindingResult
  */
+@SuppressWarnings("serial")
 public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
 
 	private final Object target;
@@ -52,6 +53,7 @@ public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
 	}
 
 
+	@Override
 	public final Object getTarget() {
 		return this.target;
 	}
@@ -61,6 +63,7 @@ public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
 	 * Creates a new one if none existed before.
 	 * @see #createDirectFieldAccessor()
 	 */
+	@Override
 	public final ConfigurablePropertyAccessor getPropertyAccessor() {
 		if (this.directFieldAccessor == null) {
 			this.directFieldAccessor = createDirectFieldAccessor();

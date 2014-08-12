@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,6 @@ import org.springframework.util.CollectionUtils;
  * with one or more MBeans in an {@link javax.management.MBeanServer}
  * (typically via a {@link javax.management.MBeanServerConnection}).
  *
- * <p>Requires JMX 1.2's <code>MBeanServerConnection</code> feature.
- * As a consequence, this class will not work on JMX 1.0.
- *
  * @author Juergen Hoeller
  * @since 2.5.2
  * @see #setServer
@@ -59,7 +56,7 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 
 	private JMXServiceURL serviceUrl;
 
-	private Map environment;
+	private Map<String, ?> environment;
 
 	private String agentId;
 
@@ -69,7 +66,7 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 
 
 	/**
-	 * Set the <code>MBeanServerConnection</code> used to connect to the
+	 * Set the {@code MBeanServerConnection} used to connect to the
 	 * MBean which all invocations are routed to.
 	 */
 	public void setServer(MBeanServerConnection server) {
@@ -80,7 +77,7 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 	 * Specify the environment for the JMX connector.
 	 * @see javax.management.remote.JMXConnectorFactory#connect(javax.management.remote.JMXServiceURL, java.util.Map)
 	 */
-	public void setEnvironment(Map environment) {
+	public void setEnvironment(Map<String, ?> environment) {
 		this.environment = environment;
 	}
 
@@ -91,29 +88,31 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 	 * "environment[myKey]". This is particularly useful for
 	 * adding or overriding entries in child bean definitions.
 	 */
-	public Map getEnvironment() {
+	public Map<String, ?> getEnvironment() {
 		return this.environment;
 	}
 
 	/**
-	 * Set the service URL of the remote <code>MBeanServer</code>.
+	 * Set the service URL of the remote {@code MBeanServer}.
 	 */
 	public void setServiceUrl(String url) throws MalformedURLException {
 		this.serviceUrl = new JMXServiceURL(url);
 	}
 
 	/**
-	 * Set the agent id of the <code>MBeanServer</code> to locate.
+	 * Set the agent id of the {@code MBeanServer} to locate.
 	 * <p>Default is none. If specified, this will result in an
 	 * attempt being made to locate the attendant MBeanServer, unless
 	 * the {@link #setServiceUrl "serviceUrl"} property has been set.
 	 * @see javax.management.MBeanServerFactory#findMBeanServer(String)
+	 * <p>Specifying the empty String indicates the platform MBeanServer.
 	 */
 	public void setAgentId(String agentId) {
 		this.agentId = agentId;
 	}
 
 
+	@Override
 	public void afterPropertiesSet() {
 		if (getNotificationListener() == null) {
 			throw new IllegalArgumentException("Property 'notificationListener' is required");
@@ -125,8 +124,8 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 	}
 
 	/**
-	 * Registers the specified <code>NotificationListener</code>.
-	 * <p>Ensures that an <code>MBeanServerConnection</code> is configured and attempts
+	 * Registers the specified {@code NotificationListener}.
+	 * <p>Ensures that an {@code MBeanServerConnection} is configured and attempts
 	 * to detect a local connection if one is not supplied.
 	 */
 	public void prepare() {
@@ -138,9 +137,9 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 			if (logger.isDebugEnabled()) {
 				logger.debug("Registering NotificationListener for MBeans " + Arrays.asList(this.actualObjectNames));
 			}
-			for (int i = 0; i < this.actualObjectNames.length; i++) {
-				this.server.addNotificationListener(this.actualObjectNames[i],
-						getNotificationListener(), getNotificationFilter(), getHandback());
+			for (ObjectName actualObjectName : this.actualObjectNames) {
+				this.server.addNotificationListener(
+						actualObjectName, getNotificationListener(), getNotificationFilter(), getHandback());
 			}
 		}
 		catch (IOException ex) {
@@ -153,15 +152,16 @@ public class NotificationListenerRegistrar extends NotificationListenerHolder
 	}
 
 	/**
-	 * Unregisters the specified <code>NotificationListener</code>.
+	 * Unregisters the specified {@code NotificationListener}.
 	 */
+	@Override
 	public void destroy() {
 		try {
 			if (this.actualObjectNames != null) {
-				for (int i = 0; i < this.actualObjectNames.length; i++) {
+				for (ObjectName actualObjectName : this.actualObjectNames) {
 					try {
-						this.server.removeNotificationListener(this.actualObjectNames[i],
-								getNotificationListener(), getNotificationFilter(), getHandback());
+						this.server.removeNotificationListener(
+								actualObjectName, getNotificationListener(), getNotificationFilter(), getHandback());
 					}
 					catch (Exception ex) {
 						if (logger.isDebugEnabled()) {

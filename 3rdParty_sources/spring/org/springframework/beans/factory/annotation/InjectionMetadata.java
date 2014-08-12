@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -49,74 +48,50 @@ public class InjectionMetadata {
 
 	private final Log logger = LogFactory.getLog(InjectionMetadata.class);
 
-	private String targetClassName;
+	private final Class<?> targetClass;
 
-	private final Set<InjectedElement> injectedFields = new LinkedHashSet<InjectedElement>();
+	private final Collection<InjectedElement> injectedElements;
 
-	private final Set<InjectedElement> injectedMethods = new LinkedHashSet<InjectedElement>();
-
-
-	public InjectionMetadata() {
-	}
-
-	public InjectionMetadata(Class targetClass) {
-		this.targetClassName = targetClass.getName();
-	}
+	private volatile Set<InjectedElement> checkedElements;
 
 
-	public void addInjectedField(InjectedElement element) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Found injected field on class [" + this.targetClassName + "]: " + element);
-		}
-		this.injectedFields.add(element);
-	}
-
-	public void addInjectedMethod(InjectedElement element) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Found injected method on class [" + this.targetClassName + "]: " + element);
-		}
-		this.injectedMethods.add(element);
+	public InjectionMetadata(Class<?> targetClass, Collection<InjectedElement> elements) {
+		this.targetClass = targetClass;
+		this.injectedElements = elements;
 	}
 
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
-		doRegisterConfigMembers(beanDefinition, this.injectedFields);
-		doRegisterConfigMembers(beanDefinition, this.injectedMethods);
-	}
-
-	private void doRegisterConfigMembers(RootBeanDefinition beanDefinition, Set<InjectedElement> members) {
-		for (Iterator<InjectedElement> it = members.iterator(); it.hasNext();) {
-			Member member = it.next().getMember();
+		Set<InjectedElement> checkedElements = new LinkedHashSet<InjectedElement>(this.injectedElements.size());
+		for (InjectedElement element : this.injectedElements) {
+			Member member = element.getMember();
 			if (!beanDefinition.isExternallyManagedConfigMember(member)) {
 				beanDefinition.registerExternallyManagedConfigMember(member);
-			}
-			else {
-				it.remove();
-			}
-		}
-	}
-
-	public void injectFields(Object target, String beanName) throws Throwable {
-		if (!this.injectedFields.isEmpty()) {
-			boolean debug = logger.isDebugEnabled();
-			for (InjectedElement element : this.injectedFields) {
-				if (debug) {
-					logger.debug("Processing injected field of bean '" + beanName + "': " + element);
+				checkedElements.add(element);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Registered injected element on class [" + this.targetClass.getName() + "]: " + element);
 				}
-				element.inject(target, beanName, null);
 			}
 		}
+		this.checkedElements = checkedElements;
 	}
 
-	public void injectMethods(Object target, String beanName, PropertyValues pvs) throws Throwable {
-		if (!this.injectedMethods.isEmpty()) {
+	public void inject(Object target, String beanName, PropertyValues pvs) throws Throwable {
+		Collection<InjectedElement> elementsToIterate =
+				(this.checkedElements != null ? this.checkedElements : this.injectedElements);
+		if (!elementsToIterate.isEmpty()) {
 			boolean debug = logger.isDebugEnabled();
-			for (InjectedElement element : this.injectedMethods) {
+			for (InjectedElement element : elementsToIterate) {
 				if (debug) {
 					logger.debug("Processing injected method of bean '" + beanName + "': " + element);
 				}
 				element.inject(target, beanName, pvs);
 			}
 		}
+	}
+
+
+	public static boolean needsRefresh(InjectionMetadata metadata, Class<?> clazz) {
+		return (metadata == null || !metadata.targetClass.equals(clazz));
 	}
 
 
@@ -140,7 +115,7 @@ public class InjectionMetadata {
 			return this.member;
 		}
 
-		protected final Class getResourceType() {
+		protected final Class<?> getResourceType() {
 			if (this.isField) {
 				return ((Field) this.member).getType();
 			}
@@ -152,16 +127,16 @@ public class InjectionMetadata {
 			}
 		}
 
-		protected final void checkResourceType(Class resourceType) {
+		protected final void checkResourceType(Class<?> resourceType) {
 			if (this.isField) {
-				Class fieldType = ((Field) this.member).getType();
+				Class<?> fieldType = ((Field) this.member).getType();
 				if (!(resourceType.isAssignableFrom(fieldType) || fieldType.isAssignableFrom(resourceType))) {
 					throw new IllegalStateException("Specified field type [" + fieldType +
 							"] is incompatible with resource type [" + resourceType.getName() + "]");
 				}
 			}
 			else {
-				Class paramType =
+				Class<?> paramType =
 						(this.pd != null ? this.pd.getPropertyType() : ((Method) this.member).getParameterTypes()[0]);
 				if (!(resourceType.isAssignableFrom(paramType) || paramType.isAssignableFrom(resourceType))) {
 					throw new IllegalStateException("Specified parameter type [" + paramType +
@@ -180,10 +155,7 @@ public class InjectionMetadata {
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
 			else {
-				if (this.skip == null) {
-					this.skip = Boolean.valueOf(checkPropertySkipping(pvs));
-				}
-				if (this.skip.booleanValue()) {
+				if (checkPropertySkipping(pvs)) {
 					return;
 				}
 				try {
@@ -203,16 +175,30 @@ public class InjectionMetadata {
 		 * affected property as processed for other processors to ignore it.
 		 */
 		protected boolean checkPropertySkipping(PropertyValues pvs) {
-			if (this.pd != null && pvs != null) {
-				if (pvs.contains(this.pd.getName())) {
-					// Explicit value provided as part of the bean definition.
-					return true;
-				}
-				else if (pvs instanceof MutablePropertyValues) {
-					((MutablePropertyValues) pvs).registerProcessedProperty(this.pd.getName());
-				}
+			if (this.skip != null) {
+				return this.skip;
 			}
-			return false;
+			if (pvs == null) {
+				this.skip = false;
+				return false;
+			}
+			synchronized (pvs) {
+				if (this.skip != null) {
+					return this.skip;
+				}
+				if (this.pd != null) {
+					if (pvs.contains(this.pd.getName())) {
+						// Explicit value provided as part of the bean definition.
+						this.skip = true;
+						return true;
+					}
+					else if (pvs instanceof MutablePropertyValues) {
+						((MutablePropertyValues) pvs).registerProcessedProperty(this.pd.getName());
+					}
+				}
+				this.skip = false;
+				return false;
+			}
 		}
 
 		/**
@@ -222,6 +208,7 @@ public class InjectionMetadata {
 			return null;
 		}
 
+		@Override
 		public boolean equals(Object other) {
 			if (this == other) {
 				return true;
@@ -230,21 +217,15 @@ public class InjectionMetadata {
 				return false;
 			}
 			InjectedElement otherElement = (InjectedElement) other;
-			if (this.isField) {
-				return this.member.equals(otherElement.member);
-			}
-			else {
-				return (otherElement.member instanceof Method &&
-						this.member.getName().equals(otherElement.member.getName()) &&
-						Arrays.equals(((Method) this.member).getParameterTypes(),
-								((Method) otherElement.member).getParameterTypes()));
-			}
+			return this.member.equals(otherElement.member);
 		}
 
+		@Override
 		public int hashCode() {
 			return this.member.getClass().hashCode() * 29 + this.member.getName().hashCode();
 		}
 
+		@Override
 		public String toString() {
 			return getClass().getSimpleName() + " for " + this.member;
 		}

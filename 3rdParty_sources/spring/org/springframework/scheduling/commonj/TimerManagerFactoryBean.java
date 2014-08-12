@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package org.springframework.scheduling.commonj;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.naming.NamingException;
 
 import commonj.timers.Timer;
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.Lifecycle;
-import org.springframework.jndi.JndiLocatorSupport;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} that retrieves a
@@ -54,70 +51,13 @@ import org.springframework.jndi.JndiLocatorSupport;
  * @see commonj.timers.TimerManager
  * @see commonj.timers.TimerListener
  */
-public class TimerManagerFactoryBean extends JndiLocatorSupport
-		implements FactoryBean, InitializingBean, DisposableBean, Lifecycle {
-
-	private TimerManager timerManager;
-
-	private String timerManagerName;
-
-	private boolean shared = false;
+public class TimerManagerFactoryBean extends TimerManagerAccessor
+		implements FactoryBean<TimerManager>, InitializingBean, DisposableBean, Lifecycle {
 
 	private ScheduledTimerListener[] scheduledTimerListeners;
 
-	private final List timers = new LinkedList();
+	private final List<Timer> timers = new LinkedList<Timer>();
 
-
-	/**
-	 * Specify the CommonJ TimerManager to delegate to.
-	 * <p>Note that the given TimerManager's lifecycle will be managed
-	 * by this FactoryBean.
-	 * <p>Alternatively (and typically), you can specify the JNDI name
-	 * of the target TimerManager.
-	 * @see #setTimerManagerName
-	 */
-	public void setTimerManager(TimerManager timerManager) {
-		this.timerManager = timerManager;
-	}
-
-	/**
-	 * Set the JNDI name of the CommonJ TimerManager.
-	 * <p>This can either be a fully qualified JNDI name, or the JNDI name relative
-	 * to the current environment naming context if "resourceRef" is set to "true".
-	 * @see #setTimerManager
-	 * @see #setResourceRef
-	 */
-	public void setTimerManagerName(String timerManagerName) {
-		this.timerManagerName = timerManagerName;
-	}
-
-	/**
-	 * Specify whether the TimerManager obtained by this FactoryBean
-	 * is a shared instance ("true") or an independent instance ("false").
-	 * The lifecycle of the former is supposed to be managed by the application
-	 * server, while the lifecycle of the latter is up to the application.
-	 * <p>Default is "false", i.e. managing an independent TimerManager instance.
-	 * This is what the CommonJ specification suggests that application servers
-	 * are supposed to offer via JNDI lookups, typically declared as a
-	 * <code>resource-ref</code> of type <code>commonj.timers.TimerManager</code>
-	 * in <code>web.xml<code>, with <code>res-sharing-scope</code> set to 'Unshareable'.
-	 * <p>Switch this flag to "true" if you are obtaining a shared TimerManager,
-	 * typically through specifying the JNDI location of a TimerManager that
-	 * has been explicitly declared as 'Shareable'. Note that WebLogic's
-	 * cluster-aware Job Scheduler is a shared TimerManager too.
-	 * <p>The sole difference between this FactoryBean being in shared or
-	 * non-shared mode is that it will only attempt to suspend / resume / stop
-	 * the underlying TimerManager in case of an independent (non-shared) instance.
-	 * This only affects the {@link org.springframework.context.Lifecycle} support
-	 * as well as application context shutdown.
-	 * @see #stop()
-	 * @see #start()
-	 * @see #destroy()
-	 * @see commonj.timers.TimerManager
-	 */
-	public void setShared(boolean shared) {
-		this.shared = shared;
-	}
 
 	/**
 	 * Register a list of ScheduledTimerListener objects with the TimerManager
@@ -136,28 +76,23 @@ public class TimerManagerFactoryBean extends JndiLocatorSupport
 	// Implementation of InitializingBean interface
 	//---------------------------------------------------------------------
 
+	@Override
 	public void afterPropertiesSet() throws NamingException {
-		if (this.timerManager == null) {
-			if (this.timerManagerName == null) {
-				throw new IllegalArgumentException("Either 'timerManager' or 'timerManagerName' must be specified");
-			}
-			this.timerManager = (TimerManager) lookup(this.timerManagerName, TimerManager.class);
-		}
-
+		super.afterPropertiesSet();
 		if (this.scheduledTimerListeners != null) {
-			for (int i = 0; i < this.scheduledTimerListeners.length; i++) {
-				ScheduledTimerListener scheduledTask = this.scheduledTimerListeners[i];
-				Timer timer = null;
+			TimerManager timerManager = getTimerManager();
+			for (ScheduledTimerListener scheduledTask : this.scheduledTimerListeners) {
+				Timer timer;
 				if (scheduledTask.isOneTimeTask()) {
-					timer = this.timerManager.schedule(scheduledTask.getTimerListener(), scheduledTask.getDelay());
+					timer = timerManager.schedule(scheduledTask.getTimerListener(), scheduledTask.getDelay());
 				}
 				else {
 					if (scheduledTask.isFixedRate()) {
-						timer = this.timerManager.scheduleAtFixedRate(
+						timer = timerManager.scheduleAtFixedRate(
 								scheduledTask.getTimerListener(), scheduledTask.getDelay(), scheduledTask.getPeriod());
 					}
 					else {
-						timer = this.timerManager.schedule(
+						timer = timerManager.schedule(
 								scheduledTask.getTimerListener(), scheduledTask.getDelay(), scheduledTask.getPeriod());
 					}
 				}
@@ -171,51 +106,20 @@ public class TimerManagerFactoryBean extends JndiLocatorSupport
 	// Implementation of FactoryBean interface
 	//---------------------------------------------------------------------
 
-	public Object getObject() {
-		return this.timerManager;
+	@Override
+	public TimerManager getObject() {
+		return getTimerManager();
 	}
 
-	public Class getObjectType() {
-		return (this.timerManager != null ? this.timerManager.getClass() : TimerManager.class);
+	@Override
+	public Class<? extends TimerManager> getObjectType() {
+		TimerManager timerManager = getTimerManager();
+		return (timerManager != null ? timerManager.getClass() : TimerManager.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
-	}
-
-
-	//---------------------------------------------------------------------
-	// Implementation of Lifecycle interface
-	//---------------------------------------------------------------------
-
-	/**
-	 * Resumes the underlying TimerManager (if not shared).
-	 * @see commonj.timers.TimerManager#resume()
-	 */
-	public void start() {
-		if (!this.shared) {
-			this.timerManager.resume();
-		}
-	}
-
-	/**
-	 * Suspends the underlying TimerManager (if not shared).
-	 * @see commonj.timers.TimerManager#suspend()
-	 */
-	public void stop() {
-		if (!this.shared) {
-			this.timerManager.suspend();
-		}
-	}
-
-	/**
-	 * Considers the underlying TimerManager as running if it is
-	 * neither suspending nor stopping.
-	 * @see commonj.timers.TimerManager#isSuspending()
-	 * @see commonj.timers.TimerManager#isStopping()
-	 */
-	public boolean isRunning() {
-		return (!this.timerManager.isSuspending() && !this.timerManager.isStopping());
 	}
 
 
@@ -229,10 +133,10 @@ public class TimerManagerFactoryBean extends JndiLocatorSupport
 	 * @see commonj.timers.Timer#cancel()
 	 * @see commonj.timers.TimerManager#stop()
 	 */
+	@Override
 	public void destroy() {
 		// Cancel all registered timers.
-		for (Iterator it = this.timers.iterator(); it.hasNext();) {
-			Timer timer = (Timer) it.next();
+		for (Timer timer : this.timers) {
 			try {
 				timer.cancel();
 			}
@@ -242,11 +146,8 @@ public class TimerManagerFactoryBean extends JndiLocatorSupport
 		}
 		this.timers.clear();
 
-		// Stop the entire TimerManager, if necessary.
-		if (!this.shared) {
-			// May return early, but at least we already cancelled all known Timers.
-			this.timerManager.stop();
-		}
+		// Stop the TimerManager itself.
+		super.destroy();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.transaction.support;
+
+import java.lang.reflect.UndeclaredThrowableException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +59,7 @@ import org.springframework.transaction.TransactionSystemException;
  * @see #setTransactionManager
  * @see org.springframework.transaction.PlatformTransactionManager
  */
+@SuppressWarnings("serial")
 public class TransactionTemplate extends DefaultTransactionDefinition
 		implements TransactionOperations, InitializingBean {
 
@@ -69,7 +72,7 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 	/**
 	 * Construct a new TransactionTemplate for bean usage.
 	 * <p>Note: The PlatformTransactionManager needs to be set before
-	 * any <code>execute</code> calls.
+	 * any {@code execute} calls.
 	 * @see #setTransactionManager
 	 */
 	public TransactionTemplate() {
@@ -110,6 +113,7 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 		return this.transactionManager;
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		if (this.transactionManager == null) {
 			throw new IllegalArgumentException("Property 'transactionManager' is required");
@@ -117,13 +121,14 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 	}
 
 
-	public Object execute(TransactionCallback action) throws TransactionException {
+	@Override
+	public <T> T execute(TransactionCallback<T> action) throws TransactionException {
 		if (this.transactionManager instanceof CallbackPreferringPlatformTransactionManager) {
 			return ((CallbackPreferringPlatformTransactionManager) this.transactionManager).execute(this, action);
 		}
 		else {
 			TransactionStatus status = this.transactionManager.getTransaction(this);
-			Object result = null;
+			T result;
 			try {
 				result = action.doInTransaction(status);
 			}
@@ -136,6 +141,11 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 				// Transactional code threw error -> rollback
 				rollbackOnException(status, err);
 				throw err;
+			}
+			catch (Exception ex) {
+				// Transactional code threw unexpected exception -> rollback
+				rollbackOnException(status, ex);
+				throw new UndeclaredThrowableException(ex, "TransactionCallback threw undeclared checked exception");
 			}
 			this.transactionManager.commit(status);
 			return result;

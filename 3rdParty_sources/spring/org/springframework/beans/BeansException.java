@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  */
+@SuppressWarnings("serial")
 public abstract class BeansException extends NestedRuntimeException {
 
 	/**
@@ -50,6 +51,7 @@ public abstract class BeansException extends NestedRuntimeException {
 	}
 
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -62,6 +64,7 @@ public abstract class BeansException extends NestedRuntimeException {
 				ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 	}
 
+	@Override
 	public int hashCode() {
 		return getMessage().hashCode();
 	}

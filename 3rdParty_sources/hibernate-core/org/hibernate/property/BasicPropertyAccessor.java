@@ -25,29 +25,30 @@ package org.hibernate.property;
 
 import java.beans.Introspector;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyAccessException;
 import org.hibernate.PropertyNotFoundException;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.PropertySetterAccessException;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * Accesses property values via a get/set pair, which may be nonpublic.
  * The default (and recommended strategy).
- * 
+ *
  * @author Gavin King
  */
 public class BasicPropertyAccessor implements PropertyAccessor {
-
-	private static final Logger log = LoggerFactory.getLogger(BasicPropertyAccessor.class);
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( BasicPropertyAccessor.class );
 
 	public static final class BasicSetter implements Setter {
 		private Class clazz;
@@ -60,7 +61,8 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 			this.propertyName=propertyName;
 		}
 
-		public void set(Object target, Object value, SessionFactoryImplementor factory) 
+		@Override
+		public void set(Object target, Object value, SessionFactoryImplementor factory)
 		throws HibernateException {
 			try {
 				method.invoke( target, value );
@@ -68,38 +70,38 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 			catch (NullPointerException npe) {
 				if ( value==null && method.getParameterTypes()[0].isPrimitive() ) {
 					throw new PropertyAccessException(
-							npe, 
-							"Null value was assigned to a property of primitive type", 
-							true, 
-							clazz, 
+							npe,
+							"Null value was assigned to a property of primitive type",
+							true,
+							clazz,
 							propertyName
 						);
 				}
 				else {
 					throw new PropertyAccessException(
-							npe, 
-							"NullPointerException occurred while calling", 
-							true, 
-							clazz, 
+							npe,
+							"NullPointerException occurred while calling",
+							true,
+							clazz,
 							propertyName
 						);
 				}
 			}
 			catch (InvocationTargetException ite) {
 				throw new PropertyAccessException(
-						ite, 
-						"Exception occurred inside", 
-						true, 
-						clazz, 
+						ite,
+						"Exception occurred inside",
+						true,
+						clazz,
 						propertyName
 					);
 			}
 			catch (IllegalAccessException iae) {
 				throw new PropertyAccessException(
-						iae, 
-						"IllegalAccessException occurred while calling", 
-						true, 
-						clazz, 
+						iae,
+						"IllegalAccessException occurred while calling",
+						true,
+						clazz,
 						propertyName
 					);
 				//cannot occur
@@ -107,39 +109,35 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 			catch (IllegalArgumentException iae) {
 				if ( value==null && method.getParameterTypes()[0].isPrimitive() ) {
 					throw new PropertyAccessException(
-							iae, 
-							"Null value was assigned to a property of primitive type", 
-							true, 
-							clazz, 
+							iae,
+							"Null value was assigned to a property of primitive type",
+							true,
+							clazz,
 							propertyName
 						);
 				}
 				else {
-					log.error(
-							"IllegalArgumentException in class: " + clazz.getName() +
-							", setter method of property: " + propertyName
-						);
-					log.error(
-							"expected type: " + 
-							method.getParameterTypes()[0].getName() +
-							", actual value: " + 
-							( value==null ? null : value.getClass().getName() )
-						);
-					throw new PropertyAccessException(
-							iae, 
-							"IllegalArgumentException occurred while calling", 
-							true, 
-							clazz, 
-							propertyName
+					final Class expectedType = method.getParameterTypes()[0];
+					LOG.illegalPropertySetterArgument( clazz.getName(), propertyName );
+					LOG.expectedType( expectedType.getName(), value == null ? null : value.getClass().getName() );
+					throw new PropertySetterAccessException(
+							iae,
+							clazz,
+							propertyName,
+							expectedType,
+							target,
+							value
 						);
 				}
 			}
 		}
 
+		@Override
 		public Method getMethod() {
 			return method;
 		}
 
+		@Override
 		public String getMethodName() {
 			return method.getName();
 		}
@@ -148,7 +146,8 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 			return createSetter(clazz, propertyName);
 		}
 
-		public String toString() {
+		@Override
+        public String toString() {
 			return "BasicSetter(" + clazz.getName() + '.' + propertyName + ')';
 		}
 	}
@@ -164,106 +163,91 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 			this.propertyName=propertyName;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public Object get(Object target) throws HibernateException {
 			try {
 				return method.invoke( target, (Object[]) null );
 			}
 			catch (InvocationTargetException ite) {
 				throw new PropertyAccessException(
-						ite, 
-						"Exception occurred inside", 
-						false, 
-						clazz, 
+						ite,
+						"Exception occurred inside",
+						false,
+						clazz,
 						propertyName
 					);
 			}
 			catch (IllegalAccessException iae) {
 				throw new PropertyAccessException(
-						iae, 
-						"IllegalAccessException occurred while calling", 
-						false, 
-						clazz, 
+						iae,
+						"IllegalAccessException occurred while calling",
+						false,
+						clazz,
 						propertyName
 					);
 				//cannot occur
 			}
 			catch (IllegalArgumentException iae) {
-				log.error(
-						"IllegalArgumentException in class: " + clazz.getName() +
-						", getter method of property: " + propertyName
-					);
+                LOG.illegalPropertyGetterArgument(clazz.getName(), propertyName);
 				throw new PropertyAccessException(
-						iae, 
-						"IllegalArgumentException occurred calling", 
-						false, 
-						clazz, 
+						iae,
+						"IllegalArgumentException occurred calling",
+						false,
+						clazz,
 						propertyName
 					);
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public Object getForInsert(Object target, Map mergeMap, SessionImplementor session) {
 			return get( target );
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public Class getReturnType() {
 			return method.getReturnType();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public Member getMember() {
 			return method;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public Method getMethod() {
 			return method;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public String getMethodName() {
 			return method.getName();
 		}
 
-		public String toString() {
+		@Override
+        public String toString() {
 			return "BasicGetter(" + clazz.getName() + '.' + propertyName + ')';
 		}
-		
+
 		Object readResolve() {
 			return createGetter(clazz, propertyName);
 		}
 	}
 
 
-	public Setter getSetter(Class theClass, String propertyName) 
-	throws PropertyNotFoundException {
+	@Override
+	public Setter getSetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		return createSetter(theClass, propertyName);
 	}
-	
-	private static Setter createSetter(Class theClass, String propertyName) 
-	throws PropertyNotFoundException {
+
+	private static Setter createSetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		BasicSetter result = getSetterOrNull(theClass, propertyName);
 		if (result==null) {
-			throw new PropertyNotFoundException( 
-					"Could not find a setter for property " + 
-					propertyName + 
-					" in class " + 
-					theClass.getName() 
+			throw new PropertyNotFoundException(
+					"Could not find a setter for property " +
+					propertyName +
+					" in class " +
+					theClass.getName()
 				);
 		}
 		return result;
@@ -276,7 +260,7 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 		Method method = setterMethod(theClass, propertyName);
 
 		if (method!=null) {
-			if ( !ReflectHelper.isPublic(theClass, method) ) method.setAccessible(true);
+			method.setAccessible(true);
 			return new BasicSetter(theClass, method, propertyName);
 		}
 		else {
@@ -293,7 +277,6 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 	}
 
 	private static Method setterMethod(Class theClass, String propertyName) {
-
 		BasicGetter getter = getGetterOrNull(theClass, propertyName);
 		Class returnType = (getter==null) ? null : getter.getReturnType();
 
@@ -316,18 +299,19 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 		return potentialSetter;
 	}
 
+	@Override
 	public Getter getGetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		return createGetter(theClass, propertyName);
 	}
-	
+
 	public static Getter createGetter(Class theClass, String propertyName) throws PropertyNotFoundException {
 		BasicGetter result = getGetterOrNull(theClass, propertyName);
 		if (result==null) {
-			throw new PropertyNotFoundException( 
-					"Could not find a getter for " + 
-					propertyName + 
-					" in class " + 
-					theClass.getName() 
+			throw new PropertyNotFoundException(
+					"Could not find a getter for " +
+					propertyName +
+					" in class " +
+					theClass.getName()
 			);
 		}
 		return result;
@@ -341,9 +325,7 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 		Method method = getterMethod(theClass, propertyName);
 
 		if (method!=null) {
-			if ( !ReflectHelper.isPublic(theClass, method) ) {
-				method.setAccessible(true);
-			}
+			method.setAccessible(true);
 			return new BasicGetter(theClass, method, propertyName);
 		}
 		else {
@@ -393,5 +375,4 @@ public class BasicPropertyAccessor implements PropertyAccessor {
 
 		return null;
 	}
-
 }

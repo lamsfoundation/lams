@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Inc.
+ * distributed under license by Red Hat Middleware LLC.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,18 +20,17 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
+ *
  */
 package org.hibernate.id.insert;
-
-import org.hibernate.exception.JDBCExceptionHelper;
-import org.hibernate.pretty.MessageHelper;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.id.PostInsertIdentityPersister;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.PostInsertIdentityPersister;
+import org.hibernate.pretty.MessageHelper;
 
 /**
  * Abstract InsertGeneratedIdentifierDelegate implementation where the
@@ -47,53 +46,60 @@ public abstract class AbstractSelectingDelegate implements InsertGeneratedIdenti
 		this.persister = persister;
 	}
 
-	public final Serializable performInsert(String insertSQL, SessionImplementor session, Binder binder) {
+	public final Serializable performInsert(
+			String insertSQL,
+			SessionImplementor session,
+			Binder binder) {
 		try {
 			// prepare and execute the insert
-			PreparedStatement insert = session.getBatcher().prepareStatement( insertSQL, false );
+			PreparedStatement insert = session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( insertSQL, PreparedStatement.NO_GENERATED_KEYS );
 			try {
 				binder.bindValues( insert );
-				insert.executeUpdate();
+				session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
 			}
 			finally {
-				session.getBatcher().closeStatement( insert );
+				session.getTransactionCoordinator().getJdbcCoordinator().release( insert );
 			}
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
-					sqle,
-					"could not insert: " + MessageHelper.infoString( persister ),
-					insertSQL
-			);
+			throw session.getFactory().getSQLExceptionHelper().convert(
+			        sqle,
+			        "could not insert: " + MessageHelper.infoString( persister ),
+			        insertSQL
+				);
 		}
 
 		final String selectSQL = getSelectSQL();
 
 		try {
 			//fetch the generated id in a separate query
-			PreparedStatement idSelect = session.getBatcher().prepareStatement( selectSQL );
+			PreparedStatement idSelect = session.getTransactionCoordinator()
+					.getJdbcCoordinator()
+					.getStatementPreparer()
+					.prepareStatement( selectSQL, false );
 			try {
 				bindParameters( session, idSelect, binder.getEntity() );
-				ResultSet rs = idSelect.executeQuery();
+				ResultSet rs = session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().extract( idSelect );
 				try {
 					return getResult( session, rs, binder.getEntity() );
 				}
 				finally {
-					rs.close();
+					session.getTransactionCoordinator().getJdbcCoordinator().release( rs, idSelect );
 				}
 			}
 			finally {
-				session.getBatcher().closeStatement( idSelect );
+				session.getTransactionCoordinator().getJdbcCoordinator().release( idSelect );
 			}
 
 		}
 		catch ( SQLException sqle ) {
-			throw JDBCExceptionHelper.convert(
-					session.getFactory().getSQLExceptionConverter(),
-					sqle,
-					"could not retrieve generated id after insert: " + MessageHelper.infoString( persister ),
-					insertSQL
+			throw session.getFactory().getSQLExceptionHelper().convert(
+			        sqle,
+			        "could not retrieve generated id after insert: " + MessageHelper.infoString( persister ),
+			        insertSQL
 			);
 		}
 	}

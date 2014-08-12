@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2009, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2009, 2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,32 +20,27 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
 package org.hibernate;
 
+import org.hibernate.dialect.lock.OptimisticEntityLockException;
+
 /**
- *
  * Throw when an optimistic locking conflict occurs.
  *
  * @author Scott Marlow
+ *
+ * @deprecated Use {@link org.hibernate.dialect.lock.OptimisticEntityLockException} instead
  */
-public class OptimisticLockException extends HibernateException {
-
-	Object entity;
-
-	public OptimisticLockException(String s) {
-		super(s);
+@Deprecated
+public class OptimisticLockException extends OptimisticEntityLockException {
+	/**
+	 * Constructs a OptimisticLockException using the specified information.
+	 *
+	 * @param entity The entity instance that could not be locked
+	 * @param message A message explaining the exception condition
+	 */
+	public OptimisticLockException(Object entity, String message) {
+		super( entity, message );
 	}
-
-	public OptimisticLockException(String s, Object entity) {
-		super(s);
-		this.entity = entity;
-	}
-
-	public Object getEntity() {
-		return entity;
-	}
-
-
 }

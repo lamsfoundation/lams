@@ -32,8 +32,9 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
  */
 public class ServiceFactoryBean extends AbstractServiceLoaderBasedFactoryBean implements BeanClassLoaderAware {
 
-	protected Object getObjectToExpose(ServiceLoader serviceLoader) {
-		Iterator it = serviceLoader.iterator();
+	@Override
+	protected Object getObjectToExpose(ServiceLoader<?> serviceLoader) {
+		Iterator<?> it = serviceLoader.iterator();
 		if (!it.hasNext()) {
 			throw new IllegalStateException(
 					"ServiceLoader could not find service for type [" + getServiceType() + "]");
@@ -41,7 +42,8 @@ public class ServiceFactoryBean extends AbstractServiceLoaderBasedFactoryBean im
 		return it.next();
 	}
 
-	public Class getObjectType() {
+	@Override
+	public Class<?> getObjectType() {
 		return getServiceType();
 	}
 

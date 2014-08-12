@@ -22,19 +22,19 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.loader;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.MappingException;
-import org.hibernate.engine.JoinHelper;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.internal.JoinHelper;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.Joinable;
 import org.hibernate.sql.JoinFragment;
+import org.hibernate.sql.JoinType;
 import org.hibernate.type.AssociationType;
 import org.hibernate.type.EntityType;
-import org.hibernate.util.CollectionHelper;
 
 /**
  * Part of the Hibernate SQL rendering internals.  This class represents
@@ -50,7 +50,7 @@ public final class OuterJoinableAssociation {
 	private final String[] lhsColumns; // belong to other persister
 	private final String rhsAlias;
 	private final String[] rhsColumns;
-	private final int joinType;
+	private final JoinType joinType;
 	private final String on;
 	private final Map enabledFilters;
 	private final boolean hasRestriction;
@@ -65,11 +65,11 @@ public final class OuterJoinableAssociation {
 				null,
 				null,
 				alias,
-				JoinFragment.LEFT_OUTER_JOIN,
+				JoinType.LEFT_OUTER_JOIN,
 				null,
 				false,
 				factory,
-				CollectionHelper.EMPTY_MAP
+				Collections.EMPTY_MAP
 		);
 	}
 
@@ -79,7 +79,7 @@ public final class OuterJoinableAssociation {
 			String lhsAlias,
 			String[] lhsColumns,
 			String rhsAlias,
-			int joinType,
+			JoinType joinType,
 			String withClause,
 			boolean hasRestriction,
 			SessionFactoryImplementor factory,
@@ -102,7 +102,7 @@ public final class OuterJoinableAssociation {
 		return propertyPath;
 	}
 
-	public int getJoinType() {
+	public JoinType getJoinType() {
 		return joinType;
 	}
 

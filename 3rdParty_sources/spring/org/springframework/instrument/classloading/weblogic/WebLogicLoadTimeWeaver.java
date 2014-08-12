@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2007 the original author or authors.
- * 
+ * Copyright 2002-2012 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ import org.springframework.util.ClassUtils;
  */
 public class WebLogicLoadTimeWeaver implements LoadTimeWeaver {
 
-	private final WebLogicClassLoader classLoader;
+	private final WebLogicClassLoaderAdapter classLoader;
 
 
 	/**
@@ -49,25 +49,27 @@ public class WebLogicLoadTimeWeaver implements LoadTimeWeaver {
 	/**
 	 * Creates a new instance of the {@link WebLogicLoadTimeWeaver} class using
 	 * the supplied {@link ClassLoader}.
-	 * @param classLoader the <code>ClassLoader</code> to delegate to for
-	 * weaving (must not be <code>null</code>)
+	 * @param classLoader the {@code ClassLoader} to delegate to for
+	 * weaving (must not be {@code null})
 	 */
 	public WebLogicLoadTimeWeaver(ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");
-		this.classLoader = new WebLogicClassLoader(classLoader);
+		this.classLoader = new WebLogicClassLoaderAdapter(classLoader);
 	}
 
 
+	@Override
 	public void addTransformer(ClassFileTransformer transformer) {
 		this.classLoader.addTransformer(transformer);
 	}
 
+	@Override
 	public ClassLoader getInstrumentableClassLoader() {
-		return this.classLoader.getInternalClassLoader();
+		return this.classLoader.getClassLoader();
 	}
 
+	@Override
 	public ClassLoader getThrowawayClassLoader() {
 		return this.classLoader.getThrowawayClassLoader();
 	}
-
 }

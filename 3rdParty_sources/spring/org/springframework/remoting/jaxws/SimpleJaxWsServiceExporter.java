@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2009 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.remoting.jaxws;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.WebServiceProvider;
 
 /**
  * Simple exporter for JAX-WS services, autodetecting annotated service beans
@@ -62,9 +63,29 @@ public class SimpleJaxWsServiceExporter extends AbstractJaxWsServiceExporter {
 	}
 
 
+	@Override
 	protected void publishEndpoint(Endpoint endpoint, WebService annotation) {
-		String fullAddress = this.baseAddress + annotation.serviceName();
-		endpoint.publish(fullAddress);
+		endpoint.publish(calculateEndpointAddress(endpoint, annotation.serviceName()));
+	}
+
+	@Override
+	protected void publishEndpoint(Endpoint endpoint, WebServiceProvider annotation) {
+		endpoint.publish(calculateEndpointAddress(endpoint, annotation.serviceName()));
+	}
+
+	/**
+	 * Calculate the full endpoint address for the given endpoint.
+	 * @param endpoint the JAX-WS Provider Endpoint object
+	 * @param serviceName the given service name
+	 * @return the full endpoint address
+	 */
+	protected String calculateEndpointAddress(Endpoint endpoint, String serviceName) {
+		String fullAddress = this.baseAddress + serviceName;
+		if (endpoint.getClass().getName().startsWith("weblogic.")) {
+			// Workaround for WebLogic 10.3
+			fullAddress = fullAddress + "/";
+		}
+		return fullAddress;
 	}
 
 }

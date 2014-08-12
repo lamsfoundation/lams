@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.springframework.util.ObjectUtils;
  * @see PropertyValues
  * @see BeanWrapper
  */
+@SuppressWarnings("serial")
 public class PropertyValue extends BeanMetadataAttributeAccessor implements Serializable {
 
 	private final String name;
@@ -46,6 +47,8 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	private final Object value;
 
 	private Object source;
+
+	private boolean optional = false;
 
 	private boolean converted = false;
 
@@ -63,7 +66,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 
 	/**
 	 * Create a new PropertyValue instance.
-	 * @param name the name of the property (never <code>null</code>)
+	 * @param name the name of the property (never {@code null})
 	 * @param value the value of the property (possibly before type conversion)
 	 */
 	public PropertyValue(String name, Object value) {
@@ -73,13 +76,16 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 
 	/**
 	 * Copy constructor.
-	 * @param original the PropertyValue to copy (never <code>null</code>)
+	 * @param original the PropertyValue to copy (never {@code null})
 	 */
 	public PropertyValue(PropertyValue original) {
 		Assert.notNull(original, "Original must not be null");
 		this.name = original.getName();
 		this.value = original.getValue();
 		this.source = original.getSource();
+		this.optional = original.isOptional();
+		this.converted = original.converted;
+		this.convertedValue = original.convertedValue;
 		this.conversionNecessary = original.conversionNecessary;
 		this.resolvedTokens = original.resolvedTokens;
 		this.resolvedDescriptor = original.resolvedDescriptor;
@@ -89,7 +95,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	/**
 	 * Constructor that exposes a new value for an original value holder.
 	 * The original holder will be exposed as source of the new holder.
-	 * @param original the PropertyValue to link to (never <code>null</code>)
+	 * @param original the PropertyValue to link to (never {@code null})
 	 * @param newValue the new value to apply
 	 */
 	public PropertyValue(PropertyValue original, Object newValue) {
@@ -97,6 +103,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 		this.name = original.getName();
 		this.value = newValue;
 		this.source = original;
+		this.optional = original.isOptional();
 		this.conversionNecessary = original.conversionNecessary;
 		this.resolvedTokens = original.resolvedTokens;
 		this.resolvedDescriptor = original.resolvedDescriptor;
@@ -134,9 +141,17 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 		return original;
 	}
 
+	public void setOptional(boolean optional) {
+		this.optional = optional;
+	}
+
+	public boolean isOptional() {
+		return this.optional;
+	}
+
 	/**
-	 * Return whether this holder contains a converted value already (<code>true</code>),
-	 * or whether the value still needs to be converted (<code>false</code>).
+	 * Return whether this holder contains a converted value already ({@code true}),
+	 * or whether the value still needs to be converted ({@code false}).
 	 */
 	public synchronized boolean isConverted() {
 		return this.converted;
@@ -160,6 +175,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	}
 
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -173,10 +189,12 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 				ObjectUtils.nullSafeEquals(this.source, otherPv.source));
 	}
 
+	@Override
 	public int hashCode() {
 		return this.name.hashCode() * 29 + ObjectUtils.nullSafeHashCode(this.value);
 	}
 
+	@Override
 	public String toString() {
 		return "bean property '" + this.name + "'";
 	}

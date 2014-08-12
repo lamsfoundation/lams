@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.context.annotation;
 
 import java.lang.annotation.Annotation;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -35,6 +34,7 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AspectJTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
@@ -43,8 +43,8 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the &lt;context:component-scan/&gt; element.
- * 
+ * Parser for the {@code <context:component-scan/>} element.
+ *
  * @author Mark Fisher
  * @author Ramnivas Laddad
  * @author Juergen Hoeller
@@ -59,11 +59,11 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String USE_DEFAULT_FILTERS_ATTRIBUTE = "use-default-filters";
 
 	private static final String ANNOTATION_CONFIG_ATTRIBUTE = "annotation-config";
-	
+
 	private static final String NAME_GENERATOR_ATTRIBUTE = "name-generator";
-	
+
 	private static final String SCOPE_RESOLVER_ATTRIBUTE = "scope-resolver";
-	
+
 	private static final String SCOPED_PROXY_ATTRIBUTE = "scoped-proxy";
 
 	private static final String EXCLUDE_FILTER_ELEMENT = "exclude-filter";
@@ -75,9 +75,10 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String FILTER_EXPRESSION_ATTRIBUTE = "expression";
 
 
+	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		String[] basePackages =
-				StringUtils.commaDelimitedListToStringArray(element.getAttribute(BASE_PACKAGE_ATTRIBUTE));
+		String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute(BASE_PACKAGE_ATTRIBUTE),
+				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
 		// Actually scan for bean definitions and register them.
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
@@ -98,6 +99,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		// Delegate bean definition registration to scanner class.
 		ClassPathBeanDefinitionScanner scanner = createScanner(readerContext, useDefaultFilters);
 		scanner.setResourceLoader(readerContext.getResourceLoader());
+		scanner.setEnvironment(parserContext.getDelegate().getEnvironment());
 		scanner.setBeanDefinitionDefaults(parserContext.getDelegate().getBeanDefinitionDefaults());
 		scanner.setAutowireCandidatePatterns(parserContext.getDelegate().getAutowireCandidatePatterns());
 
@@ -119,7 +121,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			readerContext.error(ex.getMessage(), readerContext.extractSource(element), ex.getCause());
 		}
 
-		parseTypeFilters(element, scanner, readerContext);
+		parseTypeFilters(element, scanner, readerContext, parserContext);
 
 		return scanner;
 	}
@@ -134,8 +136,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		Object source = readerContext.extractSource(element);
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), source);
 
-		for (Iterator it = beanDefinitions.iterator(); it.hasNext();) {
-			BeanDefinitionHolder beanDefHolder = (BeanDefinitionHolder) it.next();
+		for (BeanDefinitionHolder beanDefHolder : beanDefinitions) {
 			compositeDef.addNestedComponent(new BeanComponentDefinition(beanDefHolder));
 		}
 
@@ -195,7 +196,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	protected void parseTypeFilters(
-			Element element, ClassPathBeanDefinitionScanner scanner, XmlReaderContext readerContext) {
+			Element element, ClassPathBeanDefinitionScanner scanner, XmlReaderContext readerContext, ParserContext parserContext) {
 
 		// Parse exclude and include filter elements.
 		ClassLoader classLoader = scanner.getResourceLoader().getClassLoader();
@@ -203,7 +204,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				String localName = node.getLocalName();
+				String localName = parserContext.getDelegate().getLocalName(node);
 				try {
 					if (INCLUDE_FILTER_ELEMENT.equals(localName)) {
 						TypeFilter typeFilter = createTypeFilter((Element) node, classLoader);
@@ -239,7 +240,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 				return new RegexPatternTypeFilter(Pattern.compile(expression));
 			}
 			else if ("custom".equals(filterType)) {
-				Class filterClass = classLoader.loadClass(expression);
+				Class<?> filterClass = classLoader.loadClass(expression);
 				if (!TypeFilter.class.isAssignableFrom(filterClass)) {
 					throw new IllegalArgumentException(
 							"Class is not assignable to [" + TypeFilter.class.getName() + "]: " + expression);
@@ -256,8 +257,8 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Object instantiateUserDefinedStrategy(String className, Class strategyType, ClassLoader classLoader) {
-		Object result = null;
+	private Object instantiateUserDefinedStrategy(String className, Class<?> strategyType, ClassLoader classLoader) {
+		Object result;
 		try {
 			result = classLoader.loadClass(className).newInstance();
 		}
@@ -267,7 +268,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		catch (Exception ex) {
 			throw new IllegalArgumentException("Unable to instantiate class [" + className + "] for strategy [" +
-					strategyType.getName() + "]. A zero-argument constructor is required", ex);
+					strategyType.getName() + "]: a zero-argument constructor is required", ex);
 		}
 
 		if (!strategyType.isAssignableFrom(result.getClass())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.context.annotation;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.EnvironmentCapable;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -45,7 +50,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.SystemPropertyUtils;
 
 /**
  * A component provider that scans the classpath from a base package. It then
@@ -53,26 +57,29 @@ import org.springframework.util.SystemPropertyUtils;
  *
  * <p>This implementation is based on Spring's
  * {@link org.springframework.core.type.classreading.MetadataReader MetadataReader}
- * facility, backed by an ASM {@link org.objectweb.asm.ClassReader ClassReader}.
+ * facility, backed by an ASM {@link org.springframework.asm.ClassReader ClassReader}.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
+ * @author Chris Beams
  * @since 2.5
  * @see org.springframework.core.type.classreading.MetadataReaderFactory
  * @see org.springframework.core.type.AnnotationMetadata
  * @see ScannedGenericBeanDefinition
  */
-public class ClassPathScanningCandidateComponentProvider implements ResourceLoaderAware {
+public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
 
-	protected static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
-
+	static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	private Environment environment;
+
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(this.resourcePatternResolver);
+	private MetadataReaderFactory metadataReaderFactory =
+			new CachingMetadataReaderFactory(this.resourcePatternResolver);
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
@@ -80,9 +87,11 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
 
+	private ConditionEvaluator conditionEvaluator;
+
 
 	/**
-	 * Create a ClassPathScanningCandidateComponentProvider.
+	 * Create a ClassPathScanningCandidateComponentProvider with a {@link StandardEnvironment}.
 	 * @param useDefaultFilters whether to register the default filters for the
 	 * {@link Component @Component}, {@link Repository @Repository},
 	 * {@link Service @Service}, and {@link Controller @Controller}
@@ -90,9 +99,23 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 * @see #registerDefaultFilters()
 	 */
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters) {
+		this(useDefaultFilters, new StandardEnvironment());
+	}
+
+	/**
+	 * Create a ClassPathScanningCandidateComponentProvider with the given {@link Environment}.
+	 * @param useDefaultFilters whether to register the default filters for the
+	 * {@link Component @Component}, {@link Repository @Repository},
+	 * {@link Service @Service}, and {@link Controller @Controller}
+	 * stereotype annotations
+	 * @param environment the Environment to use
+	 * @see #registerDefaultFilters()
+	 */
+	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters, Environment environment) {
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
+		this.environment = environment;
 	}
 
 
@@ -104,6 +127,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
+	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
@@ -114,6 +138,47 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 */
 	public final ResourceLoader getResourceLoader() {
 		return this.resourcePatternResolver;
+	}
+
+	/**
+	 * Set the {@link MetadataReaderFactory} to use.
+	 * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
+	 * {@linkplain #setResourceLoader resource loader}.
+	 * <p>Call this setter method <i>after</i> {@link #setResourceLoader} in order
+	 * for the given MetadataReaderFactory to override the default factory.
+	 */
+	public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
+		this.metadataReaderFactory = metadataReaderFactory;
+	}
+
+	/**
+	 * Return the MetadataReaderFactory used by this component provider.
+	 */
+	public final MetadataReaderFactory getMetadataReaderFactory() {
+		return this.metadataReaderFactory;
+	}
+
+	/**
+	 * Set the Environment to use when resolving placeholders and evaluating
+	 * {@link Conditional @Conditional}-annotated component classes.
+	 * <p>The default is a {@link StandardEnvironment}
+	 * @param environment the Environment to use
+	 */
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+		this.conditionEvaluator = null;
+	}
+
+	@Override
+	public final Environment getEnvironment() {
+		return this.environment;
+	}
+
+	/**
+	 * Returns the {@link BeanDefinitionRegistry} used by this scanner, if any.
+	 */
+	protected BeanDefinitionRegistry getRegistry() {
+		return null;
 	}
 
 	/**
@@ -159,13 +224,34 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 	/**
 	 * Register the default filter for {@link Component @Component}.
-	 * This will implicitly register all annotations that have the
+	 * <p>This will implicitly register all annotations that have the
 	 * {@link Component @Component} meta-annotation including the
 	 * {@link Repository @Repository}, {@link Service @Service}, and
 	 * {@link Controller @Controller} stereotype annotations.
+	 * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
+	 * JSR-330's {@link javax.inject.Named} annotations, if available.
+	 *
 	 */
+	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
+		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
+		try {
+			this.includeFilters.add(new AnnotationTypeFilter(
+					((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false));
+			logger.debug("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
+		}
+		catch (ClassNotFoundException ex) {
+			// JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
+		}
+		try {
+			this.includeFilters.add(new AnnotationTypeFilter(
+					((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Named", cl)), false));
+			logger.debug("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
+		}
+		catch (ClassNotFoundException ex) {
+			// JSR-330 API not available - simply skip.
+		}
 	}
 
 
@@ -182,33 +268,38 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 			Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
-			for (int i = 0; i < resources.length; i++) {
-				Resource resource = resources[i];
+			for (Resource resource : resources) {
 				if (traceEnabled) {
 					logger.trace("Scanning " + resource);
 				}
 				if (resource.isReadable()) {
-					MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
-					if (isCandidateComponent(metadataReader)) {
-						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
-						sbd.setResource(resource);
-						sbd.setSource(resource);
-						if (isCandidateComponent(sbd)) {
-							if (debugEnabled) {
-								logger.debug("Identified candidate component class: " + resource);
+					try {
+						MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+						if (isCandidateComponent(metadataReader)) {
+							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
+							sbd.setResource(resource);
+							sbd.setSource(resource);
+							if (isCandidateComponent(sbd)) {
+								if (debugEnabled) {
+									logger.debug("Identified candidate component class: " + resource);
+								}
+								candidates.add(sbd);
 							}
-							candidates.add(sbd);
+							else {
+								if (debugEnabled) {
+									logger.debug("Ignored because not a concrete top-level class: " + resource);
+								}
+							}
 						}
 						else {
-							if (debugEnabled) {
-								logger.debug("Ignored because not a concrete top-level class: " + resource);
+							if (traceEnabled) {
+								logger.trace("Ignored because not matching any filter: " + resource);
 							}
 						}
 					}
-					else {
-						if (traceEnabled) {
-							logger.trace("Ignored because not matching any filter: " + resource);
-						}
+					catch (Throwable ex) {
+						throw new BeanDefinitionStoreException(
+								"Failed to read candidate component class: " + resource, ex);
 					}
 				}
 				else {
@@ -224,6 +315,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 		return candidates;
 	}
 
+
 	/**
 	 * Resolve the specified base package into a pattern specification for
 	 * the package search path.
@@ -233,7 +325,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 * @return the pattern specification to be used for package searching
 	 */
 	protected String resolveBasePackage(String basePackage) {
-		return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
+		return ClassUtils.convertClassNameToResourcePath(this.environment.resolveRequiredPlaceholders(basePackage));
 	}
 
 	/**
@@ -250,10 +342,23 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 		}
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, this.metadataReaderFactory)) {
-				return true;
+				return isConditionMatch(metadataReader);
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Determine whether the given class is a candidate component based on any
+	 * {@code @Conditional} annotations.
+	 * @param metadataReader the ASM ClassReader for the class
+	 * @return whether the class qualifies as a candidate component
+	 */
+	private boolean isConditionMatch(MetadataReader metadataReader) {
+		if (this.conditionEvaluator == null) {
+			this.conditionEvaluator = new ConditionEvaluator(getRegistry(), getEnvironment(), getResourceLoader());
+		}
+		return !this.conditionEvaluator.shouldSkip(metadataReader.getAnnotationMetadata());
 	}
 
 	/**
@@ -265,6 +370,16 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 	 */
 	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
 		return (beanDefinition.getMetadata().isConcrete() && beanDefinition.getMetadata().isIndependent());
+	}
+
+
+	/**
+	 * Clear the underlying metadata cache, removing all cached class metadata.
+	 */
+	public void clearCache() {
+		if (this.metadataReaderFactory instanceof CachingMetadataReaderFactory) {
+			((CachingMetadataReaderFactory) this.metadataReaderFactory).clearCache();
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,18 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @see org.springframework.web.servlet.FrameworkServlet#createWebApplicationContext
  */
 public interface ConfigurableWebApplicationContext extends WebApplicationContext, ConfigurableApplicationContext {
+
+	/**
+	 * Prefix for ApplicationContext ids that refer to context path and/or servlet name.
+	 */
+	String APPLICATION_CONTEXT_ID_PREFIX = WebApplicationContext.class.getName() + ":";
+
+	/**
+	 * Name of the ServletConfig environment bean in the factory.
+	 * @see javax.servlet.ServletConfig
+	 */
+	String SERVLET_CONFIG_BEAN_NAME = "servletConfig";
+
 
 	/**
 	 * Set the ServletContext for this web application context.
@@ -88,7 +100,7 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 
 	/**
 	 * Return the config locations for this web application context,
-	 * or <code>null</code> if none specified.
+	 * or {@code null} if none specified.
 	 */
 	String[] getConfigLocations();
 

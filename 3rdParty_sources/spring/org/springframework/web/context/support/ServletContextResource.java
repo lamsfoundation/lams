@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import javax.servlet.ServletContext;
 
-import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.AbstractFileResolvingResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
@@ -38,7 +38,7 @@ import org.springframework.web.util.WebUtils;
  * relative paths within the web application root directory.
  *
  * <p>Always supports stream access and URL access, but only allows
- * <code>java.io.File</code> access when the web application archive
+ * {@code java.io.File} access when the web application archive
  * is expanded.
  *
  * @author Juergen Hoeller
@@ -47,7 +47,7 @@ import org.springframework.web.util.WebUtils;
  * @see javax.servlet.ServletContext#getResource
  * @see javax.servlet.ServletContext#getRealPath
  */
-public class ServletContextResource extends AbstractResource implements ContextResource {
+public class ServletContextResource extends AbstractFileResolvingResource implements ContextResource {
 
 	private final ServletContext servletContext;
 
@@ -93,9 +93,10 @@ public class ServletContextResource extends AbstractResource implements ContextR
 
 
 	/**
-	 * This implementation checks <code>ServletContext.getResource</code>.
+	 * This implementation checks {@code ServletContext.getResource}.
 	 * @see javax.servlet.ServletContext#getResource(String)
 	 */
+	@Override
 	public boolean exists() {
 		try {
 			URL url = this.servletContext.getResource(this.path);
@@ -107,10 +108,33 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	}
 
 	/**
-	 * This implementation delegates to <code>ServletContext.getResourceAsStream</code>,
+	 * This implementation delegates to {@code ServletContext.getResourceAsStream},
+	 * which returns {@code null} in case of a non-readable resource (e.g. a directory).
+	 * @see javax.servlet.ServletContext#getResourceAsStream(String)
+	 */
+	@Override
+	public boolean isReadable() {
+		InputStream is = this.servletContext.getResourceAsStream(this.path);
+		if (is != null) {
+			try {
+				is.close();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * This implementation delegates to {@code ServletContext.getResourceAsStream},
 	 * but throws a FileNotFoundException if no resource found.
 	 * @see javax.servlet.ServletContext#getResourceAsStream(String)
 	 */
+	@Override
 	public InputStream getInputStream() throws IOException {
 		InputStream is = this.servletContext.getResourceAsStream(this.path);
 		if (is == null) {
@@ -120,10 +144,11 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	}
 
 	/**
-	 * This implementation delegates to <code>ServletContext.getResource</code>,
+	 * This implementation delegates to {@code ServletContext.getResource},
 	 * but throws a FileNotFoundException if no resource found.
 	 * @see javax.servlet.ServletContext#getResource(String)
 	 */
+	@Override
 	public URL getURL() throws IOException {
 		URL url = this.servletContext.getResource(this.path);
 		if (url == null) {
@@ -134,13 +159,23 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	}
 
 	/**
-	 * This implementation delegates to <code>ServletContext.getRealPath</code>,
-	 * but throws a FileNotFoundException if not found or not resolvable.
+	 * This implementation resolves "file:" URLs or alternatively delegates to
+	 * {@code ServletContext.getRealPath}, throwing a FileNotFoundException
+	 * if not found or not resolvable.
+	 * @see javax.servlet.ServletContext#getResource(String)
 	 * @see javax.servlet.ServletContext#getRealPath(String)
 	 */
+	@Override
 	public File getFile() throws IOException {
-		String realPath = WebUtils.getRealPath(this.servletContext, this.path);
-		return new File(realPath);
+		URL url = this.servletContext.getResource(this.path);
+		if (url != null && ResourceUtils.isFileURL(url)) {
+			// Proceed with file system resolution...
+			return super.getFile();
+		}
+		else {
+			String realPath = WebUtils.getRealPath(this.servletContext, this.path);
+			return new File(realPath);
+		}
 	}
 
 	/**
@@ -148,6 +183,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	 * relative to the path of the underlying file of this resource descriptor.
 	 * @see org.springframework.util.StringUtils#applyRelativePath(String, String)
 	 */
+	@Override
 	public Resource createRelative(String relativePath) {
 		String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);
 		return new ServletContextResource(this.servletContext, pathToUse);
@@ -158,6 +194,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	 * resource refers to.
 	 * @see org.springframework.util.StringUtils#getFilename(String)
 	 */
+	@Override
 	public String getFilename() {
 		return StringUtils.getFilename(this.path);
 	}
@@ -166,10 +203,12 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	 * This implementation returns a description that includes the ServletContext
 	 * resource location.
 	 */
+	@Override
 	public String getDescription() {
 		return "ServletContext resource [" + this.path + "]";
 	}
 
+	@Override
 	public String getPathWithinContext() {
 		return this.path;
 	}
@@ -178,6 +217,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	/**
 	 * This implementation compares the underlying ServletContext resource locations.
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;
@@ -193,6 +233,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
 	 * This implementation returns the hash code of the underlying
 	 * ServletContext resource location.
 	 */
+	@Override
 	public int hashCode() {
 		return this.path.hashCode();
 	}

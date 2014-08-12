@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,9 +63,10 @@ public class RefreshableScriptTargetSource extends BeanFactoryRefreshableTargetS
 
 	/**
 	 * Determine whether a refresh is required through calling
-	 * ScriptFactory's <code>requiresScriptedObjectRefresh</code> method.
+	 * ScriptFactory's {@code requiresScriptedObjectRefresh} method.
 	 * @see ScriptFactory#requiresScriptedObjectRefresh(ScriptSource)
 	 */
+	@Override
 	protected boolean requiresRefresh() {
 		return this.scriptFactory.requiresScriptedObjectRefresh(this.scriptSource);
 	}
@@ -73,6 +74,7 @@ public class RefreshableScriptTargetSource extends BeanFactoryRefreshableTargetS
 	/**
 	 * Obtain a fresh target object, retrieving a FactoryBean if necessary.
 	 */
+	@Override
 	protected Object obtainFreshBean(BeanFactory beanFactory, String beanName) {
 		return super.obtainFreshBean(beanFactory,
 				(this.isFactoryBean ? BeanFactory.FACTORY_BEAN_PREFIX + beanName : beanName));

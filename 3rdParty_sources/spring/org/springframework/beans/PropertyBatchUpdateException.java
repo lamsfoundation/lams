@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Combined exception, composed of individual PropertyAccessException instances.
@@ -34,6 +35,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 18 April 2001
  */
+@SuppressWarnings("serial")
 public class PropertyBatchUpdateException extends BeansException {
 
 	/** List of PropertyAccessException objects */
@@ -60,19 +62,18 @@ public class PropertyBatchUpdateException extends BeansException {
 
 	/**
 	 * Return an array of the propertyAccessExceptions stored in this object.
-	 * Will return the empty array (not null) if there were no errors.
+	 * <p>Will return the empty array (not {@code null}) if there were no errors.
 	 */
 	public final PropertyAccessException[] getPropertyAccessExceptions() {
 		return this.propertyAccessExceptions;
 	}
 
 	/**
-	 * Return the exception for this field, or <code>null</code> if there isn't one.
+	 * Return the exception for this field, or {@code null} if there isn't any.
 	 */
 	public PropertyAccessException getPropertyAccessException(String propertyName) {
-		for (int i = 0; i < this.propertyAccessExceptions.length; i++) {
-			PropertyAccessException pae = this.propertyAccessExceptions[i];
-			if (propertyName.equals(pae.getPropertyChangeEvent().getPropertyName())) {
+		for (PropertyAccessException pae : this.propertyAccessExceptions) {
+			if (ObjectUtils.nullSafeEquals(propertyName, pae.getPropertyName())) {
 				return pae;
 			}
 		}
@@ -80,8 +81,9 @@ public class PropertyBatchUpdateException extends BeansException {
 	}
 
 
+	@Override
 	public String getMessage() {
-		StringBuffer sb = new StringBuffer("Failed properties: ");
+		StringBuilder sb = new StringBuilder("Failed properties: ");
 		for (int i = 0; i < this.propertyAccessExceptions.length; i++) {
 			sb.append(this.propertyAccessExceptions[i].getMessage());
 			if (i < this.propertyAccessExceptions.length - 1) {
@@ -91,8 +93,9 @@ public class PropertyBatchUpdateException extends BeansException {
 		return sb.toString();
 	}
 
+	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getName()).append("; nested PropertyAccessExceptions (");
 		sb.append(getExceptionCount()).append(") are:");
 		for (int i = 0; i < this.propertyAccessExceptions.length; i++) {
@@ -102,6 +105,7 @@ public class PropertyBatchUpdateException extends BeansException {
 		return sb.toString();
 	}
 
+	@Override
 	public void printStackTrace(PrintStream ps) {
 		synchronized (ps) {
 			ps.println(getClass().getName() + "; nested PropertyAccessException details (" +
@@ -113,6 +117,7 @@ public class PropertyBatchUpdateException extends BeansException {
 		}
 	}
 
+	@Override
 	public void printStackTrace(PrintWriter pw) {
 		synchronized (pw) {
 			pw.println(getClass().getName() + "; nested PropertyAccessException details (" +
@@ -124,15 +129,15 @@ public class PropertyBatchUpdateException extends BeansException {
 		}
 	}
 
-	public boolean contains(Class exType) {
+	@Override
+	public boolean contains(Class<?> exType) {
 		if (exType == null) {
 			return false;
 		}
 		if (exType.isInstance(this)) {
 			return true;
 		}
-		for (int i = 0; i < this.propertyAccessExceptions.length; i++) {
-			PropertyAccessException pae = this.propertyAccessExceptions[i];
+		for (PropertyAccessException pae : this.propertyAccessExceptions) {
 			if (pae.contains(exType)) {
 				return true;
 			}

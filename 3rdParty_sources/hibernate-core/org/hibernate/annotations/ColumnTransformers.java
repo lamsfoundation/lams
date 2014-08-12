@@ -38,5 +38,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @java.lang.annotation.Target({FIELD,METHOD})
 @Retention(RUNTIME)
 public @interface ColumnTransformers {
+	/**
+	 * The aggregated transformers.
+	 */
 	ColumnTransformer[] value();
 }

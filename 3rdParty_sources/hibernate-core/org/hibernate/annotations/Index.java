@@ -22,22 +22,31 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.annotations;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
 
 /**
- * Define a DB index
+ * Define a DB index.
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated Using {@link javax.persistence.Index} instead.
  */
 @Target({FIELD, METHOD})
 @Retention(RUNTIME)
+@Deprecated
 public @interface Index {
+	/**
+	 * The index name.
+	 */
 	String name();
 
+	/**
+	 * The column(s) that are indexed.
+	 */
 	String[] columnNames() default {};
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.TypeConverter;
 import org.springframework.core.GenericCollectionTypeResolver;
-import org.springframework.core.JdkVersion;
 
 /**
  * Simple factory for shared Map instances. Allows for central setup
@@ -34,17 +32,18 @@ import org.springframework.core.JdkVersion;
  * @see SetFactoryBean
  * @see ListFactoryBean
  */
-public class MapFactoryBean extends AbstractFactoryBean {
+public class MapFactoryBean extends AbstractFactoryBean<Map<Object, Object>> {
 
-	private Map sourceMap;
+	private Map<?, ?> sourceMap;
 
-	private Class targetMapClass;
+	@SuppressWarnings("rawtypes")
+	private Class<? extends Map> targetMapClass;
 
 
 	/**
 	 * Set the source Map, typically populated via XML "map" elements.
 	 */
-	public void setSourceMap(Map sourceMap) {
+	public void setSourceMap(Map<?, ?> sourceMap) {
 		this.sourceMap = sourceMap;
 	}
 
@@ -54,7 +53,8 @@ public class MapFactoryBean extends AbstractFactoryBean {
 	 * <p>Default is a linked HashMap, keeping the registration order.
 	 * @see java.util.LinkedHashMap
 	 */
-	public void setTargetMapClass(Class targetMapClass) {
+	@SuppressWarnings("rawtypes")
+	public void setTargetMapClass(Class<? extends Map> targetMapClass) {
 		if (targetMapClass == null) {
 			throw new IllegalArgumentException("'targetMapClass' must not be null");
 		}
@@ -65,31 +65,34 @@ public class MapFactoryBean extends AbstractFactoryBean {
 	}
 
 
-	public Class getObjectType() {
+	@Override
+	@SuppressWarnings("rawtypes")
+	public Class<Map> getObjectType() {
 		return Map.class;
 	}
 
-	protected Object createInstance() {
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Map<Object, Object> createInstance() {
 		if (this.sourceMap == null) {
 			throw new IllegalArgumentException("'sourceMap' is required");
 		}
-		Map result = null;
+		Map<Object, Object> result = null;
 		if (this.targetMapClass != null) {
-			result = (Map) BeanUtils.instantiateClass(this.targetMapClass);
+			result = BeanUtils.instantiateClass(this.targetMapClass);
 		}
 		else {
-			result = new LinkedHashMap(this.sourceMap.size());
+			result = new LinkedHashMap<Object, Object>(this.sourceMap.size());
 		}
-		Class keyType = null;
-		Class valueType = null;
-		if (this.targetMapClass != null && JdkVersion.isAtLeastJava15()) {
+		Class<?> keyType = null;
+		Class<?> valueType = null;
+		if (this.targetMapClass != null) {
 			keyType = GenericCollectionTypeResolver.getMapKeyType(this.targetMapClass);
 			valueType = GenericCollectionTypeResolver.getMapValueType(this.targetMapClass);
 		}
 		if (keyType != null || valueType != null) {
 			TypeConverter converter = getBeanTypeConverter();
-			for (Iterator it = this.sourceMap.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
+			for (Map.Entry<?, ?> entry : this.sourceMap.entrySet()) {
 				Object convertedKey = converter.convertIfNecessary(entry.getKey(), keyType);
 				Object convertedValue = converter.convertIfNecessary(entry.getValue(), valueType);
 				result.put(convertedKey, convertedValue);

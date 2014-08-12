@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2012, Red Hat Inc. or third-party contributors as
+ * Copyright (c) 2008-2011, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat Inc.
@@ -23,22 +23,23 @@
  */
 package org.hibernate.id;
 
-import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
-import org.hibernate.id.insert.AbstractReturningDelegate;
-import org.hibernate.id.insert.IdentifierGeneratingInsert;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.HibernateException;
-import org.hibernate.MappingException;
-import org.hibernate.sql.Insert;
-import org.hibernate.type.Type;
-import org.hibernate.engine.SessionImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import org.hibernate.HibernateException;
+import org.hibernate.MappingException;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.insert.AbstractReturningDelegate;
+import org.hibernate.id.insert.IdentifierGeneratingInsert;
+import org.hibernate.id.insert.InsertGeneratedIdentifierDelegate;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.sql.Insert;
+import org.hibernate.type.Type;
+
+import org.jboss.logging.Logger;
 
 /**
  * A generator which combines sequence generation with immediate retrieval
@@ -53,12 +54,17 @@ import java.util.Properties;
  *
  * @author Steve Ebersole
  */
-public class SequenceIdentityGenerator extends SequenceGenerator
+public class SequenceIdentityGenerator
+		extends SequenceGenerator
 		implements PostInsertIdentifierGenerator {
 
-	private static final Logger log = LoggerFactory.getLogger( SequenceIdentityGenerator.class );
+    private static final CoreMessageLogger LOG = Logger.getMessageLogger(
+			CoreMessageLogger.class,
+			SequenceIdentityGenerator.class.getName()
+	);
 
-	public Serializable generate(SessionImplementor s, Object obj) {
+	@Override
+    public Serializable generate(SessionImplementor s, Object obj) {
 		return IdentifierGeneratorHelper.POST_INSERT_INDICATOR;
 	}
 
@@ -69,7 +75,8 @@ public class SequenceIdentityGenerator extends SequenceGenerator
 		return new Delegate( persister, dialect, getSequenceName() );
 	}
 
-	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
+	@Override
+    public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
 		super.configure( type, params, dialect );
 	}
 
@@ -94,16 +101,17 @@ public class SequenceIdentityGenerator extends SequenceGenerator
 			return insert;
 		}
 
-		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
-			return session.getBatcher().prepareStatement( insertSQL, keyColumns );
+		@Override
+        protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
+			return session.getTransactionCoordinator().getJdbcCoordinator().getStatementPreparer().prepareStatement( insertSQL, keyColumns );
 		}
 
 		@Override
-		protected Serializable executeAndExtract(PreparedStatement insert) throws SQLException {
-			insert.executeUpdate();
+		protected Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session) throws SQLException {
+						session.getTransactionCoordinator().getJdbcCoordinator().getResultSetReturn().executeUpdate( insert );
 			return IdentifierGeneratorHelper.getGeneratedIdentity(
 					insert.getGeneratedKeys(),
-					getPersister().getIdentifierColumnNames()[0],
+					getPersister().getRootTableKeyColumnNames()[0],
 					getPersister().getIdentifierType()
 			);
 		}
@@ -114,10 +122,11 @@ public class SequenceIdentityGenerator extends SequenceGenerator
 			super( dialect );
 		}
 
-		public Insert setComment(String comment) {
+		@Override
+        public Insert setComment(String comment) {
 			// don't allow comments on these insert statements as comments totally
 			// blow up the Oracle getGeneratedKeys "support" :(
-			log.info( "disallowing insert statement comment for select-identity due to Oracle driver bug" );
+			LOG.disallowingInsertStatementComment();
 			return this;
 		}
 	}

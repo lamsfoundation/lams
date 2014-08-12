@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link NamespaceHandler} for the <code>util</code> namespace.
+ * {@link NamespaceHandler} for the {@code util} namespace.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -45,6 +45,7 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 	private static final String SCOPE_ATTRIBUTE = "scope";
 
 
+	@Override
 	public void init() {
 		registerBeanDefinitionParser("constant", new ConstantBeanDefinitionParser());
 		registerBeanDefinitionParser("property-path", new PropertyPathBeanDefinitionParser());
@@ -57,10 +58,12 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class ConstantBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return FieldRetrievingFactoryBean.class;
 		}
 
+		@Override
 		protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
 			String id = super.resolveId(element, definition, parserContext);
 			if (!StringUtils.hasText(id)) {
@@ -73,10 +76,12 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class PropertyPathBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return PropertyPathFactoryBean.class;
 		}
 
+		@Override
 		protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 			String path = element.getAttribute("path");
 			if (!StringUtils.hasText(path)) {
@@ -95,6 +100,7 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			builder.addPropertyValue("propertyPath", propertyPath);
 		}
 
+		@Override
 		protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
 			String id = super.resolveId(element, definition, parserContext);
 			if (!StringUtils.hasText(id)) {
@@ -107,13 +113,15 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class ListBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return ListFactoryBean.class;
 		}
 
+		@Override
 		protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 			String listClass = element.getAttribute("list-class");
-			List parsedList = parserContext.getDelegate().parseListElement(element, builder.getRawBeanDefinition());
+			List<Object> parsedList = parserContext.getDelegate().parseListElement(element, builder.getRawBeanDefinition());
 			builder.addPropertyValue("sourceList", parsedList);
 			if (StringUtils.hasText(listClass)) {
 				builder.addPropertyValue("targetListClass", listClass);
@@ -128,13 +136,15 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class SetBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return SetFactoryBean.class;
 		}
 
+		@Override
 		protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 			String setClass = element.getAttribute("set-class");
-			Set parsedSet = parserContext.getDelegate().parseSetElement(element, builder.getRawBeanDefinition());
+			Set<Object> parsedSet = parserContext.getDelegate().parseSetElement(element, builder.getRawBeanDefinition());
 			builder.addPropertyValue("sourceSet", parsedSet);
 			if (StringUtils.hasText(setClass)) {
 				builder.addPropertyValue("targetSetClass", setClass);
@@ -149,13 +159,15 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class MapBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return MapFactoryBean.class;
 		}
 
+		@Override
 		protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 			String mapClass = element.getAttribute("map-class");
-			Map parsedMap = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
+			Map<Object, Object> parsedMap = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
 			builder.addPropertyValue("sourceMap", parsedMap);
 			if (StringUtils.hasText(mapClass)) {
 				builder.addPropertyValue("targetMapClass", mapClass);
@@ -170,14 +182,17 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static class PropertiesBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
+		@Override
+		protected Class<?> getBeanClass(Element element) {
 			return PropertiesFactoryBean.class;
 		}
 
+		@Override
 		protected boolean isEligibleAttribute(String attributeName) {
 			return super.isEligibleAttribute(attributeName) && !SCOPE_ATTRIBUTE.equals(attributeName);
 		}
 
+		@Override
 		protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 			super.doParse(element, parserContext, builder);
 			Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,24 +70,28 @@ public class BlobSerializableType extends AbstractLobType {
 
 	/**
 	 * Constructor used for testing: takes an explicit LobHandler
-	 * and an explicit JTA TransactionManager (can be <code>null</code>).
+	 * and an explicit JTA TransactionManager (can be {@code null}).
 	 */
 	protected BlobSerializableType(LobHandler lobHandler, TransactionManager jtaTransactionManager) {
 		super(lobHandler, jtaTransactionManager);
 	}
 
+	@Override
 	public int[] sqlTypes() {
 		return new int[] {Types.BLOB};
 	}
 
-	public Class returnedClass() {
+	@Override
+	public Class<?> returnedClass() {
 		return Serializable.class;
 	}
 
+	@Override
 	public boolean isMutable() {
 		return true;
 	}
 
+	@Override
 	public Object deepCopy(Object value) throws HibernateException {
 		try {
 			// Write to new byte array to clone.
@@ -118,6 +122,7 @@ public class BlobSerializableType extends AbstractLobType {
 		}
 	}
 
+	@Override
 	protected Object nullSafeGetInternal(
 			ResultSet rs, String[] names, Object owner, LobHandler lobHandler)
 			throws SQLException, IOException, HibernateException {
@@ -140,6 +145,7 @@ public class BlobSerializableType extends AbstractLobType {
 		}
 	}
 
+	@Override
 	protected void nullSafeSetInternal(
 			PreparedStatement ps, int index, Object value, LobCreator lobCreator)
 			throws SQLException, IOException {

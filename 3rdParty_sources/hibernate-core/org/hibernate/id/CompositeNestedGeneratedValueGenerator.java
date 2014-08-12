@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.id;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 
 /**
  * For composite identifiers, defines a number of "nested" generations that
@@ -113,25 +112,22 @@ public class CompositeNestedGeneratedValueGenerator implements IdentifierGenerat
 		generationPlans.add( plan );
 	}
 
+	@Override
 	public Serializable generate(SessionImplementor session, Object object) throws HibernateException {
 		final Serializable context = generationContextLocator.locateGenerationContext( session, object );
 
-		Iterator itr = generationPlans.iterator();
-		while ( itr.hasNext() ) {
-			final GenerationPlan plan = (GenerationPlan) itr.next();
+		for ( Object generationPlan : generationPlans ) {
+			final GenerationPlan plan = (GenerationPlan) generationPlan;
 			plan.execute( session, object, context );
 		}
 
 		return context;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void registerPersistentGenerators(Map generatorMap) {
-		final Iterator itr = generationPlans.iterator();
-		while ( itr.hasNext() ) {
-			final GenerationPlan plan = (GenerationPlan) itr.next();
+		for ( Object generationPlan : generationPlans ) {
+			final GenerationPlan plan = (GenerationPlan) generationPlan;
 			plan.registerPersistentGenerators( generatorMap );
 		}
 	}

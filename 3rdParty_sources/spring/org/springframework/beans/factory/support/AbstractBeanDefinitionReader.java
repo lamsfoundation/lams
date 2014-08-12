@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -37,10 +39,11 @@ import org.springframework.util.Assert;
  * and the class loader to use for loading bean classes.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 11.12.2003
  * @see BeanDefinitionReaderUtils
  */
-public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader {
+public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable, BeanDefinitionReader {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -50,6 +53,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	private ResourceLoader resourceLoader;
 
 	private ClassLoader beanClassLoader;
+
+	private Environment environment;
 
 	private BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
@@ -62,9 +67,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * {@link org.springframework.context.ApplicationContext} implementations.
 	 * <p>If given a plain BeanDefinitionRegistry, the default ResourceLoader will be a
 	 * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
+	 * <p>If the the passed-in bean factory also implements {@link EnvironmentCapable} its
+	 * environment will be used by this reader.  Otherwise, the reader will initialize and
+	 * use a {@link StandardEnvironment}. All ApplicationContext implementations are
+	 * EnvironmentCapable, while normal BeanFactory implementations are not.
 	 * @param registry the BeanFactory to load bean definitions into,
 	 * in the form of a BeanDefinitionRegistry
 	 * @see #setResourceLoader
+	 * @see #setEnvironment
 	 */
 	protected AbstractBeanDefinitionReader(BeanDefinitionRegistry registry) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
@@ -77,6 +87,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		else {
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
+
+		// Inherit Environment if possible
+		if (this.registry instanceof EnvironmentCapable) {
+			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
+		}
+		else {
+			this.environment = new StandardEnvironment();
+		}
 	}
 
 
@@ -84,6 +102,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		return this.registry;
 	}
 
+	@Override
 	public final BeanDefinitionRegistry getRegistry() {
 		return this.registry;
 	}
@@ -94,7 +113,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * will be capable of resolving resource patterns to Resource arrays.
 	 * <p>Default is PathMatchingResourcePatternResolver, also capable of
 	 * resource pattern resolving through the ResourcePatternResolver interface.
-	 * <p>Setting this to <code>null</code> suggests that absolute resource loading
+	 * <p>Setting this to {@code null} suggests that absolute resource loading
 	 * is not available for this bean definition reader.
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
@@ -103,23 +122,39 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		this.resourceLoader = resourceLoader;
 	}
 
+	@Override
 	public ResourceLoader getResourceLoader() {
 		return this.resourceLoader;
 	}
 
 	/**
 	 * Set the ClassLoader to use for bean classes.
-	 * <p>Default is <code>null</code>, which suggests to not load bean classes
+	 * <p>Default is {@code null}, which suggests to not load bean classes
 	 * eagerly but rather to just register bean definitions with class names,
 	 * with the corresponding Classes to be resolved later (or never).
-	 * @see java.lang.Thread#getContextClassLoader()
+	 * @see Thread#getContextClassLoader()
 	 */
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 	}
 
+	@Override
 	public ClassLoader getBeanClassLoader() {
 		return this.beanClassLoader;
+	}
+
+	/**
+	 * Set the Environment to use when reading bean definitions. Most often used
+	 * for evaluating profile information to determine which bean definitions
+	 * should be read and which should be omitted.
+	 */
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+
+	@Override
+	public Environment getEnvironment() {
+		return this.environment;
 	}
 
 	/**
@@ -131,20 +166,23 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : new DefaultBeanNameGenerator());
 	}
 
+	@Override
 	public BeanNameGenerator getBeanNameGenerator() {
 		return this.beanNameGenerator;
 	}
 
 
-	public int loadBeanDefinitions(Resource[] resources) throws BeanDefinitionStoreException {
+	@Override
+	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
 		int counter = 0;
-		for (int i = 0; i < resources.length; i++) {
-			counter += loadBeanDefinitions(resources[i]);
+		for (Resource resource : resources) {
+			counter += loadBeanDefinitions(resource);
 		}
 		return counter;
 	}
 
+	@Override
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
 	}
@@ -156,7 +194,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @param location the resource location, to be loaded with the ResourceLoader
 	 * (or ResourcePatternResolver) of this bean definition reader
 	 * @param actualResources a Set to be filled with the actual Resource objects
-	 * that have been resolved during the loading process. May be <code>null</code>
+	 * that have been resolved during the loading process. May be {@code null}
 	 * to indicate that the caller is not interested in those Resource objects.
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
@@ -164,7 +202,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
-	public int loadBeanDefinitions(String location, Set actualResources) throws BeanDefinitionStoreException {
+	public int loadBeanDefinitions(String location, Set<Resource> actualResources) throws BeanDefinitionStoreException {
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -177,8 +215,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 				int loadCount = loadBeanDefinitions(resources);
 				if (actualResources != null) {
-					for (int i = 0; i < resources.length; i++) {
-						actualResources.add(resources[i]);
+					for (Resource resource : resources) {
+						actualResources.add(resource);
 					}
 				}
 				if (logger.isDebugEnabled()) {
@@ -205,11 +243,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 	}
 
-	public int loadBeanDefinitions(String[] locations) throws BeanDefinitionStoreException {
+	@Override
+	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
 		int counter = 0;
-		for (int i = 0; i < locations.length; i++) {
-			counter += loadBeanDefinitions(locations[i]);
+		for (String location : locations) {
+			counter += loadBeanDefinitions(location);
 		}
 		return counter;
 	}

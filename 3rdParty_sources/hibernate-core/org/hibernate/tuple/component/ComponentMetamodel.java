@@ -24,16 +24,17 @@
  */
 package org.hibernate.tuple.component;
 
-import org.hibernate.mapping.Component;
-import org.hibernate.mapping.Property;
-import org.hibernate.HibernateException;
-import org.hibernate.tuple.StandardProperty;
-import org.hibernate.tuple.PropertyFactory;
-
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
+
+import org.hibernate.EntityMode;
+import org.hibernate.HibernateException;
+import org.hibernate.mapping.Component;
+import org.hibernate.mapping.Property;
+import org.hibernate.tuple.PropertyFactory;
+import org.hibernate.tuple.StandardProperty;
 
 /**
  * Centralizes metamodel information about a component.
@@ -48,7 +49,9 @@ public class ComponentMetamodel implements Serializable {
 	private final String role;
 	private final boolean isKey;
 	private final StandardProperty[] properties;
-	private final ComponentEntityModeToTuplizerMapping tuplizerMapping;
+
+	private final EntityMode entityMode;
+	private final ComponentTuplizer componentTuplizer;
 
 	// cached for efficiency...
 	private final int propertySpan;
@@ -66,11 +69,19 @@ public class ComponentMetamodel implements Serializable {
 		while ( itr.hasNext() ) {
 			Property property = ( Property ) itr.next();
 			properties[i] = PropertyFactory.buildStandardProperty( property, false );
-			propertyIndexes.put( property.getName(), new Integer( i ) );
+			propertyIndexes.put( property.getName(), i );
 			i++;
 		}
 
-		tuplizerMapping = new ComponentEntityModeToTuplizerMapping( component );
+		entityMode = component.hasPojoRepresentation() ? EntityMode.POJO : EntityMode.MAP;
+
+		// todo : move this to SF per HHH-3517; also see HHH-1907 and ComponentMetamodel
+		final ComponentTuplizerFactory componentTuplizerFactory = new ComponentTuplizerFactory();
+		final String tuplizerClassName = component.getTuplizerImplClassName( entityMode );
+		this.componentTuplizer = tuplizerClassName == null ? componentTuplizerFactory.constructDefaultTuplizer(
+				entityMode,
+				component
+		) : componentTuplizerFactory.constructTuplizer( tuplizerClassName, component );
 	}
 
 	public boolean isKey() {
@@ -97,15 +108,19 @@ public class ComponentMetamodel implements Serializable {
 		if ( index == null ) {
 			throw new HibernateException( "component does not contain such a property [" + propertyName + "]" );
 		}
-		return index.intValue();
+		return index;
 	}
 
 	public StandardProperty getProperty(String propertyName) {
 		return getProperty( getPropertyIndex( propertyName ) );
 	}
 
-	public ComponentEntityModeToTuplizerMapping getTuplizerMapping() {
-		return tuplizerMapping;
+	public EntityMode getEntityMode() {
+		return entityMode;
+	}
+
+	public ComponentTuplizer getComponentTuplizer() {
+		return componentTuplizer;
 	}
 
 }

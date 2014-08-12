@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
-import org.jruby.RubyException;
 import org.jruby.RubyNil;
 import org.jruby.ast.ClassNode;
 import org.jruby.ast.Colon2Node;
@@ -34,7 +33,6 @@ import org.jruby.ast.Node;
 import org.jruby.exceptions.JumpException;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
-import org.jruby.runtime.DynamicScope;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import org.springframework.core.NestedRuntimeException;
@@ -46,8 +44,7 @@ import org.springframework.util.StringUtils;
 /**
  * Utility methods for handling JRuby-scripted objects.
  *
- * <p>As of Spring 2.5, this class supports JRuby 0.9.9, 0.9.9 and 1.0.x.
- * <b>Note that there is no support for JRuby 1.1 at this point!</b>
+ * <p>Note: Spring 4.0 supports JRuby 1.5 and higher.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -55,11 +52,6 @@ import org.springframework.util.StringUtils;
  * @since 2.0
  */
 public abstract class JRubyScriptUtils {
-
-	// Determine whether the old JRuby 0.9 parse method is available (incompatible with 1.0)
-	private final static Method oldParseMethod = ClassUtils.getMethodIfAvailable(
-			Ruby.class, "parse", new Class[] {String.class, String.class, DynamicScope.class});
-
 
 	/**
 	 * Create a new JRuby-scripted object from the given script source,
@@ -70,7 +62,7 @@ public abstract class JRubyScriptUtils {
 	 * @throws JumpException in case of JRuby parsing failure
 	 * @see ClassUtils#getDefaultClassLoader()
 	 */
-	public static Object createJRubyObject(String scriptSource, Class[] interfaces) throws JumpException {
+	public static Object createJRubyObject(String scriptSource, Class<?>... interfaces) throws JumpException {
 		return createJRubyObject(scriptSource, interfaces, ClassUtils.getDefaultClassLoader());
 	}
 
@@ -82,17 +74,15 @@ public abstract class JRubyScriptUtils {
 	 * @return the scripted Java object
 	 * @throws JumpException in case of JRuby parsing failure
 	 */
-	public static Object createJRubyObject(String scriptSource, Class[] interfaces, ClassLoader classLoader) {
+	public static Object createJRubyObject(String scriptSource, Class<?>[] interfaces, ClassLoader classLoader) {
 		Ruby ruby = initializeRuntime();
 
-		Node scriptRootNode = (oldParseMethod != null ?
-				(Node) ReflectionUtils.invokeMethod(oldParseMethod, ruby, new Object[] {scriptSource, "", null}) :
-				ruby.parse(scriptSource, "", null, 0));
-		IRubyObject rubyObject = ruby.eval(scriptRootNode);
+		Node scriptRootNode = ruby.parseEval(scriptSource, "", null, 0);
+        IRubyObject rubyObject = ruby.runNormally(scriptRootNode);
 
 		if (rubyObject instanceof RubyNil) {
 			String className = findClassName(scriptRootNode);
-			rubyObject = ruby.evalScript("\n" + className + ".new");
+			rubyObject = ruby.evalScriptlet("\n" + className + ".new");
 		}
 		// still null?
 		if (rubyObject instanceof RubyNil) {
@@ -125,31 +115,32 @@ public abstract class JRubyScriptUtils {
 
 	/**
 	 * Find the first {@link ClassNode} under the supplied {@link Node}.
-	 * @return the found <code>ClassNode</code>, or <code>null</code>
-	 * if no {@link ClassNode} is found
+	 * @return the corresponding {@code ClassNode}, or {@code null} if none found
 	 */
 	private static ClassNode findClassNode(Node node) {
+		if (node == null) {
+			return null;
+		}
 		if (node instanceof ClassNode) {
 			return (ClassNode) node;
 		}
-		List children = node.childNodes();
-		for (int i = 0; i < children.size(); i++) {
-			Node child = (Node) children.get(i);
+		List<Node> children = node.childNodes();
+		for (Node child : children) {
 			if (child instanceof ClassNode) {
 				return (ClassNode) child;
-			} else if (child instanceof NewlineNode) {
+			}
+			else if (child instanceof NewlineNode) {
 				NewlineNode nn = (NewlineNode) child;
-				Node found = findClassNode(nn.getNextNode());
-				if (found instanceof ClassNode) {
-					return (ClassNode) found;
+				ClassNode found = findClassNode(nn.getNextNode());
+				if (found != null) {
+					return found;
 				}
 			}
 		}
-		for (int i = 0; i < children.size(); i++) {
-			Node child = (Node) children.get(i);
-			Node found = findClassNode(child);
-			if (found instanceof ClassNode) {
-				return (ClassNode) found;
+		for (Node child : children) {
+			ClassNode found = findClassNode(child);
+			if (found != null) {
+				return found;
 			}
 		}
 		return null;
@@ -170,12 +161,13 @@ public abstract class JRubyScriptUtils {
 			this.ruby = ruby;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (ReflectionUtils.isEqualsMethod(method)) {
-				return (isProxyForSameRubyObject(args[0]) ? Boolean.TRUE : Boolean.FALSE);
+				return (isProxyForSameRubyObject(args[0]));
 			}
 			else if (ReflectionUtils.isHashCodeMethod(method)) {
-				return new Integer(this.rubyObject.hashCode());
+				return this.rubyObject.hashCode();
 			}
 			else if (ReflectionUtils.isToStringMethod(method)) {
 				String toStringResult = this.rubyObject.toString();
@@ -215,7 +207,7 @@ public abstract class JRubyScriptUtils {
 			return rubyArgs;
 		}
 
-		private Object convertFromRuby(IRubyObject rubyResult, Class returnType) {
+		private Object convertFromRuby(IRubyObject rubyResult, Class<?> returnType) {
 			Object result = JavaEmbedUtils.rubyToJava(this.ruby, rubyResult, returnType);
 			if (result instanceof RubyArray && returnType.isArray()) {
 				result = convertFromRubyArray(((RubyArray) result).toJavaArray(), returnType);
@@ -223,8 +215,8 @@ public abstract class JRubyScriptUtils {
 			return result;
 		}
 
-		private Object convertFromRubyArray(IRubyObject[] rubyArray, Class returnType) {
-			Class targetType = returnType.getComponentType();
+		private Object convertFromRubyArray(IRubyObject[] rubyArray, Class<?> returnType) {
+			Class<?> targetType = returnType.getComponentType();
 			Object javaArray = Array.newInstance(targetType, rubyArray.length);
 			for (int i = 0; i < rubyArray.length; i++) {
 				IRubyObject rubyObject = rubyArray[i];
@@ -238,24 +230,17 @@ public abstract class JRubyScriptUtils {
 	/**
 	 * Exception thrown in response to a JRuby {@link RaiseException}
 	 * being thrown from a JRuby method invocation.
-	 * <p>Introduced because the <code>RaiseException</code> class does not
-	 * have useful {@link Object#toString()}, {@link Throwable#getMessage()},
-	 * and {@link Throwable#printStackTrace} implementations.
 	 */
+	@SuppressWarnings("serial")
 	public static class JRubyExecutionException extends NestedRuntimeException {
 
 		/**
-		 * Create a new <code>JRubyException</code>,
-		 * wrapping the given JRuby <code>RaiseException</code>.
-		 * @param ex the cause (must not be <code>null</code>)
+		 * Create a new {@code JRubyException},
+		 * wrapping the given JRuby {@code RaiseException}.
+		 * @param ex the cause (must not be {@code null})
 		 */
 		public JRubyExecutionException(RaiseException ex) {
-			super(buildMessage(ex), ex);
-		}
-
-		private static String buildMessage(RaiseException ex) {
-			RubyException rubyEx = ex.getException();
-			return (rubyEx != null && rubyEx.message != null) ? rubyEx.message.toString() : "Unexpected JRuby error";
+			super(ex.getMessage(), ex);
 		}
 	}
 

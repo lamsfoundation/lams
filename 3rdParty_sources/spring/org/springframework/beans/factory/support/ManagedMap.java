@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,14 @@ import org.springframework.beans.Mergeable;
  * @author Rob Harrop
  * @since 27.05.2003
  */
-public class ManagedMap extends LinkedHashMap implements Mergeable, BeanMetadataElement {
+@SuppressWarnings("serial")
+public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, BeanMetadataElement {
 
 	private Object source;
+
+	private String keyTypeName;
+
+	private String valueTypeName;
 
 	private boolean mergeEnabled;
 
@@ -46,15 +51,44 @@ public class ManagedMap extends LinkedHashMap implements Mergeable, BeanMetadata
 
 
 	/**
-	 * Set the configuration source <code>Object</code> for this metadata element.
+	 * Set the configuration source {@code Object} for this metadata element.
 	 * <p>The exact type of the object will depend on the configuration mechanism used.
 	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
 
+	@Override
 	public Object getSource() {
 		return this.source;
+	}
+
+	/**
+	 * Set the default key type name (class name) to be used for this map.
+	 */
+	public void setKeyTypeName(String keyTypeName) {
+		this.keyTypeName = keyTypeName;
+	}
+
+	/**
+	 * Return the default key type name (class name) to be used for this map.
+	 */
+	public String getKeyTypeName() {
+		return this.keyTypeName;
+	}
+
+	/**
+	 * Set the default value type name (class name) to be used for this map.
+	 */
+	public void setValueTypeName(String valueTypeName) {
+		this.valueTypeName = valueTypeName;
+	}
+
+	/**
+	 * Return the default value type name (class name) to be used for this map.
+	 */
+	public String getValueTypeName() {
+		return this.valueTypeName;
 	}
 
 	/**
@@ -65,10 +99,13 @@ public class ManagedMap extends LinkedHashMap implements Mergeable, BeanMetadata
 		this.mergeEnabled = mergeEnabled;
 	}
 
+	@Override
 	public boolean isMergeEnabled() {
 		return this.mergeEnabled;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
 	public Object merge(Object parent) {
 		if (!this.mergeEnabled) {
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
@@ -79,8 +116,8 @@ public class ManagedMap extends LinkedHashMap implements Mergeable, BeanMetadata
 		if (!(parent instanceof Map)) {
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		Map merged = new ManagedMap();
-		merged.putAll((Map) parent);
+		Map<K, V> merged = new ManagedMap<K, V>();
+		merged.putAll((Map<K, V>) parent);
 		merged.putAll(this);
 		return merged;
 	}

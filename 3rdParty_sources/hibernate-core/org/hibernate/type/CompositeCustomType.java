@@ -30,20 +30,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.dom4j.Element;
-import org.dom4j.Node;
-
 import org.hibernate.EntityMode;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.engine.CascadeStyle;
-import org.hibernate.engine.Mapping;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.CascadeStyle;
+import org.hibernate.engine.spi.CascadeStyles;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.collections.ArrayHelper;
+import org.hibernate.metamodel.relational.Size;
 import org.hibernate.usertype.CompositeUserType;
 import org.hibernate.usertype.LoggableUserType;
-import org.hibernate.util.ArrayHelper;
+
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * Adapts {@link CompositeUserType} to the {@link Type} interface
@@ -88,13 +90,11 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		return userType.getPropertyNames();
 	}
 
-	public Object[] getPropertyValues(Object component, SessionImplementor session)
-		throws HibernateException {
-		return getPropertyValues( component, session.getEntityMode() );
+	public Object[] getPropertyValues(Object component, SessionImplementor session) throws HibernateException {
+		return getPropertyValues( component, EntityMode.POJO );
 	}
 
-	public Object[] getPropertyValues(Object component, EntityMode entityMode)
-		throws HibernateException {
+	public Object[] getPropertyValues(Object component, EntityMode entityMode) throws HibernateException {
 
 		int len = getSubtypes().length;
 		Object[] result = new Object[len];
@@ -117,13 +117,12 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		return getPropertyValue(component, i);
 	}
 
-	public Object getPropertyValue(Object component, int i)
-		throws HibernateException {
-		return userType.getPropertyValue(component, i);
+	public Object getPropertyValue(Object component, int i) throws HibernateException {
+		return userType.getPropertyValue( component, i );
 	}
 
 	public CascadeStyle getCascadeStyle(int i) {
-		return CascadeStyle.NONE;
+		return CascadeStyles.NONE;
 	}
 
 	public FetchMode getFetchMode(int i) {
@@ -134,9 +133,9 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		return true;
 	}
 
-	public Object deepCopy(Object value, EntityMode entityMode, SessionFactoryImplementor factory) 
+	public Object deepCopy(Object value, SessionFactoryImplementor factory)
 	throws HibernateException {
-		return userType.deepCopy(value);
+		return userType.deepCopy( value );
 	}
 
 	public Object assemble(
@@ -145,14 +144,14 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		Object owner)
 		throws HibernateException {
 
-		return userType.assemble(cached, session, owner);
+		return userType.assemble( cached, session, owner );
 	}
 
 	public Serializable disassemble(Object value, SessionImplementor session, Object owner)
 	throws HibernateException {
 		return userType.disassemble(value, session);
 	}
-	
+
 	public Object replace(
 			Object original, 
 			Object target,
@@ -163,12 +162,12 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		return userType.replace(original, target, session, owner);
 	}
 	
-	public boolean isEqual(Object x, Object y, EntityMode entityMode) 
+	public boolean isEqual(Object x, Object y)
 	throws HibernateException {
 		return userType.equals(x, y);
 	}
 
-	public int getHashCode(Object x, EntityMode entityMode) {
+	public int getHashCode(Object x) {
 		return userType.hashCode(x);
 	}
 	
@@ -200,7 +199,7 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		Object owner)
 		throws HibernateException, SQLException {
 
-		return userType.nullSafeGet(rs, new String[] {columnName}, session, owner);
+		return userType.nullSafeGet( rs, new String[] {columnName}, session, owner );
 	}
 
 	public Object nullSafeGet(
@@ -233,7 +232,6 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		throws HibernateException, SQLException {
 
 		userType.nullSafeSet(st, value, index, session);
-
 	}
 
 	public int[] sqlTypes(Mapping mapping) throws MappingException {
@@ -245,6 +243,32 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public Size[] dictatedSizes(Mapping mapping) throws MappingException {
+		//Not called at runtime so doesn't matter if its slow :)
+		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
+		int soFar = 0;
+		for ( Type propertyType : userType.getPropertyTypes() ) {
+			final Size[] propertySizes = propertyType.dictatedSizes( mapping );
+			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
+			soFar += propertySizes.length;
+		}
+		return sizes;
+	}
+
+	@Override
+	public Size[] defaultSizes(Mapping mapping) throws MappingException {
+		//Not called at runtime so doesn't matter if its slow :)
+		final Size[] sizes = new Size[ getColumnSpan( mapping ) ];
+		int soFar = 0;
+		for ( Type propertyType : userType.getPropertyTypes() ) {
+			final Size[] propertySizes = propertyType.defaultSizes( mapping );
+			System.arraycopy( propertySizes, 0, sizes, soFar, propertySizes.length );
+			soFar += propertySizes.length;
+		}
+		return sizes;
 	}
 	
 	public String toLoggableString(Object value, SessionFactoryImplementor factory) throws HibernateException {
@@ -267,7 +291,7 @@ public class CompositeCustomType extends AbstractType implements CompositeType, 
 		return xml;
 	}
 
-	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory) 
+	public void setToXMLNode(Node node, Object value, SessionFactoryImplementor factory)
 	throws HibernateException {
 		replaceNode( node, (Element) value );
 	}

@@ -22,7 +22,6 @@
  * Boston, MA  02110-1301  USA
  */
 package org.hibernate.mapping;
-
 import org.hibernate.cfg.Mappings;
 import org.hibernate.type.CollectionType;
 
@@ -40,7 +39,7 @@ public class Bag extends Collection {
 	public CollectionType getDefaultCollectionType() {
 		return getMappings().getTypeResolver()
 				.getTypeFactory()
-				.bag( getRole(), getReferencedPropertyName(), isEmbedded() );
+				.bag( getRole(), getReferencedPropertyName() );
 	}
 
 	void createPrimaryKey() {

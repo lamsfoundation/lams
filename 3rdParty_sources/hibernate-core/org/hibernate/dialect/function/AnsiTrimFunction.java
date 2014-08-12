@@ -23,7 +23,7 @@
  */
 package org.hibernate.dialect.function;
 
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 /**
  * Defines support for rendering according to ANSI SQL <tt>TRIM</tt> function specification.
@@ -32,14 +32,11 @@ import org.hibernate.engine.SessionFactoryImplementor;
  */
 public class AnsiTrimFunction extends TrimFunctionTemplate {
 	protected String render(Options options, String trimSource, SessionFactoryImplementor factory) {
-		return new StringBuffer()
-				.append( "trim(" )
-				.append( options.getTrimSpecification().getName() )
-				.append( ' ' )
-				.append( options.getTrimCharacter() )
-				.append( " from " )
-				.append( trimSource )
-				.append( ')' )
-				.toString();
+		return String.format(
+				"trim(%s %s from %s)",
+				options.getTrimSpecification().getName(),
+				options.getTrimCharacter(),
+				trimSource
+		);
 	}
 }
