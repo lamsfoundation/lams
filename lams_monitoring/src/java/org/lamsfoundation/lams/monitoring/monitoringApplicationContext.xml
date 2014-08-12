@@ -35,8 +35,7 @@
 		<property name="groupUserDAO"><ref bean="groupUserDAO"/></property>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
-		<property name="authoringService"><ref bean="authoringService"/></property>	
-		<property name="transitionDAO"><ref bean="transitionDAO"/></property>	
+		<property name="authoringService"><ref bean="authoringService"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>	
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>

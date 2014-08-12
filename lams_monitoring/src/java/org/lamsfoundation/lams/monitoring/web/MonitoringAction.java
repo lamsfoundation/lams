@@ -560,8 +560,10 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
+	getAuditService();	
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
+	
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -586,6 +588,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
 		    + message);
 	}
+	
+	//audit log force completion attempt
+	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
+	Object[] args = new Object[] {learnerId, activityId, lessonId};
+	String auditMessage = monitoringService.getMessageService().getMessage(messageKey, args);
+	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);

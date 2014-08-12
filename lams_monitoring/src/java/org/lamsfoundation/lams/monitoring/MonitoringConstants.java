@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.monitoring;
 
 public class MonitoringConstants {
 
+    public static final String MONITORING_MODULE_NAME = "Monitoring";
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
     public static final String CREATE_LESSON_MESSAGE_KEY = "createLessonClass";
     public static final String INIT_LESSON_MESSAGE_KEY = "initializeLesson";

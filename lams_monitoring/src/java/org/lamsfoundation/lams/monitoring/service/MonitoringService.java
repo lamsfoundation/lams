@@ -153,13 +153,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
 
-    private static final int DEFAULT_LEARNER_PROGRESS_BATCH_SIZE = 15;
-
     private ILessonDAO lessonDAO;
 
     private ILessonClassDAO lessonClassDAO;
-
-    private ITransitionDAO transitionDAO;
 
     private IActivityDAO activityDAO;
 
@@ -196,7 +192,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ILogEventService logEventService;
 
     /** Message keys */
-    private static final String FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE = "force.complete.stop.message.activity.done";
 
     private static final String FORCE_COMPLETE_STOP_MESSAGE_GROUPING_ERROR = "force.complete.stop.message.grouping.error";
 
@@ -240,14 +235,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      */
     public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
-    }
-
-    /**
-     * @param transitionDAO
-     *            The transitionDAO to set.
-     */
-    public void setTransitionDAO(ITransitionDAO transitionDAO) {
-	this.transitionDAO = transitionDAO;
     }
 
     /**
@@ -342,9 +329,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	this.activityDAO = activityDAO;
     }
 
-    /**
-     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
-     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 	this.applicationContext = applicationContext;
@@ -370,20 +354,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     // Service Methods
     // ---------------------------------------------------------------------
 
-    private void auditAction(String messageKey, Object[] args) {
-	String message = messageService.getMessage(messageKey, args);
-	auditService.log("Monitoring", message);
-    }
-
     @Override
     public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription) {
 	checkOwnerOrStaffMember(userId, lessonDAO.getLesson(lessonId), actionDescription);
     }
 
-    /**
-     * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
-     * not, throws a UserAccessDeniedException exception
-     */
     @Override
     public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
 	User user = (User) baseDAO.find(User.class, userId);
@@ -406,21 +381,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * <p>
-     * Create new lesson according to the learning design specified by the user. This involves following major steps:
-     * </P>
-     * 
-     * <li>1. Make a runtime copy of static learning design defined in authoring</li> <li>2. Go through all the tool
-     * activities defined in the learning design, create a runtime copy of all tool's content.</li>
-     * 
-     * <P>
-     * As a runtime design, it is not copied into any folder.
-     * </P>
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(String, String, long,
-     *      Integer)
-     */
     @Override
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
@@ -471,10 +431,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return initializedLesson;
     }
 
-    /**
-     * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
-     * normal learning session. The design is not assigned to any workspace folder.
-     */
     @Override
     public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
@@ -491,9 +447,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		learnerImAvailable, liveEditEnabled, true, false, null, null);
     }
 
-    /**
-     * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
-     */
     @Override
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
@@ -509,12 +462,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
 		liveEditEnabled, enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish,
 		precedingLesson);
-	auditAction(MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] { lessonName, learningDesign.getTitle(),
+	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] { lessonName, learningDesign.getTitle(),
 		learnerExportAvailable });
 	return lesson;
     }
 
-    public Lesson initializeLesson(String lessonName, String lessonDescription, LearningDesign originalLearningDesign,
+    private Lesson initializeLesson(String lessonName, String lessonDescription, LearningDesign originalLearningDesign,
 	    User user, WorkspaceFolder workspaceFolder, int copyType, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
@@ -537,15 +490,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
 		liveEditEnabled, enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish,
 		precedingLesson);
-	auditAction(MonitoringService.AUDIT_LESSON_CREATED_KEY,
+	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, copiedLearningDesign.getTitle(), learnerExportAvailable });
 	return lesson;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(java.util.Integer,
-     *      java.lang.String)
-     */
     @Override
     public String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception {
 	FlashMessage flashMessage = null;
@@ -604,21 +553,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * <p>
-     * Pre-condition: This method must be called under the condition of the the new lesson exists (without lesson
-     * class).
-     * </p>
-     * <p>
-     * A lesson class record should be inserted and organization should be setup after execution of this service.
-     * </p>
-     * 
-     * @param staffGroupName
-     * @param learnerGroupName
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLesson(long,
-     *      org.lamsfoundation.lams.usermanagement.Organisation, java.util.List, java.util.List, java.util.Integer)
-     */
     @Override
     @SuppressWarnings("unchecked")
     public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
@@ -654,15 +588,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return newLesson;
     }
 
-    /**
-     * Start lesson on schedule.
-     * 
-     * @param lessonId
-     * @param startDate
-     * @param userID
-     *            : checks that this user is a staff member for this lesson
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date, User)
-     */
     @Override
     public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
 
@@ -720,13 +645,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * Finish lesson on schedule.
-     * 
-     * @param lessonId
-     * @param endDate
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date , User)
-     */
     @Override
     public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
 	// we get the lesson want to finish
@@ -812,9 +730,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
-     */
     @Override
     public void startLesson(long lessonId, Integer userId) {
 	// System.out.println(messageService.getMessage("NO.SUCH.LESSON",new
@@ -875,11 +790,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
     }
 
-    /**
-     * Do any normal initialisation needed for gates and branching. Done both when a lesson is started, or for new
-     * activities added during a Live Edit. Returns a new MaxID for the design if needed. If MaxID is returned, update
-     * the design with this new value and save the whole design (as initialiseSystemActivities has changed the design).
-     */
     @Override
     public Integer startSystemActivity(Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName) {
 	Integer newMaxId = null;
@@ -916,23 +826,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return newMaxId;
     }
 
-    /**
-     * <p>
-     * Runs the system scheduler to start the scheduling for opening gate and closing gate. It involves a couple of
-     * steps to start the scheduler:
-     * </p>
-     * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li> <li>2. Create
-     * customized triggers for the scheduling.</li> <li>3. start the scheduling job</li>
-     * 
-     * @param scheduleGate
-     *            the gate that needs to be scheduled.
-     * @param schedulingStartTime
-     *            the time on which the gate open should be based if an offset is used. For starting a lesson, this is
-     *            the lessonStartTime. For live edit, it is now.
-     * @param lessonName
-     *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
-     * @returns An updated gate, that should be saved by the calling code.
-     */
     @Override
     public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
 	    String lessonName) {
@@ -979,9 +872,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return scheduleGate;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLesson(long)
-     */
     @Override
     public void finishLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -993,12 +883,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	setLessonState(requestedLesson, Lesson.FINISHED_STATE);
     }
 
-    /**
-     * Archive the specified the lesson. When archived, the data is retained but the learners cannot access the details.
-     * 
-     * @param lessonId
-     *            the specified the lesson id.
-     */
     @Override
     public void archiveLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1013,12 +897,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * Unarchive the specified the lesson. Reverts back to its previous state.
-     * 
-     * @param lessonId
-     *            the specified the lesson id.
-     */
     @Override
     public void unarchiveLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1031,10 +909,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#suspendLesson(long)
-     */
     @Override
     public void suspendLesson(long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1048,10 +922,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /**
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#unsuspendLesson(long)
-     */
     @Override
     public void unsuspendLesson(long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1122,9 +992,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		null, requestedLesson.getLessonId(), null);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
-     */
     @Override
     public void removeLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1138,30 +1005,27 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLearnerPortfolioAvailable(long,
-     *      java.lang.Integer, boolean)
-     */
     @Override
-    public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable) {
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
+    public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean isLearnerExportAvailable) {
+	isLearnerExportAvailable = (isLearnerExportAvailable != null) ? isLearnerExportAvailable : Boolean.FALSE;
+
+	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
+	if (lesson == null) {
 	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set learner portfolio available to " + learnerExportAvailable);
+		    + " is missing. Unable to set learner portfolio available to " + isLearnerExportAvailable);
 	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "set learner portfolio available");
-	requestedLesson.setLearnerExportAvailable(learnerExportAvailable != null ? learnerExportAvailable
-		: Boolean.FALSE);
-	auditAction(MonitoringService.AUDIT_LEARNER_PORTFOLIO_SET, new Object[] { requestedLesson.getLessonName(),
-		requestedLesson.getLearnerExportAvailable() });
-	lessonDAO.updateLesson(requestedLesson);
-	return requestedLesson.getLearnerExportAvailable();
+	checkOwnerOrStaffMember(userId, lesson, "set learner portfolio available");
+	
+	lesson.setLearnerExportAvailable(isLearnerExportAvailable);
+	lessonDAO.updateLesson(lesson);
+
+	//audit log enabling/disabling export portfolio
+	writeAuditLog(MonitoringService.AUDIT_LEARNER_PORTFOLIO_SET, new Object[] { lesson.getLessonName(),
+		lesson.getLearnerExportAvailable() });
+	
+	return lesson.getLearnerExportAvailable();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceAvailable(long, java.lang.Integer,
-     *      boolean)
-     */
     @Override
     public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1175,10 +1039,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return requestedLesson.getLearnerPresenceAvailable();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceImAvailable(long,
-     *      java.lang.Integer, boolean)
-     */
     @Override
     public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1192,10 +1052,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return requestedLesson.getLearnerImAvailable();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLiveEditEnabled(long, java.lang.Integer,
-     *      boolean)
-     */
     @Override
     public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1209,9 +1065,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return requestedLesson.getLiveEditEnabled();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
-     */
     @Override
     public GateActivity openGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
@@ -1262,9 +1115,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return gate;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#closeGate(org.lamsfoundation.lams.learningdesign.GateActivity)
-     */
     @Override
     public GateActivity closeGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
@@ -1273,10 +1123,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return gate;
     }
 
-    /**
-     * @throws LamsToolServiceException
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
-     */
     @Override
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent) {
@@ -1313,6 +1159,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			    .getCompletedActivities().containsKey(parentActivity) || ((parentActivity
 			    .getParentActivity() != null) && learnerProgress.getCompletedActivities().containsKey(
 			    parentActivity.getParentActivity())))))) {
+		
 		return forceUncompleteActivity(learnerProgress, stopActivity, removeLearnerContent);
 	    }
 	}
@@ -1710,11 +1557,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		new Object[] { targetActivity.getTitle() });
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
-     */
     @Override
     public String getLessonDetails(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
@@ -1757,11 +1599,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return flashMessage.serializeMessage();
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
-     */
     @Override
     public String getLessonLearners(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -1783,11 +1620,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return flashMessage.serializeMessage();
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonStaff(java.lang.Long)
-     */
     @Override
     public String getLessonStaff(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -1950,36 +1782,22 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return usersCompletedLesson;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
-     */
     @Override
     public String getLearningDesignDetails(Long lessonID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId(), "");
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long)
-     */
     @Override
     public Activity getActivityById(Long activityId) {
 	return activityDAO.getActivityByActivityId(activityId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long, Class)
-     */
     @Override
     public Activity getActivityById(Long activityId, Class clasz) {
 	return activityDAO.getActivityByActivityId(activityId, clasz);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getGroupingActivityById(Long)
-     */
     @Override
     public GroupingActivity getGroupingActivityById(Long activityID) {
 	Activity activity = getActivityById(activityID);
@@ -2010,12 +1828,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return result;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long,
-     *      java.lang.Integer)
-     */
     @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException {
@@ -2042,11 +1854,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return url;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
-     */
     @Override
     public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException {
@@ -2065,12 +1872,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return null;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer,
-     *      java.lang.Integer)
-     */
     @Override
     public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2099,12 +1900,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String,
-     *      java.lang.Integer)
-     */
     @Override
     public String renameLesson(Long lessonID, String newName, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2124,11 +1919,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return flashMessage.serializeMessage();
     }
 
-    /**
-     * (non-javadoc)
-     * 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#releaseGate(java.lang.Long)
-     */
     @Override
     public String releaseGate(Long activityID) throws IOException {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
@@ -2147,10 +1937,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * @throws LessonServiceException
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#performChosenGrouping(GroupingActivity,java.util.List)
-     */
     @Override
     public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException {
 	Grouping grouping = groupingActivity.getCreateGrouping();
@@ -2295,20 +2081,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     // Helper Methods - start lesson
     // ---------------------------------------------------------------------
 
-    /**
-     * If the activity is not grouped and not in a branch, then it create lams tool session for all the learners in the
-     * lesson. After the creation of lams tool session, it delegates to the tool instances to create tool's own tool
-     * session. Can't create it for a grouped activity or an activity in a branch as it may not be applicable to all
-     * users.
-     * <p>
-     * 
-     * @param activity
-     *            the tool activity that all tool session reference to.
-     * @param lesson
-     *            the target lesson that these tool sessions belongs to.
-     * @throws LamsToolServiceException
-     *             the exception when lams is talking to tool.
-     */
     @Override
     public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) {
 	if (activity.getApplyGrouping().equals(Boolean.FALSE) && (activity.getParentBranch() == null)) {
@@ -2377,12 +2149,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     // ---------------------------------------------------------------------
     // Preview related methods
     // ---------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.lamsfoundation.lams.preview.service.IMonitoringService#
-     * createPreviewClassForLesson(long, long)
-     */
+    
     @Override
     public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
@@ -2403,6 +2170,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
+     * {@inheritDoc}<br><br>
+     * 
      * Delete a preview lesson and all its contents. Warning: can only delete preview lessons. Can't guarentee data
      * integrity if it is done to any other type of lesson. See removeLesson() for hiding lessons from a teacher's view
      * without removing them from the database. TODO remove the related tool data.
@@ -2444,12 +2213,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.lamsfoundation.lams.preview.service.IMonitoringService#
-     * deleteAllOldPreviewLessons(int)
-     */
     @Override
     public int deleteAllOldPreviewLessons() {
 
@@ -2490,22 +2253,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /* Grouping and branching related calls */
-    /**
-     * Get all the active learners in the lesson who are not in a group/branch
-     * 
-     * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
-     * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
-     * branching activities.
-     * 
-     * TODO Optimise the database query. Do a single query rather then large collection access
-     * 
-     * @param activityID
-     * @param lessonID
-     * @param useCreateGrouping
-     *            true/false for GroupingActivities, always false for non-GroupingActivities
-     * @return Sorted set of Users, sorted by surname
-     */
+
     @Override
+    //TODO Optimise the database query. Do a single query rather then large collection access
     public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping) {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, useCreateGrouping, "getClassMembersNotGrouped");
@@ -2582,21 +2332,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return grouping;
     }
 
-    /**
-     * Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. If
-     * the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create grouping.
-     * Otherwise leave it false and it will use the grouping applied to the activity - this is used for branching
-     * activities.
-     * 
-     * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
-     * 
-     * @param activityID
-     *            id of the grouping activity
-     * @param name
-     *            group name
-     * @throws LessonServiceException
-     *             , MonitoringServiceException
-     */
     @Override
     public Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException {
@@ -2632,22 +2367,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return lessonService.createGroup(grouping, name);
     }
 
-    /**
-     * Remove a group to from a grouping activity. If the group does not exists then nothing happens. If the group is
-     * already used (e.g. a tool session exists) then it throws a LessonServiceException.
-     * 
-     * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
-     * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
-     * branching activities.
-     * 
-     * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
-     * 
-     * @param activityID
-     *            id of the grouping activity
-     * @param name
-     *            group name
-     * @throws LessonServiceException
-     **/
     @Override
     public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
@@ -2655,9 +2374,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	lessonService.removeGroup(grouping, groupId);
     }
 
-    /**
-     * Add learners to a group. Doesn't necessarily check if the user is already in another group.
-     */
     @Override
     public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
@@ -2689,16 +2405,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return learners;
     }
 
-    /**
-     * Add learners to a branch. Doesn't necessarily check if the user is already in another branch. Assumes there
-     * should only be one group for this branch. Use for Teacher Chosen Branching. Don't use for Group Based Branching
-     * as there could be more than one group for the branch.
-     * 
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
-     */
     @Override
     public void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
@@ -2748,11 +2454,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	lessonService.performGrouping(grouping, group.getGroupId(), learners);
     }
 
-    /**
-     * Remove a user to a group. If the user is not in the group, then nothing is changed.
-     * 
-     * @throws LessonServiceException
-     */
     @Override
     public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
@@ -2761,15 +2462,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	lessonService.removeLearnersFromGroup(grouping, groupId, learners);
     }
 
-    /**
-     * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
-     * Branching. Don't use for Group Based Branching as there could be more than one group for the branch.
-     * 
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
-     */
     @Override
     public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
@@ -2793,15 +2485,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch. Use for
-     * Group Based Branching.
-     * 
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
-     */
     @Override
     public void addGroupToBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException {
 
@@ -2851,15 +2534,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * Remove group / branch mapping. Cannot be done if any users in the group have started the branch. Used for group
-     * based branching in define later.
-     * 
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
-     */
     @Override
     public void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException {
 
@@ -2911,10 +2585,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * Has anyone started this branch / branching activity ? Irrespective of the groups. Used to determine if a branch
-     * mapping can be removed.
-     */
     @Override
     public boolean isActivityAttempted(Activity activity) {
 	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedActivity(activity);
@@ -2925,12 +2595,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return (numAttempted != null) && (numAttempted.intValue() > 0);
     }
 
-    /**
-     * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
-     * 
-     * @param branchingActivityID
-     *            Activity id of the branchingActivity
-     */
     @Override
     public SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException {
 
@@ -2957,11 +2621,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     }
 
-    /**
-     * Get the list of users who have attempted an activity. This is based on the progress engine records. This will
-     * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
-     * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
-     */
     @Override
     public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 	return lessonService.getLearnersHaveAttemptedActivity(activity);
@@ -2972,9 +2631,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return learnerService.getProgress(learnerId, lessonId);
     }
 
-    /**
-     * Set a group's name
-     */
     @Override
     public void setGroupName(Long groupID, String name) {
 	Group group = groupDAO.getGroupById(groupID);
@@ -2987,19 +2643,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return (Organisation) baseDAO.find(Organisation.class, organisationId);
     }
 
-    /**
-     * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff
-     * and learner ids should already be members of the group.
-     * 
-     * @param lessonIds
-     * @param addAllStaff
-     * @param addAllLearners
-     * @param staffIds
-     * @param learnerIds
-     * @param group
-     * @return number of lessons created.
-     * @throws MonitoringServiceException
-     */
     @Override
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
@@ -3103,5 +2746,16 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 	}
 	return staffUsers;
+    }
+
+    /**
+     * Write out audit log entry
+     * 
+     * @param messageKey
+     * @param args
+     */
+    private void writeAuditLog(String messageKey, Object[] args) {
+	String message = messageService.getMessage(messageKey, args);
+	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, message);
     }
 }
