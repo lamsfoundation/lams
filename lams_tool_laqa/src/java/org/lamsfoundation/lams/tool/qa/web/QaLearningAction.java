@@ -136,8 +136,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		mapAnswers.put(questionIndexInteger.toString(), answer);
 		mapAnswersPresentable.put(questionIndexInteger.toString(), answer);
 
-		Map<Integer, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
-		QaQuestionDTO dto = questionContentMap.get(questionIndexInteger);
+		Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		QaQuestionDTO dto = questionMap.get(questionIndexInteger);
 		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexInteger));
 		    forwardName = QaAppConstants.LOAD_LEARNER;
@@ -159,7 +159,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    int numQuestions = questionMap.size();
 	    Integer finalQuestionIndex = new Integer(numQuestions);
 	    QaQuestionDTO dto = questionMap.get(finalQuestionIndex);
-	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex).toString())) {
+	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex.toString()))) {
 		errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", finalQuestionIndex));
 		forwardName = QaAppConstants.LOAD_LEARNER;
 	    }
