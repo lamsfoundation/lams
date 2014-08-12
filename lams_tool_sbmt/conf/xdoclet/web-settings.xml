@@ -1,10 +1,6 @@
 <display-name>LAMS</display-name>
 
 <description>Learning Activity Management System</description>
-<context-param>
-    <param-name>contextClass</param-name>
-    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
-</context-param> 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/tool/sbmt/dbupdates/autopatchContext.xml</param-value>

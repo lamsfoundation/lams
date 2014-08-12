@@ -9,10 +9,7 @@
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
 	<param-value>org.lamsfoundation.lams.tool.survey.ApplicationResources</param-value>
 </context-param>
-<context-param>
-    <param-name>contextClass</param-name>
-    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
-</context-param> 
+ 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/tool/survey/dbupdates/autopatchContext.xml</param-value>

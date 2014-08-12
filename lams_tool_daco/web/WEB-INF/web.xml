@@ -10,10 +10,6 @@
 	<param-value>org.lamsfoundation.lams.tool.daco.ApplicationResources</param-value>
 </context-param>
 
-<context-param>
-    <param-name>contextClass</param-name>
-    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
-</context-param> 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/tool/daco/dbupdates/autopatchContext.xml</param-value>

@@ -22,13 +22,7 @@
 	If there are local (private for web application; see tools and admin for example) bean definitions,
 	path to application context XML file can still be added to contextConfigLocation.
  -->
- <!--
- 	contextClass parameter may be removed later in the development, as it does not solve Ant-style pattern problem
- -->
-<context-param>
-    <param-name>contextClass</param-name>
-    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
-</context-param> 
+
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value></param-value>

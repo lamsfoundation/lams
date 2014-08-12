@@ -33,7 +33,7 @@
 	 -->
 	 
 	<bean id="context.central"
-         class="org.jboss.spring.factory.VFSClassPathXmlApplicationContext">
+         class="org.springframework.context.support.ClassPathXmlApplicationContext">
      <constructor-arg>
        <list>
        		<value>/org/lamsfoundation/lams/applicationContext.xml</value>
