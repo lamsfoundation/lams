@@ -44,9 +44,13 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     private static final String QUERY_GET_CATEGORY = "from " + QaWizardCategory.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_SKILL = "from " + QaWizardCognitiveSkill.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_QUESTION = "from " + QaWizardQuestion.class.getName() + " q where q.uid=?";
-    
+
     public void saveOrUpdateCategories(SortedSet<QaWizardCategory> categories) {
-	getHibernateTemplate().saveOrUpdateAll(categories);
+	if (categories != null) {
+	    for (QaWizardCategory category : categories) {
+		getHibernateTemplate().saveOrUpdate(category);
+	    }
+	}
     }
 
     @SuppressWarnings("unchecked")

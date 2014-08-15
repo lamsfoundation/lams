@@ -96,13 +96,17 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	public void insertOrUpdate(Object object) {
 		getHibernateTemplate().saveOrUpdate(object);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdateAll(java.util.Collection)
-	 */
-	public void insertOrUpdateAll(Collection objects) {
-		getHibernateTemplate().saveOrUpdateAll(objects);
-	}
+    
+        /* (non-Javadoc)
+         * @see org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdateAll(java.util.Collection)
+         */
+        public void insertOrUpdateAll(Collection objects) {
+        	if (objects != null) {
+        	    for (Object object : objects) {
+        		getHibernateTemplate().saveOrUpdate(object);
+        	    }
+        	}
+        }
 
 	public void update(String queryString) {
 		getHibernateTemplate().bulkUpdate(queryString);
