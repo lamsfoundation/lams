@@ -113,7 +113,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 	}
 
 	boolean credentialMatched = false;
-	Session hibernateSession = getSession();
+	Session hibernateSession = getSessionFactory().getCurrentSession();
 	ScrollableResults result = hibernateSession.createSQLQuery(buf.toString()).scroll();
 	if (result.next()) {
 	    long val = result.getLong(0);

@@ -55,7 +55,7 @@ public class LeaderselectionDAO extends BaseDAO implements ILeaderselectionDAO {
 
     @Override
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
+	getSessionFactory().getCurrentSession().evict(o);
 
     }
 }

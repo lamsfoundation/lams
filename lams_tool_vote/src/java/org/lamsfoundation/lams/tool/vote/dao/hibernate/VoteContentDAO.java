@@ -32,9 +32,9 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -57,14 +57,14 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
     }
 
     public void saveOrUpdateVote(VoteContent vote) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(vote);
     }
 
     public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(query).setLong(0, voteContentId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteContent vote = (VoteContent) list.get(0);
@@ -84,24 +84,24 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
     }
 
     public void saveVoteContent(VoteContent voteContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(voteContent);
     }
 
     public void updateVoteContent(VoteContent voteContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(voteContent);
     }
 
     public void removeVoteById(Long voteContentId) {
 	HibernateTemplate templ = this.getHibernateTemplate();
 	if (voteContentId != null) {
-	    List list = getSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
+	    List list = getSessionFactory().getCurrentSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
 		    .setLong(0, voteContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
 		VoteContent vote = (VoteContent) list.get(0);
-		this.getSession().setFlushMode(FlushMode.AUTO);
+		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		templ.delete(vote);
 		templ.flush();
 	    }

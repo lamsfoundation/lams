@@ -28,7 +28,7 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 public class ScratchieConfigItemDAOHibernate extends BaseDAO implements ScratchieConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from ScratchieConfigItem configuration"

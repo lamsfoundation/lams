@@ -60,7 +60,7 @@ public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFold
 	public int deleteContentWithVersion(Long uuid, Long versionID, Long folderContentID){
 		int numDeleted = 0;
 		if ( uuid != null && versionID != null && folderContentID != null ) {
-			List list = this.getSession().createQuery(DELETE_BY_VERSION)
+			List list = getSessionFactory().getCurrentSession().createQuery(DELETE_BY_VERSION)
 				.setLong(0, folderContentID.longValue())
 				.setLong(1, uuid.longValue())
 				.setLong(2,versionID.longValue())
@@ -69,7 +69,7 @@ public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFold
 				Iterator iter = list.iterator();
 				while (iter.hasNext()) {
 					Object element = (Object) iter.next();
-					this.getSession().delete(element);
+					getSessionFactory().getCurrentSession().delete(element);
 					numDeleted++;
 				}
 			}

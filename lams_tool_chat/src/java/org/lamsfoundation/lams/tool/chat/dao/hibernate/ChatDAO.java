@@ -52,7 +52,6 @@ public class ChatDAO extends BaseDAO implements IChatDAO {
     }
 
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
-
+	getSessionFactory().getCurrentSession().evict(o);
     }
 }

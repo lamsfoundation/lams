@@ -26,7 +26,7 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * Hibernate implementation for database access to VoteQueContent for the vote
@@ -52,7 +52,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     @Override
     public VoteQueContent getDefaultVoteContentFirstQuestion() {
 	final long voteContentId = 1;
-	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
 		voteContentId).list();
 
 	if (list != null && list.size() > 0) {
@@ -64,7 +64,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 
     @Override
     public VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
-	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("displayOrder",
+	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("displayOrder",
 		displayOrder.longValue()).setLong("voteContentUid", voteContentUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -76,7 +76,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 
     @Override
     public List getAllQuestionsSorted(final long voteContentId) {
-	List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("voteContentId",
+	List list = getSessionFactory().getCurrentSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("voteContentId",
 		voteContentId).list();
 
 	return list;
@@ -94,7 +94,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 
     @Override
     public void removeQuestion(VoteQueContent voteQueContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(voteQueContent);
     }
 }

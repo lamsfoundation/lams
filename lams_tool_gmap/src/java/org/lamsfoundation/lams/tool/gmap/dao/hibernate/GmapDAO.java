@@ -30,7 +30,7 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * DAO for accessing the Gmap objects - Hibernate specific code.

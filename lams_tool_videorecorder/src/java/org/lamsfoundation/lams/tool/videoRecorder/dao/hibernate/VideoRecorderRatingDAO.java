@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRecordingDAO
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * DAO for accessing the VideoRecorderRating objects - Hibernate specific code.

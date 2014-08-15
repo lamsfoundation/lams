@@ -84,7 +84,7 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     }
     
     public void removeResponseRating(ResponseRating rating) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(rating);
     }
 

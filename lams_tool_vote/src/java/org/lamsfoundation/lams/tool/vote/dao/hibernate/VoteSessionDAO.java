@@ -31,9 +31,9 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
@@ -63,7 +63,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     public VoteSession getSessionBySessionId(Long voteSessionId) {
 	String query = "from VoteSession votes where votes.voteSessionId=?";
 
-	List list = getSession().createQuery(query).setLong(0, voteSessionId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteSession vote = (VoteSession) list.get(0);
@@ -73,7 +73,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     }
 
     public int countSessionComplete() {
-	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(COUNT_SESSION_COMPLETE).list();
 
 	if (list != null && list.size() > 0) {
 	    return list.size();
@@ -86,7 +86,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     }
 
     public void updateVoteSession(VoteSession voteSession) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(voteSession);
     }
 
@@ -99,12 +99,12 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
 	HibernateTemplate templ = this.getHibernateTemplate();
 	if (voteSessionId != null) {
-	    List list = getSession().createQuery(FIND_VOTE_SESSION_CONTENT).setLong(0, voteSessionId.longValue())
+	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT).setLong(0, voteSessionId.longValue())
 		    .list();
 
 	    if (list != null && list.size() > 0) {
 		VoteSession vote = (VoteSession) list.get(0);
-		this.getSession().setFlushMode(FlushMode.AUTO);
+		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		templ.delete(vote);
 		templ.flush();
 	    }
@@ -113,7 +113,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     }
 
     public void removeVoteSession(VoteSession voteSession) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(voteSession);
     }
 

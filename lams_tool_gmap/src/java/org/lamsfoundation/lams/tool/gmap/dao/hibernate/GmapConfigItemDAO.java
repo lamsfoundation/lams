@@ -5,7 +5,7 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapConfigItemDAO;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 public class GmapConfigItemDAO extends BaseDAO implements IGmapConfigItemDAO
 {
 	private static final String LOAD_CONFIG_ITEM_BY_KEY = "from GmapConfigItem configuration" 

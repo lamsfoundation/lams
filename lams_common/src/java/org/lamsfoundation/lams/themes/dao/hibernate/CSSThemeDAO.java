@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * This class interacts with Spring's HibernateTemplate to save/delete and

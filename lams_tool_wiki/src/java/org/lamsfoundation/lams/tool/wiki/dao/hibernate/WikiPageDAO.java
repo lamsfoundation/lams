@@ -30,7 +30,7 @@ public class WikiPageDAO extends BaseDAO implements IWikiPageDAO {
     public WikiPage getByWikiAndTitle(Wiki wiki, String title) {
 	if (wiki != null && title != null && title.length() > 0) {
 	    Long wikiId = wiki.getUid();
-	    Query query = this.getSession().createQuery(GET_BY_WIKI_AND_TITLE);
+	    Query query = getSessionFactory().getCurrentSession().createQuery(GET_BY_WIKI_AND_TITLE);
 	    query.setLong(0, wikiId);
 	    query.setString(1, title);
 	    return (WikiPage) query.uniqueResult();
@@ -41,7 +41,7 @@ public class WikiPageDAO extends BaseDAO implements IWikiPageDAO {
     public WikiPage getBySessionAndTitle(WikiSession wikiSession, String title) {
 	if (wikiSession != null && title != null && title.length() > 0) {
 	    Long wikiId = wikiSession.getUid();
-	    Query query = this.getSession().createQuery(GET_BY_SESSION_AND_TITLE);
+	    Query query = getSessionFactory().getCurrentSession().createQuery(GET_BY_SESSION_AND_TITLE);
 	    query.setLong(0, wikiId);
 	    query.setString(1, title);
 	    return (WikiPage) query.uniqueResult();
@@ -57,7 +57,7 @@ public class WikiPageDAO extends BaseDAO implements IWikiPageDAO {
 	String codeToReplace = WikiPageDAO.CHANGE_WIKI_JAVASCRIPT_METHOD.replace("?", escapedTitle);
 	String replacementCode = "#";
 
-	SQLQuery query = this.getSession().createSQLQuery(REMOVE_WIKI_REFERENCES);
+	SQLQuery query = getSessionFactory().getCurrentSession().createSQLQuery(REMOVE_WIKI_REFERENCES);
 	query.setString(0, codeToReplace);
 	query.setString(1, replacementCode);
 	query.setLong(2, removedWikiPage.getParentWiki().getUid());

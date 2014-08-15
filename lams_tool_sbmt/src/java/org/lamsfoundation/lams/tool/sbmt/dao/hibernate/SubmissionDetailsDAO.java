@@ -65,7 +65,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	 */
 	public List getSubmissionDetailsBySession(Long sessionID) {
 		if ( sessionID != null ) {
-			return this.getSession().createQuery(FIND_BY_SESSION)
+			return getSessionFactory().getCurrentSession().createQuery(FIND_BY_SESSION)
 				.setLong(0, sessionID.longValue())
 				.list();
 		}

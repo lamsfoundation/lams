@@ -28,7 +28,7 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeConfigItemDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 public class CommonCartridgeConfigItemDAOHibernate extends BaseDAO implements CommonCartridgeConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from CommonCartridgeConfigItem configuration"

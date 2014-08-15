@@ -64,7 +64,7 @@ public class MindmapDAO extends BaseDAO implements IMindmapDAO {
     }
 
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
+	getSessionFactory().getCurrentSession().evict(o);
 
     }
 }

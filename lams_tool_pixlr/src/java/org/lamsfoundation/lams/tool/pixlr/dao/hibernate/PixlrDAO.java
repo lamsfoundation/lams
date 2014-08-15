@@ -30,7 +30,7 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * DAO for accessing the Pixlr objects - Hibernate specific code.
@@ -55,7 +55,7 @@ public class PixlrDAO extends BaseDAO implements IPixlrDAO {
     }
 
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
+	getSessionFactory().getCurrentSession().evict(o);
 
     }
 }

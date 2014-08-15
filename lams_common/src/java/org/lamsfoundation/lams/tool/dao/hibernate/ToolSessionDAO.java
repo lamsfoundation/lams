@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * Hibernate implementation of ILessonDAO
@@ -75,14 +75,14 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 	 */
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity)
 	{
-		Query query = this.getSession().createQuery(LOAD_GROUPED_TOOL_SESSION_BY_GROUP2);
+		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_GROUPED_TOOL_SESSION_BY_GROUP2);
 		query.setParameter("learner",learner);
 		query.setParameter("activity",activity);
 		GroupedToolSession groupedToolSession = (GroupedToolSession) query.uniqueResult();
 		if ( groupedToolSession != null ) 
 			return groupedToolSession;
 
-		query = this.getSession().createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER);
+		query = getSessionFactory().getCurrentSession().createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER);
 		query.setParameter("learner",learner);
 		query.setParameter("activity",activity);
 		NonGroupedToolSession nonGroupedSession = (NonGroupedToolSession) query.uniqueResult();
@@ -99,7 +99,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 	 */
 	public List getToolSessionByActivity(final Activity activity)
 	{
-		Query query = this.getSession().createQuery(LOAD_TOOL_SESSION_BY_ACTIVITY);
+		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_TOOL_SESSION_BY_ACTIVITY);
 		query.setParameter("activity",activity);
 		return (List) query.list();
 	}
@@ -122,7 +122,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
      */
 	public List getToolSessionsByLesson(final Lesson lesson) {
 
-		Query query = this.getSession().createQuery(LOAD_TOOL_SESSION_BY_LESSON);
+		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_TOOL_SESSION_BY_LESSON);
 		query.setParameter("lesson",lesson);
 		return query.list();
 

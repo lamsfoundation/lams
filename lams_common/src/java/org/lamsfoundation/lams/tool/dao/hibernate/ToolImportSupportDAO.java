@@ -29,8 +29,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.ToolImportSupport;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 public class ToolImportSupportDAO extends HibernateDaoSupport implements IToolImportSupportDAO
 {

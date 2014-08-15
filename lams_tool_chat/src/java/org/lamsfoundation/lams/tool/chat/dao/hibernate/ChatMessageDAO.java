@@ -89,7 +89,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 
     public List getLatest(ChatSession chatSession, int max) {
 	try {
-	    Query query = this.getSession().createQuery(
+	    Query query = getSessionFactory().getCurrentSession().createQuery(
 		    ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC);
 	    query.setLong(0, chatSession.getUid());
 	    query.setMaxResults(max);

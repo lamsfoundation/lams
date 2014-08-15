@@ -77,7 +77,7 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	public List getLearningDesignByUserId(Long userID){		
 		if ( userID != null ) {
 			try{
-				Query query = this.getSession().createQuery(FIND_BY_USERID);
+				Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_USERID);
 				query.setLong(0,userID.longValue());
 				return query.list();
 			}catch(HibernateException he){

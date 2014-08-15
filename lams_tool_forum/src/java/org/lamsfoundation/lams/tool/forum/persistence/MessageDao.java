@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author conradb

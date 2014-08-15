@@ -29,7 +29,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lamsfoundation.lams.tool.daco.dao.DAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * This class serves as the Base class for all other DAOs - namely to hold
@@ -68,11 +68,11 @@ public class BaseDAOHibernate extends HibernateDaoSupport implements DAO {
 	 */
 	public void removeObject(Class clazz, Serializable id) {
 		getHibernateTemplate().delete(getObject(clazz, id));
-	}
-
-	public void releaseFromCache(Object o) {
-		getSession().evict(o);
-
-	}
+        }
+    
+        public void releaseFromCache(Object o) {
+    		getSessionFactory().getCurrentSession().evict(o);
+    
+        }
 
 }

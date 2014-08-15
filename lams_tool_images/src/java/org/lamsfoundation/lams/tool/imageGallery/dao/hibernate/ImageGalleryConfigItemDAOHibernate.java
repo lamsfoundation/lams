@@ -28,7 +28,7 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 public class ImageGalleryConfigItemDAOHibernate extends BaseDAO implements ImageGalleryConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from ImageGalleryConfigItem configuration"

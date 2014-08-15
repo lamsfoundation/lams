@@ -29,7 +29,7 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -42,7 +42,7 @@ public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO
     private static final String SORT_QUESTION_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid order by qaQuestion.displayOrder";
 
     public QaQueContent getQuestionByDisplayOrder(Long displayOrder, Long contentUid) {
-	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER).setLong(
+	List<QaQueContent> list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER).setLong(
 		"displayOrder", displayOrder.longValue()).setLong("uid", contentUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -53,7 +53,7 @@ public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO
     }
     
     public QaQueContent getQuestionByUid(Long questionUid) {
-	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_QUESTION_UID).setLong(
+	List<QaQueContent> list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_QUESTION_UID).setLong(
 		"uid", questionUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -64,38 +64,38 @@ public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO
     }
 
     public List<QaQueContent> getAllQuestionEntriesSorted(final long contentUid) {
-	List<QaQueContent> list = getSession().createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setLong(
+	List<QaQueContent> list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setLong(
 		"uid", contentUid).list();
 
 	return list;
     }
     
     public List<QaQueContent> getAllQuestionEntries(final long contentUid) {
-	List list = getSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setLong(
+	List list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setLong(
 		"uid", contentUid).list();
 
 	return list;
     }
 
     public void createQueContent(QaQueContent queContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(queContent);
     }
 
     public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(qaQuestion);
     }
 
     public void removeQueContent(long qaQueContentId) {
 	QaQueContent qaQuestion = (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class,
 		new Long(qaQueContentId));
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(qaQuestion);
     }
 
     public void removeQaQueContent(QaQueContent qaQuestion) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(qaQuestion);
     }
 }

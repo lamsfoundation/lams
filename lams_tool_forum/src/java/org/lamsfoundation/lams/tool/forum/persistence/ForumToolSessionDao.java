@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 public class ForumToolSessionDao extends HibernateDaoSupport {
 

@@ -29,7 +29,7 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRecordingDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * DAO for accessing the VideoRecorderRecording objects - Hibernate specific code.

@@ -27,7 +27,7 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -71,13 +71,13 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 
     @Override
     public List<McUsrAttempt> getFinalizedUserAttempts(final Long userUid) {
-	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
+	return (List<McUsrAttempt>) getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", userUid.longValue()).list();
     }
     
     @Override
     public int getUserTotalMark(final Long userUid) {
-	List list = getSession().createQuery(FIND_USER_TOTAL_MARK).setLong("userUid", userUid.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(FIND_USER_TOTAL_MARK).setLong("userUid", userUid.longValue()).list();
 	
 	if (list == null || list.size() == 0) {
 	    return 0;
@@ -88,7 +88,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 
     @SuppressWarnings("unchecked")
     public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
-	List<McUsrAttempt> userAttemptList = (List<McUsrAttempt>) getSession()
+	List<McUsrAttempt> userAttemptList = (List<McUsrAttempt>) getSessionFactory().getCurrentSession()
 		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setLong("queUsrUid", queUsrUid.longValue())
 		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
 	if (userAttemptList.size() > 1) {
@@ -101,15 +101,15 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 
     @Override
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcUsrAttempt);
     }
 
     @Override
     public void removeAllUserAttempts(Long queUserUid) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 
-	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
+	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", queUserUid.longValue()).list();
 
 	for (McUsrAttempt userAttempt : userAttempts) {

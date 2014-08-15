@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate4.HibernateObjectRetrievalFailureException;
 
 
 
@@ -99,7 +99,7 @@ public class WorkspaceDAO extends BaseDAO implements IWorkspaceDAO  {
 
 	public void flushSession() throws RepositoryCheckedException {
 		try {
-			getSession().flush();
+		    getSessionFactory().getCurrentSession().flush();
 		} catch (Exception e) {
 			log.error("Exception occured during flush. ",e);
 			throw new RepositoryCheckedException("Unable to write changes to db successfully (flush).", e);

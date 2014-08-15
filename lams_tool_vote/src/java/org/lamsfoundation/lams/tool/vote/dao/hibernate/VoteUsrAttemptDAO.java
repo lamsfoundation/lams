@@ -31,8 +31,8 @@ import java.util.Set;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * Hibernate implementation for database access to VoteUsrAttemptDAO for the voting tool.
@@ -70,7 +70,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     public VoteUsrAttempt getAttemptByUID(Long uid) {
 	String query = "from VoteUsrAttempt attempt where attempt.uid=?";
 
-	List<VoteUsrAttempt> list = getSession().createQuery(query).setLong(0, uid.longValue()).list();
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, uid.longValue()).list();
 
 	if ((list != null) && (list.size() > 0)) {
 	    VoteUsrAttempt attempt = list.get(0);
@@ -86,14 +86,14 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId) {
-	List list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER)
+	List list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER)
 		.setLong("queUsrId", queUsrId.longValue()).list();
 	return list;
     }
 
     @Override
     public int getUserEnteredVotesCountForContent(final Long voteContentUid) {
-	List result = getSession().createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPTS_BY_CONTENT_ID)
+	List result = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPTS_BY_CONTENT_ID)
 		.setLong("voteContentId", voteContentUid).list();
 	Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
 	return resultLong.intValue();
@@ -101,7 +101,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public Set<String> getUserEntries(final Long voteContentUid) {
-	List<String> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRIES)
+	List<String> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRIES)
 		.setLong("voteContentUid", voteContentUid).list();
 
 	Set<String> userEntries = new HashSet<String>();
@@ -119,14 +119,14 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public List<VoteUsrAttempt> getUserAttempts(final Long voteContentUid, final String userEntry) {
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRY_RECORDS)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRY_RECORDS)
 		.setLong("voteContentUid", voteContentUid).setString("userEntry", userEntry).list();
 	return list;
     }
 
     @Override
     public Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid) {
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ENTRIES_BY_SESSION_UID)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ENTRIES_BY_SESSION_UID)
 		.setLong("voteSessionUid", voteSessionUid).list();
 
 	Set<VoteUsrAttempt> sessionUserEntries = new HashSet();
@@ -138,14 +138,14 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
 	String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List<VoteUsrAttempt> list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue())
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue())
 		.setLong("sessionUid", sessionUid).list();
 
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
 		VoteUsrAttempt attempt = listIterator.next();
-		this.getSession().setFlushMode(FlushMode.AUTO);
+		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		templ.delete(attempt);
 		templ.flush();
 	    }
@@ -154,7 +154,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public int getAttemptsForQuestionContent(final Long questionUid) {
-	List list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+	List list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
 		.setLong("voteQueContentId", questionUid.longValue()).list();
 
 	if ((list != null) && (list.size() > 0)) {
@@ -173,7 +173,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
 	    final Long sessionUid) {
-	List<VoteUsrAttempt> list = getSession()
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
 		.setLong("voteQueContentId", questionUid.longValue())
 		.setLong("sessionUid", sessionUid.longValue()).list();
@@ -188,7 +188,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid) {
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
 		.setLong("voteQueContentId", questionUid.longValue()).list();
 	return list;
 
@@ -196,7 +196,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long questionUid) {
-	List<VoteUsrAttempt> list = getSession()
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue())
 		.list();
@@ -207,7 +207,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
 	    final Long questionUid, final Long sessionUid) {
-	List<VoteUsrAttempt> list = getSession()
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue())
 		.setLong("sessionUid", sessionUid.longValue()).list();
@@ -221,7 +221,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long sessionUid) {
 
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
 
 	Set<String> userEntries = new HashSet<String>();
@@ -242,7 +242,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
 
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
 
 	String openAnswer = "";
@@ -271,7 +271,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {
-	List result = getSession().createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
+	List result = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
 		.setLong("voteSessionUid", voteSessionUid).list();
 	Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
 	return resultLong.intValue();
@@ -279,13 +279,13 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(voteUsrAttempt);
     }
 
     @Override
     public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(voteUsrAttempt);
     }
 }

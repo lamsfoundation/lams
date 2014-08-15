@@ -33,9 +33,9 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author mtruong
@@ -89,13 +89,13 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     	HibernateTemplate templ = this.getHibernateTemplate();
 		if ( nbSessionId != null) {
 			//String query = "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
-			List list = getSession().createQuery(FIND_NB_SESSION)
+			List list = getSessionFactory().getCurrentSession().createQuery(FIND_NB_SESSION)
 				.setLong(0,nbSessionId.longValue())
 				.list();
 			
 			if(list != null && list.size() > 0){
 				NoticeboardSession nb = (NoticeboardSession) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
+				getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 				templ.delete(nb);
 				templ.flush();
 			}

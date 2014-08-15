@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.events.Event;
 import org.lamsfoundation.lams.events.dao.EventDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 

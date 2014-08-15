@@ -53,7 +53,7 @@ public class WookieDAO extends BaseDAO implements IWookieDAO {
     }
 
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
+	getSessionFactory().getCurrentSession().evict(o);
 
     }
 }

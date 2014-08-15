@@ -52,7 +52,7 @@ public class KalturaDAO extends BaseDAO implements IKalturaDAO {
     }
 
     public void releaseFromCache(Object o) {
-	getSession().evict(o);
+	getSessionFactory().getCurrentSession().evict(o);
 
     }
 }

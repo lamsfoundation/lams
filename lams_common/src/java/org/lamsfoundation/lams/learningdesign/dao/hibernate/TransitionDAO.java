@@ -60,7 +60,7 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 */
 	public Transition getTransitionByToActivityID(Long toActivityID) {		
 		if ( toActivityID != null ) {
-			Query query = this.getSession().createQuery(FIND_BY_TO_ACTIVITY);
+			Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_TO_ACTIVITY);
 			query.setLong(0,toActivityID.longValue());
 			return (Transition) query.uniqueResult();
 		}
@@ -73,7 +73,7 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 */
 	public Transition getTransitionByfromActivityID(Long fromActivityID) {
 		if ( fromActivityID != null ) {
-			return (Transition) this.getSession().createQuery(FIND_BY_FROM_ACTIVITY)
+			return (Transition) getSessionFactory().getCurrentSession().createQuery(FIND_BY_FROM_ACTIVITY)
 			.setLong(0,fromActivityID.longValue())
 			.uniqueResult();
 		}
@@ -82,7 +82,7 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	
 	public List getTransitionsByLearningDesignID(Long learningDesignID){
 		if ( learningDesignID != null ) {
-			return this.getSession().createQuery(FIND_BY_LEARNING_DESIGN_ID)
+			return getSessionFactory().getCurrentSession().createQuery(FIND_BY_LEARNING_DESIGN_ID)
 				.setLong(0, learningDesignID.longValue())
 				.list();
 		} 
@@ -100,7 +100,7 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	{
 	    if ( transitionUUID != null && learningDesign != null ) {
 			Long designID = learningDesign.getLearningDesignId();
-			Query query = this.getSession().createQuery(FIND_BY_UI_ID);
+			Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_UI_ID);
 			query.setInteger(0,transitionUUID.intValue());
 			query.setLong(1,designID.longValue());
 			return (Transition) query.uniqueResult();

@@ -27,7 +27,7 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -48,7 +48,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
-	List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
+	List list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
 		.setLong("mcSessionUid", mcSessionUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -67,13 +67,13 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     }
 
     public void removeMcUser(McQueUsr mcUser) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(mcUser);
     }
 
     /** Get the max, min and average mark (in that order) for a session */
     public Integer[] getMarkStatisticsForSession(Long sessionUid) {
-	Object[] stats = (Object[]) getSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
+	Object[] stats = (Object[]) getSessionFactory().getCurrentSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
 		.setLong("mcSessionUid", sessionUid.longValue()).uniqueResult();
 
 	if (stats != null) {

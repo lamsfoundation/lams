@@ -29,7 +29,7 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -40,7 +40,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
     private static final String GET_SESSION_IDS_FROM_CONTENT = "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent order by qas.session_name asc";
 
     public int countSessionComplete(QaContent qa) {
-	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(COUNT_SESSION_COMPLETE).list();
 
 	int sessionCount = 0;
 	if (list != null && list.size() > 0) {
@@ -57,7 +57,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
      */
     public QaSession getQaSessionById(long qaSessionId) {
 	String query = "from QaSession as qus where qus.qaSessionId = ?";
-	List list = getSession().createQuery(query).setLong(0, qaSessionId).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaSessionId).list();
 
 	if (list != null && list.size() > 0) {
 	    QaSession qus = (QaSession) list.get(0);
@@ -70,7 +70,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#CreateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void createSession(QaSession session) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(session);
     }
 
@@ -78,7 +78,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#UpdateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void UpdateQaSession(QaSession session) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(session);
     }
 
@@ -86,7 +86,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#deleteSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void deleteQaSession(QaSession qaSession) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(qaSession);
     }
 

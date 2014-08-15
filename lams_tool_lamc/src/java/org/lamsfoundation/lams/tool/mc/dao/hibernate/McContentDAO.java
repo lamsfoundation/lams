@@ -30,9 +30,9 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -52,7 +52,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	String query = "from McContent as mc where mc.mcContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
 
-	List list = getSession().createQuery(FIND_MC_CONTENT).setLong(0, mcContentId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(FIND_MC_CONTENT).setLong(0, mcContentId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    McContent mc = (McContent) list.get(0);
@@ -62,28 +62,28 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
     }
 
     public void saveMcContent(McContent mcContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(mcContent);
     }
 
     public void updateMcContent(McContent mcContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcContent);
     }
 
     public void saveOrUpdateMc(McContent mc) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(mc);
     }
 
     public void removeMcById(Long mcContentId) {
 	HibernateTemplate templ = this.getHibernateTemplate();
 	if (mcContentId != null) {
-	    List list = getSession().createQuery(FIND_MC_CONTENT).setLong(0, mcContentId.longValue()).list();
+	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_MC_CONTENT).setLong(0, mcContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
 		McContent mc = (McContent) list.get(0);
-		this.getSession().setFlushMode(FlushMode.AUTO);
+		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		templ.delete(mc);
 		templ.flush();
 	    }

@@ -28,7 +28,7 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * 
@@ -44,7 +44,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    + QaUsrResp.class.getName() + " as r where r.qaQuestion.qaContent.qaContentId=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(qaUsrResp);
     }
 
@@ -56,17 +56,17 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
      * @see org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO#updateUserResponse(org.lamsfoundation.lams.tool.qa.QaUsrResp)
      */
     public void updateUserResponse(QaUsrResp resp) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(resp);
     }
 
     public void removeUserResponse(QaUsrResp resp) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(resp);
     }
 
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId) {
-	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION)
+	List<QaUsrResp> list = getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("questionId", questionId.longValue()).list();
 	if (list == null || list.size() == 0) {
 	    return null;
@@ -77,7 +77,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     
     @Override
     public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
-	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER).setLong("userUid", userUid.longValue())
+	List<QaUsrResp> list = getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_USER).setLong("userUid", userUid.longValue())
 		.list();
 	return list;
     }

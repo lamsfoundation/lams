@@ -32,8 +32,8 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
@@ -55,7 +55,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
 	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSession.qaSessionId=:qaSessionId";
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue()).setLong(
+	List list = getSessionFactory().getCurrentSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue()).setLong(
 		"qaSessionId", qaSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -67,23 +67,23 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     public List getUserBySessionOnly(final QaSession qaSession) {
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
+	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
 		qaSession.getQaSessionId().longValue()).list();
 	return list;
     }
 
     public void createUsr(QaQueUsr usr) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(usr);
     }
 
     public void updateUsr(QaQueUsr usr) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(usr);
     }
 
     public void deleteQaQueUsr(QaQueUsr qaQueUsr) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(qaQueUsr);
     }
 
@@ -91,7 +91,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
 	int returnInt = 0;
 	if (qa != null && qa.getUid() != null) {
-	    List result = getSession().createQuery(GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid()).list();
+	    List result = getSessionFactory().getCurrentSession().createQuery(GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid()).list();
 	    Long resultLong = (result.get(0) != null) ? (Long) result.get(0) : new Long(0);
 	    returnInt = resultLong.intValue();
 	} else {

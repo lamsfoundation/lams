@@ -47,7 +47,7 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<LearningLibrary> getAllLearningLibraries() {
-	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
+	return getSessionFactory().getCurrentSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
     }
 
     @Override

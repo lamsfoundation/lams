@@ -25,7 +25,7 @@ public class CompetenceMappingDAO extends BaseDAO implements ICompetenceMappingD
 			if ( toolActivity != null && competence != null ) {
 			Long activityId = toolActivity.getActivityId();
 			Long competenceId = competence.getCompetenceId();
-			Query query = this.getSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
+			Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
 			query.setLong(0,competenceId);
 			query.setLong(1,activityId.longValue());
 			return (CompetenceMapping) query.uniqueResult();

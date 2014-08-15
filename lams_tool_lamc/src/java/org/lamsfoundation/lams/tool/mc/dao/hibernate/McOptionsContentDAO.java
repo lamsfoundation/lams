@@ -31,8 +31,8 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * Hibernate implementation for database access to McOptionsContent for the mc tool.
@@ -51,7 +51,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 
     public List<McOptsContent> findMcOptionsContentByQueId(Long questionUid) {
 	if (questionUid != null) {
-	    List<McOptsContent> list = getSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
+	    List<McOptsContent> list = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
 		    .setLong("mcQueContentUid", questionUid.longValue()).list();
 	    return list;
 	}
@@ -62,7 +62,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	List<McOptionDTO> optionDtos = new LinkedList();
 
 	if (questionUid != null) {
-	    List<McOptsContent> options = getSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
+	    List<McOptsContent> options = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
 		    .setLong("mcQueContentUid", questionUid.longValue()).list();
 
 	    if (options != null && options.size() > 0) {
@@ -80,7 +80,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	List<String> listOptionCorrect = new LinkedList<String>();
 
 	if (questionUid != null) {
-	    List<McOptsContent> options = getSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
+	    List<McOptsContent> options = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
 		    .setLong("mcQueContentUid", questionUid.longValue()).list();
 
 	    if (options != null && options.size() > 0) {
@@ -93,7 +93,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
     }
 
     public McOptsContent getOptionContentByOptionText(final String option, final Long questionUid) {
-	List<McOptsContent> list = getSession().createQuery(FIND_OPTIONS_BY_OPTION_TEXT).setString("option", option)
+	List<McOptsContent> list = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_OPTION_TEXT).setString("option", option)
 		.setLong("mcQueContentUid", questionUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
@@ -117,7 +117,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
     }
 
     public void removeMcOptionsContent(McOptsContent mcOptsContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(mcOptsContent);
     }
 

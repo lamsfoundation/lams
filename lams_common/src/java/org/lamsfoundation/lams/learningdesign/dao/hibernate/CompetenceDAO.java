@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 public class CompetenceDAO extends BaseDAO implements ICompetenceDAO
 {
@@ -60,7 +60,7 @@ public class CompetenceDAO extends BaseDAO implements ICompetenceDAO
     {
    		if ( design != null && competenceTitle != null ) {
 			Long designID = design.getLearningDesignId();
-			Query query = this.getSession().createQuery(LOAD_COMPETENCE_BY_LDID_AND_TITLE);
+			Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_COMPETENCE_BY_LDID_AND_TITLE);
 			query.setString(0,competenceTitle);
 			query.setLong(1,designID.longValue());
 			return (Competence) query.uniqueResult();

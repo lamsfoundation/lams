@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 public class MessageSeqDao extends HibernateDaoSupport {
     private static final String SQL_QUERY_FIND_TOPIC_THREAD = "from " + MessageSeq.class.getName()

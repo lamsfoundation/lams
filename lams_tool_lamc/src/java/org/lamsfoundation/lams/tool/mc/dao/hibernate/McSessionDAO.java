@@ -29,8 +29,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
@@ -52,7 +52,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 
     public McSession getMcSessionById(Long mcSessionId) {
 
-	List list = getSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID).setLong(0, mcSessionId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID).setLong(0, mcSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    McSession mcs = (McSession) list.get(0);
@@ -66,12 +66,12 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     }
 
     public void updateMcSession(McSession mcSession) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcSession);
     }
 
     public void removeMcSession(McSession mcSession) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
+	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(mcSession);
     }
 

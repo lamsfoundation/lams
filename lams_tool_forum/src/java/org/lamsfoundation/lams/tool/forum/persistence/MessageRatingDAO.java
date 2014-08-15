@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
  * DAO interface for <code>MessageRating</code>..

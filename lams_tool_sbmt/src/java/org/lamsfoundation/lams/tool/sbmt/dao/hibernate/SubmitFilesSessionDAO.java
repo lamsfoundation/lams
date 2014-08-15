@@ -59,7 +59,7 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
     
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID){
         if ( contentID != null ) {
-            return this.getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
+            return getSessionFactory().getCurrentSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
                 .setLong("contentID", contentID.longValue())
                 .list();
         }

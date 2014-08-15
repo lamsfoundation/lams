@@ -192,7 +192,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	public Activity getActivityByUIID(Integer id, LearningDesign design) {
 		if (id != null && design != null) {
 			Long designID = design.getLearningDesignId();
-			Query query = this.getSession().createQuery(ActivityDAO.FIND_BY_UI_ID);
+			Query query = this.getSessionFactory().getCurrentSession().createQuery(ActivityDAO.FIND_BY_UI_ID);
 			query.setInteger(0, id.intValue());
 			query.setLong(1, designID.longValue());
 			return getNonCGLibActivity((Activity) query.uniqueResult());
