@@ -24,11 +24,12 @@
 package org.lamsfoundation.lams.util;
 
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate4.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
 
 
 /**
@@ -54,11 +55,15 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter
 	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession(SessionFactory, boolean)
 	 * @see org.hibernate.FlushMode#NEVER
 	 */
-	protected Session getSession(SessionFactory sessionFactory)
-			throws DataAccessResourceFailureException {
-		Session session = SessionFactoryUtils.getSession(sessionFactory, true);
-		session.setFlushMode(FlushMode.AUTO);
-		return session;
+	protected Session openSession(SessionFactory sessionFactory) throws DataAccessResourceFailureException {
+		try {
+			Session session = sessionFactory.openSession();
+			session.setFlushMode(FlushMode.AUTO);
+			return session;
+		}
+		catch (HibernateException ex) {
+			throw new DataAccessResourceFailureException("Could not open Hibernate Session", ex);
+		}
 	}
 
 	/**
@@ -73,8 +78,8 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter
 	 * @param session the Session used for filtering
 	 * @param sessionFactory the SessionFactory that this filter uses
 	 */
-	protected void closeSession(Session session, SessionFactory sessionFactory) {
+	protected void closeSession(Session session) {
 		session.flush();
-		SessionFactoryUtils.releaseSession(session, sessionFactory);
+		SessionFactoryUtils.closeSession(session);
 	}
 }
