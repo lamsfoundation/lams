@@ -44,5 +44,7 @@
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-tx-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-beans-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-support-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-aop-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
+        <archive path="/lams_build/lib/spring/aopalliance.jar"/>
     </library>
 </eclipse-userlibraries>
