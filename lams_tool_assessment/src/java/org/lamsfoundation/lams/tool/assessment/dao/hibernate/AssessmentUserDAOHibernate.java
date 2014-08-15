@@ -51,8 +51,9 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
 	return (AssessmentUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<AssessmentUser> getBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<AssessmentUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

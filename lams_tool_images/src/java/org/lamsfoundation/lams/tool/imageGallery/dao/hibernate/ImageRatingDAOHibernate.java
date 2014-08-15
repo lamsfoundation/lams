@@ -49,8 +49,9 @@ public class ImageRatingDAOHibernate extends BaseDAOHibernate implements ImageRa
 	return (ImageRating) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ImageRating> getImageRatingsByImageUid(Long imageUid) {
-	return getHibernateTemplate().find(FIND_BY_IMAGE_UID, imageUid);
+	return (List<ImageRating>) getHibernateTemplate().find(FIND_BY_IMAGE_UID, imageUid);
     }
 
 }

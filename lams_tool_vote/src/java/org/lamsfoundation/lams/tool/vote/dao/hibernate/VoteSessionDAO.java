@@ -140,8 +140,9 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     }
 
+    @SuppressWarnings("unchecked")
     public List<Long> getSessionsFromContent(VoteContent voteContent) {
-	return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "voteContent", voteContent));
+	return (List<Long>) (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "voteContent", voteContent));
     }
 
     public List getSessionNamesFromContent(VoteContent voteContent) {

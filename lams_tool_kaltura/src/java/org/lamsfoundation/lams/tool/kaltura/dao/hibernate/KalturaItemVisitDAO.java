@@ -60,9 +60,10 @@ public class KalturaItemVisitDAO extends BaseDAO implements IKalturaItemVisitDAO
 	return ((Number) list.get(0)).intValue();
     }
 
+    @SuppressWarnings("unchecked")
     public List<KalturaItemVisitLog> getKalturaItemLogBySession(Long sessionId, Long itemUid) {
 
-	return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return (List<KalturaItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
 }

@@ -57,8 +57,9 @@ public class SubmitUserDAO extends BaseDAO implements ISubmitUserDAO {
 			return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<SubmitUser> getUsersBySession(Long sessionID){
-		return getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionID);
+		return (List<SubmitUser>) getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionID);
 	}
 	
 	

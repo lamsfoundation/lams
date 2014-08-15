@@ -40,8 +40,9 @@ public class SpreadsheetSessionDAOHibernate extends BaseDAOHibernate implements 
 			return null;
 		return (SpreadsheetSession) list.get(0);
 	}
+	@SuppressWarnings("unchecked")
 	public List<SpreadsheetSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<SpreadsheetSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(SpreadsheetSession session) {

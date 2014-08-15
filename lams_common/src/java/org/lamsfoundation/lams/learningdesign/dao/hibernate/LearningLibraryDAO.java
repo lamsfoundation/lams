@@ -56,7 +56,7 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
 	if (valid) {
 	    return getAllLearningLibraries();
 	} else {
-	    return getHibernateTemplate().find(LearningLibraryDAO.FIND_ALL_LIB);
+	    return (List<LearningLibrary>) getHibernateTemplate().find(LearningLibraryDAO.FIND_ALL_LIB);
 	}
     }
 

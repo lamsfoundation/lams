@@ -45,12 +45,14 @@ public class BranchActivityEntryDAO extends BaseDAO implements IBranchActivityEn
      * 
      * @see org.lamsfoundation.lams.learningdesign.dao.hibernate.IBranchActivityEntryDAO#getEntriesByLearningDesign(java.lang.Long)
      */
+    @SuppressWarnings("unchecked")
     public List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId) {
-	return this.getHibernateTemplate().find(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
+	return (List<BranchActivityEntry>) this.getHibernateTemplate().find(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
     }
 
+    @SuppressWarnings("unchecked")
     public BranchCondition getConditionByID(Long conditionID) {
-	List<BranchCondition> result = this.getHibernateTemplate().find(BranchActivityEntryDAO.CONDITION_BY_ID,
+	List<BranchCondition> result = (List<BranchCondition>) this.getHibernateTemplate().find(BranchActivityEntryDAO.CONDITION_BY_ID,
 		conditionID);
 	if (result == null || result.isEmpty()) {
 	    return null;

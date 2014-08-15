@@ -171,7 +171,7 @@ public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
     
     @SuppressWarnings("unchecked")
     public List<MindmapNode> getMindmapNodesBySessionIdAndUserId(Long sessionId, Long userId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODES_BY_SESSION_ID_AND_USER_ID,
+	return (List<MindmapNode>) this.getHibernateTemplate().find(SQL_QUERY_FIND_NODES_BY_SESSION_ID_AND_USER_ID,
 		new Object[] { sessionId, userId });
     }
 }

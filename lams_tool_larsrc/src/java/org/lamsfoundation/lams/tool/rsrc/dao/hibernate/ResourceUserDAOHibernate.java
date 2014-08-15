@@ -49,8 +49,9 @@ public class ResourceUserDAOHibernate extends BaseDAOHibernate implements Resour
 		return (ResourceUser) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ResourceUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<ResourceUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

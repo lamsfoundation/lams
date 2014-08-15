@@ -15,9 +15,10 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
     protected static final String GET_EVENTS_TO_RESEND_QUERY = "SELECT DISTINCT e FROM " + Event.class.getName()
 	    + " AS e, Subscription AS s WHERE s.event = e AND (e.failTime IS NOT NULL OR "
 	    + "(s.periodicity > 0 AND (NOW()- s.lastOperationTime >= s.periodicity)))";
-
+    
+    @SuppressWarnings("unchecked")
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
-	List<Event> events = getHibernateTemplate().find(EventDAOHibernate.GET_EVENT_QUERY,
+	List<Event> events = (List<Event>) getHibernateTemplate().find(EventDAOHibernate.GET_EVENT_QUERY,
 		new Object[] { scope, name, sessionId });
 	if (events.size() > 1) {
 	    throw new InvalidParameterException("Two events with the same parameters exist in the database.");
@@ -28,8 +29,9 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 	return events.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Event> getEventsToResend() {
-	return getHibernateTemplate().find(EventDAOHibernate.GET_EVENTS_TO_RESEND_QUERY);
+	return (List<Event>) getHibernateTemplate().find(EventDAOHibernate.GET_EVENTS_TO_RESEND_QUERY);
     }
 
     public void deleteEvent(Event event) {

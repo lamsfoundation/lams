@@ -42,8 +42,9 @@ public class AssessmentSessionDAOHibernate extends BaseDAOHibernate implements A
 	return (AssessmentSession) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<AssessmentSession> getByContentId(Long toolContentId) {
-	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	return (List<AssessmentSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     public void delete(AssessmentSession session) {

@@ -352,8 +352,9 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getMonitorsByToolSessionId(Long)
      */
+    @SuppressWarnings("unchecked")
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
+	return (List<User>) this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
 		sessionId);
     }
     

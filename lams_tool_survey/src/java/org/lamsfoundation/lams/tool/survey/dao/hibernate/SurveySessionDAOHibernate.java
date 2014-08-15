@@ -40,8 +40,9 @@ public class SurveySessionDAOHibernate extends BaseDAOHibernate implements Surve
 			return null;
 		return (SurveySession) list.get(0);
 	}
+	@SuppressWarnings("unchecked")
 	public List<SurveySession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<SurveySession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(SurveySession session) {

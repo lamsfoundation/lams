@@ -80,10 +80,11 @@ public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements
 	}
 
 	// returns for specified Eadventure UUID the number () of eadVisitLogs asociated to this eAdventure
+	@SuppressWarnings("unchecked")
 	public Map<Long,Integer> getSummary(Long contentId) {
 
 		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
+		List<Object[]> result =  (List<Object[]>) getHibernateTemplate().find(FIND_SUMMARY,contentId);
 		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
 		for(Object[] list : result){
 			if ( list[1] != null ) {
@@ -96,7 +97,7 @@ public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements
 
 	public List<EadventureItemVisitLog> getEadventureItemLogBySession(Long sessionId, Long itemUid) {
 		
-		return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
+		return (List<EadventureItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
 	}
 
 }

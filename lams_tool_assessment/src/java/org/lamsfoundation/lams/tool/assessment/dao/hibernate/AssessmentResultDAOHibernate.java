@@ -48,12 +48,14 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     private static final String FIND_BY_UID = "from " + AssessmentResult.class.getName() + " as r where r.uid = ?";
 
+    @SuppressWarnings("unchecked")
     public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
+	return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
     }
     
+    @SuppressWarnings("unchecked")
     public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
+	return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
     }
     
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {

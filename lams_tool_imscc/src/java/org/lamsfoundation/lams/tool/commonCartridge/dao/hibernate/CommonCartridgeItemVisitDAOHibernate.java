@@ -63,10 +63,11 @@ public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate imple
 	return ((Number) list.get(0)).intValue();
     }
 
+    @SuppressWarnings("unchecked")
     public Map<Long, Integer> getSummary(Long contentId) {
 
 	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-	List<Object[]> result = getHibernateTemplate().find(FIND_SUMMARY, contentId);
+	List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(FIND_SUMMARY, contentId);
 	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
@@ -77,9 +78,10 @@ public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate imple
 
     }
 
+    @SuppressWarnings("unchecked")
     public List<CommonCartridgeItemVisitLog> getCommonCartridgeItemLogBySession(Long sessionId, Long itemUid) {
 
-	return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return (List<CommonCartridgeItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
 }

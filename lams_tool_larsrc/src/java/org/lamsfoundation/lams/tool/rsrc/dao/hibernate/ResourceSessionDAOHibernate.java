@@ -40,8 +40,9 @@ public class ResourceSessionDAOHibernate extends BaseDAOHibernate implements Res
 			return null;
 		return (ResourceSession) list.get(0);
 	}
+	@SuppressWarnings("unchecked")
 	public List<ResourceSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<ResourceSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(ResourceSession session) {

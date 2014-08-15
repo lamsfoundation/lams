@@ -33,9 +33,10 @@ public class ScratchieItemDAOHibernate extends BaseDAOHibernate implements Scrat
     private static final String FIND_AUTHORING_ITEMS = "from " + ScratchieItem.class.getName()
 	    + " where scratchie_uid = ? order by create_date asc";
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieItem> getAuthoringItems(Long scratchieUid) {
-	return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, scratchieUid);
+	return (List<ScratchieItem>) this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, scratchieUid);
     }
 
     @Override

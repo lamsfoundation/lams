@@ -73,8 +73,9 @@ public class LeaderselectionUserDAO extends BaseDAO implements ILeaderselectionU
 	return (LeaderselectionUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<LeaderselectionUser> getBySessionId(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<LeaderselectionUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 }

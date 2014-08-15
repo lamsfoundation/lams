@@ -57,14 +57,16 @@ public class KalturaRatingDAO extends BaseDAO implements IKalturaRatingDAO {
 	return (KalturaRating) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<KalturaRating> getKalturaRatingsByItemUid(Long itemUid) {
-	return getHibernateTemplate().find(FIND_BY_ITEM_UID, itemUid);
+	return (List<KalturaRating>) getHibernateTemplate().find(FIND_BY_ITEM_UID, itemUid);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public AverageRatingDTO getAverageRatingDtoByItem(Long itemUid, Long sessionId) {
-	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { itemUid, sessionId });
+	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { itemUid, sessionId });
 	Object[] results = list.get(0);
 
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];

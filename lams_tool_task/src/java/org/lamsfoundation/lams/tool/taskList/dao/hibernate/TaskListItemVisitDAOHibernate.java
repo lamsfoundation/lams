@@ -91,9 +91,10 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
     /**
      * {@inheritDoc}
      */
+	@SuppressWarnings("unchecked")
 	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId, Long itemUid) {
 		
-		return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
+		return (List<TaskListItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
 	}
 
 }

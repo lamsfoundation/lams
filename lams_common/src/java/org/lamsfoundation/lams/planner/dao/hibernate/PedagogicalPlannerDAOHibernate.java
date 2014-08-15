@@ -69,8 +69,9 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().get(PedagogicalPlannerSequenceNode.class, uid);
     }
 
+    @SuppressWarnings("unchecked")
     public PedagogicalPlannerSequenceNode getRootNode() {
-	List<PedagogicalPlannerSequenceNode> subnodeList = getHibernateTemplate().find(
+	List<PedagogicalPlannerSequenceNode> subnodeList = (List<PedagogicalPlannerSequenceNode>) getHibernateTemplate().find(
 		PedagogicalPlannerDAOHibernate.FIND_ROOT_NODE);
 	PedagogicalPlannerSequenceNode rootNode = new PedagogicalPlannerSequenceNode();
 	rootNode.setLocked(true);
@@ -79,13 +80,14 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	return rootNode;
     }
 
+    @SuppressWarnings("unchecked")
     public List<String[]> getTitlePath(Long nodeUid) {
 	Long currentUid = nodeUid;
 	LinkedList<String[]> titlePath = new LinkedList<String[]>();
 	List<Object[]> result;
 	Object[] row;
 	while (currentUid != null) {
-	    result = getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_PARENT_TITLE, currentUid);
+	    result = (List<Object[]>) getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_PARENT_TITLE, currentUid);
 	    if (result.size() > 0) {
 		row = result.get(0);
 		if (!currentUid.equals(nodeUid)) {

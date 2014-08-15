@@ -42,8 +42,9 @@ public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSes
 		return (DacoSession) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<DacoSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
+		return (List<DacoSession>) getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
 	}
 
 	public void deleteBySessionId(Long toolSessionId) {

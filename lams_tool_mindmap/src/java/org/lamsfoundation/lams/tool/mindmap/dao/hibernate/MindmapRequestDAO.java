@@ -79,6 +79,6 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
     
     @SuppressWarnings("unchecked")
     public List<MindmapRequest> getRequestsByUserId(Long userId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
+	return (List<MindmapRequest>) this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
     }
 }

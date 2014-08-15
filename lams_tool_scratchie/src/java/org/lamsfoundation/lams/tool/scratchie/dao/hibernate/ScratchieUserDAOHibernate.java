@@ -51,8 +51,9 @@ public class ScratchieUserDAOHibernate extends BaseDAOHibernate implements Scrat
 	return (ScratchieUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ScratchieUser> getBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<ScratchieUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

@@ -71,8 +71,9 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
      * @param userId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<MessageRating> getRatingsByMessage(Long messageId) {
-	return getHibernateTemplate().find(FIND_BY_MESSAGE_ID, messageId);
+	return (List<MessageRating>) getHibernateTemplate().find(FIND_BY_MESSAGE_ID, messageId);
     }
 
     /**
@@ -81,8 +82,9 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
      * @param messageId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public AverageRatingDTO getAverageRatingDTOByMessage(Long messageId) {
-	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { messageId });
+	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { messageId });
 	Object[] results = list.get(0);
 	
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];

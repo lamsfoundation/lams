@@ -51,8 +51,9 @@ public class CommonCartridgeUserDAOHibernate extends BaseDAOHibernate implements
 	return (CommonCartridgeUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<CommonCartridgeUser> getBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<CommonCartridgeUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

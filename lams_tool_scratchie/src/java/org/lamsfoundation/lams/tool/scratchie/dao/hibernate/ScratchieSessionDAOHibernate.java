@@ -42,8 +42,9 @@ public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements Sc
 	return (ScratchieSession) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	return (List<ScratchieSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     public void delete(ScratchieSession session) {

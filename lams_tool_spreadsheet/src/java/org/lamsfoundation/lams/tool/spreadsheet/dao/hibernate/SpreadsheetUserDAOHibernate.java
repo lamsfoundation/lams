@@ -49,8 +49,9 @@ public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements Spr
 		return (SpreadsheetUser) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<SpreadsheetUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<SpreadsheetUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

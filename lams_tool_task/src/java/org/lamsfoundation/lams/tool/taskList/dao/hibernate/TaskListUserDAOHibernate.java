@@ -63,8 +63,9 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
     /**
      * {@inheritDoc}
      */
+	@SuppressWarnings("unchecked")
 	public List<TaskListUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<TaskListUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 	
 }

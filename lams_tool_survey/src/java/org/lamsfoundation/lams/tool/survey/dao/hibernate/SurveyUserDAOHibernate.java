@@ -49,8 +49,9 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 		return (SurveyUser) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<SurveyUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<SurveyUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

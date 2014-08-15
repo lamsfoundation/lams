@@ -51,8 +51,9 @@ public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements Im
 	return (ImageGalleryUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ImageGalleryUser> getBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<ImageGalleryUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

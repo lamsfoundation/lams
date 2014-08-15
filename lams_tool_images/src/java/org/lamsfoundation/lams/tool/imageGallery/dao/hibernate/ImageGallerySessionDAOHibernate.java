@@ -40,8 +40,9 @@ public class ImageGallerySessionDAOHibernate extends BaseDAOHibernate implements
 			return null;
 		return (ImageGallerySession) list.get(0);
 	}
+	@SuppressWarnings("unchecked")
 	public List<ImageGallerySession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<ImageGallerySession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(ImageGallerySession session) {

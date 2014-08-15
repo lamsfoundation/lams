@@ -49,8 +49,9 @@ public class EadventureUserDAOHibernate extends BaseDAOHibernate implements Eadv
 		return (EadventureUser) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<EadventureUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<EadventureUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

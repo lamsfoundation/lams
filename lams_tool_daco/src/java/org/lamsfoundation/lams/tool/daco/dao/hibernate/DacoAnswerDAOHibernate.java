@@ -42,9 +42,10 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
     private static final String FIND_USER_RECORD_COUNT = "SELECT COUNT (DISTINCT a.recordId) FROM "
 	    + DacoAnswer.class.getName() + " AS a WHERE a.user.userId=:userId AND a.user.session.sessionId=:sessionId";
 
+    @SuppressWarnings("unchecked")
     public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid, List<QuestionSummaryDTO> summaries) {
 
-	List<Object[]> result = getHibernateTemplate().findByNamedParam(
+	List<Object[]> result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
 		DacoAnswerDAOHibernate.FIND_USER_NUMBER_SUMMARY, new String[] { "userUid", "numberQuestionType" },
 		new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
@@ -52,7 +53,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addNumberSummary(summaries, objectRow, true);
 	}
 
-	result = getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_GROUP_NUMBER_SUMMARY,
+	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_GROUP_NUMBER_SUMMARY,
 		new String[] { "userUid", "numberQuestionType" },
 		new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
@@ -60,7 +61,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addNumberSummary(summaries, objectRow, false);
 	}
 
-	result = getHibernateTemplate().findByNamedParam(
+	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
 		DacoAnswerDAOHibernate.FIND_USER_ANSWER_ENUMERATION_QUERY,
 		new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 			"checkboxQuestionType" },
@@ -71,7 +72,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addAnswerEnumerationSummary(summaries, objectRow, true);
 	}
 
-	result = getHibernateTemplate().findByNamedParam(
+	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
 		DacoAnswerDAOHibernate.FIND_GROUP_ANSWER_ENUMERATION_QUERY,
 		new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 			"checkboxQuestionType" },

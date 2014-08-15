@@ -121,6 +121,6 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
         @SuppressWarnings("unchecked")
         @Override
         public List<LearningDesignAccess> getAccessByUser(Integer userId) {
-    		return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
+    		return (List<LearningDesignAccess>) this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
         }
     }

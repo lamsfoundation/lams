@@ -124,8 +124,9 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	return resultMap;
     }
 
+    @SuppressWarnings("unchecked")
     public List<ChatMessage> getSentByUser(Long userUid) {
-	return this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER,
+	return (List<ChatMessage>) this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER,
 		new Object[] { userUid });
     }
 }

@@ -98,7 +98,7 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
     @SuppressWarnings("unchecked")
     public List<ChatUser> getBySessionIdAndLastPresence(Long toolSessionID, Date oldestLastPresence) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID_AND_TIME,
+	return (List<ChatUser>) this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID_AND_TIME,
 		new Object[] { toolSessionID, oldestLastPresence });
 
     }

@@ -53,9 +53,10 @@ public class ImageGalleryItemVisitDAOHibernate extends BaseDAOHibernate implemen
 	return ((Number) list.get(0)).intValue();
     }
 
+    @SuppressWarnings("unchecked")
     public List<ImageGalleryItemVisitLog> getImageGalleryItemLogBySession(Long sessionId, Long itemUid) {
 
-	return getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return (List<ImageGalleryItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
 }

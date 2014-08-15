@@ -52,7 +52,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     @SuppressWarnings("unchecked")
     public SortedSet<QaWizardCategory> getWizardCategories() {
 	SortedSet<QaWizardCategory> ret = new TreeSet<QaWizardCategory>();
-	List<QaWizardCategory> list = getHibernateTemplate().find(QUERY_FIND_ALL_CATEGORIES);
+	List<QaWizardCategory> list = (List<QaWizardCategory>) getHibernateTemplate().find(QUERY_FIND_ALL_CATEGORIES);
 	for (QaWizardCategory category : list) {
 	    ret.add(category);
 	}

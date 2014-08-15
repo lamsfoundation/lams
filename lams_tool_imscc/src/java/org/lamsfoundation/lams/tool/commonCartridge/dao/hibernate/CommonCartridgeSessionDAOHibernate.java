@@ -42,8 +42,9 @@ public class CommonCartridgeSessionDAOHibernate extends BaseDAOHibernate impleme
 	return (CommonCartridgeSession) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<CommonCartridgeSession> getByContentId(Long toolContentId) {
-	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	return (List<CommonCartridgeSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     public void delete(CommonCartridgeSession session) {

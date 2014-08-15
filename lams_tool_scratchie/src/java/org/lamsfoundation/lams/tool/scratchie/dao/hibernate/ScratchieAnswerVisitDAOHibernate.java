@@ -62,14 +62,16 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	return ((Number) list.get(0)).intValue();
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid) {
-	return getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
+	return (List<ScratchieAnswerVisitLog>) getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId) {
-	return getHibernateTemplate().find(FIND_BY_SESSION, new Object[] { sessionId });
+	return (List<ScratchieAnswerVisitLog>) getHibernateTemplate().find(FIND_BY_SESSION, new Object[] { sessionId });
     }
     
     @Override

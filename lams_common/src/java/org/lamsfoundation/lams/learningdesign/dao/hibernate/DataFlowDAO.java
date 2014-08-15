@@ -51,8 +51,9 @@ public class DataFlowDAO extends BaseDAO implements IDataFlowDAO {
 	    + ToolActivity.class.getName()
 	    + " AS activity WHERE activity.toolContentId=:toolContentId AND activity=transition.toActivity AND transition=obj.dataTransition AND obj.toolAssigmentId=:toolAssigmentId";
 
+    @SuppressWarnings("unchecked")
     public List<DataFlowObject> getDataFlowObjectsByToolContentId(Long toolContentId) {
-	List<DataFlowObject> result = this.getHibernateTemplate().find(
+	List<DataFlowObject> result = (List<DataFlowObject>) this.getHibernateTemplate().find(
 		DataFlowDAO.FIND_DATA_FLOW_OBJECTS_BY_TOOL_CONTENT_ID, toolContentId);
 	if (result == null || result.isEmpty()) {
 	    return null;
@@ -60,8 +61,9 @@ public class DataFlowDAO extends BaseDAO implements IDataFlowDAO {
 	return result;
     }
 
+    @SuppressWarnings("unchecked")
     public DataFlowObject getAssignedDataFlowObject(Long toolContentId, Integer assigmentId) {
-	List<DataFlowObject> result = this.getHibernateTemplate().findByNamedParam(
+	List<DataFlowObject> result = (List<DataFlowObject>) this.getHibernateTemplate().findByNamedParam(
 		DataFlowDAO.FIND_ASSIGNED_DATA_FLOW_OBJECTS, new String[] { "toolContentId", "toolAssigmentId" },
 		new Object[] { toolContentId, assigmentId });
 	// There must be exactly one result

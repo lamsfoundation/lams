@@ -52,8 +52,9 @@ public class TaskListSessionDAOHibernate extends BaseDAOHibernate implements Tas
     /**
      * {@inheritDoc}
      */
+	@SuppressWarnings("unchecked")
 	public List<TaskListSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<TaskListSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
     /**

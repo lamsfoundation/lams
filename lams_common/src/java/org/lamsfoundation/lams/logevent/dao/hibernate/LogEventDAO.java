@@ -60,12 +60,14 @@ public class LogEventDAO extends BaseDAO implements ILogEventDAO {
 	}
     }  
 
+    @SuppressWarnings("unchecked")
     public List<LogEvent> getByUser(Integer userId) {
-	return getHibernateTemplate().find(GET_LOG_EVENT_BY_USER, userId);
+	return (List<LogEvent>) getHibernateTemplate().find(GET_LOG_EVENT_BY_USER, userId);
     }
     
+    @SuppressWarnings("unchecked")
     public List<LogEvent> getEventsOccurredBetween(Date startDate, Date finishDate) {
-	return getHibernateTemplate().find(GET_LOG_EVENTS_OCCURED_BETWEEN_DATES, new Date[] { startDate, finishDate });
+	return (List<LogEvent>) getHibernateTemplate().find(GET_LOG_EVENTS_OCCURED_BETWEEN_DATES, new Date[] { startDate, finishDate });
     }
 
 }

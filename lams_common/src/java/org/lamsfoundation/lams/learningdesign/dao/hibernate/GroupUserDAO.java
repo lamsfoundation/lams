@@ -62,8 +62,9 @@ public class GroupUserDAO extends BaseDAO implements IGroupUserDAO {
      * @param timeToScheduledLessonEnd
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<User> getUsersWithLessonEndingSoonerThan(Lesson lesson, Date timeToScheduledLessonEnd) {
-	return getHibernateTemplate().find(GET_USERS_BY_LESSON_AND_TIME,
+	return (List<User>) getHibernateTemplate().find(GET_USERS_BY_LESSON_AND_TIME,
 		new Object[] { lesson.getLessonClass().getGroupingId(), timeToScheduledLessonEnd });
     }
 

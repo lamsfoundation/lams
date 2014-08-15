@@ -42,12 +42,13 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 			return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid) {
-		return getHibernateTemplate().find(GET_SESSION_ANSWER,new Object[]{sessionId,questionUid});
+		return (List<SurveyAnswer>) getHibernateTemplate().find(GET_SESSION_ANSWER,new Object[]{sessionId,questionUid});
 	}
 	
     @SuppressWarnings("unchecked")
     public List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId) {
-	return getHibernateTemplate().find(GET_BY_TOOL_CONTENT_ID_AND_USER_ID, new Object[] { toolContentId, userId });
+	return (List<SurveyAnswer>) getHibernateTemplate().find(GET_BY_TOOL_CONTENT_ID_AND_USER_ID, new Object[] { toolContentId, userId });
     }
 }

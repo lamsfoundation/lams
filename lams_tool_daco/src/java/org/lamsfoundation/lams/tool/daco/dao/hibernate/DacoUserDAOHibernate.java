@@ -55,7 +55,8 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 		return (DacoUser) list.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<DacoUser> getBySessionId(Long sessionId) {
-		return this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+		return (List<DacoUser>) this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 	}
 }

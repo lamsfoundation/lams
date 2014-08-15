@@ -60,12 +60,14 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 	return (ResponseRating) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<ResponseRating> getRatingsByResponse(Long responseId) {
-	return getHibernateTemplate().find(FIND_BY_RESPONSE_ID, responseId);
+	return (List<ResponseRating>) getHibernateTemplate().find(FIND_BY_RESPONSE_ID, responseId);
     }
 
+    @SuppressWarnings("unchecked")
     public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
-	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_RESPONSE, new Object[] { responseId });
+	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_RESPONSE, new Object[] { responseId });
 	Object[] results = list.get(0);
 	
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
@@ -88,6 +90,6 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 
     @SuppressWarnings("unchecked")
     public List<ResponseRating> getRatingsByUser(Long userUid) {
-	return getHibernateTemplate().find(FIND_BY_USER_UID, userUid);
+	return (List<ResponseRating>) getHibernateTemplate().find(FIND_BY_USER_UID, userUid);
     }
 }

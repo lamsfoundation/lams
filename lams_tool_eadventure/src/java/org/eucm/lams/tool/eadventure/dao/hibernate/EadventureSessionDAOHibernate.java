@@ -40,8 +40,9 @@ public class EadventureSessionDAOHibernate extends BaseDAOHibernate implements E
 			return null;
 		return (EadventureSession) list.get(0);
 	}
+	@SuppressWarnings("unchecked")
 	public List<EadventureSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<EadventureSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(EadventureSession session) {
