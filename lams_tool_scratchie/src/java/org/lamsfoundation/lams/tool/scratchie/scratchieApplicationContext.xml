@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="scratchieMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -57,25 +58,25 @@
 	
     <bean id="scratchieManagerTarget" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl">
         <property name="scratchieDao">
-            <ref local="scratchieDao"/>
+            <ref bean="scratchieDao"/>
         </property>
         <property name="scratchieItemDao">
-            <ref local="scratchieItemDao"/>
+            <ref bean="scratchieItemDao"/>
         </property>
         <property name="scratchieAnswerVisitDao">
-            <ref local="scratchieAnswerVisitDao"/>
+            <ref bean="scratchieAnswerVisitDao"/>
         </property>
         <property name="scratchieUserDao">
-            <ref local="scratchieUserDao"/>
+            <ref bean="scratchieUserDao"/>
         </property>
         <property name="scratchieSessionDao">
-            <ref local="scratchieSessionDao"/>
+            <ref bean="scratchieSessionDao"/>
         </property>
         <property name="scratchieConfigItemDao">
-            <ref local="scratchieConfigItemDao"/>
+            <ref bean="scratchieConfigItemDao"/>
         </property>
         <property name="scratchieToolContentHandler">
-            <ref local="scratchieToolContentHandler"/>
+            <ref bean="scratchieToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -102,7 +103,7 @@
     <bean id="scratchieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="scratchieManagerTarget"/>
+            <ref bean="scratchieManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

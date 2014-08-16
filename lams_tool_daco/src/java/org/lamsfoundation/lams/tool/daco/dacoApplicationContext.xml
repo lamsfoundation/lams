@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="dacoMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -52,22 +53,22 @@
 	
     <bean id="dacoManagerTarget" class="org.lamsfoundation.lams.tool.daco.service.DacoServiceImpl">
         <property name="dacoDao">
-            <ref local="dacoDao"/>
+            <ref bean="dacoDao"/>
         </property>
         <property name="dacoQuestionDao">
-            <ref local="dacoQuestionDao"/>
+            <ref bean="dacoQuestionDao"/>
         </property>
         <property name="dacoAnswerDao">
-            <ref local="dacoAnswerDao"/>
+            <ref bean="dacoAnswerDao"/>
         </property>
         <property name="dacoUserDao">
-            <ref local="dacoUserDao"/>
+            <ref bean="dacoUserDao"/>
         </property>
         <property name="dacoSessionDao">
-            <ref local="dacoSessionDao"/>
+            <ref bean="dacoSessionDao"/>
         </property>
         <property name="dacoToolContentHandler">
-            <ref local="dacoToolContentHandler"/>
+            <ref bean="dacoToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -99,7 +100,7 @@
     <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="dacoManagerTarget"/>
+            <ref bean="dacoManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

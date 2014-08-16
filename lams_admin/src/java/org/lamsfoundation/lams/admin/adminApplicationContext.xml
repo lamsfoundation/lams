@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
 	<bean id="adminMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.admin.ApplicationResources</value></property>
 	</bean>
 	<bean id="adminMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource"><ref local="adminMessageSource"/></property>										
+		<property name="messageSource"><ref bean="adminMessageSource"/></property>										
 	</bean>
 	
 	<bean id="importService" class="org.lamsfoundation.lams.admin.service.ImportService">

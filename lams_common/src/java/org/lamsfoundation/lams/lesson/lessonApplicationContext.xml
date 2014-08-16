@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!--
-  - Application context definition for LAMS.
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 	
@@ -34,7 +33,7 @@
 	
 	<bean id="lessonService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="lessonServiceTarget"/></property>
+		<property name="target"><ref bean="lessonServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>

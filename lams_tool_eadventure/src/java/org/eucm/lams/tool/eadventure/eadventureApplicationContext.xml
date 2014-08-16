@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="eadventureMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -72,31 +73,31 @@
 	
     <bean id="eadventureManagerTarget" class="org.eucm.lams.tool.eadventure.service.EadventureServiceImpl">
         <property name="eadventureDao">
-            <ref local="eadventureDao"/>
+            <ref bean="eadventureDao"/>
         </property>
         <property name="eadventureUserDao">
-            <ref local="eadventureUserDao"/>
+            <ref bean="eadventureUserDao"/>
         </property>
         <property name="eadventureSessionDao">
-            <ref local="eadventureSessionDao"/>
+            <ref bean="eadventureSessionDao"/>
         </property>
          <property name="eadventureItemVisitDao">
-            <ref local="eadventureItemVisitDao"/>
+            <ref bean="eadventureItemVisitDao"/>
         </property>
          <property name="eadventureVarsDao">
-            <ref local="eadventureVarsDao"/>
+            <ref bean="eadventureVarsDao"/>
         </property>
         <property name="eadventureParamDao">
-            <ref local="eadventureParamDao"/>
+            <ref bean="eadventureParamDao"/>
         </property>
          <property name="eadventureConditionDao">
-            <ref local="eadventureConditionDao"/>
+            <ref bean="eadventureConditionDao"/>
         </property>
          <property name="eadventureExpressionDao">
-            <ref local="eadventureExpressionDao"/>
+            <ref bean="eadventureExpressionDao"/>
         </property>
         <property name="eadventureToolContentHandler">
-            <ref local="eadventureToolContentHandler"/>
+            <ref bean="eadventureToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -133,7 +134,7 @@
     <bean id="eadventureService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="eadventureManagerTarget"/>
+            <ref bean="eadventureManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

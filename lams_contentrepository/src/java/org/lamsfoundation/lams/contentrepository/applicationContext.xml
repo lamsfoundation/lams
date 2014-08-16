@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
   - Application context definition for content repository application context.
   - Requires lams.jar applicationContent.xml.
  -->
-<beans>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
@@ -20,7 +23,7 @@
 			<ref bean ="transactionManager"/>
 		</property>
 		<property name ="target">
-			<ref local="repositoryTarget"/>
+			<ref bean="repositoryTarget"/>
 		</property>
 		<property name="transactionAttributes">
 			<props>
@@ -47,7 +50,7 @@
 		</property>
 		<property name="preInterceptors">
 			<list>
-				<ref local="checkCredentialTicketBeforeAdvice"/>
+				<ref bean="checkCredentialTicketBeforeAdvice"/>
 			</list>
 		</property>
 	</bean>
@@ -65,8 +68,8 @@
 		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
 	</bean>
 
-	<bean id="node" class="org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode"
-		singleton="false" destroy-method="destroy">
+	<bean id="node" class="org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode" scope="prototype"
+		destroy-method="destroy">
 		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
 		<property name="fileDAO"><ref bean="fileDAO"/></property>
 		<property name="nodeFactory"><ref bean="nodeFactory"/></property>

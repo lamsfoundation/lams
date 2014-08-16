@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="laasseMessageService" class="org.lamsfoundation.lams.util.MessageService">
 		<property name="messageSource">
@@ -59,25 +60,25 @@
 	
     <bean id="laasseAssessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
         <property name="assessmentDao">
-            <ref local="laasseAssessmentDao"/>
+            <ref bean="laasseAssessmentDao"/>
         </property>
         <property name="assessmentQuestionDao">
-            <ref local="laasseAssessmentQuestionDao"/>
+            <ref bean="laasseAssessmentQuestionDao"/>
         </property>
         <property name="assessmentQuestionResultDao">
-            <ref local="laasseAssessmentQuestionResultDao"/>
+            <ref bean="laasseAssessmentQuestionResultDao"/>
         </property>
         <property name="assessmentResultDao">
-            <ref local="laasseAssessmentResultDao"/>
+            <ref bean="laasseAssessmentResultDao"/>
         </property>
         <property name="assessmentUserDao">
-            <ref local="laasseAssessmentUserDao"/>
+            <ref bean="laasseAssessmentUserDao"/>
         </property>
         <property name="assessmentSessionDao">
-            <ref local="laasseAssessmentSessionDao"/>
+            <ref bean="laasseAssessmentSessionDao"/>
         </property>
         <property name="assessmentToolContentHandler">
-            <ref local="laasseAssessmentToolContentHandler"/>
+            <ref bean="laasseAssessmentToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -124,7 +125,7 @@
     <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="laasseAssessmentManagerTarget"/>
+            <ref bean="laasseAssessmentManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

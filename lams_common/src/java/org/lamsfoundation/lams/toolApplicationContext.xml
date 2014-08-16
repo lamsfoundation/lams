@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!--
-  - Application context definition for LAMS.
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="toolContentDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
@@ -26,12 +25,12 @@
 	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
 		
 	>
-		<property name="toolContentDao"><ref local="toolContentDAO"/></property>
+		<property name="toolContentDao"><ref bean="toolContentDAO"/></property>
 	</bean>	
 	
 	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
+		<property name="target"><ref bean="toolContentIDGeneratorTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW</prop>
@@ -39,7 +38,7 @@
 		</property>
 	</bean>
 	
-	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService" singleton="false">
+	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService" scope="prototype">
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
@@ -49,7 +48,7 @@
 	
 	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="lamsCoreToolServiceTarget"/></property>
+		<property name="target"><ref bean="lamsCoreToolServiceTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createToolSession*">PROPAGATION_REQUIRED</prop>

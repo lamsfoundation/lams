@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 	<bean id="forumMessageService" class="org.lamsfoundation.lams.util.MessageService"
 		>
 		<property name="messageSource">
@@ -83,31 +86,31 @@
 
 	<bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
 		<property name="forumDao">
-			<ref local="forumDao" />
+			<ref bean="forumDao" />
 		</property>
 		<property name="forumUserDao">
-			<ref local="forumUserDao" />
+			<ref bean="forumUserDao" />
 		</property>
 		<property name="attachmentDao">
-			<ref local="attachmentDao" />
+			<ref bean="attachmentDao" />
 		</property>
 		<property name="messageDao">
-			<ref local="messageDao" />
+			<ref bean="messageDao" />
 		</property>
 		<property name="messageSeqDao">
-			<ref local="messageSeqDao" />
+			<ref bean="messageSeqDao" />
 		</property>
 		<property name="messageRatingDao">
-			<ref local="messageRatingDao" />
+			<ref bean="messageRatingDao" />
 		</property>	
 		<property name="timestampDao">
-			<ref local="timestampDao" />
+			<ref bean="timestampDao" />
 		</property>
 		<property name="forumToolSessionDao">
-			<ref local="forumToolSessionDao" />
+			<ref bean="forumToolSessionDao" />
 		</property>
 		<property name="forumToolContentHandler">
-			<ref local="forumToolContentHandler" />
+			<ref bean="forumToolContentHandler" />
 		</property>
 		<property name="repositoryService">
 			<ref bean="repositoryService" />
@@ -134,7 +137,7 @@
 			<ref bean="coreNotebookService" />
 		</property>
 		<property name="forumOutputFactory">
-			<ref local="forumOutputFactory" />
+			<ref bean="forumOutputFactory" />
 		</property>
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService" />
@@ -156,7 +159,7 @@
 			<ref bean="transactionManager" />
 		</property>
 		<property name="target">
-			<ref local="forumManagerTarget" />
+			<ref bean="forumManagerTarget" />
 		</property>
 		<property name="proxyTargetClass">
 			<value>false</value>

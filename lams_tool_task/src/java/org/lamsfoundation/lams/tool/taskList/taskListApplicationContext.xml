@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="lataskMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.taskList.ApplicationResources</value></property>
 	</bean>
 	<bean id="lataskMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource"><ref local="lataskMessageSource"/></property>										
+		<property name="messageSource"><ref bean="lataskMessageSource"/></property>										
 	</bean>
 
 	<!-- OutputFactory -->
@@ -59,25 +60,25 @@
 	
     <bean id="lataskTaskListManagerTarget" class="org.lamsfoundation.lams.tool.taskList.service.TaskListServiceImpl">
         <property name="taskListDao">
-            <ref local="lataskTaskListDao"/>
+            <ref bean="lataskTaskListDao"/>
         </property>
         <property name="taskListItemDao">
-            <ref local="lataskTaskListItemDao"/>
+            <ref bean="lataskTaskListItemDao"/>
         </property>
         <property name="taskListItemVisitDao">
-            <ref local="lataskTaskListItemVisitDao"/>
+            <ref bean="lataskTaskListItemVisitDao"/>
         </property>
         <property name="taskListConditionDao">
-            <ref local="lataskTaskListConditionDao"/>
+            <ref bean="lataskTaskListConditionDao"/>
         </property>
         <property name="taskListUserDao">
-            <ref local="lataskTaskListUserDao"/>
+            <ref bean="lataskTaskListUserDao"/>
         </property>
         <property name="taskListSessionDao">
-            <ref local="lataskTaskListSessionDao"/>
+            <ref bean="lataskTaskListSessionDao"/>
         </property>
         <property name="taskListToolContentHandler">
-            <ref local="lataskTaskListToolContentHandler"/>
+            <ref bean="lataskTaskListToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -99,7 +100,7 @@
     <bean id="lataskTaskListService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="lataskTaskListManagerTarget"/>
+            <ref bean="lataskTaskListManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

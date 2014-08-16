@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="lasurvMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.survey.ApplicationResources</value></property>
 	</bean>
 	<bean id="lasurvMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource"><ref local="lasurvMessageSource"/></property>										
+		<property name="messageSource"><ref bean="lasurvMessageSource"/></property>										
 	</bean>
 
     <!-- OutputFactory -->
@@ -52,22 +53,22 @@
 	
     <bean id="lasurvSurveyManagerTarget" class="org.lamsfoundation.lams.tool.survey.service.SurveyServiceImpl">
         <property name="surveyDao">
-            <ref local="lasurvSurveyDao"/>
+            <ref bean="lasurvSurveyDao"/>
         </property>
         <property name="surveyQuestionDao">
-            <ref local="lasurvSurveyQuestionDao"/>
+            <ref bean="lasurvSurveyQuestionDao"/>
         </property>
         <property name="surveyAnswerDao">
-            <ref local="lasurvSurveyAnswerDao"/>
+            <ref bean="lasurvSurveyAnswerDao"/>
         </property>
         <property name="surveyUserDao">
-            <ref local="lasurvSurveyUserDao"/>
+            <ref bean="lasurvSurveyUserDao"/>
         </property>
         <property name="surveySessionDao">
-            <ref local="lasurvSurveySessionDao"/>
+            <ref bean="lasurvSurveySessionDao"/>
         </property>
         <property name="surveyToolContentHandler">
-            <ref local="lasurvSurveyToolContentHandler"/>
+            <ref bean="lasurvSurveyToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -92,7 +93,7 @@
     <bean id="lasurvSurveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="lasurvSurveyManagerTarget"/>
+            <ref bean="lasurvSurveyManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

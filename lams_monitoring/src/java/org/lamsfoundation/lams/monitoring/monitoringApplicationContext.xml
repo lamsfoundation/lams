@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 <!--
   - Application context definition for lams survey business layer.
 	- Contains bean references to the transaction manager and to the DAOs in
 	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
 	-->
-<beans>
 		<bean id="monitoringMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 			<property name="basename">
 				<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
@@ -28,7 +29,7 @@
 		- by an outer transactional proxy. The two bean definitions could have been separate,
 		- but this is cleaner as there is no need to ever access the unwrapped object.
 	-->
-	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService" singleton="false">
+	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService" scope="prototype">
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
@@ -52,7 +53,7 @@
 	
 	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="monitoringServiceTarget"/></property>
+		<property name="target"><ref bean="monitoringServiceTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="initializeLesson*">PROPAGATION_REQUIRED</prop>
@@ -74,28 +75,28 @@
 		</property>
 	</bean>    
 
-    <bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
+    <bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" scope="prototype">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob</value>
         </property>
     </bean>
 
-    <bean id="closeScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
+    <bean id="closeScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean" scope="prototype">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.CloseScheduleGateJob</value>
         </property>
     </bean>
-    <bean id="startScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
+    <bean id="startScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" scope="prototype">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.StartScheduleLessonJob</value>
         </property>
     </bean>
-    <bean id="finishScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
+    <bean id="finishScheduleLessonJob" class="org.springframework.scheduling.quartz.JobDetailBean" scope="prototype">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob</value>
         </property>
     </bean>
-    <bean id="emailScheduleMessageJob" class="org.springframework.scheduling.quartz.JobDetailBean" singleton="false">
+    <bean id="emailScheduleMessageJob" class="org.springframework.scheduling.quartz.JobDetailBean" scope="prototype">
     	<property name="jobClass">
     		<value>org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob</value>
     	</property>

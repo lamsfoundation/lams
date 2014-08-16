@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
-
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
 	<bean id="laimagMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.imageGallery.ApplicationResources</value></property>
 	</bean>
 	<bean id="laimagMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource"><ref local="laimagMessageSource"/></property>										
+		<property name="messageSource"><ref bean="laimagMessageSource"/></property>										
 	</bean>
     
     <!-- OutputFactory -->
@@ -74,34 +75,34 @@
 	
     <bean id="laimagImageGalleryManagerTarget" class="org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceImpl">
         <property name="imageGalleryDao">
-            <ref local="laimagImageGalleryDao"/>
+            <ref bean="laimagImageGalleryDao"/>
         </property>
         <property name="imageGalleryItemDao">
-            <ref local="laimagImageGalleryItemDao"/>
+            <ref bean="laimagImageGalleryItemDao"/>
         </property>
         <property name="imageCommentDao">
-            <ref local="laimagImageCommentDao"/>
+            <ref bean="laimagImageCommentDao"/>
         </property>
         <property name="imageRatingDao">
-            <ref local="laimagImageRatingDao"/>
+            <ref bean="laimagImageRatingDao"/>
         </property>       
         <property name="imageVoteDao">
-            <ref local="laimagImageVoteDao"/>
+            <ref bean="laimagImageVoteDao"/>
         </property>          
         <property name="imageGalleryItemVisitDao">
-            <ref local="laimagImageGalleryItemVisitDao"/>
+            <ref bean="laimagImageGalleryItemVisitDao"/>
         </property>
         <property name="imageGalleryUserDao">
-            <ref local="laimagImageGalleryUserDao"/>
+            <ref bean="laimagImageGalleryUserDao"/>
         </property>
         <property name="imageGallerySessionDao">
-            <ref local="laimagImageGallerySessionDao"/>
+            <ref bean="laimagImageGallerySessionDao"/>
         </property>
         <property name="imageGalleryConfigItemDAO">
-            <ref local="laimagImageGalleryConfigItemDAO"/>
+            <ref bean="laimagImageGalleryConfigItemDAO"/>
         </property>
         <property name="imageGalleryToolContentHandler">
-            <ref local="laimagImageGalleryToolContentHandler"/>
+            <ref bean="laimagImageGalleryToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -130,7 +131,7 @@
     <bean id="laimagImageGalleryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="laimagImageGalleryManagerTarget"/>
+            <ref bean="laimagImageGalleryManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

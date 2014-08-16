@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="spreadsheetMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -52,22 +53,22 @@
 	
     <bean id="spreadsheetManagerTarget" class="org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceImpl">
         <property name="spreadsheetDao">
-            <ref local="spreadsheetDao"/>
+            <ref bean="spreadsheetDao"/>
         </property>
         <property name="userModifiedSpreadsheetDao">
-            <ref local="userModifiedSpreadsheetDao"/>
+            <ref bean="userModifiedSpreadsheetDao"/>
         </property>
         <property name="spreadsheetMarkDao">
-            <ref local="spreadsheetMarkDao"/>
+            <ref bean="spreadsheetMarkDao"/>
         </property>
         <property name="spreadsheetUserDao">
-            <ref local="spreadsheetUserDao"/>
+            <ref bean="spreadsheetUserDao"/>
         </property>
         <property name="spreadsheetSessionDao">
-            <ref local="spreadsheetSessionDao"/>
+            <ref bean="spreadsheetSessionDao"/>
         </property>
         <property name="spreadsheetToolContentHandler">
-            <ref local="spreadsheetToolContentHandler"/>
+            <ref bean="spreadsheetToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -88,7 +89,7 @@
     <bean id="spreadsheetService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="spreadsheetManagerTarget"/>
+            <ref bean="spreadsheetManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

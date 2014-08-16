@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="commonCartridgeMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -53,25 +54,25 @@
 	
     <bean id="commonCartridgeManagerTarget" class="org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceImpl">
         <property name="commonCartridgeDao">
-            <ref local="commonCartridgeDao"/>
+            <ref bean="commonCartridgeDao"/>
         </property>
         <property name="commonCartridgeItemDao">
-            <ref local="commonCartridgeItemDao"/>
+            <ref bean="commonCartridgeItemDao"/>
         </property>
         <property name="commonCartridgeItemVisitDao">
-            <ref local="commonCartridgeItemVisitDao"/>
+            <ref bean="commonCartridgeItemVisitDao"/>
         </property>
         <property name="commonCartridgeConfigItemDao">
-            <ref local="commonCartridgeConfigItemDao"/>
+            <ref bean="commonCartridgeConfigItemDao"/>
         </property>
         <property name="commonCartridgeUserDao">
-            <ref local="commonCartridgeUserDao"/>
+            <ref bean="commonCartridgeUserDao"/>
         </property>
         <property name="commonCartridgeSessionDao">
-            <ref local="commonCartridgeSessionDao"/>
+            <ref bean="commonCartridgeSessionDao"/>
         </property>
         <property name="commonCartridgeToolContentHandler">
-            <ref local="commonCartridgeToolContentHandler"/>
+            <ref bean="commonCartridgeToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -105,7 +106,7 @@
     <bean id="commonCartridgeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="commonCartridgeManagerTarget"/>
+            <ref bean="commonCartridgeManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

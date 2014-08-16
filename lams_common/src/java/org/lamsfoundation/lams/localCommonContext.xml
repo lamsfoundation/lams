@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!--
-  - Application context definition for LAMS. Used to deploy to JBOSS.
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 	  	<property name="properties">
@@ -148,7 +147,7 @@
 
 	<!-- LAMS primary business object: Hibernate implementation -->
 	<bean id="userManagementServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.UserManagementService"
-		singleton="false"
+		scope="prototype"
 	>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
@@ -161,7 +160,7 @@
 	<!-- Transactional proxy for the user management primary business object -->
 	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="userManagementServiceTarget"/></property>
+		<property name="target"><ref bean="userManagementServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
@@ -190,7 +189,7 @@
 	
 	<bean id="learningDesignService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="learningDesignServiceTarget"/></property>
+		<property name="target"><ref bean="learningDesignServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
@@ -201,8 +200,8 @@
 	</bean>
 	
 	<bean id="themeServiceTarget" class="org.lamsfoundation.lams.themes.service.ThemeService">
-		<property name="themeDAO"><ref local="themeDAO"/></property>
-		<property name="userManagementService"><ref local="userManagementService"/></property>
+		<property name="themeDAO"><ref bean="themeDAO"/></property>
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>
 	
@@ -253,7 +252,7 @@
 	</bean>
 	
     <!--  Processes a LAMS 1.0.2 import file. Called by exportToolContentService -->
-	<bean id="ld102Importer" class="org.lamsfoundation.lams.learningdesign.service.LD102Importer" singleton="false">
+	<bean id="ld102Importer" class="org.lamsfoundation.lams.learningdesign.service.LD102Importer" scope="prototype">
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
@@ -273,13 +272,13 @@
     </bean>
     	
     <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
-	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" singleton="false">
+	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" scope="prototype">
 	</bean>
 			
 	<!--  Core Notebook Service -->
 	<bean id="coreNotebookServiceTarget" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService">
 		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="userManagementService"><ref local="userManagementService"/></property>
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
 	</bean>
 	
@@ -360,96 +359,96 @@
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="branchActivityEntryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.BranchActivityEntryDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="learningLibraryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	<bean id="transitionDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="licenseDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
 	<!--User management related beans -->
 	
 	<bean id="baseDAO" class="org.lamsfoundation.lams.dao.hibernate.BaseDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<!--  Theme beans -->
 	<bean id="themeDAO" class="org.lamsfoundation.lams.themes.dao.hibernate.CSSThemeDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--Event service related beans -->
 	<bean id="eventDAO" class="org.lamsfoundation.lams.events.dao.hibernate.EventDAOHibernate">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
 	<!-- Presence Chat related beans -->
 	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="registrationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  Competence related beans -->
 	<bean id="competenceDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<bean id="competenceMappingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  Pedagogical Planner related beans -->
 	<bean id="pedagogicalPlannerDAO" class="org.lamsfoundation.lams.planner.dao.hibernate.PedagogicalPlannerDAOHibernate">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  Gradebook related beans -->
 	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  Data flow related beans -->
 	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  System Session bean -->
@@ -457,7 +456,7 @@
 	    class="org.lamsfoundation.lams.web.session.SessionManager"
 	    init-method="init"
 	    destroy-method="destroy"
-		singleton="true">
+		>
 		<property name="monitorPeriod"><value>60</value></property>
 	</bean>
 	

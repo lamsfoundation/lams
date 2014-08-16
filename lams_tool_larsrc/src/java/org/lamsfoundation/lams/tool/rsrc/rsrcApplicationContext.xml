@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="resourceMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
@@ -52,22 +53,22 @@
 	
     <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceImpl">
         <property name="resourceDao">
-            <ref local="resourceDao"/>
+            <ref bean="resourceDao"/>
         </property>
         <property name="resourceItemDao">
-            <ref local="resourceItemDao"/>
+            <ref bean="resourceItemDao"/>
         </property>
         <property name="resourceItemVisitDao">
-            <ref local="resourceItemVisitDao"/>
+            <ref bean="resourceItemVisitDao"/>
         </property>
         <property name="resourceUserDao">
-            <ref local="resourceUserDao"/>
+            <ref bean="resourceUserDao"/>
         </property>
         <property name="resourceSessionDao">
-            <ref local="resourceSessionDao"/>
+            <ref bean="resourceSessionDao"/>
         </property>
         <property name="resourceToolContentHandler">
-            <ref local="resourceToolContentHandler"/>
+            <ref bean="resourceToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -98,7 +99,7 @@
     <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="resourceManagerTarget"/>
+            <ref bean="resourceManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>

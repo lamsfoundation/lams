@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!--
-  - Application context definition for lams survey business layer.
-	- Contains bean references to the transaction manager and to the DAOs in
-	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
-	-->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 <!-- ========================= GENERAL DEFINITIONS ========================= -->
 
@@ -15,7 +12,7 @@
 		<property name="basename"><value>org.lamsfoundation.lams.tool.vote.ApplicationResources</value></property>
 	</bean>
 	<bean id="lavoteMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource"><ref local="lavoteMessageSource"/></property>										
+		<property name="messageSource"><ref bean="lavoteMessageSource"/></property>										
 	</bean>
 	
 
