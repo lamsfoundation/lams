@@ -30,6 +30,7 @@
     <resource-root path="spring-context-4.0.6.RELEASE.jar"/>
     <resource-root path="spring-context-support-4.0.6.RELEASE.jar"/>
     <resource-root path="spring-expression-4.0.6.RELEASE.jar"/>
+    <resource-root path="spring-jdbc-4.0.6.RELEASE.jar"/>
     <resource-root path="spring-orm-4.0.6.RELEASE.jar"/>
     <resource-root path="spring-tx-4.0.6.RELEASE.jar"/>
     <resource-root path="spring-web-4.0.6.RELEASE.jar"/>
@@ -40,12 +41,16 @@
     <system>
   		<paths>
   			<path name="org/xml/sax"/>
-  			<path name="javax/xml/parsers"/>
   			<path name="org/w3c/dom"/>
+  			<path name="javax/xml/parsers"/>
+  			<path name="javax/naming"/>
   		</paths>
   	</system>
   	<module name="javax.servlet.api" />
+  	<module name="javaee.api" />
   	<module name="org.apache.commons.logging" />
   	<module name="org.hibernate" />
+  	<module name="org.jboss.vfs" />
+  	<module name="org.quartz" />
   </dependencies>
 </module>

@@ -60,6 +60,7 @@ spring            spring-core-4.0.6.RELEASE.jar			4.0.6				   Apache License 2.0
 				  spring-context-4.0.6.RELEASE.jar
 				  spring-context-support-4.0.6.RELEASE.jar
 				  spring-expression-4.0.6.RELEASE.jar
+				  spring-jdbc-4.0.6.RELEASE.jar
 				  spring-orm-4.0.6.RELEASE.jar
 				  spring-tx-4.0.6.RELEASE.jar
 				  spring-web-4.0.6.RELEASE.jar
