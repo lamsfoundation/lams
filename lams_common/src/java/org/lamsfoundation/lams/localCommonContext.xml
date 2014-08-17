@@ -25,7 +25,7 @@
 		  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	
 	  	  But remember all application servers do not have the same JNDI name for their transaction manager!
 	 -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
@@ -46,7 +46,7 @@
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
  		 rather than several local Session Factiories.
  	-->
-	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="localDataSource"/></property>
 		<property name="mappingLocations">
 			<list>

@@ -52,7 +52,7 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter
 	 * @param sessionFactory the SessionFactory that this filter uses
 	 * @return the Session to use
 	 * @throws DataAccessResourceFailureException if the Session could not be created
-	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession(SessionFactory, boolean)
+	 * @see org.springframework.orm.hibernate4.SessionFactoryUtils#getSession(SessionFactory, boolean)
 	 * @see org.hibernate.FlushMode#NEVER
 	 */
 	protected Session openSession(SessionFactory sessionFactory) throws DataAccessResourceFailureException {

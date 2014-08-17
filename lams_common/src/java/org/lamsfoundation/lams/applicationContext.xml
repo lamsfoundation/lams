@@ -52,7 +52,7 @@
 		  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	
 	  	  But remember all application servers do not have the same JNDI name for their transaction manager!
 	 -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 

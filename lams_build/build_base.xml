@@ -227,7 +227,7 @@
 		<echo>${ant.project.name}: Building Hibernate XML files using XDoclet</echo>
 		<hibernatedoclet destdir="${basedir}/build/classes/java" excludedtags="@version,@author,@todo" force="true">
 			<fileset refid="hbm.fileset" />
-			<hibernate version="3.0" />
+			<hibernate version="3.0" templateFile="../lams_build/conf/xdoclet-hibernate-template.xml" />
 		</hibernatedoclet>
 		
 		<!-- Copy remaining HBM non-generated files from conf directory -->
