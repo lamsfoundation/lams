@@ -540,30 +540,6 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/hibernate/cache/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jboss">
-				<include name="hibernate-jbosscache*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/hibernate/cache/main/module.xml"
-			  file="lib/jboss/hibernate-jbosscache.module.xml" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/jboss/cache/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jboss">
-				<include name="jbosscache-core.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/jboss/cache/main/module.xml"
-			  file="lib/jboss/jbosscache-core.module.xml" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/jgroups/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jboss">
-				<include name="jgroups-all.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/jgroups/main/module.xml"
-			  file="lib/jboss/jgroups.module.xml" overwrite="true" verbose="true" />
-		
 		<copy todir="${server.home}/modules/system/layers/base/org/jboss/jbossweb/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jboss">
 				<include name="jbossweb.jar" />

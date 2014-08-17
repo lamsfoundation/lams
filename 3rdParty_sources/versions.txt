@@ -23,13 +23,7 @@ Hibernate Core 3.6.10
 
 httpunit 1.7
 
-jbosscache 3.1.0.CR1
-
 JBoss Web 2.1.3
-
-Jexcelapi 2.6
-
-jgroups 2.6.10
 
 JSP API 2.3
 

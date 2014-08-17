@@ -10,6 +10,7 @@
   	<!-- If you change hibernate.treecache.objectName, you will also need to change the -->
   	<!--  cacheManager object 															-->
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+  	
 	  	<property name="properties">
 		<props>
 			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
@@ -18,10 +19,14 @@
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 			<prop key="hibernate.c3p0.timeout">1800</prop>
 			<prop key="hibernate.c3p0.max_statement">50</prop>
+			<prop key="hibernate.cache.region.factory_class">org.jboss.as.jpa.hibernate4.infinispan.InfinispanRegionFactory</prop>
+			<prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
 			<prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
-			<prop key="hibernate.cache.use_second_level_cache">true</prop>
+			<prop key="hibernate.cache.use_second_level_cache">false</prop>
+			
+			<!--
 			<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jbc2.SharedJBossCacheRegionFactory</prop>
-			<!-- For JBoss Cache 2 and 3, and for Hibernate 3 there is a different idea of accessing Cache,
+			 For JBoss Cache 2 and 3, and for Hibernate 3 there is a different idea of accessing Cache,
 				called Region Factory Class. Currently, Hibernate gets the Cache configuration from "treecache.xml" file
 				located in LAMS EAR and creates a local instance for its own use.
 				In the future, this may be changed to a JNDI exposed instance, for lams_admin to access.

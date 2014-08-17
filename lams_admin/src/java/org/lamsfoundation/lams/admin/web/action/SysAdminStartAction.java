@@ -57,8 +57,6 @@ public class SysAdminStartAction extends Action {
 		
 		ArrayList<LinkBean> links = new ArrayList<LinkBean>();
 		if (request.isUserInRole(Role.SYSADMIN)) {
-			LinkBean linkBean = new LinkBean("cache.do", "cache.title");
-			links.add(linkBean);
 			links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
 			links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
 			links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));

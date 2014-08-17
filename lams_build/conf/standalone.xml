@@ -113,6 +113,31 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
+            
+            <logger category="org.hibernate.persister.walking">
+				<level name="INFO" />
+			</logger>
+			<logger category="org.hibernate.internal.util.xml">
+				<level name="INFO" />
+			</logger>
+			<logger category="org.hibernate.loader.plan">
+				<level name="INFO" />
+			</logger>
+			
+            <!-- 
+            <logger category="org.jboss.jdbc">
+        		<level name="TRACE" />
+     		</logger>
+    		<logger category="org.hibernate.SQL">
+	        	<level name="TRACE" />
+	     	</logger>
+			<logger category="org.hibernate">
+				<level name="TRACE" />
+			</logger>
+			<logger category="org.infinispan">
+				<level name="TRACE" />
+			</logger>
+     		 -->
             <root-logger>
                 <level name="DEBUG"/>
                 <handlers>
@@ -138,7 +163,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds">
+                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="true">
 				    <connection-url>@db.url.run@</connection-url>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
