@@ -1,32 +1,32 @@
-CKEDITOR.plugins.add('WikiLink',
+CKEDITOR.plugins.add('wikilink',
        {
           requires : ['iframedialog'],
 		  lang : [ 'en' ],
           init : function(editor) {
-             var pluginPath = CKEDITOR.plugins.getPath('WikiLink');
+             var pluginPath = CKEDITOR.plugins.getPath('wikilink');
              
              editor.ui.addButton(
-                'WikiLink',
+                'wikilink',
                 {
-                   label   : "WikiLink",
-                   command : 'WikiLink',
+                   label   : "wikilink",
+                   command : 'wikilink',
                    icon    : pluginPath + 'wikilink.gif',
                    title   : editor.lang.wikilink.WikiLinkToolTip
                 }
              );
              
              editor.addCommand(
-            	'WikiLink', 
+            	'wikilink', 
             	{
             	   exec : function(editor){
-            	   			editor.openDialog('WikiLink');
+            	   			editor.openDialog('wikilink');
              			  }
             	}
              );
              
              CKEDITOR.dialog.addIframe(
-                'WikiLink',
-                'WikiLink',
+                'wikilink',
+                'wikilink',
                 pluginPath + 'wikilink.jsp',
                 280,
                 230,
