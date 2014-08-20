@@ -69,6 +69,7 @@ CKEDITOR.config.extraPlugins = 'kaltura,wikilink,equation,paint,movieplayer,skyp
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
+CKEDITOR.config.toolbarCanCollapse = true;
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
