@@ -148,6 +148,7 @@
 		  </c:otherwise>
 		</c:choose> 
 	</html:form>
+	</div>
 	
 </div>
 
