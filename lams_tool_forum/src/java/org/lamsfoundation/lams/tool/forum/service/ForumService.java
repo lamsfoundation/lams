@@ -751,6 +751,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		Message msg = (Message) iter.next();
 		// set this message forum Uid as toContent
 		if (!msg.getIsAuthored() || msg.getToolSession() != null) {
+		    iter.remove();
 		    continue;
 		}
 		msg.setReplyNumber(0);
