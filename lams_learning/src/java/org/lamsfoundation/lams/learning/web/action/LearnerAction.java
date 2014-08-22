@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -78,8 +77,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/learner" parameter="method" validate="false"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
- * @struts:action-forward name="displayProgress" path="/progress.jsp" ----------------XDoclet Tags--------------------
- * 
+ * @struts:action-forward name="displayProgress" path="/progress.jsp"
+ * @struts:action-forward name="message" path=".message"
  */
 public class LearnerAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -155,6 +154,21 @@ public class LearnerAction extends LamsDispatchAction {
 	    // get user and lesson based on request.
 	    learner = LearningWebUtil.getUserId();
 	    long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+	    // security check
+	    Lesson lesson = learnerService.getLesson(lessonID);
+	    User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(
+		    User.class, learner);
+	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
+		request.setAttribute("messageKey", "User " + user.getLogin()
+			+ " is not a learner in the requested lesson.");
+		return mapping.findForward("message");
+	    }
+	    // check lesson's state if its suitable for learner's access
+	    if (!lesson.isLessonAccessibleForLearner()) {
+		request.setAttribute("messageKey", "Lesson is inaccessible");
+		return mapping.findForward("message");
+	    }
 
 	    if (LearnerAction.log.isDebugEnabled()) {
 		LearnerAction.log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
