@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -555,7 +556,7 @@ public class AuthoringAction extends Action {
     /**
      * Prepares Scratchie content for QTI packing
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -569,21 +570,22 @@ public class AuthoringAction extends Action {
 	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 	    question.setTitle(item.getTitle());
 	    question.setText(item.getDescription());
+	    
 	    List<Answer> answers = new ArrayList<Answer>();
+	    Set<ScratchieAnswer> scratchieAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    scratchieAnswers.addAll(item.getAnswers());
 
-	    for (ScratchieAnswer itemAnswer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer itemAnswer : scratchieAnswers) {
 		Answer answer = new Answer();
-
 		answer.setText(itemAnswer.getDescription());
 		// there is no LAMS interface to adjust, so use the default 1 point 
 		Float score = itemAnswer.isCorrect() ? 1F : 0;
 		answer.setScore(score);
-		// answer order ID is 0-based, but questions is 1-based...
-		answers.add(itemAnswer.getOrderId(), answer);
+		answers.add(answer);
 	    }
 
 	    question.setAnswers(answers);
-	    questions.add(item.getOrderId() - 1, question);
+	    questions.add(question);
 	}
 
 	String title = request.getParameter("title");
