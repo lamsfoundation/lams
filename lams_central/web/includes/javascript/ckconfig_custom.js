@@ -70,6 +70,7 @@ CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV;
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.toolbarCanCollapse = true;
+CKEDITOR.config.autoGrow_minHeight = 100;
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
