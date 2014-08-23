@@ -20,6 +20,16 @@
                 document.QaAuthoringForm.submit();
             }
             
+			$(function() {
+				//change size of an iframe on ckeditor's autogrow 
+				CKEDITOR.instances.newQuestion.on("instanceReady", function(e) {
+				    e.editor.on('resize',function(reEvent){
+				    	var iframe = window.parent.document.getElementById("messageArea");
+				    	iframe.style.height=eval(iframe.contentWindow.document.body.scrollHeight)+'px';
+				    });
+				});
+			});
+            
             <c:choose>
                 <c:when test="${wizardEnabled == true}">
 
@@ -176,7 +186,7 @@
 
             <lams:CKEditor id="newQuestion"
                 value="${qaGeneralAuthoringDTO.editableQuestionText}"
-                contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
+                contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}" width="99%"></lams:CKEditor>
                 
             <div class="field-name space-top">
 				<html:checkbox property="required" value="1" styleId="required"
