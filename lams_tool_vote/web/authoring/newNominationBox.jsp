@@ -1,11 +1,22 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
+		
+		<script type="text/javascript">			
+			$(function() {
+				//change size of an iframe on ckeditor's autogrow 
+				CKEDITOR.instances.newNomination.on("instanceReady", function(e) {
+				    e.editor.on('resize', function(reEvent){
+				    	var iframe = window.parent.document.getElementById("messageArea");
+				    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
+				    });
+				});
+			});
+		</script>
 	</lams:head>
 
 	<body>

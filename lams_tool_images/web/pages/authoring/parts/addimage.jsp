@@ -13,6 +13,20 @@
 	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeImageFile.do'/>";
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+		<script type="text/javascript">	
+			$.noConflict();
+			jQuery(function() {
+				//change size of an iframe on ckeditor's autogrow 
+				CKEDITOR.instances.description.on("instanceReady", function(e) {
+				    e.editor.on('resize',function(reEvent){
+				    	var iframe = window.parent.document.getElementById("reourceInputArea");
+				    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
+				    });
+				});
+			});
+		</script>
+		
 	</lams:head>
 	<body>
 
@@ -46,8 +60,7 @@
 			<div class="field-name space-top">
 				<fmt:message key="label.authoring.basic.resource.file.input" />
 			</div>
-			<c:set var="itemAttachment"
-				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<div id="itemAttachmentArea">
 				<%@ include file="/pages/authoring/parts/imagefile.jsp"%>
 			</div>

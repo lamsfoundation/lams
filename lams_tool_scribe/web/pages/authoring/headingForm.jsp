@@ -1,6 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
 <script type="text/javascript"> 
+	$(function() {
+		//change size of an iframe on ckeditor's autogrow 
+		CKEDITOR.instances.heading.on("instanceReady", function(e) {
+		    e.editor.on('resize', function(reEvent){
+		    	var iframe = window.parent.document.getElementById("iframeArea");
+		    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
+		    });
+		});
+	});
+
 	function callHideMessage() {
 		if (window.parent && window.parent.hideMessage) {
 			window.parent.hideMessage();

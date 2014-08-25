@@ -133,6 +133,7 @@
 		</td>
 	</tr>
 </table>
+
 <!-- Topics List Row -->
 <div id="messageListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
@@ -143,7 +144,8 @@
 	<a
 		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
 		class="button-add-item"> <fmt:message
-			key="label.authoring.create.new.topic" /> </a>
+			key="label.authoring.create.new.topic" /> 
+	</a>
 </p>
 
 <p>
@@ -154,5 +156,3 @@
 		scrolling="no">
 	</iframe>
 </p>
-
-
