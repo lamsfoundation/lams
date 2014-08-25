@@ -96,6 +96,8 @@ function fillGroup(users, container) {
 	var createOnServer = lessonMode && !skipAssigningWhenCreatingGroup
 									&& container.attr('id') != 'unassignedUserCell';
 	if (users) {
+		var userDivs = [],
+			userIds = [];
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
 			var userDiv = $('<div />').attr('userId', userJSON.id)
@@ -103,6 +105,9 @@ function fillGroup(users, container) {
 	    		.text(userJSON.firstName + ' ' + userJSON.lastName 
 	    				  + ' (' + userJSON.login + ')'
 	    			   );
+			// for later use
+			userDivs.push(userDiv);
+			userIds.push(userJSON.id);
 			
 			// if teacher can not edit, then no drag&drop is available
 			if (canEdit) {
@@ -162,18 +167,20 @@ function fillGroup(users, container) {
 					});
 			}
 			
-			if (createOnServer) {
-				// copy course groups as lesson groups, creating new instances
-				if (assignUsersToGroup([userJSON.id], container)) {
-					$('.userContainer', container).append(userDiv);
-				} else {
-					// if it fails, put them in unassigned list
-					$('#unassignedUserCell .userContainer').append(userDiv);
-				}
-			} else {
+			if (!createOnServer) {
 				$('.userContainer', container).append(userDiv);
 			}
 		});
+		
+		if (createOnServer) {
+			// copy course groups as lesson groups, creating new instances
+			if (assignUsersToGroup(userIds, container)) {
+				$('.userContainer', container).append(userDivs);
+			} else {
+				// if it fails, put them in unassigned list
+				$('#unassignedUserCell .userContainer').append(userDivs);
+			}
+		}
 		
 		sortUsers(container);
 	} else if (createOnServer) {
