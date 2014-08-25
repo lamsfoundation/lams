@@ -62,6 +62,7 @@
 		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
+				autoGrow_minHeight            : "${height}".replace("px", ""),
 				toolbar                       : "${toolbarSet}",
 				language                      : "${language}",
 				defaultLangugage              : "en",

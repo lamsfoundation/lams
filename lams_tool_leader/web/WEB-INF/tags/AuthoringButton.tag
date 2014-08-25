@@ -106,7 +106,7 @@
 			doAjaxCall(clearSessionUrl);
 		} else {
 			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
-				window.location.href = notifyCloseURL;
+				window.location.href = notifyCloseURL + '&action=' + nextAction;
 			} else if (window.parent.opener == null){
 				doAjaxCall(notifyCloseURL);
 			} else {

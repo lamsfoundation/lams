@@ -1,5 +1,6 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
@@ -29,8 +30,10 @@
 <c:if test="${empty height}">
 	<c:set var="height" value="100px" />
 </c:if>
+<c:set var="fixedValue" value="${fn:replace(value,'&lt','&amp;lt')}"/>
+<c:set var="fixedValue" value="${fn:replace(fixedValue,'&gt','&amp;gt')}"/>
 
-<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${value}</textarea>
+<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${fixedValue}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">
 	<c:set scope="request" var="ckEditorBasePath"><lams:LAMSURL/>ckeditor/</c:set>
@@ -59,6 +62,7 @@
 		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
+				autoGrow_minHeight            : "${height}".replace("px", ""),
 				toolbar                       : "${toolbarSet}",
 				language                      : "${language}",
 				defaultLangugage              : "en",
