@@ -1192,6 +1192,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 	    // force complete operates on previous activity, not target
 	    stopPreviousActivity = stopActivity.getTransitionTo().getFromActivity();
+	    // de-proxy the activity
+	    stopPreviousActivity = getActivityById(stopPreviousActivity.getActivityId());
 	}
 	String stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity,
 		stopPreviousActivity, new ArrayList<Long>());
