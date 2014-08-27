@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -102,7 +103,10 @@ public interface IQaService {
     void updateUser(QaQueUsr qaQueUsr);
 
     QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId);
+    
+    List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
 
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId);
     /**
      * Creates or updates response with answer submitted by user.
      * 

@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
@@ -260,12 +261,24 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return user;
     }
 
+    @Override
     public QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) {
 	return qaQueUsrDAO.getQaUserBySession(queUsrId, qaSessionId);
     }
 
+    @Override
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId) {
 	return qaUsrRespDAO.getResponseByUserAndQuestion(queUsrId, qaQueContentId);
+    }
+    
+    @Override
+    public List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId) {
+	return qaUsrRespDAO.getResponseBySessionAndQuestion(qaSessionId, questionId);
+    }
+    
+    @Override
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId) {
+	return qaResponseRatingDAO.getAverageRatingDTOByResponseAndQuestionAndSession(questionUid, qaSessionId);
     }
 
     public void updateUserResponse(QaUsrResp resp) {
@@ -273,6 +286,32 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(toolUser.getUserID().longValue());
+	QaQueUsr user = getUserByIdAndSession(userId, new Long(toolSessionID));
+
+	QaSession session = getSessionById(new Long(toolSessionID));
+	QaContent qaContent = session.getQaContent();
+
+	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder), qaContent.getUid());
+
+	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+	// if response doesn't exist
+	if (response == null) {
+	    response = new QaUsrResp(newAnswer, new Date(System.currentTimeMillis()), "", question, user, true);
+	    createUserResponse(response);
+
+	    // if answer has changed
+	} else if (!newAnswer.equals(response.getAnswer())) {
+	    response.setAnswer(newAnswer);
+	    response.setAttemptTime(new Date(System.currentTimeMillis()));
+	    response.setTimezone("");
+	    updateUserResponse(response);
+	}
+    }
+    
+    public void getResponses(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());

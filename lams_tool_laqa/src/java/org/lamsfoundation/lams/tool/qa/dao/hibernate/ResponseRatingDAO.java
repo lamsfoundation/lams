@@ -24,8 +24,10 @@
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
@@ -49,6 +51,9 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     
     private static final String FIND_AVERAGE_RATING_BY_RESPONSE = "SELECT AVG(r.rating), COUNT(*) from "
 	    + ResponseRating.class.getName() + " as r where r.response.responseId=?";
+    
+    private static final String FIND_AVERAGE_RATING_BY_RESPONSE_QUESTION_SESSION = "SELECT r.response.responseId, AVG(r.rating), COUNT(*) from "
+	    + ResponseRating.class.getName() + " as r where r.response.qaQuestion.uid=? and r.response.qaQueUser.qaSession.qaSessionId=? group by r.response.responseId";
     
     private static final String FIND_BY_USER_UID = "from " + ResponseRating.class.getName()
 	    + " as r where r.user.uid = ?";
@@ -75,6 +80,32 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 	
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
 	return new AverageRatingDTO(averageRating, numberOfVotes);
+    }
+    
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId) {
+	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_RESPONSE_QUESTION_SESSION, new Object[] { questionUid, qaSessionId });
+	
+	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = new HashMap<Long, AverageRatingDTO>();
+	for (Object[] results : list) {
+	    if (results[0] == null) {
+		return null;
+	    }
+	    
+	    Long responseId = (Long) results[0];
+
+	    Object averageRatingObj = results[1];
+	    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	    numberFormat.setMaximumFractionDigits(1);
+	    String averageRating = numberFormat.format(averageRatingObj);
+
+	    String numberOfVotes = String.valueOf(results[2]);
+
+	    mapResponseIdToAverageRating.put(responseId, new AverageRatingDTO(averageRating, numberOfVotes));
+
+	}
+
+	return mapResponseIdToAverageRating;
+
     }
 
     public void saveObject(Object o) {

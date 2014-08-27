@@ -38,10 +38,12 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
 
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId and qaUsrResp.qaQuestion.uid=:questionId";
+
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
-    
-    private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from "
-	    + QaUsrResp.class.getName() + " as r where r.qaQuestion.qaContent.qaContentId=?";
+
+    private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from " + QaUsrResp.class.getName()
+	    + " as r where r.qaQuestion.qaContent.qaContentId=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
@@ -65,6 +67,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	this.getHibernateTemplate().delete(resp);
     }
 
+    @Override
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId) {
 	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("questionId", questionId.longValue()).list();
@@ -74,16 +77,22 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    return (QaUsrResp) list.get(list.size() - 1);
 	}
     }
-    
+
+    @Override
+    public List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId) {
+	return getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION)
+		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).list();
+    }
+
     @Override
     public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
 	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER).setLong("userUid", userUid.longValue())
 		.list();
 	return list;
     }
-    
+
     public int getCountResponsesByQaContent(final Long qaContentId) {
-	    
+
 	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
 	if (list == null || list.size() == 0) {
 	    return 0;

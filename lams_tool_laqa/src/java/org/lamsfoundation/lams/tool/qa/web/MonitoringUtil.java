@@ -72,30 +72,34 @@ public class MonitoringUtil implements QaAppConstants {
 	    String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId, String userId) {
 	List<Map<String, QaMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, QaMonitoredUserDTO>>();
 
-	QaSession session = qaService.getSessionById(new Long(sessionId).longValue());
+	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = qaService.getAverageRatingDTOByResponseAndQuestionAndSession(new Long(questionUid), new Long(sessionId));
 
-	List<QaQueUsr> listUsers = new LinkedList<QaQueUsr>();
+	List<QaUsrResp> responses = new ArrayList<QaUsrResp>();
 	if (!isLearnerRequest) {
 	    /* request is for monitoring summary */
 
 	    if (qaContent.isUseSelectLeaderToolOuput()) {
+		QaSession session = qaService.getSessionById(new Long(sessionId).longValue());
 		QaQueUsr groupLeader = session.getGroupLeader();
 		if (groupLeader != null) {
-		    listUsers.add(groupLeader);
+		    QaUsrResp response = qaService.getResponseByUserAndQuestion(groupLeader.getQueUsrId(), new Long(questionUid));
+		    if (response != null) {
+			responses.add(response);			
+		    }
 		}
+		
 	    } else {
-		listUsers = qaService.getUserBySessionOnly(session);
+		responses = qaService.getResponseBySessionAndQuestion(new Long(sessionId), new Long(questionUid));
 	    }
+	    
 	} else {
-
 	    if (qaContent.isShowOtherAnswers()) {
-		listUsers = qaService.getUserBySessionOnly(session);
+		responses = qaService.getResponseBySessionAndQuestion(new Long(sessionId), new Long(questionUid));
+		
 	    } else {
-		listUsers = new ArrayList<QaQueUsr>();
-		QaQueUsr currentUser = qaService.getUserByIdAndSession(new Long(userId).longValue(),
-			session.getQaSessionId());
-		if (currentUser != null) {
-		    listUsers.add(currentUser);
+		QaUsrResp response = qaService.getResponseByUserAndQuestion(new Long(userId), new Long(questionUid));
+		if (response != null) {
+		    responses.add(response);
 		}
 	    }
 	}
@@ -106,8 +110,8 @@ public class MonitoringUtil implements QaAppConstants {
 	 * user.
 	 */
 	List<QaMonitoredUserDTO> qaMonitoredUserDTOs = new LinkedList<QaMonitoredUserDTO>();
-	for (QaQueUsr user : (List<QaQueUsr>) listUsers) {
-	    QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), new Long(questionUid));
+	for (QaUsrResp response : responses) {
+	    QaQueUsr user = response.getQaQueUser();
 	    if (response != null) {
 		QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
 		qaMonitoredUserDTO.setAttemptTime(response.getAttemptTime());
@@ -134,9 +138,17 @@ public class MonitoringUtil implements QaAppConstants {
 
 		// set averageRating
 		if (qaContent.isAllowRateAnswers()) {
-		    AverageRatingDTO averageRating = qaService.getAverageRatingDTOByResponse(response.getResponseId());
-		    qaMonitoredUserDTO.setAverageRating(averageRating.getRating());
-		    qaMonitoredUserDTO.setNumberOfVotes(averageRating.getNumberOfVotes());
+		    
+		    AverageRatingDTO averageRating = mapResponseIdToAverageRating.get(response.getResponseId());
+//		    AverageRatingDTO averageRating = qaService.getAverageRatingDTOByResponse(response.getResponseId());
+		    if (averageRating == null) {
+			qaMonitoredUserDTO.setAverageRating("0");
+			qaMonitoredUserDTO.setNumberOfVotes("0");
+		    } else {
+			qaMonitoredUserDTO.setAverageRating(averageRating.getRating());
+			qaMonitoredUserDTO.setNumberOfVotes(averageRating.getNumberOfVotes());
+		    }
+
 		}
 
 		qaMonitoredUserDTOs.add(qaMonitoredUserDTO);
