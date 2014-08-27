@@ -433,6 +433,7 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
      *      java.lang.String)
      */
+    @SuppressWarnings("unchecked")
     public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
 	    boolean getUser) {
 	Vector users = null;
@@ -444,30 +445,21 @@ public class UserManagementService implements IUserManagementService {
 	    users = new Vector<UserDTO>();
 	}
 
-	Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationID);
-	if (organisation != null) {
-	    Set uos = organisation.getUserOrganisations();
-	    if (uos != null) {
-		Iterator iterator = uos.iterator();
-		while (iterator.hasNext()) {
-		    UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
-		    Iterator userOrganisationRoleIterator = userOrganisation.getUserOrganisationRoles().iterator();
-		    while (userOrganisationRoleIterator.hasNext()) {
-			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator
-				.next();
-			if (userOrganisationRole.getRole().getName().equals(roleName)) {
-			    if (isFlashCall && !getUser) {
-				users.add(userOrganisation.getUser().getUserFlashDTO());
-			    } else if (getUser) {
-				users.add(userOrganisation.getUser());
-			    } else {
-				users.add(userOrganisation.getUser().getUserDTO());
-			    }
-			}
-		    }
-		}
+	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
+	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
+		+ organisationID + " AND r.role.name= '" + roleName + "'";
+	List<User> queryResult = (List<User>) baseDAO.find(query);
+	
+	for (User user : queryResult) {
+	    if (isFlashCall && !getUser) {
+		users.add(user.getUserFlashDTO());
+	    } else if (getUser) {
+		users.add(user);
+	    } else {
+		users.add(user.getUserDTO());
 	    }
 	}
+	
 	return users;
     }
 

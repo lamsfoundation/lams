@@ -74,7 +74,7 @@
     <!-- bi-directional one-to-many association to User -->
     <set
         name="users"
-        lazy="false"
+        lazy="extra"
         cascade="none"
         table="lams_user_group"
         batch-size="20"

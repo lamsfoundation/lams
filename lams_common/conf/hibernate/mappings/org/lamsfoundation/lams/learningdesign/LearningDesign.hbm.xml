@@ -226,24 +226,24 @@
     </set>
     
     <!-- bi-directional one-to-many association to Transition -->
-    <set name="transitions" lazy="false" inverse="true" cascade="all-delete-orphan" sort="unsorted">
+    <set name="transitions" inverse="true" cascade="all-delete-orphan" sort="unsorted">
     	 <key><column name="learning_design_id" /></key>
     	 <one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"/>
     </set>
     
     <!-- bi-directional one-to-many association to Activity -->
-    <set name="activities" lazy="false" inverse="true" cascade="all-delete-orphan" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator">
+    <set name="activities" inverse="true" cascade="all-delete-orphan" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator">
     	 <key><column name="learning_design_id" /></key>
          <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
     </set>
     
-    <set name="competences" lazy="false" inverse="true" cascade="all-delete-orphan" >
+    <set name="competences" inverse="true" cascade="all-delete-orphan" >
     	 <key><column name="learning_design_id" /></key>
          <one-to-many class="org.lamsfoundation.lams.learningdesign.Competence"/>
     </set>
     
     <!-- bi-directional one-to-many association to Lesson -->
-    <set name="annotations" lazy="true" inverse="true" cascade="all-delete-orphan">        
+    <set name="annotations" inverse="true" cascade="all-delete-orphan">        
         <key><column name="learning_design_id" /></key>
         <one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation"/>
     </set>
