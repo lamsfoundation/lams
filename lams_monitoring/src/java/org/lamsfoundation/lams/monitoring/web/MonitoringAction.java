@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 
+/* $$Id$$ */
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -276,10 +278,11 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getServletContext());
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
+	List<User> allUsers = userManagementService.getUsersFromOrganisation(organisationId);
 	String learnerGroupName = organisation.getName() + " learners";
 	String staffGroupName = organisation.getName() + " staff";
-	List<User> learners = parseUserList(request, "learners");
-	List<User> staff = parseUserList(request, "monitors");
+	List<User> learners = parseUserList(request, "learners", allUsers);
+	List<User> staff = parseUserList(request, "monitors", allUsers);
 
 	monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
 		staffGroupName, staff, userID);
@@ -331,10 +334,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer userId = getUserId();
 	User creator = (User) userManagementService.findById(User.class, userId);
 
-	List<User> learners = parseUserList(request, "learners");
+	List<User> allUsers = userManagementService.getUsersFromOrganisation(organisationId);
+	List<User> learners = parseUserList(request, "learners", allUsers);
 	String learnerGroupName = organisation.getName() + " learners";
 
-	List<User> staff = parseUserList(request, "monitors");
+	List<User> staff = parseUserList(request, "monitors", allUsers);
 	// add the creator as staff, if not already done
 	if (!staff.contains(creator)) {
 	    staff.add(creator);
@@ -665,7 +669,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	Lesson lesson = getLessonService().getLesson(lessonId);
 
 	// monitor user opted for removing lesson progress for following users
-	List<User> removedLearners = parseUserList(request, "removedLearners");
+	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
+		.getServletContext());
+	List<User> allUsers = userManagementService.getUsersFromOrganisation(lesson.getOrganisation()
+		.getOrganisationId());
+	List<User> removedLearners = parseUserList(request, "removedLearners", allUsers);
 	for (User removedLearner : removedLearners) {
 	    getLessonService().removeLearnerProgress(lessonId, removedLearner.getUserId());
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
@@ -674,10 +682,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	List<User> learners = parseUserList(request, "learners");
+	List<User> learners = parseUserList(request, "learners", allUsers);
 	getLessonService().setLearners(lesson, learners);
 
-	List<User> staff = parseUserList(request, "monitors");
+	List<User> staff = parseUserList(request, "monitors", allUsers);
 	getLessonService().setStaffMembers(lesson, staff);
 
 	return null;
@@ -1372,16 +1380,20 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Creates a list of users out of string with comma-delimited user IDs.
      */
-    private List<User> parseUserList(HttpServletRequest request, String paramName) {
+    private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
 	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
 		.getServletContext());
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);
-	for (String userId : userIdArray) {
-	    if (!StringUtils.isBlank(userId)) {
-		User user = (User) userManagementService.findById(User.class, Integer.valueOf(userId));
+	
+	for (User user : users) {
+	    Integer userId = user.getUserId();
+	    for (String includeId : userIdArray) {
+		if (userId.equals(includeId)) {
 		result.add(user);
+		    break;
+		}
 	    }
 	}
 	return result;

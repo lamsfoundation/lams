@@ -383,7 +383,7 @@
 	<!-- bi-directional one-to-many association to LearnerProgress -->
     <set
         name="learnerProgresses"
-        lazy="true"
+        lazy="extra"
         inverse="true"
 		cascade="none"
     >

@@ -226,7 +226,7 @@
 			<column name="parent_organisation_id" />
 		</many-to-one>
 		<!-- bi-directional one-to-many association to Lesson -->
-		<set name="lessons" lazy="true" inverse="true" cascade="none">
+		<set name="lessons" lazy="extra" inverse="true" cascade="none">
 			<meta attribute="field-description">
 				@hibernate.set lazy="true" inverse="true" cascade="none"
 

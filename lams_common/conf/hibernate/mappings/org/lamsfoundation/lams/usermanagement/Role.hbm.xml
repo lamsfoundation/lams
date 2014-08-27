@@ -69,33 +69,6 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to UserOrganisationRole -->
-    <set
-        name="userOrganisationRoles"
-        lazy="true"
-        inverse="true"
-		cascade="delete-orphan"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="delete-orphan"
-
-           @hibernate.collection-key
-            column="role_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
-        </meta>
-        <key>
-            <column name="role_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
-        />
-    </set>
-
     <!-- bi-directional one-to-many association to LamsRolePrivilege -->
     <set
         name="rolePrivileges"
