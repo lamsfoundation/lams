@@ -28,7 +28,14 @@
     <resource-root path="tk-discovery-1.0.0.jar"/>
   </resources>
   <dependencies>
+  	<system>
+  		<paths>
+  			<path name="javax/naming" />
+  			<path name="javax/sql" />
+  		</paths>
+  	</system>
   	<module name="javax.servlet.api" />
     <module name="org.apache.commons.logging" />
+    <module name="org.apache.commons.collections" />
   </dependencies>
 </module>

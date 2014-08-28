@@ -29,5 +29,6 @@
   <dependencies>
   	<module name="javax.servlet.api" />
   	<module name="org.slf4j" />
+    <module name="org.apache.commons.fileupload" />
   </dependencies>
 </module>
