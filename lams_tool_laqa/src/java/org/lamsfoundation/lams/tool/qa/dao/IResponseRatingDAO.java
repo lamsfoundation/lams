@@ -69,5 +69,7 @@ public interface IResponseRatingDAO {
     
     public List<ResponseRating> getRatingsByUser(Long userUid);
     
-    Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId);
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId);
+    
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId);
 }

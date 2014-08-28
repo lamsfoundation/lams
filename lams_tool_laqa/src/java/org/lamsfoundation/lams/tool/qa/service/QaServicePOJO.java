@@ -265,6 +265,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) {
 	return qaQueUsrDAO.getQaUserBySession(queUsrId, qaSessionId);
     }
+    
+    @Override
+    public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
+	return qaUsrRespDAO.getResponsesByUserUid(userUid);
+    }
 
     @Override
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId) {
@@ -277,8 +282,24 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
     
     @Override
-    public Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId) {
-	return qaResponseRatingDAO.getAverageRatingDTOByResponseAndQuestionAndSession(questionUid, qaSessionId);
+    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    int page, int size, int sorting) {
+	return qaUsrRespDAO.getResponsesForTablesorter(qaSessionId, questionId, excludeUserId, page, size, sorting);
+    }    
+    
+    @Override
+    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
+	return qaUsrRespDAO.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId);
+    }
+    
+    @Override
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId) {
+	return qaResponseRatingDAO.getAverageRatingDTOByQuestionAndSession(questionUid, qaSessionId);
+    }
+    
+    @Override
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId) {
+	return qaResponseRatingDAO.getAverageRatingDTOByUserAndContentId(userUid, contentId);
     }
 
     public void updateUserResponse(QaUsrResp resp) {
@@ -286,32 +307,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
-	HttpSession ss = SessionManager.getSession();
-	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = new Long(toolUser.getUserID().longValue());
-	QaQueUsr user = getUserByIdAndSession(userId, new Long(toolSessionID));
-
-	QaSession session = getSessionById(new Long(toolSessionID));
-	QaContent qaContent = session.getQaContent();
-
-	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder), qaContent.getUid());
-
-	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
-	// if response doesn't exist
-	if (response == null) {
-	    response = new QaUsrResp(newAnswer, new Date(System.currentTimeMillis()), "", question, user, true);
-	    createUserResponse(response);
-
-	    // if answer has changed
-	} else if (!newAnswer.equals(response.getAnswer())) {
-	    response.setAnswer(newAnswer);
-	    response.setAttemptTime(new Date(System.currentTimeMillis()));
-	    response.setTimezone("");
-	    updateUserResponse(response);
-	}
-    }
-    
-    public void getResponses(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());

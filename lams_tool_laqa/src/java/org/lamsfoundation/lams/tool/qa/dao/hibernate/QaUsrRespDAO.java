@@ -26,24 +26,33 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * 
  * @author Ozgur Demirtas
- * 
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
-    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp "
+	    + "where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
 
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId and qaUsrResp.qaQuestion.uid=:questionId";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION = "from qaUsrResp in class QaUsrResp "
+	    + " where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId and qaUsrResp.qaQuestion.uid=:questionId";
 
-    private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT = "from qaUsrResp in class QaUsrResp "
+	    + "where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId order by ";
+
+    private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
+	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
 
     private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from " + QaUsrResp.class.getName()
 	    + " as r where r.qaQuestion.qaContent.qaContentId=?";
+
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION = "SELECT COUNT(*) from "
+	    + QaUsrResp.class.getName()
+	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
@@ -85,6 +94,33 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     }
 
     @Override
+    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    int page, int size, int sorting) {
+	String sortingOrder = "";
+	switch (sorting) {
+	case QaAppConstants.SORT_BY_NO:
+	    sortingOrder = "qaUsrResp.attemptTime";
+	    break;
+	case QaAppConstants.SORT_BY_ANSWER_ASC:
+	    sortingOrder = "answer ASC";
+	    break;
+	case QaAppConstants.SORT_BY_ANSWER_DESC:
+	    sortingOrder = "answer DESC";
+	    break;
+	case QaAppConstants.SORT_BY_AVG_RATING_ASC:
+	    sortingOrder = "NULL";
+	    break;
+	case QaAppConstants.SORT_BY_AVG_RATING_DESC:
+	    sortingOrder = "NULL";
+	    break;
+	}
+
+	return getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder)
+		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).setLong("excludeUserId", excludeUserId.longValue())
+		.setFirstResult(page * size).setMaxResults(size).list();
+    }
+
+    @Override
     public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
 	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER).setLong("userUid", userUid.longValue())
 		.list();
@@ -94,6 +130,16 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     public int getCountResponsesByQaContent(final Long qaContentId) {
 
 	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+
+    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
+
+	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
+		new Object[] { qaSessionId, questionId, excludeUserId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

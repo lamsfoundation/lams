@@ -101,12 +101,22 @@ public interface IQaService {
     int countSessionComplete(QaContent qa);
 
     void updateUser(QaQueUsr qaQueUsr);
+    
+    List<QaUsrResp> getResponsesByUserUid(final Long userUid);
 
     QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId);
     
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
+    
+    List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    int page, int size, int sorting);
+    
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId);
 
-    Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId);
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId);
+    
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId);
+    
     /**
      * Creates or updates response with answer submitted by user.
      * 

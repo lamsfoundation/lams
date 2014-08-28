@@ -282,6 +282,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	    QaLearningAction.refreshSummaryData(request, qaContent, qaService, qaContent.isUsernameVisible(),
 		    toolSessionID, userId.toString(), generalLearnerFlowDTO);
+	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
 	}

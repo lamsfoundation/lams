@@ -72,7 +72,7 @@ public class MonitoringUtil implements QaAppConstants {
 	    String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId, String userId) {
 	List<Map<String, QaMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, QaMonitoredUserDTO>>();
 
-	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = qaService.getAverageRatingDTOByResponseAndQuestionAndSession(new Long(questionUid), new Long(sessionId));
+	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = qaService.getAverageRatingDTOByQuestionAndSession(new Long(questionUid), new Long(sessionId));
 
 	List<QaUsrResp> responses = new ArrayList<QaUsrResp>();
 	if (!isLearnerRequest) {

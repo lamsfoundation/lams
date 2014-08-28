@@ -52,8 +52,11 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     private static final String FIND_AVERAGE_RATING_BY_RESPONSE = "SELECT AVG(r.rating), COUNT(*) from "
 	    + ResponseRating.class.getName() + " as r where r.response.responseId=?";
     
-    private static final String FIND_AVERAGE_RATING_BY_RESPONSE_QUESTION_SESSION = "SELECT r.response.responseId, AVG(r.rating), COUNT(*) from "
+    private static final String FIND_AVERAGE_RATING_BY_QUESTION_AND_SESSION = "SELECT r.response.responseId, AVG(r.rating), COUNT(*) from "
 	    + ResponseRating.class.getName() + " as r where r.response.qaQuestion.uid=? and r.response.qaQueUser.qaSession.qaSessionId=? group by r.response.responseId";
+
+    private static final String FIND_AVERAGE_RATING_BY_USER_AND_CONTENT = "SELECT r.response.responseId, AVG(r.rating), COUNT(*) from "
+	    + ResponseRating.class.getName() + " as r where r.response.qaQueUser.uid=? and r.response.qaQuestion.qaContent.qaContentId=? group by r.response.responseId";
     
     private static final String FIND_BY_USER_UID = "from " + ResponseRating.class.getName()
 	    + " as r where r.user.uid = ?";
@@ -82,8 +85,34 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 	return new AverageRatingDTO(averageRating, numberOfVotes);
     }
     
-    public Map<Long, AverageRatingDTO> getAverageRatingDTOByResponseAndQuestionAndSession(Long questionUid, Long qaSessionId) {
-	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_RESPONSE_QUESTION_SESSION, new Object[] { questionUid, qaSessionId });
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId) {
+	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_QUESTION_AND_SESSION, new Object[] { questionUid, qaSessionId });
+	
+	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = new HashMap<Long, AverageRatingDTO>();
+	for (Object[] results : list) {
+	    if (results[0] == null) {
+		return null;
+	    }
+	    
+	    Long responseId = (Long) results[0];
+
+	    Object averageRatingObj = results[1];
+	    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	    numberFormat.setMaximumFractionDigits(1);
+	    String averageRating = numberFormat.format(averageRatingObj);
+
+	    String numberOfVotes = String.valueOf(results[2]);
+
+	    mapResponseIdToAverageRating.put(responseId, new AverageRatingDTO(averageRating, numberOfVotes));
+
+	}
+
+	return mapResponseIdToAverageRating;
+
+    }
+    
+    public Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId) {
+	List<Object[]> list = getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_USER_AND_CONTENT, new Object[] {userUid, contentId});
 	
 	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = new HashMap<Long, AverageRatingDTO>();
 	for (Object[] results : list) {

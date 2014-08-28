@@ -28,6 +28,12 @@ package org.lamsfoundation.lams.tool.qa;
  * @author Ozgur Demirtas
  */
 public interface QaAppConstants {
+    
+    public static final int SORT_BY_NO = 0;
+    public static final int SORT_BY_ANSWER_ASC = 1;
+    public static final int SORT_BY_ANSWER_DESC = 2;
+    public static final int SORT_BY_AVG_RATING_ASC = 3;
+    public static final int SORT_BY_AVG_RATING_DESC = 4;
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";
