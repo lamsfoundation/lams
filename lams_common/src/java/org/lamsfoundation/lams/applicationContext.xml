@@ -6,9 +6,7 @@
            				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
  	<!-- Hibernate Properties. Should be used by all Hibernate session factories unless -->
-  	<!--  the tool has a specific need for a different setting. 						-->			
-  	<!-- If you change hibernate.treecache.objectName, you will also need to change the -->
-  	<!--  cacheManager object 															-->
+  	<!--  the tool has a specific need for a different setting. 						-->
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
   	
 	  	<property name="properties">

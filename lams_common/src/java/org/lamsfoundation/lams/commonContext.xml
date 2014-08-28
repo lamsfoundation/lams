@@ -419,12 +419,6 @@
 		<property name="monitorPeriod"><value>60</value></property>
 	</bean>
 	
-	<!-- Cache Manager bean. cacheObjectName should be the same value as hibernate.treecache.objectName -->
-	<bean id="cacheManager" class="org.lamsfoundation.lams.cache.CacheManager">
-		<property name="cacheObjectName"><value>jboss.cache:service=TreeCache</value></property>
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
 	<bean id="statisticsService" class="org.lamsfoundation.lams.statistics.service.StatisticsService">
    		<property name="baseDAO">
    			<ref bean="baseDAO"/>
