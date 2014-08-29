@@ -49,8 +49,7 @@
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
 			    widthFixed: true,
-			    widgets: ['zebra'],
-			    headers : { 1 : { sorter: false } }
+			    widgets: ['zebra']
 			});
 			
 			$(".tablesorter").each(function() {

@@ -1003,16 +1003,16 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
-	Integer isSort2 = WebUtil.readIntParam(request, "column1]", true);
+	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
 	
 	int sorting = QaAppConstants.SORT_BY_NO;
 	if (isSort1 != null && isSort1.equals(0)) {
 	    sorting = QaAppConstants.SORT_BY_ANSWER_ASC;
 	} else if (isSort1 != null && isSort1.equals(1)) {
 	    sorting = QaAppConstants.SORT_BY_ANSWER_DESC;
-	} else if (isSort2 != null && isSort1.equals(0)) {
+	} else if (isSort2 != null && isSort2.equals(0)) {
 	    sorting = QaAppConstants.SORT_BY_AVG_RATING_ASC;
-	} else if (isSort2 != null && isSort1.equals(1)) {
+	} else if (isSort2 != null && isSort2.equals(1)) {
 	    sorting = QaAppConstants.SORT_BY_AVG_RATING_DESC;
 	}
 	

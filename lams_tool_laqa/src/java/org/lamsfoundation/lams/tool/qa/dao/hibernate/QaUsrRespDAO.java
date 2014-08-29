@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.poi.ss.formula.functions.Rate;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -43,7 +45,11 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId order by ";
-
+    
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_ORDER_BY_AVG_RATING = "SELECT resp FROM "
+	    + " ResponseRating as rating RIGHT JOIN rating.response as resp "
+	    + " WHERE resp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND resp.qaQuestion.uid=:questionId AND resp.qaQueUser.queUsrId!=:excludeUserId GROUP BY resp.responseId ORDER BY AVG(rating.rating) ";
+    
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
 
@@ -108,16 +114,30 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    sortingOrder = "answer DESC";
 	    break;
 	case QaAppConstants.SORT_BY_AVG_RATING_ASC:
-	    sortingOrder = "NULL";
+	    sortingOrder = "ASC";
 	    break;
 	case QaAppConstants.SORT_BY_AVG_RATING_DESC:
-	    sortingOrder = "NULL";
+	    sortingOrder = "DESC";
 	    break;
 	}
+	
+	if (sorting == QaAppConstants.SORT_BY_AVG_RATING_ASC || sorting == QaAppConstants.SORT_BY_AVG_RATING_DESC) {
 
-	return getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder)
-		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).setLong("excludeUserId", excludeUserId.longValue())
-		.setFirstResult(page * size).setMaxResults(size).list();
+	    List list = getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_ORDER_BY_AVG_RATING + sortingOrder)
+		    .setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
+		    .setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size)
+		    .setMaxResults(size).list();
+	    
+	    return list;
+
+	} else {
+	    return getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder)
+		    .setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
+		    .setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size)
+		    .setMaxResults(size).list();
+	}
+
+
     }
 
     @Override
