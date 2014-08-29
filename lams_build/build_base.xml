@@ -284,6 +284,10 @@
 		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
+		
+		<!-- Add extra dir for CKEditor connector -->
+		<mkdir dir="${basedir}/build/war/assembly/userfiles"/>
+		
 		<war warfile="${basedir}/build/lib/${product}.war" 
   		     webxml="${basedir}/build/war/WEB-INF/web.xml"
 			 manifest="${basedir}/build/MANIFEST.MF">
