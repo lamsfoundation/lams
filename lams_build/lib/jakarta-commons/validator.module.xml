@@ -26,4 +26,10 @@
   <resources>
     <resource-root path="commons-validator.jar"/>
   </resources>
+  
+  <dependencies>
+  	<module name="org.apache.commons.logging" />
+  	<module name="org.apache.commons.collections" />
+  	<module name="org.apache.commons.digester" />
+  </dependencies>
 </module>
