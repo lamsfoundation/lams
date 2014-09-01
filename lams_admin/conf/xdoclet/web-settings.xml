@@ -33,7 +33,7 @@
 </context-param>
 <context-param>
     <param-name>migration.datasource</param-name>
-    <param-value>java:jdbc/lams-ds</param-value>
+    <param-value>java:jboss/datasources/lams-ds</param-value>
 </context-param>
 
 <mime-mapping>
