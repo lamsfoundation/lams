@@ -48,7 +48,6 @@
       <module name="org.tuckey.urlrewrite" export="true" />
       <module name="com.allaire.wddx" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
-      <module name="org.lamsfoundation.lams.session" export="true" />
       <module name="org.lamsfoundation.lams.valve" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
