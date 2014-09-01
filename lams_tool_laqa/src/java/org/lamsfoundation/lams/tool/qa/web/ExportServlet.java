@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -52,7 +53,6 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
  * 
  * @author Ozgur Demirtas
  */
-
 public class ExportServlet extends AbstractExportPortfolioServlet implements QaAppConstants {
     static Logger logger = Logger.getLogger(ExportServlet.class.getName());
     private static final long serialVersionUID = -1779093489007108143L;
@@ -111,17 +111,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    request.getSession().setAttribute(QaAppConstants.IS_TOOL_SESSION_AVAILABLE, isNoToolSessions);
 
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
-	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, content, qaService,
-		    content.isUsernameVisible(), true, toolSessionID.toString(), userID.toString());
+	    List listMonitoredAnswersContainerDTO = qaService.exportLearner(content, content.isUsernameVisible(), true,
+		    toolSessionID.toString(), userID.toString());
 	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setUserUid(userID.toString());
 	    request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	    MonitoringUtil.setUpMonitoring(request, qaService, content);
-
-	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
-	    request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	    if (content.isReflect()) {
+		List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
+		request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	    }
 	}
 
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
@@ -150,15 +150,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	MonitoringUtil.setUpMonitoring(request, qaService, content);
-
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 
-	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
-	request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	if (content.isReflect()) {
+	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, null);
+	    request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	}
 
 	// generateGroupsSessionData
-	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(request, content, qaService);
+	List listAllGroupsDTO = qaService.exportTeacher(content);
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 	request.getSession().setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
     }

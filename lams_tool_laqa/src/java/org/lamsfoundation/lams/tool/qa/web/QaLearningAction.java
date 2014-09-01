@@ -999,7 +999,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long qaSessionId = WebUtil.readLongParam(request, "qaSessionId");
-	Long userId = WebUtil.readLongParam(request, "userId");	
+	
+	//in case of monitoring we show all results. in case of learning - don't show results from the current user
+	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
+	Long excludeUserId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
+	
+	//paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
@@ -1016,13 +1021,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    sorting = QaAppConstants.SORT_BY_AVG_RATING_DESC;
 	}
 	
-	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaSessionId, questionUid, userId, page, size,
+	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaSessionId, questionUid, excludeUserId, page, size,
 		sorting);	
 	
 	JSONArray rows = new JSONArray();
 
 	JSONObject responcedata = new JSONObject();
-	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId));
+	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, excludeUserId));
 	
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
@@ -1031,8 +1036,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
-	    responseRow.put("answer", StringEscapeUtils.escapeJava(response.getAnswer()));
-	    responseRow.put("userName", StringEscapeUtils.escapeJavaScript(user.getFullname()));
+	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
+	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 	    responseRow.put("attemptTime", response.getAttemptTime());
 	    

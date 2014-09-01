@@ -25,15 +25,20 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -48,13 +53,23 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaStatsDTO;
+import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -73,14 +88,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	
-	qaMonitoringForm.setQaService(qaService);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	ActionForward validateParameters = validateParameters(request, mapping, qaMonitoringForm);
-	
 	if (validateParameters != null) {
 	    return validateParameters;
 	}
@@ -92,49 +104,97 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
 
-	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
-
 	qaMonitoringForm.setCurrentTab("1");
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	qaMonitoringForm.setToolContentID(strToolContentID);
-	
 
 	/* this section is related to summary tab. Starts here. */
-
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
-	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
-
-	qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+//	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+//	sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
+//	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
+//
+//	qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
+//	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	List questionDTOs = new LinkedList();
-	Iterator queIterator = qaContent.getQaQueContents().iterator();
-	while (queIterator.hasNext()) {
-	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
-	    if (qaQuestion != null) {
-		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
-		questionDTOs.add(qaQuestionDTO);
-	    }
+	for (QaQueContent question : qaContent.getQaQueContents()) {
+	    QaQuestionDTO questionDTO = new QaQuestionDTO(question);
+	    questionDTOs.add(questionDTO);
 	}
 	request.setAttribute(LIST_QUESTION_DTOS, questionDTOs);
-	sessionMap.put(LIST_QUESTION_DTOS, questionDTOs);
-	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	
-	// preserve conditions into sessionMap
-	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());
-	conditionSet.addAll(qaContent.getConditions());
-	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
+//	sessionMap.put(LIST_QUESTION_DTOS, questionDTOs);
+//	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
-	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
+	//session dto list
+	List<GroupDTO> groupDTOs = new LinkedList<GroupDTO>();
+	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
+	sessions.addAll(qaContent.getQaSessions());
+	for (QaSession session : sessions) {
+	    String sessionId = session.getQaSessionId().toString();
+	    String sessionName = session.getSession_name();
+
+	    GroupDTO groupDTO = new GroupDTO();
+	    groupDTO.setSessionName(sessionName);
+	    groupDTO.setSessionId(sessionId);
+	    groupDTOs.add(groupDTO);
+	}
+	request.setAttribute(LIST_ALL_GROUPS_DTO, groupDTOs);
+
+	if (qaContent.isReflect()) {
+	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	    request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	}
+
+	// setting up the advanced summary for LDEV-1662
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
+
+	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+
+	//buildQaStatsDTO
+	QaStatsDTO qaStatsDTO = new QaStatsDTO();
+	int countSessionComplete = 0;
+	int countAllUsers = 0;
+	Iterator iteratorSession = qaContent.getQaSessions().iterator();
+	while (iteratorSession.hasNext()) {
+	    QaSession qaSession = (QaSession) iteratorSession.next();
+
+	    if (qaSession != null) {
+
+		if (qaSession.getSession_status().equals(COMPLETED)) {
+		    ++countSessionComplete;
+		}
+
+		Iterator iteratorUser = qaSession.getQaQueUsers().iterator();
+		while (iteratorUser.hasNext()) {
+		    QaQueUsr qaQueUsr = (QaQueUsr) iteratorUser.next();
+
+		    if (qaQueUsr != null) {
+			++countAllUsers;
+		    }
+		}
+	    }
+	}
+	qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
+	qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
+	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
+	
+	// set SubmissionDeadline, if any
+	if (qaContent.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = qaContent.getSubmissionDeadline();
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+	    request.setAttribute(QaAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
 
 	return (mapping.findForward(LOAD_MONITORING));
     }
 
     /**
      * validates request paramaters based on tool contract
-     * validateParameters(HttpServletRequest request, ActionMapping mapping)
      * 
      * @param request
      * @param mapping
@@ -160,17 +220,5 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    }
 	}
 	return null;
-    }
-
-    /**
-     * persists error messages to request scope
-     * 
-     * @param request
-     * @param message
-     */
-    public void persistError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
     }
 }

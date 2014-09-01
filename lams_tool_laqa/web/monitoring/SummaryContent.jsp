@@ -19,25 +19,21 @@
 </c:if>
 
 <c:forEach var="groupDto" items="${listAllGroupsDTO}">
-	<c:set var="sessionId" scope="request" value="${groupDto.sessionId}"/>
-	<c:set var="sessionName" scope="request" value="${groupDto.sessionName}"/>
-	<c:set var="groupData" scope="request" value="${groupDto.groupData}"/>
 			  	 		
 	<c:if test="${isGroupedActivity}">
 		<h1 class="group-name-title">
-			<fmt:message key="group.label" />: <c:out value="${sessionName}"/>
+			<fmt:message key="group.label" />: <c:out value="${groupDto.sessionName}"/>
 		</h1>
 	</c:if>
 
-	<c:forEach var="currentDto" items="${groupData}">
-		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+	<c:forEach var="question" items="${questionDTOs}">
 		
 		<div class="tablesorter-container">
 		<div class="question-title">
-			<c:out value="${currentDto.question}" escapeXml="false"/>
+			<c:out value="${question.question}" escapeXml="false"/>
 		</div>	
 		
-		<table class="tablesorter">	
+		<table class="tablesorter" data-question-uid="${question.uid}" data-session-id="${groupDto.sessionId}">
 		
 			<thead>
 				<tr>
@@ -46,7 +42,7 @@
 					</th>
 					
 					<c:if test="${content.allowRateAnswers}">
-						<th title="<fmt:message key='label.sort.by.rating'/>" width="19%">
+						<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
 							<fmt:message key="label.learning.rating" />
 						</th>
 					</c:if>
@@ -54,56 +50,6 @@
 			</thead>
 			
 			<tbody>
-
-		  		<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-					<c:forEach var="sData" items="${questionAttemptData.value}">
-						<c:set var="userData" scope="request" value="${sData.value}"/>
-						<c:set var="responseUid" scope="request" value="${userData.uid}"/>
-						<c:set var="userSessionId" scope="request" value="${userData.sessionId}"/>
-								  	 		
-	  	 				<c:if test="${(sessionId == userSessionId) && (currentQuestionId == userData.questionUid)}"> 											  	 		
-
-							<tr> 
-								<td id="td-response-${responseUid}" valign=top <c:if test="${userData.visible != 'true' }">class="hidden"</c:if>>  
-									<c:out value="${userData.userName}"/> <lams:Date value="${userData.attemptTime}"/>
-	
-				   					<div class="float-right" valign=top>
-										<a href="#nogo" title="<fmt:message key='label.tooltip.edit'/>" class="image-link"
-												onclick="javascript:editResponse(${userData.uid});">
-									    	<img src="<c:out value="${tool}"/>images/edit.gif" border="0">
-										</a>
-				   						
-				   						<c:choose>
-				   							<c:when test="${userData.visible == 'true'}">
-												<a href='#nogo' title="<fmt:message key='label.hide'/>" class="image-link"
-														onclick="changeResponseVisibility(this, ${responseUid}, true);">						                                             
-													<img src="<c:out value="${tool}"/>images/display-eye.png" border="0">
-												</a>				   							
-				   							</c:when>
-				   							<c:otherwise>
-												<a href='#nogo' title="<fmt:message key='label.show'/>" 
-														onclick="changeResponseVisibility(this, ${responseUid}, false);">						                                             
-													<img src="<c:out value="${tool}"/>images/hidden-eye.png" border="0">
-												 </a>				   							
-				   							</c:otherwise>
-				   						</c:choose>																
-									</div>
-									 
-								 	<br>
-										
-									<span id="response-${responseUid}"><c:out value="${userData.response}" escapeXml="false"/></span>
-								</td>
-								
-								<c:if test="${content.allowRateAnswers}">
-									<td>
-										<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
-									</td>
-								</c:if>								
-							</tr>
-						</c:if>										  					 									  													  														
-
-	 				</c:forEach>		  	
-				</c:forEach>
 			</tbody>
 		</table>
 		

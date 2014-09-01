@@ -65,15 +65,6 @@
 				      // and a filterList = [[2,Blue],[3,13]] becomes "&fcol[2]=Blue&fcol[3]=13" in the url
 					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
 
-				      // modify the url after all processing has been applied
-				   //   customAjaxUrl: function(table, url) {
-				          // manipulate the url string as you desire
-				          // url += '&cPage=' + window.location.pathname;
-				          // trigger my custom event
-				          //$(table).trigger('changingUrl', url);
-				          // send the server the current page
-				       //   return url;
-				     // },
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
@@ -156,19 +147,26 @@
 				
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
-				    $(".rating-stars").jRating({
-				    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
-				    	rateMax : 5,
-				    	decimalLength : 1,
-					  	onSuccess : function(data, responseUid){
-					    	$("#averageRating" + responseUid).html(data.averageRating);
-					    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
-					    	$("#averageRating" + responseUid).parents(".tablesorter").trigger("update");
-						},
-					  	onError : function(){
-					    	jError('Error : please retry');
-					  	}
-					});
+				    $(".rating-stars").each(function() {
+				    	//make sure jRating gets applied only once
+				    	if ($(this)[0].innerHTML.indexOf("jRatingColor") > -1) {
+				    		return;
+				    	}
+				    	
+						$(this).jRating({
+					    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
+					    	rateMax : 5,
+					    	decimalLength : 1,
+						  	onSuccess : function(data, responseUid){
+						    	$("#averageRating" + responseUid).html(data.averageRating);
+						    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
+						    	$("#averageRating" + responseUid).parents(".tablesorter").trigger("update");
+							},
+						  	onError : function(){
+						    	jError('Error : please retry');
+						  	}
+						})
+				    })
 				});
 			});
 	  		

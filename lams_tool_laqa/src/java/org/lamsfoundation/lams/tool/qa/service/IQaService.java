@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -333,6 +334,17 @@ public interface IQaService {
      * @return
      */
     List<ReflectionDTO> getReflectList(QaContent content, String userID);
+    
+    /**
+     * ends up populating the attempt history for all the users of all the tool sessions for a content
+     * 
+     * User id is needed if isUserNamesVisible is false && is learnerRequest = true, as it is required to work out if
+     * the data being analysed is the current user.
+     */
+    List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId,
+	    String userId);
+    
+    List<GroupDTO> exportTeacher(QaContent qaContent);
 
     /**
      * notifyTeachersOnResponseSubmit
