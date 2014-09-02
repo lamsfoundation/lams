@@ -1746,6 +1746,10 @@ function getLearnerDisplayName(learner, raw) {
  * Escapes HTML tags to prevent XSS injection.
  */
 function escapeHtml(unsafe) {
+	if (unsafe == undefined) {
+		return "";
+	}
+	
     return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
