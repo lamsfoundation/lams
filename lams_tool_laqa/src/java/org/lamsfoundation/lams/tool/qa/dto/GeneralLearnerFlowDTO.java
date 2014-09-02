@@ -25,8 +25,11 @@ package org.lamsfoundation.lams.tool.qa.dto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
  * <p>
@@ -93,7 +96,12 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Map<Integer, QaQuestionDTO> mapQuestionContentLearner;
 
+    //only for export now
     protected List listMonitoredAnswersContainerDTO;
+    
+    protected Set<QaQueContent> questions;
+    
+    protected List<QaUsrResp> userResponses;
 
     protected String initialScreen;
 
@@ -467,6 +475,36 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setListMonitoredAnswersContainerDTO(List listMonitoredAnswersContainerDTO) {
 	this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
+    }
+    
+    /**
+     * @return Returns the questions.
+     */
+    public List<QaUsrResp> getUserResponses() {
+	return userResponses;
+    }
+
+    /**
+     * @param questions
+     *            The questions to set.
+     */
+    public void setUserResponses(List<QaUsrResp> userResponses) {
+	this.userResponses = userResponses;
+    }
+    
+    /**
+     * @return Returns the questions.
+     */
+    public Set<QaQueContent> getQuestions() {
+	return questions;
+    }
+
+    /**
+     * @param questions
+     *            The questions to set.
+     */
+    public void setQuestions(Set<QaQueContent> questions) {
+	this.questions = questions;
     }
 
     /**

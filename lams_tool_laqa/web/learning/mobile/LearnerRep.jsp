@@ -55,6 +55,77 @@
 			
 			$(".tablesorter").each(function() {
 				$(this).tablesorterPager({
+					// set to false otherwise it remembers setting from other jsFiddle demos
+					savePages: false,
+				      // use this format: "http:/mydatabase.com?page={page}&size={size}&{sortList:col}"
+				      // where {page} is replaced by the page number (or use {page+1} to get a one-based index),
+				      // {size} is replaced by the number of records to show,
+				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
+				      // the filterList to the url into an "fcol" array.
+				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
+				      // and a filterList = [[2,Blue],[3,13]] becomes "&fcol[2]=Blue&fcol[3]=13" in the url
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
+
+					ajaxProcessing: function (data) {
+				    	if (data && data.hasOwnProperty('rows')) {
+				    		var rows = [],
+				            json = {};
+				    		
+							for (i = 0; i < data.rows.length; i++){
+								var userData = data.rows[i];
+								
+								rows += '<tr>';
+								rows += '<td>';
+								
+								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
+									rows += '<div>';
+									rows += 	'<span class="field-name">';
+									rows += 		userData["userName"];
+									rows += 	'</span> ';
+									rows += 	userData["attemptTime"];
+									rows += '</div>';
+								}
+								
+								rows += 	'<div class="user-answer">';
+								if (userData["visible"] == 'true') {
+									rows += 	userData["answer"];
+								} else {
+									rows += 	'<i><fmt:message key="label.hidden"/></i>';
+								}
+								rows += 	'</div>';
+								
+								rows += '</td>';
+								
+								if (${generalLearnerFlowDTO.allowRateAnswers == 'true'}) {
+									rows += '<td style="width:50px;">';
+									
+									if (userData["visible"] == 'true') {
+										var responseUid = userData["responseUid"];
+										
+										rows += '<div class="rating-stars-div">';
+										rows += 	'<div class="rating-stars" data-average="' + userData["averageRating"] +'" data-id="' + responseUid + '"></div>';
+										rows += 	'<div class="rating-stars-caption">';
+										rows += 		'<span id="averageRating' + responseUid + '">' + userData["averageRating"] +'</span> / ';
+										rows += 		'<span id="numberOfVotes' + responseUid + '">' + userData["numberOfVotes"] +'</span> ';
+										rows += 		'<fmt:message key="label.votes" />';
+										rows += 	'</div>';
+										rows += '</div>';
+										rows += '<div style="clear: both;"></div>';
+									}									
+									
+									rows += '</td>';
+								}	
+								
+								rows += '</tr>';
+							}
+				            
+							json.total = data.total_rows; // only allow 100 rows in total
+							//json.filteredRows = 100; // no filtering
+							json.rows = $(rows);
+							return json;
+				            
+				    	}
+					},
 				    container: $(this).next(".pager"),
 				    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
 				    // if true, the table will remain the same height no matter how many records are displayed. The space is made up by an empty
@@ -73,21 +144,33 @@
 					cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
 					// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
 					cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				})
+				
+				// bind to pager events
+				.bind('pagerInitialized pagerComplete', function(event, options){
+				    $(".rating-stars").each(function() {
+				    	//make sure jRating gets applied only once
+				    	if ($(this)[0].innerHTML.indexOf("jRatingColor") > -1) {
+				    		return;
+				    	}
+				    	
+				    	$(this).jRating({
+					    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
+					    	rateMax : 5,
+					    	decimalLength : 1,
+						  	onSuccess : function(data, responseUid){
+						    	$("#averageRating" + responseUid).html(data.averageRating);
+						    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
+						    	$("#averageRating" + responseUid).parents(".tablesorter").trigger("update");
+							},
+						  	onError : function(){
+						    	jError('Error : please retry');
+						  	}
+				    	})
+					});
 				});
 			});
 	  		
-		    $(".rating-stars").jRating({
-		    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
-		    	rateMax : 5,
-		    	decimalLength : 1,
-			  	onSuccess : function(data, responseUid){
-			    	$("#averageRating" + responseUid).html(data.averageRating);
-			    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
-				},
-			  	onError : function(){
-			    	jError('Error : please retry');
-			  	}
-			});
 		    $(".rating-stars-disabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
@@ -141,7 +224,7 @@
 		
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-			<html:hidden property="userID" />
+			<html:hidden property="userID" styleId="userID"/>
 			<html:hidden property="httpSessionID" />
 			<html:hidden property="totalQuestionCount"/>
 			
@@ -162,36 +245,28 @@
 		</html:form>
 	
 		<ul data-role="listview" data-theme="c" id="qaQuestions" style="padding-top: 0;">
-			<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
-				<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}" />
-
+			<c:forEach var="userResponse" items="${generalLearnerFlowDTO.userResponses}" varStatus="status">
 				<li>
+				
 					<p class="space-top">
-						<strong> <fmt:message key="label.question" /> : </strong>
-						<c:out value="${currentDto.question}" escapeXml="false" />
+						<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
+						<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
 					</p>
 
-					<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-						<c:forEach var="sData" items="${questionAttemptData.value}">
-							<c:set var="userData" scope="request" value="${sData.value}" />
-							<c:set var="responseUid" scope="request" value="${userData.uid}" />
-
-							<c:if test="${generalLearnerFlowDTO.userUid == userData.queUsrId}">
-								<c:if test="${currentQuestionId == userData.questionUid}">
-									<p class="small-space-top">
-										<span class="field-name"> <c:out value="${userData.userName}" /> </span> -
-										<lams:Date value="${userData.attemptTime}" style="short"/>
-									</p>
-									<p class="small-space-bottom user-answer">
-										<c:out value="${userData.responsePresentable}" escapeXml="false" />
-									</p>
-									<jsp:include page="parts/ratingStarsDisabled.jsp" />
-								</c:if>
-							</c:if>								
-						</c:forEach>
-					</c:forEach>
+					<p class="small-space-top">
+						<span class="field-name"> <c:out value="${userResponse.qaQueUser.fullname}" /> </span> -
+							<lams:Date value="${userResponse.attemptTime}" style="short"/>
+					</p>
+					<p class="small-space-bottom user-answer">
+						<c:out value="${userResponse.answer}" escapeXml="false" />
+					</p>
+									
+					<c:set var="userData" scope="request" value="${userResponse}" />
+					<c:set var="responseUid" scope="request" value="${userResponse.responseId}" />
+					<jsp:include page="parts/ratingStarsDisabled.jsp" />
+					
 				</li>
-			</c:forEach>				
+			</c:forEach>	
 		</ul>
 		
 		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
@@ -200,16 +275,15 @@
 			</h2>
 					
 			<ul data-role="listview" data-theme="c" id="qaAnswers">
-				<c:forEach var="currentDto"	items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}">
-					<c:set var="currentQuestionId" scope="request"	value="${currentDto.questionUid}" />
+				<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">			
 			
 					<li>
 						<p class="space-top">
-							<strong> <fmt:message key="label.question" /> : </strong>
-							<c:out value="${currentDto.question}" escapeXml="false" />
+							<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
+							<c:out value="${question.question}" escapeXml="false" />
 						</p>
 							
-						<table class="tablesorter">
+						<table class="tablesorter" data-question-uid="${question.uid}">
 							<thead>
 								<tr>
 									<th title="<fmt:message key='label.sort.by.answer'/>" >
@@ -223,46 +297,6 @@
 								</tr>
 							</thead>
 							<tbody>
-			
-								<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-									<c:forEach var="sData" items="${questionAttemptData.value}">
-										<c:set var="userData" scope="request" value="${sData.value}" />
-										<c:set var="responseUid" scope="request" value="${userData.uid}" />
-			
-										<c:if test="${generalLearnerFlowDTO.userUid != userData.queUsrId}">	
-											<c:if test="${currentQuestionId == userData.questionUid}">
-												<tr>
-													<td>
-														<div class="small-space-top">
-															<span class="field-name"> <c:out value="${userData.userName}" /> </span>
-															<c:if test="${generalLearnerFlowDTO.userNameVisible == 'true'}">																			
-																<lams:Date value="${userData.attemptTime}" style="short"/>
-															</c:if>
-														</div>
-														<div class="user-answer space-bottom">
-															<c:choose>
-																<c:when test="${userData.visible == 'true'}">
-																	<c:out value="${userData.responsePresentable}"	escapeXml="false" />
-																</c:when>
-																<c:otherwise>
-																	<i><fmt:message key="label.hidden"/></i>
-																</c:otherwise>
-															</c:choose>												
-														</div>
-													</td>
-													
-													<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
-														<td style="width:50px;">
-															<c:if test="${userData.visible == 'true'}">	
-																<jsp:include page="parts/ratingStars.jsp" />
-															</c:if>	
-														</td>
-													</c:if>											
-												</tr>											
-											</c:if>
-										</c:if>									
-									</c:forEach>
-								</c:forEach>
 
 							</tbody>
 						</table>

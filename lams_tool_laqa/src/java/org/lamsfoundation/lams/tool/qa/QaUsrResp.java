@@ -62,6 +62,10 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String timezone;
+    
+    //DTO fields
+    private String averageRating;
+    private String numberOfVotes;
 
     /** full constructor */
     public QaUsrResp(Long responseId, String answer, Date attemptTime, String timezone,
@@ -231,6 +235,22 @@ public class QaUsrResp implements Serializable, Comparable {
      */
     public void setVisible(boolean visible) {
 	this.visible = visible;
+    }
+
+    public String getNumberOfVotes() {
+	return numberOfVotes;
+    }
+
+    public void setNumberOfVotes(String numberOfVotes) {
+	this.numberOfVotes = numberOfVotes;
+    }
+
+    public String getAverageRating() {
+	return averageRating;
+    }
+
+    public void setAverageRating(String averageRating) {
+	this.averageRating = averageRating;
     }
 
 }

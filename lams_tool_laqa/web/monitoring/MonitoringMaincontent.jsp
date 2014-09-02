@@ -120,10 +120,6 @@
 	<script language="JavaScript" type="text/JavaScript">
 	
 	  	$(document).ready(function(){
-		    $(".rating-stars-disabled").jRating({
-		    	rateMax : 5,
-		    	isDisabled : true
-			});
 		    
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
@@ -132,6 +128,75 @@
 			
 			$(".tablesorter").each(function() {
 				$(this).tablesorterPager({
+					// set to false otherwise it remembers setting from other jsFiddle demos
+					savePages: false,
+				      // use this format: "http:/mydatabase.com?page={page}&size={size}&{sortList:col}"
+				      // where {page} is replaced by the page number (or use {page+1} to get a one-based index),
+				      // {size} is replaced by the number of records to show,
+				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
+				      // the filterList to the url into an "fcol" array.
+				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
+					ajaxProcessing: function (data) {
+				    	if (data && data.hasOwnProperty('rows')) {
+				    		var rows = [],
+				            json = {};
+				    		
+							for (i = 0; i < data.rows.length; i++){
+								var userData = data.rows[i];
+								
+								rows += '<tr>';
+								rows += '<td>';
+								
+								if (${content.usernameVisible == 'true'}) {
+									rows += '<div>';
+									rows += 	'<span class="field-name">';
+									rows += 		userData["userName"];
+									rows += 	'</span> ';
+									rows += 	userData["attemptTime"];
+									rows += '</div>';
+								}
+								
+								rows += 	'<div class="user-answer">';
+								if (userData["visible"] == 'true') {
+									rows += 	userData["answer"];
+								} else {
+									rows += 	'<i><fmt:message key="label.hidden"/></i>';
+								}
+								rows += 	'</div>';
+								
+								rows += '</td>';
+								
+								if (${content.allowRateAnswers == 'true'}) {
+									rows += '<td style="width:50px;">';
+									
+									if (userData["visible"] == 'true') {
+										var responseUid = userData["responseUid"];
+										
+										rows += '<div class="rating-stars-div">';
+										rows += 	'<div class="rating-stars-disabled" data-average="' + userData["averageRating"] +'" data-id="' + responseUid + '"></div>';
+										rows += 	'<div class="rating-stars-caption">';
+										rows += 		'<span id="averageRating' + responseUid + '">' + userData["averageRating"] +'</span> / ';
+										rows += 		'<span id="numberOfVotes' + responseUid + '">' + userData["numberOfVotes"] +'</span> ';
+										rows += 		'<fmt:message key="label.votes" />';
+										rows += 	'</div>';
+										rows += '</div>';
+										rows += '<div style="clear: both;"></div>';
+									}									
+									
+									rows += '</td>';
+								}	
+								
+								rows += '</tr>';
+							}
+				            
+							json.total = data.total_rows; // only allow 100 rows in total
+							//json.filteredRows = 100; // no filtering
+							json.rows = $(rows);
+							return json;
+				            
+				    	}
+					},					
 				    container: $(this).next(".pager"),
 				    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
 				    // if true, the table will remain the same height no matter how many records are displayed. The space is made up by an empty
@@ -150,7 +215,15 @@
 					cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
 					// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
 					cssDisabled: 'disabled' // Note there is no period "." in front of this class name
-				});
+				})
+				
+				// bind to pager events
+				.bind('pagerInitialized pagerComplete', function(event, options){
+				    $(".rating-stars-disabled").jRating({
+				    	rateMax : 5,
+				    	isDisabled : true
+					})
+				})
 			});
 			
 			$("#edit-response-dialog").dialog({

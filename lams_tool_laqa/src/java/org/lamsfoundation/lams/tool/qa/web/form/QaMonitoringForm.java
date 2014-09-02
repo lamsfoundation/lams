@@ -43,23 +43,6 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
 
     protected String sessionId;
 
-    protected IQaService qaService;
-
-    /**
-     * @return Returns the qaService.
-     */
-    public IQaService getQaService() {
-	return qaService;
-    }
-
-    /**
-     * @param qaService
-     *                The qaService to set.
-     */
-    public void setQaService(IQaService qaService) {
-	this.qaService = qaService;
-    }
-
     /**
      * @return Returns the currentUid.
      */

@@ -24,10 +24,13 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -35,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -43,8 +47,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -53,6 +59,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -136,8 +143,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		mapAnswers.put(questionIndexInteger.toString(), answer);
 		mapAnswersPresentable.put(questionIndexInteger.toString(), answer);
 
-		Map<Integer, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
-		QaQuestionDTO dto = questionContentMap.get(questionIndexInteger);
+		Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		QaQuestionDTO dto = questionMap.get(questionIndexInteger);
 		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexInteger));
 		    forwardName = QaAppConstants.LOAD_LEARNER;
@@ -159,7 +166,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    int numQuestions = questionMap.size();
 	    Integer finalQuestionIndex = new Integer(numQuestions);
 	    QaQuestionDTO dto = questionMap.get(finalQuestionIndex);
-	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex).toString())) {
+	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex.toString()))) {
 		errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", finalQuestionIndex));
 		forwardName = QaAppConstants.LOAD_LEARNER;
 	    }
@@ -951,17 +958,102 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    boolean isUserNamesVisible, String sessionId, String userId,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 
-	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService,
-		isUserNamesVisible, true, sessionId, userId);
+//	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService,
+//		isUserNamesVisible, true, sessionId, userId);
+//	generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
+	
+	Set<QaQueContent> questions = qaContent.getQaQueContents();
+	generalLearnerFlowDTO.setQuestions(questions);
+	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
+	
+	QaQueUsr user = qaService.getUserByIdAndSession(new Long(userId), new Long(sessionId));	
+	List<QaUsrResp> userResponses = qaService.getResponsesByUserUid(user.getUid());
+	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = qaService.getAverageRatingDTOByUserAndContentId(user.getUid(), qaContent.getQaContentId());
 
-	if (generalLearnerFlowDTO != null) {
-	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
-	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
-	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
+	for (QaUsrResp userResponse : userResponses) {
+
+	    AverageRatingDTO averageRating = mapResponseIdToAverageRating.get(userResponse.getResponseId());
+	    if (averageRating == null) {
+		userResponse.setAverageRating("0");
+		userResponse.setNumberOfVotes("0");
+	    } else {
+		userResponse.setAverageRating(averageRating.getRating());
+		userResponse.setNumberOfVotes(averageRating.getNumberOfVotes());
+	    }
 	}
-
-	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
+	
+	for (QaQueContent question : questions) {
+	    //TODO may be add questions that were not answered
+	    
+	}
+	generalLearnerFlowDTO.setUserResponses(userResponses);
+	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
     }
+    
+    /**
+     * Refreshes user list.
+     */
+    public ActionForward getResponses(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	initializeQAService();
+	
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long qaSessionId = WebUtil.readLongParam(request, "qaSessionId");
+	
+	//in case of monitoring we show all results. in case of learning - don't show results from the current user
+	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
+	Long excludeUserId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
+	
+	//paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
+	
+	int sorting = QaAppConstants.SORT_BY_NO;
+	if (isSort1 != null && isSort1.equals(0)) {
+	    sorting = QaAppConstants.SORT_BY_ANSWER_ASC;
+	} else if (isSort1 != null && isSort1.equals(1)) {
+	    sorting = QaAppConstants.SORT_BY_ANSWER_DESC;
+	} else if (isSort2 != null && isSort2.equals(0)) {
+	    sorting = QaAppConstants.SORT_BY_AVG_RATING_ASC;
+	} else if (isSort2 != null && isSort2.equals(1)) {
+	    sorting = QaAppConstants.SORT_BY_AVG_RATING_DESC;
+	}
+	
+	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaSessionId, questionUid, excludeUserId, page, size,
+		sorting);	
+	
+	JSONArray rows = new JSONArray();
+
+	JSONObject responcedata = new JSONObject();
+	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, excludeUserId));
+	
+	for (QaUsrResp response : responses) {
+	    QaQueUsr user = response.getQaQueUser();
+	    //JSONArray cell=new JSONArray();
+	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
+	    
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put("responseUid", response.getResponseId().toString());
+	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
+	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
+	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
+	    responseRow.put("attemptTime", response.getAttemptTime());
+	    
+	    AverageRatingDTO averageRatingDto = qaService.getAverageRatingDTOByResponse(response.getResponseId());
+	    String averageRating =  (averageRatingDto == null) ? "0" : averageRatingDto.getRating();
+	    responseRow.put("averageRating", averageRating);
+	    String numberOfVotes =  (averageRatingDto == null) ? "0" : averageRatingDto.getNumberOfVotes();
+	    responseRow.put("numberOfVotes", numberOfVotes);
+	    
+	    rows.put(responseRow);
+	}
+	responcedata.put("rows", rows);
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responcedata.toString()));
+	return null;
+     }
 
     private static Map removeNewLinesMap(Map map) {
 	Map newMap = new TreeMap(new QaStringComparator());

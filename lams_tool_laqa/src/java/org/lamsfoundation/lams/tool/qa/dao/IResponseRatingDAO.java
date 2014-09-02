@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
@@ -67,4 +68,8 @@ public interface IResponseRatingDAO {
     public void removeResponseRating(ResponseRating rating);
     
     public List<ResponseRating> getRatingsByUser(Long userUid);
+    
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId);
+    
+    Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId);
 }
