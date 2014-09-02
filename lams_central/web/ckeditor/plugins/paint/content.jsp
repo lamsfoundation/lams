@@ -43,8 +43,8 @@
 				okButton.on('click', triggerOK);
 				
 				var xmlDic="<xml><language>";
-				for(var prop in CK.lang.Paint.Flash){
-					xmlDic += "<entry key='local." + prop + "'><name>" + CK.lang.Paint.Flash[prop] + "</name></entry>";
+				for(var prop in CK.lang.paint.Flash){
+					xmlDic += "<entry key='local." + prop + "'><name>" + CK.lang.paint.Flash[prop] + "</name></entry>";
 				}
 				xmlDic += "</language></xml>";
 				var flashvars = {

@@ -27,7 +27,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 	<script language="JavaScript" type="text/javascript">
-	<!--
 		//Specify Kaltura settings
 		//kaltura server 
 		var KALTURA_SERVER = "${KALTURA_SERVER}";
@@ -117,54 +116,48 @@
 				}
 			}
 			
-			var swfobject = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"><\/script>' );
-			CK.document.getBody().append(swfobject);
+			var kalturaHtml = '<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"><\/script>';
 			
 			//enable HTML5 support
-			var html5 = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"><\/script>' );
-			html5.insertAfter(swfobject);
-			var options = '<script type="text/javascript">';
-			options += 'mw.setConfig("Kaltura.ServiceUrl" , "' + KALTURA_SERVER + '" );';
-			options += 'mw.setConfig("Kaltura.CdnUrl" , "' + KALTURA_SERVER + '" );';
-			options += 'mw.setConfig("Kaltura.ServiceBase", "/api_v3/index.php?service=");';
-			options += 'mw.setConfig("EmbedPlayer.EnableIframeApi", true );';
-			options += 'mw.setConfig("EmbedPlayer.UseFlashOnAndroid", false );';
-			options += 'mw.setConfig("Kaltura.UseAppleAdaptive", false );';
-			options += 'mw.setConfig("EmbedPlayer.AttributionButton", false );';
-			options += 'mw.setConfig("EmbedPlayer.OverlayControls", false ); ';
-			options += '<\/script>';
-			var html5Options = CKGlobal.dom.element.createFromHtml(options);
-			html5Options.insertAfter(html5);
+			kalturaHtml += '<script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"><\/script>';
+			kalturaHtml += '<script type="text/javascript">';
+			kalturaHtml += 'mw.setConfig("Kaltura.ServiceUrl" , "' + KALTURA_SERVER + '" );';
+			kalturaHtml += 'mw.setConfig("Kaltura.CdnUrl" , "' + KALTURA_SERVER + '" );';
+			kalturaHtml += 'mw.setConfig("Kaltura.ServiceBase", "/api_v3/index.php?service=");';
+			kalturaHtml += 'mw.setConfig("EmbedPlayer.EnableIframeApi", true );';
+			kalturaHtml += 'mw.setConfig("EmbedPlayer.UseFlashOnAndroid", false );';
+			kalturaHtml += 'mw.setConfig("Kaltura.UseAppleAdaptive", false );';
+			kalturaHtml += 'mw.setConfig("EmbedPlayer.AttributionButton", false );';
+			kalturaHtml += 'mw.setConfig("EmbedPlayer.OverlayControls", false ); ';
+			kalturaHtml += '<\/script>';
 			
 			// this is the callback function; execute after external script finishes loading
-			var innerHTML =	'<script type="text/javascript">';			
+			kalturaHtml += '<script type="text/javascript">';			
 			for(var i = 0; i < entries.length; i++) {
 				var entryId = entries[i].entryId;
 				
-				innerHTML +=	'	var params'+entryId+' = {';
-				innerHTML +=	'		allowscriptaccess: "always",';
-				innerHTML +=	'		allownetworking: "all",';
-				innerHTML +=	'		allowfullscreen: "true",';
-				innerHTML +=	'		wmode: "opaque"';
-				innerHTML +=	'	};	';
-				innerHTML +=	'	var flashVars'+entryId+' = {';
-				innerHTML +=	'		entryId: "'+entryId+'"';
-				innerHTML +=	'	};	';
-				innerHTML +=	'	swfobject.embedSWF("' + KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID + '", "kplayer' + entryId + '", "400", "360", "9.0.0", "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/expressInstall.swf", flashVars'+entryId+', params'+entryId+');';
+				kalturaHtml +=	'	var params'+entryId+' = {';
+				kalturaHtml +=	'		allowscriptaccess: "always",';
+				kalturaHtml +=	'		allownetworking: "all",';
+				kalturaHtml +=	'		allowfullscreen: "true",';
+				kalturaHtml +=	'		wmode: "opaque"';
+				kalturaHtml +=	'	};	';
+				kalturaHtml +=	'	var flashVars'+entryId+' = {';
+				kalturaHtml +=	'		entryId: "'+entryId+'"';
+				kalturaHtml +=	'	};	';
+				kalturaHtml +=	'	swfobject.embedSWF("' + KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID + '", "kplayer' + entryId + '", "400", "360", "9.0.0", "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/expressInstall.swf", flashVars'+entryId+', params'+entryId+');';
 			}		
-			innerHTML +='<\/script>';
-			var embedSwf = CKGlobal.dom.element.createFromHtml( innerHTML );
-			embedSwf.insertAfter(html5Options);
+			kalturaHtml +='<\/script>';
 			
 			//add divs which will contain videos
 			for(var i = 0; i < entries.length; i++) {
 				var entryId = entries[i].entryId;
-				var div = CKGlobal.dom.element.createFromHtml('<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360" src="#"></embed></object></div>' );
-				div.insertAfter(embedSwf);
+				kalturaHtml += '<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360" src="#"></embed></object></div>';
 			}
 			
+			//append resulted html to CKEditor
+			CK.setData( CK.getData() + kalturaHtml );
 		}
-	// -->
 	</script>
 
 </lams:head>

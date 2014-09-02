@@ -33,6 +33,11 @@ a:hover {
 	border-bottom: 1px solid #47bc23;
 }
 
+/* CKEditor buttons */
+a.cke_button {
+	border-bottom: none;
+}
+
 .row {
 	voice-family: "\"}\""; /* hide the following rules from IE5 */
 	voice-family: inherit;

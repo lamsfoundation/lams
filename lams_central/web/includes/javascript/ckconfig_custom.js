@@ -35,7 +35,7 @@ CKEDITOR.config.toolbar_CustomWiki = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-	['WikiLink','Link','Image'],
+	['wikilink','Link','Image'],
 	['equation','About'],
 	['TextColor','BGColor'],
 	['Table','HorizontalRule','Smiley','SpecialChar'],
@@ -58,16 +58,18 @@ CKEDITOR.config.toolbar_LessonDescription = [
 
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css' ;
-CKEDITOR.config.skin = 'office2003' ;
+//CKEDITOR.config.skin = 'office2003' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div' ;
-CKEDITOR.plugins.addExternal('WikiLink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
-CKEDITOR.config.extraPlugins = 'kaltura,WikiLink,equation,paint,movieplayer,skype' ;
+CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
+CKEDITOR.config.extraPlugins = 'kaltura,wikilink,equation,paint,movieplayer,skype' ;
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
+CKEDITOR.config.allowedContent = true;
+CKEDITOR.config.toolbarCanCollapse = true;
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized

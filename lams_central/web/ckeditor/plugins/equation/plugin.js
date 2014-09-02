@@ -80,7 +80,7 @@ var currentEdit=null;
 
 	CKEDITOR.plugins.add( 'equation',
 	{
-	  lang : ['en'],
+	  lang : 'en',
 		
 		init : function( editor )
 		{

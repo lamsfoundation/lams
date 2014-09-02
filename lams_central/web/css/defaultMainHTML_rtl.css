@@ -349,6 +349,11 @@ Layout of main content section
 	text-decoration: none;
 }
 
+/* CKEditor buttons */
+#content a.cke_button {
+	border-bottom: none;
+}
+
 /*layout of authoring buttons*/
 
 /*layout of a general button*/
