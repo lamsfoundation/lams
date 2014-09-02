@@ -44,42 +44,42 @@ public interface INotebookService {
      * @params newContentID
      * @return
      */
-    public Notebook copyDefaultContent(Long newContentID);
+    Notebook copyDefaultContent(Long newContentID);
 
     /**
      * Returns an instance of the Notebook tools default content.
      * 
      * @return
      */
-    public Notebook getDefaultContent();
+    Notebook getDefaultContent();
 
     /**
      * @param toolSignature
      * @return
      */
-    public Long getDefaultContentIdBySignature(String toolSignature);
+    Long getDefaultContentIdBySignature(String toolSignature);
 
     /**
      * @param toolContentID
      * @return
      */
-    public Notebook getNotebookByContentId(Long toolContentID);
+    Notebook getNotebookByContentId(Long toolContentID);
 
     /**
      * @param notebook
      */
-    public void saveOrUpdateNotebook(Notebook notebook);
+    void saveOrUpdateNotebook(Notebook notebook);
 
     /**
      * @param toolSessionId
      * @return
      */
-    public NotebookSession getSessionBySessionId(Long toolSessionId);
+    NotebookSession getSessionBySessionId(Long toolSessionId);
 
     /**
      * @param notebookSession
      */
-    public void saveOrUpdateNotebookSession(NotebookSession notebookSession);
+    void saveOrUpdateNotebookSession(NotebookSession notebookSession);
 
     /**
      * 
@@ -87,20 +87,20 @@ public interface INotebookService {
      * @param toolSessionId
      * @return
      */
-    public NotebookUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+    NotebookUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
      * 
      * @param uid
      * @return
      */
-    public NotebookUser getUserByUID(Long uid);
+    NotebookUser getUserByUID(Long uid);
 
     /**
      * 
      * @param notebookUser
      */
-    public void saveOrUpdateNotebookUser(NotebookUser notebookUser);
+    void saveOrUpdateNotebookUser(NotebookUser notebookUser);
 
     /**
      * 
@@ -108,7 +108,9 @@ public interface INotebookService {
      * @param notebookSession
      * @return
      */
-    public NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession);
+    NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession);
+    
+    boolean notifyUser(Integer userId, String comment);
 
     /**
      * 

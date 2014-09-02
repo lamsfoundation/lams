@@ -24,17 +24,21 @@
 
 package org.lamsfoundation.lams.tool.notebook.web.actions;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookEntryDTO;
@@ -45,6 +49,7 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -122,15 +127,21 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	setupService();
 	
-	String teachersComment = WebUtil.readStrParam(request, "teachersComment");
+	String teachersComment = WebUtil.readStrParam(request, "value", true);
 	Long userUid = WebUtil.readLongParam(request, NotebookConstants.PARAM_USER_UID);
+	boolean isNotifyLearner = WebUtil.readBooleanParam(request, "isNotifyLearner");
 	NotebookUser user = notebookService.getUserByUID(userUid);
 	
-	//check user had available notebook entry
-	if (user.getEntryUID() != null) {
-	    Long toolSessionID = user.getNotebookSession().getSessionId();
-	    user.setTeachersComment(teachersComment);
-	    notebookService.saveOrUpdateNotebookUser(user);
+	//check user had available notebook entry and teachersComment is not blank
+	if ((user.getEntryUID() == null) && StringUtils.isNotBlank(teachersComment)) {
+	    return null;
+	}
+
+	user.setTeachersComment(teachersComment);
+	notebookService.saveOrUpdateNotebookUser(user);
+
+	if (isNotifyLearner) {
+	    notebookService.notifyUser(user.getUserId().intValue(), teachersComment);
 	}
 
 	return null;

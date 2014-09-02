@@ -26,6 +26,27 @@
 	#session-list > h1 {
 		margin-left: -10px;
 	}
+	
+	.comment-area {
+		background-color: whitesmoke;
+	}
+	
+	.comment-area input.jip-ok-button {
+		margin: 7px 7px 5px 20px;
+	}
+	
+	.comment-area input.jip-cancel-button {
+		margin-right: 5px;
+	}
+	
+	.comment-area #notify-learner {
+		margin-right: 5px;
+		vertical-align: middle;
+	}
+	
+	.jip-button {
+		padding: 4px;
+	}
 </style>
 
 <script type="text/javascript">
@@ -44,9 +65,10 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript" src="${tool}includes/javascript/jinplace-1.0.1.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		<c:forEach var="sessionDto" items="${notebookDTO.sessionDTOs}" varStatus="status">
@@ -66,10 +88,7 @@
    	        <c:forEach var="userDto" items="${sessionDto.userDTOs}" varStatus="i">
    	    		entryData${sessionId}['${userDto.uid}'] = "<c:if test='${not empty userDto.entryDTO}'>${userDto.entryDTO.entryEscaped}</c:if>";
    	    		
-   	    		teachersCommentData${sessionId}['${userDto.uid}'] = [{
-   	   	     		id:"${i.index + 1}",
-   	   	     		teachersComment:"${userDto.teachersComment}"
-   	     		}];
+   	    		teachersCommentData${sessionId}['${userDto.uid}'] = "${userDto.teachersComment}";
 	        </c:forEach>
 		
 			jQuery("#group${sessionId}").jqGrid({
@@ -125,29 +144,27 @@
 					}).appendTo(subgrid);
 					subgrid.append("<br>");
 					
-					//teacher's comment
-					var subgridTable = $('<table/>', {
-						id: "${sessionId}_" + rowId + "_t",
-						className: "scroll"
+					subgrid.append('<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all ui-state-default ui-th-column ui-th-ltr" style="text-align:left; margin-bottom: 4px;padding: 3px;"><fmt:message key="label.comment" /></div>');
+					//ui-widget-content
+					//display teacher's comment
+					$('<div/>', {
+						"class": "user-entry editable${sessionId}_" + rowId + "_t comment-area",
+						"data-type": "textarea",
+						"data-checkbox-label": "<fmt:message key='label.notify.learner' />",
+					    html: teachersCommentData${sessionId}[userUid]
 					}).appendTo(subgrid);
 					
-					subgridTable.jqGrid({
-						datatype: "local",
-						height: 'auto',
-						width: 730,
-						loadonce:true,
-						cellEdit: true,
-						cellurl: "<c:url value='/monitoring.do'/>?dispatch=saveTeacherComment&userUid=" + userUid,
-						colNames: [
-							'#',
-							"<fmt:message key="label.comment" />"
-						],
-						colModel:[
-							{name:'id',index:'id', width:0, hidden: true},
-							{name:'teachersComment', index:'teachersComment', editable:true, edittype:'textarea', editoptions:{rows:'4'}},
-						],
-						data: teachersCommentData${sessionId}[userUid]
-					}).jqGrid ('setLabel', 'teachersComment', 'Comment', {'text-align':'left'});//align left header
+					$(".editable${sessionId}_" + rowId + "_t").jinplace({
+					    url: "<c:url value='/monitoring.do'/>?dispatch=saveTeacherComment&userUid=" + userUid,
+					    textOnly: false,
+					    placeholder: '<fmt:message key="label.click.to.edit" />',
+					    okButton: "<fmt:message key='button.ok' />",
+					    cancelButton: "<fmt:message key='button.cancel' />"
+					});
+
+					
+					//<c:url value='/monitoring.do'/>?dispatch=saveTeacherComment&userUid=" + userUid, <fmt:message key="label.comment" />
+
 				}
 			});
 			
