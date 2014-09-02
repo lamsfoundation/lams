@@ -180,6 +180,11 @@ public class MockAdmin extends MockUser {
 			Matcher m = MockAdmin.NEW_USER_ID_PATTERN.matcher(respText);
 			if (m.find()) {
 			    String userId = m.group(1);
+			    if (userId.equals("0")) {
+				log.error(respText);
+				throw new TestHarnessException("Error while creating user " + name
+					+ ". Server returned user ID 0");
+			    }
 			    mockUser.setUserId(userId);
 			    MockAdmin.log.debug("User " + name + " created with ID " + userId);
 			} else {
