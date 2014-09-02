@@ -65,13 +65,13 @@ table.forum.question-summary-table tr:last-child td{
 }
 
 div.error, div.message {
-    background-color: #ffffcc;
+    background-color: #FFE4C4;
     border: 1px solid #000;
     color: #000000;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: normal;
     margin: 10px auto;
-    padding: 3px;
+    padding: 8px;
     text-align: left;
     vertical-align: bottom;
 }

@@ -7,9 +7,8 @@
 		<%@ include file="/common/header.jsp"%>
 		<style media="screen,projection" type="text/css">
 			label { width: 10em; float: left; }
-			label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;}
+			label.error { float: none; color: red; vertical-align: top; font-weight: bold; font-style: italic;}
 			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
-			input.error { border: 2px solid red;}
 			#content {width: 91%; margin-bottom: 10px;}
 			table.alternative-color td {padding-left: 0;}
 			input[type=text].shortInputText {width:10%;}
@@ -20,10 +19,9 @@
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
+		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">
-		<!--
 			var addAnswerUrl = "<c:url value='/authoring/addAnswer.do'/>";
 		   	var removeAnswerUrl = "<c:url value='/authoring/removeAnswer.do'/>";
     	    var upAnswerUrl = "<c:url value='/authoring/upAnswer.do'/>";
@@ -175,7 +173,9 @@
 	    			    }
 		    		},
 		    		messages: {
-		    			title: "<fmt:message key='label.authoring.title.required'/>"
+		    			title: "<fmt:message key='label.authoring.title.required'/>",
+		    			hasAnswerFilled: "<fmt:message key='label.authoring.error.possible.answer'/>",
+		    			hasFilledCorrectAnswer: "<fmt:message key='label.authoring.error.correct.answer'/>"
 		    		},
 		    	    invalidHandler: function(form, validator) {
 		    		      var errors = validator.numberOfInvalids();
@@ -202,13 +202,13 @@
 		    	    			self.parent.refreshThickbox()
 		    	    			self.parent.tb_remove();
 		    	    		} 
-		    		    }; 				
+		    		    };
 		    		    				
 		    			$('#scratchieItemForm').ajaxSubmit(answers);
 		    		}
 		  		});
 			});   
-  		--></script>
+  		</script>
 		
 	</lams:head>
 	
@@ -240,19 +240,19 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
-				<lams:CKEditor id="description" value="${formBean.description}"
-					contentFolderID="${formBean.contentFolderID}" >
+				<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderID}" >
 				</lams:CKEditor>
-				
 				<br><br>
-				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
+				
+				<input type="text" name="hasAnswerFilled" id="hasAnswerFilled" class="fake-validation-input">
+				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.scratchie.answers" />
 				</div>
-				<label for="hasAnswerFilled" class="error" style="display: none;"><fmt:message key='label.authoring.error.possible.answer'/></label>
+				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
 				
-				<input type="hidden" name="hasFilledCorrectAnswer" id=hasFilledCorrectAnswer>
-				<label for="hasFilledCorrectAnswer" class="error" style="display: none;"><br><fmt:message key='label.authoring.error.correct.answer'/></label>
+				<input type="text" name="hasFilledCorrectAnswer" id="hasFilledCorrectAnswer" class="fake-validation-input">
+				<label for="hasFilledCorrectAnswer" class="error" style="display: none;"></label>
 				
 			</html:form>
 			

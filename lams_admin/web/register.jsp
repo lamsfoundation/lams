@@ -1,13 +1,11 @@
-
 <%@ include file="/taglibs.jsp"%>
 
 <script src="<lams:LAMSURL/>/includes/javascript/jquery.js" type="text/javascript"></script>
-<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.pack.js" type="text/javascript"></script>
+<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-<!--
-	
 	$().ready(function() {
+		
 		// validate signup form on keyup and submit
 		$("#RegisterForm").validate({
 			rules: {
@@ -26,12 +24,9 @@
 				email: '<font color="red"><i><fmt:message key="register.error.emailRequiredValid"/></i></font>'
 			}
 		});
+		
 	});
-//-->
 </script>
-
-
-
 
 <html:form action="/register" method="post" styleId="RegisterForm">
 	<html:hidden property="method" value="register" />

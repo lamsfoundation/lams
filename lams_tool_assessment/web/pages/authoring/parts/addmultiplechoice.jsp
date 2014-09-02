@@ -19,7 +19,7 @@
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	    <script>
 			$(document).ready(function(){
@@ -65,7 +65,7 @@
 		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    			},
 		    			hasOneHundredGrade: {
-		    				required: "<br><fmt:message key='error.form.validation.hundred.score'/>"
+		    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
 		    			}
 		    		},
 		    	    invalidHandler: function(form, validator) {
@@ -197,8 +197,8 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.answer.options" />
 				</div>
-				<input type="hidden" name="hasOptionFilled" id="hasOptionFilled">
-				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
+				<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+				<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
 			</html:form>
 			
 			<!-- Options -->

@@ -186,16 +186,28 @@ hr {border:0px;
 }
 
 .error {
-        color: #000000;
-        padding:8px 10px 10px 40px;
-        margin-top: 25px;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: left;
-        font-weight: normal;
-        background: url('../images/css/error.png') no-repeat #ffffce 10px 8px;
-        width: 70%;
-        border: 1px solid #C0C0C0;
+	color: #000000;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+	font-weight: normal;
+}
+input.error {
+	background-color: bisque;
+	padding:8px 2px 10px;
+}
+label.error {
+	margin-left: 10px;
+	background-color: #EFEFEF;
+	padding:8px 10px 10px;
+}
+
+#errorMessages {
+	padding:8px 10px 10px 40px;
+	margin-top: 25px;
+	background-color: #ffffce;
+	width: 70%;
+	border: 1px solid #C0C0C0;
 }
 
 .ui-finishbtn-right { float: right;padding-right: 40px; min-height: 30px;}

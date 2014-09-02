@@ -11,9 +11,9 @@
 		<c:set var="questionType" value="5"	scope="request" />
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-  	    <script><!--
+  	    <script>
 			$(document).ready(function(){
 				
 		    	$("#assessmentQuestionForm").validate({
@@ -73,8 +73,7 @@
     			self.parent.refreshThickbox()
     			self.parent.tb_remove();
     		}    
-  		--></script>
-		
+  		</script>
 		
 	</lams:head>
 	

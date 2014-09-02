@@ -13,20 +13,17 @@
 	<lams:css/>
 	
 	<script src="<lams:LAMSURL/>/includes/javascript/jquery.js" type="text/javascript"></script>
-	<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.pack.js" type="text/javascript"></script>
+	<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/javascript">
-		function submitForm()
-		{
+		function submitForm() {
 			var valid = $("#lamsCommunityLoginForm").valid();
 			
 			if (valid) {
 				document.getElementById("lamsCommunityLoginForm").submit();
 			}
-			
 		}
 		
-		function init()
-		{
+		function init() {
 			document.getElementById("lcPassword").value = "";
 		}
 		
@@ -74,7 +71,6 @@
 			<fmt:message key="label.lamscommunity.info"/>
 		</p>
 		<br />
-		
 		
 		<html:form action="/lamsCommunityLogin" method="post" styleId="lamsCommunityLoginForm">
 			
