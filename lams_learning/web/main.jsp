@@ -34,19 +34,19 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 <lams:html>
 <lams:head>
 	<lams:css />
-	<link href="css/main.css" rel="stylesheet" type="text/css" />
+	<link href="<c:url value="/"/>css/main.css" rel="stylesheet" type="text/css" />
 	<link href="<lams:LAMSURL/>css/progressBar.css" rel="stylesheet" type="text/css" />
 
 	<title><fmt:message key="learner.title" /></title>
 
-	<c:if test="${not empty param.notifyCloseURL}">
-		<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="request" />
+	<c:if test="${not empty notifyCloseURL}">
+		<c:set var="notifyCloseURL" value="${notifyCloseURL}" scope="request" />
 	</c:if>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="includes/javascript/main.js"></script>
+	<script type="text/javascript" src="<c:url value="/"/>includes/javascript/main.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			APP_URL = LAMS_URL + 'learning/',
@@ -60,11 +60,11 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			},
 			
 			parentURL = "${notifyCloseURL}",
-			lessonId = '${param.lessonID}',
+			lessonId = '${lessonID}',
 			progressPanelEnabled = '<lams:Configuration key="LearnerCollapsProgressPanel" />' != 'false',
 			
 			// settings for progress bar
-			presenceEnabled = '${param.presenceEnabledPatch}' != 'false',
+			presenceEnabled = '${presenceEnabledPatch}' != 'false',
 			isHorizontalBar = false,
 			hasContentFrame = true,
 			hasDialog = false,
@@ -136,14 +136,14 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			</tr>
 			<tr>
 				<td id="exportButtonCell">
-					<c:if test="${param.portfolioEnabled}">
+					<c:if test="${portfolioEnabled}">
 						<input onClick="javascript:exportPortfolio()" type="button" class="button progressButton" value='<fmt:message key="button.export" />' />
 					</c:if>
 				</td>
 			</tr>
 		</table>
 		
-		<div id="lessonTitleRow" class="separatorRow progressStaticHeight"><c:out value="${param.title}" /></div>
+		<div id="lessonTitleRow" class="separatorRow progressStaticHeight"><c:out value="${title}" /></div>
 		
 		<div id="progressBarDiv" class="progressBarContainer"></div>
 		
@@ -160,7 +160,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			<span id="notebookTogglerCell" class="togglerCell"/>▲</span>
 		</div>
 		<form id="notebookForm" action="<lams:WebAppURL />notebook.do?method=processNewEntry" method="post">
-			<input type="hidden" name="lessonID" value="${param.lessonID}" />
+			<input type="hidden" name="lessonID" value="${lessonID}" />
 			<input type="hidden" name="signature" value="SCRATCHPAD" />
 			<input type="hidden" name="skipViewAll" value="true" />
 			
@@ -191,7 +191,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 		</form>
 	</div>
 
-	<c:if test="${param.presenceEnabledPatch}">
+	<c:if test="${presenceEnabledPatch}">
 		<%@ include file="presenceChat.jsp"%>
 	</c:if>
 
@@ -199,13 +199,13 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 		<c:when test="${isTouchInterface}">
 			<div id="content-frame-container" class="ui-layout-center">
 				<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" 
-					src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
+					src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>"> </iframe>
 			</div>
 		</c:when>
 		
 		<c:otherwise>
 			<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
-				src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
+				src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>"> </iframe>
 		</c:otherwise>
 	</c:choose>
 	

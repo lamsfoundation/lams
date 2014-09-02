@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -178,38 +179,10 @@ public class HomeAction extends DispatchAction {
 		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
 		}
 		
-		if (lesson.getLearnerRestart()) {
-		    // start the lesson from the beginning each time
-		    getLessonService().removeLearnerProgress(lessonId, user.getUserID());
-		}
-		
-
-		String learnerURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "learning/main.jsp";
-
-		if (mode != null) {
-		    learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_MODE, mode);
-		}
-
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED,
-			String.valueOf(lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable()
-				: Boolean.TRUE));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_ENABLED,
-			String.valueOf(lesson.getLearnerPresenceAvailable()));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_IM_ENABLED,
-			String.valueOf(lesson.getLearnerImAvailable()));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_TITLE,
-			URLEncoder.encode(lesson.getLessonName(), "UTF8"));
-
-		/* Date Format for Chat room append */
-		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_CREATE_DATE_TIME,
-			sfm.format(lesson.getCreateDateTime()));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_LESSON_ID,
-			String.valueOf(lessonId));
-
-		// show lesson intro page if required
-		if (lesson.isEnableLessonIntro()) {
-		    req.setAttribute("learnerURL", learnerURL);
+		// show lesson intro page if required and it's not been shown already
+		boolean isLessonIntroWatched = WebUtil.readBooleanParam(req, "isLessonIntroWatched", false);
+		if (lesson.isEnableLessonIntro() && !isLessonIntroWatched) {
+		    req.setAttribute("learnerURL", "learnerURL");
 		    req.setAttribute("lesson", lesson);
 		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
 		    req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
@@ -228,11 +201,37 @@ public class HomeAction extends DispatchAction {
 			}
 		    }
 		    return mapping.findForward("lessonIntro");
-		} else {
-		    res.setCharacterEncoding("UTF-8");
-		    res.sendRedirect(learnerURL);
-		    return null;
 		}
+		
+		if (lesson.getLearnerRestart()) {
+		    // start the lesson from the beginning each time
+		    getLessonService().removeLearnerProgress(lessonId, user.getUserID());
+		}
+		
+		if (mode != null) {
+		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
+		}
+
+		req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
+		req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(lesson
+			.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE));
+		req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
+			String.valueOf(lesson.getLearnerPresenceAvailable()));
+		req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED,
+			String.valueOf(lesson.getLearnerImAvailable()));
+		req.setAttribute(AttributeNames.PARAM_TITLE, URLEncoder.encode(lesson.getLessonName(), "UTF8"));
+
+		/* Date Format for Chat room append */
+		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
+		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
+		
+		//forward to /lams/learning/main.jsp
+		String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
+		serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/" + serverURLContextPath;
+		serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
+		getServlet().getServletContext().getContext(serverURLContextPath + "learning")
+			.getRequestDispatcher("/main.jsp").forward(req, res);
+		return null;
 	    }
 
 	} catch (Exception e) {
