@@ -58,29 +58,41 @@ public interface IMonitoringService {
      * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
      * not, throws a UserAccessDeniedException exception
      */
-    public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription);
+    void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription);
 
     /**
      * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
      * not, throws a UserAccessDeniedException exception
      */
-    public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription);
+    void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription);
 
     /** Get the message service, which gives access to the I18N text */
-    public MessageService getMessageService();
+    MessageService getMessageService();
 
     /**
      * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
      */
-    public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
-	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
-	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
+    Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
+	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson);
 
     /**
-     * Initialize a new lesson so as to start the learning process. It needs to notify lams which learning design it
-     * belongs to. The initialize process doesn't involve the setup of lesson class and organization.
+     * <p>
+     * Create new lesson according to the learning design specified by the user. This involves following major steps:
+     * </P>
+     * 
+     * <li>1. Make a runtime copy of static learning design defined in authoring</li> <li>2. Go through all the tool
+     * activities defined in the learning design, create a runtime copy of all tool's content.</li>
+     * 
+     * <P>
+     * As a runtime design, it is not copied into any folder.
+     * </P>
+     * 
+     * <p>
+     * The initialization process doesn't involve the setup of lesson class and organization.
+     * </p>
      * 
      * @param lessonName
      *            the name of the lesson
@@ -108,10 +120,10 @@ public interface IMonitoringService {
      *            feature)
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
-	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
-	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableNotifications, Boolean learnerRestart,
+    Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId, Integer organisationId,
+	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
+	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
+	    Boolean liveEditEnabled, Boolean enableNotifications, Boolean learnerRestart,
 	    Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
@@ -126,34 +138,42 @@ public interface IMonitoringService {
      * @return WDDX message packet containing the Lesson ID
      * @throws Exception
      */
-    public String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception;
+    String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception;
 
     /**
      * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
      * normal learning session. The design is not assigned to any workspace folder.
      */
-    public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
+    Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled);
 
     /**
      * Setup the lesson class and organization for a lesson according to the input from monitoring GUI interface.
      * 
+     * <p>
+     * Pre-condition: This method must be called under the condition of the the new lesson exists (without lesson
+     * class).
+     * </p>
+     * <p>
+     * A lesson class record should be inserted and organization should be setup after execution of this service.
+     * </p>
+     * 
      * @param lessonId
      *            the lesson without lesson class and organization
      * @param organisation
      *            the organization this lesson belongs to.
-     * @param name
-     *            of learner group
+     * @param learnerGroupName
+     *            name of learner group
      * @param organizationUsers
      *            a list of learner will be in this new lessons.
-     * @param name
-     *            of staff group
+     * @param staffGroupName
+     *            name of staff group
      * @param staffs
      *            a list of staffs who will be in charge of this lesson.
      * @return the lesson with lesson class and organization
      */
-    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
+    Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userID)
 	    throws UserAccessDeniedException;
 
@@ -167,14 +187,14 @@ public interface IMonitoringService {
      * @throws LamsToolServiceException
      *             the exception occurred during the lams and tool interaction to start a lesson.
      */
-    public void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * Do any normal initialisation needed for gates and branching. Done both when a lesson is started, or for new
      * activities added during a Live Edit. Returns a new MaxID for the design if needed. If MaxID is returned, update
      * the design with this new value and save the whole design (as initialiseSystemActivities has changed the design).
      */
-    public Integer startSystemActivity(Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName);
+    Integer startSystemActivity(Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName);
 
     /**
      * <p>
@@ -193,11 +213,10 @@ public interface IMonitoringService {
      *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
      * @returns An updated gate, that should be saved by the calling code.
      */
-    public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
-	    String lessonName);
+    ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime, String lessonName);
 
     /**
-     * Start a lesson on schedule datetime.
+     * Start a lesson on scheduled datetime.
      * 
      * @param lessonId
      * @param startDate
@@ -206,10 +225,10 @@ public interface IMonitoringService {
      *            checks that the user is a staff member for this lesson
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
+    void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
 
     /**
-     * Finish a lesson on schedule datetime.
+     * Finish a lesson on scheduled datetime.
      * 
      * @param lessonId
      * @param endDate
@@ -217,7 +236,7 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
+    void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
 	    throws UserAccessDeniedException;
 
     /**
@@ -231,7 +250,7 @@ public interface IMonitoringService {
      * @param endDate
      *            teh lesson end date and time.
      */
-    public void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * Set whether or not the export portfolio button is available in learner. Sets it to FALSE if
@@ -243,7 +262,7 @@ public interface IMonitoringService {
      * @return new value for learnerExportAvailable. Normally will be same as input parameter, will only be different if
      *         the value cannot be updated for some reason.
      */
-    public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable);
+    Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable);
 
     /**
      * Set whether or not the learner presence button is available in monitor. Sets it to FALSE if
@@ -255,7 +274,7 @@ public interface IMonitoringService {
      * @return new value for learnerPresenceAvailable. Normally will be same as input parameter, will only be different
      *         if the value cannot be updated for some reason.
      */
-    public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
+    Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
 
     /**
      * Set whether or not the learner IM button is available in monitor. Sets it to FALSE if learnerExportAvailable is
@@ -267,7 +286,7 @@ public interface IMonitoringService {
      * @return new value for learnerPresenceImAvailable. Normally will be same as input parameter, will only be
      *         different if the value cannot be updated for some reason.
      */
-    public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
+    Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
 
     /**
      * Set whether or not the live edit is available in monitor. Sets it to FALSE if learnerExportAvailable is null.
@@ -279,9 +298,9 @@ public interface IMonitoringService {
      * @return new value for liveEditEnabled. Normally will be same as input parameter, will only be different if the
      *         value cannot be updated for some reason.
      */
-    public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
+    Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
-    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
+    String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent);
 
     /**
@@ -292,7 +311,7 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void archiveLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void archiveLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * Unarchive the specified the lesson. Reverts back to its previous state.
@@ -300,7 +319,7 @@ public interface IMonitoringService {
      * @param lessonId
      *            the specified the lesson id.
      */
-    public void unarchiveLesson(long lessonId, Integer userId);
+    void unarchiveLesson(long lessonId, Integer userId);
 
     /**
      * A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
@@ -311,7 +330,7 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson back to its previous state.
@@ -321,7 +340,7 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void unsuspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void unsuspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * <P>
@@ -334,7 +353,7 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void removeLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void removeLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * Set the gate to open to let all the learners through. This learning service is triggerred by the system
@@ -344,7 +363,7 @@ public interface IMonitoringService {
      * @param gate
      *            the id of the gate we need to open.
      */
-    public GateActivity openGate(Long gateId);
+    GateActivity openGate(Long gateId);
 
     /**
      * Allows a single learner to pass the gate.
@@ -353,7 +372,7 @@ public interface IMonitoringService {
      * @param userId
      * @return
      */
-    public GateActivity openGateForSingleUser(Long gateId, Integer userId);
+    GateActivity openGateForSingleUser(Long gateId, Integer userId);
 
     /**
      * Set the gate to closed.
@@ -361,7 +380,7 @@ public interface IMonitoringService {
      * @param gate
      *            the id of the gate we need to close.
      */
-    public GateActivity closeGate(Long gateId);
+    GateActivity closeGate(Long gateId);
 
     /**
      * This method returns the details for the given Lesson in WDDX format. Object inside the packet is a
@@ -374,7 +393,7 @@ public interface IMonitoringService {
      * @return String The requested details in wddx format
      * @throws IOException
      */
-    public String getLessonDetails(Long lessonID, Integer userID) throws IOException;
+    String getLessonDetails(Long lessonID, Integer userID) throws IOException;
 
     /**
      * Returns a list of learners participating in the given Lesson
@@ -387,7 +406,7 @@ public interface IMonitoringService {
      * 
      * @throws IOException
      */
-    public String getLessonLearners(Long lessonID, Integer userID) throws IOException;
+    String getLessonLearners(Long lessonID, Integer userID) throws IOException;
 
     /**
      * Returns a list of staff participating in the given Lesson
@@ -400,7 +419,7 @@ public interface IMonitoringService {
      * 
      * @throws IOException
      */
-    public String getLessonStaff(Long lessonID, Integer userID) throws IOException;
+    String getLessonStaff(Long lessonID, Integer userID) throws IOException;
 
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
@@ -425,9 +444,9 @@ public interface IMonitoringService {
      * @return String The requested details in wddx format
      * @throws IOException
      */
-    public String getLearningDesignDetails(Long lessonID) throws IOException;
+    String getLearningDesignDetails(Long lessonID) throws IOException;
 
-    public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
+    List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 
     /**
      * This method returns the url associated with the activity in the monitoring enviornment. This is the URL that
@@ -448,7 +467,7 @@ public interface IMonitoringService {
      * @throws IOException
      * @throws LamsToolServiceException
      */
-    public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
+    String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException;
 
     /**
@@ -463,7 +482,7 @@ public interface IMonitoringService {
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
+    String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException;
 
     /**
@@ -480,7 +499,7 @@ public interface IMonitoringService {
      * @return String The acknowledgement message/error in WDDX format
      * @throws IOException
      */
-    public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException;
+    String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException;
 
     /**
      * This method changes the name of an existing Lesson to the one specified.
@@ -494,7 +513,7 @@ public interface IMonitoringService {
      * @return String The acknowledgement message/error in WDDX format
      * @throws IOException
      */
-    public String renameLesson(Long lessonID, String newName, Integer userID) throws IOException;
+    String renameLesson(Long lessonID, String newName, Integer userID) throws IOException;
 
     /**
      * Return an activity object based on the requested id.
@@ -503,7 +522,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
-    public Activity getActivityById(Long activityId);
+    Activity getActivityById(Long activityId);
 
     /**
      * Return an activity object based on the requested id. Where possible, give it the type we want so that it can be
@@ -513,7 +532,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
-    public Activity getActivityById(Long activityId, Class clasz);
+    Activity getActivityById(Long activityId, Class clasz);
 
     /**
      * Return an activity object based on the requested id.
@@ -522,7 +541,7 @@ public interface IMonitoringService {
      *            id of the activity.
      * @return the requested activity object.
      */
-    public GroupingActivity getGroupingActivityById(Long activityID);
+    GroupingActivity getGroupingActivityById(Long activityID);
 
     /**
      * Returns an acknowledgement that the gate has been released. Returns true if the gate has been released and false
@@ -534,7 +553,7 @@ public interface IMonitoringService {
      *            The lesson_id of the Lesson
      * @return
      */
-    public String releaseGate(Long activityID) throws IOException;
+    String releaseGate(Long activityID) throws IOException;
 
     /**
      * Perform chosen grouping. The groups contains a list of Hashtable which contain following information for each
@@ -549,7 +568,7 @@ public interface IMonitoringService {
      * @param groups
      *            list of group information.
      */
-    public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException;
+    void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException;
 
     // ---------------------------------------------------------------------
     // Preview Methods
@@ -563,7 +582,7 @@ public interface IMonitoringService {
      *            ID of the lesson
      * @return Lesson
      */
-    public abstract Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
+    abstract Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
 
     /**
      * Remove all the details for a particular preview lessons. The transaction handling for this method should be
@@ -572,7 +591,7 @@ public interface IMonitoringService {
      * @param lessonID
      *            ID of the lesson which is the preview session. Mandatory.
      */
-    public abstract void deletePreviewLesson(long lessonID);
+    abstract void deletePreviewLesson(long lessonID);
 
     /**
      * Remove all the "old" preview lessons. Removes all preview lessons older than the number of days specified in the
@@ -583,9 +602,9 @@ public interface IMonitoringService {
      * 
      * @return number of lessons deleted.
      */
-    public abstract int deleteAllOldPreviewLessons();
+    abstract int deleteAllOldPreviewLessons();
 
-    /*  Supports the Chosen Groupings and Branching */
+    /* Supports the Chosen Groupings and Branching */
     /**
      * Get all the active learners in the lesson who are not in a group or in a branch.
      * 
@@ -599,44 +618,55 @@ public interface IMonitoringService {
      *            true/false for GroupingActivities, always false for non-GroupingActivities
      * @return Sorted set of Users, sorted by surname
      */
-    public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping);
+    SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping);
 
     /**
-     * Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group.
+     * Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. If
+     * the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create grouping.
+     * Otherwise leave it false and it will use the grouping applied to the activity - this is used for branching
+     * activities.
+     * 
+     * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
      * 
      * @param activityID
-     *            id of the activity
+     *            id of the grouping activity
      * @param name
      *            group name
      * @throws LessonServiceException
+     *             , MonitoringServiceException
      */
-    public abstract Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
+    abstract Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException;
 
     /**
      * Remove a group to from a grouping activity. If the group does not exists then nothing happens. If the group is
      * already used (e.g. a tool session exists) then it throws a LessonServiceException.
      * 
+     * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
+     * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
+     * branching activities.
+     * 
+     * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
+     * 
      * @param activityID
-     *            id of the activity
+     *            id of the grouping activity
      * @param name
      *            group name
      * @throws LessonServiceException
      **/
-    public abstract void removeGroup(Long activityID, Long groupID) throws LessonServiceException;
+    abstract void removeGroup(Long activityID, Long groupID) throws LessonServiceException;
 
     /**
      * Add learners to a group. Doesn't necessarily check if the user is already in another group.
      */
-    public abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[])
-	    throws LessonServiceException;
+    abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
 
     /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
      * 
      * @throws LessonServiceException
      */
-    public abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[])
+    abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[])
 	    throws LessonServiceException;
 
     /**
@@ -649,7 +679,7 @@ public interface IMonitoringService {
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
-    public void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
+    void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
 
     /**
      * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
@@ -660,13 +690,13 @@ public interface IMonitoringService {
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
-    public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
+    void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
 
     /**
      * Has anyone started this branch / branching activity ? Irrespective of the groups. Used to determine if a branch
      * mapping can be removed.
      */
-    public boolean isActivityAttempted(Activity activity) throws LessonServiceException;
+    boolean isActivityAttempted(Activity activity) throws LessonServiceException;
 
     /**
      * Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch. Use for
@@ -677,7 +707,7 @@ public interface IMonitoringService {
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
-    public void addGroupToBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
+    void addGroupToBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
 
     /**
      * Remove group / branch mapping. Cannot be done if any users in the group have started the branch. Used for group
@@ -688,7 +718,7 @@ public interface IMonitoringService {
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
-    public void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
+    void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
 
     /**
      * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
@@ -696,30 +726,44 @@ public interface IMonitoringService {
      * @param branchingActivityID
      *            Activity id of the branchingActivity
      */
-    public SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
+    SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
 
     /**
      * Get the list of users who have attempted an activity. This is based on the progress engine records. This will
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
-    public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
     /** Get the record of the learner's progress for a particular lesson */
-    public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
+    LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
     /**
      * Set a groups name
      */
-    public void setGroupName(Long groupID, String name);
+    void setGroupName(Long groupID, String name);
 
     /** Open Time Chart */
-    public Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
+    Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /** Get Organisation by organisationId */
-    public Organisation getOrganisation(Integer organisationId);
+    Organisation getOrganisation(Integer organisationId);
 
-    public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson);
+    /**
+     * If the activity is not grouped and not in a branch, then it create lams tool session for all the learners in the
+     * lesson. After the creation of lams tool session, it delegates to the tool instances to create tool's own tool
+     * session. Can't create it for a grouped activity or an activity in a branch as it may not be applicable to all
+     * users.
+     * <p>
+     * 
+     * @param activity
+     *            the tool activity that all tool session reference to.
+     * @param lesson
+     *            the target lesson that these tool sessions belongs to.
+     * @throws LamsToolServiceException
+     *             the exception when lams is talking to tool.
+     */
+    void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson);
 
     /**
      * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff
@@ -731,9 +775,9 @@ public interface IMonitoringService {
      * @param staffIds
      * @param learnerIds
      * @param group
-     * @return
+     * @return number of lessons created.
      * @throws MonitoringServiceException
      */
-    public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
+    int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 }
