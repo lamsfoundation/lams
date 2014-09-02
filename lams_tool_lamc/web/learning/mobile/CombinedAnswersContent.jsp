@@ -32,8 +32,7 @@
 <c:forEach var="dto" varStatus="status"	items="${requestScope.learnerAnswersDTOList}">
 
 	<li>
-	<fieldset data-role="controlgroup">
-		<legend>
+		<div>
 			<span class="float-left space-right">
 				${dto.displayOrder})
 			</span>
@@ -44,7 +43,11 @@
 				<strong><fmt:message key="label.mark" /></strong>
 				<c:out value="${dto.mark}" />
 				]
-			</c:if>							
+			</c:if>
+		</div>
+		
+	<fieldset data-role="controlgroup">
+		<legend>							
 		</legend>
 	
 		<c:forEach var="option" varStatus="status" items="${dto.options}">
