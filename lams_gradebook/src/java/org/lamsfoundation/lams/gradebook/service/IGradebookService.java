@@ -89,8 +89,7 @@ public interface IGradebookService {
     ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation);
 
     /**
-     * Updates a user's lesson mark, this will make it desynchronised with the
-     * aggregated marks from the activities
+     * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities
      * 
      * @param lesson
      * @param learner
@@ -99,16 +98,19 @@ public interface IGradebookService {
     void updateUserLessonGradebookMark(Lesson lesson, User learner, Double mark);
     
     /**
-     * Updates a user's activity mark, this will automatically add up all the 
-     * user's activity marks for a lesson and set the lesson mark too
+     * Updates a user's activity mark, this will automatically add up all the user's activity marks for a lesson and set
+     * the lesson mark too
      * 
      * @param lesson
      * @param learner
      * @param activity
      * @param mark
+     * @param markedInGradebook
+     * @param isAuditLogRequired should this event be logged with audit service
      */
-    void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark, Boolean markedInGradebook);
-    
+    void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
+	    Boolean markedInGradebook, boolean isAuditLogRequired);
+
     /**
      * Updates the user's feedback for an activity
      * 
@@ -126,6 +128,13 @@ public interface IGradebookService {
      * @param feedback
      */
     void updateUserLessonGradebookFeedback(Lesson lesson, User learner, String feedback);
+    
+    /**
+     * Toggle on/off marks released option
+     * 
+     * @param lessonId
+     */
+    void toggleMarksReleased(Long lessonId);
     
     /**
      * Gets the lesson row dtos for a given organisation

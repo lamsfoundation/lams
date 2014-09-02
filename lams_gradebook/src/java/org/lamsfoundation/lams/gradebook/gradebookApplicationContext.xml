@@ -22,6 +22,7 @@
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="messageService"><ref bean="gradebookMessageService"/></property>
+		<property name="auditService"><ref bean="auditService"/></property>
 	</bean>
 	
 	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
@@ -30,6 +31,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggleMarksReleased">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="export*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>

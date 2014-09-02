@@ -702,7 +702,7 @@ public class LearnerService implements ICoreLearnerService {
 			    // Only set the mark if it hasnt previously been set by a teacher
 			    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
 				gradebookService.updateUserActivityGradebookMark(lesson, learner, toolActivity,
-					outputDouble, false);
+					outputDouble, false, false);
 			    }
 			}
 		    }

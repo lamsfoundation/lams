@@ -41,9 +41,15 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -53,6 +59,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -73,12 +80,16 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -102,6 +113,7 @@ public class GradebookService implements IGradebookService {
     private IBaseDAO baseDAO;
     private IActivityDAO activityDAO;
     private MessageService messageService;
+    private IAuditService auditService;
 
     @SuppressWarnings("unchecked")
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Lesson lesson, User learner) {
@@ -360,13 +372,22 @@ public class GradebookService implements IGradebookService {
 	    if (gradebookUserLesson == null) {
 		gradebookUserLesson = new GradebookUserLesson(lesson, learner);
 	    }
+	    String oldMark = (gradebookUserLesson.getMark() == null) ? "-" : gradebookUserLesson.getMark().toString();
+
 	    gradebookUserLesson.setMark(mark);
 	    gradebookDAO.insertOrUpdate(gradebookUserLesson);
+	    
+	    // audit log changed gradebook mark
+	    UserDTO monitorUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	    String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
+		    lesson.getLessonId().toString(), oldMark, mark.toString() };
+	    String message = messageService.getMessage("audit.lesson.change.mark", args);
+	    auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
 	}
     }
 
     public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
-	    Boolean markedInGradebook) {
+	    Boolean markedInGradebook, boolean isAuditLogRequired) {
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
 
 	    // First, update the mark for the activity
@@ -376,6 +397,8 @@ public class GradebookService implements IGradebookService {
 	    if (gradebookUserActivity == null) {
 		gradebookUserActivity = new GradebookUserActivity((ToolActivity) activity, learner);
 	    }
+	    String oldMark = (gradebookUserActivity.getMark() == null) ? "-" : gradebookUserActivity.getMark()
+		    .toString();
 
 	    gradebookUserActivity.setMark(mark);
 	    gradebookUserActivity.setMarkedInGradebook(markedInGradebook);
@@ -392,6 +415,16 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    aggregateTotalMarkForLesson(gradebookUserLesson);
+	    
+	    // audit log changed gradebook mark
+	    if (isAuditLogRequired) {
+		UserDTO monitorUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
+			activity.getActivityId().toString(), lesson.getLessonId().toString(), oldMark.toString(),
+			mark.toString() };
+		String message = messageService.getMessage("audit.activity.change.mark", args);
+		auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
+	    }
 	}
     }
 
@@ -419,6 +452,22 @@ public class GradebookService implements IGradebookService {
 
 	gradebookUserActivity.setFeedback(feedback);
 	gradebookDAO.insertOrUpdate(gradebookUserActivity);
+    }
+    
+    @Override
+    public void toggleMarksReleased(Long lessonId) {
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+
+	boolean isMarksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
+	lesson.setMarksReleased(!isMarksReleased);
+	userService.save(lesson);
+	
+	// audit log marks released
+	UserDTO monitor = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	String messageKey = (isMarksReleased) ? "audit.marks.released.off" : "audit.marks.released.on";
+	String message = messageService.getMessage(messageKey, new String[] {lessonId.toString()});
+	auditService.log(monitor, GradebookConstants.MODULE_NAME, message);
     }
 
     @SuppressWarnings("unchecked")
@@ -1042,7 +1091,7 @@ public class GradebookService implements IGradebookService {
 	    // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
 	    // mark and feedback
 	    if (gradebookUserActivity == null || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
-		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook);
+		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook, false);
 		updateUserActivityGradebookFeedback(activity, learner, feedback);
 	    }
 	}
@@ -1544,6 +1593,11 @@ public class GradebookService implements IGradebookService {
     }
 
     // Getter and setter methods -----------------------------------------------
+    
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+    
     public ILamsCoreToolService getToolService() {
 	return toolService;
     }
