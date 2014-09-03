@@ -87,12 +87,9 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	public List getLearningDesignsByOriginalDesign(Long originalDesignID);
 	
 	/**
-	 * Get the titles of all the learning designs in the given folder.
-	 * @param workspaceFolderID The workspace_folder_id of the WorkspaceFolder
-	 * 							from where the designs have to be fetched.
-	 * @return List The List of titles
+	 * Get the titles of all the learning designs with the given prefix in the given folder.
 	 */
-	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID);
+	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID, String prefix);
 	
 	public List<LearningDesignAccess> getAccessByUser(Integer userId);
 }

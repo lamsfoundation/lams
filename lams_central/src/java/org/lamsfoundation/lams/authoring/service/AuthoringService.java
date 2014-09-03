@@ -1912,7 +1912,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	String newName = originalTitle;
 	if (workspaceFolderId != null) {
-	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId);
+	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId,
+		    originalTitle);
 	    int idx = 1;
 
 	    Calendar calendar = Calendar.getInstance();
