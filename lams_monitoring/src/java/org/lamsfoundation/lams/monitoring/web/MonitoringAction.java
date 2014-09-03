@@ -1398,7 +1398,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	for (User user : users) {
 	    Integer userId = user.getUserId();
 	    for (String includeId : userIdArray) {
-		if (userId.equals(includeId)) {
+		if (userId.toString().equals(includeId)) {
 		    result.add(user);
 		    break;
 		}
