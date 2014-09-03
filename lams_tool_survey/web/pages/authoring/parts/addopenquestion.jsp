@@ -15,6 +15,21 @@
        		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
+		
+		
+		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+		<script type="text/javascript">
+			$.noConflict();
+			jQuery(function() {
+				//change size of an iframe on ckeditor's autogrow 
+				CKEDITOR.instances["question.description"].on("instanceReady", function(e) {
+				    e.editor.on('resize', function(reEvent){
+				    	var iframe = window.parent.document.getElementById("questionInputArea");
+				    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
+				    });
+				});
+			});
+		</script>
 
 	</lams:head>
 	<body>
@@ -22,11 +37,8 @@
 		<!-- Basic Info Form-->
 
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post"
-			styleId="surveyItemForm">
-			<c:set var="formBean"
-				value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="surveyItemForm">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="itemIndex" />

@@ -1,8 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-		"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ include file="/common/taglibs.jsp"%>
 
-<script lang="javascript">
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+<script type="text/javascript">
 
 	function uncheckIsFilesRequired() {
 		document.getElementById("isFilesRequired").checked=false;
@@ -19,6 +19,16 @@
 			window.top.hideMessage();
 		}
 	}
+	
+	$(function() {
+		//change size of an iframe on ckeditor's autogrow 
+		CKEDITOR.instances.description.on("instanceReady", function(e) {
+		    e.editor.on('resize', function(reEvent){
+		    	var iframe = window.parent.document.getElementById("resourceInputArea");
+		    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
+		    });
+		});
+	});
 </script>
 
 <lams:html>

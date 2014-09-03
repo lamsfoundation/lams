@@ -8,7 +8,6 @@
 	<title> <fmt:message key="label.learnersVoted"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	
 </lams:head>
 <body class="stripes">
