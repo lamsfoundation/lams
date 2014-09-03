@@ -108,7 +108,7 @@
 	</script>
 </lams:head>
 
-<body class="large-font">
+<body>
 <div data-role="page" data-cache="false">
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">
