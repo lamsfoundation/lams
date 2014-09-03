@@ -24,248 +24,214 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.noticeboard;
 
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * <p>The NoticeboardSession class represents a tool session for a noticeboard activity.
- * Each tool session may represent a group of users, if grouping is used, or may 
- * represent one learner if there is no grouping for this particular activity.
+ * <p>
+ * The NoticeboardSession class represents a tool session for a noticeboard activity. Each tool session may represent a
+ * group of users, if grouping is used, or may represent one learner if there is no grouping for this particular
+ * activity.
  * </p>
  * <br>
- * <p>The session status has three possible status':
- * <ul><li>NOT_ATTEMPTED: which means that the tool session has been established, but no learners have reached this activity yet 
- * <li>INCOMPLETE: which means that a learner has reached this activity 
+ * <p>
+ * The session status has three possible status':
+ * <ul>
+ * <li>NOT_ATTEMPTED: which means that the tool session has been established, but no learners have reached this activity
+ * yet
+ * <li>INCOMPLETE: which means that a learner has reached this activity
  * <li>COMPLETED: The session status will never be set to complete as you don't know when this tool is going to end.
- * </ul></p>
+ * </ul>
+ * </p>
+ * 
  * @author mtruong
  * @hibernate.class table="tl_lanb11_session"
  */
 
 public class NoticeboardSession implements Serializable {
 
-    
     public final static String NOT_ATTEMPTED = "NOT_ATTEMPTED";
-    
+
     public final static String INCOMPLETE = "INCOMPLETE";
-    
+
     public static final String COMPLETED = "COMPLETED";
-    
-	/** identifier field */
+
+    /** identifier field */
     private Long uid;
-    
-    /** persistent field*/
-	private Long nbSessionId;
-	
-	/** persistent field*/
-	private String nbSessionName;
-	
-  	/** nullable persistent field */
-	private Date sessionStartDate;
-		
-	/** nullable persistent field */
-	private Date sessionEndDate;
-	
-	/** nullable persistent field */
-	private String sessionStatus;
-	
-	/** persistent field */
-	private NoticeboardContent nbContent;
-	
-	/** persistent field */
-	private Set nbUsers = new HashSet();
-	
-	/** default constructor */
-	public NoticeboardSession()
-	{
-				
-	}
-	
-	/** full constructor */
-	public NoticeboardSession(Long nbSessionId, 
-							  String nbSessionName,
-							  NoticeboardContent nbContent,
-							  Date sessionStartDate,
-							  Date sessionEndDate,
-							  String sessionStatus)
-	{
-		this.nbSessionId = nbSessionId;
-		this.nbSessionName = nbSessionName;
-		//this.nbContentId = nbContentId;
-		this.nbContent = nbContent;
-		this.sessionStartDate = sessionStartDate;
-		this.sessionEndDate = sessionEndDate;
-		this.sessionStatus = sessionStatus;
-	}
-	
-	/**
-	 * Constructor used when creating a new  noticeboardSession given
-	 * the noticeboardContent id
-	 */
-	
-	public NoticeboardSession(Long nbSessionId,
-							  String nbSessionName,
-	        				  NoticeboardContent nbContent,
-	        				  Date sessionStartDate,
-	        				  String sessionStatus)
-	{
-	    this.nbSessionId = nbSessionId;
-	    this.nbSessionName = nbSessionName;
-	    this.nbContent = nbContent;
-	    this.sessionStartDate = sessionStartDate;
-	    this.sessionEndDate = null;
-	    this.sessionStatus = sessionStatus;
-	}
-	
-	public NoticeboardSession(Long nbSessionId, 
-							  String nbSessionName,
-							  NoticeboardContent nbContent)
-	{
-	    this.nbSessionId = nbSessionId;
-	    this.nbSessionName = nbSessionName;
-	    this.nbContent = nbContent;
-	    this.sessionStartDate = new Date(System.currentTimeMillis());
-		this.sessionStatus = NoticeboardSession.INCOMPLETE;
-	}
-	
-	public NoticeboardSession(Long nbSessionId, String nbSessionName)
-	{
-	    this.nbSessionId = nbSessionId;
-	    this.nbSessionName = nbSessionName;
-	    this.sessionStartDate = new Date(System.currentTimeMillis());
-		this.sessionStatus = NoticeboardSession.INCOMPLETE;
-	}
-	
-	public NoticeboardSession(Long nbSessionId)
-	{
-	    this.nbSessionId = nbSessionId;
-	    this.sessionStartDate = new Date(System.currentTimeMillis());
-		this.sessionStatus = NoticeboardSession.INCOMPLETE;
-	}
-	
-	/**
-	 * 		@hibernate.many-to-one
-     *      not-null="true"
-     *      @hibernate.column name="nb_content_uid" 
-	 */
-	public NoticeboardContent getNbContent() {
-		return nbContent;
-	}
-	
-	public void setNbContent(NoticeboardContent nbContent) {
-		this.nbContent = nbContent;
-	}
-		
-	/**
-	 *		@hibernate.property
-     *      column="nb_session_id"
-     *      length="20"
-     *      not-null="true"
-	 */
-	public Long getNbSessionId() {
-		return nbSessionId;
-	}
-	
-	public void setNbSessionId(Long nbSessionId) {
-		this.nbSessionId = nbSessionId;
-	}
-	
-	/**
-	 * 		@hibernate.property
-     *      column="nb_session_name"
-     *      length="255"
-     *      not-null="true"
-	 */
-	public String getNbSessionName() {
-		return nbSessionName;
-	}
-	
-	public void setNbSessionName(String nbSessionName) {
-		this.nbSessionName = nbSessionName;
-	}
-	
-	/**
-	 *		@hibernate.property
-     *      column="session_end_date"
-     *      length="19"
-	 */
-	public Date getSessionEndDate() {
-		return sessionEndDate;
-	}
-	
-	public void setSessionEndDate(Date sessionEndDate) {
-		this.sessionEndDate = sessionEndDate;
-	}
-	
-	/**
-	 *		@hibernate.property
-     *      column="session_start_date"
-     *      length="19"
-	 */
-	public Date getSessionStartDate() {
-		return sessionStartDate;
-	}
-	
-	public void setSessionStartDate(Date sessionStartDate) {
-		this.sessionStartDate = sessionStartDate;
-	}
-	
-	/**
-	 * 		@hibernate.property
-     *      column="session_status"
-     *      length="100"
-	 */
-	public String getSessionStatus() {
-		return sessionStatus;
-	}
-	
-	public void setSessionStatus(String sessionStatus) {
-		this.sessionStatus = sessionStatus;
-	}
-	
-	/**
-     *	  	@hibernate.id
-     *      generator-class="native"
-     *      type="java.lang.Long"
-     *      column="uid"
-     *      unsaved-value="0"
+
+    /** persistent field */
+    private Long nbSessionId;
+
+    /** persistent field */
+    private String nbSessionName;
+
+    /** nullable persistent field */
+    private Date sessionStartDate;
+
+    /** nullable persistent field */
+    private Date sessionEndDate;
+
+    /** nullable persistent field */
+    private String sessionStatus;
+
+    /** persistent field */
+    private NoticeboardContent nbContent;
+
+    /** persistent field */
+    private Set<NoticeboardUser> nbUsers = new HashSet<NoticeboardUser>();
+
+    /** default constructor */
+    public NoticeboardSession() {
+
+    }
+
+    /** full constructor */
+    public NoticeboardSession(Long nbSessionId, String nbSessionName, NoticeboardContent nbContent,
+	    Date sessionStartDate, Date sessionEndDate, String sessionStatus) {
+	this.nbSessionId = nbSessionId;
+	this.nbSessionName = nbSessionName;
+	// this.nbContentId = nbContentId;
+	this.nbContent = nbContent;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionEndDate = sessionEndDate;
+	this.sessionStatus = sessionStatus;
+    }
+
+    /**
+     * Constructor used when creating a new noticeboardSession given the noticeboardContent id
+     */
+
+    public NoticeboardSession(Long nbSessionId, String nbSessionName, NoticeboardContent nbContent,
+	    Date sessionStartDate, String sessionStatus) {
+	this.nbSessionId = nbSessionId;
+	this.nbSessionName = nbSessionName;
+	this.nbContent = nbContent;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionEndDate = null;
+	this.sessionStatus = sessionStatus;
+    }
+
+    public NoticeboardSession(Long nbSessionId, String nbSessionName, NoticeboardContent nbContent) {
+	this.nbSessionId = nbSessionId;
+	this.nbSessionName = nbSessionName;
+	this.nbContent = nbContent;
+	this.sessionStartDate = new Date(System.currentTimeMillis());
+	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+    }
+
+    public NoticeboardSession(Long nbSessionId, String nbSessionName) {
+	this.nbSessionId = nbSessionId;
+	this.nbSessionName = nbSessionName;
+	this.sessionStartDate = new Date(System.currentTimeMillis());
+	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+    }
+
+    public NoticeboardSession(Long nbSessionId) {
+	this.nbSessionId = nbSessionId;
+	this.sessionStartDate = new Date(System.currentTimeMillis());
+	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+    }
+
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="nb_content_uid"
+     */
+    public NoticeboardContent getNbContent() {
+	return nbContent;
+    }
+
+    public void setNbContent(NoticeboardContent nbContent) {
+	this.nbContent = nbContent;
+    }
+
+    /**
+     * @hibernate.property column="nb_session_id" length="20" not-null="true"
+     */
+    public Long getNbSessionId() {
+	return nbSessionId;
+    }
+
+    public void setNbSessionId(Long nbSessionId) {
+	this.nbSessionId = nbSessionId;
+    }
+
+    /**
+     * @hibernate.property column="nb_session_name" length="255" not-null="true"
+     */
+    public String getNbSessionName() {
+	return nbSessionName;
+    }
+
+    public void setNbSessionName(String nbSessionName) {
+	this.nbSessionName = nbSessionName;
+    }
+
+    /**
+     * @hibernate.property column="session_end_date" length="19"
+     */
+    public Date getSessionEndDate() {
+	return sessionEndDate;
+    }
+
+    public void setSessionEndDate(Date sessionEndDate) {
+	this.sessionEndDate = sessionEndDate;
+    }
+
+    /**
+     * @hibernate.property column="session_start_date" length="19"
+     */
+    public Date getSessionStartDate() {
+	return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Date sessionStartDate) {
+	this.sessionStartDate = sessionStartDate;
+    }
+
+    /**
+     * @hibernate.property column="session_status" length="100"
+     */
+    public String getSessionStatus() {
+	return sessionStatus;
+    }
+
+    public void setSessionStatus(String sessionStatus) {
+	this.sessionStatus = sessionStatus;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid" unsaved-value="0"
      */
     public Long getUid() {
-        return uid;
+	return uid;
     }
-    
+
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
-	
+
     /**
-     * @hibernate.set
-     *      lazy="true"
-     *      inverse="true"
-     *      cascade="all-delete-orphan"
-  	 *
- 	 * @hibernate.collection-key
-	 * 		column="nb_session_uid"
-	 * @hibernate.collection-one-to-many
-	 *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
+     * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+     *
+     * @hibernate.collection-key column="nb_session_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
      */
-    public Set getNbUsers() {
-        if (this.nbUsers == null)
-		{
-			setNbUsers(new HashSet());
-		}
-    
-        return nbUsers;
+    public Set<NoticeboardUser> getNbUsers() {
+	if (this.nbUsers == null) {
+	    setNbUsers(new HashSet<NoticeboardUser>());
+	}
+
+	return nbUsers;
     }
+
     /**
-     * @param nbUsers The nbUsers to set.
+     * @param nbUsers
+     *            The nbUsers to set.
      */
-    public void setNbUsers(Set nbUsers) {
-        this.nbUsers = nbUsers;
+    public void setNbUsers(Set<NoticeboardUser> nbUsers) {
+	this.nbUsers = nbUsers;
     }
-    
-   
+
 }
