@@ -29,7 +29,6 @@ import java.util.List;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
@@ -39,118 +38,103 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author mtruong
- * <p>Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.
+ *         </p>
  */
 
 public class NoticeboardSessionDAO extends HibernateDaoSupport implements INoticeboardSessionDAO {
-	
-	private static final String FIND_NB_SESSION = "from " + NoticeboardSession.class.getName() + " as nb where nb.nbSessionId=?";
-	
+
+    private static final String FIND_NB_SESSION = "from " + NoticeboardSession.class.getName()
+	    + " as nb where nb.nbSessionId=?";
+
     private static final String LOAD_NBSESSION_BY_USER = "select ns from NoticeboardSession ns left join fetch "
-        + "ns.nbUsers user where user.userId=:userId";
-    
-    private static final String GET_SESSIONS_FROM_CONTENT = "select ns.nbSessionId from NoticeboardSession ns where ns.nbContent= :nbContent";
-  
-	
+	    + "ns.nbUsers user where user.userId=:userId";
+
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#findNbSessionById(java.lang.Long) */
-    public NoticeboardSession findNbSessionById(Long nbSessionId)
-	{
-	    String query = "from NoticeboardSession nbS where nbS.nbSessionId=?";
-	    List session = getHibernateTemplate().find(query,nbSessionId);
-		
-		if(session!=null && session.size() == 0)
-		{			
-			return null;
-		}
-		else
-		{
-			return (NoticeboardSession)session.get(0);
-		}
+    @SuppressWarnings("unchecked")
+    @Override
+    public NoticeboardSession findNbSessionById(Long nbSessionId) {
+	String query = "from NoticeboardSession nbS where nbS.nbSessionId=?";
+	List<NoticeboardSession> session = getHibernateTemplate().find(query, nbSessionId);
+
+	if ((session != null) && (session.size() == 0)) {
+	    return null;
+	} else {
+	    return session.get(0);
 	}
-	
+    }
+
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#saveNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public void saveNbSession(NoticeboardSession nbSession)
-    {
-    	this.getHibernateTemplate().save(nbSession);
+    @Override
+    public void saveNbSession(NoticeboardSession nbSession) {
+	this.getHibernateTemplate().save(nbSession);
     }
-    
-	
+
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#updateNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public void updateNbSession(NoticeboardSession nbSession)
-    {
-    	this.getHibernateTemplate().update(nbSession);
+    @Override
+    public void updateNbSession(NoticeboardSession nbSession) {
+	this.getHibernateTemplate().update(nbSession);
     }
 
- 
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(java.lang.Long) */
-    public void removeNbSession(Long nbSessionId)
-    {
-       
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		if ( nbSessionId != null) {
-			//String query = "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
-			List list = getSession().createQuery(FIND_NB_SESSION)
-				.setLong(0,nbSessionId.longValue())
-				.list();
-			
-			if(list != null && list.size() > 0){
-				NoticeboardSession nb = (NoticeboardSession) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(nb);
-				templ.flush();
-			}
-		}
-      
+    @SuppressWarnings("unchecked")
+    @Override
+    public void removeNbSession(Long nbSessionId) {
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (nbSessionId != null) {
+	    // String query =
+	    // "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
+	    List<NoticeboardSession> list = getSession().createQuery(NoticeboardSessionDAO.FIND_NB_SESSION)
+		    .setLong(0, nbSessionId.longValue()).list();
+
+	    if ((list != null) && (list.size() > 0)) {
+		NoticeboardSession nb = (NoticeboardSession) list.get(0);
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(nb);
+		templ.flush();
+	    }
+	}
+
     }
-    
+
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public void removeNbSession(NoticeboardSession nbSession)
-    {
-    	removeNbSession(nbSession.getNbSessionId());
-        //this.getHibernateTemplate().delete(nbSession);
+    @Override
+    public void removeNbSession(NoticeboardSession nbSession) {
+	removeNbSession(nbSession.getNbSessionId());
+	// this.getHibernateTemplate().delete(nbSession);
     }
 
-    
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getNbSessionByUser(java.lang.Long) */
-    public NoticeboardSession getNbSessionByUser(final Long userId)
-	{
-		 return (NoticeboardSession) getHibernateTemplate().execute(new HibernateCallback()
-                {
+    @Override
+    public NoticeboardSession getNbSessionByUser(final Long userId) {
+	return (NoticeboardSession) getHibernateTemplate().execute(new HibernateCallback() {
 
-                    public Object doInHibernate(Session session) throws HibernateException
-                    {
-                        return session.createQuery(LOAD_NBSESSION_BY_USER)
-                                      .setLong("userId",
-                                      		userId.longValue())
-                                      .uniqueResult();
-                    }
-                });
-	}
-	
-	 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public void removeNbUsers(NoticeboardSession nbSession)
-    {
-    	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(NoticeboardSessionDAO.LOAD_NBSESSION_BY_USER)
+			.setLong("userId", userId.longValue()).uniqueResult();
+	    }
+	});
     }
-	
-    
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#addNbUsers(java.lang.Long, org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public void addNbUsers(Long nbSessionId, NoticeboardUser user)
-	{
-	    NoticeboardSession session = findNbSessionById(nbSessionId);
-	    user.setNbSession(session);
-	    session.getNbUsers().add(user);
-	    this.getHibernateTemplate().saveOrUpdate(user);
-	    this.getHibernateTemplate().merge(session);	    
-	}
-	
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getSessionsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-	public List getSessionsFromContent(NoticeboardContent nbContent)
-	{
-	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
-	            "nbContent",
-				nbContent));
-	}
-    	
+
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
+    @Override
+    public void removeNbUsers(NoticeboardSession nbSession) {
+	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#addNbUsers(java.lang.Long,
+     *      org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
+     */
+    @Override
+    public void addNbUsers(Long nbSessionId, NoticeboardUser user) {
+	NoticeboardSession session = findNbSessionById(nbSessionId);
+	user.setNbSession(session);
+	session.getNbUsers().add(user);
+	this.getHibernateTemplate().saveOrUpdate(user);
+	this.getHibernateTemplate().merge(session);
+    }
 }

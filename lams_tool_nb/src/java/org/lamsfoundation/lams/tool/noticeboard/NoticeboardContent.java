@@ -27,288 +27,243 @@ package org.lamsfoundation.lams.tool.noticeboard;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-
 
 /**
- * <p>Persistent noticeboard object/bean that defines the content for the noticeboard tool.
- * Provides accessors and mutators to get/set noticeboard attributes</p>
+ * <p>
+ * Persistent noticeboard object/bean that defines the content for the noticeboard tool. Provides accessors and mutators
+ * to get/set noticeboard attributes
+ * </p>
+ * 
  * @hibernate.class table="tl_lanb11_content"
  * @author mtruong
  */
 public class NoticeboardContent implements Serializable {
-	
-	/** identifier field */
+
+    /** identifier field */
     private Long uid;
-    
+
     /** non-nullable persistent field */
-	private Long nbContentId;
-	
-	/** nullable persistent field */
-	private String title;
-	
-	/** nullable persistent field */
-	private String content;
-	
-	/** nullable persistent field */
-	private boolean defineLater;
+    private Long nbContentId;
 
-	private Boolean reflectOnActivity;
-	
-	private String reflectInstructions;
-	
-	/** nullable persistent field */
-	private boolean contentInUse;
-	
-	/** nullable persistent field */
-	private Long creatorUserId;
-	
-	/** nullable persistent field */
-	private Date dateCreated;
-	
-	/** nullable persistent field */
-	private Date dateUpdated;
-	
-	/** persistent field */
-	private Set nbSessions = new HashSet();
-	
-	/** default constructor */
-	public NoticeboardContent()
-	{
-	}
-	
-	/** full constructor */
-	public NoticeboardContent(Long nbContentId,
-							  String title,
-							  String content,
-							  boolean defineLater,
-							  boolean reflectOnActivity,
-							  String reflectInstructions,
-							  boolean contentInUse,
-							  Long creatorUserId,
-							  Date dateCreated,
-							  Date dateUpdated)
-	{
-		this.nbContentId = nbContentId;
-		this.title = title;
-		this.content = content;
-		this.defineLater = defineLater;
-		this.reflectOnActivity = reflectOnActivity;
-		this.reflectInstructions = reflectInstructions;
-		this.contentInUse = contentInUse;
-		this.creatorUserId = creatorUserId;
-		this.dateCreated = dateCreated;
-		this.dateUpdated = dateUpdated;
-	}
-	
-	/**
-	 * Minimal Constructor used to initialise values for the NoticeboardContent object
-	 * @return
-	 */
-	
-	public NoticeboardContent(Long nbContentId,
-	        				  String title,
-	        				  String content,
-	        				  Date dateCreated)
-	{
-	    this.nbContentId = nbContentId;
-		this.title = title;
-		this.content = content;
-		this.defineLater = false;
-		this.reflectOnActivity = false;
-		this.contentInUse = false;
-		this.creatorUserId = null;
-		this.dateCreated = dateCreated;
-		this.dateUpdated = null;
-	}
-	
-	
-    
-	/**
-	 *		 @hibernate.property
-     *       column="content"
-     *       length="65535"
-	 */
-	
-	public String getContent() {
-		return content;
-	}
+    /** nullable persistent field */
+    private String title;
 
-	public void setContent(String content) {
-		this.content = content;
-	}
-	
-	/**
-	 * 
-	 *		@hibernate.property
-     *		column="creator_user_id"
-     *		length="20"
-     */	
-	public Long getCreatorUserId() {
-		return creatorUserId;
-	}
-	
-	public void setCreatorUserId(Long creatorUserId) {
-		this.creatorUserId = creatorUserId;
-	}
-	
-	/**
-	 * 
-	 *		@hibernate.property
-     *		column="date_created"
-     *		length="19"
-     */
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-	
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-	
-	/**
-	 * 
-	 *		@hibernate.property
-     *		column="date_updated"
-     *		length="19"
-     */
-	public Date getDateUpdated() {
-		return dateUpdated;
-	}
-	
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
-	
-	/** 
-	 *		@hibernate.property
-     *		column="define_later"
-     *		length="1"
-     */
-	public boolean isDefineLater() {
-		return defineLater;
-	}
-	
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
-	
-	/** 
-	 *		@hibernate.property
-     *		column="reflect_on_activity"
-     *		length="1"
-     */
-	public boolean getReflectOnActivity() {
-		return reflectOnActivity;
-	}
-	
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
-	
-	/**
-	 *		 @hibernate.property
-     *       column="reflect_instructions"
-     *       length="65535"
-	 */
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    /** nullable persistent field */
+    private String content;
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-	
-	 /** 
-	 *		@hibernate.property
-     *		column="content_in_use"
-     *		length="1"
-     */
-    
-    public boolean isContentInUse() {
-        return contentInUse;
+    /** nullable persistent field */
+    private boolean defineLater;
+
+    private Boolean reflectOnActivity;
+
+    private String reflectInstructions;
+
+    /** nullable persistent field */
+    private boolean contentInUse;
+
+    /** nullable persistent field */
+    private Long creatorUserId;
+
+    /** nullable persistent field */
+    private Date dateCreated;
+
+    /** nullable persistent field */
+    private Date dateUpdated;
+
+    /** persistent field */
+    private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
+
+    /** default constructor */
+    public NoticeboardContent() {
     }
+
+    /** full constructor */
+    public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
+	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId,
+	    Date dateCreated, Date dateUpdated) {
+	this.nbContentId = nbContentId;
+	this.title = title;
+	this.content = content;
+	this.defineLater = defineLater;
+	this.reflectOnActivity = reflectOnActivity;
+	this.reflectInstructions = reflectInstructions;
+	this.contentInUse = contentInUse;
+	this.creatorUserId = creatorUserId;
+	this.dateCreated = dateCreated;
+	this.dateUpdated = dateUpdated;
+    }
+
     /**
-     * @param contentInUse The contentInUse to set.
+     * Minimal Constructor used to initialise values for the NoticeboardContent object
+     * 
+     * @return
+     */
+
+    public NoticeboardContent(Long nbContentId, String title, String content, Date dateCreated) {
+	this.nbContentId = nbContentId;
+	this.title = title;
+	this.content = content;
+	this.defineLater = false;
+	this.reflectOnActivity = false;
+	this.contentInUse = false;
+	this.creatorUserId = null;
+	this.dateCreated = dateCreated;
+	this.dateUpdated = null;
+    }
+
+    /**
+     * @hibernate.property column="content" length="65535"
+     */
+
+    public String getContent() {
+	return content;
+    }
+
+    public void setContent(String content) {
+	this.content = content;
+    }
+
+    /**
+     * 
+     * @hibernate.property column="creator_user_id" length="20"
+     */
+    public Long getCreatorUserId() {
+	return creatorUserId;
+    }
+
+    public void setCreatorUserId(Long creatorUserId) {
+	this.creatorUserId = creatorUserId;
+    }
+
+    /**
+     * 
+     * @hibernate.property column="date_created" length="19"
+     */
+    public Date getDateCreated() {
+	return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+	this.dateCreated = dateCreated;
+    }
+
+    /**
+     * 
+     * @hibernate.property column="date_updated" length="19"
+     */
+    public Date getDateUpdated() {
+	return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+	this.dateUpdated = dateUpdated;
+    }
+
+    /**
+     * @hibernate.property column="define_later" length="1"
+     */
+    public boolean isDefineLater() {
+	return defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
+    /**
+     * @hibernate.property column="reflect_on_activity" length="1"
+     */
+    public boolean getReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    /**
+     * @hibernate.property column="reflect_instructions" length="65535"
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
+
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
+
+    /**
+     * @hibernate.property column="content_in_use" length="1"
+     */
+
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
+
+    /**
+     * @param contentInUse
+     *            The contentInUse to set.
      */
     public void setContentInUse(boolean contentInUse) {
-        this.contentInUse = contentInUse;
+	this.contentInUse = contentInUse;
     }
-	
-	/** 
-	 *		@hibernate.property
-     *      column="nb_content_id"
-     *      length="20"
-     *      not-null="true"
-     */
-	
-	public Long getNbContentId() {
-		return nbContentId;
-	}
-	
-	public void setNbContentId(Long nbContentId) {
-		this.nbContentId = nbContentId;
-	}
-	/**
-	 * 		@hibernate.set
-     *      lazy="true"
-     *      inverse="true"
-     *      cascade="all-delete-orphan"
-     *     	@hibernate.collection-key
-     *      column="nb_content_uid"
-     *     	@hibernate.collection-one-to-many
-     *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
-     */
-	public Set getNbSessions() {
-		if (this.nbSessions == null)
-		{
-			setNbSessions(new HashSet());
-		}
-		return nbSessions;
-	}
-	
-	public void setNbSessions(Set nbSessions) {
-		this.nbSessions = nbSessions;
-	}
-	
-	/**
-	 * 		@hibernate.property
-     *      column="title"
-     *      length="65535"
-	 */
-	public String getTitle() {
-		return title;
-	}
-	
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
-	 /**
-      * 	@hibernate.id
-      *     generator-class="native"
-      *     type="java.lang.Long"
-      *     column="uid"
-      *     unsaved-value="0"
-      */
-    public Long getUid() {
-        return uid;
-    }
-    
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
-	
 
-   
     /**
-     * Creates a new NoticeboardContent object from the supplied object. Assigns it the toContendId. 
+     * @hibernate.property column="nb_content_id" length="20" not-null="true"
+     */
+
+    public Long getNbContentId() {
+	return nbContentId;
+    }
+
+    public void setNbContentId(Long nbContentId) {
+	this.nbContentId = nbContentId;
+    }
+
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+     * @hibernate.collection-key column="nb_content_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
+     */
+    public Set<NoticeboardSession> getNbSessions() {
+	if (this.nbSessions == null) {
+	    setNbSessions(new HashSet<NoticeboardSession>());
+	}
+	return nbSessions;
+    }
+
+    public void setNbSessions(Set<NoticeboardSession> nbSessions) {
+	this.nbSessions = nbSessions;
+    }
+
+    /**
+     * @hibernate.property column="title" length="65535"
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid" unsaved-value="0"
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * Creates a new NoticeboardContent object from the supplied object. Assigns it the toContendId.
      * 
      * @param nb
      *            NoticeboardContent object containing the content to copy from
@@ -321,8 +276,8 @@ public class NoticeboardContent implements Serializable {
     public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId) throws ItemNotFoundException,
 	    RepositoryCheckedException {
 	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
-		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(),
-		nb.isContentInUse(), nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated());
+		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
+		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated());
 
 	return newContent;
     }

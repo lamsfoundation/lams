@@ -75,515 +75,221 @@ import org.springframework.dao.DataAccessException;
  */
 public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
-
-    private NoticeboardContent nbContent;
-    private INoticeboardContentDAO nbContentDAO = null;
-
-    private NoticeboardSession nbSession;
-    private INoticeboardSessionDAO nbSessionDAO = null;
+    private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
     private ILearnerService learnerService;
     private ILamsToolService toolService;
-
-    private NoticeboardUser nbUser;
-    private INoticeboardUserDAO nbUserDAO = null;
-    private IToolContentHandler nbToolContentHandler = null;
-
     private IExportToolContentService exportContentService;
-    private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
-
+    private IToolContentHandler nbToolContentHandler;
     private ICoreNotebookService coreNotebookService;
 
-    /*
-     * ============================================================================== Methods for access to
-     * NoticeboardContent objects ==============================================================================
-     */
+    private INoticeboardContentDAO nbContentDAO;
+    private INoticeboardSessionDAO nbSessionDAO;
+    private INoticeboardUserDAO nbUserDAO;
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboard(Long)
-     */
+    @Override
     public NoticeboardContent retrieveNoticeboard(Long nbContentId) throws NbApplicationException {
 	if (nbContentId == null) {
-	    String error = "Unable to continue. The tool content id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool content ID is missing");
 	}
 
-	try {
-	    nbContent = nbContentDAO.findNbContentById(nbContentId);
-
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException("An exception has occured when trying to retrieve noticeboard content: "
-		    + e.getMessage(), e);
-	}
-
-	return nbContent;
+	return nbContentDAO.findNbContentById(nbContentId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardBySessionID(Long)
-     */
+    @Override
     public NoticeboardContent retrieveNoticeboardBySessionID(Long nbSessionId) {
 	if (nbSessionId == null) {
-	    String error = "Unable to continue. The tool session id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool session ID is missing");
 	}
 
-	try {
-	    nbContent = nbContentDAO.getNbContentBySession(nbSessionId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException("An exception has occured when trying to retrieve noticeboard content: "
-		    + e.getMessage(), e);
-	}
-
-	return nbContent;
+	return nbContentDAO.getNbContentBySession(nbSessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
-     */
+    @Override
     public void saveNoticeboard(NoticeboardContent nbContent) {
-	try {
-	    if (nbContent.getUid() == null) {
-		nbContentDAO.saveNbContent(nbContent);
-	    } else {
-		nbContentDAO.updateNbContent(nbContent);
-	    }
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to save the noticeboard content object: "
-			    + e.getMessage(), e);
+	if (nbContent.getUid() == null) {
+	    nbContentDAO.saveNbContent(nbContent);
+	} else {
+	    nbContentDAO.updateNbContent(nbContent);
 	}
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboardSessions(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
-     */
+    @Override
     public void removeNoticeboardSessionsFromContent(NoticeboardContent nbContent) {
-	try {
-	    nbContent.getNbSessions().clear();
-	    // updateNoticeboard(nbContent);
-
-	    nbContentDAO.removeNbSessions(nbContent);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove the sessions associated with this noticeboard content object: "
-			    + e.getMessage(), e);
-	}
-
+	nbContent.getNbSessions().clear();
+	nbContentDAO.removeNbSessions(nbContent);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
-     */
+    @Override
     public void removeNoticeboard(Long nbContentId) {
 	if (nbContentId == null) {
-	    String error = "Unable to continue. The tool content id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool content ID is missing");
 	}
-
-	try {
-	    nbContentDAO.removeNoticeboard(nbContentId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this noticeboard content object: "
-			    + e.getMessage(), e);
-	}
+	nbContentDAO.removeNoticeboard(nbContentId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
-     */
+    @Override
     public void removeNoticeboard(NoticeboardContent nbContent) {
-	try {
-	    nbContentDAO.removeNoticeboard(nbContent);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this noticeboard content object: "
-			    + e.getMessage(), e);
-	}
+	nbContentDAO.removeNoticeboard(nbContent);
     }
 
-    /*
-     * ============================================================================== Methods for access to
-     * NoticeboardSession objects ==============================================================================
-     */
-
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardSession(Long)
-     */
+    @Override
     public NoticeboardSession retrieveNoticeboardSession(Long nbSessionId) {
 	if (nbSessionId == null) {
-	    String error = "Unable to continue. The tool session id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool session ID is missing");
 	}
 
-	try {
-	    nbSession = nbSessionDAO.findNbSessionById(nbSessionId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "An exception has occured when trying to retrieve noticeboard session object: " + e.getMessage(), e);
-	}
-
-	return nbSession;
+	return nbSessionDAO.findNbSessionById(nbSessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboardSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void saveNoticeboardSession(NoticeboardSession nbSession) {
-	try {
-	    NoticeboardContent content = nbSession.getNbContent();
-	    // content.getNbSessions().add(nbSession);
-	    // content.
-
-	    /* updateNoticeboard(content); */
-	    nbSessionDAO.saveNbSession(nbSession);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to save this noticeboard session: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardContent content = nbSession.getNbContent();
+	nbSessionDAO.saveNbSession(nbSession);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboardSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void updateNoticeboardSession(NoticeboardSession nbSession) {
-	try {
-	    nbSessionDAO.updateNbSession(nbSession);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to update this noticeboard session: "
-			    + e.getMessage(), e);
-	}
+	nbSessionDAO.updateNbSession(nbSession);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeSession(Long)
-     */
+    @Override
     public void removeSession(Long nbSessionId) {
 	if (nbSessionId == null) {
-	    String error = "Unable to continue. The tool session id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool session id is missing");
 	}
 
-	try {
-	    NoticeboardSession sessionToDelete = retrieveNoticeboardSession(nbSessionId);
-	    NoticeboardContent contentReferredBySession = sessionToDelete.getNbContent();
-	    // un-associate the session from content
-	    contentReferredBySession.getNbSessions().remove(sessionToDelete);
-	    nbSessionDAO.removeNbSession(nbSessionId);
-	    // updateNoticeboard(contentReferredBySession);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this noticeboard session object: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardSession sessionToDelete = retrieveNoticeboardSession(nbSessionId);
+	NoticeboardContent contentReferredBySession = sessionToDelete.getNbContent();
+	// un-associate the session from content
+	contentReferredBySession.getNbSessions().remove(sessionToDelete);
+	nbSessionDAO.removeNbSession(nbSessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void removeSession(NoticeboardSession nbSession) {
-	try {
-	    NoticeboardContent contentReferredBySession = nbSession.getNbContent();
-	    // un-associate the session from content
-	    contentReferredBySession.getNbSessions().remove(nbSession);
-
-	    nbSessionDAO.removeNbSession(nbSession);
-	    // updateNoticeboard(contentReferredBySession);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove this noticeboard session object: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardContent contentReferredBySession = nbSession.getNbContent();
+	// un-associate the session from content
+	contentReferredBySession.getNbSessions().remove(nbSession);
+	nbSessionDAO.removeNbSession(nbSession);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboardUsersFromSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void removeNoticeboardUsersFromSession(NoticeboardSession nbSession) {
-	try {
-	    nbSession.getNbUsers().clear();
-	    // updateNoticeboardSession(nbSession);
-
-	    nbSessionDAO.removeNbUsers(nbSession);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove the users associated with this noticeboard session instance: "
-			    + e.getMessage(), e);
-	}
-
+	nbSession.getNbUsers().clear();
+	nbSessionDAO.removeNbUsers(nbSession);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNbSessionByUserID(java.lang.Long)
-     */
+    @Override
     public NoticeboardSession retrieveNbSessionByUserID(Long userId) {
 	if (userId == null) {
-	    String error = "Unable to continue. The tool session id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool session ID is missing");
 	}
-
-	try {
-	    nbSession = nbSessionDAO.getNbSessionByUser(userId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrieve noticeboard session instance "
-			    + e.getMessage(), e);
-	}
-	return nbSession;
-
+	return nbSessionDAO.getNbSessionByUser(userId);
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getSessionIdsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
-    public List getSessionIdsFromContent(NoticeboardContent content) {
-	List list = null;
-	try {
-	    list = nbSessionDAO.getSessionsFromContent(content);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to the list of session ids from content "
-			    + e.getMessage(), e);
-	}
-	return list;
-    }
-
-    /*
-     * ============================================================================== Methods for access to
-     * NoticeboardUser objects ==============================================================================
-     */
-
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardUser(java.lang.Long)
-     */
+    @Override
     public NoticeboardUser retrieveNoticeboardUser(Long nbUserId, Long nbSessionId) {
 	if (nbUserId == null) {
-	    String error = "Unable to continue. The user id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("User ID is missing");
 	}
 
-	try {
-	    nbUser = nbUserDAO.getNbUser(nbUserId, nbSessionId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException("An exception has occured when trying to retrieve noticeboard user: "
-		    + e.getMessage(), e);
-	}
-
-	return nbUser;
+	return nbUserDAO.getNbUser(nbUserId, nbSessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboardUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
-     */
+    @Override
     public void saveNoticeboardUser(NoticeboardUser nbUser) {
-	try {
-	    NoticeboardSession session = nbUser.getNbSession();
-	    session.getNbUsers().add(nbUser);
-	    // updateNoticeboardSession(session);
-
-	    nbUserDAO.saveNbUser(nbUser);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to save the noticeboard user object: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardSession session = nbUser.getNbSession();
+	session.getNbUsers().add(nbUser);
+	nbUserDAO.saveNbUser(nbUser);
     }
 
-    /**
-     * org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNbUserBySession(java.lang.Long,
-     * java.lang.Long)
-     */
+    @Override
     public NoticeboardUser retrieveNbUserBySession(Long userId, Long sessionId) {
-	try {
-	    nbUser = nbUserDAO.getNbUserBySession(userId, sessionId);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to retrive the noticeboard user object: "
-			    + e.getMessage(), e);
-	}
-
-	return nbUser;
+	return nbUserDAO.getNbUserBySession(userId, sessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboardUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
-     */
+    @Override
     public void updateNoticeboardUser(NoticeboardUser nbUser) {
-	try {
-	    nbUserDAO.updateNbUser(nbUser);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to update the noticeboard user object: "
-			    + e.getMessage(), e);
-	}
+	nbUserDAO.updateNbUser(nbUser);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
-     */
+    @Override
     public void removeUser(NoticeboardUser nbUser) {
-	try {
-	    NoticeboardSession session = nbUser.getNbSession();
-	    session.getNbUsers().remove(nbUser);
-
-	    nbUserDAO.removeNbUser(nbUser);
-
-	    // updateNoticeboardSession(session);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove the noticeboard user object: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardSession session = nbUser.getNbSession();
+	session.getNbUsers().remove(nbUser);
+	nbUserDAO.removeNbUser(nbUser);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeUser(java.lang.Long)
-     */
+    @Override
     public void removeUser(Long nbUserId, Long toolSessionId) {
 	if (nbUserId == null) {
-	    String error = "Unable to continue. The user id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("User ID is missing");
 	}
-	try {
-	    NoticeboardUser user = retrieveNoticeboardUser(nbUserId, toolSessionId);
-	    NoticeboardSession session = user.getNbSession();
-	    session.getNbUsers().remove(user);
-	    nbUserDAO.removeNbUser(nbUserId);
-
-	    // updateNoticeboardSession(session);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to remove the noticeboard user object: "
-			    + e.getMessage(), e);
-	}
+	NoticeboardUser user = retrieveNoticeboardUser(nbUserId, toolSessionId);
+	NoticeboardSession session = user.getNbSession();
+	session.getNbUsers().remove(user);
+	nbUserDAO.removeNbUser(nbUserId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#addSession(java.lang.Long,
-     *      org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void addSession(Long nbContentId, NoticeboardSession session) {
-
-	if (nbContentId == null || session == null) {
-	    String error = "Unable to continue. The tool content id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	if ((nbContentId == null) || (session == null)) {
+	    throw new NbApplicationException("Tool content ID or session is missing");
 	}
 
-	try {
-	    nbContentDAO.addNbSession(nbContentId, session);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to create session: "
-		    + e.getMessage(), e);
-	}
+	nbContentDAO.addNbSession(nbContentId, session);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#addUser(java.lang.Long,
-     *      org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
-     */
+    @Override
     public void addUser(Long nbSessionId, NoticeboardUser user) {
-
 	if (nbSessionId == null) {
-	    String error = "Unable to continue. The tool session id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool session ID is missing");
 	}
-	try {
-	    nbSessionDAO.addNbUsers(nbSessionId, user);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to create user: "
-		    + e.getMessage(), e);
-	}
+	nbSessionDAO.addNbUsers(nbSessionId, user);
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getNumberOfUsersInSession(org.lamsfoundation.lams.tool.noticeboard.oticeboardSession) */
+    @Override
     public int getNumberOfUsersInSession(NoticeboardSession session) {
-	int numberOfUsers;
-	try {
-	    numberOfUsers = nbUserDAO.getNumberOfUsers(session);
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while trying to get the number of users in the session: "
-			    + e.getMessage(), e);
-	}
-	return numberOfUsers;
+	return nbUserDAO.getNumberOfUsers(session);
     }
 
-    /** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#calculateTotalNumberOfUsers(java.lang.Long) */
+    @Override
     public int calculateTotalNumberOfUsers(Long toolContentId) {
-
 	if (toolContentId == null) {
-	    String error = "Unable to continue. The tool content id is missing";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
+	    throw new NbApplicationException("Tool content id is missing");
 	}
 
 	int totalNumberOfUsers = 0;
-	try {
-	    nbContent = retrieveNoticeboard(toolContentId);
-	    List listOfSessionIds = getSessionIdsFromContent(nbContent);
-
-	    Iterator i = listOfSessionIds.iterator();
-
-	    while (i.hasNext()) {
-		Long sessionId = (Long) i.next();
-		int usersInThisSession = getNumberOfUsersInSession(retrieveNoticeboardSession(sessionId));
-		totalNumberOfUsers = totalNumberOfUsers + usersInThisSession;
-	    }
-	} catch (DataAccessException e) {
-	    throw new NbApplicationException(
-		    "EXCEPTION: An exception has occurred while calculating the total number of users in tool activity "
-			    + e.getMessage(), e);
+	NoticeboardContent nbContent = retrieveNoticeboard(toolContentId);
+	for (NoticeboardSession session : nbContent.getNbSessions()) {
+	    totalNumberOfUsers += getNumberOfUsersInSession(session);
 	}
+
 	return totalNumberOfUsers;
     }
 
-    public List getUsersBySession(Long sessionId) {
-
-	if (sessionId != null) {
-	    try {
-		return nbUserDAO.getNbUsersBySession(sessionId);
-	    } catch (DataAccessException e) {
-		throw new NbApplicationException(
-			"EXCEPTION: An exception has occurred while trying to get the list of users in the session: "
-				+ e.getMessage(), e);
-	    }
-	} else {
-	    NoticeboardServicePOJO.log.error("Unable to continue. Session id is missing");
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<NoticeboardUser> getUsersBySession(Long sessionId) {
+	if (sessionId == null) {
+	    throw new NbApplicationException("Session ID is missing");
 	}
-	return null;
+	return nbUserDAO.getNbUsersBySession(sessionId);
     }
 
-    /*
-     * ============================================================================== Methods for access to
-     * NoticeboardUser objects ==============================================================================
-     */
-    
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
 
-    /* ===============Methods implemented from ToolContentManager =============== */
-
-    /** @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long) */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-
 	if (toContentId == null) {
 	    throw new ToolException("Failed to copy Noticeboard tool content. Missing parameter: toContentId");
 	}
 	if (fromContentId == null) {
 	    // use the default content Id
-	    // fromContentId = NoticeboardConstants.DEFAULT_CONTENT_ID;
 	    fromContentId = getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
 	}
 
@@ -620,12 +326,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
-
 	nbContent.setDefineLater(false);
 	saveNoticeboard(nbContent);
     }
 
-    /** @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long) */
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
@@ -638,16 +343,17 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	removeNoticeboard(toolContentId);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId "
+	if (NoticeboardServicePOJO.log.isDebugEnabled()) {
+	    NoticeboardServicePOJO.log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId "
 		    + toolContentId);
 	}
 
 	NoticeboardContent nbContent = nbContentDAO.findNbContentById(toolContentId);
 	if (nbContent == null) {
-	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    NoticeboardServicePOJO.log.warn("Did not find activity with toolContentId: " + toolContentId
+		    + " to remove learner content");
 	    return;
 	}
 
@@ -681,7 +387,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     private NoticeboardSession getAndCheckSessionIDandObject(Long toolSessionId) throws ToolException,
 	    DataMissingException {
 	if (toolSessionId == null) {
-	    throw new ToolException("Tool session ID is missing. Unable to continue");
+	    throw new ToolException("Tool session ID is missing.");
 	}
 
 	NoticeboardSession nbSession = retrieveNoticeboardSession(toolSessionId);
@@ -692,23 +398,16 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	return nbSession;
     }
 
-    /*
-     * private void checkSessionIDandObject(Long toolSessionId) throws ToolException, DataMissingException { if
-     * (toolSessionId == null) throw new ToolException("Tool session ID is missing. Unable to continue");
-     * 
-     * NoticeboardSession nbSession = retrieveNoticeboardSession(toolSessionId); if (nbSession == null) throw new
-     * DataMissingException("No tool session matches this tool session id"); }
-     */
-
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	NoticeboardContent toolContentObj = nbContentDAO.findNbContentById(toolContentId);
 	if (toolContentObj == null) {
@@ -737,14 +436,15 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(NoticeboardImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, nbToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof NoticeboardContent)) {
@@ -769,61 +469,55 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
-    
+
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return retrieveNoticeboard(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return retrieveNoticeboard(toolContentId).isDefineLater();
     }
-    
-    /* ===============Methods implemented from ToolSessionManager =============== */
 
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
-     *      java.lang.Long)
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (toolSessionId == null || toolContentId == null) {
+	if ((toolSessionId == null) || (toolContentId == null)) {
 	    String error = "Failed to create tool session. The tool session id or tool content id is invalid";
 	    throw new ToolException(error);
 	}
 
-	nbContent = retrieveNoticeboard(toolContentId);
+	NoticeboardContent nbContent = retrieveNoticeboard(toolContentId);
 	NoticeboardSession nbSession = new NoticeboardSession(toolSessionId, toolSessionName, nbContent, new Date(
 		System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
 
 	nbContent.getNbSessions().add(nbSession);
 	saveNoticeboard(nbContent);
-	// saveNoticeboardSession(nbSession);
-
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
-     *      org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	getAndCheckSessionIDandObject(toolSessionId);
 
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
-    /** @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long) */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws ToolException, DataMissingException {
 	getAndCheckSessionIDandObject(toolSessionId);
 	throw new UnsupportedOperationException("not yet implemented");
     }
 
-    /** @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.util.List) */
+    @SuppressWarnings("unchecked")
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws ToolException,
 	    DataMissingException {
-	Iterator i = toolSessionIds.iterator();
+	Iterator<Long> i = toolSessionIds.iterator();
 	if (i.hasNext()) {
 	    Long id = (Long) i.next();
 	    getAndCheckSessionIDandObject(id);
@@ -832,7 +526,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	throw new UnsupportedOperationException("not yet implemented");
     }
 
-    /** @see org.lamsfoundation.lams.tool.ToolSessionManager#removeToolSession(java.lang.Long) */
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	NoticeboardSession session = getAndCheckSessionIDandObject(toolSessionId);
 	removeSession(session);
@@ -840,10 +534,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     /**
      * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
      */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
@@ -854,15 +546,15 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
 
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	NoticeboardContent toolContentObj = new NoticeboardContent();
@@ -876,12 +568,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	toolContentObj.setNbContentId(toolContentId);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	toolContentObj.setReflectOnActivity(false);
-	// leave as empty, no need to set them to anything.
-	// toolContentObj.setNbSessions(nbSessions);
 	nbContentDAO.saveNbContent(toolContentObj);
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
+    @Override
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -895,60 +586,27 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	toolContentObj.setReflectInstructions(description);
     }
 
-    // =========================================================================================
-
+    @Override
     public Long getToolDefaultContentIdBySignature(String toolSignature) {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (contentId == null) {
-	    String error = "Could not retrieve default content id for this tool";
-	    NoticeboardServicePOJO.log.error(error);
-	    throw new NbApplicationException(error);
-	}
-	return contentId;
+	return toolService.getToolDefaultContentIdBySignature(toolSignature);
     }
 
-    /* =============== Used by Spring to "inject" the linked objects =============== */
-
-    /*
-     * public INoticeboardContentDAO getNbContentDAO() { return nbContentDAO; }
-     */
     public void setNbContentDAO(INoticeboardContentDAO nbContentDAO) {
 	this.nbContentDAO = nbContentDAO;
     }
-
-    /*
-     * public INoticeboardSessionDAO getNbSessionDAO() { return nbSessionDAO; }
-     */
+    
     public void setNbSessionDAO(INoticeboardSessionDAO nbSessionDAO) {
 	this.nbSessionDAO = nbSessionDAO;
     }
-
-    /*
-     * public INoticeboardUserDAO getNbUserDAO() { return nbUserDAO; }
-     */
+    
     public void setNbUserDAO(INoticeboardUserDAO nbUserDAO) {
 	this.nbUserDAO = nbUserDAO;
     }
 
-    /**
-     * @return Returns the learnerService.
-     */
-    /*
-     * public ILearnerService getLearnerService() { return learnerService; }
-     */
-    /**
-     * @param learnerService
-     *                The learnerService to set.
-     */
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
 
-    /**
-     * @param toolService
-     *                The toolService to set.
-     */
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
     }
@@ -979,27 +637,27 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     /* =============== Wrappers Methods for Notebook Service (Reflective Option) =============== */
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
 	}
     }
 
-    /**
-     * @param notebookEntry
-     */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
