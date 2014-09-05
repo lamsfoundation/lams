@@ -660,6 +660,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
     
     @Override
+    public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getLastFinishedAssessmentResultGrade(assessmentUid, userId);
+    }
+    
+    @Override
+    public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getLastFinishedAssessmentResultTimeTaken(assessmentUid, userId);
+    }
+    
+    @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
 	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
 	assessmentQuestionDao.evict(result);
@@ -675,6 +685,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
 	    Long questionUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
+    }
+    
+    @Override
+    public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
+	return assessmentQuestionResultDao.getQuestionResultMark(assessmentUid, userId, questionSequenceId);
     }
     
     @Override

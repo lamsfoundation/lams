@@ -36,6 +36,10 @@ public interface AssessmentResultDAO extends DAO {
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
+    
+    Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId);
+    
+    Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId);
     

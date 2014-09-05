@@ -220,6 +220,24 @@ public interface IAssessmentService {
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
     
     /**
+     * Return the latest *finished* result grade.
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @return
+     */
+    Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId);
+
+    /**
+     * Return the latest *finished* result grade.
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @return
+     */
+    Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
+    
+    /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
      * might be useful in cases when we modify result and the use it during one request.
      * 
@@ -239,6 +257,16 @@ public interface IAssessmentService {
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
     List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
+    
+    /**
+     * Returns question result mark from the last finished assessment result, and null if not available.
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @param questionSequenceId
+     * @return
+     */
+    Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId);
     
     Long createNotebookEntry(Long sessionId, Integer userId, String entryText);
     

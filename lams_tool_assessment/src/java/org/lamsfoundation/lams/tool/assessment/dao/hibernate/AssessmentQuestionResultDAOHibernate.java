@@ -31,23 +31,31 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate implements AssessmentQuestionResultDAO {
 
-    private static final String FIND_BY_UID = "from " + AssessmentQuestionResult.class.getName()
-	    + " as r where r.uid = ?";
+    private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
+	    + " AS r WHERE r.uid = ?";
 
-    private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "from "
+    private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
 	    + AssessmentQuestionResult.class.getName()
-	    + " as q, "
+	    + " AS q, "
 	    + AssessmentResult.class.getName()
-	    + " as r "
-	    + " where q.assessmentResult.uid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? order by r.startDate asc";
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? ORDER BY r.startDate ASC";
 
-    private static final String FIND_WRONG_ANSWERS_NUMBER = "select count(q) from  "
+    private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
 	    + AssessmentQuestionResult.class.getName()
-	    + " as q, "
+	    + " AS q, "
 	    + AssessmentResult.class.getName()
-	    + " as r "
-	    + " where q.assessmentResult.uid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? and q.mark < q.assessmentQuestion.defaultGrade";
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade";
+    
+    private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
+	    + AssessmentQuestionResult.class.getName()
+	    + " AS q, "
+	    + AssessmentResult.class.getName()
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND (r.finishDate != null) AND r.user.userId =? AND q.assessmentQuestion.sequenceId =? ORDER BY r.startDate DESC LIMIT 1";
 
+    @Override
     public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
 	List list = getHibernateTemplate().find(FIND_WRONG_ANSWERS_NUMBER, new Object[] { assessmentUid, userId, questionUid });
 	if (list == null || list.size() == 0) {
@@ -57,10 +65,12 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	}
     }
 
+    @Override
     public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
 	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { assessmentUid, userId, questionUid });
     }
     
+    @Override
     public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
 	List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { questionResultUid });
 	if (list == null || list.size() == 0)
@@ -68,4 +78,13 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	return (AssessmentQuestionResult) list.get(0);
     }
 
+    @Override
+    public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
+	List list = getHibernateTemplate().find(GET_ANSWER_MARK, new Object[] { assessmentUid, userId, questionSequenceId });
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return ((Number) list.get(0)).floatValue();
+	}
+    }
 }

@@ -168,7 +168,7 @@ public class GradebookService implements IGradebookService {
 		    activityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 			    + "&toolSessionID=" + toolSession.getToolSessionId().toString());
-		    activityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+		    activityDTO.setOutput(this.getToolOutputsStr(activity, null, toolSession, learner));
 		}
 	    }
 
@@ -254,7 +254,7 @@ public class GradebookService implements IGradebookService {
 				+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 				+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 
-			gUserDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+			gUserDTO.setOutput(this.getToolOutputsStr(activity, null, toolSession, learner));
 		    }
 		}
 
@@ -574,6 +574,9 @@ public class GradebookService implements IGradebookService {
 	    Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(activity);
 
 	    List<GBUserGridRowDTO> userDTOs = new ArrayList<GBUserGridRowDTO>();
+	    
+	    SortedMap<String, ToolOutputDefinition> toolOutputNames = toolService.getOutputDefinitionsFromTool(
+		    activity.getToolContentId(), ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
 
 	    for (User learner : learners) {
 		GBUserGridRowDTO userDTO = new GBUserGridRowDTO(learner);
@@ -604,7 +607,7 @@ public class GradebookService implements IGradebookService {
 			userDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
 				+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 				+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
-			userDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+			userDTO.setOutput(this.getToolOutputsStr(activity, toolOutputNames, toolSession, learner));
 		    }
 		}
 
@@ -1367,24 +1370,29 @@ public class GradebookService implements IGradebookService {
      * Gets the outputs for a tool activity and returns the html for the ouputs cell in the grid
      * 
      * @param toolAct
+     * @param toolOutputNames
+     *            optional parameter which should be used when this object is already available and there is no need
+     *            quering it from DB. if passing null it will be requested from DB
      * @param toolSession
      * @param learner
      * @return
      */
-    private String getToolOutputsStr(ToolActivity toolAct, ToolSession toolSession, User learner) {
+    private String getToolOutputsStr(ToolActivity toolAct, SortedMap<String, ToolOutputDefinition> toolOutputNames, ToolSession toolSession, User learner) {
 	String toolOutputsStr = "";
 	boolean noOutputs = true;
 
 	if (toolAct != null && toolSession != null && learner != null) {
 
-	    SortedMap<String, ToolOutputDefinition> map = toolService.getOutputDefinitionsFromTool(
-		    toolAct.getToolContentId(), ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
+	    if (toolOutputNames == null) {
+		toolOutputNames = toolService.getOutputDefinitionsFromTool(toolAct.getToolContentId(),
+			ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
+	    }
 
 	    Set<ToolOutput> toolOutputs = new HashSet<ToolOutput>();
 
-	    if (map.keySet().size() > 0) {
+	    if (toolOutputNames.keySet().size() > 0) {
 
-		for (String outputName : map.keySet()) {
+		for (String outputName : toolOutputNames.keySet()) {
 
 		    try {
 			ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
@@ -1405,7 +1413,6 @@ public class GradebookService implements IGradebookService {
 					+ toolAct.getActivityId() + ", continuing for other activities", e);
 		    }
 		}
-		// toolOutputsStr += "</ul>";
 	    }
 	}
 
