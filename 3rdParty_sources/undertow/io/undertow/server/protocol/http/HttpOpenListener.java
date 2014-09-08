@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2013 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,18 +9,17 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
 
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
-import io.undertow.UndertowOptions;
 import io.undertow.conduits.ReadTimeoutStreamSourceConduit;
 import io.undertow.conduits.WriteTimeoutStreamSinkConduit;
 import io.undertow.server.HttpHandler;
@@ -63,7 +62,6 @@ public final class HttpOpenListener implements ChannelListener<StreamConnection>
         parser = HttpRequestParser.instance(undertowOptions);
     }
 
-    @Override
     public void handleEvent(final StreamConnection channel) {
         if (UndertowLogger.REQUEST_LOGGER.isTraceEnabled()) {
             UndertowLogger.REQUEST_LOGGER.tracef("Opened connection with %s", channel.getPeerAddress());
@@ -72,23 +70,12 @@ public final class HttpOpenListener implements ChannelListener<StreamConnection>
         //set read and write timeouts
         try {
             Integer readTimeout = channel.getOption(Options.READ_TIMEOUT);
-            Integer idleTimeout = undertowOptions.get(UndertowOptions.IDLE_TIMEOUT);
-            if ((readTimeout == null || readTimeout <= 0) && idleTimeout != null) {
-                readTimeout = idleTimeout;
-            } else if (readTimeout != null && idleTimeout != null && idleTimeout > 0) {
-                readTimeout = Math.min(readTimeout, idleTimeout);
-            }
             if (readTimeout != null && readTimeout > 0) {
-                channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel, this));
+                channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel));
             }
             Integer writeTimeout = channel.getOption(Options.WRITE_TIMEOUT);
-            if ((writeTimeout == null || writeTimeout <= 0) && idleTimeout != null) {
-                writeTimeout = idleTimeout;
-            } else if (writeTimeout != null && idleTimeout != null && idleTimeout > 0) {
-                writeTimeout = Math.min(writeTimeout, idleTimeout);
-            }
-            if (writeTimeout != null && writeTimeout > 0) {
-                channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel, this));
+            if (writeTimeout != 0 && writeTimeout > 0) {
+                channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel));
             }
         } catch (IOException e) {
             IoUtils.safeClose(channel);

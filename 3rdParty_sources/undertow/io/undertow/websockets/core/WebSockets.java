@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.websockets.core;
 
 import org.xnio.Buffers;
@@ -48,18 +30,6 @@ public class WebSockets {
         sendInternal(new ByteBuffer[]{data}, WebSocketFrameType.TEXT, wsChannel, callback);
     }
 
-
-    /**
-     * Sends a complete text message, invoking the callback when complete
-     *
-     * @param message
-     * @param wsChannel
-     * @param callback
-     */
-    public static void sendText(final ByteBuffer message, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendInternal(new ByteBuffer[]{message}, WebSocketFrameType.TEXT, wsChannel, callback);
-    }
-
     /**
      * Sends a complete text message, invoking the callback when complete
      *
@@ -69,16 +39,6 @@ public class WebSockets {
     public static void sendTextBlocking(final String message, final WebSocketChannel wsChannel) throws IOException {
         final ByteBuffer data = ByteBuffer.wrap(message.getBytes(utf8));
         sendBlockingInternal(new ByteBuffer[]{data}, WebSocketFrameType.TEXT, wsChannel);
-    }
-
-    /**
-     * Sends a complete text message, invoking the callback when complete
-     *
-     * @param message
-     * @param wsChannel
-     */
-    public static void sendTextBlocking(final ByteBuffer message, final WebSocketChannel wsChannel) throws IOException {
-        sendBlockingInternal(new ByteBuffer[]{message}, WebSocketFrameType.TEXT, wsChannel);
     }
 
     /**
@@ -231,26 +191,6 @@ public class WebSockets {
     }
 
 
-    /**
-     * Sends a complete close message, invoking the callback when complete
-     *
-     * @param code The close code
-     * @param wsChannel
-     * @param callback
-     */
-    public static void sendClose(final int code, String reason, final WebSocketChannel wsChannel, final WebSocketCallback<Void> callback) {
-        sendClose(new CloseMessage(code, reason).toByteBuffer(), wsChannel, callback);
-    }
-
-    /**
-     * Sends a complete close message, invoking the callback when complete
-     *
-     * @param code
-     * @param wsChannel
-     */
-    public static void sendCloseBlocking(final int code, String reason, final WebSocketChannel wsChannel) throws IOException {
-        sendCloseBlocking(new CloseMessage(code, reason).toByteBuffer(), wsChannel);
-    }
     /**
      * Sends a complete close message, invoking the callback when complete
      *

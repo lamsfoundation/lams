@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -43,8 +43,8 @@ public class PathMatcher<T> {
     private static final String STRING_PATH_SEPARATOR = "/";
 
     private volatile T defaultHandler;
-    private final ConcurrentMap<String, T> paths = new CopyOnWriteMap<>();
-    private final ConcurrentMap<String, T> exactPathMatches = new CopyOnWriteMap<>();
+    private final ConcurrentMap<String, T> paths = new CopyOnWriteMap<String, T>();
+    private final ConcurrentMap<String, T> exactPathMatches = new CopyOnWriteMap<String, T>();
 
     /**
      * lengths of all registered paths
@@ -67,7 +67,7 @@ public class PathMatcher<T> {
         if (!exactPathMatches.isEmpty()) {
             T match = getExactPath(path);
             if (match != null) {
-                return new PathMatch<>("", match);
+                return new PathMatch<T>("", match);
             }
         }
 
@@ -78,7 +78,7 @@ public class PathMatcher<T> {
             if (pathLength == length) {
                 T next = paths.get(path);
                 if (next != null) {
-                    return new PathMatch<>(path.substring(pathLength), next);
+                    return new PathMatch<T>(path.substring(pathLength), next);
                 }
             } else if (pathLength < length) {
                 char c = path.charAt(pathLength);
@@ -86,12 +86,12 @@ public class PathMatcher<T> {
                     String part = path.substring(0, pathLength);
                     T next = paths.get(part);
                     if (next != null) {
-                        return new PathMatch<>(path.substring(pathLength), next);
+                        return new PathMatch<T>(path.substring(pathLength), next);
                     }
                 }
             }
         }
-        return new PathMatch<>(path, defaultHandler);
+        return new PathMatch<T>(path, defaultHandler);
     }
 
     /**
@@ -151,7 +151,7 @@ public class PathMatcher<T> {
     }
 
     private void buildLengths() {
-        final Set<Integer> lengths = new TreeSet<>(new Comparator<Integer>() {
+        final Set<Integer> lengths = new TreeSet<Integer>(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
                 return -o1.compareTo(o2);

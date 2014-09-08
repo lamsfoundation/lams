@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server;
@@ -99,8 +99,8 @@ public final class HttpServerExchange extends AbstractAttachable {
     static final AttachmentKey<Pooled<ByteBuffer>[]> BUFFERED_REQUEST_DATA = AttachmentKey.create(Pooled[].class);
 
     private final ServerConnection connection;
-    private final HeaderMap requestHeaders;
-    private final HeaderMap responseHeaders;
+    private final HeaderMap requestHeaders = new HeaderMap();
+    private final HeaderMap responseHeaders = new HeaderMap();
 
     private int exchangeCompletionListenersCount = 0;
     private ExchangeCompletionListener[] exchangeCompleteListeners;
@@ -282,18 +282,12 @@ public final class HttpServerExchange extends AbstractAttachable {
     private InetSocketAddress destinationAddress;
 
     public HttpServerExchange(final ServerConnection connection, long maxEntitySize) {
-        this(connection, new HeaderMap(), new HeaderMap(), maxEntitySize);
+        this.connection = connection;
+        this.maxEntitySize = maxEntitySize;
     }
 
     public HttpServerExchange(final ServerConnection connection) {
         this(connection, 0);
-    }
-
-    public HttpServerExchange(final ServerConnection connection, final HeaderMap requestHeaders, final HeaderMap responseHeaders,  long maxEntitySize) {
-        this.connection = connection;
-        this.maxEntitySize = maxEntitySize;
-        this.requestHeaders = requestHeaders;
-        this.responseHeaders = responseHeaders;
     }
 
     /**
@@ -498,10 +492,6 @@ public final class HttpServerExchange extends AbstractAttachable {
         return this;
     }
 
-    /**
-     *
-     * @return The query string, without the leading ?
-     */
     public String getQueryString() {
         return queryString;
     }
@@ -963,18 +953,18 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Deque<String>> getQueryParameters() {
         if (queryParameters == null) {
-            queryParameters = new TreeMap<>();
+            queryParameters = new TreeMap<String, Deque<String>>();
         }
         return queryParameters;
     }
 
     public HttpServerExchange addQueryParam(final String name, final String param) {
         if (queryParameters == null) {
-            queryParameters = new TreeMap<>();
+            queryParameters = new TreeMap<String, Deque<String>>();
         }
         Deque<String> list = queryParameters.get(name);
         if (list == null) {
-            queryParameters.put(name, list = new ArrayDeque<>(2));
+            queryParameters.put(name, list = new ArrayDeque<String>(2));
         }
         list.add(param);
         return this;
@@ -988,18 +978,18 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Deque<String>> getPathParameters() {
         if (pathParameters == null) {
-            pathParameters = new TreeMap<>();
+            pathParameters = new TreeMap<String, Deque<String>>();
         }
         return pathParameters;
     }
 
     public HttpServerExchange addPathParam(final String name, final String param) {
         if (pathParameters == null) {
-            pathParameters = new TreeMap<>();
+            pathParameters = new TreeMap<String, Deque<String>>();
         }
         Deque<String> list = pathParameters.get(name);
         if (list == null) {
-            pathParameters.put(name, list = new ArrayDeque<>(2));
+            pathParameters.put(name, list = new ArrayDeque<String>(2));
         }
         list.add(param);
         return this;
@@ -1025,7 +1015,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public HttpServerExchange setResponseCookie(final Cookie cookie) {
         if (responseCookies == null) {
-            responseCookies = new TreeMap<>(); //hashmap is slow to allocate in JDK7
+            responseCookies = new TreeMap<String, Cookie>(); //hashmap is slow to allocate in JDK7
         }
         responseCookies.put(cookie.getName(), cookie);
         return this;
@@ -1036,7 +1026,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Cookie> getResponseCookies() {
         if (responseCookies == null) {
-            responseCookies = new TreeMap<>();
+            responseCookies = new TreeMap<String, Cookie>();
         }
         return responseCookies;
     }
@@ -1076,7 +1066,7 @@ public final class HttpServerExchange extends AbstractAttachable {
         final ConduitStreamSourceChannel sourceChannel = connection.getSourceChannel();
         if (wrappers != null) {
             this.requestWrappers = null;
-            final WrapperConduitFactory<StreamSourceConduit> factory = new WrapperConduitFactory<>(wrappers, requestWrapperCount, sourceChannel.getConduit(), this);
+            final WrapperConduitFactory<StreamSourceConduit> factory = new WrapperConduitFactory<StreamSourceConduit>(wrappers, requestWrapperCount, sourceChannel.getConduit(), this);
             sourceChannel.setConduit(factory.create());
         }
         return requestChannel = new ReadDispatchChannel(sourceChannel);
@@ -1256,7 +1246,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     public HttpServerExchange addResponseWrapper(final ConduitWrapper<StreamSinkConduit> wrapper) {
         ConduitWrapper<StreamSinkConduit>[] wrappers = responseWrappers;
         if (responseChannel != null) {
-            throw UndertowMessages.MESSAGES.responseChannelAlreadyProvided();
+            throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
         }
         if(wrappers == null) {
             this.responseWrappers = wrappers = new ConduitWrapper[2];
@@ -1388,10 +1378,6 @@ public final class HttpServerExchange extends AbstractAttachable {
     public HttpServerExchange endExchange() {
         final int state = this.state;
         if (allAreSet(state, FLAG_REQUEST_TERMINATED | FLAG_RESPONSE_TERMINATED)) {
-            if(blockingHttpExchange != null) {
-                //we still have to close the blocking exchange in this case,
-                IoUtils.safeClose(blockingHttpExchange);
-            }
             return this;
         }
         if(defaultResponseListeners != null) {
@@ -1412,10 +1398,6 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
         }
 
-        if (anyAreClear(state, FLAG_REQUEST_TERMINATED)) {
-            connection.terminateRequestChannel(this);
-        }
-
         if (blockingHttpExchange != null) {
             try {
                 //TODO: can we end up in this situation in a IO thread?
@@ -1428,6 +1410,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         //417 means that we are rejecting the request
         //so the client should not actually send any data
+        //TODO: how
         if (anyAreClear(state, FLAG_REQUEST_TERMINATED)) {
 
             //not really sure what the best thing to do here is
@@ -1526,7 +1509,6 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-
             IoUtils.safeClose(connection);
         }
     }
@@ -1582,7 +1564,6 @@ public final class HttpServerExchange extends AbstractAttachable {
             throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
         }
         this.maxEntitySize = maxEntitySize;
-        connection.maxEntitySizeUpdated(this);
         return this;
     }
 
@@ -1673,11 +1654,8 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void close() throws IOException {
-            try {
-                getInputStream().close();
-            } finally {
-                getOutputStream().close();
-            }
+            IoUtils.safeClose(getInputStream());
+            IoUtils.safeClose(getOutputStream());
         }
     }
 
@@ -1755,22 +1733,6 @@ public final class HttpServerExchange extends AbstractAttachable {
                 }
             });
         }
-
-        @Override
-        public void awaitWritable() throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
-                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
-            }
-            super.awaitWritable();
-        }
-
-        @Override
-        public void awaitWritable(long time, TimeUnit timeUnit) throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
-                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
-            }
-            super.awaitWritable(time, timeUnit);
-        }
     }
 
     /**
@@ -1834,13 +1796,8 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
 
         public void requestDone() {
-            if(delegate instanceof ConduitStreamSourceChannel) {
-                ((ConduitStreamSourceChannel)delegate).setReadListener(null);
-                ((ConduitStreamSourceChannel)delegate).setCloseListener(null);
-            } else {
-                delegate.getReadSetter().set(null);
-                delegate.getCloseSetter().set(null);
-            }
+            delegate.setReadListener(null);
+            delegate.setCloseListener(null);
         }
 
         @Override
@@ -1854,9 +1811,6 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable() throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
-                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
-            }
             Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable();
@@ -1911,9 +1865,6 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable(long time, TimeUnit timeUnit) throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
-                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
-            }
             Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable(time, timeUnit);

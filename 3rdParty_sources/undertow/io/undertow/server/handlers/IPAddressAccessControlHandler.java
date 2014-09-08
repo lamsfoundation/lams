@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.handlers;
 
 import java.net.Inet4Address;
@@ -72,22 +54,15 @@ public class IPAddressAccessControlHandler implements HttpHandler {
 
     private volatile HttpHandler next;
     private volatile boolean defaultAllow = false;
-    private final int denyResponseCode;
-    private final List<PeerMatch> ipv6acl = new CopyOnWriteArrayList<>();
-    private final List<PeerMatch> ipv4acl = new CopyOnWriteArrayList<>();
+    private final List<PeerMatch> ipv6acl = new CopyOnWriteArrayList<PeerMatch>();
+    private final List<PeerMatch> ipv4acl = new CopyOnWriteArrayList<PeerMatch>();
 
     public IPAddressAccessControlHandler(final HttpHandler next) {
-      this(next, StatusCodes.FORBIDDEN);
-    }
-
-    public IPAddressAccessControlHandler(final HttpHandler next, final int denyResponseCode) {
         this.next = next;
-        this.denyResponseCode = denyResponseCode;
     }
 
     public IPAddressAccessControlHandler() {
         this.next = ResponseCodeHandler.HANDLE_404;
-        this.denyResponseCode = StatusCodes.FORBIDDEN;
     }
 
     @Override
@@ -96,7 +71,7 @@ public class IPAddressAccessControlHandler implements HttpHandler {
         if (isAllowed(peer.getAddress())) {
             next.handleRequest(exchange);
         } else {
-            exchange.setResponseCode(denyResponseCode);
+            exchange.setResponseCode(StatusCodes.FORBIDDEN);
             exchange.endExchange();
         }
     }
@@ -116,10 +91,6 @@ public class IPAddressAccessControlHandler implements HttpHandler {
             }
         }
         return defaultAllow;
-    }
-
-    public int getDenyResponseCode() {
-        return denyResponseCode;
     }
 
     public boolean isDefaultAllow() {

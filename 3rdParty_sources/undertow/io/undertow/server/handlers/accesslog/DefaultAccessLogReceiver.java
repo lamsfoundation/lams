@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.handlers.accesslog;
 
 import java.io.BufferedWriter;
@@ -82,7 +64,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         this.outputDirectory = outputDirectory;
         this.logBaseName = logBaseName;
         this.logNameSuffix = (logNameSuffix != null) ? logNameSuffix : DEFAULT_LOG_SUFFIX;
-        this.pendingMessages = new ConcurrentLinkedDeque<>();
+        this.pendingMessages = new ConcurrentLinkedDeque<String>();
         this.defaultLogFile = new File(outputDirectory, logBaseName + this.logNameSuffix);
         calculateChangeOverPoint();
     }
@@ -119,7 +101,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         if (forceLogRotation) {
             doRotate();
         }
-        List<String> messages = new ArrayList<>();
+        List<String> messages = new ArrayList<String>();
         String msg = null;
         //only grab at most 1000 messages at a time
         for (int i = 0; i < 1000; ++i) {
@@ -166,7 +148,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         }
         try {
             if (writer == null) {
-                writer = new BufferedWriter(new FileWriter(defaultLogFile, true));
+                writer = new BufferedWriter(new FileWriter(defaultLogFile));
             }
             for (String message : messages) {
                 writer.write(message);

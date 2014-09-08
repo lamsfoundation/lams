@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.websockets.core;
 
 import java.nio.ByteBuffer;
@@ -30,8 +12,8 @@ public class CloseMessage {
 
     private static final Charset utf8 = Charset.forName("UTF-8");
 
-    private final int code;
-    private final String reason;
+    private final int reason;
+    private final String string;
  /*
     * For the exact meaning of the codes refer to the <a href="http://tools.ietf.org/html/rfc6455#section-7.4">WebSocket
     * RFC Section 7.4</a>.
@@ -48,35 +30,35 @@ public class CloseMessage {
 
     public CloseMessage(final ByteBuffer buffer) {
         if(buffer.remaining() >= 2) {
-            code = (buffer.get() & 0XFF) << 8 | (buffer.get() & 0xFF);
-            reason = new UTF8Output(buffer).extract();
+            reason = (buffer.get() & 0XFF) << 8 | (buffer.get() & 0xFF);
+            string = new UTF8Output(buffer).extract();
         } else {
-            code = GOING_AWAY;
-            reason = "";
+            reason = GOING_AWAY;
+            string = "";
         }
     }
 
-    public CloseMessage(int code, String reason) {
-        this.code = code;
-        this.reason = reason == null ? "" : reason;
+    public CloseMessage(int reason, String string) {
+        this.reason = reason;
+        this.string = string;
     }
 
     public CloseMessage(final ByteBuffer[] buffers) {
         this(WebSockets.mergeBuffers(buffers));
     }
 
-    public String getReason() {
+    public int getReason() {
         return reason;
     }
 
-    public int getCode() {
-        return code;
+    public String getString() {
+        return string;
     }
 
     public ByteBuffer toByteBuffer() {
-        byte[] data = reason.getBytes(utf8);
+        byte[] data = string.getBytes(utf8);
         ByteBuffer buffer = ByteBuffer.allocate(data.length + 2);
-        buffer.putShort((short) code);
+        buffer.putShort((short)reason);
         buffer.put(data);
         buffer.flip();
         return buffer;

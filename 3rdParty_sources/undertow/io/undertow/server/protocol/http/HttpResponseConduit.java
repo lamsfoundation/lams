@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2013 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
@@ -30,15 +30,11 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
 import io.undertow.util.StatusCodes;
-
-import org.xnio.Buffers;
-import org.xnio.IoUtils;
 import org.xnio.Pool;
 import org.xnio.Pooled;
 import org.xnio.XnioWorker;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.AbstractStreamSinkConduit;
-import org.xnio.conduits.ConduitWritableByteChannel;
 import org.xnio.conduits.Conduits;
 import org.xnio.conduits.StreamSinkConduit;
 
@@ -63,7 +59,6 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     private HttpServerExchange exchange;
 
     private ByteBuffer[] writevBuffer;
-    private boolean done = false;
 
     private static final int STATE_BODY = 0; // Message body, normal pass-through operation
     private static final int STATE_START = 1; // No headers written yet
@@ -114,33 +109,22 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
      * @return
      * @throws IOException
      */
-    private int processWrite(int state, final Object userData, int pos, int length) throws IOException {
-        if(done) {
-            throw new ClosedChannelException();
-        }
+    private int processWrite(int state, final ByteBuffer userData) throws IOException {
         assert state != STATE_BODY;
         if (state == STATE_BUF_FLUSH) {
             final ByteBuffer byteBuffer = pooledBuffer.getResource();
             do {
                 long res = 0;
                 ByteBuffer[] data;
-                if (userData == null || length == 0) {
+                if (userData == null) {
                     res = next.write(byteBuffer);
-                } else if (userData instanceof ByteBuffer){
+                } else {
                     data = writevBuffer;
                     if(data == null) {
                         data = writevBuffer = new ByteBuffer[2];
                     }
                     data[0] = byteBuffer;
-                    data[1] = (ByteBuffer) userData;
-                    res = next.write(data, 0, 2);
-                } else {
-                    data = writevBuffer;
-                    if(data == null || data.length < length + 1) {
-                        data = writevBuffer = new ByteBuffer[length + 1];
-                    }
-                    data[0] = byteBuffer;
-                    System.arraycopy(userData, pos, data, 1, length);
+                    data[1] = userData;
                     res = next.write(data, 0, data.length);
                 }
                 if (res == 0) {
@@ -150,7 +134,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
             bufferDone();
             return STATE_BODY;
         } else if (state != STATE_START) {
-            return processStatefulWrite(state, userData, pos, length);
+            return processStatefulWrite(state, userData);
         }
 
         //merge the cookies into the header map
@@ -197,7 +181,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                     this.charIndex = 0;
                     this.state = STATE_HDR_NAME;
                     buffer.flip();
-                    return processStatefulWrite(STATE_HDR_NAME, userData, pos, length);
+                    return processStatefulWrite(STATE_HDR_NAME, userData);
                 }
                 header.appendTo(buffer);
                 buffer.put((byte) ':').put((byte) ' ');
@@ -212,7 +196,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                     this.charIndex = 0;
                     this.state = STATE_HDR_VAL;
                     buffer.flip();
-                    return processStatefulWrite(STATE_HDR_VAL, userData, pos ,length);
+                    return processStatefulWrite(STATE_HDR_VAL, userData);
                 }
                 writeString(buffer, string);
                 buffer.put((byte) '\r').put((byte) '\n');
@@ -226,21 +210,13 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
             ByteBuffer[] data;
             if (userData == null) {
                 res = next.write(buffer);
-            }  else if (userData instanceof ByteBuffer){
+            } else {
                 data = writevBuffer;
                 if(data == null) {
                     data = writevBuffer = new ByteBuffer[2];
                 }
                 data[0] = buffer;
-                data[1] = (ByteBuffer) userData;
-                res = next.write(data, 0, 2);
-            } else {
-                data = writevBuffer;
-                if(data == null || data.length < length + 1) {
-                    data = writevBuffer = new ByteBuffer[length + 1];
-                }
-                data[0] = buffer;
-                System.arraycopy(userData, pos, data, 1, length);
+                data[1] = userData;
                 res = next.write(data, 0, data.length);
             }
             if (res == 0) {
@@ -274,7 +250,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     /**
      * Handles writing out the header data in the case where is is too big to fit into a buffer. This is a much slower code path.
      */
-    private int processStatefulWrite(int state, final Object userData, int pos, int len) throws IOException {
+    private int processStatefulWrite(int state, final ByteBuffer userData) throws IOException {
         ByteBuffer buffer = pooledBuffer.getResource();
         long fiCookie = this.fiCookie;
         int valueIdx = this.valueIdx;
@@ -425,18 +401,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                                         return STATE_BUF_FLUSH;
                                     }
                                 } while (buffer.hasRemaining());
-                            } else if(userData instanceof ByteBuffer) {
-                                ByteBuffer[] b = {buffer, (ByteBuffer) userData};
-                                do {
-                                    long r = next.write(b, 0, b.length);
-                                    if (r == 0 && buffer.hasRemaining()) {
-                                        return STATE_BUF_FLUSH;
-                                    }
-                                } while (buffer.hasRemaining());
                             } else {
-                                ByteBuffer[] b = new ByteBuffer[1 + len];
-                                b[0] = buffer;
-                                System.arraycopy(userData, pos, b, 1, len);
+                                ByteBuffer[] b = {buffer, userData};
                                 do {
                                     long r = next.write(b, 0, b.length);
                                     if (r == 0 && buffer.hasRemaining()) {
@@ -502,18 +468,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                                 return STATE_BUF_FLUSH;
                             }
                         } while (buffer.hasRemaining());
-                    } else if(userData instanceof ByteBuffer) {
-                        ByteBuffer[] b = {buffer, (ByteBuffer) userData};
-                        do {
-                            long r = next.write(b, 0, b.length);
-                            if (r == 0 && buffer.hasRemaining()) {
-                                return STATE_BUF_FLUSH;
-                            }
-                        } while (buffer.hasRemaining());
                     } else {
-                        ByteBuffer[] b = new ByteBuffer[1 + len];
-                        b[0] = buffer;
-                        System.arraycopy(userData, pos, b, 1, len);
+                        ByteBuffer[] b = {buffer, userData};
                         do {
                             long r = next.write(b, 0, b.length);
                             if (r == 0 && buffer.hasRemaining()) {
@@ -561,7 +517,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
         try {
             if (state != 0) {
                 originalRemaining = src.remaining();
-                state = processWrite(state, src, -1, -1);
+                state = processWrite(state, src);
                 if (state != 0) {
                     return 0;
                 }
@@ -592,19 +548,15 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
         int state = oldVal & MASK_STATE;
         try {
             if (state != 0) {
-                long rem = Buffers.remaining(srcs, offset, length);
-                state = processWrite(state, srcs, offset, length);
-
-                long ret  = rem - Buffers.remaining(srcs, offset, length);
+                //todo: use gathering write here
+                state = processWrite(state, null);
                 if (state != 0) {
-                    return ret;
+                    return 0;
                 }
                 if (allAreSet(oldVal, FLAG_SHUTDOWN)) {
                     next.terminateWrites();
                     throw new ClosedChannelException();
                 }
-                //we don't attempt to write again
-                return ret;
             }
             return length == 1 ? next.write(srcs[offset]) : next.write(srcs, offset, length);
         } finally {
@@ -613,11 +565,50 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     }
 
     public long transferFrom(final FileChannel src, final long position, final long count) throws IOException {
-        return src.transferTo(position, count, new ConduitWritableByteChannel(this));
+        if (count == 0L) {
+            return 0L;
+        }
+        int oldVal = state;
+        int state = oldVal & MASK_STATE;
+        try {
+            if (state != 0) {
+                state = processWrite(state, null);
+                if (state != 0) {
+                    return 0;
+                }
+                if (allAreSet(oldVal, FLAG_SHUTDOWN)) {
+                    next.terminateWrites();
+                    throw new ClosedChannelException();
+                }
+            }
+            return next.transferFrom(src, position, count);
+        } finally {
+            this.state = oldVal & ~MASK_STATE | state;
+        }
     }
 
     public long transferFrom(final StreamSourceChannel source, final long count, final ByteBuffer throughBuffer) throws IOException {
-        return IoUtils.transfer(source, count, throughBuffer, new ConduitWritableByteChannel(this));
+        if (count == 0) {
+            throughBuffer.clear().limit(0);
+            return 0L;
+        }
+        int oldVal = state;
+        int state = oldVal & MASK_STATE;
+        try {
+            if (state != 0) {
+                state = processWrite(state, null);
+                if (state != 0) {
+                    return 0;
+                }
+                if (allAreSet(oldVal, FLAG_SHUTDOWN)) {
+                    next.terminateWrites();
+                    throw new ClosedChannelException();
+                }
+            }
+            return next.transferFrom(source, count, throughBuffer);
+        } finally {
+            this.state = oldVal & ~MASK_STATE | state;
+        }
     }
 
     @Override
@@ -635,7 +626,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
         int state = oldVal & MASK_STATE;
         try {
             if (state != 0) {
-                state = processWrite(state, null, -1, -1);
+                state = processWrite(state, null);
                 if (state != 0) {
                     return false;
                 }
@@ -681,7 +672,6 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     }
 
     void freeBuffers() {
-        done = true;
         if(pooledBuffer != null) {
             bufferDone();
         }

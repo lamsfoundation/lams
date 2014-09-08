@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,33 +9,18 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.handlers.form;
 
-import io.undertow.UndertowLogger;
-import io.undertow.UndertowMessages;
-import io.undertow.UndertowOptions;
-import io.undertow.server.ExchangeCompletionListener;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.Headers;
-import io.undertow.util.MalformedMessageException;
-import io.undertow.util.MultipartParser;
-import io.undertow.util.SameThreadExecutor;
-import org.xnio.FileAccess;
-import org.xnio.IoUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -43,7 +28,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import io.undertow.UndertowLogger;
+import io.undertow.UndertowMessages;
+import io.undertow.UndertowOptions;
+import io.undertow.server.Connectors;
+import io.undertow.server.ExchangeCompletionListener;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HeaderMap;
+import io.undertow.util.Headers;
+import io.undertow.util.MalformedMessageException;
+import io.undertow.util.MultipartParser;
+import org.xnio.FileAccess;
+import org.xnio.IoUtils;
+import org.xnio.Pooled;
+import org.xnio.channels.StreamSourceChannel;
+
 /**
+ *
  * @author Stuart Douglas
  */
 public class MultiPartParserDefinition implements FormParserFactory.ParserDefinition {
@@ -71,11 +73,11 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         String mimeType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
         if (mimeType != null && mimeType.startsWith(MULTIPART_FORM_DATA)) {
             String boundary = Headers.extractTokenFromHeader(mimeType, "boundary");
-            if (boundary == null) {
+            if(boundary == null) {
                 UndertowLogger.REQUEST_LOGGER.debugf("Could not find boundary in multipart request with ContentType: %s, multipart data will not be available", mimeType);
                 return null;
             }
-            final MultiPartUploadHandler parser = new MultiPartUploadHandler(exchange, boundary, maxIndividualFileSize, defaultEncoding);
+            final MultiPartUploadHandler parser =  new MultiPartUploadHandler(exchange, boundary, maxIndividualFileSize, defaultEncoding);
             exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
                 @Override
                 public void exchangeEvent(final HttpServerExchange exchange, final NextListener nextListener) {
@@ -129,7 +131,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         private final HttpServerExchange exchange;
         private final FormData data;
         private final String boundary;
-        private final List<File> createdFiles = new ArrayList<>();
+        private final List<File> createdFiles = new ArrayList<File>();
         private final long maxIndividualFileSize;
         private String defaultEncoding;
 
@@ -176,27 +178,29 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             }
 
             final MultipartParser.ParseState parser = MultipartParser.beginParse(exchange.getConnection().getBufferPool(), this, boundary.getBytes(), exchange.getRequestCharset());
-            InputStream inputStream = exchange.getInputStream();
-            if (inputStream == null) {
+            StreamSourceChannel requestChannel = exchange.getRequestChannel();
+            if (requestChannel == null) {
                 throw new IOException(UndertowMessages.MESSAGES.requestChannelAlreadyProvided());
             }
-            byte[] buf = new byte[1024];
+            final Pooled<ByteBuffer> resource = exchange.getConnection().getBufferPool().allocate();
+            final ByteBuffer buf = resource.getResource();
             try {
-                while (true) {
-                    int c = inputStream.read(buf);
+                while (!parser.isComplete()) {
+                    buf.clear();
+                    requestChannel.awaitReadable();
+                    int c = requestChannel.read(buf);
+                    buf.flip();
                     if (c == -1) {
-                        if (parser.isComplete()) {
-                            break;
-                        } else {
-                            throw UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData();
-                        }
+                        throw UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData();
                     } else if (c != 0) {
-                        parser.parse(ByteBuffer.wrap(buf, 0, c));
+                        parser.parse(buf);
                     }
                 }
                 exchange.putAttachment(FORM_DATA, data);
             } catch (MalformedMessageException e) {
                 throw new IOException(e);
+            } finally {
+                resource.free();
             }
             return exchange.getAttachment(FORM_DATA);
         }
@@ -205,7 +209,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         public void run() {
             try {
                 parseBlocking();
-                exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
+                Connectors.executeRootHandler(handler, exchange);
             } catch (Throwable e) {
                 UndertowLogger.REQUEST_LOGGER.debug("Exception parsing data", e);
                 exchange.setResponseCode(500);
@@ -238,7 +242,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         @Override
         public void data(final ByteBuffer buffer) throws IOException {
             this.currentFileSize += buffer.remaining();
-            if (this.maxIndividualFileSize > 0 && this.currentFileSize > this.maxIndividualFileSize) {
+            if(this.maxIndividualFileSize > 0 && this.currentFileSize > this.maxIndividualFileSize) {
                 throw UndertowMessages.MESSAGES.maxFileSizeExceeded(this.maxIndividualFileSize);
             }
             if (file == null) {
@@ -290,7 +294,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         @Override
         public void close() throws IOException {
             //we have to dispatch this, as it may result in file IO
-            final List<File> files = new ArrayList<>(getCreatedFiles());
+            final List<File> files = new ArrayList<File>(getCreatedFiles());
             exchange.getConnection().getWorker().execute(new Runnable() {
                 @Override
                 public void run() {

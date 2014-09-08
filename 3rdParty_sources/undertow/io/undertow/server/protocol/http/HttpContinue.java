@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.protocol.http;
 
 import io.undertow.UndertowMessages;
@@ -51,7 +33,7 @@ public class HttpContinue {
      * @return <code>true</code> if the server needs to send a continue response
      */
     public static boolean requiresContinueResponse(final HttpServerExchange exchange) {
-        if (!exchange.isHttp11() || exchange.isResponseStarted()) {
+        if (!exchange.isHttp11()) {
             return false;
         }
         if (exchange.getConnection() instanceof HttpServerConnection) {
@@ -161,12 +143,13 @@ public class HttpContinue {
         try {
             responseChannel.shutdownWrites();
             if (!responseChannel.flush()) {
+                exchange.dispatch();
                 responseChannel.getWriteSetter().set(ChannelListeners.flushingChannelListener(
                         new ChannelListener<StreamSinkChannel>() {
                             @Override
                             public void handleEvent(StreamSinkChannel channel) {
-                                channel.suspendWrites();
                                 callback.onComplete(exchange, null);
+                                channel.suspendWrites();
                             }
                         }, new ChannelExceptionHandler<Channel>() {
                             @Override

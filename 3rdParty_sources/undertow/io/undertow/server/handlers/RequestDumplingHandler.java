@@ -1,36 +1,14 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.handlers;
 
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import io.undertow.UndertowLogger;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.ExchangeCompletionListener;
-import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.LocaleUtils;
@@ -40,11 +18,11 @@ import io.undertow.util.LocaleUtils;
  *
  * @author Stuart Douglas
  */
-public class RequestDumpingHandler implements HttpHandler {
+public class RequestDumplingHandler implements HttpHandler {
 
     private final HttpHandler next;
 
-    public RequestDumpingHandler(final HttpHandler next) {
+    public RequestDumplingHandler(final HttpHandler next) {
         this.next = next;
     }
 
@@ -147,43 +125,5 @@ public class RequestDumpingHandler implements HttpHandler {
 
         // Perform the exchange
         next.handleRequest(exchange);
-    }
-
-
-
-    public static class Builder implements HandlerBuilder {
-
-        @Override
-        public String name() {
-            return "dump-request";
-        }
-
-        @Override
-        public Map<String, Class<?>> parameters() {
-            return Collections.emptyMap();
-        }
-
-        @Override
-        public Set<String> requiredParameters() {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public String defaultParameter() {
-            return null;
-        }
-
-        @Override
-        public HandlerWrapper build(Map<String, Object> config) {
-            return new Wrapper();
-        }
-
-    }
-
-    private static class Wrapper implements HandlerWrapper {
-        @Override
-        public HttpHandler wrap(HttpHandler handler) {
-            return new RequestDumpingHandler(handler);
-        }
     }
 }

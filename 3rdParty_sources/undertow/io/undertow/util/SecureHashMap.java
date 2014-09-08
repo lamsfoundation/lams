@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -95,7 +95,7 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
         this.loadFactor = loadFactor;
         this.initialCapacity = capacity;
 
-        final Table<K, V> table = new Table<>(capacity, loadFactor);
+        final Table<K, V> table = new Table<K, V>(capacity, loadFactor);
         tableUpdater.set(this, table);
     }
 
@@ -203,7 +203,7 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
             }
 
             // Row doesn't exist, or row exists but item doesn't; try and add a new item to the row.
-            final Item<K, V> newItem = new Item<>(key, hashCode, value);
+            final Item<K, V> newItem = new Item<K, V>(key, hashCode, value);
             final Item<K, V>[] newRow = addItem(oldRow, newItem);
             if (! array.compareAndSet(idx, oldRow, newRow)) {
                 // Nope, row changed; retry.
@@ -229,7 +229,7 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
     private void resize(Table<K, V> origTable) {
         final AtomicReferenceArray<Item<K, V>[]> origArray = origTable.array;
         final int origCapacity = origArray.length();
-        final Table<K, V> newTable = new Table<>(origCapacity << 1, loadFactor);
+        final Table<K, V> newTable = new Table<K, V>(origCapacity << 1, loadFactor);
         // Prevent resize until we're done...
         newTable.size = 0x80000000;
         origTable.resizeView = newTable;
@@ -633,7 +633,7 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
     }
 
     public void clear() {
-        table = new Table<>(initialCapacity, loadFactor);
+        table = new Table<K, V>(initialCapacity, loadFactor);
     }
 
     public Set<Entry<K, V>> entrySet() {
@@ -668,13 +668,13 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
         }
 
         public Object[] toArray() {
-            ArrayList<Object> list = new ArrayList<>(size());
+            ArrayList<Object> list = new ArrayList<Object>(size());
             list.addAll(this);
             return list.toArray();
         }
 
         public <T> T[] toArray(final T[] a) {
-            ArrayList<T> list = new ArrayList<>();
+            ArrayList<T> list = new ArrayList<T>();
             list.addAll((Collection<T>) this);
             return list.toArray(a);
         }
@@ -703,13 +703,13 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
         }
 
         public Object[] toArray() {
-            ArrayList<Object> list = new ArrayList<>(size());
+            ArrayList<Object> list = new ArrayList<Object>(size());
             list.addAll(this);
             return list.toArray();
         }
 
         public <T> T[] toArray(final T[] a) {
-            ArrayList<T> list = new ArrayList<>();
+            ArrayList<T> list = new ArrayList<T>();
             list.addAll((Collection<T>) this);
             return list.toArray(a);
         }
@@ -743,13 +743,13 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
         }
 
         public Object[] toArray() {
-            ArrayList<Object> list = new ArrayList<>(size());
+            ArrayList<Object> list = new ArrayList<Object>(size());
             list.addAll(this);
             return list.toArray();
         }
 
         public <T> T[] toArray(final T[] a) {
-            ArrayList<T> list = new ArrayList<>();
+            ArrayList<T> list = new ArrayList<T>();
             list.addAll((Set<T>) this);
             return list.toArray(a);
         }
@@ -1061,7 +1061,7 @@ public final class SecureHashMap<K, V> extends AbstractMap<K, V> implements Conc
         volatile Table<K, V> resizeView;
 
         private Table(int capacity, float loadFactor) {
-            array = new AtomicReferenceArray<>(capacity);
+            array = new AtomicReferenceArray<Item<K, V>[]>(capacity);
             threshold = capacity == MAXIMUM_CAPACITY ? Integer.MAX_VALUE : (int)(capacity * loadFactor);
         }
     }

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.undertow.util;
 
@@ -43,7 +43,7 @@ public class HeaderTokenParser<E extends HeaderToken> {
         char[] headerChars = header.toCharArray();
 
         // The LinkedHashMap is used so that the parameter order can also be retained.
-        Map<E, String> response = new LinkedHashMap<>();
+        Map<E, String> response = new LinkedHashMap<E, String>();
 
         SearchingFor searchingFor = SearchingFor.START_OF_NAME;
         int nameStart = 0;
@@ -54,7 +54,7 @@ public class HeaderTokenParser<E extends HeaderToken> {
             switch (searchingFor) {
                 case START_OF_NAME:
                     // Eliminate any white space before the name of the parameter.
-                    if (headerChars[i] != COMMA && !Character.isWhitespace(headerChars[i])) {
+                    if (headerChars[i] != COMMA && Character.isWhitespace(headerChars[i]) == false) {
                         nameStart = i;
                         searchingFor = SearchingFor.EQUALS_SIGN;
                     }
@@ -70,7 +70,7 @@ public class HeaderTokenParser<E extends HeaderToken> {
                     }
                     break;
                 case START_OF_VALUE:
-                    if (!Character.isWhitespace(headerChars[i])) {
+                    if (Character.isWhitespace(headerChars[i]) == false) {
                         if (headerChars[i] == QUOTE && currentToken.isAllowQuoted()) {
                             valueStart = i + 1;
                             searchingFor = SearchingFor.LAST_QUOTE;

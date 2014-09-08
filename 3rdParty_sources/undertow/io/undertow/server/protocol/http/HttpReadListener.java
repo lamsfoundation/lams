@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2013 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
@@ -23,16 +23,13 @@ import io.undertow.UndertowOptions;
 import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.ClosingChannelExceptionHandler;
 import io.undertow.util.StringWriteChannelListener;
 import org.xnio.ChannelListener;
-import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
-import org.xnio.conduits.ConduitStreamSinkChannel;
 import org.xnio.conduits.ConduitStreamSourceChannel;
 
 import java.io.IOException;
@@ -71,7 +68,7 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
         this.connection = connection;
         this.parser = parser;
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
-        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
+        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, 0);
         this.recordRequestStartTime = connection.getUndertowOptions().get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
     }
 
@@ -271,22 +268,7 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
             if (connection.getExtraBytes() != null) {
                 connection.getChannel().getSourceChannel().setConduit(new ReadDataStreamSourceConduit(connection.getChannel().getSourceChannel().getConduit(), connection));
             }
-            try {
-                if (!connection.getChannel().getSinkChannel().flush()) {
-                    connection.getChannel().getSinkChannel().setWriteListener(ChannelListeners.flushingChannelListener(new ChannelListener<ConduitStreamSinkChannel>() {
-                        @Override
-                        public void handleEvent(ConduitStreamSinkChannel conduitStreamSinkChannel) {
-                            connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
-                        }
-                    }, new ClosingChannelExceptionHandler<ConduitStreamSinkChannel>(connection)));
-                    connection.getChannel().getSinkChannel().resumeWrites();
-                    return;
-                }
-                connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
-            } catch (IOException e) {
-                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-                IoUtils.safeClose(connection);
-            }
+            connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
         }
     }
 

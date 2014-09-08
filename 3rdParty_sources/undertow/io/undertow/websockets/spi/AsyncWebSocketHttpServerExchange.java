@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.websockets.spi;
 
 import io.undertow.UndertowLogger;
@@ -25,12 +7,9 @@ import io.undertow.security.api.SecurityContext;
 import io.undertow.security.idm.Account;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.HttpUpgradeListener;
-import io.undertow.server.session.SessionConfig;
-import io.undertow.server.session.SessionManager;
 import io.undertow.util.AttachmentKey;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
-import io.undertow.websockets.core.WebSocketChannel;
 import org.xnio.ChannelListener;
 import org.xnio.FinishedIoFuture;
 import org.xnio.FutureResult;
@@ -50,8 +29,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author Stuart Douglas
@@ -60,11 +37,9 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
 
     private final HttpServerExchange exchange;
     private Sender sender;
-    private final Set<WebSocketChannel> peerConnections;
 
-    public AsyncWebSocketHttpServerExchange(final HttpServerExchange exchange, Set<WebSocketChannel> peerConnections) {
+    public AsyncWebSocketHttpServerExchange(final HttpServerExchange exchange) {
         this.exchange = exchange;
-        this.peerConnections = peerConnections;
     }
 
 
@@ -85,9 +60,9 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
 
     @Override
     public Map<String, List<String>> getRequestHeaders() {
-        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
         for (final HttpString header : exchange.getRequestHeaders().getHeaderNames()) {
-            headers.put(header.toString(), new ArrayList<>(exchange.getRequestHeaders().get(header)));
+            headers.put(header.toString(), new ArrayList<String>(exchange.getRequestHeaders().get(header)));
         }
         return Collections.unmodifiableMap(headers);
     }
@@ -99,9 +74,9 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
 
     @Override
     public Map<String, List<String>> getResponseHeaders() {
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
         for (final HttpString header : exchange.getResponseHeaders().getHeaderNames()) {
-            headers.put(header.toString(), new ArrayList<>(exchange.getResponseHeaders().get(header)));
+            headers.put(header.toString(), new ArrayList<String>(exchange.getResponseHeaders().get(header)));
         }
         return Collections.unmodifiableMap(headers);
     }
@@ -130,7 +105,7 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
         if (sender == null) {
             this.sender = exchange.getResponseSender();
         }
-        final FutureResult<Void> future = new FutureResult<>();
+        final FutureResult<Void> future = new FutureResult<Void>();
         sender.send(data, new IoCallback() {
             @Override
             public void onComplete(final HttpServerExchange exchange, final Sender sender) {
@@ -158,10 +133,10 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
             try {
                 res = channel.read(buffer);
                 if (res == -1) {
-                    return new FinishedIoFuture<>(data.toByteArray());
+                    return new FinishedIoFuture<byte[]>(data.toByteArray());
                 } else if (res == 0) {
                     //callback
-                    final FutureResult<byte[]> future = new FutureResult<>();
+                    final FutureResult<byte[]> future = new FutureResult<byte[]>();
                     channel.getReadSetter().set(new ChannelListener<StreamSourceChannel>() {
                         @Override
                         public void handleEvent(final StreamSourceChannel channel) {
@@ -198,7 +173,7 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
                 }
 
             } catch (IOException e) {
-                final FutureResult<byte[]> future = new FutureResult<>();
+                final FutureResult<byte[]> future = new FutureResult<byte[]>();
                 future.setException(e);
                 return future.getIoFuture();
             }
@@ -228,12 +203,7 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
 
     @Override
     public String getRequestURI() {
-        String q = exchange.getQueryString();
-        if (q == null || q.isEmpty()) {
-            return exchange.getRequestURI();
-        } else {
-            return exchange.getRequestURI() + "?" + q;
-        }
+        return exchange.getRequestURI() + exchange.getQueryString();
     }
 
     @Override
@@ -248,19 +218,14 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
 
     @Override
     public Object getSession() {
-        SessionManager sm = exchange.getAttachment(SessionManager.ATTACHMENT_KEY);
-        SessionConfig sessionCookieConfig = exchange.getAttachment(SessionConfig.ATTACHMENT_KEY);
-        if(sm != null && sessionCookieConfig != null) {
-            return sm.getSession(exchange, sessionCookieConfig);
-        }
         return null;
     }
 
     @Override
     public Map<String, List<String>> getRequestParameters() {
-        Map<String, List<String>> params = new HashMap<>();
+        Map<String, List<String>> params = new HashMap<String, List<String>>();
         for (Map.Entry<String, Deque<String>> param : exchange.getQueryParameters().entrySet()) {
-            params.put(param.getKey(), new ArrayList<>(param.getValue()));
+            params.put(param.getKey(), new ArrayList<String>(param.getValue()));
         }
         return params;
     }
@@ -289,10 +254,5 @@ public class AsyncWebSocketHttpServerExchange implements WebSocketHttpExchange {
             return false;
         }
         return authenticatedAccount.getRoles().contains(role);
-    }
-
-    @Override
-    public Set<WebSocketChannel> getPeerConnections() {
-        return peerConnections;
     }
 }

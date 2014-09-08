@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -69,13 +69,9 @@ public abstract class AbstractAttachable implements Attachable {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("key");
         }
         if(attachments == null) {
-            attachments = createAttachmentMap();
+            attachments = new IdentityHashMap<AttachmentKey<?>, Object>(5);
         }
         return key.cast(attachments.put(key, key.cast(value)));
-    }
-
-    protected Map<AttachmentKey<?>, Object> createAttachmentMap() {
-        return new IdentityHashMap<>(5);
     }
 
     /**
@@ -96,12 +92,12 @@ public abstract class AbstractAttachable implements Attachable {
     public <T> void addToAttachmentList(final AttachmentKey<AttachmentList<T>> key, final T value) {
         if (key != null) {
             if(attachments == null) {
-                attachments = createAttachmentMap();
+                attachments = new IdentityHashMap<AttachmentKey<?>, Object>(5);
             }
             final Map<AttachmentKey<?>, Object> attachments = this.attachments;
             final AttachmentList<T> list = key.cast(attachments.get(key));
             if (list == null) {
-                final AttachmentList<T> newList = new AttachmentList<>(((ListAttachmentKey<T>) key).getValueClass());
+                final AttachmentList<T> newList = new AttachmentList<T>(((ListAttachmentKey<T>) key).getValueClass());
                 attachments.put(key, newList);
                 newList.add(value);
             } else {

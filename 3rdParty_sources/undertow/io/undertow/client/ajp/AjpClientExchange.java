@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.client.ajp;
 
 import io.undertow.channels.DetachableStreamSinkChannel;
@@ -26,9 +8,6 @@ import io.undertow.client.ClientExchange;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.client.ContinueNotification;
-import io.undertow.protocols.ajp.AjpClientChannel;
-import io.undertow.protocols.ajp.AjpClientRequestClientStreamSinkChannel;
-import io.undertow.protocols.ajp.AjpClientResponseStreamSourceChannel;
 import io.undertow.util.AbstractAttachable;
 import io.undertow.util.Headers;
 import org.xnio.channels.StreamSinkChannel;
@@ -50,14 +29,11 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
     private ClientCallback<ClientExchange> responseCallback;
     private ClientCallback<ClientExchange> readyCallback;
     private ContinueNotification continueNotification;
-    private AjpClientChannel ajpClientChannel;
+    private AjpClientRequestConduit ajpClientRequestConduit;
 
     private ClientResponse response;
     private ClientResponse continueResponse;
     private IOException failedReason;
-
-    private AjpClientResponseStreamSourceChannel responseChannel;
-    private AjpClientRequestClientStreamSinkChannel requestChannel;
 
     private int state = 0;
     private static final int REQUEST_TERMINATED = 1;
@@ -89,6 +65,8 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
         state |= RESPONSE_TERMINATED;
         if (anyAreSet(state, REQUEST_TERMINATED)) {
             clientConnection.requestDone();
+        } else {
+            clientConnection.installReadBodyListener();
         }
     }
 
@@ -142,7 +120,7 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
 
     @Override
     public StreamSinkChannel getRequestChannel() {
-        return new DetachableStreamSinkChannel(requestChannel) {
+        return new DetachableStreamSinkChannel(clientConnection.getConnection().getSinkChannel()) {
             @Override
             protected boolean isFinished() {
                 return anyAreSet(state, REQUEST_TERMINATED);
@@ -152,7 +130,7 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
 
     @Override
     public StreamSourceChannel getResponseChannel() {
-        return new DetachableStreamSourceChannel(responseChannel) {
+        return new DetachableStreamSourceChannel(clientConnection.getConnection().getSourceChannel()) {
             @Override
             protected boolean isFinished() {
                 return anyAreSet(state, RESPONSE_TERMINATED);
@@ -180,18 +158,18 @@ class AjpClientExchange extends AbstractAttachable implements ClientExchange {
         return clientConnection;
     }
 
-    void setResponseChannel(AjpClientResponseStreamSourceChannel responseChannel) {
-        this.responseChannel = responseChannel;
-    }
-
-    void setRequestChannel(AjpClientRequestClientStreamSinkChannel requestChannel) {
-        this.requestChannel = requestChannel;
-    }
-
     void invokeReadReadyCallback(final ClientExchange result) {
         if(readyCallback != null) {
             readyCallback.completed(result);
             readyCallback = null;
         }
+    }
+
+    public AjpClientRequestConduit getAjpClientRequestConduit() {
+        return ajpClientRequestConduit;
+    }
+
+    public void setAjpClientRequestConduit(AjpClientRequestConduit ajpClientRequestConduit) {
+        this.ajpClientRequestConduit = ajpClientRequestConduit;
     }
 }

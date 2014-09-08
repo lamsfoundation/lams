@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server;
@@ -48,7 +48,7 @@ public abstract class AbstractServerConnection  extends ServerConnection {
     protected final OptionMap undertowOptions;
     protected final StreamSourceConduit originalSourceConduit;
     protected final StreamSinkConduit originalSinkConduit;
-    protected final List<CloseListener> closeListeners = new LinkedList<>();
+    protected final List<CloseListener> closeListeners = new LinkedList<CloseListener>();
 
     protected HttpServerExchange current;
 
@@ -270,10 +270,6 @@ public abstract class AbstractServerConnection  extends ServerConnection {
 
     protected void setUpgradeListener(HttpUpgradeListener upgradeListener) {
         throw UndertowMessages.MESSAGES.upgradeNotSupported();
-    }
-
-    @Override
-    protected void maxEntitySizeUpdated(HttpServerExchange exchange) {
     }
 
     private class CloseSetter implements ChannelListener.Setter<ServerConnection>, ChannelListener<StreamConnection> {

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2013 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -37,7 +37,7 @@ public final class HeaderValues extends AbstractCollection<String> implements De
 
     private static final String[] NO_STRINGS = new String[0];
     final HttpString key;
-    byte size;
+    byte head, size;
     Object value;
 
     HeaderValues(final HttpString key) {
@@ -63,20 +63,28 @@ public final class HeaderValues extends AbstractCollection<String> implements De
     }
 
     private void clearInternal(byte size) {
+        final byte head = this.head;
         final Object value = this.value;
         if (value instanceof String[]) {
             final String[] strings = (String[]) value;
             final int len = strings.length;
-            Arrays.fill(strings, 0, len, null);
+            final int tail = head + size;
+            if (tail > len) {
+                Arrays.fill(strings, head, len, null);
+                Arrays.fill(strings, 0, tail - len, null);
+            } else {
+                Arrays.fill(strings, head, tail, null);
+            }
         } else {
             this.value = null;
         }
-        this.size = 0;
+        this.head = this.size = 0;
     }
 
     private int index(int idx) {
         assert idx >= 0;
         assert idx < size;
+        idx += head;
         final int len = ((String[]) value).length;
         if (idx > len) {
             idx -= len;
@@ -195,14 +203,19 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         if (value instanceof String[]) {
             final String[] strings = (String[]) value;
             final int len = strings.length;
+            final byte head = this.head;
             if (size == len) {
-                final String[] newStrings = new String[len + 2];
-                System.arraycopy(strings, 0, newStrings, 1, len);
-                newStrings[0] = headerValue;
+                final String[] newStrings = Arrays.copyOfRange(strings, head, head + len + (len << 1));
+                final int end = head + size;
+                if (end > len) {
+                    System.arraycopy(strings, 0, newStrings, len - head, end - len);
+                }
+                newStrings[this.head = (byte) (head - 1)] = headerValue;
                 this.value = newStrings;
+            } else if (head == 0) {
+                strings[this.head = (byte) (len - 1)] = headerValue;
             } else {
-                System.arraycopy(strings, 0, strings, 1, strings.length - 1);
-                strings[0] = headerValue;
+                strings[this.head = (byte) (head - 1)] = headerValue;
             }
             this.size = (byte) (size + 1);
         } else {
@@ -213,6 +226,7 @@ public final class HeaderValues extends AbstractCollection<String> implements De
                 this.value = new String[] { headerValue, (String) value, null, null };
                 this.size = (byte) 2;
             }
+            this.head = 0;
         }
         return true;
     }
@@ -231,20 +245,27 @@ public final class HeaderValues extends AbstractCollection<String> implements De
                 this.value = new String[] { (String) value, headerValue, null, null };
                 this.size = (byte) 2;
             }
+            this.head = 0;
         }
         return true;
     }
 
     private void offerLastMultiValue(String headerValue, int size, String[] value) {
-        final String[] strings = value;
+        final String[] strings = (String[]) value;
         final int len = strings.length;
+        final byte head = this.head;
+        final int end = head + size;
         if (size == len) {
-            final String[] newStrings = new String[len + 2];
-            System.arraycopy(strings, 0, newStrings, 0, len);
+            final String[] newStrings = Arrays.copyOfRange(strings, head, head + len + (len << 1));
+            if (end > len) {
+                System.arraycopy(strings, 0, newStrings, len - head, end - len);
+            }
             newStrings[len] = headerValue;
             this.value = newStrings;
+        } else if (end >= len) {
+            strings[end - len] = headerValue;
         } else {
-            strings[size] = headerValue;
+            strings[end] = headerValue;
         }
         this.size = (byte) (size + 1);
     }
@@ -259,22 +280,59 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         assert value instanceof String[];
         final String[] strings = (String[]) value;
         final int len = strings.length;
+        final byte head = this.head;
+        final int end = head + size;
+        final int headIdx = head + idx;
         // This stuff is all algebraically derived.
         if (size == len) {
             // Grow the list, copy each segment into new spots so that head = 0
-            final int newLen = len + 2;
+            final int newLen = (len << 1) + len;
             final String[] newStrings = new String[newLen];
-            System.arraycopy(value, 0, newStrings, 0, idx);
-            System.arraycopy(value, idx, newStrings, idx + 1, len - idx);
-
+            if (head == 0) {
+                assert headIdx == len;
+                assert end == len;
+                System.arraycopy(value, 0, newStrings, 0, idx);
+                System.arraycopy(value, idx, newStrings, idx + 1, len - idx);
+            } else if (headIdx < len) {
+                System.arraycopy(value, head, newStrings, 0, idx);
+                System.arraycopy(value, headIdx, newStrings, idx + 1, len - headIdx);
+                System.arraycopy(value, 0, newStrings, len - head + 1, head);
+            } else if (headIdx > len) {
+                System.arraycopy(value, 0, newStrings, len - head, headIdx - len);
+                System.arraycopy(value, headIdx - len, newStrings, idx + 1, len - idx + 1);
+                System.arraycopy(value, head, newStrings, 0, len - head);
+            }
             // finally fill in the new value
             newStrings[idx] = headerValue;
             this.value = newStrings;
-        } else{
-            System.arraycopy(value, idx, value, idx + 1, len - idx);
-
-            // finally fill in the new value
+            this.head = 0;
+        } else if (end > len) {
+            if (headIdx < len) {
+                System.arraycopy(value, head, value, head - 1, idx);
+                strings[headIdx - 1] = headerValue;
+                this.head = (byte) (head - 1);
+            } else if (headIdx > len) {
+                System.arraycopy(value, headIdx - len, value, headIdx - len + 1, size - idx);
+                strings[headIdx - len] = headerValue;
+            } else {
+                assert headIdx == len;
+                System.arraycopy(value, 0, value, 1, end - len);
+                strings[0] = headerValue;
+            }
             strings[idx] = headerValue;
+        } else {
+            assert size < len && end <= len;
+            if (head == 0 || idx >= size >> 1) {
+                assert end < len;
+                System.arraycopy(value, headIdx, value, headIdx + 1, size - idx);
+                strings[headIdx] = headerValue;
+            } else {
+                assert end <= len || idx < size << 1;
+                assert head > 0;
+                System.arraycopy(value, headIdx, value, headIdx - 1, size - idx);
+                strings[headIdx - 1] = headerValue;
+                this.head = (byte) (head - 1);
+            }
         }
         this.size = (byte) (size + 1);
         return true;
@@ -291,10 +349,15 @@ public final class HeaderValues extends AbstractCollection<String> implements De
             return (String) value;
         } else {
             final String[] strings = (String[]) value;
-            String ret = strings[0];
-            System.arraycopy(strings, 1, strings, 0, strings.length - 1);
+            int idx = head++;
             this.size = (byte) (size - 1);
-            return ret;
+            final int len = strings.length;
+            if (idx > len) idx -= len;
+            try {
+                return strings[idx];
+            } finally {
+                strings[idx] = null;
+            }
         }
     }
 
@@ -309,7 +372,7 @@ public final class HeaderValues extends AbstractCollection<String> implements De
             return (String) value;
         } else {
             final String[] strings = (String[]) value;
-            int idx = (this.size = (byte) (size - 1));
+            int idx = head + (this.size = (byte) (size - 1));
             final int len = strings.length;
             if (idx > len) idx -= len;
             try {
@@ -329,11 +392,33 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         // value must be an array since size > 2
         final String[] value = (String[]) this.value;
         final int len = value.length;
-        String ret = value[idx];
-        System.arraycopy(value, idx + 1, value, idx, len - idx - 1);
-        value[len - 1] = null;
-        this.size = (byte) (size - 1);
-        return ret;
+        final byte head = this.head;
+        final int headIdx = idx + head;
+        final int end = head + size;
+        if (end > len) {
+            if (headIdx > len) {
+                try {
+                    return value[headIdx - len];
+                } finally {
+                    System.arraycopy(value, headIdx + 1 - len, value, headIdx - len, size - idx - 1);
+                    this.size = (byte) (size - 1);
+                }
+            } else {
+                try {
+                    return value[headIdx];
+                } finally {
+                    System.arraycopy(value, head, value, head + 1, idx);
+                    this.size = (byte) (size - 1);
+                }
+            }
+        } else {
+            try {
+                return value[headIdx];
+            } finally {
+                System.arraycopy(value, headIdx + 1, value, headIdx, size - idx - 1);
+                this.size = (byte) (size - 1);
+            }
+        }
     }
 
     public String get(int idx) {
@@ -355,8 +440,10 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         if (value instanceof String[]) {
             final String[] list = (String[]) value;
             final int len = list.length;
+            int idx;
             for (int i = 0; i < size; i ++) {
-                if ((i > len ? list[i - len] : list[i]).equals(o)) {
+                idx = i + head;
+                if ((idx > len ? list[idx - len] : list[idx]).equals(o)) {
                     return i;
                 }
             }
@@ -373,7 +460,7 @@ public final class HeaderValues extends AbstractCollection<String> implements De
             final int len = list.length;
             int idx;
             for (int i = size - 1; i >= 0; i --) {
-                idx = i;
+                idx = i + head;
                 if ((idx > len ? list[idx - len] : list[idx]).equals(o)) {
                     return i;
                 }
@@ -432,13 +519,14 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         final Object v = this.value;
         if (v instanceof String) return new String[] { (String) v };
         final String[] list = (String[]) v;
+        final int head = this.head;
         final int len = list.length;
-        final int copyEnd =  size;
+        final int copyEnd = head + size;
         if (copyEnd < len) {
-            return Arrays.copyOfRange(list, 0, copyEnd);
+            return Arrays.copyOfRange(list, head, copyEnd);
         } else {
-            String[] ret = Arrays.copyOfRange(list, 0, copyEnd);
-            System.arraycopy(list, 0, ret, len, copyEnd - len);
+            String[] ret = Arrays.copyOfRange(list, head, copyEnd);
+            System.arraycopy(list, 0, ret, len - head, copyEnd - len);
             return ret;
         }
     }
@@ -452,7 +540,17 @@ public final class HeaderValues extends AbstractCollection<String> implements De
         if (v instanceof String) {
             target[0] = (T)v;
         } else {
-            System.arraycopy(v, 0, target, 0, size);
+            final String[] list = (String[]) v;
+            final int head = this.head;
+            final int len = list.length;
+            final int copyEnd = head + size;
+            if (copyEnd < len) {
+                System.arraycopy(list, head, target, 0, size);
+            } else {
+                final int wrapEnd = len - head;
+                System.arraycopy(list, head, target, 0, wrapEnd);
+                System.arraycopy(list, 0, target, wrapEnd, copyEnd - len);
+            }
         }
         return (T[]) target;
     }
@@ -570,10 +668,6 @@ public final class HeaderValues extends AbstractCollection<String> implements De
     }
 
     public boolean addAll(final Collection<? extends String> c) {
-        Iterator<? extends String> it = c.iterator();
-        while (it.hasNext()) {
-            add(it.next());
-        }
-        return !c.isEmpty();
+        return addAll(0, c);
     }
 }

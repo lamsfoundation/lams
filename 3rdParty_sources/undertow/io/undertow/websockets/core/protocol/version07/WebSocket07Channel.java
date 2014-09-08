@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.undertow.websockets.core.protocol.version07;
 
@@ -22,21 +22,17 @@ import io.undertow.websockets.core.StreamSinkFrameChannel;
 import io.undertow.websockets.core.StreamSourceFrameChannel;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSocketException;
-import io.undertow.websockets.core.WebSocketFrame;
 import io.undertow.websockets.core.WebSocketFrameCorruptedException;
 import io.undertow.websockets.core.WebSocketFrameType;
 import io.undertow.websockets.core.WebSocketLogger;
 import io.undertow.websockets.core.WebSocketMessages;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.function.ChannelFunction;
-
-import org.xnio.IoUtils;
 import org.xnio.Pool;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
 
 
 /**
@@ -87,8 +83,8 @@ public class WebSocket07Channel extends WebSocketChannel {
      * @param wsUrl      The url for which the {@link WebSocket07Channel} was created.
      */
     public WebSocket07Channel(StreamConnection channel, Pool<ByteBuffer> bufferPool,
-                              String wsUrl, String subProtocol, final boolean client, boolean allowExtensions, Set<WebSocketChannel> openConnections) {
-        super(channel, bufferPool, WebSocketVersion.V08, wsUrl, subProtocol, client, allowExtensions, openConnections);
+                              String wsUrl, String subProtocol, final boolean client, boolean allowExtensions) {
+        super(channel, bufferPool, WebSocketVersion.V08, wsUrl, subProtocol, client, allowExtensions);
     }
 
     @Override
@@ -99,11 +95,6 @@ public class WebSocket07Channel extends WebSocketChannel {
     @Override
     protected void markReadsBroken(Throwable cause) {
         super.markReadsBroken(cause);
-    }
-
-    @Override
-    protected void closeSubChannels() {
-        IoUtils.safeClose(fragmentedChannel);
     }
 
     @Override
@@ -124,7 +115,7 @@ public class WebSocket07Channel extends WebSocketChannel {
         }
     }
 
-    class WebSocketFrameHeader implements WebSocketFrame {
+    class WebSocketFrameHeader implements PartialFrame {
 
         private boolean frameFinalFlag;
         private int frameRsv;
@@ -339,7 +330,6 @@ public class WebSocket07Channel extends WebSocketChannel {
                         }
                         b = buffer.get();
                         lengthBuffer.put(b);
-                        state = State.READING_EXTENDED_SIZE8;
                     case READING_EXTENDED_SIZE8:
                         if (!buffer.hasRemaining()) {
                             return;
@@ -355,7 +345,6 @@ public class WebSocket07Channel extends WebSocketChannel {
                             state = State.DONE;
                             break;
                         }
-                        state = State.READING_MASK_1;
                     case READING_MASK_1:
                         if (!buffer.hasRemaining()) {
                             return;
@@ -467,17 +456,11 @@ public class WebSocket07Channel extends WebSocketChannel {
                 StreamSourceFrameChannel ret = fragmentedChannel;
                 if(frameFinalFlag) {
                     fragmentedChannel = null;
+                    ret.finalFrame(); //TODO: should  be in handle header data, maybe
                 }
                 return ret;
             }
             return null;
         }
-
-        @Override
-        public boolean isFinalFragment() {
-            return frameFinalFlag;
-        }
     }
-
-
 }

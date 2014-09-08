@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.protocol.ajp;
 
 import io.undertow.UndertowLogger;
@@ -31,6 +13,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.ChannelListener;
+import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
@@ -71,8 +54,8 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
         this.scheme = scheme;
         this.parser = parser;
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
-        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
-        this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<>(connection.getChannel().getSinkChannel());
+        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, 0);
+        this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<ConduitStreamSinkChannel>(connection.getChannel().getSinkChannel());
         this.recordRequestStartTime = connection.getUndertowOptions().get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
     }
 
@@ -85,7 +68,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
 
     public void handleEvent(final StreamSourceChannel channel) {
         if(connection.getOriginalSinkConduit().isWriteShutdown() || connection.getOriginalSourceConduit().isReadShutdown()) {
-            safeClose(connection);
+            IoUtils.safeClose(connection);
             channel.suspendReads();
             return;
         }
@@ -122,11 +105,11 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                         channel.shutdownReads();
                         final StreamSinkChannel responseChannel = connection.getChannel().getSinkChannel();
                         responseChannel.shutdownWrites();
-                        safeClose(connection);
+                        IoUtils.safeClose(connection);
                     } catch (IOException e) {
                         UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                         // fuck it, it's all ruined
-                        safeClose(connection);
+                        IoUtils.safeClose(connection);
                         return;
                     }
                     return;
@@ -140,14 +123,14 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                 }
                 int begin = buffer.remaining();
                 parser.parse(buffer, state, httpServerExchange);
-                read += begin - buffer.remaining();
+                read += (begin - buffer.remaining());
                 if (buffer.hasRemaining()) {
                     free = false;
                     connection.setExtraBytes(pooled);
                 }
                 if (read > maxRequestSize) {
                     UndertowLogger.REQUEST_LOGGER.requestHeaderWasTooLarge(connection.getPeerAddress(), maxRequestSize);
-                    safeClose(connection);
+                    IoUtils.safeClose(connection);
                     return;
                 }
             } while (!state.isComplete());
@@ -164,7 +147,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                     channel.resumeReads();
                 } else {
                     UndertowLogger.REQUEST_LOGGER.ignoringAjpRequestWithPrefixCode(state.prefix);
-                    safeClose(connection);
+                    IoUtils.safeClose(connection);
                 }
                 return;
             }
@@ -206,12 +189,12 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             } catch (Throwable t) {
                 //TODO: we should attempt to return a 500 status code in this situation
                 UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(t);
-                safeClose(channel);
-                safeClose(connection);
+                IoUtils.safeClose(channel);
+                IoUtils.safeClose(connection);
             }
         } catch (Exception e) {
             UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(e);
-            safeClose(connection.getChannel());
+            IoUtils.safeClose(connection.getChannel());
         } finally {
             if (free) pooled.free();
         }
@@ -239,7 +222,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                                     }
                                 } catch (IOException e) {
                                     UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-                                    safeClose(connection);
+                                    IoUtils.safeClose(connection);
                                 }
                             } while (buffer.hasRemaining());
                             channel.suspendWrites();
@@ -253,7 +236,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             AjpReadListener.this.handleEvent(underlyingChannel.getSourceChannel());
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-            safeClose(connection);
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -264,7 +247,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             channel.getReadSetter().set(this);
             channel.wakeupReads();
         } else if(!exchange.isPersistent()) {
-            safeClose(exchange.getConnection());
+            IoUtils.safeClose(exchange.getConnection());
         }
     }
 

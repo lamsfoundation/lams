@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -34,7 +34,7 @@ public class MimeMappings {
     public static final Map<String, String> DEFAULT_MIME_MAPPINGS;
 
     static {
-        Map<String, String> defaultMappings = new HashMap<>(101);
+        Map<String, String> defaultMappings = new HashMap<String, String>(101);
         defaultMappings.put("txt", "text/plain");
         defaultMappings.put("css", "text/css");
         defaultMappings.put("html", "text/html");
@@ -50,7 +50,6 @@ public class MimeMappings {
         defaultMappings.put("rtx", "text/richtext");
         defaultMappings.put("tsv", "text/tab-separated-values");
         defaultMappings.put("etx", "text/x-setext");
-        defaultMappings.put("json", "application/json");
         defaultMappings.put("ps", "application/x-postscript");
         defaultMappings.put("class", "application/java");
         defaultMappings.put("csh", "application/x-csh");
@@ -112,7 +111,6 @@ public class MimeMappings {
         defaultMappings.put("aiff", "audio/x-aiff");
         defaultMappings.put("aifc", "audio/x-aiff");
         defaultMappings.put("wav", "audio/x-wav");
-        defaultMappings.put("mp3", "audio/mpeg");
         defaultMappings.put("mpeg", "video/mpeg");
         defaultMappings.put("mpg", "video/mpeg");
         defaultMappings.put("mpe", "video/mpeg");
@@ -155,7 +153,7 @@ public class MimeMappings {
     }
 
     public static class Builder {
-        private final Map<String, String> mappings = new HashMap<>();
+        private final Map<String, String> mappings = new HashMap<String, String>();
 
 
         private Builder(boolean includeDefault) {

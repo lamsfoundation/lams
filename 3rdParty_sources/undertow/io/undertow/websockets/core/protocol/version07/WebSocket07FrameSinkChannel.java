@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,15 +9,14 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.undertow.websockets.core.protocol.version07;
 
-import io.undertow.server.protocol.framed.SendFrameHeader;
 import io.undertow.websockets.core.StreamSinkFrameChannel;
 import io.undertow.websockets.core.WebSocketFrameType;
 import io.undertow.websockets.core.WebSocketMessages;
@@ -56,17 +55,8 @@ public abstract class WebSocket07FrameSinkChannel extends StreamSinkFrameChannel
     }
 
     @Override
-    protected void handleFlushComplete(boolean finalFrame) {
+    protected void handleFlushComplete() {
         dataWritten = true;
-    }
-
-
-    /**
-     * If a stream sink channel is closed while in the middle of sending fragmented data we need to close the connection.
-     * @throws IOException
-     */
-    protected void channelForciblyClosed() throws IOException {
-        getChannel().sendClose();
     }
 
     private byte opCode() {
@@ -92,7 +82,7 @@ public abstract class WebSocket07FrameSinkChannel extends StreamSinkFrameChannel
     }
 
     @Override
-    protected SendFrameHeader createFrameHeader() {
+    protected Pooled<ByteBuffer> createFrameHeader() {
         if(payloadSize >= 0 && dataWritten) {
             //for fixed length we don't need more than one header
             return null;
@@ -139,7 +129,7 @@ public abstract class WebSocket07FrameSinkChannel extends StreamSinkFrameChannel
             header.put((byte)((maskingKey & 0xFF)));
         }
         header.flip();
-        return new SendFrameHeader(0, start);
+        return start;
     }
 
     @Override

@@ -1,22 +1,7 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.protocol.ajp;
+
+import io.undertow.server.BasicSSLSessionInfo;
+import io.undertow.util.HttpString;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -24,9 +9,6 @@ import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.undertow.server.BasicSSLSessionInfo;
-import io.undertow.util.HttpString;
 
 /**
  * @author Stuart Douglas
@@ -65,7 +47,7 @@ class AjpRequestParseState extends AbstractAjpParseState {
     String currentAttribute;
 
     //TODO: can there be more than one attribute?
-    Map<String, String> attributes = new HashMap<>();
+    Map<String, String> attributes = new HashMap<String, String>();
 
     String remoteAddress;
     int serverPort = 80;
@@ -92,16 +74,15 @@ class AjpRequestParseState extends AbstractAjpParseState {
     }
 
     InetSocketAddress createPeerAddress() {
-        if (remoteAddress == null) {
+        if(remoteAddress == null) {
             return null;
         }
         String portString = attributes.get(AJP_REMOTE_PORT);
         int port = 0;
-        if (portString != null) {
+        if(portString != null) {
             try {
                 port = Integer.parseInt(portString);
-            } catch (IllegalArgumentException e) {
-            }
+            } catch (IllegalArgumentException e) {}
         }
         try {
             InetAddress address = InetAddress.getByName(remoteAddress);
@@ -112,9 +93,14 @@ class AjpRequestParseState extends AbstractAjpParseState {
     }
 
     InetSocketAddress createDestinationAddress() {
-        if (serverAddress == null) {
+        if(serverAddress == null) {
             return null;
         }
-        return InetSocketAddress.createUnresolved(serverAddress, serverPort);
+        try {
+            InetAddress address = InetAddress.getByName(serverAddress);
+            return new InetSocketAddress(address, serverPort);
+        } catch (UnknownHostException e) {
+            return null;
+        }
     }
 }

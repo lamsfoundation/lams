@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.util;
@@ -103,8 +103,6 @@ public final class Headers {
     public static final String WWW_AUTHENTICATE_STRING = "WWW-Authenticate";
     public static final String X_FORWARDED_FOR_STRING = "X-Forwarded-For";
     public static final String X_FORWARDED_PROTO_STRING = "X-Forwarded-Proto";
-    public static final String X_FORWARDED_HOST_STRING = "X-Forwarded-Host";
-    public static final String X_FORWARDED_PORT_STRING = "X-Forwarded-Port";
 
     // Header names
 
@@ -180,9 +178,7 @@ public final class Headers {
     public static final HttpString WARNING = new HttpString(WARNING_STRING, 65);
     public static final HttpString WWW_AUTHENTICATE = new HttpString(WWW_AUTHENTICATE_STRING, 66);
     public static final HttpString X_FORWARDED_FOR = new HttpString(X_FORWARDED_FOR_STRING, 67);
-    public static final HttpString X_FORWARDED_HOST = new HttpString(X_FORWARDED_HOST_STRING, 68);
-    public static final HttpString X_FORWARDED_PORT = new HttpString(X_FORWARDED_PORT_STRING, 69);
-    public static final HttpString X_FORWARDED_PROTO = new HttpString(X_FORWARDED_PROTO_STRING, 70);
+    public static final HttpString X_FORWARDED_PROTO = new HttpString(X_FORWARDED_PROTO_STRING, 68);
 
     // Content codings
 

@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.server.handlers.encoding;
 
 import io.undertow.predicate.Predicate;
@@ -39,7 +21,7 @@ public class ContentEncodingRepository {
 
     public static final String IDENTITY = "identity";
 
-    private final Map<String, EncodingMapping> encodingMap = new CopyOnWriteMap<>();
+    private final Map<String, EncodingMapping> encodingMap = new CopyOnWriteMap<String, EncodingMapping>();
 
     /**
      * Gets all allow
@@ -51,10 +33,10 @@ public class ContentEncodingRepository {
         if (res == null || res.isEmpty()) {
             return null;
         }
-        final List<EncodingMapping> resultingMappings = new ArrayList<>();
+        final List<EncodingMapping> resultingMappings = new ArrayList<EncodingMapping>();
         final List<List<QValueParser.QValueResult>> found = QValueParser.parse(res);
         for (List<QValueParser.QValueResult> result : found) {
-            List<EncodingMapping> available = new ArrayList<>();
+            List<EncodingMapping> available = new ArrayList<EncodingMapping>();
             boolean includesIdentity = false;
             boolean isQValue0 = false;
 

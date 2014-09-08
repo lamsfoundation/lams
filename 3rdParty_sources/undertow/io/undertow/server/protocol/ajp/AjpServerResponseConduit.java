@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.protocol.ajp;
@@ -64,7 +64,7 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
     private static final Map<HttpString, Integer> HEADER_MAP;
 
     static {
-        final Map<HttpString, Integer> headers = new HashMap<>();
+        final Map<HttpString, Integer> headers = new HashMap<HttpString, Integer>();
         headers.put(Headers.CONTENT_TYPE, 0xA001);
         headers.put(Headers.CONTENT_LANGUAGE, 0xA002);
         headers.put(Headers.CONTENT_LENGTH, 0xA003);
@@ -83,7 +83,6 @@ final class AjpServerResponseConduit extends AbstractFramedStreamSinkConduit {
     private static final int FLAG_WRITE_RESUMED = 1 << 2;
     private static final int FLAG_WRITE_READ_BODY_CHUNK_FROM_LISTENER = 1 << 3;
     private static final int FLAG_WRITE_SHUTDOWN = 1 << 4;
-    private static final int FLAG_READS_DONE = 1 << 5;
 
     private static final ByteBuffer CLOSE_FRAME_PERSISTENT;
     private static final ByteBuffer CLOSE_FRAME_NON_PERSISTENT;

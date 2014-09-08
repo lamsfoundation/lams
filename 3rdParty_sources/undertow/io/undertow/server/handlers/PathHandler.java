@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.undertow.server.handlers;
@@ -35,7 +35,7 @@ import io.undertow.util.PathMatcher;
  */
 public class PathHandler implements HttpHandler {
 
-    private final PathMatcher<HttpHandler> pathMatcher = new PathMatcher<>();
+    private final PathMatcher<HttpHandler> pathMatcher = new PathMatcher<HttpHandler>();
 
     public PathHandler(final HttpHandler defaultHandler) {
         pathMatcher.addPrefixPath("/", defaultHandler);
@@ -47,7 +47,7 @@ public class PathHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         final PathMatcher.PathMatch<HttpHandler> match = pathMatcher.match(exchange.getRelativePath());
-        if (match.getValue() == null) {
+        if(match.getValue() == null) {
             ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
             return;
         }

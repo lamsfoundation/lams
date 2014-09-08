@@ -1,19 +1,23 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
+ * Copyright 2012, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package io.undertow.client.http;
@@ -37,6 +41,7 @@ import io.undertow.util.Protocols;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
+import org.xnio.IoUtils;
 import org.xnio.Option;
 import org.xnio.OptionMap;
 import org.xnio.Pool;
@@ -88,7 +93,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         }
     };
 
-    private final Deque<HttpClientExchange> pendingQueue = new ArrayDeque<>();
+    private final Deque<HttpClientExchange> pendingQueue = new ArrayDeque<HttpClientExchange>();
     private HttpClientExchange currentRequest;
     private HttpResponseBuilder pendingResponse;
 
@@ -108,7 +113,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
     private int state;
 
-    private final ChannelListener.SimpleSetter<HttpClientConnection> closeSetter = new ChannelListener.SimpleSetter<>();
+    private final ChannelListener.SimpleSetter<HttpClientConnection> closeSetter = new ChannelListener.SimpleSetter<HttpClientConnection>();
 
     HttpClientConnection(final StreamConnection connection, final OptionMap options, final Pool<ByteBuffer> bufferPool) {
         this.options = options;
@@ -285,6 +290,27 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
             } catch (IOException e) {
                 handleError(e);
             }
+        } else if (!sinkChannel.isWriteResumed()) {
+            try {
+                //TODO: this needs some more thought
+                if (!sinkChannel.flush()) {
+                    sinkChannel.setWriteListener(new ChannelListener<ConduitStreamSinkChannel>() {
+                        @Override
+                        public void handleEvent(ConduitStreamSinkChannel channel) {
+                            try {
+                                if (channel.flush()) {
+                                    channel.suspendWrites();
+                                }
+                            } catch (IOException e) {
+                                handleError(e);
+                            }
+                        }
+                    });
+                    sinkChannel.resumeWrites();
+                }
+            } catch (IOException e) {
+                handleError(e);
+            }
         }
     }
 
@@ -326,7 +352,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
         if (anyAreSet(state, CLOSE_REQ)) {
             currentRequest = null;
             this.state |= CLOSED;
-            safeClose(connection);
+            IoUtils.safeClose(connection);
         } else if (anyAreSet(state, UPGRADE_REQUESTED)) {
             connection.getSourceChannel().suspendReads();
             currentRequest = null;
@@ -363,10 +389,10 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                         int res = channel.read(buffer);
                          if(res == -1) {
                             UndertowLogger.CLIENT_LOGGER.debugf("Connection to %s was closed by the target server", connection.getPeerAddress());
-                            safeClose(HttpClientConnection.this);
+                            IoUtils.safeClose(HttpClientConnection.this);
                         } else if(res != 0) {
                              UndertowLogger.CLIENT_LOGGER.debugf("Target server %s sent unexpected data when no request pending, closing connection", connection.getPeerAddress());
-                             safeClose(HttpClientConnection.this);
+                             IoUtils.safeClose(HttpClientConnection.this);
                         }
                         //otherwise it is a spurious notification
                     } catch (IOException e) {
@@ -400,7 +426,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
                         return;
                     } else if (res == -1) {
                         channel.suspendReads();
-                        safeClose(HttpClientConnection.this);
+                        IoUtils.safeClose(HttpClientConnection.this);
                         // Cancel the current active request
                         currentRequest.setFailed(new IOException(MESSAGES.connectionClosed()));
                         return;
@@ -448,7 +474,7 @@ class HttpClientConnection extends AbstractAttachable implements Closeable, Clie
 
             } catch (Exception e) {
                 UndertowLogger.CLIENT_LOGGER.exceptionProcessingRequest(e);
-                safeClose(connection);
+                IoUtils.safeClose(connection);
                 currentRequest.setFailed(new IOException(e));
             } finally {
                 if (free) pooled.free();

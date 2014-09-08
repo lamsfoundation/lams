@@ -1,21 +1,3 @@
-/*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
- * as indicated by the @author tags.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.undertow.io;
 
 import java.io.IOException;
@@ -273,26 +255,22 @@ public class AsyncSenderImpl implements Sender {
     @Override
     public void send(final String data, final Charset charset, final IoCallback callback) {
         ByteBuffer bytes = ByteBuffer.wrap(data.getBytes(charset));
-        if (bytes.remaining() == 0) {
-            callback.onComplete(exchange, this);
-        } else {
-            int i = 0;
-            ByteBuffer[] bufs = null;
-            while (bytes.hasRemaining()) {
-                Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
-                if (bufs == null) {
-                    int noBufs = (bytes.remaining() + pooled.getResource().remaining() - 1) / pooled.getResource().remaining(); //round up division trick
-                    pooledBuffers = new Pooled[noBufs];
-                    bufs = new ByteBuffer[noBufs];
-                }
-                pooledBuffers[i] = pooled;
-                bufs[i] = pooled.getResource();
-                Buffers.copy(pooled.getResource(), bytes);
-                pooled.getResource().flip();
-                ++i;
+        int i = 0;
+        ByteBuffer[] bufs = null;
+        while (bytes.hasRemaining()) {
+            Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+            if (bufs == null) {
+                int noBufs = (bytes.remaining() + pooled.getResource().remaining() - 1) / pooled.getResource().remaining(); //round up division trick
+                pooledBuffers = new Pooled[noBufs];
+                bufs = new ByteBuffer[noBufs];
             }
-            send(bufs, callback);
+            pooledBuffers[i] = pooled;
+            bufs[i] = pooled.getResource();
+            Buffers.copy(pooled.getResource(), bytes);
+            pooled.getResource().flip();
+            ++i;
         }
+        send(bufs, callback);
     }
 
     @Override

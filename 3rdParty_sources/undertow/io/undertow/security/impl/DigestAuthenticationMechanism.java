@@ -1,6 +1,5 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2012 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +8,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.undertow.security.impl;
 
@@ -73,7 +72,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
     private static final Set<DigestAuthorizationToken> MANDATORY_REQUEST_TOKENS;
 
     static {
-        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<>();
+        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<DigestAuthorizationToken>();
         mandatoryTokens.add(DigestAuthorizationToken.USERNAME);
         mandatoryTokens.add(DigestAuthorizationToken.REALM);
         mandatoryTokens.add(DigestAuthorizationToken.NONCE);
@@ -113,7 +112,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         this.nonceManager = nonceManager;
         this.mechanismName = mechanismName;
 
-        if (!supportedQops.isEmpty()) {
+        if (supportedQops.size() > 0) {
             StringBuilder sb = new StringBuilder();
             Iterator<DigestQop> it = supportedQops.iterator();
             sb.append(it.next().getToken());
@@ -167,12 +166,12 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         DigestContext context = exchange.getAttachment(DigestContext.ATTACHMENT_KEY);
         Map<DigestAuthorizationToken, String> parsedHeader = context.getParsedHeader();
         // Step 1 - Verify the set of tokens received to ensure valid values.
-        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<>(MANDATORY_REQUEST_TOKENS);
-        if (!supportedAlgorithms.contains(DigestAlgorithm.MD5)) {
+        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<DigestAuthorizationToken>(MANDATORY_REQUEST_TOKENS);
+        if (supportedAlgorithms.contains(DigestAlgorithm.MD5) == false) {
             // If we don't support MD5 then the client must choose an algorithm as we can not fall back to MD5.
             mandatoryTokens.add(DigestAuthorizationToken.ALGORITHM);
         }
-        if (!supportedQops.isEmpty() && !supportedQops.contains(DigestQop.AUTH)) {
+        if (supportedQops.isEmpty() == false && supportedQops.contains(DigestQop.AUTH) == false) {
             // If we do not support auth then we are mandating auth-int so force the client to send a QOP
             mandatoryTokens.add(DigestAuthorizationToken.MESSAGE_QOP);
         }
@@ -181,7 +180,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         // This check is early as is increases the list of mandatory tokens.
         if (parsedHeader.containsKey(DigestAuthorizationToken.MESSAGE_QOP)) {
             qop = DigestQop.forName(parsedHeader.get(DigestAuthorizationToken.MESSAGE_QOP));
-            if (qop == null || !supportedQops.contains(qop)) {
+            if (qop == null || supportedQops.contains(qop) == false) {
                 // We are also ensuring the client is not trying to force a qop that has been disabled.
                 REQUEST_LOGGER.invalidTokenReceived(DigestAuthorizationToken.MESSAGE_QOP.getName(),
                         parsedHeader.get(DigestAuthorizationToken.MESSAGE_QOP));
@@ -206,7 +205,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         }
 
         // Perform some validation of the remaining tokens.
-        if (!realmName.equals(parsedHeader.get(DigestAuthorizationToken.REALM))) {
+        if (realmName.equals(parsedHeader.get(DigestAuthorizationToken.REALM)) == false) {
             REQUEST_LOGGER.invalidTokenReceived(DigestAuthorizationToken.REALM.getName(),
                     parsedHeader.get(DigestAuthorizationToken.REALM));
             // TODO - This actually needs to result in a HTTP 400 Bad Request response and not a new challenge.
@@ -216,7 +215,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         // TODO - Validate the URI
 
         if (parsedHeader.containsKey(DigestAuthorizationToken.OPAQUE)) {
-            if (!OPAQUE_VALUE.equals(parsedHeader.get(DigestAuthorizationToken.OPAQUE))) {
+            if (OPAQUE_VALUE.equals(parsedHeader.get(DigestAuthorizationToken.OPAQUE)) == false) {
                 REQUEST_LOGGER.invalidTokenReceived(DigestAuthorizationToken.OPAQUE.getName(),
                         parsedHeader.get(DigestAuthorizationToken.OPAQUE));
                 return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
@@ -226,7 +225,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         DigestAlgorithm algorithm;
         if (parsedHeader.containsKey(DigestAuthorizationToken.ALGORITHM)) {
             algorithm = DigestAlgorithm.forName(parsedHeader.get(DigestAuthorizationToken.ALGORITHM));
-            if (algorithm == null || !supportedAlgorithms.contains(algorithm)) {
+            if (algorithm == null || supportedAlgorithms.contains(algorithm) == false) {
                 // We are also ensuring the client is not trying to force an algorithm that has been disabled.
                 REQUEST_LOGGER.invalidTokenReceived(DigestAuthorizationToken.ALGORITHM.getName(),
                         parsedHeader.get(DigestAuthorizationToken.ALGORITHM));
@@ -274,7 +273,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         }
 
         // Step 3 - Verify that the nonce was eligible to be used.
-        if (!validateNonceUse(context, parsedHeader, exchange)) {
+        if (validateNonceUse(context, parsedHeader, exchange) == false) {
             // TODO - This is the right place to make use of the decision but the check needs to be much much sooner
             // otherwise a failure server
             // side could leave a packet that could be 're-played' after the failed auth.
@@ -426,12 +425,12 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
 
         String theChallenge = rb.toString();
         HeaderMap responseHeader = exchange.getResponseHeaders();
-        if (supportedAlgorithms.isEmpty()) {
-            responseHeader.add(WWW_AUTHENTICATE, theChallenge);
-        } else {
+        if (supportedAlgorithms.size() > 0) {
             for (DigestAlgorithm current : supportedAlgorithms) {
                 responseHeader.add(WWW_AUTHENTICATE, String.format(theChallenge, current.getToken()));
             }
+        } else {
+            responseHeader.add(WWW_AUTHENTICATE, theChallenge);
         }
 
         return new ChallengeResult(true, UNAUTHORIZED);
@@ -442,7 +441,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         DigestQop qop = context.getQop();
         String currentNonce = context.getNonce();
         String nextNonce = nonceManager.nextNonce(currentNonce, exchange);
-        if (qop != null || !nextNonce.equals(currentNonce)) {
+        if (qop != null || nextNonce.equals(currentNonce) == false) {
             StringBuilder sb = new StringBuilder();
             sb.append(NEXT_NONCE).append("=\"").append(nextNonce).append("\"");
             if (qop != null) {
@@ -586,7 +585,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
 
         @Override
         public byte[] getSessionData() {
-            if (!context.getAlgorithm().isSession()) {
+            if (context.getAlgorithm().isSession() == false) {
                 throw MESSAGES.noSessionData();
             }
 

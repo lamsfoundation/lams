@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014 Red Hat, Inc., and individual contributors
+ * Copyright 2013 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.undertow.security.handlers;
 
@@ -41,7 +41,7 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        if (isConfidential(exchange) || !confidentialityRequired(exchange)) {
+        if (isConfidential(exchange) || (confidentialityRequired(exchange) == false)) {
             next.handleRequest(exchange);
         } else {
             try {
@@ -73,8 +73,6 @@ public abstract class AbstractConfidentialityHandler implements HttpHandler {
      * Use the HttpServerExchange to identify if confidentiality is required.
      *
      * This method currently returns true for all requests, sub-classes can override this to provide a custom check.
-     *
-     * TODO: we should deprecate this and just use a predicate to decide to execute the handler instead
      *
      * @param exchange - The {@see HttpServerExchange} for the request being processed.
      * @return true if the request requires confidentiality, false otherwise.
