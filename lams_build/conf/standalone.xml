@@ -163,7 +163,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="true">
+                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false">
 				    <connection-url>@db.url.run@</connection-url>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
@@ -363,6 +363,21 @@
                         </login-module>
                         <login-module code="RealmDirect" flag="required">
                             <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="lams" cache-type="default">
+                    <authentication>
+                        <login-module code="org.lamsfoundation.lams.security.UniversalLoginModule" flag="required">
+                            <module-option name="dsJndiName" value="java:jboss/datasources/lams-ds"/>
+                            <module-option name="principalsQuery" value="SELECT password FROM lams_user WHERE login=?"/>
+                            <module-option name="rolesQuery" value="
+				             	SELECT DISTINCT  r.name,'Roles' FROM
+				             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+				             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+				             	LEFT OUTER JOIN lams_role r USING (role_id)
+				             	WHERE u.login=?"
+				             />
                         </login-module>
                     </authentication>
                 </security-domain>
