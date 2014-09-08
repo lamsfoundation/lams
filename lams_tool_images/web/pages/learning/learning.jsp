@@ -19,7 +19,7 @@
 	<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
-	<c:set var="thumbnailImageDimensions" value="${sessionMap.thumbnailImageDimensions}" />
+	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 	<c:set var="windowMinimumWidth" value="${thumbnailImageDimensions*5 + 160}" />
 	<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
 		<c:set var="windowMinimumWidth" value="${windowMinimumWidth + 120}" />
