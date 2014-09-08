@@ -26,6 +26,8 @@
 			 that are also present in lams_build/lib.
 		-->
 		<fileset dir="${server.home}/modules/system/layers/base">
+			<include name="io/undertow/core/main/undertow-core-1.0.15.Final.jar" />
+			<include name="io/undertow/servlet/main/undertow-servlet-1.0.15.Final.jar" />
 			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
 			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
 			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
@@ -46,6 +48,7 @@
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
+			
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

@@ -34,5 +34,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.9.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.0.15.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.0.15.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

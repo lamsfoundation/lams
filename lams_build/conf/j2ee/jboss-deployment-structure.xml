@@ -48,7 +48,8 @@
       <module name="org.tuckey.urlrewrite" export="true" />
       <module name="com.allaire.wddx" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
-      <module name="org.lamsfoundation.lams.valve" export="true" />
+      <module name="io.undertow.core" export="true" />
+  	  <module name="io.undertow.servlet" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
