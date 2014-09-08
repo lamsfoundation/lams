@@ -719,11 +719,6 @@
 			  file="lib/xstream/xstream.module.xml" overwrite="true" verbose="true" />
 		
 
-		
-		<ant antfile="../lams_common/build.xml" target="deploy-libraries" inheritAll="false"/>
-		
-		
-		
 		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}">

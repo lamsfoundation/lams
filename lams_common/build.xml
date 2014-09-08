@@ -46,42 +46,9 @@
 		<echo>${ant.project.name}: Building main JAR</echo>
 		<jar jarfile="${basedir}/build/lib/${product}.jar"
 			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/classes/java">
-				<exclude name="**/LoginRequestValve.class"/>
-				<exclude name="**/SingleSignOn.class"/>
-			</fileset>
-		</jar>
-		
-		<echo>${ant.project.name}: Building Session JAR</echo>
-		<jar jarfile="${basedir}/build/lib/lams-session.jar"
-			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/classes/java">
-				<include name="${product.path.filesystem}/web/session/*"/>
-			</fileset>
-		</jar>
-		
-		<echo>${ant.project.name}: Building Valve JAR</echo>
-		<jar jarfile="${basedir}/build/lib/lams-valve.jar"
-			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/classes/java">
-				<include name="${product.path.filesystem}/integration/security/LoginRequestValve.class"/>
-				<include name="${product.path.filesystem}/integration/security/SingleSignOn.class"/>
-			</fileset>
+			<fileset dir="${basedir}/build/classes/java" />
 		</jar>
 	</target>
-
-	
-	<target name="deploy-libraries" depends="_build-jar" description="Deploys LAMS library JARs.">
-		<echo>Deploying LAMS library JARs</echo>
-		<copy todir="${server.home}/standalone/deployments/lams.ear"
-			  file="${basedir}/build/lib/lams-session.jar" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/valve/main" 
-			  file="${basedir}/build/lib/lams-valve.jar" overwrite="true" verbose="true" />
-		<copy tofile="${server.home}/modules/system/layers/base/org/lamsfoundation/lams/valve/main/module.xml"
-			  file="${basedir}/conf/module_descriptors/valve.module.xml" overwrite="true" verbose="true" />
-	</target>
-	
 	
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">
