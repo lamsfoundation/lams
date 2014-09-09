@@ -102,7 +102,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	ToolAccessMode mode = getAccessMode(request);
 	// request is from monitoring module
 	if (mode.isTeacher()) {
-	    McUtils.setDefineLater(request, true, strToolContentID, mcService);
+	    mcService.setDefineLater(strToolContentID, true);
 	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -132,7 +132,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	prepareDTOandForm(request, mapping, mcAuthoringForm, new Long(strToolContentID).longValue(),
 		mcContent, mcGeneralAuthoringDTO, sessionMap);
 
-	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent, mcService);
+	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDtos.size()));
 	request.setAttribute(LIST_QUESTION_DTOS, questionDtos);
 	sessionMap.put(LIST_QUESTION_DTOS, questionDtos);
@@ -180,7 +180,8 @@ public class McStarterAction extends Action implements McAppConstants {
 	    McAuthoringForm mcAuthoringForm, long toolContentID, McContent mcContent,
 	    McGeneralAuthoringDTO mcGeneralAuthoringDTO, SessionMap<String, Object> sessionMap) {
 
-	McUtils.populateAuthoringDTO(request, mcContent, mcGeneralAuthoringDTO);
+	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+	mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
 
 	mcAuthoringForm.setSln(mcContent.isShowReport() ? "1" : "0");
 	mcAuthoringForm.setQuestionsSequenced(mcContent.isQuestionsSequenced() ? "1" : "0");

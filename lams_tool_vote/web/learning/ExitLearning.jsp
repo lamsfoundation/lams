@@ -1,26 +1,4 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -38,8 +16,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<title><fmt:message key="activity.title" /></title>
 	
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
@@ -65,8 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content">
 
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="true" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 		</h1>
 		
 		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
@@ -113,40 +89,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
 			
-				<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
-					<h2>
-							<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
-					</h2>
+			<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
+				<h2>
+					<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
+				</h2>
 	
-					<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-						escapeHtml="true" />
-				</c:if>
+				<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
+			</c:if>
 
-				<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
+			<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<br>
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection && hasEditRight}">
-						<html:button property="forwardtoReflection" styleClass="button"
-							onclick="submitMethod('forwardtoReflection');"> 
-							<fmt:message key="label.edit" />
-						</html:button>
-					</c:if>
-
-					<div class="space-bottom-top align-right">
-						<html:link href="#nogo" property="learnerFinished" styleClass="button" styleId="finishButton"
-							onclick="submitMethod('learnerFinished');return false">
-							<span class="nextActivity">
-								<c:choose>
-									<c:when test="${activityPosition.last}">
-										<fmt:message key="button.submitActivity" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="button.endLearning" />
-									</c:otherwise>
-								</c:choose>
-						</span>
-						</html:link>
-					</div>
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection && hasEditRight}">
+					<html:button property="forwardtoReflection" styleClass="button"
+						onclick="submitMethod('forwardtoReflection');"> 
+						<fmt:message key="label.edit" />
+					</html:button>
 				</c:if>
+
+				<div class="space-bottom-top align-right">
+					<html:link href="#nogo" property="learnerFinished" styleClass="button" styleId="finishButton"
+						onclick="submitMethod('learnerFinished');return false">
+						<span class="nextActivity">
+							<c:choose>
+								<c:when test="${activityPosition.last}">
+									<fmt:message key="button.submitActivity" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.endLearning" />
+								</c:otherwise>
+							</c:choose>
+						</span>
+					</html:link>
+				</div>
+			</c:if>
 
 		</html:form>
 

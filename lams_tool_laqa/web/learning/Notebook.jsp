@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -17,8 +16,7 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) 
-		{
+		function submitLearningMethod(actionMethod) {
 			if (actionMethod == 'submitReflection') {
 				document.getElementById("finishButton").disabled = true;
 			}		
@@ -26,8 +24,7 @@
 			document.QaLearningForm.submit();
 		}
 		
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			submitLearningMethod(actionMethod);
 		}
 		
@@ -45,17 +42,14 @@
 		<div id="content">
 
 			<h1>
-				<lams:out value="${generalLearnerFlowDTO.activityTitle}"
-					escapeHtml="true" />
+				<lams:out value="${generalLearnerFlowDTO.activityTitle}" escapeHtml="true" />
 			</h1>
 
 			<p>
-				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}"
-					escapeHtml="true" />
+				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area"></html:textarea>
+			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
 
 			<div class="space-bottom-top align-right">
 				<html:link href="#nogo" property="submitReflection" styleId="finishButton"

@@ -46,10 +46,6 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 
     private static final String LOAD_MCSESSION_BY_MCSESSIONID = "from McSession mcs where mcs.mcSessionId=?";
 
-    public McSession getMcSessionByUID(Long uid) {
-	return (McSession) this.getHibernateTemplate().get(McSession.class, uid);
-    }
-
     public McSession getMcSessionById(Long mcSessionId) {
 
 	List list = getSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID).setLong(0, mcSessionId.longValue()).list();

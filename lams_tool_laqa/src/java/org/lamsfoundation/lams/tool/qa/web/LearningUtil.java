@@ -41,11 +41,9 @@ import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
  * Keeps all operations needed for Learning mode.
  * 
  * @author Ozgur Demirtas
- * 
  */
 public class LearningUtil implements QaAppConstants {
 

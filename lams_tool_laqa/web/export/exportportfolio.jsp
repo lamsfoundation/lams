@@ -98,7 +98,7 @@
 													<c:when
 														test="${generalLearnerFlowDTO.userUid == userData.queUsrId or userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}" escapeXml="true" />
-														<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
+														<jsp:include page="../learning/atingStarsDisabled.jsp" />
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden" /> </i>
@@ -176,7 +176,7 @@
 													</c:if>
 													<c:out value="${userData.responsePresentable}"
 														escapeXml="false" />
-													<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
+													<jsp:include page="../learning/ratingStarsDisabled.jsp" />
 												</td>
 											</tr>
 

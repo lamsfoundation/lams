@@ -125,7 +125,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(mcContent, null);
 	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
-	if (mcService.studentActivityOccurredGlobal(mcContent)) {
+	if (!mcContent.getMcSessions().isEmpty()) {
 	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {

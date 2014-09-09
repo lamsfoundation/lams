@@ -44,7 +44,5 @@ public interface IQaQueUsrDAO {
 
     int countSessionUser(QaSession qaSession);
 
-    int getTotalNumberOfUsers(QaContent qa);
-
     List getUserBySessionOnly(final QaSession qaSession);
 }

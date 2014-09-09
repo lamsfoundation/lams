@@ -20,8 +20,7 @@
 
 <body class="stripes">
 
-	<html:form action="/learning?method=displayMc&validate=false"
-		styleId="reflectionForm" method="POST">
+	<html:form action="/learning?method=displayMc&validate=false" styleId="reflectionForm" method="POST">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
@@ -33,14 +32,11 @@
 				<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="true" />
 			</h1>
 
-
-
 			<p>
 				<lams:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area">
+			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area">
 				<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
 					<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/>		
 				</c:if>
@@ -48,24 +44,13 @@
 
 			<div class="space-bottom-top align-right">
 			    <html:link href="#" property="submitReflection" styleClass="button"
-			    onclick="javascript:document.McLearningForm.submit();return false">
-					 <span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+			   		onclick="javascript:document.McLearningForm.submit();return false">
+					<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
 			    </html:link>
 			</div>
-
 
 		</div>
 	</html:form>
 
-
-
 </body>
 </lams:html>
-
-
-
-
-
-
-
-

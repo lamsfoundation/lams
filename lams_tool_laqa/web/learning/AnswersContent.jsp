@@ -30,7 +30,9 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
+	<link href="jquery.jgrowl.min.css" rel="stylesheet"/>
+
+	<script type="text/javascript" src="jquery.jgrowl.min.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 	
 		function submitMethod(actionMethod) {
@@ -81,7 +83,7 @@
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
 				
-			var interval = "30000"; // = 30 seconds
+			var interval = "5000"; // = 30 seconds
 			window.setInterval(
 				function(){
 					//fire onchange event for lams:textarea
@@ -90,10 +92,11 @@
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
 			               success: function() {
-			               	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+			               	$.jGrowl('<fmt:message key="label.learning.draft.autosaved" />');
 			               }
 					});
-		       	}, interval
+		       	}, 
+		       	interval
 		   );
 		}
 		
@@ -193,14 +196,3 @@
 
 </body>
 </lams:html>
-
-
-
-
-
-
-
-
-
-
-

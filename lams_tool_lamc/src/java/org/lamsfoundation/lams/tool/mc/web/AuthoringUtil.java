@@ -503,85 +503,6 @@ public class AuthoringUtil implements McAppConstants {
 	return mcContent;
     }
 
-    /**
-     * persists the questions
-     */
-    public static McContent createQuestions(List<McQuestionDTO> questionDTOs, IMcService mcService, McContent content) {
-
-	int displayOrder = 0;
-	for (McQuestionDTO questionDTO : questionDTOs) {
-	    String currentQuestionText = questionDTO.getQuestion();
-
-	    // skip empty questions
-	    if (currentQuestionText.isEmpty()) {
-		continue;
-	    }
-
-	    ++displayOrder;
-	    String currentFeedback = questionDTO.getFeedback();
-	    String currentMark = questionDTO.getMark();
-	    /* set the default mark in case it is not provided */
-	    if (currentMark == null) {
-		currentMark = "1";
-	    }
-
-	    McQueContent question = mcService.getQuestionByUid(questionDTO.getUid());
-
-	    // in case question doesn't exist
-	    if (question == null) {
-		question = new McQueContent(currentQuestionText, new Integer(displayOrder), new Integer(currentMark),
-			currentFeedback, content, null, null);
-
-		// adding a new question to content
-		content.getMcQueContents().add(question);
-		question.setMcContent(content);
-
-		// in case question exists already
-	    } else {
-
-		question.setQuestion(currentQuestionText);
-		question.setFeedback(currentFeedback);
-		question.setDisplayOrder(new Integer(displayOrder));
-		question.setMark(new Integer(currentMark));
-	    }
-
-	    // persist candidate answers
-	    List<McOptionDTO> optionDTOs = questionDTO.getListCandidateAnswersDTO();
-	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
-	    Set<McOptsContent> newOptions = new HashSet<McOptsContent>();
-	    int displayOrderOption = 1;
-	    for (McOptionDTO optionDTO : optionDTOs) {
-
-		Long optionUid = optionDTO.getUid();
-		String optionText = optionDTO.getCandidateAnswer();
-		boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
-		
-		//find persisted option if it exists
-		McOptsContent option = new McOptsContent();
-		for (McOptsContent oldOption: oldOptions) {
-		    if (oldOption.getUid().equals(optionUid)) {
-			option = oldOption;
-		    }
-		}
-		
-		option.setDisplayOrder(displayOrderOption);
-		option.setCorrectOption(isCorrectOption);
-		option.setMcQueOptionText(optionText);
-		option.setMcQueContent(question);
-
-		newOptions.add(option);
-		displayOrderOption++;
-	    }
-	    
-	    question.setMcOptionsContents(newOptions);
-
-	    // updating the existing question content
-	    mcService.updateQuestion(question);
-
-	}
-	return content;
-    }
-
     public static Map buildDynamicPassMarkMap(List questionDTOs, boolean initialScreen) {
 
 	Map map = new TreeMap(new McComparator());
@@ -637,53 +558,9 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     /**
-     * repopulateOptionsBox
-     */
-    public static List<McOptionDTO> repopulateOptionDTOs(HttpServletRequest request, boolean isAddBlankOptions) {
-
-	String correct = request.getParameter("correct");
-
-	/* check this logic again */
-	int intCorrect = 0;
-	if (correct != null) {
-	    intCorrect = new Integer(correct).intValue();
-	}
-
-	List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
-
-	for (int i = 0; i < McAppConstants.MAX_OPTION_COUNT; i++) {
-	    String optionText = request.getParameter("ca" + i);
-	    Long optionUid = WebUtil.readLongParam(request, "caUid" + i, true);
-
-	    String isCorrect = "Incorrect";
-
-	    if (i == intCorrect) {
-		isCorrect = "Correct";
-	    }
-
-	    if (optionText != null) {
-		McOptionDTO optionDTO = new McOptionDTO();
-		optionDTO.setUid(optionUid);
-		optionDTO.setCandidateAnswer(optionText);
-		optionDTO.setCorrect(isCorrect);
-		optionDtos.add(optionDTO);
-	    }
-	}
-
-	if (isAddBlankOptions) {
-	    McOptionDTO optionDTO = new McOptionDTO();
-	    optionDTO.setCandidateAnswer("");
-	    optionDTO.setCorrect("Incorrect");
-	    optionDtos.add(optionDTO);
-	}
-
-	return optionDtos;
-    }
-
-    /**
      * generates a list for holding default questions and their candidate answers
      */
-    public static List<McQuestionDTO> buildDefaultQuestions(McContent mcContent, IMcService mcService) {
+    public static List<McQuestionDTO> buildDefaultQuestions(McContent mcContent) {
 	List<McQuestionDTO> questionDTOs = new LinkedList<McQuestionDTO>();
 
 	Long mapIndex = new Long(1);

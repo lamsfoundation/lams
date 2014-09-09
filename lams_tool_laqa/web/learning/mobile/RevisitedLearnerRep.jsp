@@ -247,7 +247,7 @@
 										<p class="space-bottom user-answer">
 											<c:out value="${userData.responsePresentable}" escapeXml="false" />
 										</p>
-										<jsp:include page="parts/ratingStarsDisabled.jsp" />
+										<jsp:include page="ratingStarsDisabled.jsp" />
 									</c:if>
 							</c:if>								
 						</c:forEach>

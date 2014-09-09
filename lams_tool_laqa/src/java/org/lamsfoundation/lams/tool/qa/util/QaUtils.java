@@ -197,21 +197,4 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(USER_EXCEPTION_QUESTIONS_DUPLICATE);
     }
 
-    /**
-     * 
-     * @param request
-     * @param value
-     * @param toolContentID
-     */
-    public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
-	    IQaService qaService) {
-
-	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
-
-	if (qaContent != null) {
-	    qaContent.setDefineLater(value);
-	    qaService.updateQaContent(qaContent);
-	}
-    }
-
 }

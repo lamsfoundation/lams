@@ -43,11 +43,6 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
     private static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 
     private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
-    private static final String FIND_OPTIONS_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
-
-    public McOptsContent getMcOptionsContentByUID(Long uid) {
-	return (McOptsContent) this.getHibernateTemplate().get(McOptsContent.class, uid);
-    }
 
     public List<McOptsContent> findMcOptionsContentByQueId(Long questionUid) {
 	if (questionUid != null) {
@@ -75,50 +70,8 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	return optionDtos;
     }
 
-    public List<String> findMcOptionCorrectByQueId(Long questionUid) {
-
-	List<String> listOptionCorrect = new LinkedList<String>();
-
-	if (questionUid != null) {
-	    List<McOptsContent> options = getSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
-		    .setLong("mcQueContentUid", questionUid.longValue()).list();
-
-	    if (options != null && options.size() > 0) {
-		for (McOptsContent option : options) {
-		    listOptionCorrect.add(new Boolean(option.isCorrectOption()).toString());
-		}
-	    }
-	}
-	return listOptionCorrect;
-    }
-
-    public McOptsContent getOptionContentByOptionText(final String option, final Long questionUid) {
-	List<McOptsContent> list = getSession().createQuery(FIND_OPTIONS_BY_OPTION_TEXT).setString("option", option)
-		.setLong("mcQueContentUid", questionUid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    McOptsContent mcq = (McOptsContent) list.get(0);
-	    return mcq;
-	}
-	return null;
-    }
-
-    public void saveMcOptionsContent(McOptsContent mcOptsContent) {
-	this.getHibernateTemplate().saveOrUpdate(mcOptsContent);
-    }
-
     public void updateMcOptionsContent(McOptsContent mcOptsContent) {
 	this.getHibernateTemplate().update(mcOptsContent);
-    }
-
-    public void removeMcOptionsContentByUID(Long uid) {
-	McOptsContent mco = (McOptsContent) getHibernateTemplate().get(McOptsContent.class, uid);
-	this.getHibernateTemplate().delete(mco);
-    }
-
-    public void removeMcOptionsContent(McOptsContent mcOptsContent) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mcOptsContent);
     }
 
     public void flush() {

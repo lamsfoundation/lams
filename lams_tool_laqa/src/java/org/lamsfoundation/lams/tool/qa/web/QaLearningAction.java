@@ -331,13 +331,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	String userID = request.getParameter("userID");
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
-	Long toolContentID = qaSession.getQaContent().getQaContentId();
 	QaContent qaContent = qaSession.getQaContent();
-
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
-	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
-
+	
 	// LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
 	// mark response as finalised
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
@@ -349,6 +344,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	if (qaContent.isShowOtherAnswers()) {
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
+	    String httpSessionID = qaLearningForm.getHttpSessionID();
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 	    String isUserNamesVisibleBoolean = generalLearnerFlowDTO.getUserNameVisible();
 	    boolean isUserNamesVisible = new Boolean(isUserNamesVisibleBoolean).booleanValue();

@@ -144,7 +144,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    if (mode.isTeacher()) {
 		Set<McQueContent> oldQuestions = mcContent.getMcQueContents();
 		mcService.releaseQuestionsFromCache(mcContent);
-		McUtils.setDefineLater(request, false, strToolContentID, mcService);
+		mcService.setDefineLater(strToolContentID, false);
 		    
 		// recalculate User Answers
 		mcService.recalculateUserAnswers(mcContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
@@ -170,7 +170,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mcContentTest, strToolContentID);
 	    
 	    //store questions
-	    mcContent = AuthoringUtil.createQuestions(questionDTOs, mcService, mcContent);
+	    mcContent = mcService.createQuestions(questionDTOs, mcContent);
 
 	    if (mcContent != null) {
 
@@ -253,7 +253,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String passmark = request.getParameter("passmark");
 
-	List<McOptionDTO> options = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> options = repopulateOptionDTOs(request, false);
 	options = AuthoringUtil.removeBlankOptions(options);
 
 	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap
@@ -583,7 +583,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String passmark = request.getParameter("passmark");
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 	optionDtos = AuthoringUtil.removeBlankOptions(optionDtos);
 
 	if ((newQuestionParam != null) && (newQuestionParam.length() > 0)) {
@@ -1132,7 +1132,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1251,7 +1251,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1382,7 +1382,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	}
 
 	//update options
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<McOptionDTO>();
 	McOptionDTO mcOptionDTO = null;
 	Iterator listCaIterator = optionDtos.iterator();
@@ -1486,7 +1486,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, true);
 
 	String newQuestion = request.getParameter("newQuestion");
 
@@ -1658,7 +1658,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1743,7 +1743,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
@@ -1827,7 +1827,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	// removeAddedCandidate
 	McQuestionDTO newQuestionDTO = (McQuestionDTO) sessionMap.get(McAppConstants.NEW_QUESTION_DTO);
 	
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<McOptionDTO>();
 	int caIndex = 0;
 	for (McOptionDTO mcOptionDTO : optionDtos) {
@@ -1915,7 +1915,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
-	List<McOptionDTO> optionDtos = AuthoringUtil.repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, true);
 
 	String newQuestion = request.getParameter("newQuestion");
 
@@ -2010,6 +2010,50 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    mode = ToolAccessMode.AUTHOR;
 	}
 	return mode;
+    }
+
+    /**
+     * repopulateOptionsBox
+     */
+    private static List<McOptionDTO> repopulateOptionDTOs(HttpServletRequest request, boolean isAddBlankOptions) {
+
+	String correct = request.getParameter("correct");
+
+	/* check this logic again */
+	int intCorrect = 0;
+	if (correct != null) {
+	    intCorrect = new Integer(correct).intValue();
+	}
+
+	List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
+
+	for (int i = 0; i < McAppConstants.MAX_OPTION_COUNT; i++) {
+	    String optionText = request.getParameter("ca" + i);
+	    Long optionUid = WebUtil.readLongParam(request, "caUid" + i, true);
+
+	    String isCorrect = "Incorrect";
+
+	    if (i == intCorrect) {
+		isCorrect = "Correct";
+	    }
+
+	    if (optionText != null) {
+		McOptionDTO optionDTO = new McOptionDTO();
+		optionDTO.setUid(optionUid);
+		optionDTO.setCandidateAnswer(optionText);
+		optionDTO.setCorrect(isCorrect);
+		optionDtos.add(optionDTO);
+	    }
+	}
+
+	if (isAddBlankOptions) {
+	    McOptionDTO optionDTO = new McOptionDTO();
+	    optionDTO.setCandidateAnswer("");
+	    optionDTO.setCorrect("Incorrect");
+	    optionDtos.add(optionDTO);
+	}
+
+	return optionDtos;
     }
 
 }

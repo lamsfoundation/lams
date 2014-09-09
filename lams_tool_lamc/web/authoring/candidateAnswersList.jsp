@@ -83,18 +83,18 @@
 
 					<td class="align-center">
 
-							<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
-								<c:set var="SELECTED_ANSWER" scope="request" value="" />
-								<c:set var="ISCORRECT" scope="request" value="Incorrect" />
+						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
+							<c:set var="SELECTED_ANSWER" scope="request" value="" />
+							<c:set var="ISCORRECT" scope="request" value="Incorrect" />
 								
-								<c:if test="${correctEntry.value == currentCandidateDTO.correct}">
-									<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
-									<c:set var="ISCORRECT" scope="request" value="Correct" />
-								</c:if>
+							<c:if test="${correctEntry.value == currentCandidateDTO.correct}">
+								<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
+								<c:set var="ISCORRECT" scope="request" value="Correct" />
+							</c:if>
 
-								<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" <c:out value="${SELECTED_ANSWER}"/> >  
+							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" <c:out value="${SELECTED_ANSWER}"/> >  
 
-							</c:forEach>
+						</c:forEach>
 					</td>
 
 					<td>

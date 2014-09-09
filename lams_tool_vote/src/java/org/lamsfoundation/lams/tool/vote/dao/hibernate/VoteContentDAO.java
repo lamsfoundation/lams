@@ -108,10 +108,6 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 	}
     }
 
-    public void removeVote(VoteContent voteContent) {
-	this.getHibernateTemplate().delete(voteContent);
-    }
-
     public void removeVoteSessions(VoteContent voteContent) {
 	this.getHibernateTemplate().deleteAll(voteContent.getVoteSessions());
     }

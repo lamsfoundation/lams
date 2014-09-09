@@ -146,7 +146,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	List<ReflectionDTO> reflectionsContainerDTO = service.getReflectionList(mcContent, null);
 	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
-	if (service.studentActivityOccurredGlobal(mcContent)) {
+	if (!mcContent.getMcSessions().isEmpty()) {
 	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {

@@ -26,13 +26,8 @@
 
 	<div id="footer"></div>
 
-
 </body>
 </lams:html>
-
-
-
-
 
 
 

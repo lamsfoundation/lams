@@ -37,8 +37,6 @@ public interface IVoteQueContentDAO {
 
     VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid);
 
-    void saveQuestion(VoteQueContent voteQueContent);
-
     void saveOrUpdateQuestion(VoteQueContent voteQueContent);
 
     void removeQuestion(VoteQueContent voteQueContent);

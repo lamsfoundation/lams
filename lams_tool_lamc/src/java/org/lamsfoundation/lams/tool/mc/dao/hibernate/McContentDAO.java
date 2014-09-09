@@ -90,10 +90,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	}
     }
 
-    public void removeMc(McContent mcContent) {
-	this.getHibernateTemplate().delete(mcContent);
-    }
-
     public void removeMcSessions(McContent mcContent) {
 	this.getHibernateTemplate().deleteAll(mcContent.getMcSessions());
     }

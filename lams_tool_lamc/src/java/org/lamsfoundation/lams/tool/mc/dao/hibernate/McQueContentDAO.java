@@ -44,11 +44,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     private static final String REFRESH_QUESTION_CONTENT = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
 
-    private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
-
     private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.displayOrder=:displayOrder and mcQueContent.mcContentId=:mcContentUid";
-
-    private static final String GET_NEXT_AVAILABLE_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 
     private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
 
@@ -64,11 +60,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    }
 	}
 	return null;
-    }
-
-    @Override
-    public McQueContent getMcQueContentByUID(Long uid) {
-	return (McQueContent) this.getHibernateTemplate().get(McQueContent.class, uid);
     }
 
     @Override
@@ -90,19 +81,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
     }
 
     @Override
-    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT).setString("question", question)
-		.setLong("mcContentUid", mcContentUid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    McQueContent mcq = (McQueContent) list.get(0);
-	    return mcq;
-	}
-	return null;
-    }
-
-    @Override
     public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) {
 	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
@@ -117,62 +95,8 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
     }
 
     @Override
-    public void removeQuestionContentByMcUid(final Long mcContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-		.setLong("mcContentId", mcContentUid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    Iterator listIterator = list.iterator();
-	    while (listIterator.hasNext()) {
-		McQueContent mcQueContent = (McQueContent) listIterator.next();
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(mcQueContent);
-		templ.flush();
-	    }
-	}
-    }
-
-    @Override
-    public void resetAllQuestions(final Long mcContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-		.setLong("mcContentId", mcContentUid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    Iterator listIterator = list.iterator();
-	    while (listIterator.hasNext()) {
-		McQueContent mcQueContent = (McQueContent) listIterator.next();
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.update(mcQueContent);
-	    }
-	}
-    }
-
-    @Override
-    public List getNextAvailableDisplayOrder(final long mcContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(GET_NEXT_AVAILABLE_DISPLAY_ORDER).setLong("mcContentId", mcContentId)
-		.list();
-
-	return list;
-    }
-
-    @Override
-    public void saveMcQueContent(McQueContent mcQueContent) {
-	this.getHibernateTemplate().save(mcQueContent);
-    }
-
-    @Override
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) {
 	this.getHibernateTemplate().saveOrUpdate(mcQueContent);
-    }
-
-    @Override
-    public void removeMcQueContentByUID(Long uid) {
-	McQueContent mcq = (McQueContent) getHibernateTemplate().get(McQueContent.class, uid);
-	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mcq);
     }
 
     @Override

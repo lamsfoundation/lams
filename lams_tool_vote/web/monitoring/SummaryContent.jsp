@@ -39,6 +39,7 @@
 <h1>
 	<c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
 </h1>
+
 <div class="instructions small-space-top">
 	<c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
 </div>

@@ -80,8 +80,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected String notebookEntry;
 
-    protected String totalQuestionCount;
-
     protected String previewOnly;
 
     protected String reportViewOnly;
@@ -383,21 +381,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the totalQuestionCount.
-     */
-    public String getTotalQuestionCount() {
-	return totalQuestionCount;
-    }
-
-    /**
-     * @param totalQuestionCount
-     *            The totalQuestionCount to set.
-     */
-    public void setTotalQuestionCount(String totalQuestionCount) {
-	this.totalQuestionCount = totalQuestionCount;
-    }
-
-    /**
      * @return Returns the listUserEntries.
      */
     public List getListUserEntries() {
@@ -429,8 +412,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 		.append("learningMode: ", learningMode).append("maxNominationCount: ", maxNominationCount)
 		.append("allowTextEntry: ", allowTextEntry).append("showResults: ", showResults)
 		.append("lockOnFinish: ", lockOnFinish).append("toolContentID: ", toolContentID)
-		.append("toolContentUID: ", toolContentUID).append("totalQuestionCount: ", totalQuestionCount)
-		.append("requestLearningReport: ", requestLearningReport)
+		.append("toolContentUID: ", toolContentUID).append("requestLearningReport: ", requestLearningReport)
 		.append("requestLearningReportProgress: ", requestLearningReportProgress)
 		.append("nominationsSubmited: ", nominationsSubmited)
 		.append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)

@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -27,10 +26,11 @@
 				elem.disabled = true;
 			}
 		}
-	         function submitForm(methodName){
-        	        var f = document.getElementById('Form1');
-	                f.submit();
-	        }
+		
+		function submitForm(methodName) {
+			var f = document.getElementById('Form1');
+			f.submit();
+		}
 	</script>
 </lams:head>
 
@@ -49,8 +49,7 @@
 			</h4>
 		</c:if>
 
-		<html:form action="/learning?method=displayMc&validate=false"
-			method="POST" target="_self" onsubmit="disableFinishButton();"  styleId="Form1">
+		<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self" onsubmit="disableFinishButton();"  styleId="Form1">
 			<html:hidden property="toolContentID" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="httpSessionID" />
@@ -73,8 +72,7 @@
 
 			<!--  QUESTIONS  -->
 			<c:set var="mainQueIndex" scope="request" value="0" />
-			<c:forEach var="questionEntry" varStatus="status"
-				items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
+			<c:forEach var="questionEntry" varStatus="status" items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
 				<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
 				<div class="shading-bg">
@@ -83,23 +81,21 @@
 							${status.count})
 						</span>					
 						<c:out value="${questionEntry.value}" escapeXml="false" />
-					</div>																			  								
-
+					</div>
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />
-					<c:forEach var="mainEntry"
-						items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+					<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
 						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 
 						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
-								<ul>
-									<c:forEach var="subEntry" items="${mainEntry.value}">
-										<li>
-											<c:out value="${subEntry.value}" escapeXml="false" /> 
-										</li>
-									</c:forEach>
-								</ul>
+							<ul>
+								<c:forEach var="subEntry" items="${mainEntry.value}">
+									<li>
+										<c:out value="${subEntry.value}" escapeXml="false" /> 
+									</li>
+								</c:forEach>
+							</ul>
 						
 							<p>
 								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
@@ -111,6 +107,7 @@
 								<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 									<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 										<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+										
 											<c:choose>
 												<c:when test="${attemptEntry.value.mcOptionsContent.correctOption}">
 													<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
@@ -118,7 +115,8 @@
 												<c:otherwise>
 													<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
 												</c:otherwise>
-											</c:choose>									
+											</c:choose>
+											
 										</c:if>
 									</c:forEach>
 								</c:if>
@@ -127,47 +125,46 @@
 					</c:forEach>
 
 					<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-						<c:forEach var="feedbackEntry"
-							items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
-							<c:if test="${requestScope.mainQueIndex == feedbackEntry.key}">
-								<c:if test="${(feedbackEntry.value != null) && (feedbackEntry.value != '')}">
-									<div style="overflow: auto;">									  							
-										<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="true" />
-									</div>								
-								</c:if>																			
+						<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
+							<c:if test="${(requestScope.mainQueIndex == feedbackEntry.key)
+								&& (feedbackEntry.value != null) && (feedbackEntry.value != '')}">
+								
+								<div style="overflow: auto;">									  							
+									<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${feedbackEntry.value}" escapeXml="true" />
+								</div>	
+																									
 							</c:if>
 						</c:forEach>
 					</c:if>
 				</div>
 			</c:forEach>
 			<!-- END QUESTION  -->
-
-
+			
 			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
-					<h4>
-						<fmt:message key="label.group.results" />
-					</h4>
+				<h4>
+					<fmt:message key="label.group.results" />
+				</h4>
 					
-					<table class="alternative-color" cellspacing="0">
-					  <tr>
-					  	<td width="30%"> 
-						  	  <strong> <fmt:message key="label.topMark"/> </strong>
-						 </td> 
-						 <td>	
-							  	 <c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
-					  	</td>
-					  </tr>	
+				<table class="alternative-color" cellspacing="0">
+					<tr>
+						<td width="30%"> 
+							<strong> <fmt:message key="label.topMark"/> </strong>
+						</td> 
+						<td>	
+							<c:out value="${mcGeneralLearnerFlowDTO.topMark}"/>
+						</td>
+					</tr>	
 		
-					  <tr>
-					  	<td> 
-						  	 <strong><fmt:message key="label.avMark"/> </strong>
-					  	</td>
+					<tr>
+						<td> 
+							<strong><fmt:message key="label.avMark"/> </strong>
+						</td>
 					  	<td>
-							  	<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
+							<c:out value="${mcGeneralLearnerFlowDTO.averageMark}"/>
 					  	</td>
-					  </tr>	
-					</table>
-				</c:if>				
+					</tr>	
+				</table>
+			</c:if>				
 
 			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
 				<html:submit property="redoQuestions" styleClass="button">
@@ -225,7 +222,7 @@
 			</c:if>
 
 			<p>							
-			<html:hidden property="doneLearnerProgress" />
+				<html:hidden property="doneLearnerProgress" />
 			</p>
 			
 		</html:form>

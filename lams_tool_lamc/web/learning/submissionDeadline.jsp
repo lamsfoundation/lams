@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -24,22 +23,21 @@
 				elem.disabled = true;
 			}
 		}
-	         function submitForm(methodName){
-	                var f = document.getElementById('messageForm');
-	                f.submit();
-	        }
+		
+		function submitForm(methodName){
+			var f = document.getElementById('messageForm');
+			f.submit();
+		}
 	</script>
 </lams:head>
 
 <body class="stripes">
 
-	<html:form action="/learning?method=displayMc&validate=false"
-		method="POST" onsubmit="disableFinishButton();" styleId="messageForm">
+	<html:form action="/learning?method=displayMc&validate=false" method="POST" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
 		<html:hidden property="userID" />
-
 
 		<div id="content">
 
@@ -78,16 +76,10 @@
 					</html:submit>
 				</c:if>
 			</div>
+			
 		</div>
 	</html:form>
+	
 	<div id="footer"></div>
 </body>
 </lams:html>
-
-
-
-
-
-
-
-

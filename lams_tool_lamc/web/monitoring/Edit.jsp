@@ -83,10 +83,5 @@
 			</html:link>				 		  					
 		</td>
 	</tr>
-</table>
-
-
-
-
-		
+</table>		
 		

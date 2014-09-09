@@ -22,8 +22,10 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -105,27 +107,15 @@ public interface IVoteService {
 
     VoteUsrAttempt getAttemptByUID(Long uid);
 
-    void createVoteQue(VoteQueContent voteQueContent);
-
-    void createVoteSession(VoteSession voteSession);
-
     void createVoteQueUsr(VoteQueUsr voteQueUsr);
 
     VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid);
 
     VoteQueUsr getUserByUserId(Long userId);
 
-    List getVoteUserBySessionUid(final Long voteSessionUid);
-
-    int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
-
     VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid);
 
     Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid);
-
-    Set getSessionUserEntriesSet(final Long voteSessionUid);
-
-    void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
     void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 
@@ -135,22 +125,19 @@ public interface IVoteService {
 
     void showOpenVote(VoteUsrAttempt voteUsrAttempt);
 
-    int getAttemptsForQuestionContent(final Long questionUid);
-
     boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
 
     int getUserEnteredVotesCountForContent(final Long voteContentUid);
 
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 
-    int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionId);
-
-    int getSessionEntriesCount(final Long voteSessionId);
-
     List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid);
-
-    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId, final Long questionUid,
-	    final Long toolSessionUid);
+    
+    /**
+     * creates a new vote record in the database
+     */
+    void createAttempt(VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,
+	    VoteSession voteSession, Long voteContentUid);
 
     VoteQueContent getQuestionByUid(Long uid);
 
@@ -159,12 +146,23 @@ public interface IVoteService {
     VoteQueContent getVoteQueContentByUID(Long uid);
 
     void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent);
+    
+    VoteContent createQuestions(List<VoteQuestionDTO> questionDTOs, VoteContent voteContent);
+
+    /**
+     * Build a map of the display ids -> nomination text. If checkedOptions != null then only include the display ids in
+     * the checkedOptions list.
+     * 
+     * @param request
+     * @param voteContent
+     *                the content of the vote from the database
+     * @param checkedOptions
+     *                collection of String display IDs to which to restrict the map (optional)
+     * @return Map of display id -> nomination text.
+     */
+    Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions);
 
     List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
-    
-    VoteQueContent getDefaultVoteContentFirstQuestion();
-
-    VoteQueUsr getVoteUserByUID(Long uid);
 
     void updateVoteUser(VoteQueUsr voteUser);
 
@@ -176,33 +174,7 @@ public interface IVoteService {
 
     void updateVote(VoteContent vote);
 
-    void updateVoteSession(VoteSession voteSession);
-
     VoteSession getVoteSessionByUID(Long uid);
-
-    /**
-     * Get the count of all the potential learners for the vote session. This will include the people that have never
-     * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
-     * the number of people already known to the tool.
-     * 
-     * @param voteSessionId
-     *            The tool session id
-     */
-    int getVoteSessionPotentialLearnersCount(Long voteSessionId);
-
-    void deleteVote(VoteContent vote);
-
-    void deleteVoteById(Long voteId);
-
-    void deleteVoteSession(VoteSession voteSession);
-
-    List getSessionNamesFromContent(VoteContent voteContent);
-
-    void removeAttempt(VoteUsrAttempt attempt);
-
-    void deleteVoteQueUsr(VoteQueUsr voteQueUsr);
-
-    User getCurrentUserData(String username);
 
     int getTotalNumberOfUsers();
 

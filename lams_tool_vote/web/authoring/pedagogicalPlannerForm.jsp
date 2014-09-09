@@ -78,13 +78,12 @@
 		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<h4 class="space-left"><fmt:message key="label.authoring.instructions"/></h4>
-		<lams:CKEditor id="instructions"
-			value="${formBean.instructions}"
+		<lams:CKEditor id="instructions" value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
-               toolbarSet="CustomPedplanner" height="150px"
-               width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
+			toolbarSet="CustomPedplanner" height="150px"
+			width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
-		
+
 		<c:if test="${formBean.nominationCount ne 0}">
 			<h4 class="space-left space-top"><fmt:message key="label.vote.nominations"/></h4>
 			<table id="nominationTable" cellpadding="0" cellspacing="0">

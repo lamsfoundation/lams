@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -238,7 +237,7 @@
 				
 				<c:set var="userData" scope="request" value="${userResponse}" />
 				<c:set var="responseUid" scope="request" value="${userResponse.responseId}" />
-				<jsp:include page="parts/ratingStarsDisabled.jsp" />
+				<jsp:include page="ratingStarsDisabled.jsp" />
 				
 			</div>
 		</c:forEach>
@@ -317,7 +316,6 @@
 				</td>
 			    </tr>
 			</table>
-			
 			
 			<c:if test="${hasEditRight}">
 				<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 

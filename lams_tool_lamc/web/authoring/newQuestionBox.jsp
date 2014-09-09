@@ -147,8 +147,7 @@
 
 	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content" >
-		<html:form action="/authoring?validate=false"
-			styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+		<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
 			<html:hidden property="dispatch" value="addSingleQuestion" />
 			<html:hidden property="currentField" />			
 			<html:hidden property="toolContentID" />
@@ -178,22 +177,20 @@
 					</html:button>
 				</div>
 				<div id="questions-worth">
-				<fmt:message key="label.questions.worth"></fmt:message>
-				<select name="mark">
-					<c:forEach var="markEntry"
-						items="${mcGeneralAuthoringDTO.marksMap}">
-						<c:set var="SELECTED_MARK" scope="request" value="" />
-						<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
-							<c:set var="SELECTED_MARK" scope="request" value="SELECTED" />
-						</c:if>
-
-						<option value="<c:out value="${markEntry.value}"/>"
-							<c:out value="${SELECTED_MARK}"/>>
-							<c:out value="${markEntry.value}" />
-						</option>
-					</c:forEach>
-				</select>
-				<fmt:message key="label.marks"></fmt:message>
+					<fmt:message key="label.questions.worth"></fmt:message>
+					<select name="mark">
+						<c:forEach var="markEntry" items="${mcGeneralAuthoringDTO.marksMap}">
+							<c:set var="SELECTED_MARK" scope="request" value="" />
+							<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
+								<c:set var="SELECTED_MARK" scope="request" value="SELECTED" />
+							</c:if>
+	
+							<option value="<c:out value="${markEntry.value}"/>" <c:out value="${SELECTED_MARK}"/>>
+								<c:out value="${markEntry.value}" />
+							</option>
+						</c:forEach>
+					</select>
+					<fmt:message key="label.marks"></fmt:message>
 				</div>
 			</div>
 
@@ -203,8 +200,7 @@
 			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
 			
 			<lams:ImgButtonWrapper>
-					<a href="#" onclick="addItem();"				
-						onmousedown="self.focus();" class="button-add-item"> 
+					<a href="#" onclick="addItem();" onmousedown="self.focus();" class="button-add-item"> 
 						<fmt:message key="label.add.new.question" />
 					</a>
 	

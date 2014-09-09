@@ -73,13 +73,13 @@
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
 			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>
 			   		<property name="messageService"><ref bean="lavoteMessageService"/></property>
-			   		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
 				<props>
 					<prop key="create*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="buildQuestionMap">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -VoteApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>

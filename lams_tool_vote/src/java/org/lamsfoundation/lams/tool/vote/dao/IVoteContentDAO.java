@@ -43,8 +43,6 @@ public interface IVoteContentDAO {
 
     void saveOrUpdateVote(VoteContent voteContent);
 
-    void removeVote(VoteContent voteContent);
-
     void removeVoteById(Long voteContentId);
 
     void removeVoteSessions(VoteContent voteContent);

@@ -181,33 +181,6 @@ public abstract class McUtils implements McAppConstants {
 
     /**
      * 
-     * @param request
-     * @param defaultMcContent
-     * @param mcGeneralAuthoringDTO
-     */
-    public static void populateAuthoringDTO(HttpServletRequest request, McContent defaultMcContent,
-	    McGeneralAuthoringDTO mcGeneralAuthoringDTO) {
-	mcGeneralAuthoringDTO.setActivityTitle(defaultMcContent.getTitle());
-	mcGeneralAuthoringDTO.setActivityInstructions(defaultMcContent.getInstructions());
-    }
-
-    /**
-     * @param request
-     * @param value
-     * @param toolContentID
-     */
-    public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
-	    IMcService mcService) {
-
-	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
-	if (mcContent != null) {
-	    mcContent.setDefineLater(value);
-	    mcService.updateMc(mcContent);
-	}
-    }
-
-    /**
-     * 
      */
     public static void setFormProperties(HttpServletRequest request, McAuthoringForm mcAuthoringForm,
 	    McGeneralAuthoringDTO mcGeneralAuthoringDTO, String strToolContentID, String httpSessionID) {

@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -18,41 +17,34 @@
 			<div id="content">
 		
 			<h1>
-			<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
-			<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/></c:if>			
+				<c:if test="${(portfolioExportMode == 'learner')}"><fmt:message key="label.export.learner"/></c:if>			
+				<c:if test="${(portfolioExportMode != 'learner')}"><fmt:message key="label.export.teacher"/></c:if>			
 	        </h1>
 
-				<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-				<c:if test="${(portfolioExportMode != 'learner')}">
-						<h2> <fmt:message key="error.noLearnerActivity"/> </h2>
-				</c:if>			
+				<c:if test="${(userExceptionNoToolSessions == 'true') && (portfolioExportMode != 'learner')}"> 
+					<h2> <fmt:message key="error.noLearnerActivity"/> </h2>
 				</c:if>			
 		
 				<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 					<c:choose> 
-					  <c:when test="${(portfolioExportMode != 'learner')}" > 
+						<c:when test="${(portfolioExportMode != 'learner')}" > 
 							<jsp:include page="/export/class.jsp" /> 
-					  </c:when> 
-					  <c:otherwise>
+					  	</c:when> 
+					  	<c:otherwise>
 							<c:if test="${not empty  listMonitoredAnswersContainerDto}"> 
-							<jsp:include page="/export/learner.jsp" /> 
+								<jsp:include page="/export/learner.jsp" /> 
 							</c:if>
-					  </c:otherwise>
+					  	</c:otherwise>
 					</c:choose> 
 
 			  	  	<jsp:include page="/export/reflections.jsp" />  
 				</c:if>						
 		
-			</div>  <!--closes content-->
+			</div>  <!--closes content-->		
 		
-		
-			<div id="footer">
-			</div><!--closes footer-->
+			<div id="footer"></div><!--closes footer-->
 		
 		</html:form>	
 
 	</body>
 </lams:html>
-
-
-

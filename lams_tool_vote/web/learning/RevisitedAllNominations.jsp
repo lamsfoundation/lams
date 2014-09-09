@@ -1,26 +1,4 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -38,8 +16,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<title><fmt:message key="activity.title" /></title>
 	
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
@@ -50,8 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript">
 		var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
 		
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			if (actionMethod == "learnerFinished") {
 				document.getElementById("finishButton").disabled = true;
 			}
@@ -107,26 +83,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
 
-				<h4>
-						<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
-				</h4>
+			<h4>
+				<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />												
+			</h4>
 
-				<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					escapeHtml="true" />
+			<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 			
-				<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
+			<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
 				<br>
-						<html:button property="forwardtoReflection" styleClass="button"
-							onclick="submitMethod('forwardtoReflection');"> 
-							<fmt:message key="label.edit" />
-						</html:button>
-				</c:if>													
+				<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 
+					<fmt:message key="label.edit" />
+				</html:button>
+			</c:if>													
 
 			<div class="space-bottom-top">
 
 				<c:if test="${hasEditRight}">
-					<html:submit property="redoQuestionsOk" styleClass="button"
-						onclick="submitMethod('redoQuestionsOk');">
+					<html:submit property="redoQuestionsOk" styleClass="button" onclick="submitMethod('redoQuestionsOk');">
 						<fmt:message key="label.retake" />
 					</html:submit>
 				</c:if>

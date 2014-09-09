@@ -127,7 +127,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	if (mcContent != null) {
 	    setToolContentID(mcContent.getMcContentId());
 
-	    List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent, mcService);
+	    List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
 	    setCandidateAnswerCount(new ArrayList<Integer>(questionDtos.size()));

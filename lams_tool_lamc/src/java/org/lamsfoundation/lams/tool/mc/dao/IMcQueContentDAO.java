@@ -32,29 +32,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
  * @author Ozgur Demirtas
  */
 public interface IMcQueContentDAO {
-    
-    /**
-     * <p>
-     * Return the persistent instance of a McQueContent with the given identifier <code>uid</code>, returns null if not
-     * found.
-     * </p>
-     * 
-     * @param uid
-     * @return McQueContent
-     */
-    McQueContent getMcQueContentByUID(Long uid);
-
-    /**
-     * <p>
-     * Return the persistent instance of a McQueContent with the given identifier <code>question</code> and
-     * <code>mcContentUid</code>, returns null if not found.
-     * </p>
-     * 
-     * @param question
-     * @param mcContentUid
-     * @return McQueContent
-     */
-    McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
 
     /**
      * <p>
@@ -92,33 +69,6 @@ public interface IMcQueContentDAO {
 
     /**
      * <p>
-     * resets McQueContent with the given identifier <code>mcContentUid</code>
-     * </p>
-     * 
-     * @param mcContentUid
-     */
-    void resetAllQuestions(final Long mcContentUid);
-
-    /**
-     * <p>
-     * removes McQueContent with the given identifier <code>mcContentUid</code>
-     * </p>
-     * 
-     * @param mcContentUid
-     */
-    void removeQuestionContentByMcUid(final Long mcContentUid);
-
-    /**
-     * <p>
-     * saves McQueContent with the given identifier <code>mcQueContent</code>
-     * </p>
-     * 
-     * @param mcQueContent
-     */
-    void saveMcQueContent(McQueContent mcQueContent);
-
-    /**
-     * <p>
      * updates McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      * 
@@ -137,15 +87,6 @@ public interface IMcQueContentDAO {
 
     /**
      * <p>
-     * removes McQueContent with the given identifier <code>uid</code>
-     * </p>
-     * 
-     * @param uid
-     */
-    void removeMcQueContentByUID(Long uid);
-
-    /**
-     * <p>
      * removes McQueContent with the given identifier <code>mcQueContent</code>
      * </p>
      * 
@@ -153,16 +94,6 @@ public interface IMcQueContentDAO {
      * @return
      */
     void removeMcQueContent(McQueContent mcQueContent);
-
-    /**
-     * <p>
-     * used to get the next available display order with the given identifier <code>mcContentId</code>
-     * </p>
-     * 
-     * @param mcQueContent
-     * @return
-     */
-    List getNextAvailableDisplayOrder(final long mcContentId);
 
     McQueContent findMcQuestionContentByUid(Long uid);
 

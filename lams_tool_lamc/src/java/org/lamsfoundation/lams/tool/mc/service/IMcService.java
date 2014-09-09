@@ -72,15 +72,13 @@ public interface IMcService {
     void createMc(McContent mcContent) throws McApplicationException;
 
     McContent getMcContent(Long toolContentId) throws McApplicationException;
-
-    void createQuestion(McQueContent mcQueContent) throws McApplicationException;
+    
+    void setDefineLater(String strToolContentID, boolean value);
 
     void updateQuestion(McQueContent mcQueContent) throws McApplicationException;
 
     McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
 	    throws McApplicationException;
-
-    void createMcSession(McSession mcSession) throws McApplicationException;
 
     McQueUsr createMcUser(Long toolSessionId) throws McApplicationException;
 
@@ -92,29 +90,20 @@ public interface IMcService {
 
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
-    McQueContent getMcQueContentByUID(Long uid) throws McApplicationException;
-
     void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
+    /**
+     * persists the questions
+     */
+    McContent createQuestions(List<McQuestionDTO> questionDTOs, McContent content);
+    
     void releaseQuestionsFromCache(McContent content);
-
-    void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
-
-    McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
-
-    void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
 
     List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
 
     List getAllQuestionsSorted(final long mcContentId) throws McApplicationException;
 
     McQueContent getQuestionByUid(Long uid);
-
-    void removeMcOptionsContent(McOptsContent mcOptsContent);
-
-    McQueContent getQuestionByQuestionText(final String question, final Long mcContentUid);
-
-    void removeMcQueContentByUID(Long uid) throws McApplicationException;
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
 
@@ -124,37 +113,15 @@ public interface IMcService {
 
     void updateMc(McContent mc) throws McApplicationException;
 
-    void updateMcSession(McSession mcSession) throws McApplicationException;
-
     void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
     List<McOptionDTO> getOptionDtos(Long mcQueContentId) throws McApplicationException;
-
-    McSession getMcSessionByUID(Long uid) throws McApplicationException;
-
+    
     List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException;
-
-    void deleteMc(McContent mc) throws McApplicationException;
-
-    void deleteMcById(Long mcId) throws McApplicationException;
-
-    void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
     List findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
 
-    void saveOption(McOptsContent mcOptsContent) throws McApplicationException;
-
-    McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
-
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
-
-    void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
-
-    void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;
-
-    void saveMcContent(McContent mc) throws McApplicationException;
-
-    boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
 
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
 	    throws McApplicationException;
@@ -180,10 +147,6 @@ public interface IMcService {
     IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
 
     long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
-
-    List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
-
-    List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 

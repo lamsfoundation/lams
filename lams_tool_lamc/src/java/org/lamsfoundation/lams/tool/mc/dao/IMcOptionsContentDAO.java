@@ -33,17 +33,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
  * @author Ozgur Demirtas
  */
 public interface IMcOptionsContentDAO {
-    /**
-     * *
-     * <p>
-     * Return the persistent instance of a McOptsContent with the given identifier <code>uid</code>, returns null if not
-     * found.
-     * </p>
-     * 
-     * @param uid
-     * @return McOptsContent
-     */
-    McOptsContent getMcOptionsContentByUID(Long uid);
 
     /**
      * <p>
@@ -56,30 +45,7 @@ public interface IMcOptionsContentDAO {
      */
     List findMcOptionsContentByQueId(Long mcQueContentId);
 
-    /**
-     * <p>
-     * Return the persistent instance of a McOptsContent with the given identifiers <code>option</code>,
-     * <code>mcQueContentUid  </code> returns null if not found.
-     * </p>
-     * 
-     * @param option
-     * @param mcQueContentUid
-     * @return McOptsContent
-     */
-    McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
-
-    List<String> findMcOptionCorrectByQueId(Long mcQueContentId);
-
     List<McOptionDTO> getOptionDtos(Long mcQueContentId);
-
-    /**
-     * <p>
-     * saves McOptsContent
-     * </p>
-     * 
-     * @param mcOptionsContent
-     */
-    void saveMcOptionsContent(McOptsContent mcOptionsContent);
 
     /**
      * <p>
@@ -89,22 +55,4 @@ public interface IMcOptionsContentDAO {
      * @param mcOptionsContent
      */
     void updateMcOptionsContent(McOptsContent mcOptionsContent);
-
-    /**
-     * <p>
-     * removes McOptsContent
-     * </p>
-     * 
-     * @param mcOptionsContent
-     */
-    void removeMcOptionsContentByUID(Long uid);
-
-    /**
-     * <p>
-     * removes McOptsContent
-     * </p>
-     * 
-     * @param mcOptionsContent
-     */
-    void removeMcOptionsContent(McOptsContent mcOptsContent);
 }

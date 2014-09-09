@@ -14,6 +14,7 @@
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<%@ include file="/common/mobileheader.jsp"%>
+	<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	
 	<style media="screen,projection" type="text/css">
 		div.growlUI { background: url(check48.png) no-repeat 10px 10px }
@@ -22,19 +23,22 @@
 		}
 	</style>
 	
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="jquery.bootstrap-growl.js"></script>
+	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
-			var interval = "30000"; // = 30 seconds
+			var interval = "5000"; // = 30 seconds
 			window.setInterval(
 				function(){
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
 			            success: function() {
-			                $.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+			            	$.bootstrapGrowl("This is a test.");
+			                //$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
 			            }
 					});
 		        }, interval

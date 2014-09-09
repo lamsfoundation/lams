@@ -33,6 +33,7 @@
 
 <c:forEach var="dto" varStatus="status"	items="${requestScope.learnerAnswersDTOList}">
 	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
+	
 		<div class="shading-bg">
 			<div style="overflow: auto;">
 				<span class="float-left space-right">
