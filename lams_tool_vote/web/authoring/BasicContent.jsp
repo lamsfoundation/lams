@@ -16,7 +16,6 @@
 		var area=document.getElementById("messageArea");
 		if(area != null){
 			area.style.width="100%";
-			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}

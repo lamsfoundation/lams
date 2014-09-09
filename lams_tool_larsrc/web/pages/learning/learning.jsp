@@ -22,8 +22,8 @@
 	<c:set var="resource" value="${sessionMap.resource}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
 			var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
@@ -60,12 +60,10 @@
 			var area=document.getElementById("reourceInputArea");
 			if(area != null){
 				area.style.width="100%";
-				area.style.height="100%";
 				area.src=url;
 				area.style.display="block";
 			}
 		}
-	-->        
     </script>
 </lams:head>
 <body class="stripes">
@@ -178,37 +176,29 @@
 				</div>
 
 				<iframe
-					onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+					onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px';"
 					id="reourceInputArea" name="reourceInputArea"
 					style="width: 0px; height: 0px; border: 0px; display: none"
 					frameborder="no" scrolling="no">
 				</iframe>
-
-
 
 			</c:if>
 
 			<c:choose>
 				<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
 					<script type="text/javascript">
-					<!--
 						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
+					</script>
 				</c:when>
 				<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
 					<script type="text/javascript">
-					<!--
 						showMessage("<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
+					</script>
 				</c:when>
 				<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
 					<script type="text/javascript">
-					<!--
 						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
+					</script>
 				</c:when>
 			</c:choose>
 			<%-- end mode != teacher --%>

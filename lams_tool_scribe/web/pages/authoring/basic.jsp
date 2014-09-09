@@ -9,7 +9,6 @@
 		var area=document.getElementById("iframeArea");
 		if(area != null){
 			area.style.width="685px";
-			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}
