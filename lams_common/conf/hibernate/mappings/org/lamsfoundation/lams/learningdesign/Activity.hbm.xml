@@ -226,7 +226,7 @@
        			<key><column name="activity_id" /></key>
        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
    			</set>
-   			<set name="allowedToPassLearners" lazy="extra" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=1">
+   			<set name="allowedToPassLearners" lazy="false" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=1">
        			<key><column name="activity_id" /></key>
        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
    			</set>
