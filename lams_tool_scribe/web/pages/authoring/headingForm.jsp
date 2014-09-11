@@ -47,7 +47,7 @@
 				</c:if>
 
 				<lams:CKEditor id="heading" value="${headingText}"
-					contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
+					contentFolderID="${sessionMap.contentFolderID}" width="99%"/>
 
 				<div class="small-space-top">
 

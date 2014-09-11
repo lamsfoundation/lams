@@ -54,7 +54,8 @@
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<c:set var="sessionMap"	value="${sessionScope[formBean.sessionMapID]}" />
 			<div class="small-space-bottom" >
-				<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" resizeParentFrameName="reourceInputArea" width="100%" />
+				<lams:CKEditor id="description" value="${formBean.description}" width="99%" 
+					contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" resizeParentFrameName="reourceInputArea" />
 			</div>
 
 			<div class="field-name space-top">

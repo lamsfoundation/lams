@@ -48,11 +48,8 @@
 				<c:if test="${not empty formBean.message}">
 					<c:set var="body" value="${formBean.message.body}"/>
 				</c:if>
-				<lams:CKEditor id="message.body" value="${body}"
-					contentFolderID="${sessionMap.contentFolderID}"
-					width="100%" 
-					resizeParentFrameName="messageArea">
-				</lams:CKEditor>
+				<lams:CKEditor id="message.body" value="${body}" width="99%" 
+					contentFolderID="${sessionMap.contentFolderID}" resizeParentFrameName="messageArea"/>
 				<html:errors property="message.body" />
 			</div>
 

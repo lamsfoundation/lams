@@ -52,10 +52,8 @@
 				<fmt:message key="label.question" />
 			</div>
 
-			<lams:CKEditor id="question.description"
-				value="${formBean.question.description}"
-				contentFolderID="${formBean.contentFolderID}"
-				width="100%"
+			<lams:CKEditor id="question.description" value="${formBean.question.description}"
+				contentFolderID="${formBean.contentFolderID}" width="99%"
 				resizeParentFrameName="questionInputArea">
 			</lams:CKEditor>
 

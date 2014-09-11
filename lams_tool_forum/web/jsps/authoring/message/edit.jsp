@@ -50,11 +50,8 @@
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 			<div class="small-space-bottom">
-				<lams:CKEditor id="message.body" value="${formBean.message.body}"
-					contentFolderID="${sessionMap.contentFolderID}"
-					width="100%"
-					resizeParentFrameName="messageArea">
-				</lams:CKEditor>
+				<lams:CKEditor id="message.body" value="${formBean.message.body}" width="99%"
+					contentFolderID="${sessionMap.contentFolderID}" resizeParentFrameName="messageArea" />
 				<html:errors property="message.body" />
 			</div>
 			

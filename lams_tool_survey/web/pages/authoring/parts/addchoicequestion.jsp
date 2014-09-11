@@ -23,9 +23,7 @@
 		<%@ include file="/common/messages.jsp"%>
 		<html:form action="/authoring/saveOrUpdateItem" method="post"
 			styleId="surveyItemForm">
-			<c:set var="formBean"
-				value="<%=request
-										.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<%-- This field is not belong STRUTS form --%>
 			<input type="hidden" name="instructionList" id="instructionList" />
 			<html:hidden property="sessionMapID" />
@@ -42,12 +40,8 @@
 				<fmt:message key="label.question" />
 			</div>
 
-
-
-			<lams:CKEditor id="question.description"
-				value="${formBean.question.description}"
-				contentFolderID="${formBean.contentFolderID}"
-				width="100%"
+			<lams:CKEditor id="question.description" value="${formBean.question.description}"
+				contentFolderID="${formBean.contentFolderID}" width="99%"
 				resizeParentFrameName="questionInputArea">	
 			</lams:CKEditor>
 
