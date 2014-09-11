@@ -226,11 +226,11 @@
        			<key><column name="activity_id" /></key>
        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
    			</set>
-   			<set name="allowedToPassLearners" lazy="extra" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=1">
+   			<set name="allowedToPassLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=1">
        			<key><column name="activity_id" /></key>
        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
    			</set>
-   			<set name="allGateUsers" table="lams_activity_learners" lazy="extra" cascade="all" batch-size="20">
+   			<set name="allGateUsers" table="lams_activity_learners" lazy="true" cascade="all" batch-size="20">
        			<key><column name="activity_id" /></key>
        			<composite-element class="org.lamsfoundation.lams.learningdesign.GateUser">
        				<many-to-one name="user" class="org.lamsfoundation.lams.usermanagement.User" column="user_id" cascade="none" />
