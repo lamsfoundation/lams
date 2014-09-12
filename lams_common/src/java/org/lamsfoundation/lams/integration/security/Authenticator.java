@@ -30,39 +30,94 @@ import org.lamsfoundation.lams.util.HashUtil;
  * <p>
  * <a href="Authenticator.java.html"><i>View Source</i><a>
  * </p>
- *
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class Authenticator {
-	public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method, String hashValue) throws AuthenticationException{
-		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
-		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
-		String plaintext = datetime.toLowerCase().trim() +
-		                   username.toLowerCase().trim() +
-		                   method.toLowerCase().trim() +
-		                   map.getServerid().toLowerCase().trim() + 
-		                   map.getServerkey().toLowerCase().trim();
-		checkHash(plaintext, hashValue);
+    /**
+     * Checks hash. Hash is expected to be constructed using the following formula [ts + uid + method + serverID +
+     * serverKey]. (Note: all lower case before hashing)
+     * 
+     * @param map
+     * @param datetime
+     * @param username
+     * @param method
+     * @param hashValue
+     * @throws AuthenticationException
+     */
+    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method,
+	    String hashValue) throws AuthenticationException {
+	if (map == null) {
+	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
-    
-	public static void authenticate(ExtServerOrgMap map, String datetime, String username, String hashValue) throws AuthenticationException{
-		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
-		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
-		String plaintext = datetime.toLowerCase().trim()+username.toLowerCase().trim()+map.getServerid().toLowerCase().trim()+map.getServerkey().toLowerCase().trim();
-		checkHash(plaintext, hashValue);
-	}
-	
-	public static void authenticate(ExtServerOrgMap map, String datetime, String hashValue) throws AuthenticationException{
-		if(map==null) throw new AuthenticationException("The third party server is not configured on LAMS server");
-		if(map.getDisabled()) throw new AuthenticationException("The third party server is disabled");
-		String plaintext = datetime.toLowerCase().trim()+map.getServerid().toLowerCase().trim()+map.getServerkey().toLowerCase().trim();
-		checkHash(plaintext, hashValue);
+	if (map.getDisabled()) {
+	    throw new AuthenticationException("The third party server is disabled");
 	}
 	
-	private static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
-			if(!hashValue.equals(HashUtil.sha1(plaintext))){
-			    throw new AuthenticationException("Authentication failed!");
-			}
+	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
+		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
+	checkHash(plaintext, hashValue);
+    }
+
+    /**
+     * Checks hash. Differs from the method above (the one without lsid parameter) in a way that hash is expected to also
+     * contain lsidx: [ts + uid + method + lsid + serverID + serverKey]
+     * 
+     * @param map
+     * @param datetime
+     * @param username
+     * @param method
+     * @param lsid
+     * @param hashValue
+     * @throws AuthenticationException
+     */
+    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method, String lsid,
+	    String hashValue) throws AuthenticationException {
+	if (map == null) {
+	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
+	if (map.getDisabled()) {
+	    throw new AuthenticationException("The third party server is disabled");
+	}
+
+	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
+		+ lsid.toLowerCase().trim() + map.getServerid().toLowerCase().trim()
+		+ map.getServerkey().toLowerCase().trim();
+	checkHash(plaintext, hashValue);
+    }
+
+    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String hashValue)
+	    throws AuthenticationException {
+	if (map == null) {
+	    throw new AuthenticationException("The third party server is not configured on LAMS server");
+	}
+	if (map.getDisabled()) {
+	    throw new AuthenticationException("The third party server is disabled");
+	}
+	
+	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
+		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
+	checkHash(plaintext, hashValue);
+    }
+
+    public static void authenticate(ExtServerOrgMap map, String datetime, String hashValue)
+	    throws AuthenticationException {
+	if (map == null) {
+	    throw new AuthenticationException("The third party server is not configured on LAMS server");
+	}
+	if (map.getDisabled()) {
+	    throw new AuthenticationException("The third party server is disabled");
+	}
+	
+	String plaintext = datetime.toLowerCase().trim() + map.getServerid().toLowerCase().trim()
+		+ map.getServerkey().toLowerCase().trim();
+	checkHash(plaintext, hashValue);
+    }
+
+    private static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
+	if (!hashValue.equals(HashUtil.sha1(plaintext))) {
+	    throw new AuthenticationException("Authentication failed!");
+	}
+    }
 
 }

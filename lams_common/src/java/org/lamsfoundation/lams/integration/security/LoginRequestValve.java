@@ -49,8 +49,6 @@ public class LoginRequestValve extends ValveBase {
     // Declare the constants
     private static final String PARAM_USERID = "uid";
 
-    private static final String PARAM_OPENID_URL = "openid_url";
-
     private static final String LOGIN_REQUEST = "LoginRequest";
 
     @Override
