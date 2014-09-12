@@ -35,7 +35,7 @@
 
 			<lams:CKEditor id="newNomination"
 				value="${voteGeneralAuthoringDTO.editableNominationText}"   
-                height="370px"
+                height="370px" width="99%"
 				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"
 				resizeParentFrameName="messageArea">
 			</lams:CKEditor>
