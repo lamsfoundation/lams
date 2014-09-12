@@ -72,20 +72,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
+ * This class is used to load the default content and initialize the presentation Map for Learner mode.
+ * It is important that ALL the session attributes created in this action gets removed by: QaUtils.cleanupSession(request)
  * 
  * @author Ozgur Demirtas
  * 
- * This class is used to load the default content and initialize the
- * presentation Map for Learner mode
- * 
- * createToolSession will not be called once the tool is deployed.
- * 
- * It is important that ALL the session attributes created in this action gets
- * removed by: QaUtils.cleanupSession(request)
- * 
  */
 public class QaLearningStarterAction extends Action implements QaAppConstants {
-    static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
+    private static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
     
     private static IQaService qaService;
 

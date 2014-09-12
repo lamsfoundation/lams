@@ -757,7 +757,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 		    voteContentTest, strToolContentID);
 
 	    //store questions
-	    voteContent = AuthoringUtil.createQuestions(questionDTOs, voteService, voteContent);
+	    voteContent = voteService.createQuestions(questionDTOs, voteContent);
 
 	    //store DataFlowObjectAssigment
 	    voteService.saveDataFlowObjectAssigment(assignedDataFlowObject);

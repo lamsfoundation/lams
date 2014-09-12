@@ -54,8 +54,6 @@ public interface IVoteUsrAttemptDAO {
 
     List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
 
-    int getAttemptsForQuestionContent(final Long voteQueContentId);
-
     int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId,

@@ -48,8 +48,7 @@
         	document.VoteMonitoringForm.submit();
         }
 
-		function submitMonitoringMethod(actionMethod) 
-		{
+		function submitMonitoringMethod(actionMethod) {
 			document.VoteMonitoringForm.dispatch.value=actionMethod; 
 			document.VoteMonitoringForm.submit();
 		}
@@ -59,27 +58,23 @@
 			document.VoteAuthoringForm.submit();
 		}
 		
-		function submitModifyQuestion(questionIndexValue, actionMethod) 
-		{
+		function submitModifyQuestion(questionIndexValue, actionMethod) {
 			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
-		function submitModifyMonitoringNomination(questionIndexValue, actionMethod) 
-		{
+		function submitModifyMonitoringNomination(questionIndexValue, actionMethod) {
 			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
 		
-		function submitEditResponse(responseId, actionMethod) 
-		{
+		function submitEditResponse(responseId, actionMethod) {
 			document.VoteMonitoringForm.responseId.value=responseId; 
 			submitMethod(actionMethod);
 		}
 		
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			submitMonitoringMethod(actionMethod);
 		}
 		
@@ -88,14 +83,12 @@
 			submitMethod(actionMethod);
 		}
 		
-		function submitModifyOption(optionIndexValue, actionMethod) 
-		{
+		function submitModifyOption(optionIndexValue, actionMethod) {
 			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
-		function submitModifyNomination(optionIndexValue, actionMethod) 
-		{
+		function submitModifyNomination(optionIndexValue, actionMethod) {
 			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}

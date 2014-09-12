@@ -1,26 +1,4 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -159,14 +137,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:if>
 							</c:forEach>
 
-							<c:forEach var="currentRate"
-								items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
-								<c:set var="currentRateKey" scope="request"
-									value="${currentRate.key}" />
+							<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
+								<c:set var="currentRateKey" scope="request" value="${currentRate.key}" />
 								<c:if test="${currentNominationKey == currentRateKey}"> 				
-																	 &nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentRate.value}" />
+									&nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentRate.value}" />
 									<fmt:message key="label.percent" />) 
-														</c:if>
+								</c:if>
 							</c:forEach>
 						</td>
 					</tr>
@@ -189,8 +165,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">
 					<strong> <fmt:message key="label.open.votes"/> </strong>
-					<c:forEach var="vote"
-						items="${requestScope.listUserEntriesContent}">
+					
+					<c:forEach var="vote" items="${requestScope.listUserEntriesContent}">
 						<c:if test="${vote.userEntry != null}">
 							<div>
 								<c:out value="${vote.userEntry}" escapeXml="true" /> 
@@ -201,20 +177,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 
 				<c:choose>
-				 <c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
-                                      <strong><fmt:message key="label.learner.nominations" />  </strong>
-				 </c:when>
-                                 <c:otherwise>
-
-				     <strong><fmt:message key="label.learner.nomination" />  </strong>
-				 </c:otherwise>
+					<c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
+                    	<strong><fmt:message key="label.learner.nominations" />  </strong>
+					</c:when>
+                	<c:otherwise>
+						<strong><fmt:message key="label.learner.nomination" />  </strong>
+					</c:otherwise>
 				</c:choose>
-
 
 			</div>
 
-			<c:forEach var="entry"
-				items="${requestScope.listGeneralCheckedOptionsContent}">
+			<c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
 				<div>
 					<c:out value="${entry}" escapeXml="false" />
 				</div>
@@ -223,7 +196,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div>
 				<c:out value="${VoteLearningForm.userEntry}" escapeXml="true"/>
 			</div>
-
 
 			<c:if test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">
 	
@@ -237,7 +209,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:if>							
 
 			<div id="chartDiv0" style="height: 220px; display: none;"></div>
-			
 
 			<div class="space-bottom-top">
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">

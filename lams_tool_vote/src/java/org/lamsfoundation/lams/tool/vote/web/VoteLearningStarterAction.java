@@ -170,13 +170,10 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
-	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
+	Map<String, String> mapQuestions = voteService.buildQuestionMap(voteContent, null);
+	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
 
-	/* handle PREVIEW mode */
-	if (mode != null && mode.equals("author")) {
-	    commonContentSetup(request, voteService, voteContent, voteGeneralLearnerFlowDTO);
-	    request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	}
+	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 	
 	VoteQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -270,12 +267,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	}
 
 	/*
-	 * fetch question content from content
-	 */
-	Map<String, String> mapQuestions = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
-	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
-
-	/*
 	 * the user's session id AND user id exists in the tool tables goto this screen if the OverAll Results scren has
 	 * been already called up by this user
 	 */
@@ -361,21 +352,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	}
 
 	request.setAttribute(VoteAppConstants.MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
-    }
-
-    /**
-     * sets up question and candidate answers maps commonContentSetup(HttpServletRequest request, VoteContent
-     * voteContent)
-     * 
-     * @param request
-     * @param voteContent
-     */
-    protected void commonContentSetup(HttpServletRequest request, IVoteService voteService, VoteContent voteContent,
-	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
-	Map<String, String> mapQuestionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
-
-	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-	voteGeneralLearnerFlowDTO.setTotalQuestionCount(new Long(mapQuestionsContent.size()).toString());
     }
 
     /**

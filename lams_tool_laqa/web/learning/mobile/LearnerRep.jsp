@@ -263,7 +263,7 @@
 									
 					<c:set var="userData" scope="request" value="${userResponse}" />
 					<c:set var="responseUid" scope="request" value="${userResponse.responseId}" />
-					<jsp:include page="parts/ratingStarsDisabled.jsp" />
+					<jsp:include page="ratingStarsDisabled.jsp" />
 					
 				</li>
 			</c:forEach>	

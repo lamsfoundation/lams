@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -31,12 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -49,6 +53,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -88,6 +93,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -118,7 +125,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     private IDataFlowDAO dataFlowDAO;
 
     private MessageService messageService;
-    private ILamsCoreToolService lamsCoreToolService;
 
     public VoteServicePOJO() {
     }
@@ -162,7 +168,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 		// set group leader
 		session.setGroupLeader(leader);
-		this.updateVoteSession(session);
+		voteSessionDAO.updateVoteSession(session);
 	    }
 	}
 
@@ -197,7 +203,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    if (userAttempt == null) {
 		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, question, user, userEntry,
 			true);
-		this.createVoteUsrAttempt(voteUsrAttempt);
+		voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
 
 		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
@@ -214,7 +220,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	// remove redundant ones
 	for (VoteUsrAttempt redundantUserAttempt : userAttempts) {
-	    this.removeAttempt(redundantUserAttempt);
+	    voteUsrAttemptDAO.removeVoteUsrAttempt(redundantUserAttempt);
 	}
     }
 
@@ -227,8 +233,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	int entriesCount = 0;
 	Set<VoteUsrAttempt> userEntries = null;
 	if (toolSessionUid != null) {
-	    entriesCount = this.getSessionEntriesCount(toolSessionUid);
-	    userEntries = this.getSessionUserEntriesSet(toolSessionUid);
+	    entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(toolSessionUid);
+	    userEntries = voteUsrAttemptDAO.getSessionUserEntriesSet(toolSessionUid);
 	}
 
 	Long mapIndex = 1L;
@@ -247,7 +253,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    String noHTMLNomination = VoteUtils.stripHTML(question.getQuestion());
 	    mapStandardNominationsContent.put(mapIndex, noHTMLNomination);
 
-	    int votesCount = this.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(), toolSessionUid);
+	    int votesCount = voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(), toolSessionUid);
 	    totalStandardVotesCount += votesCount;
 	    mapStandardUserCount.put(mapIndex, new Long(votesCount));
 
@@ -301,14 +307,14 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    sessionDTO.setSessionId(session.getVoteSessionId().toString());
 	    sessionDTO.setSessionName(session.getSession_name());
 
-	    int entriesCount = this.getSessionEntriesCount(session.getUid());
+	    int entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(session.getUid());
 
 	    // potentialUserCount
 	    int potentialUserCount = this.getVoteSessionPotentialLearnersCount(session.getUid());
 	    sessionDTO.setSessionUserCount(potentialUserCount);
 
 	    // completedSessionUserCount
-	    int completedSessionUserCount = this.getCompletedVoteUserBySessionUid(session.getUid());
+	    int completedSessionUserCount = voteUserDAO.getCompletedVoteUserBySessionUid(session.getUid());
 	    sessionDTO.setCompletedSessionUserCount(completedSessionUserCount);
 
 	    Long mapIndex = 1L;
@@ -323,7 +329,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
 		mapStandardNominationsHTMLedContent.put(mapIndex, question.getQuestion());
 
-		int votesCount = this.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
+		int votesCount = voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
 			session.getUid());
 		totalStandardVotesCount += votesCount;
 		mapStandardUserCount.put(mapIndex, new Long(votesCount));
@@ -447,6 +453,26 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 
 	return sessionDTOs;
+    }
+
+    /**
+     * Get the count of all the potential learners for the vote session. This will include the people that have never
+     * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
+     * the number of people already known to the tool.
+     * 
+     * @param voteSessionId
+     *            The tool session id
+     */
+    private int getVoteSessionPotentialLearnersCount(Long sessionUid) {
+	VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
+	if (session != null) {
+	    Set<User> potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
+	    return potentialLearners != null ? potentialLearners.size() : 0;
+	} else {
+	    VoteServicePOJO.logger
+		    .error("Unable to find vote session record id=" + sessionUid + ". Returning 0 users.");
+	    return 0;
+	}
     }
 
     @Override
@@ -591,10 +617,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return voteContentDAO.getVoteContentByContentId(toolContentID);
     }
 
-    public void updateVoteContent(VoteContent voteContent) {
-	voteContentDAO.updateVoteContent(voteContent);
-    }
-
     public VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
 	return voteQueContentDAO.getQuestionByDisplayOrder(displayOrder, voteContentUid);
     }
@@ -602,10 +624,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public VoteQueUsr getUserById(long voteQueUsrId) {
 	VoteQueUsr voteQueUsr = voteUserDAO.getVoteQueUsrById(voteQueUsrId);
 	return voteQueUsr;
-    }
-
-    public void createVoteQue(VoteQueContent voteQueContent) {
-	voteQueContentDAO.saveQuestion(voteQueContent);
     }
 
     public List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
@@ -621,10 +639,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return voteUsrAttemptDAO.getAttemptsForUserAndSession(queUsrUid, sessionUid);
     }
 
-    public Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid) {
-	return voteUsrAttemptDAO.getSessionUserEntriesSet(voteSessionUid);
-    }
-
+    @Override
     public VoteQueContent getVoteQueContentByUID(Long uid) {
 	if (uid == null) {
 	    return null;
@@ -633,151 +648,374 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return voteQueContentDAO.getQuestionByUid(uid);
     }
 
+    @Override
     public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) {
 	voteQueContentDAO.saveOrUpdateQuestion(voteQueContent);
     }
+    
+    @Override
+    public VoteContent createQuestions(List<VoteQuestionDTO> questionDTOs, VoteContent voteContent) {
 
+	int displayOrder = 0;
+	for (VoteQuestionDTO questionDTO : questionDTOs) {
+	    String currentQuestionText = questionDTO.getQuestion();
+
+	    // skip empty questions
+	    if (currentQuestionText.isEmpty()) {
+		continue;
+	    }
+
+	    ++displayOrder;
+
+	    VoteQueContent question = getVoteQueContentByUID(questionDTO.getUid());
+
+	    // in case question doesn't exist
+	    if (question == null) {
+
+		question = new VoteQueContent(currentQuestionText, displayOrder, voteContent);
+		// adding a new question to content
+		voteContent.getVoteQueContents().add(question);
+		question.setVoteContent(voteContent);
+
+		// in case question exists already
+	    } else {
+
+		question.setQuestion(currentQuestionText);
+		question.setDisplayOrder(displayOrder);
+	    }
+
+	    saveOrUpdateVoteQueContent(question);
+	}
+
+	return voteContent;
+    }
+    
+    @Override
+    public Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions) {
+	Map<String, String> mapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	Set<VoteQueContent> questions = voteContent.getVoteQueContents();
+	
+	// should we add questions from data flow from other activities?
+	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject())
+		&& (voteContent.getMaxExternalInputs() == null || voteContent.getExternalInputsAdded() == null || voteContent
+			.getExternalInputsAdded() < voteContent.getMaxExternalInputs())) {
+	    // If we are using tool input, we need to get it now and
+	    // create questions. Once they are created, they will be not altered, no matter if another learner gets to
+	    // this point and the tool input changed
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    long userId = toolUser.getUserID().longValue();
+
+	    // We get whatever the source tool provides us with and try to create questions out of it
+	    ToolOutput toolInput = getToolInput(voteContent.getVoteContentId(), new Long(userId).intValue());
+
+	    Object value = toolInput.getValue().getComplex();
+	    short inputsAdded = voteContent.getExternalInputsAdded() == null ? 0 : voteContent.getExternalInputsAdded();
+	    Short maxInputs = voteContent.getMaxExternalInputs();
+	    Set<VoteQueContent> existingNominations = voteContent.getVoteQueContents();
+	    // The input is an array (users) of arrays of strings (their answers)
+	    if (value instanceof String[][]) {
+		if (value != null) {
+		    String[][] usersAndAnswers = (String[][]) value;
+		    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		    for (String[] userAnswers : usersAndAnswers) {
+			if (userAnswers != null) {
+			    if (maxInputs != null && inputsAdded >= maxInputs) {
+				// if we reached the maximum number of inputs, i.e. number of students that will be
+				// taken
+				// into account
+				break;
+			    }
+			    boolean anyAnswersAdded = false;
+			    for (String questionText : userAnswers) {
+				if (!StringUtils.isBlank(questionText)) {
+				    VoteQueContent nomination = new VoteQueContent();
+				    nomination.setDisplayOrder(nominationIndex);
+				    nomination.setMcContent(voteContent);
+				    nomination.setQuestion(questionText);
+				    if (!isNominationExists(nomination, existingNominations)) {
+					saveOrUpdateVoteQueContent(nomination);
+					voteContent.getVoteQueContents().add(nomination);
+					nominationIndex++;
+					anyAnswersAdded = true;
+				    }
+				}
+			    }
+			    if (anyAnswersAdded) {
+				inputsAdded++;
+			    }
+			}
+		    }
+		}
+	    } else if (value instanceof String[]) {
+		// the input is a list of strings (questions, for example)
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		String[] userAnswers = (String[]) value;
+		for (String questionText : userAnswers) {
+		    if (maxInputs != null && inputsAdded >= maxInputs) {
+			// if we reached the maximum number of inputs, i.e. number of students that will be taken
+			// into account
+			break;
+		    }
+
+		    if (!StringUtils.isBlank(questionText)) {
+			VoteQueContent nomination = new VoteQueContent();
+			nomination.setDisplayOrder(nominationIndex);
+			nomination.setMcContent(voteContent);
+			nomination.setQuestion(questionText);
+			if (!isNominationExists(nomination, existingNominations)) {
+			    saveOrUpdateVoteQueContent(nomination);
+			    voteContent.getVoteQueContents().add(nomination);
+			    nominationIndex++;
+			    inputsAdded++;
+			}
+		    }
+		}
+	    } else if (value instanceof String && !StringUtils.isBlank((String) value)) {
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		VoteQueContent nomination = new VoteQueContent();
+		nomination.setDisplayOrder(nominationIndex);
+		nomination.setMcContent(voteContent);
+		nomination.setQuestion((String) value);
+		if (!isNominationExists(nomination, existingNominations)) {
+		    saveOrUpdateVoteQueContent(nomination);
+		    voteContent.getVoteQueContents().add(nomination);
+		}
+	    }
+	    if (value instanceof SimpleURL[][]) {
+		if (value != null) {
+		    SimpleURL[][] usersAndUrls = (SimpleURL[][]) value;
+		    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		    for (SimpleURL[] userUrls : usersAndUrls) {
+			if (userUrls != null) {
+			    if (maxInputs != null && inputsAdded >= maxInputs) {
+				// if we reached the maximum number of inputs, i.e. number of students that will be
+				// taken
+				// into account
+				break;
+			    }
+			    boolean anyAnswersAdded = false;
+			    for (SimpleURL url : userUrls) {
+				if (url != null) {
+				    VoteQueContent nomination = new VoteQueContent();
+				    nomination.setDisplayOrder(nominationIndex);
+				    nomination.setMcContent(voteContent);
+
+				    String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+				    nomination.setQuestion(link);
+				    if (!isNominationExists(nomination, existingNominations)) {
+					saveOrUpdateVoteQueContent(nomination);
+					voteContent.getVoteQueContents().add(nomination);
+					nominationIndex++;
+					anyAnswersAdded = true;
+				    }
+				}
+			    }
+			    if (anyAnswersAdded) {
+				inputsAdded++;
+			    }
+			}
+		    }
+		}
+	    }
+
+	    else if (value instanceof SimpleURL[]) {
+		// the input is a list of strings (questions, for example)
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		SimpleURL[] userUrls = (SimpleURL[]) value;
+		for (SimpleURL url : userUrls) {
+		    if (maxInputs != null && inputsAdded >= maxInputs) {
+			// if we reached the maximum number of inputs, i.e. number of students that will be taken
+			// into account
+			break;
+		    }
+		    if (url != null) {
+			VoteQueContent nomination = new VoteQueContent();
+			nomination.setDisplayOrder(nominationIndex);
+			nomination.setMcContent(voteContent);
+
+			String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+			nomination.setQuestion(link);
+			if (!isNominationExists(nomination, existingNominations)) {
+			    saveOrUpdateVoteQueContent(nomination);
+			    voteContent.getVoteQueContents().add(nomination);
+			    nominationIndex++;
+			    inputsAdded++;
+			}
+		    }
+		}
+	    } else if (value instanceof SimpleURL) {
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		VoteQueContent nomination = new VoteQueContent();
+		nomination.setDisplayOrder(nominationIndex);
+
+		SimpleURL url = (SimpleURL) value;
+		String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+		nomination.setQuestion(link);
+		if (!isNominationExists(nomination, existingNominations)) {
+		    nomination.setMcContent(voteContent);
+		    saveOrUpdateVoteQueContent(nomination);
+		    voteContent.getVoteQueContents().add(nomination);
+		}
+	    }
+
+	    voteContent.setExternalInputsAdded(inputsAdded);
+	    saveVoteContent(voteContent);
+	    questions = voteContent.getVoteQueContents();
+	}
+
+	for (VoteQueContent question : questions) {
+	    String displayOrder = "" + question.getDisplayOrder();
+	    if ((checkedOptions == null || checkedOptions.contains(displayOrder)) && !displayOrder.equals("0")) {
+		/* add the question to the questions Map in the displayOrder */
+		mapQuestionsContent.put(displayOrder.toString(), question.getQuestion());
+	    }
+	}
+
+	return mapQuestionsContent;
+    }
+
+    private static boolean isNominationExists(VoteQueContent nomination, Set<VoteQueContent> existingNominations) {
+	if (existingNominations != null && nomination != null) {
+	    for (VoteQueContent existingNomination : existingNominations) {
+		if (existingNomination.getQuestion() != null
+			&& existingNomination.getQuestion().equals(nomination.getQuestion())) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
+    @Override
     public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) {
 	return voteUserDAO.getUserBySessionOnly(voteSession);
     }
 
-    public void createVoteSession(VoteSession voteSession) {
-	voteSessionDAO.saveVoteSession(voteSession);
-    }
-
+    @Override
     public VoteSession getVoteSessionByUID(Long uid) {
 	return voteSessionDAO.getVoteSessionByUID(uid);
     }
 
-    public int getVoteSessionPotentialLearnersCount(Long sessionUid) {
-	VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
-	if (session != null) {
-	    Set<User> potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
-	    return potentialLearners != null ? potentialLearners.size() : 0;
-	} else {
-	    VoteServicePOJO.logger
-		    .error("Unable to find vote session record id=" + sessionUid + ". Returning 0 users.");
-	    return 0;
-	}
-    }
-
+    @Override
     public void createVoteQueUsr(VoteQueUsr voteQueUsr) {
 	voteUserDAO.saveVoteUser(voteQueUsr);
     }
 
+    @Override
     public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long sessionUid) {
 	return voteUserDAO.getVoteUserBySession(queUsrId, sessionUid);
     }
 
-    public VoteQueUsr getVoteUserByUID(Long uid) {
-	return voteUserDAO.getVoteUserByUID(uid);
-    }
-
+    @Override
     public void updateVoteUser(VoteQueUsr voteUser) {
 	voteUserDAO.updateVoteUser(voteUser);
     }
 
+    @Override
     public VoteQueUsr getUserByUserId(Long userID) {
 	VoteQueUsr voteQueUsr = voteUserDAO.getUserByUserId(userID);
 	return voteQueUsr;
     }
 
-    public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
-    }
-
+    @Override
     public List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long voteQueContentId) {
 	return voteUsrAttemptDAO.getStandardAttemptsByQuestionUid(voteQueContentId);
     }
 
-    public int getSessionEntriesCount(final Long voteSessionUid) {
-	return voteUsrAttemptDAO.getSessionEntriesCount(voteSessionUid);
-    }
-
+    @Override
     public VoteUsrAttempt getAttemptByUID(Long uid) {
 	return voteUsrAttemptDAO.getAttemptByUID(uid);
     }
 
-    public int getAttemptsForQuestionContent(final Long voteQueContentId) {
-	return voteUsrAttemptDAO.getAttemptsForQuestionContent(voteQueContentId);
-    }
-
-    public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid) {
-	return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
-    }
-
-    public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long voteQueContentId, final Long toolSessionUid) {
-	return voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(queUsrId, voteQueContentId,
-		toolSessionUid);
-    }
-
+    @Override
     public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
 	voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
     }
 
+    @Override
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
 	voteUsrAttemptDAO.removeAttemptsForUserandSession(queUsrId, sessionUid);
     }
 
+    @Override
     public List<VoteUsrAttempt> getAttemptsForUser(final Long userUid) {
 	return voteUsrAttemptDAO.getAttemptsForUser(userUid);
     }
+    
+    @Override
+    public void createAttempt(VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,
+	    VoteSession voteSession, Long voteContentUid) {
 
+	Date attempTime = new Date(System.currentTimeMillis());
+	String timeZone = TimeZone.getDefault().getDisplayName();
+
+	//in case of free entry
+	if (mapGeneralCheckedOptionsContent.size() == 0) {
+	    VoteQueContent defaultContentFirstQuestion = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
+	    createAttempt(defaultContentFirstQuestion, voteQueUsr, attempTime, timeZone, userEntry, voteSession);
+	    
+	//if the question is selected
+	} else if (voteContentUid != null) {
+	    Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
+	    while (itCheckedMap.hasNext()) {
+		Map.Entry checkedPairs = (Map.Entry) itCheckedMap.next();
+		Long questionDisplayOrder = new Long(checkedPairs.getKey().toString());
+
+		VoteQueContent question = getQuestionByDisplayOrder(questionDisplayOrder, voteContentUid);
+		createAttempt(question, voteQueUsr, attempTime, timeZone, userEntry, voteSession);
+	    }
+	}
+
+    }
+    
+    private void createAttempt(VoteQueContent question, VoteQueUsr user, Date attempTime, String timeZone,
+	    String userEntry, VoteSession session) {
+
+	if (question != null) {
+	    VoteUsrAttempt existingAttempt = voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(
+		    user.getQueUsrId(), question.getVoteContentId(), session.getUid());
+
+	    if (existingAttempt != null) {
+		existingAttempt.setUserEntry(userEntry);
+		existingAttempt.setAttemptTime(attempTime);
+		existingAttempt.setTimeZone(timeZone);
+		updateVoteUsrAttempt(existingAttempt);
+	    } else {
+		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, question, user, userEntry,
+			true);
+		voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
+	    }
+	}
+    }
+
+    @Override
     public int getUserEnteredVotesCountForContent(final Long voteContentUid) {
 	return voteUsrAttemptDAO.getUserEnteredVotesCountForContent(voteContentUid);
     }
 
+    @Override
     public VoteQueContent getQuestionByUid(Long uid) {
 	return voteQueContentDAO.getQuestionByUid(uid);
     }
 
+    @Override
     public void removeVoteQueContent(VoteQueContent voteQueContent) {
 	voteQueContentDAO.removeQuestion(voteQueContent);
     }
 
+    @Override
     public VoteSession getSessionBySessionId(Long voteSessionId) {
 	return voteSessionDAO.getSessionBySessionId(voteSessionId);
     }
 
-    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) {
-	return voteUserDAO.getCompletedVoteUserBySessionUid(voteSessionUid);
-    }
-
-    public List getVoteUserBySessionUid(final Long voteSessionUid) {
-	return voteUserDAO.getVoteUserBySessionUid(voteSessionUid);
-    }
-
-    public List getSessionNamesFromContent(VoteContent voteContent) {
-	return voteSessionDAO.getSessionNamesFromContent(voteContent);
-    }
-
+    @Override
     public void updateVote(VoteContent vote) {
 	voteContentDAO.updateVoteContent(vote);
     }
 
-    public void updateVoteSession(VoteSession voteSession) {
-	voteSessionDAO.updateVoteSession(voteSession);
-    }
-
-    public void deleteVote(VoteContent vote) {
-	voteContentDAO.removeVote(vote);
-    }
-
-    public void deleteVoteById(Long voteId) {
-	voteContentDAO.removeVoteById(voteId);
-    }
-
     public int countSessionComplete() {
 	return voteSessionDAO.countSessionComplete();
-    }
-
-    public void deleteVoteSession(VoteSession voteSession) {
-	voteSessionDAO.removeVoteSession(voteSession);
-    }
-
-    public void removeAttempt(VoteUsrAttempt attempt) {
-	voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
     }
 
     /**
@@ -796,37 +1034,19 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
 
-    public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) {
-	try {
-	    voteUserDAO.removeVoteUser(voteQueUsr);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is removing" + " the user: "
-		    + e.getMessage(), e);
-	}
-    }
-
+    @Override
     public void saveVoteContent(VoteContent vote) {
 	voteContentDAO.saveVoteContent(vote);
     }
 
+    @Override
     public List<Long> getSessionsFromContent(VoteContent voteContent) {
 	return voteSessionDAO.getSessionsFromContent(voteContent);
     }
 
+    @Override
     public int getTotalNumberOfUsers() {
 	return voteUserDAO.getTotalNumberOfUsers();
-    }
-
-    public User getCurrentUserData(String username) {
-	/**
-	 * this will return null if the username not found
-	 */
-	User user = userManagementService.getUserByLogin(username);
-	if (user == null) {
-	    VoteServicePOJO.logger.error("No user with the username: " + username + " exists.");
-	    throw new VoteApplicationException("No user with that username exists.");
-	}
-	return user;
     }
 
     @Override
@@ -984,7 +1204,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    Iterator sessionUsersAttemptsIterator = voteQueUsr.getVoteUsrAttempts().iterator();
 		    while (sessionUsersAttemptsIterator.hasNext()) {
 			VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) sessionUsersAttemptsIterator.next();
-			removeAttempt(voteUsrAttempt);
+			voteUsrAttemptDAO.removeVoteUsrAttempt(voteUsrAttempt);
 		    }
 		}
 	    }
@@ -1200,12 +1420,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	return contentId;
-    }
-
-    @Override
-    public VoteQueContent getDefaultVoteContentFirstQuestion() {
-	VoteQueContent voteQueContent = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
-	return voteQueContent;
     }
     
     @Override
@@ -1613,10 +1827,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
-	this.lamsCoreToolService = lamsCoreToolService;
     }
 
     public void removeQuestionsFromCache(VoteContent voteContent) {

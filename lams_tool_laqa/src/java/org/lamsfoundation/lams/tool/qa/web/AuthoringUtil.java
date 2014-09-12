@@ -56,104 +56,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class AuthoringUtil implements QaAppConstants {
 
-    protected static List<QaQuestionDTO> swapQuestions(List<QaQuestionDTO> questionDTOs, String questionIndex,
-	    String direction, Set<QaCondition> conditions) {
 
-	int intQuestionIndex = new Integer(questionIndex).intValue();
-	int intOriginalQuestionIndex = intQuestionIndex;
-
-	int replacedQuestionIndex = 0;
-	if (direction.equals("down")) {
-	    // direction down
-	    replacedQuestionIndex = ++intQuestionIndex;
-	} else {
-	    // direction up
-	    replacedQuestionIndex = --intQuestionIndex;
-	}
-
-	QaQuestionDTO mainQuestion = getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
-
-	QaQuestionDTO replacedQuestion = getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
-
-	List<QaQuestionDTO> newQuestionDtos = new LinkedList<QaQuestionDTO>();
-
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO questionDTO = iter.next();
-	    QaQuestionDTO tempQuestion = null;
-
-	    if (!questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
-		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// normal copy
-		tempQuestion = questionDTO;
-
-	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
-		// move type 1
-		tempQuestion = replacedQuestion;
-
-	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// move type 1
-		tempQuestion = mainQuestion;
-	    }
-
-	    newQuestionDtos.add(tempQuestion);
-	}
-
-	// references in conditions also need to be changed
-	if (conditions != null) {
-	    for (QaCondition condition : conditions) {
-		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<QaQuestionDTO>(
-			new QaQuestionContentDTOComparator());
-		for (QaQuestionDTO dto : (List<QaQuestionDTO>) newQuestionDtos) {
-		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
-			newQuestionDTOSet.add(dto);
-		    }
-		}
-		condition.temporaryQuestionDTOSet = newQuestionDTOSet;
-	    }
-	}
-
-	return newQuestionDtos;
-    }
-
-    private static QaQuestionDTO getQuestionAtDisplayOrder(List<QaQuestionDTO> questionDTOs,
-	    int intOriginalQuestionIndex) {
-
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = iter.next();
-	    if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionDTO.getDisplayOrder())) {
-		return qaQuestionDTO;
-	    }
-	}
-	return null;
-    }
-
-    protected static List<QaQuestionDTO> reorderQuestionDTOs(List<QaQuestionDTO> questionDTOs) {
-	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
-
-	int queIndex = 0;
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = iter.next();
-
-	    String question = qaQuestionDTO.getQuestion();
-	    String feedback = qaQuestionDTO.getFeedback();
-	    boolean required = qaQuestionDTO.isRequired();
-
-	    if (question != null && !question.equals("")) {
-		++queIndex;
-
-		qaQuestionDTO.setQuestion(question);
-		qaQuestionDTO.setDisplayOrder(new Integer(queIndex).toString());
-		qaQuestionDTO.setFeedback(feedback);
-		qaQuestionDTO.setRequired(required);
-
-		listFinalQuestionDTO.add(qaQuestionDTO);
-	    }
-	}
-	return listFinalQuestionDTO;
-    }
 
     protected static List<QaQuestionDTO> reorderUpdateQuestionDTOs(List<QaQuestionDTO> questionDTOs,
 	    QaQuestionDTO qaQuestionContentDTONew, String editableQuestionIndex) {
@@ -193,8 +96,7 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     public static QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, IQaService qaService,
-	    HttpServletRequest request, QaContent qaContent, String strToolContentID,
-	    Set<QaCondition> conditions) {
+	    HttpServletRequest request, QaContent qaContent, String strToolContentID, Set<QaCondition> conditions) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
@@ -314,8 +216,8 @@ public class AuthoringUtil implements QaAppConstants {
 	}
 	qaContent.setConditions(conditions);
 	qaService.updateQaContent(qaContent);
-	
-	//persist questions
+
+	// persist questions
 	int displayOrder = 0;
 	for (QaQuestionDTO questionDTO : questionDTOs) {
 
@@ -336,8 +238,8 @@ public class AuthoringUtil implements QaAppConstants {
 			questionDTO.isRequired(), qaContent);
 		qaContent.getQaQueContents().add(question);
 		question.setQaContent(qaContent);
-		
-	    // in case question exists already		
+
+		// in case question exists already
 	    } else {
 
 		question.setQuestion(questionText);
@@ -345,10 +247,10 @@ public class AuthoringUtil implements QaAppConstants {
 		question.setDisplayOrder(displayOrder);
 		question.setRequired(questionDTO.isRequired());
 	    }
-	    
+
 	    qaService.saveOrUpdateQuestion(question);
 	}
-	
+
 	return qaContent;
     }
 

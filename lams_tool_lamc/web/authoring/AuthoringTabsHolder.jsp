@@ -84,8 +84,6 @@
         }
 	</script>
 </lams:head>
-
-
 <body onLoad="init();" class="stripes">
 
 <div id="page">
@@ -124,7 +122,6 @@
 	<div id="footer"></div>
 
 </div>
-
 
 </body>
 </lams:html>

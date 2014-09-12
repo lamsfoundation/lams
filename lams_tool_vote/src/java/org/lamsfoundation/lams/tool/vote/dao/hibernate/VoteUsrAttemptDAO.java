@@ -153,18 +153,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     }
 
     @Override
-    public int getAttemptsForQuestionContent(final Long questionUid) {
-	List list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-		.setLong("voteQueContentId", questionUid.longValue()).list();
-
-	if ((list != null) && (list.size() > 0)) {
-	    return list.size();
-	}
-
-	return 0;
-    }
-
-    @Override
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long sessionUid) {
 	List list = getAttemptsForQuestionContentAndSessionUid(questionUid, sessionUid);
 	return list.size();

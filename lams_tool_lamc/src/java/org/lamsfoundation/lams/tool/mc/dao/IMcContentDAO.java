@@ -81,16 +81,6 @@ public interface IMcContentDAO {
 
     /**
      * <p>
-     * Delete the given instance of McContent
-     * </p>
-     * 
-     * @param mcContent
-     *            The instance of McContent to delete.
-     */
-    public void removeMc(McContent mcContent);
-
-    /**
-     * <p>
      * Delete the given instance of McContent with the given tool content id <code>mcContentId</code>
      * 
      * @param mcContentId

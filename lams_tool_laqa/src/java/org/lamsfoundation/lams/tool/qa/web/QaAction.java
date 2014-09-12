@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,7 @@ import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -129,7 +131,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    if (mode.isTeacher()) {
 		Set<QaQueContent> oldQuestions = qaContent.getQaQueContents();
 		qaService.removeQuestionsFromCache(qaContent);
-		QaUtils.setDefineLater(request, false, strToolContentID, qaService);
+		qaService.setDefineLater(strToolContentID, false);
 		    
 		// recalculate User Answers
 		qaService.recalculateUserAnswers(qaContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
@@ -616,9 +618,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
-	questionDTOs = AuthoringUtil.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
+	questionDTOs = swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
 
-	questionDTOs = AuthoringUtil.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -678,9 +680,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
-	questionDTOs = AuthoringUtil.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
+	questionDTOs = swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
 
-	questionDTOs = AuthoringUtil.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -723,6 +725,105 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
+    }
+    
+    private static List<QaQuestionDTO> swapQuestions(List<QaQuestionDTO> questionDTOs, String questionIndex,
+	    String direction, Set<QaCondition> conditions) {
+
+	int intQuestionIndex = new Integer(questionIndex).intValue();
+	int intOriginalQuestionIndex = intQuestionIndex;
+
+	int replacedQuestionIndex = 0;
+	if (direction.equals("down")) {
+	    // direction down
+	    replacedQuestionIndex = ++intQuestionIndex;
+	} else {
+	    // direction up
+	    replacedQuestionIndex = --intQuestionIndex;
+	}
+
+	QaQuestionDTO mainQuestion = getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
+
+	QaQuestionDTO replacedQuestion = getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+
+	List<QaQuestionDTO> newQuestionDtos = new LinkedList<QaQuestionDTO>();
+
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO questionDTO = iter.next();
+	    QaQuestionDTO tempQuestion = null;
+
+	    if (!questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
+		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+		// normal copy
+		tempQuestion = questionDTO;
+
+	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
+		// move type 1
+		tempQuestion = replacedQuestion;
+
+	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+		// move type 1
+		tempQuestion = mainQuestion;
+	    }
+
+	    newQuestionDtos.add(tempQuestion);
+	}
+
+	// references in conditions also need to be changed
+	if (conditions != null) {
+	    for (QaCondition condition : conditions) {
+		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<QaQuestionDTO>(
+			new QaQuestionContentDTOComparator());
+		for (QaQuestionDTO dto : (List<QaQuestionDTO>) newQuestionDtos) {
+		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
+			newQuestionDTOSet.add(dto);
+		    }
+		}
+		condition.temporaryQuestionDTOSet = newQuestionDTOSet;
+	    }
+	}
+
+	return newQuestionDtos;
+    }
+    
+    private static QaQuestionDTO getQuestionAtDisplayOrder(List<QaQuestionDTO> questionDTOs,
+	    int intOriginalQuestionIndex) {
+
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO qaQuestionDTO = iter.next();
+	    if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionDTO.getDisplayOrder())) {
+		return qaQuestionDTO;
+	    }
+	}
+	return null;
+    }
+    
+    private static List<QaQuestionDTO> reorderQuestionDTOs(List<QaQuestionDTO> questionDTOs) {
+	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<QaQuestionDTO>();
+
+	int queIndex = 0;
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
+	while (iter.hasNext()) {
+	    QaQuestionDTO qaQuestionDTO = iter.next();
+
+	    String question = qaQuestionDTO.getQuestion();
+	    String feedback = qaQuestionDTO.getFeedback();
+	    boolean required = qaQuestionDTO.isRequired();
+
+	    if (question != null && !question.equals("")) {
+		++queIndex;
+
+		qaQuestionDTO.setQuestion(question);
+		qaQuestionDTO.setDisplayOrder(new Integer(queIndex).toString());
+		qaQuestionDTO.setFeedback(feedback);
+		qaQuestionDTO.setRequired(required);
+
+		listFinalQuestionDTO.add(qaQuestionDTO);
+	    }
+	}
+	return listFinalQuestionDTO;
     }
 
     /**

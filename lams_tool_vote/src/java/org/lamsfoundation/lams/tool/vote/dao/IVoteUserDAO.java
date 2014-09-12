@@ -28,36 +28,30 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 /**
+ * <p>
+ * Interface that defines the contract for VoteQueUsr access
+ * </p>
+ * 
  * @author Ozgur Demirtas
  * 
- *         <p>
- *         Interface that defines the contract for VoteQueUsr access
- *         </p>
  */
 public interface IVoteUserDAO {
-    public VoteQueUsr getVoteUserByUID(Long uid);
 
-    public VoteQueUsr getUserByUserId(Long userId);
+    VoteQueUsr getUserByUserId(Long userId);
 
-    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
+    VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
 
-    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
+    int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
 
-    public List getVoteUserBySessionUid(final Long voteSessionUid);
+    VoteQueUsr getVoteQueUsrById(long voteQueUsrId);
 
-    public VoteQueUsr getVoteQueUsrById(long voteQueUsrId);
+    void saveVoteUser(VoteQueUsr voteUser);
 
-    public void saveVoteUser(VoteQueUsr voteUser);
+    void updateVoteUser(VoteQueUsr voteUser);
 
-    public void updateVoteUser(VoteQueUsr voteUser);
+    List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession);
 
-    public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession);
+    void removeVoteUser(VoteQueUsr voteUser);
 
-    public void removeVoteUserById(Long userId);
-
-    public void removeVoteUser(VoteQueUsr voteUser);
-
-    public int getNumberOfUsers(VoteSession voteSession);
-
-    public int getTotalNumberOfUsers();
+    int getTotalNumberOfUsers();
 }

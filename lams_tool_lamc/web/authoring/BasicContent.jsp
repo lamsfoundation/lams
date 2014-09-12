@@ -64,7 +64,7 @@
     	form.submit();
     }
     
-    function exportQTI(){
+    function exportQTI() {
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("title")[0].value);
     	frame.src = '<html:rewrite page="/authoring.do?dispatch=exportQTI&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}" />'

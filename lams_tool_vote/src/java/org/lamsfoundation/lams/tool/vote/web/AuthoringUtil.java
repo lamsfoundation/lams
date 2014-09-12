@@ -303,41 +303,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	return voteContent;
     }
 
-    protected static VoteContent createQuestions(List<VoteQuestionDTO> questionDTOs, IVoteService voteService,
-	    VoteContent voteContent) {
 
-	int displayOrder = 0;
-	for (VoteQuestionDTO questionDTO : questionDTOs) {
-	    String currentQuestionText = questionDTO.getQuestion();
-
-	    // skip empty questions
-	    if (currentQuestionText.isEmpty()) {
-		continue;
-	    }
-
-	    ++displayOrder;
-
-	    VoteQueContent question = voteService.getVoteQueContentByUID(questionDTO.getUid());
-
-	    // in case question doesn't exist
-	    if (question == null) {
-
-		question = new VoteQueContent(currentQuestionText, displayOrder, voteContent);
-		// adding a new question to content
-		voteContent.getVoteQueContents().add(question);
-		question.setVoteContent(voteContent);
-
-		// in case question exists already
-	    } else {
-
-		question.setQuestion(currentQuestionText);
-		question.setDisplayOrder(displayOrder);
-	    }
-
-	    voteService.saveOrUpdateVoteQueContent(question);
-	}
-
-	return voteContent;
-    }
 
 }

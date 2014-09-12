@@ -35,68 +35,15 @@
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
-	
-		function submitMethod(actionMethod) {
-			var submit = true;
-			if (actionMethod != 'getPreviousQuestion') {
-				jQuery(".text-area").each(function() {
-					if (jQuery.trim($(this).val()) == "") {
-						if (confirm("<fmt:message key="warning.empty.answers" />")) {
-							doSubmit(actionMethod);
-							return false;
-						} else {
-							this.focus();
-							//return submit = false;
-							return false;
-						}
-					}
-				});
-			}
-			if (submit) {
-				doSubmit(actionMethod);
-			}
-		}
-		
-		function doSubmit(actionMethod) {
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
-		}
-		
-		if (${!hasEditRight && mode != "teacher"}) {
-			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
-		}
-		
-		function checkLeaderProgress() {
-			
-	        $.ajax({
-	        	async: false,
-	            url: '<c:url value="/learning.do"/>',
-	            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
-	            dataType: 'json',
-	            type: 'post',
-	            success: function (json) {
-	            	if (json.isLeaderResponseFinalized) {
-	            		location.reload();
-	            	}
-	            }
-	       	});
-		}
+
 		
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
 				
-			var interval = "30000"; // = 30 seconds
+			var interval = "3000"; // = 30 seconds
 			window.setInterval(
 				function(){
-					//fire onchange event for lams:textarea
-					$("[id$=__lamstextarea]").change();
-					//ajax form submit
-					$('#learningForm').ajaxSubmit({
-						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
-			               success: function() {
 			               	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
-			               }
-					});
 		       	}, interval
 		   );
 		}
@@ -114,22 +61,6 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-	
-		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<div class="info">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
-				</fmt:message>
-			</div>
-		</c:if>	
-				
-		<c:if test="${isLeadershipEnabled}">
-			<h4>
-				<fmt:message key="label.group.leader" >
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
-				</fmt:message>
-			</h4>
-		</c:if>
 		
 
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"  styleId="learningForm">
@@ -147,52 +78,39 @@
 			<html:hidden property="httpSessionID" />
 			<html:hidden property="questionIndex" />
 			<html:hidden property="totalQuestionCount" />
-
-			<logic:messagesPresent>
-				<p class="warning">
-				  	<html:messages id="error" message="false"> 
-            			<c:out value="${error}" escapeXml="false"/><BR> 
-         			</html:messages> 
-				</p>
-			</logic:messagesPresent>
 			
 			<p>
 				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 			</p>
 			
-			<c:choose>
-				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
-
-					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-						<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
-							<p><fmt:message key="label.feedback.seq" />
-								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-								<fmt:message key="label.questions.simple" />
+			<ul data-role="listview"  >
+			<c:forEach var="dto" varStatus="status"	items="${generalLearnerFlowDTO.mapAnswers}">
+			
+				<li>
+							<p class="space-top">
+							 	asdasdasdasd
 							</p>
-						</c:if>
-					</c:if>
-
-					<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
-						<p>
-							<fmt:message key="label.questions.remaining" />
-							<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-						</p>
-					</c:if>
-
-					<jsp:include page="/learning/mobile/SequentialAnswersContent.jsp" />
-				</c:when>
-
-				<c:otherwise>
-					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-						<fmt:message key="label.feedback.combined" /> &nbsp <c:out
-							value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-						<fmt:message key="label.questions.simple" />
-					</c:if>						
-					<jsp:include page="/learning/mobile/CombinedAnswersContent.jsp" />
-				</c:otherwise>
-			</c:choose>
-
+								
+							<p class="small-space-top">
+								<strong><fmt:message key="label.answer" /></strong>
+							</p>
+								
+							<div class="small-space-bottom">
+										<lams:textarea name="answeraaa" rows="5" cols="60" class="text-area" ><c:out value='aaaa' escapeXml='false' /></lams:textarea>
+			
+			
+							</div>
+				</li>
+			</c:forEach>
+			</ul>
 		</html:form>
+			
+			</div><!-- /page div -->
+			
+			<div data-role="footer" data-theme="b">
+				<h2>&nbsp;</h2>
+			</div><!-- /footer -->
+
 
 </div>
 </body>

@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.poi.ss.formula.functions.Rate;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 

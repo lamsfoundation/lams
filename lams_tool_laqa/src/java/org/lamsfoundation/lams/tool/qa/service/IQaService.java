@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -76,6 +77,8 @@ public interface IQaService {
      * @param leader
      */
     void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader);
+    
+    void setDefineLater(String strToolContentID, boolean value);
 
     /**
      * Get users by given toolSessionID.
@@ -96,10 +99,6 @@ public interface IQaService {
     QaContent getQaContent(long toolContentId);
 
     void saveOrUpdateQaContent(QaContent qa);
-
-    int getTotalNumberOfUsers(QaContent qa);
-
-    int countSessionComplete(QaContent qa);
 
     void updateUser(QaQueUsr qaQueUsr);
     
@@ -154,11 +153,7 @@ public interface IQaService {
      */
     QaSession getSessionById(long qaSessionId);
 
-    void createSession(QaSession qaSession);
-
     void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
-
-    List getSessionsFromContent(QaContent qaContent);
 
     QaQueUsr createUser(Long toolSessionID);
 
@@ -176,8 +171,6 @@ public interface IQaService {
 
     List getAllQuestionEntries(final Long uid);
 
-    List getUserBySessionOnly(final QaSession qaSession);
-
     void recalculateUserAnswers(QaContent content, Set<QaQueContent> oldQuestions, List<QaQuestionDTO> questionDTOs,
 	    List<QaQuestionDTO> deletedQuestions);
 
@@ -189,6 +182,13 @@ public interface IQaService {
      */
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
+    /**
+     * checks the paramter content in the user responses table
+     * 
+     * @param qa
+     * @return boolean
+     * @throws QaApplicationException
+     */
     boolean isStudentActivityOccurredGlobal(QaContent qaContent);
 
     /**

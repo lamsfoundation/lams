@@ -54,8 +54,6 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     private static final String COUNT_SESSION_COMPLETE = "from voteSession in class VoteSession where voteSession.sessionStatus='COMPLETE'";
 
-    private static final String GET_SESSIONNAMES_FROM_CONTENT = "select votes.session_name from VoteSession votes where votes.voteContent=:voteContent order by votes.voteSessionId";
-
     public VoteSession getVoteSessionByUID(Long sessionUid) {
 	return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, sessionUid);
     }
@@ -143,9 +141,5 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     @SuppressWarnings("unchecked")
     public List<Long> getSessionsFromContent(VoteContent voteContent) {
 	return (List<Long>) (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "voteContent", voteContent));
-    }
-
-    public List getSessionNamesFromContent(VoteContent voteContent) {
-	return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT, "voteContent", voteContent));
     }
 }

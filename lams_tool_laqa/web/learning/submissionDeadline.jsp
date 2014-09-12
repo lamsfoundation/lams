@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
@@ -19,8 +18,7 @@
 	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) 
-		{
+		function submitLearningMethod(actionMethod) {
 			if (actionMethod == 'endLearning') {
 				document.getElementById("finishButton").disabled = true;
 			}
@@ -28,8 +26,7 @@
 			document.QaLearningForm.submit();
 		}
 		
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			submitLearningMethod(actionMethod);
 		}
 	</script>
@@ -90,11 +87,3 @@
 	<div id="footer"></div>
 </body>
 </lams:html>
-
-
-
-
-
-
-
-

@@ -417,20 +417,18 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteService.removeAttemptsForUserandSession(user.getUid(), session.getUid());
 
 	/* to minimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent structure */
-	Map<String, String> mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent,
+	Map<String, String> mapGeneralCheckedOptionsContent = voteService.buildQuestionMap(voteContent,
 		voteDisplayOrderIds);
 
 	if (mapGeneralCheckedOptionsContent.size() > 0) {
-	    LearningUtil.createAttempt(voteService, user, mapGeneralCheckedOptionsContent, "", session,
-		    voteContentUid);
+	    voteService.createAttempt(user, mapGeneralCheckedOptionsContent, "", session, voteContentUid);
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() == 0 && (userEntryAvailable == true))) {
 	    Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
-		LearningUtil.createAttempt(voteService, user, mapLeanerCheckedOptionsContent, userEntry,
-			session, voteContentUid);
+		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
 	    }
 	}
 
@@ -438,8 +436,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
-		LearningUtil.createAttempt(voteService, user, mapLeanerCheckedOptionsContent, userEntry,
-			session, voteContentUid);
+		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
 	    }
 	}
 
@@ -495,7 +492,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
 
-	Map<String, String> mapQuestionsContent = LearningUtil.buildQuestionMap(request, voteService, voteContent, null);
+	Map<String, String> mapQuestionsContent = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 
 	Map mapGeneralCheckedOptionsContent = new TreeMap(new VoteComparator());

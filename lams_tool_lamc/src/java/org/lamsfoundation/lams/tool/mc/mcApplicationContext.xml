@@ -98,6 +98,7 @@
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="setDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>

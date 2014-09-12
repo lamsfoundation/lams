@@ -29,11 +29,12 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 /**
+ * <p>
+ * Interface that defines the contract for VoteSession access
+ * </p>
+ * 
  * @author Ozgur Demirtas
  * 
- *         <p>
- *         Interface that defines the contract for VoteSession access
- *         </p>
  */
 public interface IVoteSessionDAO {
     VoteSession getVoteSessionByUID(Long uid);
@@ -59,7 +60,5 @@ public interface IVoteSessionDAO {
     void addVoteUsers(Long voteSessionId, VoteQueUsr user);
 
     List<Long> getSessionsFromContent(VoteContent voteContent);
-
-    List getSessionNamesFromContent(VoteContent voteContent);
 
 }

@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -205,6 +206,17 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    }
 	}
     }
+    
+    @Override
+    public void setDefineLater(String strToolContentID, boolean value) {
+
+	QaContent qaContent = getQaContent(new Long(strToolContentID).longValue());
+
+	if (qaContent != null) {
+	    qaContent.setDefineLater(value);
+	    updateQaContent(qaContent);
+	}
+    }
 
     @Override
     public List<QaQueUsr> getUsersBySessionId(Long toolSessionID) {
@@ -212,22 +224,27 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaQueUsrDAO.getUserBySessionOnly(session);
     }
 
+    @Override
     public void createQaContent(QaContent qaContent) {
 	qaDAO.saveQa(qaContent);
     }
 
+    @Override
     public QaContent getQaContent(long toolContentID) {
 	return qaDAO.getQaByContentId(toolContentID);
     }
 
+    @Override
     public void saveOrUpdateQaContent(QaContent qa) {
 	qaDAO.saveOrUpdateQa(qa);
     }
 
+    @Override
     public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid) {
 	return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
     }
     
+    @Override
     public QaQueContent getQuestionByUid(Long questionUid) {
 	if (questionUid == null) {
 	    return null;
@@ -236,20 +253,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaQuestionDAO.getQuestionByUid(questionUid);
     }
 
+    @Override
     public void saveOrUpdateQuestion(QaQueContent question) {
 	qaQuestionDAO.saveOrUpdateQaQueContent(question);
     }
 
+    @Override
     public void createQuestion(QaQueContent question) {
 	qaQuestionDAO.createQueContent(question);
-    }
-
-    public void createSession(QaSession qaSession) {
-	qaSessionDAO.createSession(qaSession);
-    }
-
-    public List getSessionsFromContent(QaContent qaContent) {
-	return qaSessionDAO.getSessionsFromContent(qaContent);
     }
 
     public QaQueUsr createUser(Long toolSessionID) {
@@ -307,10 +318,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaResponseRatingDAO.getAverageRatingDTOByUserAndContentId(userUid, contentId);
     }
 
+    @Override
     public void updateUserResponse(QaUsrResp resp) {
 	qaUsrRespDAO.updateUserResponse(resp);
     }
 
+    @Override
     public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -337,38 +350,37 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List getUserBySessionOnly(final QaSession qaSession) {
-	return qaQueUsrDAO.getUserBySessionOnly(qaSession);
-    }
-
+    @Override
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	qaUsrRespDAO.createUserResponse(qaUsrResp);
     }
 
+    @Override
     public void updateUser(QaQueUsr qaQueUsr) {
 	qaQueUsrDAO.updateUsr(qaQueUsr);
     }
 
+    @Override
     public QaUsrResp getResponseById(Long responseId) {
 	return qaUsrRespDAO.getResponseById(responseId);
     }
 
-    public int countSessionComplete(QaContent qa) {
-	return qaSessionDAO.countSessionComplete(qa);
-    }
-
+    @Override
     public QaSession getSessionById(long qaSessionId) {
 	return qaSessionDAO.getQaSessionById(qaSessionId);
     }
 
+    @Override
     public void updateQaContent(QaContent qa) {
 	qaDAO.updateQa(qa);
     }
 
+    @Override
     public void updateSession(QaSession qaSession) {
 	qaSessionDAO.UpdateQaSession(qaSession);
     }
 
+    @Override
     public void removeUserResponse(QaUsrResp resp) {
 	auditService.logChange(QaAppConstants.MY_SIGNATURE, resp.getQaQueUser().getQueUsrId(), resp.getQaQueUser()
 		.getUsername(), resp.getAnswer(), null);
@@ -397,29 +409,22 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public int getTotalNumberOfUsers(QaContent qa) {
-	return qaQueUsrDAO.getTotalNumberOfUsers(qa);
-    }
-
+    @Override
     public List<QaQueContent> getAllQuestionEntries(final Long uid) {
 	return qaQuestionDAO.getAllQuestionEntries(uid.longValue());
     }
 
+    @Override
     public List<QaQueContent> getAllQuestionEntriesSorted(final long contentUid) {
 	return qaQuestionDAO.getAllQuestionEntriesSorted(contentUid);
     }
 
+    @Override
     public void removeQuestion(QaQueContent question) {
 	qaQuestionDAO.removeQaQueContent(question);
     }
 
-    /**
-     * checks the paramter content in the user responses table
-     * 
-     * @param qa
-     * @return boolean
-     * @throws QaApplicationException
-     */
+    @Override
     public boolean isStudentActivityOccurredGlobal(QaContent qaContent) {
 	int countResponses = 0;
 	if (qaContent != null) {
@@ -609,6 +614,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
+    @Override
     public AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating) {
 	QaQueUsr imageGalleryUser = this.getUserByIdAndSession(userId, toolSessionID);
 	ResponseRating responseRating = qaResponseRatingDAO.getRatingByResponseAndUser(responseId, userId);
@@ -627,10 +633,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
     }
 
+    @Override
     public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
 	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
     }
 
+    @Override
     public List<ReflectionDTO> getReflectList(QaContent content, String userID) {
 
 	// reflection data for all sessions
@@ -905,15 +913,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
     }
 
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
-     * @throws ToolException
-     *             if any other error occurs
-     */
-
+    @Override
     public void exportToolContent(Long toolContentID, String rootPath) {
 	QaContent toolContentObj = qaDAO.getQaByContentId(toolContentID);
 	if (toolContentObj == null) {
@@ -946,12 +946,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *             if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
@@ -981,14 +976,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentId);
@@ -1010,11 +998,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaDAO.getQaByContentId(toolContentId).isDefineLater();
     }
 
-    /**
-     * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
-     * 
-     * gets called only in the Learner mode. All the learners in the same group have the same toolSessionId.
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException {
 
 	if (toolSessionId == null) {
@@ -1040,6 +1024,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    QaServicePOJO.logger.error("toolSessionId is null");
@@ -1067,13 +1052,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Complete the tool session.
-     * 
-     * Part of the ToolSessionManager contract. Called by controller service to force complete the qa session, or by the
-     * web front end to complete the qa session
-     * 
-     */
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 
 	if (toolSessionId == null) {
@@ -1102,7 +1081,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     /**
      * ToolSessionManager CONTRACT
-     * 
      */
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
@@ -1110,20 +1088,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     /**
      * ToolSessionManager CONTRACT
-     * 
      */
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
-
 	throw new ToolException("not yet implemented");
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
@@ -1360,9 +1331,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
+    @Override
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -1431,6 +1400,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	this.qaWizardDAO = qaWizardDAO;
     }
 
+    @Override
     public QaContent getQaContentBySessionId(Long sessionId) {
 	QaSession session = qaSessionDAO.getQaSessionById(sessionId);
 	// to skip CGLib problem
@@ -1439,9 +1409,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return qaContent;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String createConditionName(Collection<QaCondition> existingConditions) {
 	String uniqueNumber = null;
 	do {
@@ -1456,95 +1424,69 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return getQaOutputFactory().buildUserAnswersConditionName(uniqueNumber);
     }
 
+    @Override
     public void deleteCondition(QaCondition condition) {
 	if (condition != null && condition.getConditionId() != null) {
 	    qaDAO.deleteCondition(condition);
 	}
     }
 
+    @Override
     public QaCondition createDefaultComplexCondition(QaContent qaContent) {
 	return getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent);
     }
 
-    /**
-     * Gets the qa config item with the given key
-     * 
-     * @param configKey
-     * @return
-     */
+    @Override
     public QaConfigItem getConfigItem(String configKey) {
 	return qaConfigItemDAO.getConfigItemByKey(configKey);
     }
 
-    /**
-     * Saves or updates a qa config item
-     * 
-     * @param configItem
-     */
+    @Override
     public void saveOrUpdateConfigItem(QaConfigItem configItem) {
 	qaConfigItemDAO.saveOrUpdate(configItem);
     }
 
-    /**
-     * Gets the set of wizard categories from the database
-     * 
-     * @return
-     */
+    @Override
     public SortedSet<QaWizardCategory> getWizardCategories() {
 	return qaWizardDAO.getWizardCategories();
     }
 
-    /**
-     * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
-     * 
-     * @param categories
-     */
+    @Override
     public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories) {
 	qaWizardDAO.saveOrUpdateCategories(categories);
     }
 
-    /**
-     * Deletes a wizard category from the db
-     * 
-     * @param uid
-     */
+    @Override
     public void deleteWizardCategoryByUID(Long uid) {
 	qaWizardDAO.deleteWizardCategoryByUID(uid);
     }
 
-    /**
-     * Deletes a wizard cognitive skill from the db
-     * 
-     * @param uid
-     */
+    @Override
     public void deleteWizardSkillByUID(Long uid) {
 	qaWizardDAO.deleteWizardSkillByUID(uid);
     }
 
-    /**
-     * Deletes a wizard question from the db
-     * 
-     * @param uid
-     */
+    @Override
     public void deleteWizardQuestionByUID(Long uid) {
 	qaWizardDAO.deleteWizardQuestionByUID(uid);
     }
 
-    /**
-     * Deletes all categories, sub skills and sub questions
-     */
+    @Override
     public void deleteAllWizardCategories() {
 	qaWizardDAO.deleteAllWizardCategories();
     }
 
+    @Override
     public void removeQuestionsFromCache(QaContent qaContent) {
 	qaDAO.removeQuestionsFromCache(qaContent);
     }
     
+    @Override
     public void removeQaContentFromCache(QaContent qaContent) {
 	qaDAO.removeQaContentFromCache(qaContent);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getQaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

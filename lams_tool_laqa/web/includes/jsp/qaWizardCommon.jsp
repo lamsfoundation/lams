@@ -1,10 +1,8 @@
 <!-- Javascript functions used for q&a wizard, made into jsp for language tags  -->
 <script language="JavaScript" type="text/JavaScript">
-<!--
 	
 	// Add a category to the categoryArray
-	function addCategory(title, uid, index)
-	{
+	function addCategory(title, uid, index) {
 		var cat = new Object();
 		cat.title = title;
 		cat.uid = uid;
@@ -13,8 +11,7 @@
 	}
 	
 	// Adds a skill object to the skill array (containted in the category array)
-	function addSkill(title, uid, catIndex, index)
-	{
+	function addSkill(title, uid, catIndex, index) {
 		var skill = new Object();
 		skill.title = title;
 		skill.uid = uid;
@@ -23,8 +20,7 @@
 	}
 	
 	// Adds a question object to the question array, (contained within the skill array0
-	function addQuestion(question, uid, catIndex, skillIndex, index)
-	{
+	function addQuestion(question, uid, catIndex, skillIndex, index) {
 		var questionObj = new Object();
 		questionObj.uid = uid;
 		questionObj.question = question;
@@ -37,8 +33,7 @@
 	}
 	
 	// Changes a category when it is selected, the skills options are populated with the corresponding data
-	function changeCategory() 
-	{
+	function changeCategory() {
 		nullOptions(skillMenu);
 		nullOptions(qMenu);
 	
@@ -59,24 +54,20 @@
 	}
 	
 	// Changes a skill when selected, the questions options are poulated with the corresponding data
-	function changeSkill() 
-	{
+	function changeSkill() {
 		nullOptions(qMenu);
 	
-		if (catMenu.selectedIndex != 0 && skillMenu.selectedIndex != 0)
-		{
+		if (catMenu.selectedIndex != 0 && skillMenu.selectedIndex != 0){
 			var questionArray = categoryArray[catMenu.selectedIndex -1].skills[skillMenu.selectedIndex -1].questions;
 			
 			var i;
 			with (qMenu) {
 				options[0] = new Option("<fmt:message key="wizard.selectQuestion" />", "none");
-				for(i = 0; i < questionArray.length; i++)
-				{
+				for(i = 0; i < questionArray.length; i++) {
 					options[i+1] = new Option(questionArray[i].question, i);
 				} 
 				options[0].selected = true;
 			}
 		}
 	}
-//-->
 </script>

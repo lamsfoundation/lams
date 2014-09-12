@@ -83,11 +83,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     @Override
-    public void saveQuestion(VoteQueContent voteQueContent) {
-	this.getHibernateTemplate().save(voteQueContent);
-    }
-
-    @Override
     public void saveOrUpdateQuestion(VoteQueContent voteQueContent) {
 	this.getHibernateTemplate().saveOrUpdate(voteQueContent);
     }

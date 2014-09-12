@@ -132,7 +132,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	ToolAccessMode mode = getAccessMode(request);
 	// request is from monitoring module
 	if (mode.isTeacher()) {
-	    QaUtils.setDefineLater(request, true, strToolContentID, qaService);
+	    qaService.setDefineLater(strToolContentID, true);
 	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 

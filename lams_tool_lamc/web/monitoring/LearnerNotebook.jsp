@@ -21,53 +21,44 @@
 <body class="stripes">
 	
 	<html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-	
-		<div id="content">
+	<div id="content">
 		
 		<h1>
 			<fmt:message key="label.view.reflection"/>
 		</h1>
-	
 
-			<table>
-				<tr>
-					<td>
-						<h2>
-							<c:out value="${mcGeneralLearnerFlowDTO.userName}" escapeXml="true"/>
-						</h2>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<p><lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/></p>
-					</td>
-				</tr>
-			</table>
+		<table>
+			<tr>
+				<td>
+					<h2>
+						<c:out value="${mcGeneralLearnerFlowDTO.userName}" escapeXml="true"/>
+					</h2>
+				</td>
+			</tr>
+				
+			<tr>
+				<td>
+					<p>
+						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true"/>
+					</p>
+				</td>
+			</tr>
+		</table>
 
-			<table cellpadding="0">
-				<tr>
-					<td>
-						<a href="javascript:window.close();" class="button">
-							<fmt:message key="label.close"/></a>
-					</td>
-				</tr>
-			</table>
-
+		<table cellpadding="0">
+			<tr>
+				<td>
+					<a href="javascript:window.close();" class="button">
+						<fmt:message key="label.close"/>
+					</a>
+				</td>
+			</tr>
+		</table>
 		
-		</div>
+	</div>
 	</html:form>	
 	
 	<div id="footer"></div>
 
-
-</div>
 </body>
 </lams:html>
-
-
-
-
-
-
-
-
