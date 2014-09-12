@@ -60,6 +60,8 @@ public class LoginRequestDispatcher {
     public static final String PARAM_COUNTRY = "country";
 
     public static final String PARAM_LANGUAGE = "lang";
+    
+    public static final String PARAM_IS_UPDATE_USER_DETAILS = "isUpdateUserDetails";
 
     public static final String PARAM_REQUEST_SRC = "requestSrc";
 

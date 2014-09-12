@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -99,6 +100,8 @@ public class LoginRequestServlet extends HttpServlet {
 	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
+	boolean isUpdateUserDetails = WebUtil.readBooleanParam(request,
+		LoginRequestDispatcher.PARAM_IS_UPDATE_USER_DETAILS, false);
 
 	// implicit login params
 	String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
@@ -128,7 +131,7 @@ public class LoginRequestServlet extends HttpServlet {
 		userMap = getService().getExtUserUseridMap(serverMap, extUsername, prefix);
 	    } else {
 		userMap = getService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName,
-			langIsoCode, countryIsoCode, email, prefix);
+			langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
 	    }
 
 	    Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);

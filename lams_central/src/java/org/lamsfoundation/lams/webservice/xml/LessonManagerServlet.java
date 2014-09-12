@@ -752,8 +752,9 @@ public class LessonManagerServlet extends HttpServlet {
 		userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    } else {
 		final boolean usePrefix = true;
+		final boolean isUpdateUserDetails = false;
 		userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(serverMap, username,
-			firstName, lastName, langIsoCode, countryIsoCode, email, usePrefix);
+			firstName, lastName, langIsoCode, countryIsoCode, email, usePrefix, isUpdateUserDetails);
 	    }
 
 	    // ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,

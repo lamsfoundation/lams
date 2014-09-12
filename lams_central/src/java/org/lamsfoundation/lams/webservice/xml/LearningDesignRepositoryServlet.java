@@ -290,6 +290,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String modeStr = request.getParameter(CentralConstants.PARAM_MODE);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
+	    final boolean isUpdateUserDetails = false;
 	    
 	    String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 	    String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
@@ -333,7 +334,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
 		} else {
 		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-			    lang, country, email, prefix);
+			    lang, country, email, prefix, isUpdateUserDetails);
 		}
 
 		// create group for external course if necessary
@@ -356,7 +357,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
 		} else {
 		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-			    lang, country, email, prefix);
+			    lang, country, email, prefix, isUpdateUserDetails);
 		}
 
 		// create group for external course if necessary
