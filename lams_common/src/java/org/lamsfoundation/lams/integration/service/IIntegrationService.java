@@ -58,9 +58,25 @@ public interface IIntegrationService {
     ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
+    /**
+     * compatibility method to support existing integrations. It does callback call to integrated server to get user details.
+     * 
+     * @param serverMap
+     * @param extUsername
+     * @return
+     * @throws UserInfoFetchException
+     * @throws UserInfoValidationException
+     */
     ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
+    /**
+     * Returns ExtUserUseridMap from DB, and null if it doesn't exist
+     * 
+     * @param serverMap
+     * @param extUsername
+     * @return
+     */
     ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException;
 
@@ -68,8 +84,21 @@ public interface IIntegrationService {
 
     ExtServerOrgMap getExtServerOrgMap(String serverId);
 
+    /**
+     * @param serverMap
+     * @param extUsername
+     * @param firstName
+     * @param lastName
+     * @param language
+     * @param country
+     * @param email
+     * @param prefix
+     * @param isUpdateUserDetails whether user details should be updated with provided parameters
+     * @return
+     * @throws UserInfoValidationException
+     */
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
-	    String lastName, String language, String country, String email, boolean prefix)
+	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException;
 
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
