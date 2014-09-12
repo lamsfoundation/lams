@@ -154,9 +154,9 @@ public class AssessmentOutputFactory extends OutputFactory {
      * Get total score for a user. Will always return a ToolOutput object.
      */
     private ToolOutput getTotalScore(IAssessmentService assessmentService, Long learnerId, Assessment assessment) {
-	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
+	Float assessmentResultGrade = assessmentService.getLastFinishedAssessmentResultGrade(assessment.getUid(), learnerId);
 	
-	float totalScore = (assessmentResult == null) ? 0 : assessmentResult.getGrade();
+	float totalScore = (assessmentResultGrade == null) ? 0 : assessmentResultGrade;
 	
 	return new ToolOutput(AssessmentOutputFactory.OUTPUT_NAME_LEARNER_TOTAL_SCORE, getI18NText(
 		AssessmentOutputFactory.OUTPUT_NAME_LEARNER_TOTAL_SCORE, true), totalScore);
@@ -166,12 +166,9 @@ public class AssessmentOutputFactory extends OutputFactory {
      * Get time taken for a specific user to accomplish this assessment. Will always return a ToolOutput object.
      */
     private ToolOutput getTimeTaken(IAssessmentService assessmentService, Long learnerId, Assessment assessment) {
-	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
+	Integer assessmentResultTimeTaken = assessmentService.getLastFinishedAssessmentResultTimeTaken(assessment.getUid(), learnerId);
 	
-	long timeTaken = 0;
-	if ((assessmentResult != null) && (assessmentResult.getFinishDate() != null)) {
-	    timeTaken = (assessmentResult.getFinishDate().getTime() - assessmentResult.getStartDate().getTime()) / 1000;
-	}
+	long timeTaken = (assessmentResultTimeTaken == null) ? 0 : assessmentResultTimeTaken;
 	
 	return new ToolOutput(AssessmentOutputFactory.OUTPUT_NAME_LEARNER_TIME_TAKEN, getI18NText(
 		AssessmentOutputFactory.OUTPUT_NAME_LEARNER_TIME_TAKEN, true), timeTaken);
@@ -192,20 +189,10 @@ public class AssessmentOutputFactory extends OutputFactory {
      */
     private ToolOutput getQuestionScore(IAssessmentService assessmentService, Long learnerId, Assessment assessment,
 	    int questionSequenceId) {
-	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
+	Float questionResultMarkDB = assessmentService.getQuestionResultMark(assessment.getUid(), learnerId, questionSequenceId);
 
-	float questionScore = 0;
-	
-	if (assessmentResult != null) {
-	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-		if (questionResult.getAssessmentQuestion().getSequenceId() == questionSequenceId) {
-		    questionScore = questionResult.getMark();
-		    break;
-		}
-	    }
-	}
-
-	return new ToolOutput(String.valueOf(questionSequenceId), "description", questionScore);
+	float questionResultMark = (questionResultMarkDB == null) ? 0 : questionResultMarkDB;
+	return new ToolOutput(String.valueOf(questionSequenceId), "description", questionResultMark);
     }
 
 }
