@@ -11,7 +11,6 @@
 		var area=document.getElementById("resourceInputArea");
 		if(area != null){
 			area.style.width="100%";
-			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}

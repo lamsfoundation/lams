@@ -9,7 +9,6 @@
 		var area=document.getElementById("messageArea");
 		if(area != null){
 			area.style.width="95%";
-			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}
@@ -90,7 +89,7 @@
 </p>
 
 <p>
-	<iframe onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+300)+'px';"
+	<iframe onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+220)+'px';"
 		id="messageArea" name="messageArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

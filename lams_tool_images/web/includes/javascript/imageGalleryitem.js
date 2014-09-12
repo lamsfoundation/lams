@@ -52,7 +52,6 @@
 		
 		if(area != null){
 			area.style.width="650px";
-			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}
