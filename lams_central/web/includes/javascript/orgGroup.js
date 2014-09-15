@@ -68,7 +68,7 @@ function addGroup(groupId, name, users) {
 		});
 		if (!nameIsUnique) {
 			groupTopIndex++;
-			name = LABELS.GROUP_PREFIX_LABEL + groupTopIndex;
+			name = LABELS.GROUP_PREFIX_LABEL + ' ' + groupTopIndex;
 		}
 	} while (!nameIsUnique);
 	
