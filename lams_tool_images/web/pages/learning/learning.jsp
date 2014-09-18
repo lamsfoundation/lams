@@ -58,6 +58,7 @@
 		/* parameters borrowed from jquery.jcarousel.skin.css */
 		.jcarousel-skin-tango .jcarousel-container-horizontal {
     		width: ${thumbnailImageDimensions*5 + 75}px;
+    		height: ${thumbnailImageDimensions + 8}px;
     	}
     	.jcarousel-skin-tango .jcarousel-clip-horizontal {
 		    width:  ${thumbnailImageDimensions*5 + 75}px;
