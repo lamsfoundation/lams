@@ -4,6 +4,8 @@
  */
 .jcarousel-container {
     position: relative;
+    width: 575px;
+    height: 108px;
 }
 
 .jcarousel-clip {
