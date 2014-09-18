@@ -863,17 +863,22 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	ImageGallery toContent = ImageGallery.newInstance(imageGallery, toContentId);
-	imageGalleryDao.saveObject(toContent);
-
-	// save imageGallery items as well
+	// save imageGallery items first
 	Set items = toContent.getImageGalleryItems();
 	if (items != null) {
 	    Iterator iter = items.iterator();
 	    while (iter.hasNext()) {
 		ImageGalleryItem item = (ImageGalleryItem) iter.next();
-		// createRootTopic(toContent.getUid(),null,msg);
+		if (item.isCreateByAuthor()) {
+		    imageGalleryUserDao.saveObject(item.getCreateBy());
+		    imageGalleryItemDao.saveObject(item);
+		} else {
+		    iter.remove();
+		}
 	    }
 	}
+	
+	imageGalleryDao.saveObject(toContent);
     }
 
     public String getToolContentTitle(Long toolContentId) {
