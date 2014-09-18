@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.kaltura.service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -197,6 +198,20 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    fromContent = getDefaultContent();
 	}
 	Kaltura toContent = Kaltura.newInstance(fromContent, toContentId);
+
+	Set items = toContent.getKalturaItems();
+	if (items != null) {
+	    Iterator iter = items.iterator();
+	    while (iter.hasNext()) {
+		KalturaItem item = (KalturaItem) iter.next();
+		if (item.isCreateByAuthor()) {
+		    kalturaUserDao.saveOrUpdate(item.getCreatedBy());
+		    kalturaItemDao.insert(item);
+		} else {
+		    iter.remove();
+		}
+	    }
+	}
 	kalturaDao.saveOrUpdate(toContent);
     }
     
