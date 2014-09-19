@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -99,9 +100,6 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("checkLeaderSubmittedNotebook")) {
 	    return checkLeaderSubmittedNotebook(mapping, form, request, response);
-	}
-	if (param.equals("isAnswerCorrect")) {
-	    return isAnswerCorrect(mapping, form, request, response);
 	}
 	if (param.equals("recordItemScratched")) {
 	    return recordItemScratched(mapping, form, request, response);
@@ -208,6 +206,16 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, isReflectOnActivity);
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_INSTRUCTION, scratchie.getReflectInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
+	//add all answer uids to one set
+	if (isUserLeader) {
+	    Set<Long> answerUids = new HashSet<Long>();
+	    for (ScratchieItem item : (Set<ScratchieItem>)scratchie.getScratchieItems()) {
+		for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
+		    answerUids.add(answer.getUid());
+		}
+	    }
+	    sessionMap.put(ScratchieConstants.ATTR_ANSWER_UIDS, answerUids);	    
+	}
 
 	// add define later support
 	if (scratchie.isDefineLater()) {
@@ -347,13 +355,34 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Return whether scratchie answer is correct or not
+     * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not
+     * 
+     * @throws ScratchieApplicationException
      */
-    private ActionForward isAnswerCorrect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
+    private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException, ScratchieApplicationException {
 	initializeScratchieService();
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);	
+	final Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
+	
+	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
 
-	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
+	ScratchieUser leader = this.getCurrentUser(toolSessionId);
+	// only leader is allowed to scratch answers
+	if (!toolSession.isUserGroupLeader(leader.getUid())) {
+	    return null;
+	}
+	
+	//check answer is belong to current session
+	Set<Long> answerUids = (Set<Long>) sessionMap.get(ScratchieConstants.ATTR_ANSWER_UIDS);
+	if (!answerUids.contains(answerUid)) {
+	    return null;
+	}
+
+	//Return whether scratchie answer is correct or not
 	ScratchieAnswer answer = LearningAction.service.getScratchieAnswerByUid(answerUid);
 	if (answer == null) {
 	    return null;
@@ -364,37 +393,27 @@ public class LearningAction extends Action {
 	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 
-	return null;
-    }
-
-    /**
-     * Record in DB that leader has scratched specified answer.
-     * 
-     * @throws ScratchieApplicationException
-     */
-    private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ScratchieApplicationException {
-	initializeScratchieService();
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
-	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
-
-	ScratchieUser leader = this.getCurrentUser(toolSessionId);
-	// only leader is allowed to scratch answers
-	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
-	}
-
-	final Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
-	tryExecute(new Callable<Object>() {
+	// create a new thread to record item scratched (in order to do this task in parallel not to slow down sending
+	// response back)
+	Thread recordItemScratchedThread = new Thread(new Runnable() {
 	    @Override
-	    public Object call() throws ScratchieApplicationException {
-		LearningAction.service.recordItemScratched(toolSessionId, answerUid);
-		return null;
+	    public void run() {
+
+		try {
+		    tryExecute(new Callable<Object>() {
+			@Override
+			public Object call() throws ScratchieApplicationException {
+			    LearningAction.service.recordItemScratched(toolSessionId, answerUid);
+			    return null;
+			}
+		    });
+		} catch (ScratchieApplicationException e) {
+		    log.error(e);
+		}
 	    }
-	});
+	}, "LAMS_recordItemScratched_thread");
+	recordItemScratchedThread.start();
+
 	return null;
     }
 
