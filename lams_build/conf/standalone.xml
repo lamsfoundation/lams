@@ -366,7 +366,7 @@
                         </login-module>
                     </authentication>
                 </security-domain>
-                <security-domain name="lams" cache-type="default">
+                <security-domain name="lams">
                     <authentication>
                         <login-module code="org.lamsfoundation.lams.security.UniversalLoginModule" flag="required">
                             <module-option name="dsJndiName" value="java:jboss/datasources/lams-ds"/>

@@ -55,6 +55,7 @@
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="disable*">PROPAGATION_REQUIRED</prop>
 				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>

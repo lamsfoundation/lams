@@ -34,7 +34,7 @@
 	
 	
 	<target name="_build-war"
-	        depends="_build-webdoclet, _build-manifest, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile">
+	        depends="_build-webdoclet, _build-manifest, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile, _add-sso">
 		
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
