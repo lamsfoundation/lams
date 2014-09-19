@@ -209,8 +209,8 @@
 			);		    
 		}		
 		
-		if (${!hasEditRight && mode != "teacher"}) {
-			setInterval("checkLeaderProgress();",15000);// Auto-Refresh every 15 seconds for non-leaders
+		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
+			setInterval("checkLeaderProgress();", 15000);// Auto-Refresh every 15 seconds for non-leaders
 		}
 		
 		function checkLeaderProgress() {
