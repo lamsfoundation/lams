@@ -1490,8 +1490,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    learnerProgress.getAttemptedActivities().remove(activity);
 	    learnerProgress.getCompletedActivities().remove(activity);
 	    if (removeLearnerContent && activity.isToolActivity()) {
+		ToolActivity toolActivity = (ToolActivity) getActivityById(activity.getActivityId());
 		// remove learner content from this activity
-		lamsCoreToolService.notifyToolToDeleteLearnerContent((ToolActivity) activity, learner.getUserId());
+		lamsCoreToolService.notifyToolToDeleteLearnerContent(toolActivity, learner.getUserId());
 	    }
 	}
 
