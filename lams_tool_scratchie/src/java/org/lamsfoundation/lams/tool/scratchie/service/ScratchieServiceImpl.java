@@ -1591,7 +1591,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		throw new ToolException(e);
 	    }
 	}
-	return getScratchieOutputFactory().getToolOutputDefinitions(content, definitionType);
+	return getScratchieOutputFactory().getToolOutputDefinitions(this, content, definitionType);
     }
 
     @Override
