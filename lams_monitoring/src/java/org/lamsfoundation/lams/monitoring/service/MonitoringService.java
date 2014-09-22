@@ -1440,11 +1440,14 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    }
 		    continue;
 		} else {
+		    ComplexActivity complexActivity = (ComplexActivity) getActivityById(currentActivity.getActivityId());
 		    // forget all records within complex activity
-		    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) currentActivity).getActivities()) {
+		    for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
 			uncompleteActivities.add(childActivity);
 			if (childActivity.isComplexActivity()) {
-			    uncompleteActivities.addAll(((ComplexActivity) childActivity).getActivities());
+			    ComplexActivity complexChildActivity = (ComplexActivity) getActivityById(childActivity
+				    .getActivityId());
+			    uncompleteActivities.addAll(complexChildActivity.getActivities());
 			}
 
 			// mark the activity to be "unbranched"
