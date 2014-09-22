@@ -538,6 +538,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    QaServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
 	    throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
 	} else {
+	    // save questions first, because if Hibernate decides to flush Conditions first,
+	    // there is no cascade to questions and it may trigger an error
+	    for (QaQueContent question : toContent.getQaQueContents()) {
+		qaQuestionDAO.saveOrUpdateQaQueContent(question);
+	    }
 	    qaDAO.saveQa(toContent);
 	}
 
