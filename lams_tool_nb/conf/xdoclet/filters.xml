@@ -1,13 +1,3 @@
-<!--  <filter>
-    <filter-name>contentFilter</filter-name>
-    <filter-class>org.lamsfoundation.lams.web.filter.ResponseCaptureFilter</filter-class>
-</filter>
-
-<filter-mapping>
-    <filter-name>contentFilter</filter-name>
-    <url-pattern>/portfolioExport</url-pattern>
-</filter-mapping> -->
-
 <filter>
 	<filter-name>UrlRewriteFilter</filter-name>
 	<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
