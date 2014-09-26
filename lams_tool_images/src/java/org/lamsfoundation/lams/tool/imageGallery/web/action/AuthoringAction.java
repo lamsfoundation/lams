@@ -224,7 +224,7 @@ public class AuthoringAction extends Action {
 	imageGalleryItemList.clear();
 	imageGalleryItemList.addAll(items);
 
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_FORM, imageGalleryForm);
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM, imageGalleryForm);
 	sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, imageGallery.getNextImageTitle());
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
@@ -245,7 +245,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	ImageGalleryForm existForm = (ImageGalleryForm) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE_FORM);
+	ImageGalleryForm existForm = (ImageGalleryForm) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM);
 
 	ImageGalleryForm imageGalleryForm = (ImageGalleryForm) form;
 	try {
@@ -648,7 +648,7 @@ public class AuthoringAction extends Action {
     private IImageGalleryService getImageGalleryService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
+	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
 
     /**
@@ -659,10 +659,10 @@ public class AuthoringAction extends Action {
      */
     private SortedSet<ImageGalleryItem> getImageList(SessionMap sessionMap) {
 	SortedSet<ImageGalleryItem> list = (SortedSet<ImageGalleryItem>) sessionMap
-		.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST);
+		.get(ImageGalleryConstants.ATTR_IMAGE_LIST);
 	if (list == null) {
 	    list = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
-	    sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, list);
+	    sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_LIST, list);
 	}
 	return list;
     }
@@ -674,7 +674,7 @@ public class AuthoringAction extends Action {
      * @return
      */
     private List getDeletedImageGalleryItemList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
+	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_IMAGE_LIST);
     }
 
     /**
@@ -686,7 +686,7 @@ public class AuthoringAction extends Action {
      * @return
      */
     private List getDeletedItemAttachmentList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
+	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_IMAGE_ATTACHMENT_LIST);
     }
 
     /**

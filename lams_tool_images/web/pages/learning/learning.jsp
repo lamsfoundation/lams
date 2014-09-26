@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
@@ -7,7 +6,7 @@
 	<title>
 		<fmt:message key="label.learning.title" />
 	</title>
-	<%@ include file="/common/headerWithoutPrototype.jsp"%>
+	<%@ include file="/common/header.jsp"%>
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
@@ -20,154 +19,142 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
-	<c:set var="windowMinimumWidth" value="${thumbnailImageDimensions*5 + 160}" />
-	<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
-		<c:set var="windowMinimumWidth" value="${windowMinimumWidth + 120}" />
-	</c:if>
-	<c:if test="${(mediumImageDimensions + 200) > windowMinimumWidth}">
-		<c:set var="windowMinimumWidth" value="${mediumImageDimensions + 200}" />
-	</c:if>
 
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.css'/>" />
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css' />" />
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/galleria.css'/>" >
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.rating.css'/>"/>
-	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/thickbox.css">
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
 	<style media="screen,projection" type="text/css">
-		.galleria_container{position:relative;margin-top:2em;}
-		.gallery_demo{width:${mediumImageDimensions + 62}px;margin:0 auto 0 0;}
-		.gallery_demo li{width:${thumbnailImageDimensions}px;height:${thumbnailImageDimensions}px;border:3px double #111;margin: 0 2px;background:#000;}
-		.gallery_demo li div{left:240px}
-		.gallery_demo li div .caption{font:italic 0.7em/1.4 georgia,serif;}
-		
-		.caption{position:absolute;top:0px;left:0px;width:150px;font-size:12px;color:#0087e5;}
-		#description{position:absolute; top:1000px; left:1000px; width:150px; font-style:italic;}
-		#openOriginalSizeLink{position:absolute; top:1000px; left:1000px;}
-		#delete_button{position:absolute; top:10px; left:1000px; z-index: 1000;opacity:0.4;filter:alpha(opacity=40); display:none;}
-		#delete_button:hover {opacity:1;filter:alpha(opacity=100)}
-		#rating_stars{position: absolute; top: 1000px; left: 1000px; width:150px; margin-top: 10}		
-		
-		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 40}px; width: ${mediumImageDimensions}px;}
-		#main_image img{margin-bottom: 10px; border: 1px solid #111;}
-		
-		.check_for_new{position: relative; top: ${-thumbnailImageDimensions - 23}px; left: ${thumbnailImageDimensions*5 + 160}px;}
-		.add_new_image{position: relative; top: ${-thumbnailImageDimensions + 10}px; left: ${thumbnailImageDimensions*5 + 160}px;}
-		
-		.after_main_image{text-align: left; margin: 30px 0; padding-top: 30px; clear:both;}
-		
-		/* parameters borrowed from jquery.jcarousel.skin.css */
-		.jcarousel-skin-tango .jcarousel-container-horizontal {
-    		width: ${thumbnailImageDimensions*5 + 75}px;
-    		height: ${thumbnailImageDimensions + 8}px;
-    	}
-    	.jcarousel-skin-tango .jcarousel-clip-horizontal {
-		    width:  ${thumbnailImageDimensions*5 + 75}px;
-		    height: ${thumbnailImageDimensions + 8}px;
+		@media (max-width: 750px) {
+		  	#aside {
+		    	float: none;
+		    	width: auto;
+		    	position: static;
+		  	}
 		}
-		.jcarousel-skin-tango .jcarousel-item {
-		    width: ${thumbnailImageDimensions}px;
-		    height: ${thumbnailImageDimensions}px;
+		#check-for-new-button, #add-new-image-button, #delete-button, #rating-stars {
+			float: right;
+			clear: both;
 		}
-		.jcarousel-skin-tango .jcarousel-next-horizontal {
-	    	top: ${thumbnailImageDimensions/2}px;
-	    }	
-		.jcarousel-skin-tango .jcarousel-prev-horizontal {
-    		top: ${thumbnailImageDimensions/2}px;
-    	}	    
+		#add-new-image-button, #delete-button {
+			margin-top: 8px;
+		}
+		#delete-button{
+			display:none;
+		}
+		#rating-stars {
+			padding-top: 20px;
+			width: 85px;
+			text-align: center;
+			margin-right: 20px;
+		}
+		#rating-stars-text {
+			margin-bottom: 10px;
+			margin-top:5px;
+		}
+		.caption{
+			color:#0087e5; 
+			font:italic 14px georgia,serif;
+		}
+		.description{ 
+			font-style:italic; 
+			font-size:11px;
+		}
+		.extra-controls {
+			padding-bottom: 100px;
+		}
+		#comment-textarea {
+			margin-right:10px; 
+			width:99%;
+		}
+		#comment-button {
+			margin-right: 2px;
+			float: right;
+			margin-top: 10px;
+		}
+		#comments-area {
+			margin-bottom: 50px;
+			padding-top: 50px;
+		}
+		table.forum {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+    	.fotorama__thumb {
+		    background-color: #000;
+		}
+		.fotorama__wrap {
+			margin: auto;
+		}
+		.fotorama__caption {
+			text-align: left;
+		}
+		.fotorama-container {
+			text-align: center;
+			padding-top: 10px;
+		}
     </style>
     
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>   
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.galleria.js'/>" ></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jcarousel.pack.js'/>"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
- 	
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/fotorama.js'/>"></script>
 	<script type="text/javascript">
 	
-	$(document).ready(function(){ 
-		$('ul.gallery_demo').galleria({
-			history   : true, // activates the history object for bookmarking, back-button etc.
-			clickNext : ${fn:length(sessionMap.imageGalleryList) > 1}, // sets helper for making the image clickable only if there is more than 1 image
-			insert    : '#main_image', // the containing selector for our main image
-			onImage   : function(image,caption,thumb) {
-				
-				//do further calculations only after picture is loaded so we know its width and height
-				image.load(function (){
-					// fetch the thumbnail container
-					var _li = thumb.parents('li');
-					// fade out inactive thumbnail
-					_li.siblings().children('img.selected').fadeTo(500,0.3);
-					// fade in active thumbnail
-					thumb.fadeTo('fast',1).addClass('selected');
-					// add a title for the clickable image
-					image.attr('title','Next image >>');
-
-					//positioning image title, description and rating
-					caption.css('left',image.width() + 20);
-					$('#description').html("");
-					$("#description").css('left', image.width() + 20);
-					$("#description").css('top', caption.height() + 10);
-
-					var linkLeftPosition = ($("#openOriginalSizeLink_size").width() >= image.width()) ? 0 : ((image.width() - $("#openOriginalSizeLink_size").width())/2);
-					$("#openOriginalSizeLink").css('left', linkLeftPosition);
-					$("#openOriginalSizeLink").css('top', image.height() + 10);
-					$("#openOriginalSizeLink").width(image.width());
-					
-					$("#delete_button").hide();
-					$("#delete_button").css('left', image.width() - 30);
-							
-					setStarRatingChecked(0);
-					$("#rating_stars").css('left', image.width() + 20);					
-					$("#rating_stars").css('top', image.height() - 40);
-					
-					//adjust #main_image height to real image size
-					var newHeight = (image.height() >= ${(mediumImageDimensions*3)/4}) ? ${mediumImageDimensions} : ${(mediumImageDimensions*3)/4};
-				    $('#main_image').css('height', newHeight + 40);
-
-				    loadImageData(thumb.attr('id'));
-				});
-
-			},
-			onThumb : function(thumb) { // thumbnail effects goes here
-				// fetch the thumbnail container
-				var _li = thumb.parents('li');
-				// if thumbnail is active, fade all the way.
-				var _fadeTo = _li.is('.active') ? '1' : '0.3';
-				// fade in the thumbnail when finnished loading
-				thumb.css({display:'none',opacity:_fadeTo}).fadeIn(1500);
-				// hover effects
-				thumb.hover(
-					function() { thumb.fadeTo('fast',1); },
-					function() { _li.not('.active').children('img').fadeTo('fast',0.3); } // don't fade out if the parent is active
+		$(document).ready(function(){ 
+			$('.fotorama')
+				.on('fotorama:show ',
+					function (e, fotorama, extra) {
+					    loadImageData(fotorama.activeFrame.id);
+					}
 				)
-			}
+				.fotorama({
+					//TODO history   : true,
+					width: ${mediumImageDimensions + 60},
+					height: ${mediumImageDimensions + 60}*9/16,
+					maxwidth: '100%',
+					//ratio: 16/9,
+					allowfullscreen: true,
+					keyboard: true,
+					nav: 'thumbs',
+					fit: 'scaledown',
+					//thumbfit: 'contain',
+					loop: true,
+					thumbwidth: 80,//${thumbnailImageDimensions},
+					thumbheight: 80,//${thumbnailImageDimensions},
+				    data: [
+						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
+							<c:if test="${!image.createByAuthor && (image.createBy != null)}">
+								<c:set var="imageAddedBy" ><div class="description"><fmt:message key="label.learning.added.by" /> <c:out value="${image.createBy.firstName} ${commentsImage.createBy.lastName}" escapeXml="true"/></div></c:set>
+							</c:if>					
+						
+							{
+								img: '<html:rewrite page="/download/?uuid="/>${image.mediumFileUuid}&preferDownload=false',
+								//thumb: '<html:rewrite page="/download/?uuid="/>${image.thumbnailFileUuid}&preferDownload=false',
+								full: '<html:rewrite page="/download/?uuid="/>${image.originalFileUuid}&preferDownload=false',
+								id: '${image.uid}', // Custom anchor is used with the hash:true option.
+								caption: '<div class="caption">${image.titleEscaped}</div>'
+									+ '<span class="description">${image.descriptionEscaped}</span>'
+									+'${imageAddedBy}',
+								//html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
+								//fit: 'cover' // Override the global fit option.
+								//any: 'Any data relative to the frame you want to store'
+							},
+						</c:forEach>
+					]
+				}
+			);
+	
+			$('#votingForm_vote').click(function() {
+				
+				$('#votingForm').ajaxSubmit( {
+					success: afterRatingSubmit  // post-submit callback
+				});
+				return false;
+			});
+	
 		});
-		
-		$('#mycarousel').jcarousel({
-			'itemFallbackDimension': 100
-		});
 
-		$('#votingForm_vote').click(function() {
-	    	var options = { 
-	    		success: afterRatingSubmit  // post-submit callback
-	        }; 				
-		    				
-			$('#votingForm').ajaxSubmit(options);
-			return false;
-		});		
-
-		//to prevent scroll bars overlapping
-		//var nav = navigator.appName;
-		//if (nav == "Microsoft Internet Explorer") {
-			//alert(parent.document.getElementById("contentFrame").width);
-			//parent.document.getElementById("contentFrame").width = "2000px";
-		//}
-
-	});
-
-	<!--
 		function checkNew(){
 			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
@@ -204,7 +191,7 @@
 		}
 
 		//The panel of imageGallery list panel
-		var commentsAreaTargetDiv = "#commentsArea";
+		var commentsAreaTargetDiv = "#comments-area";
 		function loadImageData(imageUid){
 			var url = "<c:url value="/learning/loadImageData.do"/>";
 			$(commentsAreaTargetDiv).load(
@@ -218,24 +205,11 @@
 		}
 
 		function afterImageDataLoaded() {
-			var description = $('#commentsArea_addedBy').val() + $('#commentsArea_description').val();
-			$('#description').html(description);
 
 			var title = $('#commentsArea_title').val();
-			$("#openOriginalSizeLink a").attr('title', title);
-			
-			var href = "<html:rewrite page='/download/?preferDownload=false'/>";
-			href = href + "&uuid=" + $('#commentsArea_originalFileUuid').val();
-			href = href + "&dbWidth=" + $('#commentsArea_originalImageWidth').val();
-			href = href + "&dbHeight=" + $('#commentsArea_originalImageHeight').val();
-			$("#openOriginalSizeLink a").attr('href', href);
 			
 			var imageUid = $('#commentsArea_imageUid').val();
 			if (${imageGallery.allowRank && (mode != 'teacher')}) {
-				//adjust #rating_stars top position to description height 
-				if ($('#main_image img').height() < $('span.caption').height() + $("#description").height() + 60) {
-					$("#rating_stars").css('top', $('span.caption').height() + $("#description").height() + 20);	
-				}
 
 				var numberRatings = $('#commentsArea_numberRatings').val();
 				$('#numberRatings').html(numberRatings);
@@ -277,17 +251,15 @@
 			}
 			
 			//set visibility of "Delete image" button 
-			var isAuthor = $('#commentsArea_isAuthor').val();
-			if (isAuthor == "true") {
-				$("#delete_button").show();
-			}
+			var isAuthor = $('#commentsArea_isAuthor').val()  == "true";
+			$("#delete-button").toggle(isAuthor);
 			
 		}
 		function setStarRatingChecked(currentRating){
-			$('#rating_stars_inputs').empty();
+			$('#rating-stars-inputs').empty();
 			for (var i = 1; i <= 5; i = i + 1) {
 				var checked = (currentRating == i) ? "checked = 'checked' " : "";
-				$('#rating_stars_inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
+				$('#rating-stars-inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
 			}
 			$('input[type=radio].star').rating({
 				readOnly: ${finishedLock},
@@ -306,13 +278,12 @@
 		function afterRatingSubmit(responseText, statusText)  { 
 			var imageUid = $('#commentsArea_imageUid').val();
 			loadImageData(imageUid);
-		} 
-	-->        
+		}     
     </script>
    
 </lams:head>
 <body class="stripes">
-	<div id="content" style="min-width: ${windowMinimumWidth}px;">
+	<div id="content">
 
 		<%--ImageGallery information-----------------------------------%>
 
@@ -322,126 +293,96 @@
 		<p>
 			<c:out value="${imageGallery.instructions}" escapeXml="false"/>
 		</p>
+		
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-				<div class="info">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
-							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+			<div class="info">
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</div>
 		</c:if>
+		
 		<%@ include file="/common/messages.jsp"%>
 		
 		<%--Main image---------------------------------------------------%>
 		
-		<div class="galleria_container">
-			<div id="description"></div>
-					
-			<div id="main_image"></div>
-			
-			<div id="openOriginalSizeLink">
-				<a href="" title="Enlarge" class="thickbox" >
-					<fmt:message key="label.learning.open.original.size" />
-				</a>
-			</div>
-			
-			<%--Delete button---------------------------------------%>
-
-			<div id="delete_button">
-				<img src="<lams:WebAppURL />includes/images/delete.png"
-					title="<fmt:message key="label.learning.delete.image" />"
-					onclick="return deleteImage();" />
-			</div>
-			
-			<%--Ranking/Voting area---------------------------------------%>
-
-			<c:if test="${(mode != 'teacher') && (not empty sessionMap.imageGalleryList)}">				
-				<div id="rating_stars">
-					<c:if test="${imageGallery.allowRank}">
-						<html:form action="learning/saveOrUpdateRating" method="post" styleId="ratingForm">
-							<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-							<input type="hidden" name="imageUid" id="ratingForm_imageUid"/>
-							
-							<div id="rating_stars_inputs"> 
-								<input class="star" type="radio" name="rating" value="1" />
-								<input class="star" type="radio" name="rating" value="2" />
-								<input class="star" type="radio" name="rating" value="3" />
-								<input class="star" type="radio" name="rating" value="4" />
-								<input class="star" type="radio" name="rating" value="5" />						
-							</div>
-							
-							<br>
-							<p>
-								<span id="numberRatings"></span>
-								<fmt:message key="label.learning.ratings" />
-							</p>						
-						</html:form>							
-					</c:if>
-					
-					<c:if test="${imageGallery.allowVote && (mode != 'teacher')}">
-						<html:form action="learning/vote" method="post" styleId="votingForm">
-							<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-							<input type="hidden" name="imageUid" id="votingForm_imageUid"/>
-							
-							<p class="small-space-top">
-								<html:checkbox property="vote" styleClass="noBorder" styleId="votingForm_vote" >	</html:checkbox>
-	
-								<label for="votingForm_vote" id="votingForm_label"></label>
-							</p>
-							
-						</html:form>							
-					</c:if> 			
-				</div>
-			</c:if>		
-			
-			<%--Image scroller-------------------------------------------------%>			
-			
-			<ul class="gallery_demo jcarousel-skin-tango" id="mycarousel">
-				<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
-					<c:choose>
-						<c:when test="${status.index == 0}">
-							<li class="active">
-						</c:when>
-						<c:otherwise>
-							<li>
-						</c:otherwise>
-					</c:choose>
-					<c:set var="title">
-						<c:out value="${image.title}" escapeXml="true"/>	
-				        </c:set>
-						<a href="<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false" title="${title}" id="${image.uid}" width="${image.mediumImageWidth}" height="${image.mediumImageHeight}">
-							<img src="<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false" alt="${title}" id="${image.uid}">
-						</a>
-					</li>
-				</c:forEach>
-			</ul>
-			
-			<%--"Check for new" and "Add new image" buttons---------------%>
-			
-			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
-				<a href="#nogo" onclick="return checkNew()" class="button check_for_new"> 
-					<fmt:message key="label.check.for.new" /> 
-				</a>
-			</c:if>
-			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher') && (not finishedLock)}">
-				<br>
-				<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button add_new_image thickbox">  
-					<fmt:message key="label.learning.add.new.image" />
-				</a>
-			</c:if>		
-			
+		<div class="fotorama-container">
+			<div class="fotorama"></div>
 		</div>
-		<div class="after_main_image"></div>
 		
+		<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">	
+			<div class="extra-controls">
+				
+				<%--Ranking/Voting area---------------------------------------%>
+	
+				<c:if test="${not empty sessionMap.imageGalleryList}">				
+					<div id="rating-stars">
+						<c:if test="${imageGallery.allowRank}">
+							<html:form action="learning/saveOrUpdateRating" method="post" styleId="ratingForm">
+								<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+								<input type="hidden" name="imageUid" id="ratingForm_imageUid"/>
+								
+								<div id="rating-stars-inputs"> 
+									<input class="star" type="radio" name="rating" value="1" />
+									<input class="star" type="radio" name="rating" value="2" />
+									<input class="star" type="radio" name="rating" value="3" />
+									<input class="star" type="radio" name="rating" value="4" />
+									<input class="star" type="radio" name="rating" value="5" />						
+								</div>
+								
+								<br>
+								<div id="rating-stars-text">
+									<span id="numberRatings"></span>
+									<fmt:message key="label.learning.ratings" />
+								</div>
+							</html:form>
+						</c:if>
+						
+						<c:if test="${imageGallery.allowVote}">
+							<html:form action="learning/vote" method="post" styleId="votingForm">
+								<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+								<input type="hidden" name="imageUid" id="votingForm_imageUid"/>
+								
+								<p class="small-space-top" style="margin-right: 0px">
+									<html:checkbox property="vote" styleClass="noBorder" styleId="votingForm_vote" />
+									<label for="votingForm_vote" id="votingForm_label"></label>
+								</p>
+								
+							</html:form>							
+						</c:if> 			
+					</div>
+				</c:if>
+				
+				<%--"Check for new", "Add new image" and "Delete" buttons---------------%>
+				
+				<c:if test="${imageGallery.allowShareImages}">
+					<a href="#nogo" onclick="return checkNew()" class="button" id="check-for-new-button"> 
+						<fmt:message key="label.check.for.new" /> 
+					</a>
+						
+					<c:if test="${not finishedLock}">
+						<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button thickbox" id="add-new-image-button">  
+							<fmt:message key="label.learning.add.new.image" />
+						</a>
+					</c:if>
+						
+					<a href="#nogo" onclick="return deleteImage();" class="button" id="delete-button"> 
+						<fmt:message key="label.learning.delete.image" /> 
+					</a>
+				</c:if>
+			</div>
+		</c:if>
+			
 		<%--Comments area----------------------------------------------%>	
- 		
-		<div id="commentsArea">
+	 		
+		<div id="comments-area">
 			<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
-		</div>
+		</div>	
  
 		<%--Reflection--------------------------------------------------%>
 
@@ -501,11 +442,7 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
-		</c:if>
-		
-		<div id="openOriginalSizeLink_size" style="display:none;" >
-			<fmt:message key="label.learning.open.original.size" />
-		</div>		
+		</c:if>	
 
 	</div>
 	<%--closes content--%>

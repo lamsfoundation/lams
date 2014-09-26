@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-		"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 		
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -9,7 +8,7 @@
 			<fmt:message key="label.monitoring.title" />
 		</title>
 		
-		<%@ include file="/common/headerWithoutPrototype.jsp"%>
+		<%@ include file="/common/header.jsp"%>
 	</lams:head>
 	
 	<body class="stripes">

@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-		"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -11,7 +10,7 @@
 	<body class="stripes">
 		<script type="text/javascript">
 			var reqIDVar = new Date();
-			window.parent.location.href  = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+			window.parent.location.href = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 		</script>
 		<div style="align:center">
 			Add File success, <a href="<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}" target="newImageGalleryFrame">click here to return</a>.

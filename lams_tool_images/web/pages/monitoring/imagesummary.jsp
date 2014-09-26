@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
@@ -15,7 +14,6 @@
 		<%@ include file="/common/header.jsp"%>
 		
 		<script type="text/javascript">
-
 			function deleteComment(commentUid) {
 				var	deletionConfirmed = confirm("<fmt:message key="warning.msg.monitoring.do.you.want.to.delete"></fmt:message>");
 
@@ -170,10 +168,12 @@
 			<br>
 			
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="self.parent.tb_remove();" class="button right-buttons space-left"><fmt:message
-						key="label.cancel" /> </a>
-				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button right-buttons space-left"><fmt:message
-						key="label.monitoring.imagesummary.save" /> </a>
+				<a href="#" onclick="self.parent.tb_remove();" class="button right-buttons space-left">
+					<fmt:message key="label.cancel" /> 
+				</a>
+				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button right-buttons space-left">
+					<fmt:message key="label.monitoring.imagesummary.save" /> 
+				</a>
 			</lams:ImgButtonWrapper>
 		</div>
 		<!--closes content-->

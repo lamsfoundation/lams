@@ -63,7 +63,7 @@ public class ImageGalleryServiceProxy {
 
     private static Object getImageGalleryDomainService(ServletContext servletContext) {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	return wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
+	return wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
 
 }
