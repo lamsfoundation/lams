@@ -1,50 +1,9 @@
 	<!--  Security Constraint -->
+	
 	<security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Secure Content</web-resource-name>
-    		<url-pattern>/addLesson.jsp</url-pattern>
-            <url-pattern>/admin.jsp</url-pattern>
-            <url-pattern>/author.jsp</url-pattern>
-            <url-pattern>/authoringConfirm.jsp</url-pattern>
-            <url-pattern>/community.jsp</url-pattern>
-            <url-pattern>/editprofile.jsp</url-pattern>
-            <url-pattern>/findUserLessons.jsp</url-pattern>
-            <url-pattern>/findUserLessonsAutocomplete.jsp</url-pattern>
-            <url-pattern>/footer.jsp</url-pattern>
-            <url-pattern>/group.jsp</url-pattern>
-            <url-pattern>/groupContents.jsp</url-pattern>
-            <url-pattern>/groupHeader.jsp</url-pattern>
-            <url-pattern>/header.jsp</url-pattern>
-            <url-pattern>/index.jsp</url-pattern>
-            <url-pattern>/lams_shared_library.jsp</url-pattern>
-            <url-pattern>/launchlearner.jsp</url-pattern>
-            <url-pattern>/learner.jsp</url-pattern>
-            <url-pattern>/lessons.jsp</url-pattern>
-            <url-pattern>/main.jsp</url-pattern>
-            <url-pattern>/monitorLesson.jsp</url-pattern>
-            <url-pattern>/msgContent.jsp</url-pattern>
-            <url-pattern>/passwordChangeContent.jsp</url-pattern>
-            <url-pattern>/passwordChangeOkContent.jsp</url-pattern>
-            <url-pattern>/portrait.jsp</url-pattern>
-            <url-pattern>/profile.jsp</url-pattern>
-            <url-pattern>/sysadmin.jsp</url-pattern>
-            <url-pattern>/template.jsp</url-pattern>
-
-                <!-- 2.4 jsps -->
-                <url-pattern>/tutorialVideo.jsp</url-pattern>
-                <url-pattern>/portrait.jsp</url-pattern>
-                <url-pattern>/loadVars.jsp</url-pattern>
-                <!-- end 2.4 jsps -->
-
-    		<url-pattern>*.html</url-pattern>
-    		<url-pattern>*.do</url-pattern>
-    		<url-pattern>/servlet/*</url-pattern>
-    		<url-pattern>/ckeditor/*</url-pattern>
-    		<url-pattern>/toolcontent/*</url-pattern>
-    		<url-pattern>/development/*</url-pattern>
-    		<url-pattern>/pedagogical_planner/*</url-pattern>
-    		<url-pattern>/lamscommunity/*</url-pattern>
-    		<url-pattern>/JHB/*</url-pattern>
+	    	<web-resource-name>General secure content</web-resource-name>
+    		<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
@@ -52,57 +11,78 @@
     		<role-name>AUTHOR</role-name>
     	    <role-name>GROUP MANAGER</role-name>
     		<role-name>GROUP ADMIN</role-name>
+    		<role-name>AUTHOR ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
-    		<role-name>AUTHOR ADMIN</role-name>
-    	</auth-constraint>
-    </security-constraint>
-
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Authoring Update</web-resource-name>
-		    <url-pattern>/authoring.do</url-pattern>
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>AUTHOR</role-name>
-    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     
     <security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Staff Content</web-resource-name>
-		    <url-pattern>/monitoring.do</url-pattern>
+	    	<web-resource-name>Public content</web-resource-name>
+    		<url-pattern>/css/*</url-pattern>
+    		<url-pattern>/errorpages/*</url-pattern>
+    		<url-pattern>/images/*</url-pattern>
+    		<url-pattern>/includes/javascript/*</url-pattern>
+    		<url-pattern>/signup/*</url-pattern>	
+    		<url-pattern>*.ico</url-pattern>
+    	</web-resource-collection>
+    </security-constraint>
+
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Author content</web-resource-name>
+	    	  <url-pattern>/authoring/*</url-pattern>
+	    	  <url-pattern>/addLesson.jsp</url-pattern>
+	    	  <url-pattern>/author.jsp</url-pattern>
+	    	  <url-pattern>/authoringConfirm.jsp</url-pattern>
+	    	  <url-pattern>/lams_authoring_library.swf</url-pattern>
+	    	  <url-pattern>/lams_authoring.swf</url-pattern>
+	    	  <url-pattern>/lams_preloader.swf</url-pattern>
+    		</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    
+    <!-- Some constraints are based on DisplayGroupAction class -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Organisation grouping</web-resource-name>
+	    	  <url-pattern>/orgGroup.jsp</url-pattern>
+	    	  <url-pattern>/orgGrouping.jsp</url-pattern>
+    		</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>MONITOR</role-name>
+    		<role-name>GROUP MANAGER</role-name>
+    		<role-name>GROUP ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Add lesson</web-resource-name>
+		    <url-pattern>/addLesson.jsp</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>GROUP MANAGER</role-name>
-    	</auth-constraint>
-    </security-constraint>
-
-	<!--  some combine role security setting -->
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Download Files</web-resource-name>
-		    <url-pattern>/download/</url-pattern>
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>LEARNER</role-name>
-    		<role-name>AUTHOR</role-name>
-    		<role-name>MONITOR</role-name>
-    	    <role-name>GROUP MANAGER</role-name>
-    		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
-    		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     
-    <!-- Open access content -->
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Open access content</web-resource-name>
-			<url-pattern>/signup/*</url-pattern>
-		</web-resource-collection>
-	</security-constraint> 
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Sysadmin content</web-resource-name>
+		    <url-pattern>/admin.jsp</url-pattern>
+		    <url-pattern>/sysadmin.jsp</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
     
 	<!--  Login Configuration -->
   	<login-config>
@@ -113,36 +93,39 @@
     		<form-error-page>/login.jsp?failed=y</form-error-page>
    		</form-login-config>
    	</login-config>
-    <!-- ======================================================== -->
+   	
 	<!--  Security Roles -->
-    <!-- ======================================================== -->
 	<security-role>
 		<description>Student</description>
 		<role-name>LEARNER</role-name>
 	</security-role>
 
 	<security-role>
-		<description>Can create/modify a learning design</description>
+		<description>Authors Learning Designs</description>
 		<role-name>AUTHOR</role-name>
 	</security-role>
 
 	<security-role>
-		<description>Can running and monitoring a learning session</description>
+		<description>Member of Staff</description>
 		<role-name>MONITOR</role-name>
 	</security-role>
 
-    <security-role>
+	<security-role>
+		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-   	<security-role>
+	
+	<security-role>
+		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-
+	
 	<security-role>
-		<description>Can add/remove users to the system, set up classes of users for sessions</description>
-		<role-name>SYSADMIN</role-name>
-	</security-role>
-
-	<security-role>
+		<description>Author Administrator</description>
 		<role-name>AUTHOR ADMIN</role-name>
+	</security-role>
+	
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
 	</security-role>

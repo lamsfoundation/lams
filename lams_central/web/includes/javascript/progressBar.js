@@ -1021,7 +1021,7 @@ function fillProgressBar(barId) {
 	}
 
 	$.ajax({
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'learning/learner.do',
 		data : {
 			'method'   : 'getLearnerProgress',
 			'lessonID' : lessonId,
