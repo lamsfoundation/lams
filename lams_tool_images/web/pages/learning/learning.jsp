@@ -111,7 +111,7 @@
 				.fotorama({
 					//TODO history   : true,
 					width: ${mediumImageDimensions + 60},
-					height: ${mediumImageDimensions + 60}*9/16,
+					height: Math.round(${mediumImageDimensions + 60}*9/16),
 					maxwidth: '100%',
 					//ratio: 16/9,
 					allowfullscreen: true,

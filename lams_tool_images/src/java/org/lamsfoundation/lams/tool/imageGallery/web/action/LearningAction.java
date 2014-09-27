@@ -248,16 +248,18 @@ public class LearningAction extends Action {
 		// remove hidden items
 		if (!image.isHide()) {
 		    images.add(image);
-		}
-		
-		//escape characters
-		String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
-		image.setTitleEscaped(titleEscaped);
-		String descriptionEscaped = StringEscapeUtils.escapeJavaScript(image.getDescription());
-		image.setDescriptionEscaped(descriptionEscaped);	
+		}	
 	    }
 	} else {
 	    images.addAll(imageGallery.getImageGalleryItems());
+	}
+	
+	// escape characters
+	for (ImageGalleryItem image : images) {
+	    String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
+	    image.setTitleEscaped(titleEscaped);
+	    String descriptionEscaped = StringEscapeUtils.escapeJavaScript(image.getDescription());
+	    image.setDescriptionEscaped(descriptionEscaped);
 	}
 
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_LIST, images);
