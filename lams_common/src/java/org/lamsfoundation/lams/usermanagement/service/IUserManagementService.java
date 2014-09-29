@@ -379,12 +379,6 @@ public interface IUserManagementService {
 	public boolean isUserGlobalGroupAdmin();
 	
 	/**
-	 * Return true if user is a global author admin.
-	 * @return
-	 */
-	public boolean isUserGlobalAuthorAdmin();
-	
-	/**
 	 * Return true if user has sysadmin role in root organisation.
 	 * @return
 	 */

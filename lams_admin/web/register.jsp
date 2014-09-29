@@ -458,14 +458,6 @@
 			</tr>
 			<tr>
 				<td>
-					<fmt:message key="role.AUTHOR.ADMIN"/>
-				</td>
-				<td>
-					${registerDTO.authorAdminNumber}
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<fmt:message key="admin.register.server.stats.total.users"/>
 				</td>
 				<td>

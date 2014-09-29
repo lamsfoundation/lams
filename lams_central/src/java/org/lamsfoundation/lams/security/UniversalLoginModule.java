@@ -355,8 +355,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						group.addMember(p);
 						groupMembers.add(name);
 					}
-					if (name.equals(Role.SYSADMIN)
-							|| name.equals(Role.AUTHOR_ADMIN)) {
+					if (name.equals(Role.SYSADMIN)) {
 						p = super.createIdentity(Role.AUTHOR);
 						log.info("===> Found " + name);
 						if (!groupMembers.contains(Role.AUTHOR)) {

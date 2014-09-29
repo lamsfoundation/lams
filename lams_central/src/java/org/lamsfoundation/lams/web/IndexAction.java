@@ -158,7 +158,7 @@ public class IndexAction extends Action {
 
     private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-	if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
+	if (request.isUserInRole(Role.AUTHOR)) {
 	    if (isPedagogicalPlannerAvailable()) {
 		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    }
@@ -170,7 +170,7 @@ public class IndexAction extends Action {
 	if (reg != null) {
 	    if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN)
 		    || request.isUserInRole(Role.GROUP_MANAGER) || request.isUserInRole(Role.AUTHOR)
-		    || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR)) {
+		    || request.isUserInRole(Role.MONITOR)) {
 		headerLinks.add(new IndexLinkBean("index.community", "index.do?tab=community"));
 	    }
 	}
@@ -191,8 +191,7 @@ public class IndexAction extends Action {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + getUserManagementService().getRootOrganisation().getOrganisationId() + ')'));
 	}
-	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN)
-		|| getUserManagementService().isUserGlobalGroupAdmin()) {
+	if (request.isUserInRole(Role.SYSADMIN) || getUserManagementService().isUserGlobalGroupAdmin()) {
 	    adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 	}
 	request.setAttribute("adminLinks", adminLinks);

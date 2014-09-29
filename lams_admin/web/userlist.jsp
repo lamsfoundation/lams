@@ -81,10 +81,6 @@ p {
 		<td align="right"><fmt:message key="label.group.admins"/>:</td>
 		<td><c:out value="${GROUP_ADMIN}"/></td>
 	</tr>
-	<tr>
-		<td align="right"><fmt:message key="label.author.admins"/>:</td>
-		<td><c:out value="${AUTHOR_ADMIN}"/></td>
-	</tr>
 </table>
 </logic:equal>
 

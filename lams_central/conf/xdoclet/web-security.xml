@@ -11,7 +11,6 @@
     		<role-name>AUTHOR</role-name>
     	    <role-name>GROUP MANAGER</role-name>
     		<role-name>GROUP ADMIN</role-name>
-    		<role-name>AUTHOR ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -24,15 +23,14 @@
     		<url-pattern>/images/*</url-pattern>
     		<url-pattern>/includes/javascript/*</url-pattern>
     		<url-pattern>/signup/*</url-pattern>	
-    		<url-pattern>*.ico</url-pattern>
+    		<url-pattern>/favicon.ico</url-pattern>
     	</web-resource-collection>
     </security-constraint>
 
-    <security-constraint>
+   <security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Author content</web-resource-name>
+	    	<web-resource-name>Authoring content</web-resource-name>
 	    	  <url-pattern>/authoring/*</url-pattern>
-	    	  <url-pattern>/addLesson.jsp</url-pattern>
 	    	  <url-pattern>/author.jsp</url-pattern>
 	    	  <url-pattern>/authoringConfirm.jsp</url-pattern>
 	    	  <url-pattern>/lams_authoring_library.swf</url-pattern>
@@ -41,6 +39,8 @@
     		</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<!-- For live edit -->
+    		<role-name>MONITOR</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -118,11 +118,6 @@
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
-	</security-role>
-	
-	<security-role>
-		<description>Author Administrator</description>
-		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 	
 	<security-role>

@@ -79,9 +79,6 @@ public class SysAdminStartAction extends Action {
 			if (openIDEnabled != null && Boolean.parseBoolean(openIDEnabled.getConfigValue()) == Boolean.TRUE) {
 				links.add(new LinkBean("openIDConfig.do", "admin.openid.title"));
 			}
-		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
-			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.tool.management");
-			links.add(linkBean);
 		} else if (service.isUserGlobalGroupAdmin()) {
 			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
 			links.add(linkBean);

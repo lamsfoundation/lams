@@ -157,7 +157,6 @@
     		<role-name>AUTHOR</role-name>
     	    <role-name>GROUP MANAGER</role-name>
     		<role-name>GROUP ADMIN</role-name>
-    		<role-name>AUTHOR ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -196,11 +195,6 @@
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
-	</security-role>
-	
-	<security-role>
-		<description>Author Administrator</description>
-		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 	
 	<security-role>

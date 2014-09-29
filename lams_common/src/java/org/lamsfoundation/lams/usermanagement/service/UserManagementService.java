@@ -887,8 +887,7 @@ public class UserManagementService implements IUserManagementService {
 	    log.debug("setting role: " + role.getName() + " in organisation: " + org.getName());
 	    uors.add(uor);
 	    // when a user gets these roles, they need a workspace
-	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.AUTHOR_ADMIN)
-		    || role.getName().equals(Role.SYSADMIN)) {
+	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.SYSADMIN)) {
 		if (user.getWorkspace() == null) {
 		    createWorkspaceForUser(user);
 		}
@@ -973,8 +972,6 @@ public class UserManagementService implements IUserManagementService {
 	if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE) || !isSysadmin) {
 	    role.setRoleId(Role.ROLE_SYSADMIN);
 	    allRoles.remove(role);
-	    role.setRoleId(Role.ROLE_AUTHOR_ADMIN);
-	    allRoles.remove(role);
 	} else {
 	    role.setRoleId(Role.ROLE_AUTHOR);
 	    allRoles.remove(role);
@@ -1052,12 +1049,6 @@ public class UserManagementService implements IUserManagementService {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
-    }
-
-    public boolean isUserGlobalAuthorAdmin() {
-	Integer rootOrgId = getRootOrganisation().getOrganisationId();
-	Integer requestorId = getRequestorId();
-	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.AUTHOR_ADMIN) : false;
     }
 
     public boolean isUserSysAdmin() {

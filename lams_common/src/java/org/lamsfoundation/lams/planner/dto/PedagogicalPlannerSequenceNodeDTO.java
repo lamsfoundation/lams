@@ -124,7 +124,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		|| (user != null && node.getUser() != null && user.getUserID().equals(node.getUser().getUserId()));
 	dto.isEditor = dto.isOwner
 		|| (user != null && pedagogicalPlannerDAO.isEditor(user.getUserID(), node.getUid(),
-			Role.ROLE_AUTHOR_ADMIN));
+			Role.ROLE_SYSADMIN));
 	Integer nodePermissions = node.getPermissions();
 	dto.permitViewTemplate = dto.isOwner
 		|| nodePermissions == null

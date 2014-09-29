@@ -241,6 +241,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
+    		<role-name>MONITOR</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
@@ -282,11 +283,6 @@
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
-	</security-role>
-	
-	<security-role>
-		<description>Author Administrator</description>
-		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 	
 	<security-role>

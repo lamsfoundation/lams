@@ -125,7 +125,6 @@ public class RegisterAction extends LamsDispatchAction {
 	registerDTO.setMonitorNumber(userManagementService.getCountRoleForSystem(Role.ROLE_MONITOR));
 	registerDTO.setManagerNumber(userManagementService.getCountRoleForSystem(Role.ROLE_GROUP_MANAGER));
 	registerDTO.setLearnerNumber(userManagementService.getCountRoleForSystem(Role.ROLE_LEARNER));
-	registerDTO.setAuthorAdminNumber(userManagementService.getCountRoleForSystem(Role.ROLE_AUTHOR_ADMIN));
 	registerDTO.setUserNumber(Integer.valueOf(userManagementService.findAll(User.class).size()));
 	registerDTO.setServerUrl(Configuration.get(ConfigurationKeys.SERVER_URL));
 	registerDTO.setServerVersion(Configuration.get(ConfigurationKeys.VERSION));
@@ -224,7 +223,6 @@ public class RegisterAction extends LamsDispatchAction {
 	    params.put("authorno", userManagementService.getCountRoleForSystem(Role.ROLE_AUTHOR).toString());
 	    params.put("monitorno", userManagementService.getCountRoleForSystem(Role.ROLE_MONITOR).toString());
 	    params.put("learnerno", userManagementService.getCountRoleForSystem(Role.ROLE_LEARNER).toString());
-	    params.put("authoradminno", userManagementService.getCountRoleForSystem(Role.ROLE_AUTHOR_ADMIN).toString());
 	    params.put("userno", Integer.valueOf(userManagementService.findAll(User.class).size()).toString());
 
 	    // make the request to lamscommunity.org

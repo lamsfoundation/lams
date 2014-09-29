@@ -2,7 +2,7 @@
   	
 	<security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Secure Content</web-resource-name>
+	    	<web-resource-name>Secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
@@ -10,6 +10,21 @@
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
+    
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Lesson start content</web-resource-name>
+			<url-pattern>/initializeLesson</url-pattern>
+			<url-pattern>/monitoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<!-- Author can preview the lesson -->
+    		<role-name>AUTHOR</role-name>
+    		<role-name>MONITOR</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    		
 
 	<!--  Login Configuration -->
 	
@@ -47,11 +62,6 @@
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
-	</security-role>
-	
-	<security-role>
-		<description>Author Administrator</description>
-		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>
 	
 	<security-role>

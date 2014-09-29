@@ -982,7 +982,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		try {
 		    HttpSession s = SessionManager.getSession();
 		    UserDTO u = (UserDTO) s.getAttribute(AttributeNames.USER);
-		    getPedagogicalPlannerDAO().saveNodeRole(u.getUserID(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+		    getPedagogicalPlannerDAO().saveNodeRole(u.getUserID(), nodeUid, Role.ROLE_SYSADMIN);
 		} catch (Exception e) {
 		    PedagogicalPlannerAction.log.error("Error saving role for newly created root node: "
 			    + e.getMessage());
@@ -1877,15 +1877,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 
 	if (canEditNode(request, nodeUid)) {
-	    List<User> existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	    List<User> existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_SYSADMIN);
 
 	    Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
 	    Vector<User> potentialUsersVector = getUserManagementService().getUsersFromOrganisationByRole(orgId,
-		    Role.AUTHOR_ADMIN, false, true);
+		    Role.SYSADMIN, false, true);
 
 	    // list existing users (inherited role from parent nodes)
 	    Set<User> allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid,
-		    Role.ROLE_AUTHOR_ADMIN);
+		    Role.ROLE_SYSADMIN);
 	    ArrayList<User> filteredInheritedUsers = new ArrayList<User>();
 	    for (Object o : allInheritedUsers) {
 		User u = (User) o;
@@ -1927,7 +1927,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 
 	if (canEditNode(request, nodeUid)) {
-	    getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	    getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_SYSADMIN);
 	} else {
 	    PedagogicalPlannerAction.log.debug("Unauthorised attempt to add editor to node.");
 	}
@@ -1941,7 +1941,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, false);
 
 	if (canEditNode(request, nodeUid)) {
-	    getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	    getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_SYSADMIN);
 	} else {
 	    PedagogicalPlannerAction.log.debug("Unauthorised attempt to remove editor from node.");
 	}
@@ -1963,7 +1963,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    if (nodeUid == null) {
 		// all global author admins (GAA) can create and edit at the root level
-		return getUserManagementService().isUserGlobalAuthorAdmin();
+		return getUserManagementService().isUserSysAdmin();
 	    } else {
 		// at any other node, the user needs to be the node's owner
 		// or linked to that node or one of its parents
@@ -1977,7 +1977,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private boolean isEditor(HttpServletRequest request, Long nodeUid) {
 	User user = getUserManagementService().getUserByLogin(request.getRemoteUser());
-	return getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	return getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_SYSADMIN);
     }
 
     private boolean canRemoveSubtree(HttpServletRequest request, Long nodeUid) {
