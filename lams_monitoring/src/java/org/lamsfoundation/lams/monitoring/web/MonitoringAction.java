@@ -55,8 +55,6 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
@@ -86,8 +84,6 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -563,10 +559,10 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	getAuditService();	
+	getAuditService();
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	
+
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -591,12 +587,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
 		    + message);
 	}
-	
-	//audit log force completion attempt
+
+	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
-	Object[] args = new Object[] {learnerId, activityId, lessonId};
+	Object[] args = new Object[] { learnerId, activityId, lessonId };
 	String auditMessage = monitoringService.getMessageService().getMessage(messageKey, args);
-	auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
+	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
@@ -936,48 +932,6 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Produces necessary data for learner progress bar.
-     */
-    @SuppressWarnings("unchecked")
-    public ActionForward getLearnerProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
-	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
-	Integer monitorId = null;
-	if (learnerId == null) {
-	    // get progress for current user
-	    learnerId = getUserId();
-	} else {
-	    // monitor mode; get progress for user given in the parameter
-	    monitorId = getUserId();
-	}
-
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
-	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
-
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("currentActivityId", ret[1]);
-	responseJSON.put("isPreview", ret[2]);
-	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
-	    if (activity.getFloating()) {
-		// these are support activities
-		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    responseJSON.append("support",
-			    activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
-		}
-	    } else {
-		responseJSON.append("activities",
-			activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
-	    }
-	}
-
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON.toString());
-
-	return null;
-    }
-
-    /**
      * Produces data to update Lesson tab in Monitor.
      */
     public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1059,8 +1013,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    activityJSON.put("x", ((OptionsWithSequencesActivity) activity).getStartXcoord());
 		    activityJSON.put("y", ((OptionsWithSequencesActivity) activity).getStartYcoord());
 		} else if ((parentActivity != null)
-			&& (Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId() || Activity.PARALLEL_ACTIVITY_TYPE == parentActivity
-				.getActivityTypeId())) {
+			&& ((Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId()) || (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity
+				.getActivityTypeId()))) {
 		    // Optional Activity children had coordinates relative to parent
 		    activityJSON.put("x", parentActivity.getXcoord() + activity.getXcoord());
 		    activityJSON.put("y", parentActivity.getYcoord() + activity.getYcoord());
@@ -1185,8 +1139,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
 
-	    } else {
-		flashMessage = handleCriticalError("startPreviewSession", "error.system.error", monitoringService);
 	    }
 
 	} catch (Exception e) {
@@ -1332,60 +1284,6 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Converts an activity in learner progress to a JSON object.
-     */
-    private JSONObject activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
-	    Integer learnerId, Integer monitorId) throws JSONException, IOException {
-	JSONObject activityJSON = new JSONObject();
-	activityJSON.put("id", activity.getActivityId());
-	activityJSON.put("name", activity.getTitle());
-	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
-
-	// URL in learner mode
-	String url = activity.getUrl();
-	if ((url != null) && (monitorId != null)) {
-	    IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		    .getServletContext());
-	    // URL in monitor mode
-	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "monitoring/monitoring.do?method=getLearnerActivityURL&lessonID=" + lessonId + "&activityID="
-		    + activity.getActivityId() + "&userID=" + learnerId;
-	}
-
-	if (url != null) {
-	    if (url.startsWith("learner.do")) {
-		url = "learning/" + url;
-	    }
-	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-	    if (!url.startsWith(serverUrl)) {
-		// monitor mode URLs should be prepended with server URL
-		url = serverUrl + url;
-	    }
-	    activityJSON.put("url", url);
-	}
-
-	String actType = activity.getType().toLowerCase();
-	String type = "a";
-	if (actType.contains("gate")) {
-	    type = "g";
-	} else if (actType.contains("options")) {
-	    type = "o";
-	} else if (actType.contains("branching")) {
-	    type = "b";
-	}
-	activityJSON.put("type", type);
-
-	if (activity.getChildActivities() != null) {
-	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.append("childActivities",
-			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
-	    }
-	}
-
-	return activityJSON;
-    }
-
-    /**
      * Creates a list of users out of string with comma-delimited user IDs.
      */
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
@@ -1394,17 +1292,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);
-	
+
 	for (User user : users) {
 	    Integer userId = user.getUserId();
 	    for (String includeId : userIdArray) {
-		if (userId.equals(includeId)) {
+		if (userId.toString().equals(includeId)) {
 		    result.add(user);
 		    break;
 		}
 	    }
 	}
-	
+
 	return result;
     }
 

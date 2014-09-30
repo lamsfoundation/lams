@@ -1,19 +1,33 @@
-	<!--  Security Constraint -->
+  	<!--  Security Constraint -->
+  	
 	<security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Secure Content</web-resource-name>
+	    	<web-resource-name>Secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
-    		<role-name>LEARNER</role-name>
     		<role-name>MONITOR</role-name>
-    		<role-name>AUTHOR</role-name>
     		<role-name>SYSADMIN</role-name>
-			<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
+    
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Lesson start content</web-resource-name>
+			<url-pattern>/initializeLesson</url-pattern>
+			<url-pattern>/monitoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<!-- Author can preview the lesson -->
+    		<role-name>AUTHOR</role-name>
+    		<role-name>MONITOR</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    		
 
 	<!--  Login Configuration -->
+	
   	<login-config>
    		<auth-method>FORM</auth-method>
 		<realm-name>LAMS</realm-name>
@@ -22,36 +36,35 @@
     		<form-error-page>/login.jsp</form-error-page>
    		</form-login-config>
    	</login-config>
-	<!-- ======================================================== -->
+   	
 	<!--  Security Roles -->
-    <!-- ======================================================== -->
+	
 	<security-role>
 		<description>Student</description>
 		<role-name>LEARNER</role-name>
 	</security-role>
 
 	<security-role>
-		<description>Can create/modify a learning design</description>
+		<description>Authors Learning Designs</description>
 		<role-name>AUTHOR</role-name>
 	</security-role>
 
 	<security-role>
-		<description>Can running and monitoring a learning session</description>
+		<description>Member of Staff</description>
 		<role-name>MONITOR</role-name>
 	</security-role>
 
-    <security-role>
+	<security-role>
+		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-   	<security-role>
+	
+	<security-role>
+		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-
+	
 	<security-role>
-		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
-	</security-role>
-
-	<security-role>
-		<role-name>AUTHOR ADMIN</role-name>
 	</security-role>

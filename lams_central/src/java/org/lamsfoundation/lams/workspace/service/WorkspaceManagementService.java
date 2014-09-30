@@ -502,8 +502,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     }
 
     private boolean isSysAuthorAdmin(User user) {
-	return userMgmtService.hasRoleInOrganisation(user, Role.ROLE_AUTHOR_ADMIN)
-		|| userMgmtService.hasRoleInOrganisation(user, Role.ROLE_SYSADMIN);
+	return userMgmtService.hasRoleInOrganisation(user, Role.ROLE_SYSADMIN);
     }
 
     /**
@@ -1411,7 +1410,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	while (roleIterator.hasNext()) {
 	    UserOrganisationRole userOrganisationRole = (UserOrganisationRole) roleIterator.next();
 	    Role role = userOrganisationRole.getRole();
-	    if (role.isAuthor() || role.isSysAdmin() || role.isGroupManager() || role.isAuthorAdmin()) {
+	    if (role.isAuthor() || role.isSysAdmin() || role.isGroupManager()) {
 		return true;
 	    }
 	}

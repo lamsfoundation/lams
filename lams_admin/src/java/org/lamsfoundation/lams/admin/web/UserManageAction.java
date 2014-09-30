@@ -140,7 +140,6 @@ public class UserManageAction extends Action {
 		HashMap<String, Integer> roleCount = new HashMap<String, Integer>();
 		if (orgId.equals(rootOrgId)) {
 			roleCount.put(Role.SYSADMIN, Role.ROLE_SYSADMIN);
-			roleCount.put(Role.AUTHOR_ADMIN, Role.ROLE_AUTHOR_ADMIN);
 			roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
 		} else {
 			roleCount.put(Role.LEARNER, Role.ROLE_LEARNER);

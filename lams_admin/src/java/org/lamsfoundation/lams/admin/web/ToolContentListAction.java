@@ -102,7 +102,7 @@ public class ToolContentListAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// check permission
-	if (!(request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.AUTHOR_ADMIN))) {
+	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_NAME, "ToolContentListAction");
 	    request.setAttribute(
 		    ToolContentListAction.ATTRIBUTE_ERROR_MESSAGE,

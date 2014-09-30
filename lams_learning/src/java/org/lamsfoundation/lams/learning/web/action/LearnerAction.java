@@ -26,17 +26,22 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -45,11 +50,15 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -430,6 +439,51 @@ public class LearnerAction extends LamsDispatchAction {
     }
 
     /**
+     * Produces necessary data for learner progress bar.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getLearnerProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
+	Integer monitorId = null;
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Integer userId = user != null ? user.getUserID() : null;
+	if (learnerId == null) {
+	    // get progress for current user
+	    learnerId = userId;
+	} else {
+	    // monitor mode; get progress for user given in the parameter
+	    monitorId = userId;
+	}
+
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("currentActivityId", ret[1]);
+	responseJSON.put("isPreview", ret[2]);
+	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
+	    if (activity.getFloating()) {
+		// these are support activities
+		for (ActivityURL childActivity : activity.getChildActivities()) {
+		    responseJSON.append("support",
+			    activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
+		}
+	    } else {
+		responseJSON.append("activities",
+			activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+	    }
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON.toString());
+
+	return null;
+    }
+
+    /**
      * Gets the same url as getLearnerActivityURL() but forwards directly to the url, rather than returning the url in a
      * Flash packet.
      * 
@@ -642,4 +696,55 @@ public class LearnerAction extends LamsDispatchAction {
 	return redirectToURL(mapping, response, url);
     }
 
+    /**
+     * Converts an activity in learner progress to a JSON object.
+     */
+    private JSONObject activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId,
+	    Integer learnerId, Integer monitorId) throws JSONException, IOException {
+	JSONObject activityJSON = new JSONObject();
+	activityJSON.put("id", activity.getActivityId());
+	activityJSON.put("name", activity.getTitle());
+	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
+
+	// URL in learner mode
+	String url = activity.getUrl();
+	if ((url != null) && (monitorId != null)) {
+	    // URL in monitor mode
+	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "monitoring/monitoring.do?method=getLearnerActivityURL&lessonID=" + lessonId + "&activityID="
+		    + activity.getActivityId() + "&userID=" + learnerId;
+	}
+
+	if (url != null) {
+	    if (url.startsWith("learner.do")) {
+		url = "learning/" + url;
+	    }
+	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	    if (!url.startsWith(serverUrl)) {
+		// monitor mode URLs should be prepended with server URL
+		url = serverUrl + url;
+	    }
+	    activityJSON.put("url", url);
+	}
+
+	String actType = activity.getType().toLowerCase();
+	String type = "a";
+	if (actType.contains("gate")) {
+	    type = "g";
+	} else if (actType.contains("options")) {
+	    type = "o";
+	} else if (actType.contains("branching")) {
+	    type = "b";
+	}
+	activityJSON.put("type", type);
+
+	if (activity.getChildActivities() != null) {
+	    for (ActivityURL childActivity : activity.getChildActivities()) {
+		activityJSON.append("childActivities",
+			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+	    }
+	}
+
+	return activityJSON;
+    }
 }

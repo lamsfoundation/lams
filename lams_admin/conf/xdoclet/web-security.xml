@@ -5,7 +5,6 @@
 			<url-pattern>/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
-    		<role-name>AUTHOR ADMIN</role-name>
     	    <role-name>GROUP MANAGER</role-name>
     		<role-name>GROUP ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
@@ -22,17 +21,33 @@
    		</form-login-config>
    	</login-config>
 
-    <!--  Security Roles -->
-    <security-role>
-		<role-name>AUTHOR ADMIN</role-name>
+	<!--  Security Roles -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
 	</security-role>
-    <security-role>
+
+	<security-role>
+		<description>Authors Learning Designs</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Member of Staff</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-   	<security-role>
+	
+	<security-role>
+		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-	<security-role>
-		<role-name>SYSADMIN</role-name>
-	</security-role>
 	
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>	
