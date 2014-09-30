@@ -1198,6 +1198,14 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
  * Extracts activity using SVG attributes.
  */
 function getActivityCoordinates(activity){
+	// fix missing coordinates, not set by Flash Authoring
+	if (!activity.x) {
+		activity.x = 0;
+	}
+	if (!activity.y) {
+		activity.y = 0;
+	}
+	
 	// special processing for gates
 	if ([3,4,5,14].indexOf(activity.type) > -1) {
 		return {
