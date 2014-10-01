@@ -18,11 +18,24 @@
     <security-constraint>
 	   	<web-resource-collection>
 	    	<web-resource-name>Public content</web-resource-name>
+ 	    	<!-- Integrations -->
+    		<url-pattern>/LoginRequest</url-pattern>
+    		<url-pattern>/services/xml/LessonManager/*</url-pattern>
+    		<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+    		<url-pattern>/services/LearningDesignSVG/*</url-pattern>
+    		<url-pattern>/services/Gradebook</url-pattern>
+    		<url-pattern>/services/xml/LessonJoin/*</url-pattern>
+    		<url-pattern>/services/CourseGroupManager</url-pattern>
+			
+			<url-pattern>/services/Register/*</url-pattern>
+			<url-pattern>/ForgotPasswordRequest</url-pattern>
+			<url-pattern>/signup/*</url-pattern>
+			 			
+	    	<!-- Static resources -->
     		<url-pattern>/css/*</url-pattern>
     		<url-pattern>/errorpages/*</url-pattern>
     		<url-pattern>/images/*</url-pattern>
     		<url-pattern>/includes/javascript/*</url-pattern>
-    		<url-pattern>/signup/*</url-pattern>	
     		<url-pattern>/favicon.ico</url-pattern>
     	</web-resource-collection>
     </security-constraint>
