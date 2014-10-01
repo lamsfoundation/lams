@@ -870,6 +870,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    while (iter.hasNext()) {
 		ImageGalleryItem item = (ImageGalleryItem) iter.next();
 		if (item.isCreateByAuthor()) {
+		    item.getComments().clear();
 		    imageGalleryUserDao.saveObject(item.getCreateBy());
 		    imageGalleryItemDao.saveObject(item);
 		} else {
