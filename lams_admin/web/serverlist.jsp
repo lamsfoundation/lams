@@ -13,6 +13,7 @@
 		<th><fmt:message key="sysadmin.prefix" /></th>
 		<th><fmt:message key="sysadmin.disabled" /></th>
 		<th><fmt:message key="sysadmin.organisation" /></th>
+		<th><fmt:message key="admin.actions"/></th>
 	</tr>
 	<c:forEach items="${servers}" var="serverOrgMap">
 	<tr>
@@ -32,21 +33,19 @@
 			</c:choose>
 		</td>
 		<td><c:out value="${serverOrgMap.organisation.name}" /></td>
-	</tr>
-	<tr>	
-		<td colspan="7">
-			<a href="servermaintain.do?method=edit&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.edit" /></a>
+		<td>
+			<a id="edit_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=edit&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.edit" /></a>
 			&nbsp;
 			<c:choose>
 				<c:when test="${serverOrgMap.disabled}">
-					<a href="servermaintain.do?method=enable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.enable" /></a>
+					<a id="enable_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=enable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.enable" /></a>
 				</c:when>
 				<c:otherwise>
-					<a href="servermaintain.do?method=disable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.disable" /></a>
+					<a id="disable_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=disable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.disable" /></a>
 				</c:otherwise>
 			</c:choose>
 			&nbsp;
-			<a href="servermaintain.do?method=delete&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.delete" /></a>
+			<a id="delete_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=delete&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.delete" /></a>
 		</td>
 	</tr>
 	</c:forEach>
