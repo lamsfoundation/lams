@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.learning.export.service;
 import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -49,5 +50,10 @@ public class ExportPortfolioServiceProxy {
 
     public static final ILessonService getLessonService(ServletContext servletContext) {
 	return (ILessonService) ExportPortfolioServiceProxy.getDomainService(servletContext, "lessonService");
+    }
+    
+
+    public static final ISecurityService getSecurityService(ServletContext servletContext) {
+	return (ISecurityService) ExportPortfolioServiceProxy.getDomainService(servletContext, "securityService");
     }
 }

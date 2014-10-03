@@ -298,8 +298,23 @@
 		<property name="messageService"><ref bean="commonMessageService"/></property>
     </bean>
 
-	<!-- Learning Design related beans-->
+	<!-- Security service -->
+	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
+		<property name="securityDAO"><ref bean="securityDAO"/></property>
+	</bean>	
 	
+	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="securityServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Learning Design related beans-->
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
@@ -408,6 +423,11 @@
 	
 	<!--  Data flow related beans -->
 	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Data flow related beans -->
+	<bean id="securityDAO" class="org.lamsfoundation.lams.security.SecurityDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

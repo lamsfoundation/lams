@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,6 +57,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonDTOComparator;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -101,6 +102,7 @@ public class HomeAction extends DispatchAction {
     private static ILearningDesignService learningDesignService;
     private static IGroupUserDAO groupUserDAO;
     private static IWorkspaceManagementService workspaceManagementService;
+    private static ISecurityService securityService;
 
     /**
      * request for sysadmin environment
@@ -178,7 +180,7 @@ public class HomeAction extends DispatchAction {
 		if (!lesson.isLessonAccessibleForLearner()) {
 		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
 		}
-		
+
 		// show lesson intro page if required and it's not been shown already
 		boolean isLessonIntroWatched = WebUtil.readBooleanParam(req, "isLessonIntroWatched", false);
 		if (lesson.isEnableLessonIntro() && !isLessonIntroWatched) {
@@ -202,12 +204,12 @@ public class HomeAction extends DispatchAction {
 		    }
 		    return mapping.findForward("lessonIntro");
 		}
-		
+
 		if (lesson.getLearnerRestart()) {
 		    // start the lesson from the beginning each time
 		    getLessonService().removeLearnerProgress(lessonId, user.getUserID());
 		}
-		
+
 		if (mode != null) {
 		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
 		}
@@ -224,10 +226,11 @@ public class HomeAction extends DispatchAction {
 		/* Date Format for Chat room append */
 		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
-		
-		//forward to /lams/learning/main.jsp
+
+		// forward to /lams/learning/main.jsp
 		String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
-		serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/" + serverURLContextPath;
+		serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/"
+			+ serverURLContextPath;
 		serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 		getServlet().getServletContext().getContext(serverURLContextPath + "learning")
 			.getRequestDispatcher("/main.jsp").forward(req, res);
@@ -307,6 +310,7 @@ public class HomeAction extends DispatchAction {
 	if (HomeAction.log.isDebugEnabled()) {
 	    HomeAction.log.debug("Requested Lesson Monitor");
 	}
+	
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	UserDTO user = getUser();
 	if (user == null) {
@@ -331,13 +335,20 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws IOException, UserAccessDeniedException, JSONException,
 	    RepositoryCheckedException {
 	UserDTO userDTO = getUser();
+	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
+
+	try {
+	    getSecurityService().hasOrgRole(organisationID, userDTO.getUserID(), Role.MONITOR, Role.GROUP_MANAGER);
+	} catch (SecurityException e) {
+	    HomeAction.log.error("Cannot add lesson", e);
+	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+	    return null;
+	}
 
 	// get all user accessible folders and LD descriptions as JSON
 	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(null, userDTO.getUserID(),
 		false);
 	req.setAttribute("folderContents", folderContentsJSON);
-
-	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 	JSONObject users = new JSONObject();
 
 	// get learners available for newly created lesson
@@ -395,8 +406,8 @@ public class HomeAction extends DispatchAction {
 	    RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
-	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID, getUser().getUserID(),
-		allowInvalidDesigns);
+	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID,
+		getUser().getUserID(), allowInvalidDesigns);
 
 	res.setContentType("application/json;charset=UTF-8");
 	res.getWriter().print(folderContentsJSON);
@@ -514,6 +525,16 @@ public class HomeAction extends DispatchAction {
 	}
 
 	return HomeAction.workspaceManagementService;
+    }
+
+    private ISecurityService getSecurityService() {
+	if (HomeAction.securityService == null) {
+	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    HomeAction.securityService = (ISecurityService) webContext.getBean("securityService");
+	}
+
+	return HomeAction.securityService;
     }
 
     private UserDTO getUser() {
