@@ -228,6 +228,14 @@
 	        </filterset>
 		</copy>
 		
+		<echo>Copying EAR static 3rd party dependencies (not included as modules)</echo>
+		<copy todir="assembly/lams.ear/lib" flatten="true">
+			<!-- copy autopatcher-->
+			<fileset dir="lib/autopatch">
+				<include name="tk-*.jar" />
+			</fileset>
+		</copy>
+		
 		<copy todir="assembly/lams.ear/META-INF" verbose="true">
 			<fileset dir="${conf.dir}/j2ee">
 				<include name="*.xml" />
@@ -438,13 +446,13 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
+		<!--<copy todir="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
 			<fileset dir="lib/autopatch">
 				<include name="tk-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main/module.xml"
-			  file="lib/autopatch/autopatch.module.xml" overwrite="true" verbose="true" />
+			  file="lib/autopatch/autopatch.module.xml" overwrite="true" verbose="true" />-->
 		
 		
 		

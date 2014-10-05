@@ -20,13 +20,13 @@
       <module name="org.javassist" export="true" />
       <module name="org.apache.poi" export="true" />
       <module name="org.apache.aspirin" export="true" />
-      <module name="com.tacitknowledge.autopatch" export="true" />
       <module name="org.apache.axis" export="true" />
       <module name="org.apache.batik" export="true" />
       <module name="net.sf.cglib" export="true" />
       <module name="net.fckeditor" export="true" />
       <module name="com.flagstone" export="true" />
       <module name="org.apache.commons.beanutils" export="true" />
+      <module name="org.apache.commons.collections" export="true" />
       <module name="org.apache.commons.io" export="true" />
       <module name="org.apache.commons.lang" export="true" />
       <module name="org.apache.commons.codec" export="true" />
@@ -34,6 +34,7 @@
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
+      <module name="org.infinispan" export="true" />
       <module name="org.hibernate" export="true" />
       <module name="org.jboss.jbossweb" export="true" />
       <module name="org.jdom" slot="0.7" export="true" />
@@ -56,11 +57,12 @@
        -->
     </dependencies>
     
-    <!-- These add additional classes to the module. In this case it is the same as including the jar in the EAR's lib directory
+    <!-- These add additional classes to the module. In this case it is the same as including the jar in the EAR's lib directory-->
     <resources>
-      <resource-root path="my-library.jar" />
+      <resource-root path="lib/tk-autopatch-1.2.0-b2-cvs.jar" />
+      <resource-root path="lib/tk-discovery-1.0.0.jar" />
     </resources>
-     -->
+    
   </deployment>
   
   
