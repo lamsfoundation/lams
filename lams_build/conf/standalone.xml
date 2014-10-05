@@ -292,18 +292,18 @@
                     <file-store passivation="false" purge="false"/>
                 </local-cache>
             </cache-container>
-            <cache-container name="hibernate" default-cache="local-query" module="org.hibernate">
-                <local-cache name="entity">
+            <cache-container name="hibernate" default-cache="local-query" module="org.hibernate" start="EAGER">
+                <local-cache name="entity" start="EAGER">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LRU" max-entries="10000"/>
                     <expiration max-idle="100000"/>
                 </local-cache>
-                <local-cache name="local-query">
+                <local-cache name="local-query" start="EAGER">
                     <transaction mode="NONE"/>
                     <eviction strategy="LRU" max-entries="10000"/>
                     <expiration max-idle="100000"/>
                 </local-cache>
-                <local-cache name="timestamps">
+                <local-cache name="timestamps" start="EAGER">
                     <transaction mode="NONE"/>
                     <eviction strategy="NONE"/>
                 </local-cache>
