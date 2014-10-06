@@ -64,7 +64,7 @@
 	</tr>
 </table>
 <div align="center">
-	<html:submit styleClass="button"><fmt:message key="admin.save" /></html:submit>
+	<html:submit property="submitbutton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
 	<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
 	<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
 </div>
