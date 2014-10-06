@@ -3,7 +3,7 @@
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <h1><fmt:message key="sysadmin.maintain.external.servers" /></h1>
 
-<p class="align-right"><input class="button" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" /></p>
+<p class="align-right"><input class="button" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" /></p>
 <table class=alternative-color width=100%>
 	<tr>
 		<th><fmt:message key="sysadmin.serverid" /></th>
@@ -34,18 +34,18 @@
 		</td>
 		<td><c:out value="${serverOrgMap.organisation.name}" /></td>
 		<td>
-			<a id="edit_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=edit&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.edit" /></a>
+			<a id="edit_<c:out value='${serverOrgMap.serverid}'/>" href="servermaintain.do?method=edit&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.edit" /></a>
 			&nbsp;
 			<c:choose>
 				<c:when test="${serverOrgMap.disabled}">
-					<a id="enable_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=enable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.enable" /></a>
+					<a id="enable_<c:out value='${serverOrgMap.serverid}'/>" href="servermaintain.do?method=enable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.enable" /></a>
 				</c:when>
 				<c:otherwise>
-					<a id="disable_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=disable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.disable" /></a>
+					<a id="disable_<c:out value='${serverOrgMap.serverid}'/>" href="servermaintain.do?method=disable&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.disable" /></a>
 				</c:otherwise>
 			</c:choose>
 			&nbsp;
-			<a id="delete_sid<c:out value='${serverOrgMap.sid}'/>" href="servermaintain.do?method=delete&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.delete" /></a>
+			<a id="delete_<c:out value='${serverOrgMap.serverid}'/>" href="servermaintain.do?method=delete&sid=<c:out value='${serverOrgMap.sid}' />"><fmt:message key="admin.delete" /></a>
 		</td>
 	</tr>
 	</c:forEach>
