@@ -57,11 +57,9 @@
        -->
     </dependencies>
     
-    <!-- These add additional classes to the module. In this case it is the same as including the jar in the EAR's lib directory-->
+    <!-- These add additional classes to the module. In this case it is the same as including the jar in the EAR's lib directory
     <resources>
-      <resource-root path="lib/tk-autopatch-1.2.0-b2-cvs.jar" />
-      <resource-root path="lib/tk-discovery-1.0.0.jar" />
-    </resources>
+    </resources>-->
     
   </deployment>
   
