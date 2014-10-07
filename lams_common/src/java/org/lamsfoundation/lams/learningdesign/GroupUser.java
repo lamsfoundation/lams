@@ -87,4 +87,43 @@ public class GroupUser implements Serializable {
     public void setScheduledLessonEndDate(Date scheduledLessonEndDate) {
 	this.scheduledLessonEndDate = scheduledLessonEndDate;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + ((scheduledLessonEndDate == null) ? 0 : scheduledLessonEndDate.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GroupUser other = (GroupUser) obj;
+		if (group == null) {
+			if (other.group != null)
+				return false;
+		} else if (!group.equals(other.group))
+			return false;
+		if (scheduledLessonEndDate == null) {
+			if (other.scheduledLessonEndDate != null)
+				return false;
+		} else if (!scheduledLessonEndDate.equals(other.scheduledLessonEndDate))
+			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
+		return true;
+	}
+    
+    
 }
