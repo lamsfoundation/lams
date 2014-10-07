@@ -15,13 +15,13 @@
 					<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
 					<c:choose>
 					<c:when test="${row.format==BOOLEAN}">
-						<html:select name="row" property="value">
+						<html:select styleId="${row.key}" name="row" property="value">
 						<html:option value="true">true</html:option>
 						<html:option value="false">false&nbsp;&nbsp;</html:option>
 						</html:select>
 					</c:when>
 					<c:otherwise>
-						<html:text property="value" name="row" value="${row.value}" size="50" maxlength="255"/>
+						<html:text styleId="${row.key}" property="value" name="row" value="${row.value}" size="50" maxlength="255"/>
 					</c:otherwise>
 					</c:choose>
 				</td>
