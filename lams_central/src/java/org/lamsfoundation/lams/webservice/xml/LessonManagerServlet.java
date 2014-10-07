@@ -428,7 +428,7 @@ public class LessonManagerServlet extends HttpServlet {
 		ExtUserUseridMap progressUserMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(
 			serverMap, progressUser);
 
-		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(userMap
+		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(progressUserMap
 			.getUser().getUserId(), lsId);
 
 		Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
