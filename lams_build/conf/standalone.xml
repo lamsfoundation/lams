@@ -81,76 +81,177 @@
 
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:2.0">
-            <console-handler name="CONSOLE">
-                <level name="DEBUG"/>
+            <use-deployment-logging-config value="false" />
+            <add-logging-api-dependencies value="true" />
+
+
+            <periodic-rotating-file-handler name="FILE"
+                autoflush="true">
                 <formatter>
-                    <named-formatter name="COLOR-PATTERN"/>
+                    <named-formatter name="PATTERN" />
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="server.log" />
+                <suffix value="'.'yyyy-MM-dd" />
+                <append value="true" />
+
+            </periodic-rotating-file-handler>
+
+            <console-handler name="CONSOLE">
+                <target name="System.out" />
+                <level name="INFO" />
+                <formatter>
+                    <named-formatter name="CONSOLEPATTERN" />
                 </formatter>
             </console-handler>
-            <periodic-rotating-file-handler name="FILE" autoflush="true">
+
+            <periodic-rotating-file-handler name="AUDITFILE"
+                autoflush="true">
+                <level name="INFO" />
                 <formatter>
-                    <named-formatter name="PATTERN"/>
+                    <named-formatter name="AUDITPATTERN" />
                 </formatter>
-                <file relative-to="jboss.server.log.dir" path="server.log"/>
-                <suffix value=".yyyy-MM-dd"/>
-                <append value="true"/>
+                <file relative-to="jboss.server.log.dir" path="audit.log" />
+                <suffix value="'.'yyyy-MM-dd" />
+                <append value="true" />
             </periodic-rotating-file-handler>
-            <logger category="com.arjuna">
-                <level name="WARN"/>
-            </logger>
-            <logger category="org.apache.tomcat.util.modeler">
-                <level name="WARN"/>
-            </logger>
-            <logger category="org.jboss.as.config">
-                <level name="DEBUG"/>
-            </logger>
-            <logger category="sun.rmi">
-                <level name="WARN"/>
-            </logger>
-            <logger category="jacorb">
-                <level name="WARN"/>
-            </logger>
-            <logger category="jacorb.config">
-                <level name="ERROR"/>
-            </logger>
-            
-            <logger category="org.hibernate.persister.walking">
-				<level name="INFO" />
-			</logger>
-			<logger category="org.hibernate.internal.util.xml">
-				<level name="INFO" />
-			</logger>
-			<logger category="org.hibernate.loader.plan">
-				<level name="INFO" />
-			</logger>
-			
-            <!-- 
-            <logger category="org.jboss.jdbc">
-        		<level name="TRACE" />
-     		</logger>
-    		<logger category="org.hibernate.SQL">
-	        	<level name="TRACE" />
-	     	</logger>
-			<logger category="org.hibernate">
-				<level name="TRACE" />
-			</logger>
-			<logger category="org.infinispan">
-				<level name="TRACE" />
-			</logger>
-     		 -->
-            <root-logger>
-                <level name="DEBUG"/>
+
+            <size-rotating-file-handler name="LAMSFILE"
+                autoflush="true">
+                <level name="INFO" />
+                <formatter>
+                    <named-formatter name="LAMSPATTERN" />
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="lams.log" />
+                <rotate-size value="5m" />
+                <max-backup-index value="20" />
+                <append value="true" />
+            </size-rotating-file-handler>
+
+            <console-handler name="LAMSCONSOLE">
+                <target name="System.out" />
+                <level name="INFO" />
+                <formatter>
+                    <named-formatter name="LAMSCONSOLEPATTERN" />
+                </formatter>
+            </console-handler>
+
+            <size-rotating-file-handler name="HIBERNATEFILE"
+                autoflush="true">
+                <level name="INFO" />
+                <formatter>
+                    <named-formatter name="HIBERNATEPATTERN" />
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="hibernatelams.log" />
+                <rotate-size value="5m" />
+                <max-backup-index value="20" />
+                <append value="true" />
+            </size-rotating-file-handler>
+
+            <!-- ISO8601 date format -->
+            <formatter name="HIBERNATEPATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c - %m%n" />
+            </formatter>
+            <formatter name="LAMSCONSOLEPATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{1}] %m%n" />
+            </formatter>
+            <formatter name="LAMSPATTERN">
+                <pattern-formatter
+                    pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
+            </formatter>
+            <formatter name="AUDITPATTERN">
+                <pattern-formatter
+                    pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
+            </formatter>
+
+            <!-- ABSOLUTE date format -->
+            <formatter name="CONSOLEPATTERN">
+                <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c{1}] %m%n" />
+            </formatter>
+            <formatter name="PATTERN">
+                <pattern-formatter pattern="%d %-5p [%c] (%t) %m%n" />
+            </formatter>
+
+            <logger category="org.lamsfoundation.lams"
+                use-parent-handlers="false">
+                <level name="DEBUG" />
                 <handlers>
-                    <handler name="CONSOLE"/>
-                    <handler name="FILE"/>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+
+            <logger category="org.wildfly" use-parent-handlers="false">
+                <level name="DEBUG" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+
+            <logger
+                category="org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter"
+                use-parent-handlers="false">
+                <level name="INFO" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
+
+            <logger category="org.lamsfoundation.lams.util.audit"
+                use-parent-handlers="false">
+                <level name="INFO" />
+                <handlers>
+                    <handler name="AUDITFILE" />
+                </handlers>
+            </logger>
+
+            <logger category="org.hibernate" use-parent-handlers="false">
+                <level name="INFO" />
+                <handlers>
+                    <handler name="HIBERNATEFILE" />
+                </handlers>
+            </logger>
+
+            <logger category="org.jboss">
+                <level name="INFO" />
+            </logger>
+
+            <logger category="org.apache">
+                <level name="INFO" />
+            </logger>
+
+            <logger category="jacorb">
+                <level name="WARN" />
+            </logger>
+
+            <logger category="javax.enterprise.resource.webcontainer.jsf">
+                <level name="INFO" />
+            </logger>
+
+            <logger category="org.jgroups">
+                <level name="WARN" />
+            </logger>
+
+            <logger category="org.quartz">
+                <level name="INFO" />
+            </logger>
+
+            <logger category="org.jboss.management">
+                <level name="INFO" />
+            </logger>
+
+            <logger category="org.jboss.serial">
+                <level name="INFO" />
+            </logger>
+
+            <root-logger>
+                <level name="DEBUG" />
+                <handlers>
+                    <handler name="CONSOLE" />
+                    <handler name="FILE" />
                 </handlers>
             </root-logger>
-            <formatter name="PATTERN">
-                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
-            </formatter>
-            <formatter name="COLOR-PATTERN">
-                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
-            </formatter>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:batch:1.0">
             <job-repository>
