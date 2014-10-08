@@ -102,7 +102,7 @@ function loadFrame(activity) {
 
 // adjusts elements after window resize
 function resizeElements() {
-	var width = $(window).width() - 160;
+	var width = $('#controlFrame').is(":visible")? $(window).width() - 160 : $(window).width();
 	var height = $(window).height();
 
 	if (hasContentFrame) {
