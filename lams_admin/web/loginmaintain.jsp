@@ -22,8 +22,7 @@
 </div>
 <br />
 <p align="center">
-	<html:submit styleClass="button"><fmt:message key="admin.save" /></html:submit>
-	<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
-	<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+	<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+	<html:submit styleId="saveButton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
 </p>
 </html:form>
