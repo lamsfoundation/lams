@@ -39,8 +39,8 @@
 	</tr>
 </table>
 <p align="center">
-<html:submit styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
-<html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
+<html:submit styleId="importButton" styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
 </p>
 
 </html:form>
