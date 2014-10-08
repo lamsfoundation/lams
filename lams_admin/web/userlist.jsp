@@ -87,7 +87,7 @@ p {
 <form>
 	
 <p>
-	<input class="button" type="button" value="<fmt:message key="admin.user.add"/>" onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+	<input id="addRemoveUsers" class="button" type="button" value="<fmt:message key="admin.user.add"/>" onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 </p>
 
 <div class="floatRight">
