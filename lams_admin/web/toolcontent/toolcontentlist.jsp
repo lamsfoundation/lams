@@ -71,7 +71,7 @@
 		<th><fmt:message key="sysadmin.library.activity.description" /></th>
 		<th><fmt:message key="label.tool.version" /></th>
 		<th><fmt:message key="label.database.version" /></th>
-		<th style="padding-right: 15px"><fmt:message key="sysadmin.function" /></th>
+		<th style="padding-right: 15px"><fmt:message key="admin.user.actions" /></th>
 	</tr>
 	<logic:iterate name="toolLibrary" id="dto">
 		<tr>
@@ -90,28 +90,20 @@
 			<td>
 				<c:choose>
 					<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-						<a href="<c:url value='toolcontentlist.do?action=disable&libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>
+						[<a id="disable${dto.activityTitle}" href="<c:url value='toolcontentlist.do?action=disable&libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>] 
 					</c:when>
 					<c:otherwise>
-						<a href="<c:url value='toolcontentlist.do?action=enable&libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>
+						[<a id="enable${dto.activityTitle}" href="<c:url value='toolcontentlist.do?action=enable&libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>]
 					</c:otherwise>
 				</c:choose>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="5">
 				<c:if test="${not empty dto.toolContentID}">
 					<c:set var="editDefaultContentUrl">
 						<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1"
 					</c:set>
-					<a href="${editDefaultContentUrl}" target="_blank">
-						<fmt:message key="sysadmin.edit.default.tool.content" />
-					</a>
+					[<a id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>]
 					<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
 						&nbsp;&nbsp;
-						<a href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />">
-							<fmt:message key="msg.tool.management" />
-						</a>
+						[<a id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />"><fmt:message key="msg.tool.management" /></a>]
 					</c:if>
 				</c:if>
 			</td>
