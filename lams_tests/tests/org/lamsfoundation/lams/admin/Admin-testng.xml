@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Admin Tests Suite" parallel="false">
+  <test name="Admin Tests">
+    <classes>
+      <class name="org.lamsfoundation.lams.admin.UserManagement"/>
+      <class name="org.lamsfoundation.lams.admin.ImportUsers"/>
+      <class name="org.lamsfoundation.lams.admin.ImportCourses"/>
+      <class name="org.lamsfoundation.lams.admin.MaintainLoginPage"/>
+      <class name="org.lamsfoundation.lams.admin.Signup"/>
+      <class name="org.lamsfoundation.lams.admin.ToolManagement"/>
+      <class name="org.lamsfoundation.lams.admin.ConfigurationSettings"/>
+      <class name="org.lamsfoundation.lams.admin.MaintainIntegrations"/>
+    </classes>
+  </test> <!-- Admin Tests -->
+</suite> <!-- Admin Tests Suite -->
