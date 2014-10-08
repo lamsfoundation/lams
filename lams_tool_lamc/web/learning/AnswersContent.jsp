@@ -1,4 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -30,49 +31,47 @@
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-	<link href="jquery.jgrowl.min.css" rel="stylesheet"/>
-
-	<script type="text/javascript" src="jquery.jgrowl.min.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
-			var interval = "5000"; // = 30 seconds
+			var interval = "30000"; // = 30 seconds
 			window.setInterval(
 				function(){
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
 		                success: function() {
-		                	$.jGrowl('<fmt:message key="label.learning.draft.autosaved" />');
+		                	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
 		                }
 					});
 	        	}, interval
 	        );
 		}
 			
-		function submitNextQuestionSelected() {
-			if (verifyAllQuestionsAnswered()) {
-				++document.McLearningForm.questionIndex.value;
-				document.McLearningForm.nextQuestionSelected.value = 1;
-				disableContinueButton();
-				document.McLearningForm.submit();
+			function submitNextQuestionSelected() {
+				if (verifyAllQuestionsAnswered()) {
+					++document.McLearningForm.questionIndex.value;
+					document.McLearningForm.nextQuestionSelected.value = 1;
+					disableContinueButton();
+					document.McLearningForm.submit();
+				}
 			}
-		}
 
-		function submitAllAnswers() {
-			document.McLearningForm.continueOptionsCombined.value = 1;			
-			doSubmit();
-		}
+			function submitAllAnswers() {
+				document.McLearningForm.continueOptionsCombined.value = 1;			
+				doSubmit();
+			}
 			
-		function doSubmit() {
-			if (verifyAllQuestionsAnswered()) {
-				disableContinueButton();
-				document.McLearningForm.submit();
+			function doSubmit() {
+				if (verifyAllQuestionsAnswered()) {
+					disableContinueButton();
+					document.McLearningForm.submit();
+				}
 			}
-		}
 
-		function verifyAllQuestionsAnswered() {
+			function verifyAllQuestionsAnswered() {
 				// in case oneQuestionPerPage option is ON user has to select 1 answer, and all answers otherwise
 				var isOneQuestionPerPage = ${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'};
 				var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.learnerAnswersDTOList)};
@@ -86,36 +85,36 @@
 					alert(msg);
 					return false;
 				}
-		}
+			}
 			
-		function disableContinueButton() {
-			var elem = document.getElementById("continueButton");
-			if (elem != null) {
-				elem.disabled = true;
-			}				
-		}
+			function disableContinueButton() {
+				var elem = document.getElementById("continueButton");
+				if (elem != null) {
+					elem.disabled = true;
+				}				
+			}
 			
-		if (${!hasEditRight && mode != "teacher"}) {
-			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
-		}
+			if (${!hasEditRight && mode != "teacher"}) {
+				setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
+			}
 			
-		function checkLeaderProgress() {
+			function checkLeaderProgress() {
 				
-			$.ajax({
-				async: false,
-		    	url: '<c:url value="/learning.do"/>',
-		    	data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
-		    	dataType: 'json',
-		    	type: 'post',
-		    	success: function (json) {
-		        	if (json.isLeaderResponseFinalized) {
-		        		location.reload();
-		        	}
-		        }
-			});
-		}
+		        $.ajax({
+		        	async: false,
+		            url: '<c:url value="/learning.do"/>',
+		            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+		            dataType: 'json',
+		            type: 'post',
+		            success: function (json) {
+		            	if (json.isLeaderResponseFinalized) {
+		            		location.reload();
+		            	}
+		            }
+		       	});
+			}
 			
-	</script>
+		</script>
 </lams:head>
 
 <body class="stripes">
@@ -161,4 +160,5 @@
 <div id="footer"></div>
 
 </body>
-</lams:html>	
+</lams:html>
+	
