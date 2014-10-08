@@ -185,8 +185,8 @@ p {
 <div id="form" class="floatRight">
 	<html:form action="userorgsave.do" method="post">
 		<html:hidden property="orgId" />
-		<html:submit styleClass="button" onclick="return populateForm();"><fmt:message key="label.next"/></html:submit>
-		<html:cancel styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
+		<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
+		<html:submit styleId="nextButton" styleClass="button" onclick="return populateForm();"><fmt:message key="label.next"/></html:submit>
 	</html:form>
 </div>
 

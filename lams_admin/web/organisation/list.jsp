@@ -112,13 +112,13 @@ p {
 	</p>
 	
 	<div class="floatRight">
-		<input class="button" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input id="manageUsers" class="button" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
 	<% if (request.isUserInRole(Role.SYSADMIN)) { %>
 	<div class="floatRight">
-		<input class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+		<input id="closeLessons" class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
 	</div>
 	<p style="padding-top:10px;">&nbsp;</p>
 	<% } %>
@@ -129,7 +129,7 @@ p {
 			<c:param name="typeId" value="3" />
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
-		<input class="button" type="button" value="<fmt:message key="admin.class.add"/>" onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
+		<input id="createNewSubcourse" class="button" type="button" value="<fmt:message key="admin.class.add"/>" onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
 	</div>
 	</form>
 	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
@@ -205,7 +205,7 @@ p {
 <table class=tablesorter-admin width=100%>
 	<thead>
 	<tr>
-		<th>Id</th>
+		<th id="idsorter">Id</th>
 		<th><fmt:message key="admin.organisation.name"/></th>
 		<th><fmt:message key="admin.organisation.code"/></th>
 		<th><fmt:message key="admin.organisation.description"/></th>

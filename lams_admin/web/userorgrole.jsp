@@ -47,7 +47,7 @@ function toggleCheckboxes(roleIndex, object){
 		</td>
 		<logic:iterate id="role" name="roles">
 			<td>
-				<html-el:multibox property="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
+				<html-el:multibox styleId="${userBean.login}Role${role.roleId}" property="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
 			</td>
 		</logic:iterate>
 	</tr>
@@ -55,9 +55,8 @@ function toggleCheckboxes(roleIndex, object){
 <tr>
 	<td></td>
 	<td colspan=<c:out value="${numroles}" /> class="align-right">
-		<html-el:submit styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
-		<html-el:reset styleClass="button"><fmt:message key="admin.reset"/></html-el:reset>
-		<html-el:cancel styleClass="button"><fmt:message key="admin.cancel"/></html-el:cancel>
+		<html-el:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html-el:cancel>
+		<html-el:submit styleId="saveButton"   styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
 	</td>
 </tr>
 </table>
