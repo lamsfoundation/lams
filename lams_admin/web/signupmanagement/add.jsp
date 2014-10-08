@@ -66,8 +66,8 @@
 		<tr>
 			<td></td>
 			<td style="padding-left: 80px; padding-top: 15px;">
-				<html:submit styleClass="button"><fmt:message key="admin.submit" /></html:submit>
-				<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+				<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+				<html:submit styleId="submitButton" styleClass="button"><fmt:message key="admin.submit" /></html:submit>
 			</td>
 			<td></td>
 		</tr>
