@@ -120,7 +120,7 @@ j_security_login_page
 				   <input name="j_password" type="password" size="16" style="width:125px" autocomplete="off" tabindex="2" onkeypress="onEnter(event)"/>
 				  </p>
 					<p class="login-button">
-					 <a href="javascript:submitForm()" class="button" tabindex="3"/><fmt:message key="button.login"/></a>
+					 <a id="loginButton" href="javascript:submitForm()" class="button" tabindex="3"/><fmt:message key="button.login"/></a>
 					 </p>
 				</form>	
 				<p class="login-button">
