@@ -198,7 +198,7 @@
 
 				<c:if test="${not empty userOrgRoles}">
 					<tr><td>
-						<table class="alternative-color" cellspacing="0">
+						<table id="tableRoles" class="alternative-color" cellspacing="0">
 							<tr>
 								<th><fmt:message key="label.member.of"/>:</th>
 								<th><fmt:message key="label.with.roles"/>:</th>
