@@ -1,11 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-		"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
+		
+		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 		<script type="text/javascript"> 
 			function callHideMessage() {
 				if (window.parent && window.parent.hideMessage) {
@@ -14,6 +15,16 @@
 					window.top.hideMessage();
 				}
 			}
+			
+			$(function() {
+				//change size of an iframe on ckeditor's autogrow 
+				CKEDITOR.instances.comments.on("instanceReady", function(e) {
+				    e.editor.on('resize',function(reEvent){
+				    	var iframe = window.parent.document.getElementById("marksInputArea");
+				    	iframe.style.height=eval(iframe.contentWindow.document.body.scrollHeight)+'px';
+				    });
+				});
+			});
 		</script>
 	</lams:head>
 	<body class="tabpart">
@@ -53,7 +64,7 @@
 			<a href="#" onclick="markForm.submit();" class="button space-left">
 				<fmt:message key="label.monitoring.summary.marking.update.marks" /> 
 			</a>
-			<a href="javascript:;" onclick="javascript:callHideMessage" class="button space-left">
+			<a href="javascript:;" onclick="javascript:callHideMessage()" class="button space-left">
 				<fmt:message key="label.cancel" /> 
 			</a>
 		</lams:ImgButtonWrapper>
