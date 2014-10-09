@@ -1,5 +1,5 @@
 <listener>
-    <listener-class>com.tacitknowledge.util.migration.jdbc.WebAppJNDIMigrationLauncher</listener-class>
+    <listener-class>org.lamsfoundation.lams.dbupdates.WebAppJNDIMigrationLauncherSynchronizer</listener-class>
 </listener>
 <listener>
 	<listener-class>
