@@ -432,6 +432,7 @@ public class SessionManager {
 	public void setAttribute(String name, Object value) {
 	    if (value == null) {
 		removeAttribute(name);
+		return;
 	    }
 
 	    Object old = valueMap.put(name, value);
