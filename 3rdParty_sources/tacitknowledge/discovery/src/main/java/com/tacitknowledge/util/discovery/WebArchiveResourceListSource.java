@@ -49,14 +49,17 @@ class WebArchiveResourceListSource extends ArchiveResourceListSource
         String libPath = path + File.separator + "lib";
         List<String> jars = new ArrayList<String>();
         String[] entries = getLibEntries(libPath);
-        for (String jar : entries)
-        {
-            if (jar.endsWith(".jar") || jar.endsWith(".zip"))
+        if (entries != null) {
+        	for (String jar : entries)
             {
-                String jarName = libPath + File.separator + jar;
-                jars.add(jarName);
-            }
+                if (jar.endsWith(".jar") || jar.endsWith(".zip"))
+                {
+                    String jarName = libPath + File.separator + jar;
+                    jars.add(jarName);
+                }
+            }	
         }
+        
         return jars;
     }
 
@@ -72,12 +75,13 @@ class WebArchiveResourceListSource extends ArchiveResourceListSource
      */
     protected String[] getLibEntries(String dir)
     {
-        String[] entries = new String[0];
+//        String[] entries = new String[0];
         File libdir = new File(dir);
-        if (libdir.exists() && libdir.isDirectory())
-        {
-            entries = libdir.list();
-        }
-        return entries;
+        return libdir.list();
+//        if (libdir.exists() && libdir.isDirectory())
+//        {
+//            entries = libdir.list();
+//        }
+//        return entries;
     }
 }

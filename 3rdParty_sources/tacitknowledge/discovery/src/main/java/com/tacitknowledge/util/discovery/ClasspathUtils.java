@@ -93,6 +93,7 @@ public final class ClasspathUtils
             if (file.isFile()
                 && (file.getName().endsWith(".jar") || file.getName().endsWith(".zip")))
             {
+            	log.debug("Found archive " + file.getAbsolutePath());
                 archives.add(possibleDir);
             }
         }
@@ -138,9 +139,30 @@ public final class ClasspathUtils
             // Calling File.getPath() cleans up the path so that it's using
             // the proper path separators for the host OS
             component = getCanonicalPath(component);
+            log.debug("System classpath: " + component);
             components.add(component);
         }
-
+        
+        // search jars in current directory as this library
+		URL url = ClasspathUtils.class.getProtectionDomain().getCodeSource().getLocation();
+		String path = url.getPath();
+		String realPath = path.substring(path.indexOf(':') + 1);
+		File thisJar = new File(realPath);
+		if (thisJar != null) {
+			File currentDir = thisJar.getParentFile();
+			if (currentDir.isDirectory()) {
+				File[] jars = currentDir.listFiles(new JarFilter());
+				for (File jar : jars) {
+					try {
+						components.add(jar.getCanonicalPath());
+					} catch (IOException e) {
+						log.error(e.getMessage());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+ 	 	
         // Set removes any duplicates, return a list for the api.
         return new LinkedList(new HashSet(components));
     }
@@ -175,6 +197,8 @@ public final class ClasspathUtils
 
         URL[] urls = new URL[0];
 
+        log.debug("URLClassLoader.getName() = " + ucl.getClass().getName());
+        
         // Workaround for running on JBoss with UnifiedClassLoader3 usage
         // We need to invoke getClasspath() method instead of getURLs()
         if (ucl.getClass().getName().equals("org.jboss.mx.loading.UnifiedClassLoader3"))
@@ -198,7 +222,10 @@ public final class ClasspathUtils
         for (int i = 0; i < urls.length; i++)
         {
             URL url = urls[i];
-            components.add(getCanonicalPath(url.getPath()));
+            
+            String path = getCanonicalPath(url.getPath());
+            components.add(path);
+            log.debug("URLClassLoader found path: " + path);
         }
 
         return components;
