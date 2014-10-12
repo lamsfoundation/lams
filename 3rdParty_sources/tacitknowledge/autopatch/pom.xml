@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tacitknowledge</groupId>
+    <artifactId>autopatch</artifactId>
+    <version>1.4.2</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>com.tacitknowledge</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>1</version>
+    </parent>
+
+    <name>AutoPatch</name>
+    <description>An automated Java patching system</description>
+    <url>https://github.com/tacitknowledge/autopatch</url>
+
+    <organization>
+        <name>Tacit Knowledge</name>
+        <url>http://www.tacitknowledge.com/</url>
+    </organization>
+
+    <inceptionYear>2004</inceptionYear>
+
+    <properties>
+        <source.jdk>1.6</source.jdk>
+        <target.jdk>1.6</target.jdk>
+        <unit.tests.pattern>**/*Test.java</unit.tests.pattern>
+        <integration.tests.pattern>
+            **/MigrationUnlockTest.java,**/MultiNodeAutoPatchTest.java,**/MissingPatchMigrationRunnerStrategyIntegrationTest.java,**/MultiServerRaceConditionTest.java
+        </integration.tests.pattern>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>Github Issue Tracker</system>
+        <url>https://github.com/tacitknowledge/autopatch/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/tacitknowledge/autopatch.git</connection>
+        <developerConnection>scm:git:git@github.com:tacitknowledge/autopatch.git</developerConnection>
+        <url>https://github.com/tacitknowledge/autopatch</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>scottfromsf</id>
+            <name>Scott Askew</name>
+            <email>scott at tacitknowledge.com</email>
+            <organization>Tacit Knowledge</organization>
+        </developer>
+        <developer>
+            <id>mikehardy</id>
+            <name>Mike Hardy</name>
+            <email>mikehardy at tacitknowledge.com</email>
+            <organization>Tacit Knowledge</organization>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Alexandru Croitor</name>
+        </contributor>
+        <contributor>
+            <name>Alex Soto</name>
+        </contributor>
+        <contributor>
+            <name>David Martinez</name>
+        </contributor>
+        <contributor>
+            <name>Ian Mortimer</name>
+        </contributor>
+        <contributor>
+            <name>Marek Gilbert</name>
+        </contributor>
+        <contributor>
+            <name>Vladislav Gangan</name>
+        </contributor>
+        <contributor>
+            <name>Vladimir Pertu</name>
+        </contributor>
+        <contributor>
+            <name>Marques Lee</name>
+        </contributor>
+        <contributor>
+            <name>Ulises Pulido</name>
+        </contributor>
+        <contributor>
+            <name>Hemri Herrera</name>
+        </contributor>
+    </contributors>
+
+    <build>
+        <testResources>
+            <!-- Include resources for both unit and integration tests since they are in different folders -->
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <includes>
+                    <include>*.properties</include>
+                    <include>**/*.sql</include>
+                </includes>
+            </testResource>
+
+            <testResource>
+                <directory>${basedir}/src/integration-test/resources</directory>
+                <includes>
+                    <include>*.properties</include>
+                    <include>**/*.sql</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <!-- Plugins configuration -->
+        <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<source>${source.jdk}</source>
+					<target>${target.jdk}</target>
+				</configuration>
+			</plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <configLocation>tacit_checkstyle.config</configLocation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <check>
+                        <!--Current values (11/09/2011)
+                            Project needs more tests for increase the rates,
+                            but at this time the rates should not decrease these values at least.
+                        -->
+                        <branchRate>0</branchRate>
+                        <lineRate>0</lineRate>
+                        <haltOnFailure>true</haltOnFailure>
+                        <totalBranchRate>64</totalBranchRate>
+                        <totalLineRate>67</totalLineRate>
+                        <packageLineRate>30</packageLineRate>
+                        <packageBranchRate>42</packageBranchRate>
+                    </check>
+                    <format>xml</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Plugin for adding integration tests to sources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/src/integration-test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <!-- unit test run configuration -->
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <childDelegation>true</childDelegation>
+                    <includes>
+                        <include>${unit.tests.pattern}</include>
+                    </includes>
+                    <excludes>
+                        <exclude>${integration.tests.pattern}</exclude>
+                    </excludes>
+                    <skip>false</skip>
+                </configuration>
+
+                <!-- Definition for integration tests -->
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <!-- special configuration to pick up src/test/inttest during integration-test phase -->
+                        <configuration>
+                            <testSourceDirectory>${basedir}/src/integration-test/java</testSourceDirectory>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>${integration.tests.pattern}</include>
+                            </includes>
+                            <skip>false</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.tacitknowledge.util.migration.jdbc.StandaloneMigrationLauncher
+                                    </mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.tacitknowledge</groupId>
+            <artifactId>discovery</artifactId>
+            <version>[1.0,)</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>[2.0,)</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit-addons</groupId>
+            <artifactId>junit-addons</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.9</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+            <version>[2.2,)</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>2.5.1-final-20040804</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockejb</groupId>
+            <artifactId>mockejb</artifactId>
+            <version>0.6-beta2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mockrunner</groupId>
+            <artifactId>mockrunner</artifactId>
+            <version>0.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Required for mockrunner -->
+        <dependency>
+            <groupId>struts</groupId>
+            <artifactId>struts</artifactId>
+            <version>1.2.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Required for mockrunner -->
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>1.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>1.1-rc4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-ejb</artifactId>
+            <version>2.1-rc4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.2.8</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+	        <groupId>org.picocontainer</groupId>
+	        <artifactId>picocontainer</artifactId>
+	        <version>2.14.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <configLocation>tacit_checkstyle.config</configLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+</project>
+

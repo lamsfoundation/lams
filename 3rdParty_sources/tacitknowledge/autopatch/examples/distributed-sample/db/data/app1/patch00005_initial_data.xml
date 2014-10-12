@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <baz id="1" value="Some Value"/>
+    <baz id="2" value="Another Value" />
+    <baz id="3" value="A third value" />
+    <baz id="4" value="A longer value field, but still should fit" />
+</dataset>

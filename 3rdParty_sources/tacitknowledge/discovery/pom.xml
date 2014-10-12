@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.tacitknowledge</groupId>
+  <artifactId>discovery</artifactId>
+  <version>1.0.5</version>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>com.tacitknowledge</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>1</version>
+  </parent>
+
+  <name>Resource Discovery</name>
+  <description>Java Resource Discovery Library</description>
+  <url>https://github.com/tacitknowledge/discovery</url>
+
+  <organization>
+    <name>Tacit Knowledge</name>
+    <url>http://www.tacitknowledge.com/</url>
+  </organization>
+  
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:https://github.com/tacitknowledge/discovery.git</connection>
+    <developerConnection>scm:git:git@github.com:tacitknowledge/discovery.git</developerConnection>
+    <url>https://github.com/tacitknowledge/discovery</url>
+  </scm>
+
+  <properties>
+    <source.jdk>1.5</source.jdk>
+    <target.jdk>1.5</target.jdk>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <emma.coverage.class>100</emma.coverage.class>
+    <emma.coverage.method>79</emma.coverage.method>
+    <emma.coverage.block>79</emma.coverage.block>
+    <emma.coverage.line>74</emma.coverage.line>
+  </properties>
+  
+  <developers>
+     <developer>
+       <id>scottfromsf</id>
+       <name>Scott Askew</name>
+     </developer>
+     <developer>
+       <name>Vladimir Pertu</name>
+     </developer>
+     <developer>
+       <name>Matthew Short</name>
+     </developer>
+     <developer>
+       <name>Mike Hardy</name>
+     </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

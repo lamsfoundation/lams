@@ -1,0 +1,41 @@
+<project name="distributed-sample" default="patch.info" basedir=".">
+    <property name="autopatch.dir" value="../.." />
+    <fileset id="autopatch.jars" dir="${autopatch.dir}">
+        <include name="build/tk-autopatch-*.jar" />
+        <include name="lib/core/*.jar" />
+        <include name="lib/compile/*.jar" />
+    </fileset>
+    
+    <fileset id="dependent.jars" dir="${basedir}/lib">
+        <include name="**/*.jar" />
+    </fileset>
+    
+    <path id="patch.classpath">
+        <fileset refid="autopatch.jars" />
+        <fileset refid="dependent.jars" />
+        <pathelement location="${basedir}/conf" />
+        <pathelement location="${basedir}/db/sql" />
+        <pathelement location="${basedir}/db/data" />
+    </path>
+    
+    <target name="patch.info" description="Prints out information about patch levels">
+        <java   fork="true" 
+                classpathref="patch.classpath" 
+                failonerror="true"
+                logError="true"
+                classname="com.tacitknowledge.util.migration.jdbc.DistributedMigrationInformation">
+                <sysproperty key="migration.systemname"  value="${ant.project.name}"/>
+        </java>
+    </target>    
+
+    <target name="patch.database" description="Brings up the databases to the current patch levels">
+        <java   fork="true" 
+                classpathref="patch.classpath" 
+                failonerror="true"
+                logError="true"
+                classname="com.tacitknowledge.util.migration.jdbc.DistributedStandaloneMigrationLauncher">
+                <sysproperty key="migration.systemname"  value="${ant.project.name}"/>
+        </java>
+    </target>    
+
+</project>

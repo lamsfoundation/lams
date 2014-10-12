@@ -1,0 +1,92 @@
+
+Simon Kingaby got a working setup with autopatch talking to MS-SQL using ant.
+He documented his configuration in the hopes it would help future folks.
+
+Here's his configuration:
+
+Project Structure:
+------------------
+
+trunk
+-->HelloWorldDatabase
+  (build.xml)
+---->src
+------>main
+-------->conf
+        (log4j.properties)
+        (migration.properties)
+-------->db
+---------->patch
+          (patch0001_create_table.sql)
+-->vendor
+---->build
+------>sqljdbc_1.1
+-------->enu
+        (sqljdbc.jar and other sqljdbc files and folders)
+------>tk-autopatch
+      (tk-autopatch-1.0.2.jar and other autopatch files and folders)
+
+
+Here is the migration.properties file:
+--------------------------------------
+orchestration.context=zabbadoo
+orchestration.controlled.systems=zabbadoo
+zabbadoo.jdbc.database.type=sqlserver
+zabbadoo.jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+zabbadoo.jdbc.url=jdbc:sqlserver://kobol\\dev;database=zabbadoo
+zabbadoo.jdbc.username=zabbadoo
+zabbadoo.jdbc.password=password
+zabbadoo.patch.path=db.patch
+
+
+Here is the ant build.xml:
+--------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="zabbadoo" default="patch.info" basedir=".">
+
+   <property name="autopatch.dir" value="../vendor/build/tk-autopatch" />
+   <fileset id="autopatch.jars" dir="${autopatch.dir}">
+       <include name="tk-autopatch-*.jar" />
+       <include name="lib/*.jar" />
+   </fileset>
+
+   <property name="msjdbc.dir" value="../vendor/build/sqljdbc_1.1/enu" />
+   <fileset id="msjdbc.jars" dir="${msjdbc.dir}">
+       <include name="**/*.jar" />
+   </fileset>
+
+   <fileset id="dependent.jars" dir="${basedir}">
+       <include name="**/*.jar" />
+   </fileset>
+
+   <path id="patch.classpath">
+       <fileset refid="autopatch.jars" />
+       <fileset refid="msjdbc.jars" />
+       <fileset refid="dependent.jars" />
+       <pathelement location="${basedir}/src/main/" />
+       <pathelement location="${basedir}/src/main/conf" />
+   </path>
+
+   <target name="patch.info" description="Prints out information about
+patch levels">
+       <java   fork="true"
+               classpathref="patch.classpath"
+               failonerror="true"
+               logError="true"
+               classname="com.tacitknowledge.util.migration.jdbc.MigrationInformation">
+               <sysproperty key="migration.systemname"
+value="${ant.project.name}"/>
+       </java>
+   </target>
+   <target name="patch.database" description="Brings up the databases
+to the current patch levels">
+       <java   fork="true"
+               classpathref="patch.classpath"
+               failonerror="true"
+               logError="true"
+               classname="com.tacitknowledge.util.migration.jdbc.StandaloneMigrationLauncher">
+               <sysproperty key="migration.systemname"
+value="${ant.project.name}"/>
+       </java>
+   </target>
+</project>

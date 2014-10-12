@@ -1,0 +1,186 @@
+Changelog for AutoPatch
+=======================
+
+Version 1.4.2
+----------------------------------
+- Merged pull request 31 from Brian Jaress : "Fix for abstract method errors"
+
+Version 1.4.1
+----------------------------------
+- Added PicoContainer support.
+
+Version 1.4.0
+----------------------------------
+- Fixed #30 - MigrationTaskSupport now has a default value for the 'name' property.
+
+Version 1.4.0
+----------------------------------
+- Bumped JDK requirement to 1.6. It's about time.
+- Fixed ResultSet closing bug, thanks to github/misnomer.
+
+Version 1.3.3
+----------------------------------
+- Adjusted lock.obtain query to overcome mysql's 1093 error
+
+Version 1.3.2
+----------------------------------
+- Issue #29 -- Corrected table name in label.table.exists to tk_patches.
+
+Version 1.3.1
+----------------------------------
+- Two bug fixes:
+    Issue #28. Fixes multi-server race condition
+    Issue #27: Modifying property files to use system_name and patch_level combination to be the primary key.
+
+Thanks to Jeff Kolesky for the fixes!
+
+Version 1.3
+----------------------------------
+- Support for branching. There is a new property "migration.strategy" that can
+  be used to indicate how AutoPatch should determine which patches need to be
+  run (ordered or missing patches). See more here:
+  https://github.com/tacitknowledge/autopatch/wiki/How-to-Migrate-to-AutoPatch-1.3
+
+Version 1.2.0-b3
+---------------------------------
+- Altered logging and comments for autocommit+commit/rollback to more closely
+  correlate with severity and the needed fix
+
+Version 1.2.0-b2
+---------------------------------
+- Included bugfix in discovery jar for duplicate patch detection
+
+Version 1.2.0-b1
+----------------------------------
+- Added ability for migrations to be rolled back.  This change maintains 
+  100% backwards compatibility for existing implementations of MigrationTask. 
+  Initations of rollback migrations are available through the 
+  StandaloneMigrationLauncher which now can accept a flag "-rollback." An 
+  additional integer parameter is required to indicate the level that the 
+  system should rollback to. Added a  new interface called 
+  RollbackableMigrationTask which defines three methods:  isRollbackSupported, 
+  up and down. Deprecated  MigrationTask. All new tasks should now implement 
+  RollbackableMigrationTask. If a task is not intended
+  to be rolledback, then return false for isRollbackSupported.
+  
+- Example configuration for mssql / ant from Simon Kingaby. Thanks Simon!
+
+- Exposed the MigrationListener framework to allow user defined 
+  MigrationListeners.  Define a property named <systemname>.listeners in your 
+  migration.properties.  It supports a comma separated list of fully qualified
+  java classnames that implement the MigrationListener interface.
+  Thanks to Alex Soto <Alex @ Tacit Knowledge || apsoto @ gmail>
+  
+- Added the detection of new database nodes in a DistributedMigration.
+  Default behaviour is to exit the patch process if a new node is detected.
+  The node can be forcibly synced to the current patch level by defining a
+  system property named 'forcesync'. See javadoc on DistributedMigrationProcess
+  for more details.
+  Thanks to Alex Soto <Alex @ Tacit Knowledge || apsoto @ gmail>
+  
+- Added support to DistributedStandaloneMigrationLauncher for specifying an 
+  alternate migration.properties filename via the system property 
+  'migration.settings'.  This brings the distributed migration feature
+  in line with StandaloneMigrationLauncher which already supported this.
+  Thanks to Natalia Usmanova @ KodakGallery dot Com  
+  
+- Added the ability to override the properties specified in the
+  databasetype.properties (mysql.properties, hsqldb.properties, ...).
+  Although technically possible to override any property in those files,
+  the feature was added to tweak the *supportsMultipleStatements* property,
+  and is probably the most common one to override.
+  See the javadoc on com.tacitknowledge.util.migration.jdbc.DatabaseType
+  for details on how to specify the override.
+  Thanks to Alex Soto <Alex @ Tacit Knowledge || apsoto @ gmail>
+
+- Added support for raw .sql patches in the PHP AutoPatch
+  Thanks to Mike Hardy @ Tacit Knowledge
+  
+- Fixed a bug in the handling of the readOnly flag that caused it not to work!
+  Bug found and correct patch proposed by Natalia Usmanova. Thanks Natalia!
+
+Version 1.0.3
+-------------
+- Added "lockPollRetries" property, allows a configuration where AutoPatch
+  will wait a maximum amount of time then override a lock. Also shored up
+  testing / coverage in this area
+  Thanks to Mike Hardy @ Tacit Knowledge
+
+Version 1.0.2
+-------------
+- For standalone migration information and launcher added a possibility
+  to supply a migration.settings system property (or command line argument)
+  that will specify the name of the file to use for migration settings. If
+  not supplied then the default 'migration.properties' will be used.  
+  Thanks to Vladislav Gangan @ Tacit Knowledge
+
+Version 1.0.1
+-------------
+- All development (bug tracking, feature requests, CVS, mailing lists)
+  are hosted on sourceforge now, not just the releases. Check it out:
+  http://autopatch.sourceforge.net
+  
+- Added support for Microsoft SQL Server dialect.
+  Support for Microsoft SQL Server should be considered beta
+  and some features may depend on specific JDBC drivers to
+  work. The free MS-SQL JDBC driver may have issues.
+  Basic DDL patches appear to work.
+  https://sourceforge.net/support/tracker.php?aid=1658440
+  Thank you Shirish Kulkarni
+  
+- Added support for Sybase dialect
+  Support for Sybase should be considered beta at the moment.
+  It has not received a great deal of testing yet.
+  https://sourceforge.net/support/tracker.php?aid=1662010
+  Thank you Alex Soto
+  
+- List of unapplied patches displayed prior to patching
+  Mike Hardy
+  https://sourceforge.net/support/tracker.php?aid=1658446
+  
+- Read-only mode implemented, now you can specify that the
+  system should be read-only, and it will do everything
+  *except* actually apply the patches. If the level isn't correct
+  it will throw an exception, you can use this to enforce consistency
+  while making sure that systems aren't patched automatically
+  (useful in production configurations)
+  Mike Hardy
+  https://sourceforge.net/support/tracker.php?aid=1658445
+  
+- Added an example project that demonstrates how most of the AutoPatch
+  features work, including the distributed feature
+  Thank you Alex Soto
+  
+- Found and fixed improper database connection usage
+  https://sourceforge.net/support/tracker.php?aid=1665584
+  Thank you Alex Soto
+  
+- Implemented serial application of same patch across multiple
+  databases, and extended documentation and example to cover this.
+  This is referred to as "multi-node" patch application in the code and docs
+  Mike Hardy
+  https://sourceforge.net/support/tracker.php?aid=1661985
+  
+- Added integration tests utilizing HSQLDB to further automate correctness
+  Mike Hardy
+
+- Implemented forcible table unlocking (useful if JVMs crash)
+  Mike Hardy
+  https://sourceforge.net/support/tracker.php?aid=1658547
+  
+- Big Checkstyle cleanup
+
+- Added XML file loader (useful to import DbUnit files)
+  Alex Soto
+  
+- More friendly distribution packaging - a zip file, 
+  and unpacks into a sub-directory instead of the current directory
+  Mike Hardy
+  
+- Don't allow commit or rollback statements through to the connection
+  if autocommit is true, JBoss will throw an exception otherwise
+  Reported by Kendall Jackman @ ATG (thanks Kendall)
+  
+Version 1.0.0
+-------------
+Versions prior to 1.0.0 did not maintain a changelog.

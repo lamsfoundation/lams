@@ -1,0 +1,8 @@
+<project default="copy-resources">
+  <target name="init"/>
+  <target name="copy-resources" depends="init">
+    <copy todir="target/classes/com/tacitknowledge/util/migration/jdbc" filtering="false">
+      <fileset dir="src/main/java/com/tacitknowledge/util/migration/jdbc" includes="**/*.properties" excludes="**/*.java"/>
+    </copy>
+  </target>
+</project>
