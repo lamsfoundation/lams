@@ -24,6 +24,7 @@ import org.easymock.MockControl;
 import com.mockrunner.jdbc.JDBCTestCaseAdapter;
 import com.mockrunner.jdbc.PreparedStatementResultSetHandler;
 import com.mockrunner.mock.jdbc.MockConnection;
+import com.mockrunner.mock.jdbc.MockDatabaseMetaData;
 import com.mockrunner.mock.jdbc.MockResultSet;
 import com.tacitknowledge.util.migration.MigrationException;
 import com.tacitknowledge.util.migration.jdbc.util.ConnectionWrapperDataSource;
@@ -160,6 +161,12 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Test-specific setup
         handler = conn.getPreparedStatementResultSetHandler();
         MockResultSet rs = handler.createResultSet();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
         handler.prepareGlobalResultSet(rs);
         rs.addRow(new Integer[] {new Integer(13)});
         
@@ -168,6 +175,34 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         commonVerifications();
         verifyNotCommitted();
         verifyPreparedStatementParameter(0, 1, "milestone");
+        verifyPreparedStatementNotPresent(table.getSql("patches.upgrade"));
+        verifyPreparedStatementNotPresent(table.getSql("patches.create"));
+    }
+    
+    /**
+     * Validates that the system recognizes an existing patches table.
+     * 
+     * @throws Exception if an unexpected error occurs
+     */
+    public void testVerifyAndUpgradePatchesTable() throws Exception
+    {
+        // Test-specific setup
+        handler = conn.getPreparedStatementResultSetHandler();
+        MockResultSet rs = handler.createResultSet();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mdmd.setPrimaryKeys(mrs);
+        handler.prepareGlobalResultSet(rs);
+        rs.addRow(new Integer[] {new Integer(13)});
+        
+        table.createPatchStoreIfNeeded();
+        
+        commonVerifications();
+        verifyCommitted();
+        verifyPreparedStatementParameter(0, 1, "milestone");
+        verifyPreparedStatementPresent(table.getSql("patches.upgrade"));
         verifyPreparedStatementNotPresent(table.getSql("patches.create"));
     }
     
@@ -180,6 +215,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
     {
         // Test-specific setup
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new Integer[]{new Integer(13)});
         handler.prepareGlobalResultSet(rs);
@@ -190,6 +232,7 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         commonVerifications();
         verifyNotCommitted();
         verifyPreparedStatementParameter(1, 1, "milestone");
+        verifyPreparedStatementNotPresent(table.getSql("patches.upgrade"));
         verifyPreparedStatementNotPresent(table.getSql("level.create"));
     }
 
@@ -222,6 +265,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
     public void testUpdatePatchLevel() throws Exception
     {
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new Integer[]{new Integer(12)});
         handler.prepareResultSet(table.getSql("level.read"), rs, new String[]{"milestone"});
@@ -244,6 +294,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Test-specific setup
         // Return a non-empty set in response to the patch lock query
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new String[]{"F"});
         handler.prepareResultSet(table.getSql("lock.read"), rs, new String[]{"milestone", "milestone"});
@@ -263,6 +320,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Test-specific setup
         // Return a non-empty set in response to the patch lock query
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         rs.addRow(new String[]{"T"});
         handler.prepareResultSet(table.getSql("lock.read"), rs, new String[]{"milestone", "milestone"});
@@ -283,6 +347,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Test-specific setup
         // Return a non-empty set in response to the patch lock query
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         handler.prepareUpdateCount(table.getSql("lock.obtain"), 0, new String[] {"milestone", "milestone"});
         
         try
@@ -312,6 +383,13 @@ public class PatchTableTest extends JDBCTestCaseAdapter
         // Test-specific setup
         // Return an empty set in response to the patch lock query
         handler = conn.getPreparedStatementResultSetHandler();
+        
+        MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         handler.prepareUpdateCount(table.getSql("lock.obtain"), 1, new String[] {"milestone", "milestone"});
         
@@ -384,7 +462,15 @@ public class PatchTableTest extends JDBCTestCaseAdapter
     }
 
     public void testPatchRetrievesSetWithPatchesApplied () throws SQLException, MigrationException {
+        
         handler = conn.getPreparedStatementResultSetHandler();
+        
+    	MockDatabaseMetaData mdmd = (MockDatabaseMetaData) conn.getMetaData();
+        MockResultSet mrs = handler.createResultSet();
+        mrs.addRow(new String[]{"", "", "", "system_name"});
+        mrs.addRow(new String[]{"", "", "", "patch_level"});
+        mdmd.setPrimaryKeys(mrs);
+        
         MockResultSet rs = handler.createResultSet();
         rs.addColumn("patch_level", new Object[]{1, 2});
         handler.prepareGlobalResultSet(rs);

@@ -15,12 +15,17 @@
 
 package com.tacitknowledge.util.migration.jdbc.util;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import java.sql.SQLException;
-
-import java.sql.*;
-import java.util.Properties;
 
 /**
  * Utility class for dealing with JDBC.
@@ -42,45 +47,40 @@ public final class SqlUtil
         // Hidden
     }
 
-    /**
-     * Ensures the given connection, statement, and result are properly closed.
-     *
-     * @param conn the connection to close; may be <code>null</code>
-     * @param stmt the statement to close; may be <code>null</code>
-     * @param rs   the result set to close; may be <code>null</code>
-     */
-    public static void close(Connection conn, Statement stmt, ResultSet rs)
-    {
-        if (rs != null)
-        {
-            try
-            {
-                boolean rsIsOpen = true;
-                try
-                {
-                    rsIsOpen = !rs.isClosed();
-                }
-                catch (AbstractMethodError e)
-                {
-                    log.debug("AbstractMethodError closing ResultSet.  ResultSet might be a DelegatingResultSet with a badly implemented (i.e. missing) delegation to isClosed().", e);
-                }
-                if (rsIsOpen)
-                {
-                    log.debug("Closing ResultSet: " + rs.toString());
-                    rs.close();
-                }
-                else
-                {
-                    log.debug("ResultSet (" + rs.toString() + ") already closed.");
-                }
-            }
-            catch (SQLException e)
-            {
-                log.error("Error closing ResultSet", e);
-            }
-        }
-
-        if (stmt != null)
+    
+    private static void closeResultSet(ResultSet rs) {
+    	 if (rs != null)
+         {
+             try
+             {
+                 boolean rsIsOpen = true;
+                 try
+                 {
+                     rsIsOpen = !rs.isClosed();
+                 }
+                 catch (AbstractMethodError e)
+                 {
+                     log.debug("AbstractMethodError closing ResultSet.  ResultSet might be a DelegatingResultSet with a badly implemented (i.e. missing) delegation to isClosed().", e);
+                 }
+                 if (rsIsOpen)
+                 {
+                     log.debug("Closing ResultSet: " + rs.toString());
+                     rs.close();
+                 }
+                 else
+                 {
+                     log.debug("ResultSet (" + rs.toString() + ") already closed.");
+                 }
+             }
+             catch (SQLException e)
+             {
+                 log.error("Error closing ResultSet", e);
+             }
+         }
+    }
+    
+    private static void closeStatement(Statement stmt) {
+    	if (stmt != null)
         {
             try
             {
@@ -113,8 +113,10 @@ public final class SqlUtil
                 log.error("Error closing Statement", e);
             }
         }
-
-        if (conn != null)
+    }
+    
+    private static void closeConnection(Connection conn) {
+    	if (conn != null)
         {
             try
             {
@@ -143,6 +145,20 @@ public final class SqlUtil
             }
         }
     }
+    
+    /**
+     * Ensures the given connection, statement, and result are properly closed.
+     *
+     * @param conn the connection to close; may be <code>null</code>
+     * @param stmt the statement to close; may be <code>null</code>
+     * @param rs   the result set to close; may be <code>null</code>
+     */
+    public static void close(Connection conn, Statement stmt, ResultSet rs)
+    {
+		closeResultSet(rs);
+		closeStatement(stmt);
+		closeConnection(conn);
+	}
 
     /**
      * Established and returns a connection based on the specified parameters.

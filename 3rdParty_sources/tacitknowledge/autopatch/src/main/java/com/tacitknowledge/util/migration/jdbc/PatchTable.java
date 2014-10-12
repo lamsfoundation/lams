@@ -15,18 +15,20 @@
 
 package com.tacitknowledge.util.migration.jdbc;
 
-import com.tacitknowledge.util.migration.MigrationException;
-import com.tacitknowledge.util.migration.PatchInfoStore;
-import com.tacitknowledge.util.migration.jdbc.util.SqlUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.tacitknowledge.util.migration.MigrationException;
+import com.tacitknowledge.util.migration.PatchInfoStore;
+import com.tacitknowledge.util.migration.jdbc.util.SqlUtil;
 
 
 /**
@@ -94,6 +96,7 @@ public class PatchTable implements PatchInfoStore
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        
         try
         {
             conn = context.getConnection();
@@ -103,6 +106,40 @@ public class PatchTable implements PatchInfoStore
             rs = stmt.executeQuery();
             log.debug("'patches' table already exists.");
             tableExistenceValidated = true;
+            
+            
+            ResultSet alterRs = null;
+            PreparedStatement alterStmt = null;
+            try {
+            	//if we are at this point - we are sure, that patches table exists. It is possible however, that 
+                //table primary key is invalid (as it has changed from legacy versions).
+                DatabaseMetaData databaseMetaData = conn.getMetaData();
+                String patchesTableName = getSql("patches.tablename");
+                alterRs = databaseMetaData.getPrimaryKeys(
+                	    null, null, patchesTableName);
+
+                Set<String> compoundKeyColumns = new HashSet<String>();
+    			while (alterRs.next()) {
+    				String columnName = alterRs.getString(4);
+    				compoundKeyColumns.add(columnName);
+    			}
+                if (compoundKeyColumns.size() != 2) {
+                	log.info("Legacy structure of 'patches' table found. Alter 'patches' table to use compound primary key.");
+                	alterStmt = conn.prepareStatement(getSql("patches.upgrade"));
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("Altering patches table with SQL '" + getSql("patches.upgrade") + "'");
+                    }
+                	alterStmt.execute();
+                	context.commit();
+                }
+            } catch (SQLException e) {
+            	log.error("SQLException thrown during patches table upgrade.", e);
+            } finally {
+            	SqlUtil.close(null, alterStmt, alterRs);
+            }
+            
+            
         }
         catch (SQLException e)
         {

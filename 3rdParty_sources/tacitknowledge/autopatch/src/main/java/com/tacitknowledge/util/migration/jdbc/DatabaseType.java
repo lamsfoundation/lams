@@ -29,6 +29,7 @@ import java.util.Properties;
  * required keys are:
  * <ul>
  * <li>patches.create - DDL that creates the patches table</li>
+ * <li>patches.upgrade - DDL that upgrades the patches table from legacy versions of autopatch</li>
  * <li>level.create - SQL that inserts a new patch level record for the system</li>
  * <li>level.read - SQL that selects the current patch level of the system</li>
  * <li>level.update - SQL that updates the current patch level of the system</li>
