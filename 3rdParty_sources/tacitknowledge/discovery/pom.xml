@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tacitknowledge</groupId>
   <artifactId>discovery</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.5-lams</version>
   <packaging>jar</packaging>
 
   <parent>
@@ -35,6 +35,19 @@
     <developerConnection>scm:git:git@github.com:tacitknowledge/discovery.git</developerConnection>
     <url>https://github.com/tacitknowledge/discovery</url>
   </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <source>${source.jdk}</source>
+          <target>${target.jdk}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <properties>
     <source.jdk>1.5</source.jdk>

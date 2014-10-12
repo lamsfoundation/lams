@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tacitknowledge</groupId>
     <artifactId>autopatch</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.2-lams</version>
     <packaging>jar</packaging>
 
     <parent>
