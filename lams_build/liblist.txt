@@ -10,8 +10,8 @@ apache-poi        poi-3.10-FINAL-20140208.jar           3.10                   A
 aspirin           aspirin.jar                           0.8.03                 Apache License 1.1            Apache                           embeddable send-only SMTP server
                   dnsjava-2.0.6.jar						2.0.6				   BSD							 Brian Wellington				  implementation of DNS in Java
 
-autopatch		  tk-autopatch-1.2.0-b2-cvs.jar			1.2.0				   Apache License				 Tacit Knowledge				  automated Java patching system
-				  tk-discovery-1.0.0.jar				1.0.0				  
+autopatch		  autopatch-1.4.2-lams.jar			1.4.2-lams				   Apache License				 Tacit Knowledge				  automated Java patching system
+				  discovery-1.0.5-lams.jar				1.0.5-lams				  
 
 axis              axis-ant.jar							1.4                    Apache License 2.0      	     Apache							  XML based Web service framework                                                                                          
                   axis.jar								1.4																					                                                                                                               

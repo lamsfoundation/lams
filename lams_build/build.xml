@@ -232,7 +232,7 @@
 		<copy todir="assembly/lams.ear/lib" flatten="true">
 			<!-- copy autopatcher-->
 			<fileset dir="lib/autopatch">
-				<include name="tk-*.jar" />
+				<include name="*.jar" />
 			</fileset>
 		</copy>
 		
