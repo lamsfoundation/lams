@@ -17,6 +17,7 @@ package com.tacitknowledge.util.migration.jdbc.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import java.sql.SQLException;
 
 import java.sql.*;
 import java.util.Properties;
@@ -91,6 +92,11 @@ public final class SqlUtil
                 catch (AbstractMethodError e)
                 {
                     log.debug("AbstractMethodError closing Statement.", e);
+                }
+                catch (SQLException e)
+                {
+                    //ignore - we don't care if isClosed() throws an SQLException. And it happens that
+                	//org.jboss.jca.adapters.jdbc.WrappedStatement.isClosed() does.
                 }
                 if (stmtIsOpen)
                 {
