@@ -6,11 +6,10 @@ SET FOREIGN_KEY_CHECKS=0;
 -- LKC-40 
 -- Remove logs belong to all other users except leader
 DROP TABLE IF EXISTS temp_select;
-CREATE TABLE temp_select AS SELECT group_leader_uid uid
-		FROM tl_lascrt11_session WHERE group_leader_uid IS NOT NULL;
+CREATE TEMPORARY TABLE temp_select AS SELECT group_leader_uid uid FROM tl_lascrt11_session WHERE group_leader_uid IS NOT NULL;
 ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
 DELETE FROM tl_lascrt11_answer_log WHERE user_uid NOT IN (SELECT uid FROM temp_select);
-DROP TABLE temp_select;
+DROP TEMPORARY TABLE temp_select;
 
 --Make ScratchieAnswerVisitLog belong to session and not user, thus being shared by all users
 ALTER TABLE tl_lascrt11_answer_log DROP FOREIGN KEY FK_NEW_610529188_693580A441F9365D;

@@ -10,12 +10,11 @@ ALTER TABLE tl_lavote11_session ADD INDEX FK_lavote11_session_1 (group_leader_ui
 
 -- Adding a constraint to the vote user table so no same user_id and vote_session_id can be repetead 
 -- In order to achieve this remove duplicate users and according attempts. 
-CREATE TABLE temp_select AS SELECT MAX(uid) uid
-FROM tl_lavote11_usr GROUP BY user_id, vote_session_id;
+CREATE TEMPORARY TABLE temp_select AS SELECT MAX(uid) uid FROM tl_lavote11_usr GROUP BY user_id, vote_session_id;
 ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
 DELETE FROM tl_lavote11_usr_attempt WHERE que_usr_id NOT IN (SELECT uid FROM temp_select);
 DELETE FROM tl_lavote11_usr WHERE uid NOT IN (SELECT uid FROM temp_select);
-DROP TABLE temp_select;
+DROP TEMPORARY TABLE temp_select;
 
 ALTER TABLE tl_lavote11_usr ADD UNIQUE INDEX(user_id, vote_session_id);
 

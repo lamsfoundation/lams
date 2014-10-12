@@ -13,12 +13,11 @@ ALTER TABLE tl_lamc11_content ADD COLUMN prefix_answers_with_letters TINYINT(1) 
 
 -- Adding a constraint to the MCQ user table so no same user_id and session_id can be repetead. 
 -- In order to achieve this remove duplicate users and according attempts. 
-CREATE TABLE temp_select AS SELECT MAX(uid) uid
-FROM tl_lamc11_que_usr GROUP BY que_usr_id, mc_session_id;
+CREATE TEMPORARY TABLE temp_select AS SELECT MAX(uid) uid FROM tl_lamc11_que_usr GROUP BY que_usr_id, mc_session_id;
 ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
 DELETE FROM tl_lamc11_usr_attempt WHERE que_usr_id NOT IN (SELECT uid FROM temp_select);
 DELETE FROM tl_lamc11_que_usr WHERE uid NOT IN (SELECT uid FROM temp_select);
-DROP TABLE temp_select;
+DROP TEMPORARY TABLE temp_select;
 
 ALTER TABLE tl_lamc11_que_usr ADD UNIQUE INDEX(que_usr_id, mc_session_id);
 

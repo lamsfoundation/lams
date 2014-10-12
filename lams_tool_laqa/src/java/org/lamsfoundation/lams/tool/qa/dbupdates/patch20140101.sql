@@ -10,12 +10,11 @@ ALTER TABLE tl_laqa11_session ADD INDEX FK_laqa11_session1 (qa_group_leader_uid)
 
 -- Adding a constraint to the QA user table so no same que_usr_id and qa_session_id can be repetead 
 -- In order to achieve this remove duplicate users and according responses. 
-CREATE TABLE temp_select AS SELECT MAX(uid) uid
-FROM tl_laqa11_que_usr GROUP BY que_usr_id, qa_session_id;
+CREATE TEMPORARY TABLE temp_select AS SELECT MAX(uid) uid FROM tl_laqa11_que_usr GROUP BY que_usr_id, qa_session_id;
 ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
 DELETE FROM tl_laqa11_usr_resp WHERE que_usr_id NOT IN (SELECT uid FROM temp_select);
 DELETE FROM tl_laqa11_que_usr WHERE uid NOT IN (SELECT uid FROM temp_select);
-DROP TABLE temp_select;
+DROP TEMPORARY TABLE temp_select;
 
 ALTER TABLE tl_laqa11_que_usr ADD UNIQUE INDEX(que_usr_id, qa_session_id);
 
