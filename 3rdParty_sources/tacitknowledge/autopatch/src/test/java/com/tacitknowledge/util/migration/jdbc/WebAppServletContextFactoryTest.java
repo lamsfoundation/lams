@@ -76,7 +76,7 @@ public class WebAppServletContextFactoryTest extends TestCase
         sc.setInitParameter("migration.readonly", "true");
         sc.setInitParameter("migration.databasetype", dbType);
         sc.setInitParameter("migration.patchpath", "patches");
-        sc.setInitParameter("migration.datasource", "jdbc/testsource");
+        sc.setInitParameter("migration.datasource", "java:comp/env/jdbc/testsource");
         
         MockDataSource ds = new MockDataSource();
         InitialContext context = new InitialContext();
@@ -119,9 +119,9 @@ public class WebAppServletContextFactoryTest extends TestCase
         sc.setInitParameter("migration.readonly", "true");
         sc.setInitParameter("migration.jdbc.systems", "system1,system2");
         sc.setInitParameter("migration.system1.databasetype", dbType1);
-        sc.setInitParameter("migration.system1.datasource", "jdbc/testsource1");
+        sc.setInitParameter("migration.system1.datasource", "java:comp/env/jdbc/testsource1");
         sc.setInitParameter("migration.system2.databasetype", dbType2);
-        sc.setInitParameter("migration.system2.datasource", "jdbc/testsource2");
+        sc.setInitParameter("migration.system2.datasource", "java:comp/env/jdbc/testsource2");
         sc.setInitParameter("migration.patchpath", "patches");
         
         MockDataSource ds = new MockDataSource();

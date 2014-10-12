@@ -54,7 +54,7 @@ public class DatabaseTypeTest extends TestCase
          * is what we expect before we override it.
          */
         String type = "mysql";
-        String dbTypeExpectedValue="true";
+        String dbTypeExpectedValue="false";
         DatabaseType databaseType = new DatabaseType(type);
         Properties dbProperties = new Properties();
         

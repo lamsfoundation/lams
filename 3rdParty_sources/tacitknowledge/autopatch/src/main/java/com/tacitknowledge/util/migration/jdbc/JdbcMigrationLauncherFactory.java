@@ -203,7 +203,7 @@ public class JdbcMigrationLauncherFactory
                     throw new IllegalArgumentException("A jndi context must be "
                             + "present to use this configuration.");
                 }
-                DataSource ds = (DataSource) ctx.lookup("java:comp/env/" + dataSource);
+                DataSource ds = (DataSource) ctx.lookup(dataSource);
                 context.setDataSource(ds);
                 log.debug("adding context with datasource " + dataSource
                         + " of type " + databaseType);
