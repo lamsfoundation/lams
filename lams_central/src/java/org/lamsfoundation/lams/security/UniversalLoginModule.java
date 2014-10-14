@@ -281,7 +281,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 					sharedsession.setAttribute(AttributeNames.USER, userDTO);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 				log.error("===> exception: " + e, e);
 			}
 		}
