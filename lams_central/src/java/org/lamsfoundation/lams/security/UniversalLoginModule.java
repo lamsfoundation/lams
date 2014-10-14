@@ -100,7 +100,8 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	protected boolean validatePassword(String inputPassword,
 			String expectedPassword) {
 		boolean isValid = false;
-		if (inputPassword != null) {
+		HttpSession sharedsession = SessionManager.getSession();
+		if (inputPassword != null && sharedsession != null) {
 			// empty password not allowed
 			if (inputPassword.length() == 0)
 				return false;
@@ -277,7 +278,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 						}
 					}
 
-					HttpSession sharedsession = SessionManager.getSession();
 					sharedsession.setAttribute(AttributeNames.USER, userDTO);
 				}
 			} catch (Exception e) {

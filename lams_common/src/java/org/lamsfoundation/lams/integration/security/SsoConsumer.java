@@ -59,7 +59,8 @@ public class SsoConsumer implements ServletExtension {
 	    @Override
 	    public AuthenticationMechanismOutcome authenticate(HttpServerExchange exchange, SecurityContext sc) {
 		ServletRequestContext requestContext = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
-		if (requestContext == null) {
+		// pass authentication further if it is a non-processable request or the user is loggin in just now
+		if (requestContext == null || exchange.getRequestURI().endsWith("j_security_check")) {
 		    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
 		}
 
