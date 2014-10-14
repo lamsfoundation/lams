@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.AdminUtil;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -46,7 +47,7 @@ public class MaintainLoginPage {
     	// Now logout and check that the image and text are correct
     	closeBrowser();
     	openBrowser();
-    	AdminUtil.logout(driver);
+    	LamsUtil.logout(driver);
     	
     	String expectedText = driver.findElement(By.xpath("//*[@id=\"login-left-col\"]/div")).getText().trim();
     	assertEquals(expectedText, insertText);
@@ -66,7 +67,7 @@ public class MaintainLoginPage {
     @AfterClass
     public static void closeBrowser(){
     	
-    	AdminUtil.logout(driver);
+    	LamsUtil.logout(driver);
         driver.quit();
     }
         

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.AdminUtil;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -144,7 +145,7 @@ public class UserManagement {
 	@AfterClass
 	public void afterClass() {
 
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 		driver.quit();
 	}
 

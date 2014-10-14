@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.AdminUtil;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -57,7 +58,7 @@ public class ImportCourses {
 
 	@AfterClass
 	public static void closeBrowser(){
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 		driver.quit();
 	}
 

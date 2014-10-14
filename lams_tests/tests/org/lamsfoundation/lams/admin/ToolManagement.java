@@ -3,14 +3,15 @@ package org.lamsfoundation.lams.admin;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 
 import java.util.concurrent.TimeUnit;
+
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.AdminUtil;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -74,7 +75,7 @@ public class ToolManagement {
 	@AfterClass
 	public static void closeBrowser(){
 		// Logout before quitting 
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 		driver.quit();
 	}
 

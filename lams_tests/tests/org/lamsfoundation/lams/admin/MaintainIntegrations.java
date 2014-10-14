@@ -8,7 +8,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.w3c.dom.Document;
@@ -22,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.codec.binary.Hex;
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.AdminUtil;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -37,7 +37,7 @@ public class MaintainIntegrations {
 	private static WebDriver driver = null;
 
 	// Test data
-	private static final String randomInt = randInt(0, 9999);
+	private static final String randomInt = LamsUtil.randInt(0, 9999);
 	private String serverId = "tester-" + randomInt;
 	private String serverPrefix = "t" + randomInt;
 	private static String serverKey = "qBw5QPy4i58cMI50t12F";
@@ -148,7 +148,7 @@ public class MaintainIntegrations {
 	public void getLearningDesigns() { 
 
 		// First let's logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		// Create the authentication hash
 		String hash = createHash(datetime, username);
@@ -188,7 +188,7 @@ public class MaintainIntegrations {
 		// path to file in LAMS server 
 		String filePath = "/tmp/Example1.zip";
 		// First let's logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		// Create the authentication hash
 		String hash = createHash(datetime, username);
@@ -240,7 +240,7 @@ public class MaintainIntegrations {
 		String lessonDescription = URLEncoder.encode("A lesson", "UTF-8");
 
 		// First let's logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		// Create the authentication hash
 		String hash = createHash(datetime, username);
@@ -335,7 +335,7 @@ public class MaintainIntegrations {
 		String monitorRoles = AdminUtil.rolesInCourse(driver, monitorUsername, courseName);
 
 		// Logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		Assert.assertEquals(monitorRoles, "Author Learner Monitor", "The roles for the user" 
 				+ monitorUsername + " in course " + courseName + "are incorrect");
@@ -404,7 +404,7 @@ public class MaintainIntegrations {
 		String learnerRole = AdminUtil.rolesInCourse(driver, learnerUsername, courseName);
 
 		// Logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		Assert.assertEquals(learnerRole, "Learner", "The role for the learner " 
 				+ learnerUsername + " in course " + courseName + "is incorrect");
@@ -452,7 +452,7 @@ public class MaintainIntegrations {
 		
 		// Randomly select thru the answers
 		for (int i = 0; i < 5; i++) {
-			String xpathAnswer = "//*[@id=\"question-area-" + i + "\"]/table/tbody/tr[" + randInt(1, 3) + "]/td[1]/input";
+			String xpathAnswer = "//*[@id=\"question-area-" + i + "\"]/table/tbody/tr[" + LamsUtil.randInt(1, 3) + "]/td[1]/input";
 			driver.findElement(By.xpath(xpathAnswer)).click();
 		}
 		// Submit all responses
@@ -707,21 +707,6 @@ public class MaintainIntegrations {
 		}
 	}
 
-	public static String randInt(int min, int max) {
-
-		// NOTE: Usually this should be a field rather than a method
-		// variable so that it is not re-seeded every call.
-		Random rand = new Random();
-
-		// nextInt is normally exclusive of the top value,
-		// so add 1 to make it inclusive
-		int randomNum = rand.nextInt((max - min) + 1) + min;
-
-		String randomNumString = String.valueOf(randomNum);
-
-		return randomNumString;
-	}
-
 	@BeforeClass
 	public static void openBrowser(){
 		driver = new FirefoxDriver();
@@ -736,7 +721,7 @@ public class MaintainIntegrations {
 	@AfterClass
 	public static void closeBrowser(){
 		// Logout before quitting 
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 		driver.quit();
 	}
 

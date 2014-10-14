@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.admin.util;
 import java.util.List;
 
 import org.lamsfoundation.lams.LamsConstants;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -99,27 +100,11 @@ public class AdminUtil {
 		return "error: No roles for " + username + " in course " + courseName;
 	}
 	
-	public static void loginAsSysadmin(WebDriver driver, String sysadminUser, String sysadminPasswd) {
-
-		// Login
-		driver.get(LamsConstants.TEST_SERVER_URL);
-		driver.findElement(By.name("j_username")).sendKeys(LamsConstants.SYSADMIN_USER); 
-		driver.findElement(By.name("j_password")).sendKeys(LamsConstants.SYSADMIN_PASSWD);
-		driver.findElement(By.id("loginButton")).click();
-
-	}
 
 	public static void loginAsSysadmin(WebDriver driver) {
 		// Login
-		loginAsSysadmin(driver, LamsConstants.SYSADMIN_USER, LamsConstants.SYSADMIN_PASSWD);
+		LamsUtil.loginAs(driver, LamsConstants.SYSADMIN_USER, LamsConstants.SYSADMIN_PASSWD);
 
-	}
-
-
-	public static void logout(WebDriver driver) {
-		
-		driver.get(LamsConstants.LOGOUT_URL);
-		
 	}
 
 	public static boolean createUser(WebDriver driver, String username,

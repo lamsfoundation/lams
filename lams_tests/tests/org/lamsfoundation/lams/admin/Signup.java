@@ -6,6 +6,7 @@ import java.math.BigInteger;
 
 import org.lamsfoundation.lams.LamsConstants;
 import org.lamsfoundation.lams.admin.util.*;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -83,7 +84,7 @@ public class Signup {
 		String email = (firstName + "." + lastName + "@lams.com").toLowerCase();
 				
 		// first let's logout
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 
 		// Not hiw the signup page
 		driver.get(LamsConstants.SIGNUP_URL + courseCode.toLowerCase());
@@ -114,13 +115,9 @@ public class Signup {
 	public void loginStudent() {
 		
 		//Login with the new details
-		
-		driver.get(LamsConstants.TEST_SERVER_URL);
-		driver.findElement(By.name("j_username")).sendKeys(username); 
-		driver.findElement(By.name("j_password")).sendKeys(password);
-		driver.findElement(By.id("loginButton")).click();
-		
-		// Check that the tag with the coursename exists
+		LamsUtil.loginAs(driver, username, password);
+			
+		// deal with new user pop-up
 		WebDriverWait wait = new WebDriverWait(driver, 5 /*timeout in seconds*/);
 		if (wait.until(ExpectedConditions.alertIsPresent())==null) {
 		       System.out.println("alert was not present");
@@ -130,7 +127,9 @@ public class Signup {
 				alert.accept();
 		}
 
-		Assert.assertTrue((driver.findElements(By.linkText(courseName)).size() > 0), "Student logged in successfully and in correct class");
+		// Check that the tag with the coursename exists
+		Boolean existsCourseName = (driver.findElements(By.linkText(courseName)).size() > 0);
+		Assert.assertTrue(existsCourseName, "Student logged in successfully and in correct class");
 		
 		
 		
@@ -151,7 +150,7 @@ public class Signup {
 	@AfterClass
 	public void afterClass() {
 
-		AdminUtil.logout(driver);
+		LamsUtil.logout(driver);
 		driver.quit();
 
 	}
