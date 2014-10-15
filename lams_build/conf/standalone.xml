@@ -117,7 +117,7 @@
 
             <size-rotating-file-handler name="LAMSFILE"
                 autoflush="true">
-                <level name="INFO" />
+                <level name="DEBUG" />
                 <formatter>
                     <named-formatter name="LAMSPATTERN" />
                 </formatter>
@@ -129,7 +129,7 @@
 
             <console-handler name="LAMSCONSOLE">
                 <target name="System.out" />
-                <level name="INFO" />
+                <level name="DEBUG" />
                 <formatter>
                     <named-formatter name="LAMSCONSOLEPATTERN" />
                 </formatter>
