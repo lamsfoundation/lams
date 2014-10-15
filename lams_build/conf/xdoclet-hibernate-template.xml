@@ -2,7 +2,7 @@
 
 <!DOCTYPE hibernate-mapping PUBLIC
     "<XDtXml:publicId/>" 
-    "http://hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping
       <XDtClass:ifHasClassTag tagName="hibernate.mapping" paramName="schema" superclasses="false">
