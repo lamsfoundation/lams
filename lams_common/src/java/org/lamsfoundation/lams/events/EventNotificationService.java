@@ -53,6 +53,12 @@ class EventNotificationService implements IEventNotificationService {
      * How often the attempts to resend messages should be taken (in miliseconds). Currently - every hour.
      */
     private static final long RESEND_FREQUENCY = 60 * 60 * 1000;
+    
+    /**
+     * When the first resend is to be triggered (starting from class instantiation time). 
+     */
+    private static final long FIRST_RESEND_TIME = System.currentTimeMillis() + 120000;
+    
 
     /**
      * Interface to contact the database.
@@ -102,7 +108,7 @@ class EventNotificationService implements IEventNotificationService {
 			    Scheduler.DEFAULT_GROUP, ResendMessagesJob.class);
 		    resendMessagesJobDetail.setDescription("");
 		    Trigger resendMessageTrigger = new SimpleTrigger(
-			    EventNotificationService.RESEND_MESSAGES_TRIGGER_NAME, Scheduler.DEFAULT_GROUP,
+			    EventNotificationService.RESEND_MESSAGES_TRIGGER_NAME, Scheduler.DEFAULT_GROUP, new Date(FIRST_RESEND_TIME), null, 
 			    SimpleTrigger.REPEAT_INDEFINITELY, EventNotificationService.RESEND_FREQUENCY);
 		    getScheduler().scheduleJob(resendMessagesJobDetail, resendMessageTrigger);
 		}
