@@ -160,93 +160,93 @@
 </lams:head>
 <body onresize="javascript:GeneralLib.resizePaper()">
 	<div id="toolbar" class="ui-corner-all">
-		<div class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
+		<div id="newButton" class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
 			<fmt:message key="authoring.fla.page.menu.new" />
 		</div>
 		<div>
 			<div class="split-ui-button">
-				<div onClick="javascript:MenuLib.openLearningDesign()">
+				<div id="openButton" onClick="javascript:MenuLib.openLearningDesign()">
 					<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.importLearningDesign()"><fmt:message key="authoring.fla.page.menu.import" /></li>
-				<li onClick="javascript:MenuLib.importPartLearningDesign()"><fmt:message key="authoring.fla.page.menu.import.part" /></li>
+				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><fmt:message key="authoring.fla.page.menu.import" /></li>
+				<li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><fmt:message key="authoring.fla.page.menu.import.part" /></li>
 			</ul>
 		</div>
 		<div>
 			<div class="split-ui-button">
-				<div onClick="javascript:MenuLib.saveLearningDesign()">
+				<div id="saveButton" onClick="javascript:MenuLib.saveLearningDesign()">
 					<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.saveLearningDesign(true)"><fmt:message key="authoring.fla.page.menu.saveas" /></li>
+				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><fmt:message key="authoring.fla.page.menu.saveas" /></li>
 				<li id="exportButton"><fmt:message key="authoring.fla.page.menu.export" /><span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
 					<ul>
-						<li class="exportSequenceButton"
+						<li id="exportLamsButton" class="exportSequenceButton"
 							title="Standard LAMS ZIP format"
 							onClick="javascript:MenuLib.exportLearningDesign(1)"><fmt:message key="authoring.fla.page.menu.export.lams" /></li>
-						<li class="exportSequenceButton"
+						<li id="exportImsButton" class="exportSequenceButton"
 							title="<fmt:message key='authoring.fla.page.menu.export.ims.tooltip' />"
 							onClick="javascript:MenuLib.exportLearningDesign(2)"><fmt:message key="authoring.fla.page.menu.export.ims" /></li>
-						<li class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)"><fmt:message key="authoring.fla.page.menu.export.png" /></li>
-						<li class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)"><fmt:message key="authoring.fla.page.menu.export.svg" /></li>
+						<li id="exportPngButton" class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)"><fmt:message key="authoring.fla.page.menu.export.png" /></li>
+						<li id="exportSvgButton" class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)"><fmt:message key="authoring.fla.page.menu.export.svg" /></li>
 					</ul>
 				</li>
 			</ul>
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
+		<div id="copyButton" class="ui-button" onClick="javascript:MenuLib.copyActivity()">
 			<fmt:message key="authoring.fla.page.menu.copy" />
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
+		<div id="pasteButton" class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
 			<fmt:message key="authoring.fla.page.menu.paste" />
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.addTransition()">
+		<div id="transitionButton" class="ui-button" onClick="javascript:MenuLib.addTransition()">
 			<fmt:message key="authoring.fla.page.menu.transition" />
 		</div>
 		<div>
-			<div class="split-ui-button">
+			<div id="optionalButton" class="split-ui-button">
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.optional" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addOptionalActivity()"><fmt:message key="authoring.fla.page.menu.optional.activity" /></li>
+				<li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><fmt:message key="authoring.fla.page.menu.optional.activity" /></li>
 				<li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><fmt:message key="authoring.fla.page.menu.optional.support" /></li>
 			</ul>
 		</div>
 		<div>
-			<div class="split-ui-button">
+			<div id="flowButton" class="split-ui-button">
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.flow" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addGate()"><fmt:message key="authoring.fla.page.menu.flow.gate" /></li>
-				<li onClick="javascript:MenuLib.addBranching()"><fmt:message key="authoring.fla.page.menu.flow.branch" /></li>
+				<li id="gateButton" onClick="javascript:MenuLib.addGate()"><fmt:message key="authoring.fla.page.menu.flow.gate" /></li>
+				<li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><fmt:message key="authoring.fla.page.menu.flow.branch" /></li>
 			</ul>
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
+		<div id="groupButton" class="ui-button" onClick="javascript:MenuLib.addGrouping()">
 			<fmt:message key="authoring.fla.page.menu.group" />
 		</div>
 		<div>
-			<div class="split-ui-button">
+			<div id="annotateButton" class="split-ui-button">
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 				</div>
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.addAnnotationLabel()"><fmt:message key="authoring.fla.page.menu.annotate.label" /></li>
-				<li onClick="javascript:MenuLib.addAnnotationRegion()"><fmt:message key="authoring.fla.page.menu.annotate.region" /></li>
+				<li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><fmt:message key="authoring.fla.page.menu.annotate.label" /></li>
+				<li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><fmt:message key="authoring.fla.page.menu.annotate.region" /></li>
 			</ul>
 		</div>
-		<div class="ui-button" onClick="javascript:GeneralLib.arrangeActivities()">
+		<div id="arrangeButton" class="ui-button" onClick="javascript:GeneralLib.arrangeActivities()">
 			<fmt:message key="authoring.fla.page.menu.arrange" />
 		</div>
 		<div id="previewButton" class="ui-button" onClick="javascript:MenuLib.openPreview()">
@@ -268,6 +268,7 @@
 				<div class="templateContainer">
 					<c:forEach var="tool" items="${tools}">
 						<div
+							 Id="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
 							 supportsOutputs="${tool.supportsOutputs}"

@@ -54,6 +54,6 @@
 	<c:set var="classVar" value="tab-link-highlight" />
 </c:if>
 
-<a class="tab-middle-link ${classVar}" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="border:0;">
+<a id="${fn:escapeXml(tabname)}" class="tab-middle-link ${classVar}" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="border:0;">
 	<c:out value="${tabname}" escapeXml="false"/>	
 </a>

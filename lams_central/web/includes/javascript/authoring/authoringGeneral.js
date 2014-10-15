@@ -301,6 +301,7 @@ GeneralInitLib = {
 		// buttons shared by both load and save dialogs
 		var sharedButtons = [
 		{
+		'id'	   : 'cancelButton',
 	    	'text'     : 'Cancel',
 	    	'tabIndex' : -1,
 	    	'click'    : function() {
@@ -614,6 +615,7 @@ GeneralInitLib = {
 				             {
 				            	'class'  : 'defaultFocus',
 				            	'text'   : LABELS.SAVE_BUTTON,
+                                                'id'     : 'saveLdStoreButton',
 				            	'click'  : function() {	
 				            		var dialog = $(this),
 				            			container = dialog.closest('.ui-dialog'),
