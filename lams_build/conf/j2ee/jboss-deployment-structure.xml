@@ -34,6 +34,7 @@
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
+      <module name="org.apache.xmlcommons" export="true" />
       <module name="org.infinispan" export="true" />
       <module name="org.hibernate" export="true" />
       <module name="org.jboss.jbossweb" export="true" />

@@ -30,6 +30,7 @@
 				<path name="javax" />
 				<path name="org/xml" />
 				<path name="org/w3c/dom" />
+				<path name="org/w3c/dom/stylesheets" />
   			</exclude-set>
   		</filter>
   	</resource-root>
@@ -41,6 +42,7 @@
 			<path name="javax/xml/parsers" />
 			<path name="org/xml/sax" />
 			<path name="org/w3c/dom" />
+			<path name="org/w3c/dom/stylesheets" />
 		</paths>
 	</system>
   </dependencies>

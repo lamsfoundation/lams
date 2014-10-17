@@ -108,7 +108,7 @@ public class SVGGenerator {
 	    SVGGenerator.serializer = SVGGenerator.lsDOMImplementation.createLSSerializer();
 	    SVGGenerator.serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
 	} catch (Exception e) {
-	    SVGGenerator.log.error(e);
+	    SVGGenerator.log.error("Initialization error", e);
 	}
     }
 

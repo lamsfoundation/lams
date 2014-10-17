@@ -566,6 +566,13 @@
 		
 		
 		
+		<!-- WildFly does not load all classes from JDK that LAMS needs (com/sun/org/apache/xerces/internal)
+		     We need our own, extended list -->
+		<copy tofile="${server.home}/modules/system/layers/base/sun/jdk/main/module.xml"
+			  file="lib/jdk/jdk.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/jdom/0.7" overwrite="true" verbose="true">
 			<fileset dir="lib/jdom">
 				<include name="jdom.jar" />

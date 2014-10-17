@@ -26,4 +26,15 @@
   <resources>
     <resource-root path="batik-1.7.jar"/>
   </resources>
+  
+  <dependencies>
+ 	<system>
+  		<paths>
+  			<path name="org/w3c/dom"/>
+  			<path name="org/w3c/dom/css"/>
+  			<path name="org/w3c/dom/traversal"/>
+  		</paths>
+  	</system>
+  	<module name="org.apache.xmlcommons" />
+  </dependencies>
 </module>
