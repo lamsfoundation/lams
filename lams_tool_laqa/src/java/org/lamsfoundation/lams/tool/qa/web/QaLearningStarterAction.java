@@ -159,7 +159,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = httpSessionID == null ? null : (SessionMap<String, Object>) request
+		.getSession().getAttribute(httpSessionID);
 	if (sessionMap == null) {
 	    sessionMap = new SessionMap<String, Object>();
 	    Map mapSequentialAnswers = new HashMap();
