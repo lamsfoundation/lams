@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.AbstractPage;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -61,7 +62,10 @@ public class FLAPage extends AbstractPage {
 
 	@FindBy(id = "openButton")
 	private WebElement openButton;
-
+	
+	@FindBy(id = "openDropButton")
+	private WebElement openDropButton;
+	
 	@FindBy(id = "importDesignButton")
 	private WebElement importDesignButton;
 
@@ -92,6 +96,9 @@ public class FLAPage extends AbstractPage {
 
 	@FindBy(id = "flowButton")
 	private WebElement flowButton;
+	
+	@FindBy(id = "flowDropButton")
+	private WebElement flowDropButton;
 
 	@FindBy(id = "gateButton")
 	private WebElement gateButton;
@@ -104,6 +111,9 @@ public class FLAPage extends AbstractPage {
 
 	@FindBy(id = "annotateButton")
 	private WebElement annotateButton;
+	
+	@FindBy(id = "annotateDropButton")
+	private WebElement annotateDropButton;
 
 	@FindBy(id = "annotateLabelButton")
 	private WebElement annotateLabelButton;
@@ -712,6 +722,22 @@ public class FLAPage extends AbstractPage {
 	}
 
 
+	/**
+	 * Gate properties UI component
+	 *
+	 * @return DescriptionPage object
+	 */
+	public GatePropertyPage gateProperties() {
+		
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		WebElement gateActivity = getActivityElement(svg, AuthorConstants.GATE_TITLE);
+		
+		gateActivity.click();
+		return PageFactory.initElements(driver, GatePropertyPage.class);
+		
+	}
+	
 	public String getGroupType(String groupActivityName) {
 		final String selectGroupDropDownXpath = 
 				"/html/body/div[14]/div[2]/div/table/tbody/tr[2]/td[2]/select";
@@ -745,6 +771,23 @@ public class FLAPage extends AbstractPage {
 		WebElement activity = getActivityElement(svg, activityTitle);
 		
 		return activity.getLocation();
+	}
+
+	public void dragGateToCanvas() {
+
+		flowDropButton.click();
+		gateButton.click();
+		
+		// Prepare the dragAndDrop action
+		Actions builder = new Actions(driver);  // Configure the Action
+		Action dropGate = builder
+				.moveToElement(canvas)
+				.click()
+				.build();  
+
+		// Execute the Action
+		dropGate.perform();
+		
 	}
 
 
@@ -951,8 +994,6 @@ public class FLAPage extends AbstractPage {
 		inputNumGroups.clear();
 		inputNumGroups.sendKeys(Integer.toString(numberOfGroups));
 	}
-
-
 
 	
 }

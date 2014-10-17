@@ -25,18 +25,19 @@ package org.lamsfoundation.lams.author;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.lamsfoundation.lams.pages.author.FLAPage;
+import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.lamsfoundation.lams.pages.LoginPage;
+import org.lamsfoundation.lams.pages.author.FLAPage;
 import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Authoring tests for:
@@ -67,18 +68,6 @@ import org.testng.annotations.AfterClass;
  */
 public class AuthorTests {
 	
-	
-	// Constants
-	
-	private static final String FLA_TITLE = "Flashless Authoring";
-	private static final String SAVE_SEQUENCE_SUCCESS_MSG = "Congratulations";
-	private static final String SAVE_SEQUENCE_INVALID_MSG = "validation issues";
-	
-	private static final String FORUM_TITLE = "Forum";
-	private static final String KALTURA_TITLE = "Kaltura";
-	private static final String SHARE_RESOURCES_TITLE = "Share Resources";
-	private static final String Q_AND_A_TITLE = "Q & A";
-	private static final String GROUP_TITLE = "Grouping";
 	
 	private static final String randomInt = LamsUtil.randInt(0, 9999);
 
@@ -117,7 +106,7 @@ public class AuthorTests {
 		FLAPage fla = new FLAPage(driver);
 		fla = index.openFla();
 		fla.maximizeWindows();
-		Assert.assertEquals(FLA_TITLE, fla.getTitle(), "The expected title is not present");
+		Assert.assertEquals(AuthorConstants.FLA_TITLE, fla.getTitle(), "The expected title is not present");
 
 
 		
@@ -130,10 +119,10 @@ public class AuthorTests {
 	public void createDesign() {
 		
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(FORUM_TITLE, 200, 250);
-		fla.dragActivityToCanvasPosition(SHARE_RESOURCES_TITLE, 350, (10 * randomInteger));
-		fla.dragActivityToCanvasPosition(KALTURA_TITLE, 550, (80 * randomInteger));
-		fla.dragActivityToCanvas(Q_AND_A_TITLE);
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 200, 250);
+		fla.dragActivityToCanvasPosition(AuthorConstants.SHARE_RESOURCES_TITLE, 350, (10 * randomInteger));
+		fla.dragActivityToCanvasPosition(AuthorConstants.KALTURA_TITLE, 550, (80 * randomInteger));
+		fla.dragActivityToCanvas(AuthorConstants.Q_AND_A_TITLE);
 		fla.drawTransitionBtwActivities();
 		
 		// Now get all the activity titles
@@ -141,14 +130,14 @@ public class AuthorTests {
 		
 		// Assert that all of them are in the design
 		
-		Assert.assertTrue(allActivityTitles.contains(FORUM_TITLE), 
-				"The title " + FORUM_TITLE + " was not found as an activity in the design");
-		Assert.assertTrue(allActivityTitles.contains(SHARE_RESOURCES_TITLE), 
-				"The title " + SHARE_RESOURCES_TITLE + " was not found as an activity in the design");
-		Assert.assertTrue(allActivityTitles.contains(KALTURA_TITLE), 
-				"The title " + KALTURA_TITLE + " was not found as an activity in the design");
-		Assert.assertTrue(allActivityTitles.contains(Q_AND_A_TITLE), 
-				"The title " + Q_AND_A_TITLE + " was not found as an activity in the design");		
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.FORUM_TITLE), 
+				"The title " + AuthorConstants.FORUM_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.SHARE_RESOURCES_TITLE), 
+				"The title " + AuthorConstants.SHARE_RESOURCES_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.KALTURA_TITLE), 
+				"The title " + AuthorConstants.KALTURA_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.Q_AND_A_TITLE), 
+				"The title " + AuthorConstants.Q_AND_A_TITLE + " was not found as an activity in the design");		
 	}
 
 	/**
@@ -159,7 +148,7 @@ public class AuthorTests {
 		System.out.println("design name: " + randomDesignName);
 		String saveResult = fla.saveDesign(randomDesignName);
 		// System.out.println(saveResult);
-		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_SUCCESS_MSG), 
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
 				"Saving a design returned an unexpected message: "+ saveResult);
 
 	}
@@ -218,11 +207,11 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"saveAsDesign"})
 	public void changeActivityTitle() {
 		
-		String forumNewTitle =  "New " + FORUM_TITLE;
-		String kalturaNewTitle = "New " + KALTURA_TITLE;
+		String forumNewTitle =  "New " + AuthorConstants.FORUM_TITLE;
+		String kalturaNewTitle = "New " + AuthorConstants.KALTURA_TITLE;
 		
-		fla.changeActivityTitle(FORUM_TITLE, forumNewTitle);
-		fla.changeActivityTitle(KALTURA_TITLE, kalturaNewTitle);
+		fla.changeActivityTitle(AuthorConstants.FORUM_TITLE, forumNewTitle);
+		fla.changeActivityTitle(AuthorConstants.KALTURA_TITLE, kalturaNewTitle);
 		List<String> allActivityTitles = fla.getAllActivityNames();
 		
 		System.out.println("All Activites: "+ allActivityTitles);
@@ -245,17 +234,17 @@ public class AuthorTests {
 		cleanCanvas();
 		fla.dragGroupToCanvas();
 		fla.arrangeDesign();
-		fla.dragActivityToCanvasPosition(FORUM_TITLE, 150, 100);
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 150, 100);
 		fla.arrangeDesign();
 		
 		fla.drawTransitionBtwActivities();
 		
 		String newGroupTitle = "New Group"; // + GROUP_TITLE; 
-		fla.changeActivityTitle(GROUP_TITLE, newGroupTitle);
+		fla.changeActivityTitle(AuthorConstants.GROUP_TITLE, newGroupTitle);
 		
-		fla.setGroupForActivity("New Group", FORUM_TITLE);
+		fla.setGroupForActivity("New Group", AuthorConstants.FORUM_TITLE);
 		
-		String designName = randomDesignName + "-" + GROUP_TITLE;
+		String designName = randomDesignName + "-" + AuthorConstants.GROUP_TITLE;
 		
 		fla.saveAsDesign(designName);
 		
@@ -272,12 +261,12 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"createGroupDesign"})
 	public void drawQaActivity() {
 		
-		fla.dragActivityToCanvas(Q_AND_A_TITLE);
+		fla.dragActivityToCanvas(AuthorConstants.Q_AND_A_TITLE);
 		
-		boolean activityExists = fla.activityExists(Q_AND_A_TITLE);
+		boolean activityExists = fla.activityExists(AuthorConstants.Q_AND_A_TITLE);
 		
 		Assert.assertTrue(activityExists, 
-				"The activity " + Q_AND_A_TITLE + " is not present in design");
+				"The activity " + AuthorConstants.Q_AND_A_TITLE + " is not present in design");
 		
 	}
 	
@@ -290,7 +279,7 @@ public class AuthorTests {
 		
 		String saveResult = fla.saveDesign();
 		
-		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_INVALID_MSG), 
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_INVALID_MSG), 
 				"The save design returns an unexpected message: " + saveResult );
 		
 	}
@@ -302,7 +291,7 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"saveInvalidDesign"})
 	public void fixValidation() {
 		
-		fla.drawTransitionFromTo(FORUM_TITLE, Q_AND_A_TITLE);
+		fla.drawTransitionFromTo(AuthorConstants.FORUM_TITLE, AuthorConstants.Q_AND_A_TITLE);
 		
 	}
 	
@@ -315,7 +304,7 @@ public class AuthorTests {
 		
 		String saveResult = fla.saveDesign();
 		
-		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_SUCCESS_MSG), 
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
 				"The save design returns an invalid message: " + saveResult );
 		
 	}
@@ -441,8 +430,8 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"addDesignLicense"})
 	public void copyPasteActivity() {
 		
-		String copyOfActivity = "Copy of " + Q_AND_A_TITLE;
-		fla.copyPasteActivity(Q_AND_A_TITLE);
+		String copyOfActivity = "Copy of " + AuthorConstants.Q_AND_A_TITLE;
+		fla.copyPasteActivity(AuthorConstants.Q_AND_A_TITLE);
 		
 		Boolean activityExists = fla.activityExists(copyOfActivity);
 	
@@ -460,14 +449,14 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"copyPasteActivity"})
 	public void arrangeDesign() {
 		
-		Point initialActivityLocation = fla.getActivityLocation(Q_AND_A_TITLE);
+		Point initialActivityLocation = fla.getActivityLocation(AuthorConstants.Q_AND_A_TITLE);
 		
 		reArrangeDesign();
 		
-		Point newActivityLocation = fla.getActivityLocation(Q_AND_A_TITLE);
+		Point newActivityLocation = fla.getActivityLocation(AuthorConstants.Q_AND_A_TITLE);
 
 		Assert.assertFalse(initialActivityLocation.equals(newActivityLocation), 
-				"The activity " + Q_AND_A_TITLE + " is still in the same location!" );
+				"The activity " + AuthorConstants.Q_AND_A_TITLE + " is still in the same location!" );
 		
 		saveInvalidDesign();
 		
@@ -484,7 +473,7 @@ public class AuthorTests {
 	@Test(enabled = false, dependsOnMethods={"fixValidationAndSave"})
 	public void deleteActivity() {
 		
-		String copyOfActivity = "Copy of " + Q_AND_A_TITLE;
+		String copyOfActivity = "Copy of " + AuthorConstants.Q_AND_A_TITLE;
 		fla.deleteActivity(copyOfActivity);
 		
 		Boolean activityExists = fla.activityExists(copyOfActivity);
