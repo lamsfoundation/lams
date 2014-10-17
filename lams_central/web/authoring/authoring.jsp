@@ -168,7 +168,7 @@
 				<div id="openButton" onClick="javascript:MenuLib.openLearningDesign()">
 					<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 				</div>
-				<div>&nbsp;</div>
+				<div id="openDropButton">&nbsp;</div>
 			</div>
 			<ul>
 				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><fmt:message key="authoring.fla.page.menu.import" /></li>
@@ -180,7 +180,7 @@
 				<div id="saveButton" onClick="javascript:MenuLib.saveLearningDesign()">
 					<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 				</div>
-				<div>&nbsp;</div>
+				<div id="saveDropButton">&nbsp;</div>
 			</div>
 			<ul>
 				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><fmt:message key="authoring.fla.page.menu.saveas" /></li>
@@ -212,7 +212,7 @@
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.optional" /></span>
 				</div>
-				<div>&nbsp;</div>
+				<div id="optionalDropButton">&nbsp;</div>
 			</div>
 			<ul>
 				<li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><fmt:message key="authoring.fla.page.menu.optional.activity" /></li>
@@ -224,7 +224,7 @@
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.flow" /></span>
 				</div>
-				<div>&nbsp;</div>
+				<div id="flowDropButton">&nbsp;</div>
 			</div>
 			<ul>
 				<li id="gateButton" onClick="javascript:MenuLib.addGate()"><fmt:message key="authoring.fla.page.menu.flow.gate" /></li>
@@ -239,7 +239,7 @@
 				<div>
 					<span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 				</div>
-				<div>&nbsp;</div>
+				<div id="annotateDropButton">&nbsp;</div>
 			</div>
 			<ul>
 				<li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><fmt:message key="authoring.fla.page.menu.annotate.label" /></li>
