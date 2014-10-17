@@ -31,6 +31,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.pages.AbstractPage;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
@@ -38,6 +39,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
@@ -52,150 +54,168 @@ public class FLAPage extends AbstractPage {
 	/** 
 	 * Menu buttons 
 	 * These are the menu buttons on the interface.
-	*/
-	
+	 */
+
 	@FindBy(id = "newButton")
 	private WebElement newButton;
-	
+
 	@FindBy(id = "openButton")
 	private WebElement openButton;
-	
-	@FindBy(id = "importSequenceButton")
-	private WebElement importSequenceButton;
-	
-	@FindBy(id = "importPartSequenceButton")
-	private WebElement importPartSequenceButton;
+
+	@FindBy(id = "importDesignButton")
+	private WebElement importDesignButton;
+
+	@FindBy(id = "importPartDesignButton")
+	private WebElement importPartDesignButton;
 
 	@FindBy(id = "saveButton")
 	private WebElement saveButton;
-	
+
 	@FindBy(id = "saveDropButton")
 	private WebElement saveDropButton;
-	
+
 	@FindBy(id = "saveAsButton")
 	private WebElement saveAsButton;	
-	
+
 	@FindBy(id = "exportButton")
 	private WebElement exportButton;
-	
-	
+
+
 	@FindBy(id = "copyButton")
 	private WebElement copyButton;
-	
+
 	@FindBy(id = "pasteButton")
 	private WebElement pasteButton;
-	
+
 	@FindBy(id = "transitionButton")
 	private WebElement transitionButton;
-	
+
 	@FindBy(id = "flowButton")
 	private WebElement flowButton;
-	
+
 	@FindBy(id = "gateButton")
 	private WebElement gateButton;
-		
+
 	@FindBy(id = "branchingButton")
 	private WebElement branchingButton;
-	
+
 	@FindBy(id = "groupButton")
 	private WebElement groupButton;
-	
+
 	@FindBy(id = "annotateButton")
 	private WebElement annotateButton;
-		
+
 	@FindBy(id = "annotateLabelButton")
 	private WebElement annotateLabelButton;
-	
+
 	@FindBy(id = "annotateRegionButton")
 	private WebElement annotateRegionButton;
-	
+
 	@FindBy(id = "arrangeButton")
 	private WebElement arrangeButton;
-		
+
 	@FindBy(id = "previewButton")
 	private WebElement previewButton;
-	
+
 	/** 
-	* Activities
-	*/
-	
-	
+	 * Activities
+	 */
+
+
 	/** 
-	* Page elements
-	*  These are the page elements on FLA
-	*/
-	
+	 * Page elements
+	 *  These are the page elements on FLA
+	 */
+
 	@FindBy(id = "canvas")
 	private WebElement canvas;
-	
+
 	@FindBy(id = "ldDescriptionFieldTitle")
-	private WebElement sequenceTitle;
-	
+	private WebElement designTitle;
+
 	@FindBy(id = "svg")
 	private WebElement svgCanvas;
-	
+
+	@FindBy(id = "rubbishBin")
+	private WebElement rubbishBin;
+
+
+	@FindBy(id = "ldDescriptionHideTip")
+	private WebElement designDescriptionLink;
 	
 	/**
-	* Dialogs: Save design dialog elements
-	*/
-	
+	 * Dialogs: Save design dialog elements
+	 */
+
 	@FindBy(id = "ldStoreDialogNameField")
 	private WebElement ldStoreDialogNameField;
-	
+
 	@FindBy(id = "saveLdStoreButton")
 	private WebElement saveLdStoreButton;
-	
-	
+
+
 	/**
-	* Dialogs: Open design dialog elements
-	*/
-	
+	 * Dialogs: Open design dialog elements
+	 */
+
 	@FindBy(id = "openLdStoreButton")
 	private WebElement openLdStoreButton;
-	
+
 	@FindBy(id = "ldStoreDialogTreeCell")
 	private WebElement ldTree;
-	
-	
+
+
 	@FindBy(id = "propertiesContentTool")
 	private WebElement propertiesContentTool;
-	
-	
-	
+
+
+
 	public FLAPage(WebDriver driver) {
 		super(driver);
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Opens LD Dialog to open a design
 	 * 
 	 */
 	public void openLdOpenDialog() {
-	
+
 		openButton.click();
 
 	}
-	
+
 	/**
 	 * Opens LD Dialog to save a design
 	 */
 	public void openLdSaveDialog() {
-		
+
 		saveButton.click();
 	}
 
-	
+
 	/**
 	 * Clears canvas to new
 	 */
 	public void newDesign() {
-		
+
 		newButton.click();
 		checkAlert();
 	}
+
+	/**
+	 * Drops a group activity into the canvas. 
+	 *  
+	 */
+	public void dragGroupToCanvas() {
+
+		groupButton.click();
+		canvas.click();
+
+	}
+
 
 	/**
 	 * Given the activity name, it drags it into the canvas. By default it puts it in the 
@@ -203,18 +223,18 @@ public class FLAPage extends AbstractPage {
 	 * @param name 
 	 */
 	public void dragActivityToCanvas(String name) {
-		
+
 		String toolName = "tool" + name;
-		
-        WebElement tool = driver.findElement(By.id(toolName));
-        
-        Actions builder = new Actions(driver);  // Configure the Action
-        Action dragAndDrop = builder.clickAndHold(tool)
-          .moveToElement(canvas)
-          .release(canvas)
-          .build();  // Get the action
-          dragAndDrop.perform(); // Execute the Action
-		
+
+		WebElement tool = driver.findElement(By.id(toolName));
+
+		Actions builder = new Actions(driver);  // Configure the Action
+		Action dragAndDrop = builder.clickAndHold(tool)
+				.moveToElement(canvas)
+				.release(canvas)
+				.build();  // Get the action
+		dragAndDrop.perform(); // Execute the Action
+
 	}
 
 	/**
@@ -227,25 +247,25 @@ public class FLAPage extends AbstractPage {
 	 * @param y 	y offset move
 	 */
 	public void dragActivityToCanvasPosition(String name, int x, int y) {
-		
+
 		// we include the prefix "tool" as that's what we named the ids	
 		String toolName = "tool" + name;
-		
+
 		// Finds the activity
-        WebElement tool = driver.findElement(By.id(toolName));
-        
-        // Prepare the dragAndDrop action
-        Actions builder = new Actions(driver);  // Configure the Action
-        Action dragAndDrop = builder.clickAndHold(tool)
-        		.moveByOffset(x, y)
-        		.release()
-        		.build();  
-          
-        // Execute the Action
-        dragAndDrop.perform();
-		
+		WebElement tool = driver.findElement(By.id(toolName));
+
+		// Prepare the dragAndDrop action
+		Actions builder = new Actions(driver);  // Configure the Action
+		Action dragAndDrop = builder.clickAndHold(tool)
+				.moveByOffset(x, y)
+				.release()
+				.build();  
+
+		// Execute the Action
+		dragAndDrop.perform();
+
 	}
-	
+
 	/**
 	 * Saves a design with the given param desigName. 
 	 *  
@@ -254,22 +274,24 @@ public class FLAPage extends AbstractPage {
 	 * 
 	 */
 	public String saveDesign(String designName) {
-		
+
 		String saveResult = null;
 
 		openLdSaveDialog();
+		ldStoreDialogNameField.click();
+		ldStoreDialogNameField.clear();
 		ldStoreDialogNameField.sendKeys(designName);
 		saveLdStoreButton.click();
 		saveResult = getAlertText();
-	
+
 		return saveResult;
-		
+
 	}
-	
+
 	/**
 	 * Saves a design  
 	 *  This takes no parameters as it's just a click on the
-	 *  save menu button once the sequence/design exists. 
+	 *  save menu button once the design exists. 
 	 * 
 	 * @return the message shown in the save alert popup.
 	 * 
@@ -277,23 +299,23 @@ public class FLAPage extends AbstractPage {
 	public String saveDesign() {
 
 		String saveResult = null;
-		
+
 		saveButton.click();
 		saveResult = getAlertText();
-		
+
 		return saveResult;
-		
+
 	}
 
 	/**
-	 * Gets the Sequence title/name for the canvas.
+	 * Gets the Design title/name for the canvas.
 	 *
 	 * @return 
 	 */
-	public String getSequenceName () {
-		return sequenceTitle.getText().trim();
+	public String getDesignName () {
+		return designTitle.getText().trim();
 	}
-	
+
 
 	/**
 	 * Rearranges the design on the canvas by pressing
@@ -301,27 +323,27 @@ public class FLAPage extends AbstractPage {
 	 */
 	public void arrangeDesign() {
 		arrangeButton.click();
-		
+
 	}
 
 
 	/**
-	 * Opens the open sequence dialog to select and open the design on 
+	 * Opens the open design dialog to select and open the design on 
 	 * canvas.
 	 * 
 	 * @param seqName
 	 * 
 	 */
 	public void openDesign(String seqName) {
-		
+
 		// opens the dialog
 		openLdOpenDialog();
-		
-		// parses the available sequences
+
+		// parses the available designs
 		List<WebElement> elements = ldTree.findElements(
 				By.xpath("//*[contains(text(), '"+ seqName +"')]"));
-		
-		// Find the sequence that is in seqName and also is visible 
+
+		// Find the design that is in seqName and also is visible 
 		// -- we've got to improve this though!
 		for (int i = 0; i < elements.size(); i++) {
 			WebElement el = elements.get(i);
@@ -330,10 +352,10 @@ public class FLAPage extends AbstractPage {
 				el.click();
 			}
 		}
-		
+
 		// click on open
 		openLdStoreButton.click();
-		
+
 	}
 
 
@@ -343,25 +365,25 @@ public class FLAPage extends AbstractPage {
 	 *  
 	 */
 	public void drawTransitionBtwActivities()  {
-		
+
 		WebElement svg = driver.findElement(By.tagName("svg"));
-		
+
 		List<WebElement> listActivities = svg.findElements(By.tagName("text"));
-		
+
 		int size = listActivities.size();
 		//System.out.println("Activity #: " + size);
 		for (int i = 0; i < size; i++) {
-			System.out.println("i: " + i );
+			// System.out.println("i: " + i );
 			if (i+1 < size) {
 				transitionButton.click();
 				listActivities.get(i).click();
 				listActivities.get(i+1).click();
 				//System.out.println("i + 1= " + (i+1) );
-				
+
 			}
 			//System.out.println("closing");
 		}
-		 
+
 	}
 
 	/**
@@ -371,11 +393,11 @@ public class FLAPage extends AbstractPage {
 	 * @param newActivityTitle 
 	 */
 	public void changeActivityTitle(String activityTitle, String newActivityTitle)  {
-		
+
 		WebElement svg = driver.findElement(By.tagName("svg"));
-		
+
 		WebElement activity = getActivityElement(svg, activityTitle);
-		
+
 		// select the activity
 		activity.click();
 
@@ -387,10 +409,10 @@ public class FLAPage extends AbstractPage {
 		driver.findElement(
 				By.xpath("/html/body/div[14]/div[2]/div/table/tbody/tr[1]/td[2]/input"))
 				.sendKeys(newActivityTitle);
-		
+
 		// click on canvas so the change takes effect
 		canvas.click();
-		
+
 	}
 
 	/**
@@ -403,45 +425,46 @@ public class FLAPage extends AbstractPage {
 	 * 
 	 */
 	public AbstractPage openSpecificActivity(String activityName) {
-		
+
 		WebElement svg = driver.findElement(By.tagName("svg"));
-		
+
 		WebElement act = getActivityElement(svg, activityName);
-				
+
 		Actions openAct = new Actions(driver);
 		openAct.doubleClick(act).build().perform();;
-		
+
 		String popUpWindow = getPopUpWindowId(driver);
-		
+
 		driver.switchTo().window(popUpWindow);
-		
+
 		return PageFactory.initElements(driver, AbstractPage.class);
-		
-		
+
+
 	}
-	
+
 
 	/**
 	 * Given a design on canvas, it saves it under a new name
 	 *
 	 *
-	 * @param newSequenceName	new name to save as
+	 * @param newDesignName	new name to save as
 	 * @return 					msg from alert
 	 */
-	public String saveAsDesign(String newSequenceName) {
-		
+	public String saveAsDesign(String newDesignName) {
+
 		String saveAsResult = null;
 		saveDropButton.click();
 		saveAsButton.click();
+		ldStoreDialogNameField.click();
 		ldStoreDialogNameField.clear();
-		ldStoreDialogNameField.sendKeys(newSequenceName);
+		ldStoreDialogNameField.sendKeys(newDesignName);
 		saveLdStoreButton.click();
 		saveAsResult = getAlertText();
-	
+
 		return saveAsResult;
-		
+
 	}
-	
+
 	/**
 	 *	Gets the activity names into a list.
 	 *
@@ -449,27 +472,282 @@ public class FLAPage extends AbstractPage {
 	 * @return a string list with the activity names
 	 */
 	public List<String> getAllActivityNames() {
-		
+
 		List<String> allActivities = new ArrayList<>();
-		
+
 		WebElement svg = driver.findElement(By.tagName("svg"));
-		
+
 		List<WebElement> allActivitiesElements = getActivityElements(svg);
-		
-		System.out.println("Allactivities size: " + allActivitiesElements.size());
-		
+
+		// System.out.println("Allactivities size: " + allActivitiesElements.size());
+
 		for (int i = 0; i < allActivitiesElements.size(); i++) {
-			
+
 			WebElement element = allActivitiesElements.get(i);
-			System.out.println(element.getText());
+			// System.out.println(element.getText());
 			allActivities.add(element.getText());
-			
+
 		}
-		
+
 		return allActivities;
+
+	}
+
+
+
+	/**
+	 * Sets a group for an activity
+	 * @param groupName		the group to set to the activity
+	 * @param activityName 	the activity
+	 * 
+	 */
+	public void setGroupForActivity(String groupName, String activityName) {
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+
+		WebElement activity = getActivityElement(svg, activityName);
+
+		activity.click();
+
+		Select groupDropDown = new Select(
+				driver.findElement(
+						By.xpath("/html/body/div[14]/div[2]/div/table/tbody/tr[2]/td[2]/select")));
+		groupDropDown.selectByVisibleText(groupName);
+
+		canvas.click();
+
+
+	}
+
+
+
+	/**
+	 * Draws a transition between two given activities
+	 * @param fromActivity	from activity name
+	 * @param toActivity 	to activity name
+	 */
+	public void drawTransitionFromTo(String fromActivity, String toActivity) {
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+
+		WebElement fromActivityElement = getActivityElement(svg, fromActivity);
+		WebElement toActivityElement = getActivityElement(svg, toActivity);
+
+		transitionButton.click();
+		fromActivityElement.click();
+		toActivityElement.click();
+
+		canvas.click();
+
+	}
+
+
+
+	/**
+	 * Copy/pastes a given activity
+	 * @param activity	activity to copy/paste
+	 */
+	public void copyPasteActivity(String activity) {
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		// Select activity
+		getActivityElement(svg, activity).click();
+
+		copyButton.click();
+
+		pasteButton.click();
+
+
+
+	}
+
+
+	public Boolean activityExists(String activity) {
+
+		List<String> activityNames = getAllActivityNames();
+
+		Boolean result = activityNames.contains(activity);
+
+		return result;
+	}
+
+
+
+	/**
+	 * Throws an activity into the rubbish bin
+	 * 
+	 * This method doesn't seem to be working as selenium seems to 
+	 * have some issues when moving things around with SVG.
+	 *
+	 * @param activity 
+	 */
+	public void deleteActivity(String activity) {
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		// Select activity
+		WebElement activityToDelete = getActivityElement(svg, activity);
+
+		activityToDelete.click();
+
+		WebElement bin = svg.findElement(By.id("rubbishBin"));
+	
+		Actions builder = new Actions(driver);
+		Action binActivityAction = builder.clickAndHold(activityToDelete)
+				.moveToElement(bin)
+				.release(bin)
+				.build();  // Get the action
+
+		binActivityAction.perform(); // Execute the Action
+
+	}
+
+
+
+	/**
+	 * Sets/modifies the group setting for a group activity
+	 * 
+	 * @param groupActivityName		group to be set/modified
+	 * @param groupType				group type choice (random, monitor, learner)
+	 * @param isGroupsOrLearners	true = groups , false = learners 
+	 * @param numberOfGroups		number of groups/learners
+	 * @param groupNames 			group names ie: "Group 01, Group 02, ..."
+	 * @param groupOptions			group options 
+	 *                                ie: "boolean equalGroups, boolean viewLearnersBeforeSelection"
+	 */
+	public void setGroups(String groupActivityName, String groupType, boolean isGroupsOrLearners, 
+			int numberOfGroups, String groupNames, String groupOptions) {
+
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		// Select activity
+		WebElement groupActivity = getActivityElement(svg, groupActivityName);
+
+		groupActivity.click();
+
+		switch (groupType) {
+		case "random":
+
+			// Set grouping type to random
+			setGroupType(groupType);
+
+			// Determine if group Groups or groups Learners
+			setGroupOrLearners(numberOfGroups, isGroupsOrLearners);
+
+
+			break;
+		case "monitor":
+
+			// Set grouping type to random
+			setGroupType(groupType);
+
+			// set GroupGroups
+			setGroupNumber(numberOfGroups, isGroupsOrLearners);
+			
+			break;
+
+		case "learner":
+
+			// Set grouping type to random
+			setGroupType(groupType);
+
+			// Determine if group Groups or groups Learners
+			setGroupOrLearners(numberOfGroups, isGroupsOrLearners);
+
+			// Now if there's extra options for learners choice grouping
+			if (!(groupOptions == null || groupOptions.trim().equals(""))) {
+				String[] options = groupOptions.split(",");
+				
+				// set equal group size
+				if (options[0].equals("true")) {
+					WebElement equalGroupSizes = 
+							driver.findElement(
+									By.xpath("/html/body/div[14]/div[2]/div/table/tbody/tr[5]/td[2]/input"));
+					
+					equalGroupSizes.click();
+					
+				}
+				
+				// set view learners before selection
+				if (options[1].equals("true")) {
+					WebElement viewLearnersBeforeSelection = 
+							driver.findElement(
+									By.xpath("/html/body/div[14]/div[2]/div/table/tbody/tr[6]/td[2]/input"));
+					
+					viewLearnersBeforeSelection.click();
+					
+				}
+				
+				
+			}
+
+
+			break;
+
+		default:
+			break;
+		}
+
+		// If we the group names are given then add them
+		if (!(groupNames == null || groupNames.trim().equals(""))) {
+
+			setGroupNames(groupNames);
+
+		} 
+
+		// Click on canvas to remove focus and set values
+		canvas.click();
+
+	}
+		
+	
+	/**
+	 * Design description UI component
+	 *
+	 * @return DescriptionPage object
+	 */
+	public DescriptionPage designDescription() {
+		
+	
+		return PageFactory.initElements(driver, DescriptionPage.class);
 		
 	}
+
+
+	public String getGroupType(String groupActivityName) {
+		final String selectGroupDropDownXpath = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[2]/td[2]/select";
+		
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		// Select activity
+		WebElement groupActivity = getActivityElement(svg, groupActivityName);
+
+		groupActivity.click();
+
+
+		// Set grouping type to random
+		Select groupDropDown = new Select(
+				driver.findElement(
+						By.xpath(selectGroupDropDownXpath)));
+		
+		String groupType = groupDropDown.getFirstSelectedOption().getAttribute("value");
+		
+		return groupType;
+	}
 	
+	/**
+	 * Returns the location for a given activity  
+	 * 
+	 * @param activityTitle
+	 * @return Point location for the activity
+	 */
+	public Point getActivityLocation(String activityTitle) {
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		// Select activity
+		WebElement activity = getActivityElement(svg, activityTitle);
+		
+		return activity.getLocation();
+	}
+
+
 	
 	/**
 	 * Returns the correct popup id
@@ -478,15 +756,15 @@ public class FLAPage extends AbstractPage {
 	 * @return 
 	 */
 	private String getPopUpWindowId(WebDriver driver) {
-		
+
 		String authorToolWindow = null;
 		Set<String> handles = driver.getWindowHandles();
 		Iterator<String> iterator = handles.iterator();
-		
+
 		while (iterator.hasNext()){
-		    authorToolWindow = iterator.next();
+			authorToolWindow = iterator.next();
 		}
-		
+
 		return authorToolWindow;
 	}
 
@@ -494,14 +772,14 @@ public class FLAPage extends AbstractPage {
 	 *  Clicks OK on the alert javascript popup
 	 */
 	private void checkAlert() {
-	    try {
-	        WebDriverWait wait = new WebDriverWait(driver, 2);
-	        wait.until(ExpectedConditions.alertIsPresent());
-	        Alert alert = driver.switchTo().alert();
-	        alert.accept();
-	    } catch (Exception e) {
-	        //exception handling
-	    }
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, 2);
+			wait.until(ExpectedConditions.alertIsPresent());
+			Alert alert = driver.switchTo().alert();
+			alert.accept();
+		} catch (Exception e) {
+			//exception handling
+		}
 	}
 
 	/**
@@ -510,22 +788,22 @@ public class FLAPage extends AbstractPage {
 	 * @return text from popup
 	 */
 	private String getAlertText() {
-		
+
 		String txt = null;
-		
-	    try {
-	        WebDriverWait wait = new WebDriverWait(driver, 2);
-	        wait.until(ExpectedConditions.alertIsPresent());
-	        Alert alert = driver.switchTo().alert();
-	        txt = alert.getText();
-	        //driver.switchTo().defaultContent();
-	        alert.accept();
-	    } catch (Exception e) {
-	        //exception handling
-	    }
-	    return txt;
+
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, 2);
+			wait.until(ExpectedConditions.alertIsPresent());
+			Alert alert = driver.switchTo().alert();
+			txt = alert.getText();
+			//driver.switchTo().defaultContent();
+			alert.accept();
+		} catch (Exception e) {
+			//exception handling
+		}
+		return txt;
 	}
-	
+
 	/**
 	 * Parses thru the SVG design to find the WebElement for the activity name. 
 	 *
@@ -534,22 +812,22 @@ public class FLAPage extends AbstractPage {
 	 * @return 
 	 */
 	private WebElement getActivityElement(WebElement svg, String activityName) {
-		
+
 		WebElement activityElement = null;
-		
+
 		List<WebElement> listActivities = svg.findElements(By.tagName("text"));
-		
+
 		for (WebElement webElement : listActivities) {
 			activityElement = webElement.findElement(By.tagName("tspan"));
 			String name = activityElement.getText();
-			
+
 			if (activityName.equals(name)) {
 				break;
-				
+
 			}
-			
+
 		}
-		
+
 		return activityElement;
 	}
 
@@ -560,19 +838,121 @@ public class FLAPage extends AbstractPage {
 	 * @return		list of web elements for activities in design  
 	 */
 	private List<WebElement> getActivityElements(WebElement svg) {
-		
+
 		List<WebElement> activitiesElements = new ArrayList<WebElement>();
-		
+
 		List<WebElement>  activityList = svg.findElements(By.tagName("text"));
-		
+
 		for (WebElement webElement : activityList) {
 			WebElement activityElement = webElement.findElement(By.tagName("tspan"));
 			activitiesElements.add(activityElement);
 		}
-		
+
 		return activitiesElements;
+
+	}
+
+
+	/**
+	 * Add group names to group activity
+	 * 
+	 * @param groupNames 
+	 */
+	private void setGroupNames(String groupNames) {
+		final String nameGroupButtonXpath = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[7]/td/div/span";
+		final String okButtonXpath = 
+				"/html/body/div[15]/div[11]/div/button[1]/span";
 		
+		// open naming groups dialog
+		WebElement nameGroupButton = driver.findElement(
+				By.xpath(nameGroupButtonXpath));
+
+		nameGroupButton.click();
+
+		// populate group names:
+		String[] listGroupNames = groupNames.split(",");
+		//System.out.println(listGroupNames.length);
+
+		int i = 1;
+		for (String groupName : listGroupNames) {
+
+			WebElement inputElement = driver.findElement(
+					By.xpath("/html/body/div[15]/div[2]/input[" + Integer.toString(i) + "]"));
+
+			inputElement.clear();
+			inputElement.sendKeys(groupName);
+			i++;
+
+		}
+
+		WebElement okButton = driver.findElement(
+				By.xpath(okButtonXpath));
+
+		okButton.click();
+	}
+
+	/**
+	 * Sets the group type
+	 *
+	 * @param groupType 
+	 */
+	private void setGroupType(String groupType) {
+		final String selectGroupDropDownXpath = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[2]/td[2]/select";
+
+		// Set grouping type to random
+		Select groupDropDown = new Select(
+				driver.findElement(
+						By.xpath(selectGroupDropDownXpath)));
+		groupDropDown.selectByValue(groupType);
+
+	}
+
+	private void setGroupOrLearners(int numberOfGroups, boolean groupsOrLearners) {
+		final String radioNumberOfGroupsXpath   = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[3]/td[2]/input";
+		final String radioNumberOfLearnersXpath = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[4]/td[2]/input";
+		
+		String elementXpath = (groupsOrLearners) ? radioNumberOfGroupsXpath : radioNumberOfLearnersXpath;
+
+		// Set Group to group number
+		WebElement radioGroups = 
+				driver.findElement(
+						By.xpath(elementXpath));
+
+		radioGroups.click();
+
+		setGroupNumber(numberOfGroups, groupsOrLearners);
+
 	}
 	
+	/**
+	 * Sets the group number or the number of learners per group
+	 *
+	 * @param numberOfGroups
+	 * @param groupsOrLearners 
+	 */
+	private void setGroupNumber(int numberOfGroups, Boolean groupsOrLearners) {
+		final String inputNumGroupXpath   = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[3]/td[2]/span/input";
+		final String inputNumLearnerXpath = 
+				"/html/body/div[14]/div[2]/div/table/tbody/tr[4]/td[2]/span/input";
+
+		String elementXpath = (groupsOrLearners) ? inputNumGroupXpath : inputNumLearnerXpath;
+
+		// Get input for number of groups
+		WebElement inputNumGroups = 	driver.findElement(
+				By.xpath(elementXpath));
+
+		//System.out.println("xpath: " + elementXpath);
+		// set numb groups
+		inputNumGroups.clear();
+		inputNumGroups.sendKeys(Integer.toString(numberOfGroups));
+	}
+
+
+
 	
 }

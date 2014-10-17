@@ -23,12 +23,13 @@
 package org.lamsfoundation.lams.author;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.pages.author.FLAPage;
-import org.lamsfoundation.lams.pages.AbstractPage;
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.lamsfoundation.lams.pages.LoginPage;
 import org.lamsfoundation.lams.util.LamsUtil;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -50,7 +51,16 @@ import org.testng.annotations.AfterClass;
  *  - saveAs design
  *  - change activity titles
  *  - save (one click)
- *  - open activity authoring
+ *  - Create group
+ *  - Assign group to activity
+ *  - Modify group settings
+ *  - Add design description
+ *  - Add design license
+ *  - Copy/paste activities
+ *  - Arrange design
+ *  - Save invalid design
+ *  
+ *  
  * 
  * @author Ernie Ghiglione (ernieg@lamsfoundation.org)
  *
@@ -62,11 +72,13 @@ public class AuthorTests {
 	
 	private static final String FLA_TITLE = "Flashless Authoring";
 	private static final String SAVE_SEQUENCE_SUCCESS_MSG = "Congratulations";
+	private static final String SAVE_SEQUENCE_INVALID_MSG = "validation issues";
 	
 	private static final String FORUM_TITLE = "Forum";
 	private static final String KALTURA_TITLE = "Kaltura";
 	private static final String SHARE_RESOURCES_TITLE = "Share Resources";
 	private static final String Q_AND_A_TITLE = "Q & A";
+	private static final String GROUP_TITLE = "Grouping";
 	
 	private static final String randomInt = LamsUtil.randInt(0, 9999);
 
@@ -76,24 +88,24 @@ public class AuthorTests {
 	private LoginPage onLogin;
 	private IndexPage index;
 	private FLAPage fla;
-
 	
 	WebDriver driver;
 	
 	@BeforeClass
 	public void beforeClass() {
 		driver = new FirefoxDriver();
-
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		
 		onLogin = PageFactory.initElements(driver, LoginPage.class);
 		index = PageFactory.initElements(driver, IndexPage.class);
 		fla = PageFactory.initElements(driver, FLAPage.class);
-		onLogin.navigateToLamsLogin().loginAs("test2", "test2");
+		onLogin.navigateToLamsLogin().loginAs("test3", "test3");
 		
 	}
 
 	@AfterClass
 	public void afterClass() {
-		//driver.quit();
+		driver.quit();
 	}
 
 	/**
@@ -112,16 +124,16 @@ public class AuthorTests {
 	}
 	
 	/**
-	 * Creates a 4 activity sequence
+	 * Creates a 4 activity design
 	 */
 	@Test(dependsOnMethods={"openFLA"})
 	public void createDesign() {
 		
-		// Drop activites in canvas
-		fla.dragActivityToCanvas(FORUM_TITLE);
-		fla.dragActivityToCanvasPosition(SHARE_RESOURCES_TITLE, 250, (20 * randomInteger));
-		fla.dragActivityToCanvasPosition(KALTURA_TITLE, (350 * randomInteger), 120);
-		fla.dragActivityToCanvasPosition(Q_AND_A_TITLE, 600, (14 * randomInteger));
+		// Drop activities in canvas
+		fla.dragActivityToCanvasPosition(FORUM_TITLE, 200, 250);
+		fla.dragActivityToCanvasPosition(SHARE_RESOURCES_TITLE, 350, (10 * randomInteger));
+		fla.dragActivityToCanvasPosition(KALTURA_TITLE, 550, (80 * randomInteger));
+		fla.dragActivityToCanvas(Q_AND_A_TITLE);
 		fla.drawTransitionBtwActivities();
 		
 		// Now get all the activity titles
@@ -139,36 +151,48 @@ public class AuthorTests {
 				"The title " + Q_AND_A_TITLE + " was not found as an activity in the design");		
 	}
 
+	/**
+	 * Gives the design a new name and saves it
+	 */
 	@Test(dependsOnMethods={"createDesign"})
 	public void nameAndSaveDesign() {
-		
+		System.out.println("design name: " + randomDesignName);
 		String saveResult = fla.saveDesign(randomDesignName);
 		// System.out.println(saveResult);
 		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_SUCCESS_MSG), 
-				"Saving a sequence returned an unexpected message: "+ saveResult);
+				"Saving a design returned an unexpected message: "+ saveResult);
 
 	}
 	
+	/**
+	 * Clears the canvas
+	 */
 	@Test(dependsOnMethods={"nameAndSaveDesign"})
 	public void cleanCanvas() {
 		fla.newDesign();
 		
 		// Check that the design titled is back to untitled
-		String newTitle = fla.getSequenceName();
+		String newTitle = fla.getDesignName();
 		Assert.assertTrue(newTitle.equals("Untitled"), "The canvas wasn't clean. Still shows: " + newTitle);
 		
 	}
 	
+	/**
+	 * Opens a design
+	 */
 	@Test(dependsOnMethods={"cleanCanvas"})
 	public void reOpenDesign() {
 		
 		fla.openDesign(randomDesignName);
-		Assert.assertEquals(fla.getSequenceName(), randomDesignName);
+		Assert.assertEquals(fla.getDesignName(), randomDesignName);
 	
 		
 	}
 	
 	
+	/**
+	 * Arranges design activities using "Arrange" menu button
+	 */
 	@Test(dependsOnMethods={"reOpenDesign"})
 	public void reArrangeDesign() {
 		
@@ -176,17 +200,20 @@ public class AuthorTests {
 		
 	}
 	
+	/**
+	 * SaveAs a design
+	 */
 	@Test(dependsOnMethods={"reOpenDesign"})
 	public void saveAsDesign() {
 		
-		String newSequenceName = "Re" + randomDesignName;
-		fla.saveAsDesign(newSequenceName);
-		Assert.assertEquals(fla.getSequenceName(), newSequenceName);
+		String newDesignName = "Re" + randomDesignName;
+		fla.saveAsDesign(newDesignName);
+		Assert.assertEquals(fla.getDesignName(), newDesignName);
 	}
 	
 	
 	/**
-	 * 
+	 * Change activity title
 	 */
 	@Test(dependsOnMethods={"saveAsDesign"})
 	public void changeActivityTitle() {
@@ -208,20 +235,267 @@ public class AuthorTests {
 				
 	}
 	
-
+	
+	/**
+	 * Creates a design using a grouping activity
+	 */
 	@Test(dependsOnMethods={"changeActivityTitle"})
-	public void openActivity() {
+	public void createGroupDesign () {
 		
-		AbstractPage forumPage = fla.openSpecificActivity("New " + FORUM_TITLE);
-
-		String forumPageTitle = forumPage.getTitle();
-		forumPage.closeWindow();
+		cleanCanvas();
+		fla.dragGroupToCanvas();
+		fla.arrangeDesign();
+		fla.dragActivityToCanvasPosition(FORUM_TITLE, 150, 100);
+		fla.arrangeDesign();
 		
-		Assert.assertEquals(forumPageTitle, FORUM_TITLE, 
-				"The title seems to be different from what we expected.");
+		fla.drawTransitionBtwActivities();
+		
+		String newGroupTitle = "New Group"; // + GROUP_TITLE; 
+		fla.changeActivityTitle(GROUP_TITLE, newGroupTitle);
+		
+		fla.setGroupForActivity("New Group", FORUM_TITLE);
+		
+		String designName = randomDesignName + "-" + GROUP_TITLE;
+		
+		fla.saveAsDesign(designName);
+		
+		Assert.assertEquals(fla.getDesignName(), designName, 
+				"Design name is wrong. It should be: " + designName);
+		
+	}
 
-				
+	
+	/**
+	 * Draws a new Q&A Activity
+	 * 
+	 */
+	@Test(dependsOnMethods={"createGroupDesign"})
+	public void drawQaActivity() {
+		
+		fla.dragActivityToCanvas(Q_AND_A_TITLE);
+		
+		boolean activityExists = fla.activityExists(Q_AND_A_TITLE);
+		
+		Assert.assertTrue(activityExists, 
+				"The activity " + Q_AND_A_TITLE + " is not present in design");
+		
 	}
 	
+	/**
+	 * Saves an invalid design
+	 * 
+	 */
+	@Test(dependsOnMethods={"drawQaActivity"})
+	public void saveInvalidDesign() {
+		
+		String saveResult = fla.saveDesign();
+		
+		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_INVALID_MSG), 
+				"The save design returns an unexpected message: " + saveResult );
+		
+	}
+	
+	/**
+	 * Fix validation and saves a valid design
+	 * 
+	 */
+	@Test(dependsOnMethods={"saveInvalidDesign"})
+	public void fixValidation() {
+		
+		fla.drawTransitionFromTo(FORUM_TITLE, Q_AND_A_TITLE);
+		
+	}
+	
+	/**
+	 * Saves design
+	 * 
+	 */
+	@Test(dependsOnMethods={"fixValidation"})
+	public void saveDesign() {
+		
+		String saveResult = fla.saveDesign();
+		
+		Assert.assertTrue(saveResult.contains(SAVE_SEQUENCE_SUCCESS_MSG), 
+				"The save design returns an invalid message: " + saveResult );
+		
+	}
+	
+	/**
+	 * Set group settings to random groups
+	 * 
+	 * Sets up some groups and modifications
+	 * 
+	 */
+	@Test(dependsOnMethods={"saveDesign"})
+	public void changeGroupSettingsToRandom() {
+		
+		final String groupActivityName = "New Group";
+		final String groupTypeRandom = "random";
+		
+		// set random grouping and number of learners to 3
+		fla.setGroups(groupActivityName, groupTypeRandom, true, 3, "", "");
+		
+		/// Get assertions
+		String testGroupType = fla.getGroupType(groupActivityName);
+		Assert.assertEquals(testGroupType, groupTypeRandom, "The group type returned is incorrect");
+		
+	}
+	
+	/**
+	 * Change Group settings to select in monitor
+	 * 
+	 * Sets up some groups and modifications
+	 * 
+	 */
+	@Test(dependsOnMethods={"changeGroupSettingsToRandom"})
+	public void changeGroupSettingsToMonitor() {
+
+		final String groupActivityName = "New Group";
+		final String groupTypeMonitor = "monitor";
+		
+		// set teacher selection (monitor) 4 groups and pass names
+		fla.setGroups(groupActivityName, groupTypeMonitor, true, 4, "Group Blue, Group Yellow, Group Red, Group Orange", "");
+				
+		/// Get assertions
+		String testGroupType = fla.getGroupType(groupActivityName);
+		Assert.assertEquals(testGroupType, groupTypeMonitor, "The group type returned is incorrect");
+		
+	}
+	
+	/**
+	 * Change Group settings to learner selection
+	 * 
+	 * Sets up some groups and modifications
+	 * 
+	 */
+	@Test(dependsOnMethods={"changeGroupSettingsToMonitor"})
+	public void changeGroupSettingsToLearner() {
+
+		final String groupActivityName = "New Group";
+		final String groupTypeLearner = "learner";
+		
+		// set learner choice, 5 groups, equal group sizes, view learners before select
+		fla.setGroups(groupActivityName, groupTypeLearner, false, 5, "", "true,true");
+				
+		/// Get assertions
+		String testGroupType = fla.getGroupType(groupActivityName);
+		Assert.assertEquals(testGroupType, groupTypeLearner, "The group type returned is incorrect");
+		
+	}
+	
+	
+	/**
+	 * Adds description to design
+	 * 
+	 */
+	@Test(dependsOnMethods={"changeGroupSettingsToLearner"})
+	public void addDesignDescription() {
+		
+		
+		String designDescription = "This is the <strong>description</strong> for this design";
+		
+		// opens dialog
+		fla.designDescription()
+		.openDesignDescriptionDialog();
+		
+		// Adds description
+		fla.designDescription()
+		.addDesignDescription(designDescription);
+		
+		String assertDesignDescription  = fla.designDescription().getDesignDescription();
+				
+		Assert.assertTrue((assertDesignDescription.contains(designDescription)),
+				"The description we've got is not accurate");
+		
+
+		
+	}
+	
+	/**
+	 * Adds license to design
+	 * 
+	 */
+	@Test(dependsOnMethods={"addDesignDescription"})
+	public void addDesignLicense() {
+		
+		final String licenseText = "LAMS Recommended: CC Attribution-Noncommercial-ShareAlike 2.5";
+		
+		int licenseId = 1;
+		// sets license
+		String assertLicense = fla.designDescription().addDesignLicense(licenseId);
+
+		// close description UI component
+		fla.designDescription().closeDesignDescriptionDialog();
+		
+		Assert.assertEquals(assertLicense, licenseText, "The license text does not match the expected one");
+		
+		saveDesign();
+		
+	}
+	
+		
+	/**
+	 * Copy/Pastes an activity
+	 * 
+	 */
+	@Test(dependsOnMethods={"addDesignLicense"})
+	public void copyPasteActivity() {
+		
+		String copyOfActivity = "Copy of " + Q_AND_A_TITLE;
+		fla.copyPasteActivity(Q_AND_A_TITLE);
+		
+		Boolean activityExists = fla.activityExists(copyOfActivity);
+	
+		Assert.assertTrue(activityExists, 
+				"Sorry, activity " + copyOfActivity + " doesn't exist in design.");
+		
+		saveInvalidDesign();
+		
+	}
+	
+	/**
+	 * Arranges design
+	 * 
+	 */
+	@Test(dependsOnMethods={"copyPasteActivity"})
+	public void arrangeDesign() {
+		
+		Point initialActivityLocation = fla.getActivityLocation(Q_AND_A_TITLE);
+		
+		reArrangeDesign();
+		
+		Point newActivityLocation = fla.getActivityLocation(Q_AND_A_TITLE);
+
+		Assert.assertFalse(initialActivityLocation.equals(newActivityLocation), 
+				"The activity " + Q_AND_A_TITLE + " is still in the same location!" );
+		
+		saveInvalidDesign();
+		
+	}	
+	
+	
+	/**
+	 * Delete an activity
+	 * 
+	 * This method is disabled as it seems that we can't drag and drop
+	 * svg elements from one another
+	 *  
+	 */
+	@Test(enabled = false, dependsOnMethods={"fixValidationAndSave"})
+	public void deleteActivity() {
+		
+		String copyOfActivity = "Copy of " + Q_AND_A_TITLE;
+		fla.deleteActivity(copyOfActivity);
+		
+		Boolean activityExists = fla.activityExists(copyOfActivity);
+	
+		Assert.assertFalse(activityExists, 
+				"Sorry, activity " + copyOfActivity + " still exists in design.");
+		
+	}
+	
+	
+
+
 	
 }
