@@ -267,7 +267,8 @@ public class FLAPage extends AbstractPage {
 		// Prepare the dragAndDrop action
 		Actions builder = new Actions(driver);  // Configure the Action
 		Action dragAndDrop = builder.clickAndHold(tool)
-				.moveByOffset(x, y)
+				.moveToElement(canvas, x, y)
+				// .moveByOffset(canvas, x, y)
 				.release()
 				.build();  
 
@@ -594,17 +595,22 @@ public class FLAPage extends AbstractPage {
 	public void deleteActivity(String activity) {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
+		
 		// Select activity
 		WebElement activityToDelete = getActivityElement(svg, activity);
 
-		activityToDelete.click();
-
+		//activityToDelete.click();
+		
 		WebElement bin = svg.findElement(By.id("rubbishBin"));
-	
+
 		Actions builder = new Actions(driver);
-		Action binActivityAction = builder.clickAndHold(activityToDelete)
+		@SuppressWarnings("deprecation")
+		Action binActivityAction = builder
+				.moveToElement(activityToDelete)
+				.clickAndHold()
+				.pause(500) // for some reason we need this pause otherwise it doesn't work
 				.moveToElement(bin)
-				.release(bin)
+				.release()
 				.build();  // Get the action
 
 		binActivityAction.perform(); // Execute the Action
@@ -721,7 +727,23 @@ public class FLAPage extends AbstractPage {
 		
 	}
 
+	/**
+	 * Design description UI component
+	 *
+	 * @return DescriptionPage object
+	 */
+	public BranchingPropertiesPage branchingProperties(String branchingName) {
+		
+		branchingName = branchingName + " start";
+		WebElement svg = driver.findElement(By.tagName("svg"));
+		WebElement branchingActivity = getActivityElement(svg, branchingName);
 
+		branchingActivity.click();
+		
+		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+		
+	}
+	
 	/**
 	 * Gate properties UI component
 	 *
@@ -790,7 +812,28 @@ public class FLAPage extends AbstractPage {
 		
 	}
 
+	/**
+	 * Drags a branching activity into the canvas and sets up both start
+	 * and ending points.
+	 */
+	public void dragBranchToCanvas() {
+		
+		flowDropButton.click();
+		branchingButton.click();
+		
+		// Prepare the dragAndDrop action
+		Actions builder = new Actions(driver);  // Configure the Action
+		Action dropBranch = builder
+				.moveToElement(canvas, 200, 280)
+				.click()
+				.moveByOffset(600, 0)
+				.click()
+				.build();  
 
+		// Execute the Action
+		dropBranch.perform();
+	}
+	
 	
 	/**
 	 * Returns the correct popup id
@@ -861,6 +904,7 @@ public class FLAPage extends AbstractPage {
 		List<WebElement> listActivities = svg.findElements(By.tagName("text"));
 
 		for (WebElement webElement : listActivities) {
+			
 			activityElement = webElement.findElement(By.tagName("tspan"));
 			String name = activityElement.getText();
 
@@ -873,7 +917,7 @@ public class FLAPage extends AbstractPage {
 
 		return activityElement;
 	}
-
+	
 	/**
 	 * Returns all activities in the design as WebElements in a list
 	 * 
