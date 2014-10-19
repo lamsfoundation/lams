@@ -21,6 +21,7 @@
  */ 
 package org.lamsfoundation.lams.author;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -52,18 +53,25 @@ import org.testng.annotations.Test;
  */
 public class BranchingTests {
 
+	// Branching constants 
 	private static final String BRANCHING_TYPE_INSTRUCTOR = "chosen";
 	private static final String BRANCHING_TYPE_GROUP = "group";
 	private static final String BRANCHING_TYPE_LEARNER_OUTPUT = "tool";
 	private static final String BRANCHING_TYPE_LEARNER_CHOICE = "optional";
 	private static final String randomInt = LamsUtil.randInt(0, 9999);
 	
+	// Learner choice constants
+	private static final String MAXNUMBERSEQUENCES = "2";
+	private static final String MINNUMBERSEQUENCES = "1";
+
+	// Set number of groups for group based branching
+	private static final int numberOfGroups = 3;
+	
 	// Validation error msg
 	private static final String SAVE_VALIDATION_GROUP_UNASSIGNED_MSG= 
 			"A Group Based Branching Activity must have all Groups assigned to Branches";
 	
-	// Set number of groups for group based branching
-	private static final int numberOfGroups = 3;
+
 	
 	private String randomDesignName = "Design-" + randomInt;
 	private String randomBranchingName = "Branch" + randomInt;
@@ -112,15 +120,17 @@ public class BranchingTests {
 	public void createDesignPreBranching() {
 
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(AuthorConstants.NOTICEBOARD_TITLE, 200, 150);
-		fla.dragGroupToCanvas();
-
+		fla
+		 .dragActivityToCanvasPosition(AuthorConstants.NOTICEBOARD_TITLE, 200, 150)
+		 .dragGroupToCanvas();
+		
 		// Set grouping activity to have 3 groups - so we can match one to one to branches
 		fla.setGroups(AuthorConstants.GROUP_TITLE, "random", true, numberOfGroups, "", "");
 
-		fla.dragActivityToCanvasPosition(AuthorConstants.SHARE_RESOURCES_TITLE, 200, 250);
-		fla.arrangeDesign();
-
+		fla
+		 .dragActivityToCanvasPosition(AuthorConstants.SHARE_RESOURCES_TITLE, 200, 250)
+		 .arrangeDesign();
+		
 		// Draw transitions
 		fla.drawTransitionBtwActivities();
 
@@ -264,7 +274,7 @@ public class BranchingTests {
 		String assertBranchingGroup = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
 				.getGroupInGroupBranchingType();
 
-		Assert.assertEquals(assertBranchingGroup.trim(), AuthorConstants.GROUP_TITLE, "Branching type is wrong");
+		Assert.assertEquals(assertBranchingGroup.trim(), AuthorConstants.GROUP_TITLE, "Grouping selection is wrong");
 
 
 	}
@@ -292,7 +302,7 @@ public class BranchingTests {
 	@Test(dependsOnMethods="setBranchingTitle")
 	public void nameAndSaveDesignWithError() {
 
-		String saveResult = fla.saveAsDesign(randomDesignName);
+		String saveResult = fla.saveAsDesign(randomDesignName + "-" + BRANCHING_TYPE_GROUP);
 
 		Assert.assertTrue(saveResult.contains(SAVE_VALIDATION_GROUP_UNASSIGNED_MSG), 
 				"Save error. Returned: " + saveResult);
@@ -334,7 +344,322 @@ public class BranchingTests {
 	}
 	
 	
+	/**
+	 * Prepares for a new design for
+	 */
+	@Test(dependsOnMethods="saveDesign")
+	public void clearCanvas() {
+		
+		fla.newDesign();
+
+	}
+
+	/**
+	 * Verifies the details for the group based branching
+	 */
+	@Test(dependsOnMethods="clearCanvas")
+	public void reOpenAndVerifyGroupBranching() {
+		
+		fla.openDesign(randomDesignName + "-" + BRANCHING_TYPE_GROUP);
+		
+		
+		// Assertions
+		// Assert branching settings
+		
+		String assertBranchingType = fla.branchingProperties(randomBranchingName)
+		.getBranchingType();
+		
+		// Assert branching type
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_GROUP, "Branching type error");
+		
+		// assert branching grouping
+		String assertBranchingGroup = fla.branchingProperties(randomBranchingName)
+				.getGroupInGroupBranchingType();
+
+		Assert.assertEquals(assertBranchingGroup.trim(), AuthorConstants.GROUP_TITLE, "Grouping selection is wrong");
+	}
 	
+	
+	/**
+	 * Creates a design with three activities before we do branching
+	 */
+	@Test(dependsOnMethods={"reOpenAndVerifyGroupBranching"})
+	public void createDesignLearnerChoiceBranching() {
+
+		clearCanvas();
+		// Drop activities in canvas
+		fla
+		.dragActivityToCanvasPosition(AuthorConstants.NOTICEBOARD_TITLE, 200, 150)
+		.dragActivityToCanvasPosition(AuthorConstants.GMAP_TITLE, 200, 250)
+		.arrangeDesign();
+
+		// Draw transitions
+		fla.drawTransitionBtwActivities();
+
+		// Drop branch into canvas
+		fla.dragBranchToCanvas();
+
+		// Get position for branching start point (we'll use this to present 
+		// the activities better on the screen)
+		Point startBranchingPosition = fla.getActivityLocation(AuthorConstants.BRANCHING_START_TITLE);
+
+		System.out.println("Branching start position:" + startBranchingPosition);
+
+		fla
+		.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 
+				(startBranchingPosition.x + 50), (startBranchingPosition.y - 200))
+			.dragActivityToCanvasPosition(AuthorConstants.IMAGE_GALLERY_TITLE, 
+				(startBranchingPosition.x + 230), (startBranchingPosition.y - 200))
+			.dragActivityToCanvasPosition(AuthorConstants.MINDMAP_TITLE, 
+				(startBranchingPosition.x + 50), (startBranchingPosition.y -80))
+			.dragActivityToCanvasPosition(AuthorConstants.MULTIPLE_CHOICE_TITLE, 
+				(startBranchingPosition.x + 50), (startBranchingPosition.y + 50))
+			.dragActivityToCanvasPosition(AuthorConstants.DATA_COLLECTION_TITLE, 
+				(startBranchingPosition.x + 230), (startBranchingPosition.y + 50))
+			.dragActivityToCanvasPosition(AuthorConstants.EADVENTURE_TITLE, 
+				(startBranchingPosition.x + 400), (startBranchingPosition.y + 50));
+
+		// Draw branches
+		// Branch 1
+		fla
+		.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, 
+				AuthorConstants.FORUM_TITLE)
+		.drawTransitionFromTo(AuthorConstants.FORUM_TITLE, 
+				AuthorConstants.IMAGE_GALLERY_TITLE);
+
+		// Branch 2
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, 
+				AuthorConstants.MINDMAP_TITLE)
+			.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, 
+				AuthorConstants.MULTIPLE_CHOICE_TITLE)
+			.drawTransitionFromTo(AuthorConstants.MULTIPLE_CHOICE_TITLE, 
+				AuthorConstants.DATA_COLLECTION_TITLE)
+			.drawTransitionFromTo(AuthorConstants.DATA_COLLECTION_TITLE, 
+				AuthorConstants.EADVENTURE_TITLE);			
+		
+		
+		// Draw transition from last activity to branching start
+		fla.drawTransitionFromTo(AuthorConstants.GMAP_TITLE, 
+				AuthorConstants.BRANCHING_START_TITLE);
+		
+		// Link activity to branch ending point
+		fla.drawTransitionFromTo(AuthorConstants.EADVENTURE_TITLE, 
+				AuthorConstants.BRANCH_END_TITLE);
+
+		fla.drawTransitionFromTo(AuthorConstants.MINDMAP_TITLE, 
+				AuthorConstants.BRANCH_END_TITLE);	
+		
+		fla.drawTransitionFromTo(AuthorConstants.IMAGE_GALLERY_TITLE, 
+				AuthorConstants.BRANCH_END_TITLE);			
+		
+		
+		// Set branching as learner choice
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setBranchingType(BRANCHING_TYPE_LEARNER_CHOICE);
+		
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setLearnerChoiceMinSequences(MINNUMBERSEQUENCES)
+		.setLearnerChoiceMaxSequences(MAXNUMBERSEQUENCES);
+		
+		
+		
+		
+		/// Assertions now
+		// Now get all the activity titles
+		List<String> allActivityTitles = fla.getAllActivityNames();
+		System.out.println("All activities:" + allActivityTitles);
+
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
+				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
+				"The title " + AuthorConstants.BRANCH_END_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.NOTICEBOARD_TITLE), 
+				"The title " + AuthorConstants.NOTICEBOARD_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.GMAP_TITLE), 
+				"The title " + AuthorConstants.GMAP_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.FORUM_TITLE), 
+				"The title " + AuthorConstants.FORUM_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.IMAGE_GALLERY_TITLE), 
+				"The title " + AuthorConstants.IMAGE_GALLERY_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.MINDMAP_TITLE), 
+				"The title " + AuthorConstants.MINDMAP_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.MULTIPLE_CHOICE_TITLE), 
+				"The title " + AuthorConstants.MULTIPLE_CHOICE_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.DATA_COLLECTION_TITLE), 
+				"The title " + AuthorConstants.DATA_COLLECTION_TITLE + " was not found as an activity in the design");	
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.EADVENTURE_TITLE), 
+				"The title " + AuthorConstants.EADVENTURE_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 1"), 
+				"Branch 1 was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 2"), 
+				"Branch 2 was not found as an activity in the design");		
+		Assert.assertTrue(allActivityTitles.contains("Branch 3"), 
+				"Branch 3 was not found as an activity in the design");	
+		
+		
+		// Assert branching settings
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.getBranchingType();
+		
+		String assertMinSequences = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getLearnerChoiceMinSequences();
+		
+		String assertMaxSequences = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getLearnerChoiceMaxSequences();
+		
+		// Assert branching type
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_LEARNER_CHOICE, "Branching type error");
+		
+		// Asserts min/max sequences
+		
+		Assert.assertEquals(assertMinSequences, MINNUMBERSEQUENCES, "Minimal number of sequences incorrect");
+		Assert.assertEquals(assertMaxSequences, MAXNUMBERSEQUENCES, "Maximal number of sequences incorrect");
+		
+	}
+
+	/**
+	 * Gives a name and saves the designs 
+	 */
+	@Test(dependsOnMethods="createDesignLearnerChoiceBranching")
+	public void nameAndSaveDesignLearnerChoiceDesign() {
+
+		String saveResult = fla.saveAsDesign(randomDesignName + "-" + BRANCHING_TYPE_LEARNER_CHOICE);
+
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
+				"Save error. Returned: " + saveResult);
+	}
+	
+	/**
+	 * Reopen previously saved design to confirm settings were saved correctly 
+	 */
+	@Test(dependsOnMethods="nameAndSaveDesignLearnerChoiceDesign")
+	public void reOpenAndVerifyLearnerChoiceDesign() {
+
+		clearCanvas();
+		
+		fla.openDesign(randomDesignName + "-" + BRANCHING_TYPE_LEARNER_CHOICE);
+		
+		
+		// Assertions
+		// Assert branching settings
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.getBranchingType();
+		
+		String assertMinSequences = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getLearnerChoiceMinSequences();
+		
+		String assertMaxSequences = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getLearnerChoiceMaxSequences();
+		
+		// Assert branching type
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_LEARNER_CHOICE, "Branching type error");
+		
+		// Asserts min/max sequences
+		
+		Assert.assertEquals(assertMinSequences, MINNUMBERSEQUENCES, "Minimal number of sequences incorrect");
+		Assert.assertEquals(assertMaxSequences, MAXNUMBERSEQUENCES, "Maximal number of sequences incorrect");
+		
+	}
+	
+	/**
+	 * Creates a teacher choice branching by dragging transitions from the same activity
+	 */
+	@Test(dependsOnMethods="reOpenAndVerifyLearnerChoiceDesign")
+	public void createTeacherChoiceBranching() {
+		
+		clearCanvas();
+		
+		// Drop activities in canvas
+		fla.dragActivityToCanvasPosition(AuthorConstants.CHAT_AND_SCRIBE_TITLE, 200, 150)
+		.dragActivityToCanvasPosition(AuthorConstants.NOTEBOOK_TITLE, 400, 100)
+		.dragActivityToCanvasPosition(AuthorConstants.WIKI_TITLE, 400, 250)
+		.dragActivityToCanvasPosition(AuthorConstants.WOOKIE_TITLE, 400, 400);
+		// fla.arrangeDesign();
+
+		// Draw transitions
+		List<String> toActivities = new ArrayList<>();
+		toActivities.add(AuthorConstants.NOTEBOOK_TITLE);
+		toActivities.add(AuthorConstants.WIKI_TITLE);
+		toActivities.add(AuthorConstants.WOOKIE_TITLE);
+		
+		fla.drawBranchingFromActivity(AuthorConstants.CHAT_AND_SCRIBE_TITLE, toActivities)
+		.arrangeDesign();
+		
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setBranchingType(BRANCHING_TYPE_INSTRUCTOR);
+		
+		/// Assertions now
+		// Branching type
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getBranchingType();
+		
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_INSTRUCTOR, "Branching type is incorrect");
+		
+		
+		// Now get all the activity titles
+		List<String> allActivityTitles = fla.getAllActivityNames();
+		System.out.println("All activities:" + allActivityTitles);
+
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
+				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
+				"The title " + AuthorConstants.BRANCH_END_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.NOTEBOOK_TITLE), 
+				"The title " + AuthorConstants.NOTEBOOK_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.CHAT_AND_SCRIBE_TITLE), 
+				"The title " + AuthorConstants.CHAT_AND_SCRIBE_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.WIKI_TITLE), 
+				"The title " + AuthorConstants.WIKI_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.WOOKIE_TITLE), 
+				"The title " + AuthorConstants.WOOKIE_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 1"), 
+				"Branch 1 was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 2"), 
+				"Branch 2 was not found as an activity in the design");		
+		Assert.assertTrue(allActivityTitles.contains("Branch 3"), 
+				"Branch 3 was not found as an activity in the design");	
+
+		
+		
+	}
+	
+	/**
+	 * Gives a name and saves the designs 
+	 */
+	@Test(dependsOnMethods="createTeacherChoiceBranching")
+	public void nameAndSaveDesignTeacherChoiceDesign() {
+
+		String saveResult = fla.saveAsDesign(randomDesignName + "-" + BRANCHING_TYPE_INSTRUCTOR);
+
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
+				"Save error. Returned: " + saveResult);
+	}
+	
+	/**
+	 * Reopen previously saved design to confirm settings were saved correctly 
+	 */
+	@Test(dependsOnMethods="nameAndSaveDesignTeacherChoiceDesign")
+	public void reOpenAndVerifyTeacherChoiceDesign() {
+
+		clearCanvas();
+		
+		fla.openDesign(randomDesignName + "-" + BRANCHING_TYPE_INSTRUCTOR);
+		
+		
+		// Assertions
+		// Assert branching settings
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.getBranchingType();
+		
+		// Assert branching type
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_INSTRUCTOR, "Branching type error");
+		
+		
+	}
 	
 }
 

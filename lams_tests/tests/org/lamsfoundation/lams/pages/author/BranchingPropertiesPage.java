@@ -78,6 +78,21 @@ public class BranchingPropertiesPage extends AbstractPage {
 	private WebElement okGroupButton;
 	
 	
+	/**	
+     * 	Learner's choice branching properties
+     * 
+     */	
+	
+	@FindBy(xpath = "/html/body/div[14]/div[2]/div/table/tbody/tr[8]/td[2]/span/input")
+	private WebElement minSequences;
+	
+	@FindBy(xpath = "/html/body/div[14]/div[2]/div/table/tbody/tr[9]/td[2]/span/input")
+	private WebElement maxSequences;	
+	
+	
+	
+	
+	
 	/**
 	 * Set branching title
 	 * @param title name for the branching
@@ -196,6 +211,56 @@ public class BranchingPropertiesPage extends AbstractPage {
 		okGroupButton.click();
 		
 		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+	}
+	
+	/**
+	 * Sets the number of minimal sequence to perform in the learner choice branching
+	 * @param numberMinSequences number of min sequence to do 
+	 * @return BranchingPropertiesPage
+	 */
+	public BranchingPropertiesPage setLearnerChoiceMinSequences(String numberMinSequences) {
+	
+		minSequences.click();
+		minSequences.clear();
+		minSequences.sendKeys(numberMinSequences);
+		
+		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+	}
+	
+	
+	/**
+	 * Returns the minimal sequences to perform (learner choice branching)
+	 * @return minimal sequences to perform
+	 */
+	public String getLearnerChoiceMinSequences() {
+		
+		return minSequences.getAttribute("value");
+		
+	}
+	
+	/**
+	 * Sets the number of max sequence to perform in the learner choice branching
+	 * @param numberMaxSequences number of max sequence to do 
+	 * @return BranchingPropertiesPage
+	 */
+	public BranchingPropertiesPage setLearnerChoiceMaxSequences(String numberMaxSequences) {
+	
+		maxSequences.click();
+		maxSequences.clear();
+		maxSequences.sendKeys(numberMaxSequences);
+		
+		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+	}
+	
+	
+	/**
+	 * Returns the max sequences to perform (learner choice branching)
+	 * @return max sequences to perform
+	 */
+	public String getLearnerChoiceMaxSequences() {
+		
+		return maxSequences.getAttribute("value");
+		
 	}
 	
 }
