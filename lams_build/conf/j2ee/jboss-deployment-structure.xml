@@ -44,7 +44,7 @@
       <module name="org.apache.lucene" slot="2.4" export="true" />
       <module name="org.quartz" export="true" />
       <module name="uk.ac.reload" export="true" />
-      <module name="org.springframework" export="true" />
+      <module name="org.springframework" export="true" meta-inf="export" />
       <module name="org.apache.struts" export="true" />
       <module name="org.apache.strutsel" export="true" />
       <module name="org.tuckey.urlrewrite" export="true" />

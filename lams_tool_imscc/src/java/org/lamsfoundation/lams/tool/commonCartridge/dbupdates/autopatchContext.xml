@@ -3,7 +3,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   classpath:org/springframework/beans/factory/xml/spring-beans-4.0.xsd">
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 	<!-- Autopatch service -->
 	<bean id="autopatchService" init-method="patch" class="org.lamsfoundation.lams.dbupdates.AutoPatchServiceSynchronizer">
 		<property name="systemName" value="laimsc11"/> 

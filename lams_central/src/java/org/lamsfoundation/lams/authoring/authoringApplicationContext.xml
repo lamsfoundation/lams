@@ -3,7 +3,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				   classpath:org/springframework/beans/factory/xml/spring-beans-4.0.xsd">
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- This bean is responsible for applying the interceptor to our classes.-->
 	<!-- The proxyTargetClass must be set to true to enforce usage of cglib,-->
