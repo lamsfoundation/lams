@@ -285,7 +285,7 @@ ActivityDraw = {
 						 });
 		
 		var title = this.branchingActivity.title;
-		paper.text(x + 8, y + 27,  title + '\n' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
+		paper.text(x + 8, y + 27,  title + ' ' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
 	                                        		 	 		: LABELS.BRANCHING_END_SUFFIX))
 		     .attr(layout.defaultTextAttributes);
 		
