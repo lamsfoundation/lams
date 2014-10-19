@@ -60,6 +60,7 @@ import org.testng.annotations.Test;
  *  - Copy/paste activities
  *  - Arrange design
  *  - Save invalid design
+ *  - Delete activity
  *  
  *  
  * 
@@ -224,7 +225,7 @@ public class AuthorTests {
 				
 	}
 	
-	
+
 	/**
 	 * Creates a design using a grouping activity
 	 */
@@ -470,7 +471,7 @@ public class AuthorTests {
 	 * svg elements from one another
 	 *  
 	 */
-	@Test(enabled = false, dependsOnMethods={"fixValidationAndSave"})
+	@Test(dependsOnMethods={"arrangeDesign"})
 	public void deleteActivity() {
 		
 		String copyOfActivity = "Copy of " + AuthorConstants.Q_AND_A_TITLE;
@@ -480,6 +481,8 @@ public class AuthorTests {
 	
 		Assert.assertFalse(activityExists, 
 				"Sorry, activity " + copyOfActivity + " still exists in design.");
+		
+		saveDesign();
 		
 	}
 	
