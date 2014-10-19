@@ -191,39 +191,45 @@ public class FLAPage extends AbstractPage {
 	 * Opens LD Dialog to open a design
 	 * 
 	 */
-	public void openLdOpenDialog() {
+	public FLAPage openLdOpenDialog() {
 
 		openButton.click();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
 	 * Opens LD Dialog to save a design
 	 */
-	public void openLdSaveDialog() {
+	public FLAPage openLdSaveDialog() {
 
 		saveButton.click();
+		
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
 	/**
 	 * Clears canvas to new
 	 */
-	public void newDesign() {
+	public FLAPage newDesign() {
 
 		newButton.click();
 		checkAlert();
+		
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
 	 * Drops a group activity into the canvas. 
 	 *  
 	 */
-	public void dragGroupToCanvas() {
+	public FLAPage dragGroupToCanvas() {
 
 		groupButton.click();
 		canvas.click();
-
+		
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
@@ -232,7 +238,7 @@ public class FLAPage extends AbstractPage {
 	 * center of the canvas. 
 	 * @param name 
 	 */
-	public void dragActivityToCanvas(String name) {
+	public FLAPage dragActivityToCanvas(String name) {
 
 		String toolName = "tool" + name;
 
@@ -245,6 +251,7 @@ public class FLAPage extends AbstractPage {
 				.build();  // Get the action
 		dragAndDrop.perform(); // Execute the Action
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
@@ -255,8 +262,9 @@ public class FLAPage extends AbstractPage {
 	 * @param name	activity name
 	 * @param x		x offset move
 	 * @param y 	y offset move
+	 * @return 
 	 */
-	public void dragActivityToCanvasPosition(String name, int x, int y) {
+	public FLAPage dragActivityToCanvasPosition(String name, int x, int y) {
 
 		// we include the prefix "tool" as that's what we named the ids	
 		String toolName = "tool" + name;
@@ -275,6 +283,7 @@ public class FLAPage extends AbstractPage {
 		// Execute the Action
 		dragAndDrop.perform();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
@@ -332,9 +341,10 @@ public class FLAPage extends AbstractPage {
 	 * Rearranges the design on the canvas by pressing
 	 * the "Arrange" button.
 	 */
-	public void arrangeDesign() {
+	public FLAPage arrangeDesign() {
 		arrangeButton.click();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
@@ -345,7 +355,7 @@ public class FLAPage extends AbstractPage {
 	 * @param seqName
 	 * 
 	 */
-	public void openDesign(String seqName) {
+	public FLAPage openDesign(String seqName) {
 
 		// opens the dialog
 		openLdOpenDialog();
@@ -367,6 +377,7 @@ public class FLAPage extends AbstractPage {
 		// click on open
 		openLdStoreButton.click();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
@@ -375,7 +386,12 @@ public class FLAPage extends AbstractPage {
 	 * It follows the order in which it finds the activities.
 	 *  
 	 */
-	public void drawTransitionBtwActivities()  {
+	/**
+	 * Draws transitions in between the activities.
+	 * It follows the order in which it finds the activities.
+	 * @return {@link FLAPage}
+	 */
+	public FLAPage drawTransitionBtwActivities()  {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 
@@ -395,6 +411,8 @@ public class FLAPage extends AbstractPage {
 			//System.out.println("closing");
 		}
 
+		return PageFactory.initElements(driver, FLAPage.class);
+		
 	}
 
 	/**
@@ -402,8 +420,9 @@ public class FLAPage extends AbstractPage {
 	 *
 	 * @param activityTitle
 	 * @param newActivityTitle 
+	 * @return 
 	 */
-	public void changeActivityTitle(String activityTitle, String newActivityTitle)  {
+	public FLAPage changeActivityTitle(String activityTitle, String newActivityTitle)  {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 
@@ -424,6 +443,7 @@ public class FLAPage extends AbstractPage {
 		// click on canvas so the change takes effect
 		canvas.click();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
@@ -510,9 +530,10 @@ public class FLAPage extends AbstractPage {
 	 * Sets a group for an activity
 	 * @param groupName		the group to set to the activity
 	 * @param activityName 	the activity
+	 * @return 
 	 * 
 	 */
-	public void setGroupForActivity(String groupName, String activityName) {
+	public FLAPage setGroupForActivity(String groupName, String activityName) {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 
@@ -527,7 +548,7 @@ public class FLAPage extends AbstractPage {
 
 		canvas.click();
 
-
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
@@ -537,7 +558,7 @@ public class FLAPage extends AbstractPage {
 	 * @param fromActivity	from activity name
 	 * @param toActivity 	to activity name
 	 */
-	public void drawTransitionFromTo(String fromActivity, String toActivity) {
+	public FLAPage drawTransitionFromTo(String fromActivity, String toActivity) {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 
@@ -547,18 +568,48 @@ public class FLAPage extends AbstractPage {
 		transitionButton.click();
 		fromActivityElement.click();
 		toActivityElement.click();
-
+		
 		canvas.click();
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
+	/**
+	 * Draws a branching by drawing more than 1 transition from the same activity
+	 * 
+	 * This test the feature when drawing two transitions from the same activity, it will prompt
+	 * the user to create a branching activity.
+	 * 
+	 * @param fromActivity	from activity name
+	 * @param toActivities 	to activities name
+	 */
+	public FLAPage drawBranchingFromActivity(String fromActivity, List<String> toActivities) {
 
+		WebElement svg = driver.findElement(By.tagName("svg"));
+
+		WebElement fromActivityElement = getActivityElement(svg, fromActivity);
+		
+		
+		for (String toActivity : toActivities) {
+			
+			WebElement toActivityElement = getActivityElement(svg, toActivity);
+			
+			transitionButton.click();
+			fromActivityElement.click();
+			toActivityElement.click();
+			checkAlert();
+			canvas.click();
+			
+		}
+		
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
 
 	/**
 	 * Copy/pastes a given activity
 	 * @param activity	activity to copy/paste
 	 */
-	public void copyPasteActivity(String activity) {
+	public FLAPage copyPasteActivity(String activity) {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 		// Select activity
@@ -568,7 +619,7 @@ public class FLAPage extends AbstractPage {
 
 		pasteButton.click();
 
-
+		return PageFactory.initElements(driver, FLAPage.class);
 
 	}
 
@@ -592,7 +643,7 @@ public class FLAPage extends AbstractPage {
 	 *
 	 * @param activity 
 	 */
-	public void deleteActivity(String activity) {
+	public FLAPage deleteActivity(String activity) {
 
 		WebElement svg = driver.findElement(By.tagName("svg"));
 		
@@ -615,6 +666,7 @@ public class FLAPage extends AbstractPage {
 
 		binActivityAction.perform(); // Execute the Action
 
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 
@@ -795,7 +847,7 @@ public class FLAPage extends AbstractPage {
 		return activity.getLocation();
 	}
 
-	public void dragGateToCanvas() {
+	public FLAPage dragGateToCanvas() {
 
 		flowDropButton.click();
 		gateButton.click();
@@ -810,13 +862,14 @@ public class FLAPage extends AbstractPage {
 		// Execute the Action
 		dropGate.perform();
 		
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
 	/**
 	 * Drags a branching activity into the canvas and sets up both start
 	 * and ending points.
 	 */
-	public void dragBranchToCanvas() {
+	public FLAPage dragBranchToCanvas() {
 		
 		flowDropButton.click();
 		branchingButton.click();
@@ -832,6 +885,8 @@ public class FLAPage extends AbstractPage {
 
 		// Execute the Action
 		dropBranch.perform();
+		
+		return PageFactory.initElements(driver, FLAPage.class);
 	}
 	
 	
