@@ -109,19 +109,21 @@
 			<lams:out value="${teachersComment}" escapeHtml="true"/>
 		</c:if>
 		
-		<div class="space-bottom-top align-right">
-			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity">
-					<c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
-			</html:link>
-		</div>
+		<c:if test="${mode != 'teacher'}">
+			<div class="space-bottom-top align-right">
+				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</span>
+				</html:link>
+			</div>
+		</c:if>
 	</html:form>
 </div>
