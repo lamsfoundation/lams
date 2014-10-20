@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.lamsfoundation.lams.pages.LoginPage;
+import org.lamsfoundation.lams.pages.author.ConditionsPropertiesPage;
 import org.lamsfoundation.lams.pages.author.FLAPage;
 import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Point;
@@ -118,12 +119,12 @@ public class GatesTests {
 	public void createDesign() {
 		
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 200, 50);
+		fla.dragActivityToCanvasPosition(AuthorConstants.MULTIPLE_CHOICE_TITLE, 200, 50);
 		fla.dragGateToCanvas();
 		fla.dragActivityToCanvasPosition(AuthorConstants.SHARE_RESOURCES_TITLE, 350, (10 * randomInteger));
 		
 		// Draw transitions in between the activities
-		fla.drawTransitionFromTo(AuthorConstants.FORUM_TITLE, AuthorConstants.GATE_TITLE);
+		fla.drawTransitionFromTo(AuthorConstants.MULTIPLE_CHOICE_TITLE, AuthorConstants.GATE_TITLE);
 		fla.drawTransitionFromTo(AuthorConstants.GATE_TITLE, AuthorConstants.SHARE_RESOURCES_TITLE);
 		
 		// Now get all the activity titles
@@ -131,8 +132,8 @@ public class GatesTests {
 	
 		// Assert that all of them are in the design
 		
-		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.FORUM_TITLE), 
-				"The title " + AuthorConstants.FORUM_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.MULTIPLE_CHOICE_TITLE), 
+				"The title " + AuthorConstants.MULTIPLE_CHOICE_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.GATE_TITLE), 
 				"The title " + AuthorConstants.GATE_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.SHARE_RESOURCES_TITLE), 
@@ -324,19 +325,70 @@ public class GatesTests {
 	@Test(dependsOnMethods="setGateTypeToSchedule")
 	public void setGateTypeToCondition() {
 		
+		// Test data
+		
+		String conditionZero = "Zero zone";
+		String conditionOne = "One zone";
+		
+		String zeroOption = "0";
+		String oneOption = "1";
+		
+		String gateOpen = "open";
+		String gateClosed = "closed";
+		
 		fla.gateProperties()
 			.setGateType(GATE_TYPE_CONDITION)
 			.setGateTitle("Condition Gate")
 			.setGateDescription("Testing condition gate")
-			.setConditionInput(AuthorConstants.FORUM_TITLE);
+			.setConditionInput(AuthorConstants.MULTIPLE_CHOICE_TITLE);
+			
+				
+		fla.gateProperties()
+		.clickCreateConditions()
+		.setConditionOutput(ConditionsPropertiesPage.OUTPUT_MCQ_TOTAL_MARK)
+		.setOptionType(ConditionsPropertiesPage.OPTION_RANGE)
+		.setFromRangeValue(zeroOption)
+		.setToRangeValue(zeroOption)
+		.clickAddOptionRange()
+		.setConditionName(conditionZero, "2") // #2 here is to append it to the right input (gotta fix this in the future)
+		.setFromRangeValue(oneOption)
+		.setToRangeValue(oneOption)
+		.clickAddOptionRange()
+		.setConditionName(conditionOne, "3") // same goes here
+		.clickOkConditionsButton()
+		.matchConditionToBranch(conditionZero, gateOpen)
+		.matchConditionToBranch(conditionOne, gateClosed)
+		.clickOkMatchingConditionsToBranchesButton();
 		
 		savesDesign();
 		
 		// Now assertions
 		
+		// Assert tool input
 		String assertConditionInput = fla.gateProperties().getConditionInput();
-		Assert.assertEquals(assertConditionInput, AuthorConstants.FORUM_TITLE,
+		Assert.assertEquals(assertConditionInput, AuthorConstants.MULTIPLE_CHOICE_TITLE,
 				"Condition input activity is not the same!");
+		
+		// Assert conditions
+		List<String> assertAllConditions = fla.gateProperties()
+				.clickCreateConditions()
+				.getConditionNames();
+		
+		Assert.assertTrue(assertAllConditions.contains(conditionOne), 
+				conditionOne + " is not in the list of conditions");
+		Assert.assertTrue(assertAllConditions.contains(conditionZero), 
+				conditionZero + " is not in the list of conditions");
+		
+		// Assert mappings
+		List<String> assertAllMappings = fla.gateProperties()
+				.clickCreateConditions()
+				.clickOkConditionsButton()
+				.getAllMappings();
+		
+		Assert.assertTrue(assertAllMappings.contains(conditionOne + " matches " + gateClosed),
+				conditionOne + " doesn't match " + gateClosed);
+		Assert.assertTrue(assertAllMappings.contains(conditionZero + " matches " + gateOpen),
+				conditionZero + " doesn't match " + gateOpen);
 		
 	}
 }

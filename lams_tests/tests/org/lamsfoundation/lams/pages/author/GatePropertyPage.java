@@ -65,7 +65,7 @@ public class GatePropertyPage extends AbstractPage {
 	
 	
 	/**	
-     * 	Schedule gate properties
+     * 	Condition gate properties
      * 
      */	
 		
@@ -86,7 +86,7 @@ public class GatePropertyPage extends AbstractPage {
 	 * Set gate title 
 	 * 
 	 * @param designDescription 
-	 * @return 
+	 * @return {@link GatePropertyPage}
 	 */
 	public GatePropertyPage setGateTitle(String gateTitleText) {
 		
@@ -112,7 +112,7 @@ public class GatePropertyPage extends AbstractPage {
 	/**
 	 * Sets gate description
 	 * @param gateDescriptionText 
-	 * @return 
+	 * @return {@link GatePropertyPage}
 	 */
 	public GatePropertyPage setGateDescription(String gateDescriptionText) {
 
@@ -138,7 +138,7 @@ public class GatePropertyPage extends AbstractPage {
 	/**
 	 * Set gate type in select 
 	 * @param gateType 
-	 * @return 
+	 * @return {@link GatePropertyPage}
 	 */
 	public GatePropertyPage setGateType(String gateType) {
 		
@@ -162,6 +162,11 @@ public class GatePropertyPage extends AbstractPage {
 		
 	}
 	
+	/**
+	 * Sets days
+	 * @param days
+	 * @return {@link GatePropertyPage}
+	 */
 	public GatePropertyPage setScheduleDays(String days) {
 		
 		scheduleDays.click();
@@ -171,6 +176,11 @@ public class GatePropertyPage extends AbstractPage {
 		return PageFactory.initElements(driver, GatePropertyPage.class);
 	}
 	
+	/**
+	 * Gets set days
+	 * 
+	 * @return days
+	 */
 	public String getScheduleDays() {
 		
 		return scheduleDays.getAttribute("value");
@@ -178,6 +188,11 @@ public class GatePropertyPage extends AbstractPage {
 	}
 
 
+	/**
+	 * Set hours
+	 * @param hours
+	 * @return {@link GatePropertyPage}
+	 */
 	public GatePropertyPage setScheduleHours(String hours) {
 		
 		scheduleHours.click();
@@ -187,12 +202,23 @@ public class GatePropertyPage extends AbstractPage {
 		return PageFactory.initElements(driver, GatePropertyPage.class);
 	}
 
+	/**
+	 * Gets set hours
+	 * 
+	 * @return 
+	 */
 	public String getScheduleHours() {
 		
 		return scheduleHours.getAttribute("value");
 		
 	}
 
+	/**
+	 * Set minutes
+	 *
+	 * @param minutes
+	 * @return {@link GatePropertyPage}
+	 */
 	public GatePropertyPage setScheduleMinutes(String minutes) {
 		
 		scheduleMinutes.click();
@@ -203,12 +229,20 @@ public class GatePropertyPage extends AbstractPage {
 		
 	}
 	
+	/**
+	 * Gets set minutes
+	 * @return 
+	 */
 	public String getScheduleMinutes() {
 		
 		return scheduleMinutes.getAttribute("value");
 		
 	}
 	
+	/**
+	 * click on option "since previews finished activity"
+	 * @return {@link GatePropertyPage}
+	 */
 	public GatePropertyPage setSincePreviewActivity() {
 		
 		sincePreviewActivity.click();
@@ -217,6 +251,10 @@ public class GatePropertyPage extends AbstractPage {
 		
 	}
 	
+	/**
+	 * Returns boolean with SincePreviewActivity property
+	 * @return 
+	 */
 	public Boolean isSincePreviewActivity() {
 		
 		return sincePreviewActivity.isSelected();
@@ -224,6 +262,11 @@ public class GatePropertyPage extends AbstractPage {
 	}
 
 
+	/**
+	 * Sets condition input type
+	 * @param activity
+	 * @return {@link GatePropertyPage}
+	 */
 	public GatePropertyPage setConditionInput(String activity) {
 		
 		Select inputDropDown = new Select(conditionInputSelect);
@@ -233,11 +276,23 @@ public class GatePropertyPage extends AbstractPage {
 		return PageFactory.initElements(driver, GatePropertyPage.class);
 	}
 	
+	/**
+	 * Returns the input tool 
+	 * @return 
+	 */
 	public String getConditionInput() {
 		
 		Select inputDropDown = new Select(conditionInputSelect);
 		
 		return inputDropDown.getFirstSelectedOption().getText();
 
+	}
+
+
+	public ConditionsPropertiesPage clickCreateConditions() {
+
+		createConditionsButton.click();
+
+		return PageFactory.initElements(driver, ConditionsPropertiesPage.class);
 	}	
 }
