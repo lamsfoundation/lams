@@ -1899,7 +1899,7 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					layout.infoDialog.text(LABELS.SEQUENCE_NOT_VALID)
+					layout.infoDialog.html(LABELS.SEQUENCE_NOT_VALID)
 									 .dialog('open');
 					
 					setTimeout(function(){
