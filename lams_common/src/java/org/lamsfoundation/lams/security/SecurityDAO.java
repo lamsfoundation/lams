@@ -28,6 +28,8 @@ import java.io.Serializable;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -91,9 +93,27 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
     }
 
     @Override
-    public boolean isLessonMonitor(Long lessonId, Integer userId) {
-	return !getHibernateTemplate().find(SecurityDAO.CHECK_LESSON_MONITOR, new Object[] { lessonId, userId })
-		.isEmpty();
+    public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted, boolean groupManagerAccepted) {
+	boolean result = !getHibernateTemplate().find(SecurityDAO.CHECK_LESSON_MONITOR,
+		new Object[] { lessonId, userId }).isEmpty();
+	Lesson lesson = null;
+	if (!result && ownerAccepted) {
+	    lesson = (Lesson) find(Lesson.class, lessonId);
+	    result = lesson != null && userId.equals(lesson.getUser().equals(userId));
+	}
+	if (!result && groupManagerAccepted) {
+	    if (lesson == null) {
+		lesson = (Lesson) find(Lesson.class, lessonId);
+	    }
+	    if (lesson != null) {
+		Organisation organisation = lesson.getOrganisation();
+		if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+		    organisation = organisation.getParentOrganisation();
+		}
+		result = hasOrgRole(organisation.getOrganisationId(), userId, Role.GROUP_MANAGER);
+	    }
+	}
+	return result;
     }
 
     @Override

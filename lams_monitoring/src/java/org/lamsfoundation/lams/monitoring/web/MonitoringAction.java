@@ -370,9 +370,17 @@ public class MonitoringAction extends LamsDispatchAction {
 			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ")
 			+ "\"" + lessonInstanceName + "\"");
 	    }
-	    Lesson lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId,
-		    organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
-		    enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+
+	    Lesson lesson = null;
+	    try {
+		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
+			userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
+			enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+	    } catch (SecurityException e) {
+		log.error("Cannot add a lesson for LD: " + ldId, e);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+		return null;
+	    }
 
 	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation, learnerGroupInstanceName,
 		    lessonInstanceLearners, staffGroupInstanceName, staff, userId);

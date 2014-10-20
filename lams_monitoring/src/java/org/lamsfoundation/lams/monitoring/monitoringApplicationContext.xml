@@ -44,7 +44,8 @@
 		<property name="auditService"><ref bean="auditService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>				
 		<property name="lessonService"><ref bean="lessonService"/></property>			
-		<property name="userManagementService"><ref bean="userManagementService"/></property>			
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="securityService"><ref bean="securityService"/></property>
 		<property name="scheduler"><ref bean="scheduler"/></property>
 		<property name="messageService"><ref bean="monitoringMessageService"/></property>
 	</bean>	

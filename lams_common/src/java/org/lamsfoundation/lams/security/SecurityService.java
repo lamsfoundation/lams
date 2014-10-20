@@ -58,6 +58,12 @@ public class SecurityService implements ISecurityService {
 
     @Override
     public void checkIsLessonMonitor(Long lessonId, Integer userId) throws SecurityException {
+	checkIsLessonMonitor(lessonId, userId, false, false);
+    }
+
+    @Override
+    public void checkIsLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted, boolean groupManagerAccepted)
+	    throws SecurityException {
 	if (lessonId == null) {
 	    throw new SecurityException("Lesson ID is NULL");
 	}
@@ -72,7 +78,8 @@ public class SecurityService implements ISecurityService {
 
 	hasOrgRole(lesson.getOrganisation().getOrganisationId(), userId, Role.MONITOR, Role.GROUP_MANAGER);
 
-	if (!securityDAO.isSysadmin(userId) && !securityDAO.isLessonMonitor(lessonId, userId)) {
+	if (!securityDAO.isSysadmin(userId)
+		&& !securityDAO.isLessonMonitor(lessonId, userId, ownerAccepted, groupManagerAccepted)) {
 	    throw new SecurityException("User with ID: " + userId + " is not a monitor in lesson with ID: " + lessonId);
 	}
     }
@@ -94,7 +101,7 @@ public class SecurityService implements ISecurityService {
 	hasOrgRole(lesson.getOrganisation().getOrganisationId(), userId, Role.LEARNER, Role.MONITOR, Role.GROUP_MANAGER);
 
 	if (!securityDAO.isSysadmin(userId) && !securityDAO.isLessonLearner(lessonId, userId)
-		&& !securityDAO.isLessonMonitor(lessonId, userId)) {
+		&& !securityDAO.isLessonMonitor(lessonId, userId, true, false)) {
 	    throw new SecurityException("User with ID: " + userId + " is not a learner in lesson with ID: " + lessonId);
 	}
     }
