@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.lamsfoundation.lams.pages.LoginPage;
+import org.lamsfoundation.lams.pages.author.ConditionsPropertiesPage;
 import org.lamsfoundation.lams.pages.author.FLAPage;
 import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Point;
@@ -96,7 +97,7 @@ public class BranchingTests {
 
 	@AfterClass
 	public void afterClass() {
-		// driver.quit();
+		driver.quit();
 	}
 
 	/**
@@ -658,6 +659,181 @@ public class BranchingTests {
 		// Assert branching type
 		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_INSTRUCTOR, "Branching type error");
 		
+		
+	}
+
+	
+	
+	
+	
+	/**
+	 * Creates a tool output branching by dragging transitions from the same activity
+	 * 
+	 * Here we create a small sequence with an tool input from an MCQ. 
+	 * MCQ by default has 1 question with a 1 mark output. So we create two conditions for total 
+	 * score:
+	 * 
+	 *  1) Zero condition, if the user gets just zero (wrong answer)
+	 *  2) One condition, if the user gets one mark (answers correctly)
+	 *  
+	 *  Then, we match the Zero condition to Branch 2 and One condition to Branch 1(default)
+	 * 
+	 * 
+	 */
+	@Test(dependsOnMethods="reOpenAndVerifyTeacherChoiceDesign")
+	public void createToolOutputBranching() {
+		
+		// Test data
+		String rangeValueZero = "0";
+		String rangeValueOne = "1";
+		
+		String conditionZeroRange = "Zero condition";
+		String conditionOneRange  = "One condition";
+		
+		String branchOne = "Branch 1";
+		String branchTwo = "Branch 2";
+		
+				
+		clearCanvas();
+		
+		// Drop activities in canvas
+		fla.dragActivityToCanvasPosition(AuthorConstants.MULTIPLE_CHOICE_TITLE, 200, 150)
+		.dragActivityToCanvasPosition(AuthorConstants.NOTEBOOK_TITLE, 400, 100)
+		.dragActivityToCanvasPosition(AuthorConstants.WIKI_TITLE, 400, 250);
+
+
+		// Draw transitions
+		List<String> toActivities = new ArrayList<>();
+		toActivities.add(AuthorConstants.NOTEBOOK_TITLE);
+		toActivities.add(AuthorConstants.WIKI_TITLE);
+		
+		fla.drawBranchingFromActivity(AuthorConstants.MULTIPLE_CHOICE_TITLE, toActivities)
+		.arrangeDesign();
+		
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setBranchingType(BRANCHING_TYPE_LEARNER_OUTPUT);
+		
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setInputTool(AuthorConstants.MULTIPLE_CHOICE_TITLE)
+		.clickCreateConditions()
+		.setConditionOutput(ConditionsPropertiesPage.OUTPUT_MCQ_TOTAL_MARK)
+		.setOptionType(ConditionsPropertiesPage.OPTION_RANGE)
+		.setFromRangeValue(rangeValueZero)
+		.setToRangeValue(rangeValueZero)
+		.clickAddOptionRange()
+		.setConditionName(conditionZeroRange, "2")
+		.setFromRangeValue(rangeValueOne)
+		.setToRangeValue(rangeValueOne)
+		.clickAddOptionRange()
+		.setConditionName(conditionOneRange, "3")
+		.clickOkConditionsButton()
+		.matchConditionToBranch(conditionOneRange, branchOne)
+		.matchConditionToBranch(conditionZeroRange, branchTwo)
+		.clickOkMatchingConditionsToBranchesButton();
+		
+		/// Assertions now
+		// Branching type
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getBranchingType();
+		
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_LEARNER_OUTPUT, "Branching type is incorrect");
+	
+		
+		// Now get all the activity titles
+		List<String> allActivityTitles = fla.getAllActivityNames();
+		System.out.println("All activities:" + allActivityTitles);
+
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
+				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
+				"The title " + AuthorConstants.BRANCH_END_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.MULTIPLE_CHOICE_TITLE), 
+				"The title " + AuthorConstants.MULTIPLE_CHOICE_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.NOTEBOOK_TITLE), 
+				"The title " + AuthorConstants.NOTEBOOK_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.WIKI_TITLE), 
+				"The title " + AuthorConstants.WIKI_TITLE + " was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 1"), 
+				"Branch 1 was not found as an activity in the design");
+		Assert.assertTrue(allActivityTitles.contains("Branch 2"), 
+				"Branch 2 was not found as an activity in the design");		
+		
+	}
+	
+	/**
+	 * Gives a name and saves the designs 
+	 */
+	@Test(dependsOnMethods="createToolOutputBranching")
+	public void nameAndSaveDesignToolOutputDesign() {
+
+		String saveResult = fla.saveAsDesign(randomDesignName + "-" + BRANCHING_TYPE_LEARNER_OUTPUT);
+
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
+				"Save error. Returned: " + saveResult);
+	}
+	
+	
+	
+	/**
+	 * Reopen previously saved design to confirm settings were saved correctly 
+	 */
+	@Test(dependsOnMethods="nameAndSaveDesignToolOutputDesign")
+	public void reOpenAndVerifyToolOutputDesign() {
+		
+		// Test data
+		final String conditionZeroRange = "Zero condition";
+		final String conditionOneRange  = "One condition";
+		
+		final String branchOne = "Branch 1";
+		final String branchTwo = "Branch 2";
+		
+		clearCanvas();
+		
+		fla.openDesign(randomDesignName + "-" + BRANCHING_TYPE_LEARNER_OUTPUT);
+		
+		
+		// Assertions
+		// Assert branching settings
+		
+		String assertBranchingType = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.getBranchingType();
+		
+		String assertInputTool = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.getInputTool();
+
+		String assertToolOutput = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.clickCreateConditions().getConditionOutput();
+		
+		
+		List<String> assertAllConditions = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.clickCreateConditions().getConditionNames();
+		
+		List<String> assertAllMappings = fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+				.clickMatchConditionsToBranchesButton().getAllMappings();
+
+		// Assert branching type
+		Assert.assertEquals(assertBranchingType, BRANCHING_TYPE_LEARNER_OUTPUT, "Branching type error");
+		
+		// AssertInputtool
+		Assert.assertEquals(assertInputTool, AuthorConstants.MULTIPLE_CHOICE_TITLE, 
+				"The input tool is incorrect");
+		
+		// Assert Tool output
+		Assert.assertEquals(assertToolOutput, ConditionsPropertiesPage.OUTPUT_MCQ_TOTAL_MARK,
+				"The tool output is incorrect");
+		
+		// Assert condition lists
+		Assert.assertTrue(assertAllConditions.contains(conditionZeroRange), 
+				conditionZeroRange + "is not conditions list");
+		Assert.assertTrue(assertAllConditions.contains(conditionOneRange), 
+				conditionOneRange + "is not conditions list");
+		
+		// Assert conditions to branches mapping
+		Assert.assertTrue(assertAllMappings.contains(conditionOneRange + " matches " + branchOne), 
+				"Error " + conditionOneRange + " doesn't match with " + branchOne);
+		Assert.assertTrue(assertAllMappings.contains(conditionZeroRange + " matches " + branchTwo), 
+				"Error " + conditionZeroRange + " doesn't match with " + branchTwo);
 		
 	}
 	

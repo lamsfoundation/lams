@@ -22,8 +22,6 @@
 
 package org.lamsfoundation.lams.pages.author;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.pages.AbstractPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -34,11 +32,6 @@ import org.openqa.selenium.support.ui.Select;
 
 public class BranchingPropertiesPage extends AbstractPage {
 	
-	public BranchingPropertiesPage(WebDriver driver) {
-		super(driver);
-		// TODO Auto-generated constructor stub
-	}
-
 	/**	
      * 	Branching properties
      * 
@@ -90,7 +83,26 @@ public class BranchingPropertiesPage extends AbstractPage {
 	private WebElement maxSequences;	
 	
 	
+	/**	
+     * 	Tool output branching properties
+     * 
+     */	
 	
+	@FindBy(xpath = "/html/body/div[14]/div[2]/div/table/tbody/tr[4]/td[2]/select")
+	private WebElement inputToolSelect;	
+	
+	@FindBy(xpath = "/html/body/div[14]/div[2]/div/table/tbody/tr[5]/td/div/span")
+	private WebElement createConditionsButton;
+	
+	@FindBy(xpath = "/html/body/div[14]/div[2]/div/table/tbody/tr[6]/td/div/span")
+	private WebElement matchConditionsToBranchesButton;	
+	
+	
+
+	public BranchingPropertiesPage(WebDriver driver) {
+		super(driver);
+		
+	}
 	
 	
 	/**
@@ -175,11 +187,11 @@ public class BranchingPropertiesPage extends AbstractPage {
 	 * Presses the button to open the group to branching mapping UI.
 	 * @return BranchingPropertiesPage
 	 */
-	public BranchingPropertiesPage clickMatchGroupsToBranches() {
+	public ConditionsPropertiesPage clickMatchGroupsToBranches() {
 		
 		matchGroupsToBranchesButton.click();
 		
-		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+		return PageFactory.initElements(driver, ConditionsPropertiesPage.class);
 	}
 	
 	/**
@@ -262,5 +274,68 @@ public class BranchingPropertiesPage extends AbstractPage {
 		return maxSequences.getAttribute("value");
 		
 	}
+	
+	
+	/**
+	 * Design description UI component
+	 *
+	 * @return DescriptionPage object
+	 */
+	public ConditionsPropertiesPage conditionProperties() {
+		
+
+		return PageFactory.initElements(driver, ConditionsPropertiesPage.class);
+		
+	}
+	
+	
+	/**
+	 * Selects the output to use for conditions
+	 * 
+	 * @param inputTool
+	 * @return {@link BranchingPropertiesPage}
+	 */
+	public BranchingPropertiesPage setInputTool(String inputTool) {
+		
+		Select inputToolSelector = new Select(inputToolSelect);
+		
+		inputToolSelector.selectByVisibleText(inputTool);
+
+		return PageFactory.initElements(driver, BranchingPropertiesPage.class);
+		
+	}
+	
+	
+	/**
+	 * Returns the name of the tool use as input for conditions
+	 * @return tool name
+	 */
+	public String getInputTool() {
+		
+		Select inputToolSelector = new Select(inputToolSelect);
+		
+		return inputToolSelector.getFirstSelectedOption().getText();
+		
+	}
+	
+	/**
+	 * Click on the button to create conditions.
+	 * @return {@link ConditionsPropertiesPage}
+	 */
+	public ConditionsPropertiesPage clickCreateConditions() {
+		
+		createConditionsButton.click();
+		
+		return PageFactory.initElements(driver, ConditionsPropertiesPage.class);
+		
+	}
+	
+	public ConditionsPropertiesPage clickMatchConditionsToBranchesButton() {
+		
+		matchConditionsToBranchesButton.click();
+		
+		return PageFactory.initElements(driver, ConditionsPropertiesPage.class);
+	}
+	
 	
 }
