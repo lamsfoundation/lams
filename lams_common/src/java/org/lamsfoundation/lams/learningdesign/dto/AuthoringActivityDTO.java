@@ -454,12 +454,15 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     }
 
+    @SuppressWarnings("unchecked")
     private void addConditionGateActivityAttributes(ConditionGateActivity activity,
 	    ArrayList<BranchActivityEntryDTO> branchMappings) {
-	Iterator iter = activity.getBranchActivityEntries().iterator();
-	while (iter.hasNext()) {
-	    BranchActivityEntry ba = (BranchActivityEntry) iter.next();
-	    branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
+	if (activity.getBranchActivityEntries() != null) {
+	    Iterator<BranchActivityEntry> iter = activity.getBranchActivityEntries().iterator();
+	    while (iter.hasNext()) {
+		BranchActivityEntry ba = iter.next();
+		branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
+	    }
 	}
     }
 
