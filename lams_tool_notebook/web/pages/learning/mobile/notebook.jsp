@@ -103,7 +103,7 @@
 
 	<div data-role="footer" data-theme="b" class="ui-bar">
 		<c:choose>
-			<c:when test="${contentEditable}">
+			<c:when test="${contentEditable && mode != 'teacher'}">
 				<span class="ui-finishbtn-right">
 					<a href="#nogo" id="finishButton" onclick="submitForm('finish')" data-role="button" data-icon="arrow-r" data-theme="b">
 						<span class="nextActivity">
