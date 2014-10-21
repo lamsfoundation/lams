@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -67,7 +68,7 @@ public class LoginRequestServlet extends HttpServlet {
 
     private static IntegrationService integrationService = null;
 
-    private static final String JNDI_DATASOURCE = "java:/jdbc/lams-ds";
+    private static final String JNDI_DATASOURCE = "java:jboss/datasources/lams-ds";
 
     private static final String PASSWORD_QUERY = "select password from lams_user where login=?";
 
@@ -85,7 +86,6 @@ public class LoginRequestServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	HttpSession hses = request.getSession(true);
@@ -134,7 +134,7 @@ public class LoginRequestServlet extends HttpServlet {
 			langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
 	    }
 
-	    //in case of request for learner with strict authentication check cache should also contain lsid
+	    // in case of request for learner with strict authentication check cache should also contain lsid
 	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
 		String lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
 		if (lsId == null) {
@@ -142,11 +142,11 @@ public class LoginRequestServlet extends HttpServlet {
 		    return;
 		}
 		Authenticator.authenticate(serverMap, timestamp, extUsername, method, lsId, hash);
-		
+
 	    } else {
 		Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
 	    }
-	    
+
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
 	    // The "extUser" attribute works as a flag to indicate if the user has logged in
@@ -161,19 +161,24 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 
 	    if (extCourseId != null) {
-		//check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
+		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
 		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
 			courseName, method, prefix);
 	    }
 
-	    LoginRequestServlet.log.debug("Session Id - " + hses.getId());
 	    // connect to DB and get password here
 	    String pass = getUserPassword(userMap.getUser().getLogin());
-	    // should post the parameters back so it's little more secure,
-	    // but forward doesn't work, use this until a better method is found
 	    hses.setAttribute("extUser", login);
-	    hses.setAttribute(AttributeNames.USER, user.getUserDTO());
-	    response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
+
+	    // check if there is a redirect URL parameter already
+	    String redirectURL = request.getParameter("redirectURL");
+	    if (redirectURL == null) {
+		// if not, get the full URL based on other parameters
+		redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
+	    }
+	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
+
+	    response.sendRedirect("login.jsp?login=" + login + "&password=" + pass + "&redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error");
@@ -195,7 +200,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
-    
+
     /**
      * The doPost method of the servlet. <br>
      * 

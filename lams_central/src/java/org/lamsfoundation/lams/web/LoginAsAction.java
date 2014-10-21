@@ -49,6 +49,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LoginAsAction extends Action {
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -59,23 +60,22 @@ public class LoginAsAction extends Action {
 	String login = WebUtil.readStrParam(request, "login", false);
 
 	if (service.isUserSysAdmin()) {
-	    if (login != null && login.trim().length() > 0) {
+	    if ((login != null) && (login.trim().length() > 0)) {
 		if (service.getUserByLogin(login) != null) {
-		    
+
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    IAuditService auditService = (IAuditService) ctx.getBean("auditService");
-		    String[] args = new String[]{sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login};
+		    String[] args = new String[] { sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    auditService.log(CentralConstants.MODULE_NAME, message);
-		    
+
 		    // logout, but not the LAMS shared session; needed by UniversalLoginModule
 		    // to check for sysadmin role
 		    request.getSession().invalidate();
 
-		    // send to index page; the following attribute will be cleared there
-		    request.getSession().setAttribute("login", login);
-		    return (new ActionForward("/index.jsp"));
+		    // redirect to login page
+		    return (new ActionForward("/login.jsp?login=" + login + "&password=dummy"));
 		}
 	    }
 	} else {

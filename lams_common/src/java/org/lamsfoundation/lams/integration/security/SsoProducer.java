@@ -25,9 +25,14 @@ import io.undertow.security.idm.Account;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
 import io.undertow.servlet.ServletExtension;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+import io.undertow.util.Methods;
+
+import java.security.AccessController;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletResponse;
@@ -44,11 +49,12 @@ import org.lamsfoundation.lams.web.session.SessionManager;
  *
  */
 public class SsoProducer implements ServletExtension {
-    private final static String SSO_ATTRIBUTE_NAME = "ssoAccount";
+    protected static final String SSO_ATTRIBUTE_NAME = "ssoAccount";
+
+    protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
 
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
-
 	// run when request and response were already parsed, but before security handlers
 	deploymentInfo.addOuterHandlerChainWrapper(new HandlerWrapper() {
 	    @Override
@@ -61,20 +67,57 @@ public class SsoProducer implements ServletExtension {
 			HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
 			ServletResponse response = context.getServletResponse();
 
+			// LoginRequestServlet (integrations) sets this parameter
+			String redirectURL = request.getParameter("redirectURL");
+			if (redirectURL != null) {
+			    SsoProducer.handleRedirectBack(context, redirectURL);
+			}
+
 			// create session so UniversalLoginModule can access it
 			SessionManager.startSession(request, response);
 			// do the logging in UniversalLoginModule
+			exchange.setRequestMethod(Methods.POST);
 			handler.handleRequest(exchange);
 
 			HttpSession session = SessionManager.getSession();
 			// get the just-logged-in user account and put it in the shared session
 			Account account = exchange.getSecurityContext().getAuthenticatedAccount();
-			session.setAttribute(SsoProducer.SSO_ATTRIBUTE_NAME, account);
+			if (account == null) {
+			    session.removeAttribute(SsoProducer.SSO_ATTRIBUTE_NAME);
+			} else {
+			    session.setAttribute(SsoProducer.SSO_ATTRIBUTE_NAME, account);
+			    if (redirectURL != null) {
+				// there is a good chance that the redirectURL parameter came from integrations
+				// if so, and the log in failed, remove the parameter so it can be attempted again
+				HttpSession hses = request.getSession(false);
+				if (hses != null) {
+				    hses.removeAttribute("extUser");
+				}
+			    }
+			}
 
 			SessionManager.endSession();
 		    }
 		});
 	    }
 	});
+    }
+
+    /**
+     * Notifies authentication mechanism where it should redirect after log in. Based on
+     * ServletFormAuthenticationMechanism method.
+     */
+    protected static void handleRedirectBack(ServletRequestContext context, String redirectURL) {
+	HttpSessionImpl httpSession = context.getCurrentServletContext().getSession(context.getExchange(), false);
+	if (httpSession != null) {
+	    Session session;
+	    if (System.getSecurityManager() == null) {
+		session = httpSession.getSession();
+	    } else {
+		session = AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(httpSession));
+	    }
+
+	    session.setAttribute(SsoProducer.SESSION_KEY, redirectURL);
+	}
     }
 }
