@@ -305,7 +305,7 @@
 	
 	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="securityServiceTarget"/></property>
+		<property name="target"><ref bean="securityServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
@@ -429,7 +429,7 @@
 	
 	<!--  Data flow related beans -->
 	<bean id="securityDAO" class="org.lamsfoundation.lams.security.SecurityDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<!--  System Session bean -->
