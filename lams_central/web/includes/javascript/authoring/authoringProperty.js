@@ -976,31 +976,29 @@ PropertyLib = {
 							activity = dialog.dialog('option', 'parentObject');
 						
 						// extract created mappings from UI
-						if (activity instanceof ActivityDefs.BranchingActivity) {
-							activity.conditionsToBranches = [];
-							$('#rangeConditions tr, #complexConditions li', dialog).each(function(){
-								// if it's hidden, then another output was selected, so skip it
-								var mappingEntry = $(this).is(':visible') ? $(this).data('mappingEntry') : null;
-								if (!mappingEntry) {
-									return true;
-								}
-								
-								// new UIID for new conditions
-								if (!mappingEntry.uiid) {
-									mappingEntry.uiid = ++layout.ld.maxUIID;
-								}
-								if (!mappingEntry.condition.conditionUIID) {
-									mappingEntry.condition.conditionUIID = ++layout.ld.maxUIID;
-								}
-								
-								// range conditions can have their names changed
-								var input = $('input', this);
-								if (input.length > 0) {
-									mappingEntry.condition.displayName = input.val();
-								}
-								activity.conditionsToBranches.push(mappingEntry);
-							});
-						}
+						activity.conditionsToBranches = [];
+						$('#rangeConditions tr, #complexConditions li', dialog).each(function(){
+							// if it's hidden, then another output was selected, so skip it
+							var mappingEntry = $(this).is(':visible') ? $(this).data('mappingEntry') : null;
+							if (!mappingEntry) {
+								return true;
+							}
+							
+							// new UIID for new conditions
+							if (!mappingEntry.uiid) {
+								mappingEntry.uiid = ++layout.ld.maxUIID;
+							}
+							if (!mappingEntry.condition.conditionUIID) {
+								mappingEntry.condition.conditionUIID = ++layout.ld.maxUIID;
+							}
+							
+							// range conditions can have their names changed
+							var input = $('input', this);
+							if (input.length > 0) {
+								mappingEntry.condition.displayName = input.val();
+							}
+							activity.conditionsToBranches.push(mappingEntry);
+						});
 												
 						dialog.dialog('close');
 						// go straight to mapping dialog
@@ -1651,7 +1649,7 @@ PropertyLib = {
 		// fill the branches list
 		$.each(branches, function(){
 			var branchTitle = (isGate ? (this == 'open' ? LABELS.GATE_STATE_OPEN : LABELS.GATE_STATE_CLOSED) : this.title)
-							+ (this == defaultBranch ? BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ''),
+							+ (this == defaultBranch ? LABELS.BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ''),
 				branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell).text(branchTitle);
 			if (isGate) {
 				branchElem.attr('gateState', this);
