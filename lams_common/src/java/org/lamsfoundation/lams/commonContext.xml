@@ -234,7 +234,18 @@
 				<prop key="org.quartz.jobStore.tablePrefix">lams_qtz_</prop>
 			</props>
 		</property> 
-		<property name="dataSource"><ref bean="dataSource"/></property>     
+		<property name="dataSource"><ref bean="dataSource"/></property>
+	
+		<property name="jobDetails">
+			<list>
+				<ref bean="resendMessagesJob" />
+			</list>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="resendMessagesJobTrigger" />
+			</list>
+		</property>    
     </bean>
 
 
@@ -242,9 +253,6 @@
 		<property name ="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.events.EventNotificationService">
-				<constructor-arg>
-         			<ref bean="scheduler"/>
-        		</constructor-arg>
 				<property name="eventDAO"><ref bean="eventDAO" /></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
         		<property name="messageService"><ref bean="commonMessageService"/></property>
@@ -261,10 +269,27 @@
 				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
+				<prop key="getEventsToResend*">PROPAGATION_REQUIRED</prop>
 				<prop key="saveEvent">PROPAGATION_SUPPORTS</prop>
 			</props>
 		</property>
 	</bean>
+	
+	<bean name="resendMessagesJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="org.lamsfoundation.lams.events.ResendMessagesJob" />
+		<property name="name" value="Resend Messages Job"/>
+		<property name="group" value="DEFAULT"/>
+	</bean>
+	
+	<bean id="resendMessagesJobTrigger" 
+                class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="resendMessagesJob" />
+		<property name="name" value="Resend Messages Job Trigger"/>
+		<property name="group" value="DEFAULT"/>
+		<property name="repeatInterval" value="3600000" />
+		<property name="startDelay" value="120000" />
+	</bean>
+	
 	
 	<!-- Log Event notification Service -->
 	

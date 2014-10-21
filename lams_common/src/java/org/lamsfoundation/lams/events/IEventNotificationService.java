@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -71,6 +72,12 @@ public interface IEventNotificationService {
 	    String defaultMessage, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
+     * Saves an event into the database.
+     */
+	void saveEvent(Event event);
+	
+    
+    /**
      * Deletes an event.
      * 
      * @param scope
@@ -102,6 +109,14 @@ public interface IEventNotificationService {
     abstract boolean eventExists(String scope, String name, Long eventSessionId)
 	    throws InvalidParameterException;
 
+    
+    /**
+     * Returns Event that are to be resend by QuartzJob
+     * @return events to resend
+     */
+    List<Event> getEventsToResend();
+    
+    
     /**
      * Gets the available delivery methods that can be used when subscribing an user to an event.
      * 
@@ -356,4 +371,5 @@ public interface IEventNotificationService {
      */
     abstract boolean unsubscribe(String scope, String name, Long eventSessionId, Integer userId,
 	    AbstractDeliveryMethod deliveryMethod) throws InvalidParameterException;
+
 }

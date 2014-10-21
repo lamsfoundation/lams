@@ -19,11 +19,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 
 /**
  * Provides tools for managing events and notifing users.
@@ -50,17 +45,6 @@ class EventNotificationService implements IEventNotificationService {
     protected static final Logger log = Logger.getLogger(EventNotificationService.class);
 
     /**
-     * How often the attempts to resend messages should be taken (in miliseconds). Currently - every hour.
-     */
-    private static final long RESEND_FREQUENCY = 60 * 60 * 1000;
-    
-    /**
-     * When the first resend is to be triggered (starting from class instantiation time). 
-     */
-    private static final long FIRST_RESEND_TIME = System.currentTimeMillis() + 120000;
-    
-
-    /**
      * Interface to contact the database.
      */
     protected EventDAO eventDAO;
@@ -77,46 +61,13 @@ class EventNotificationService implements IEventNotificationService {
     protected ILamsToolService toolService;
 
     /**
-     * Quartz scheduler used for resending messages.
-     */
-    private Scheduler scheduler;
-    /**
-     * Name of the Quartz job that resends messages.
-     */
-    private final static String RESEND_MESSAGES_JOB_NAME = "Resend Messages Job";
-    /**
-     * Name of the Quartz trigger that resends messages.
-     */
-    private final static String RESEND_MESSAGES_TRIGGER_NAME = "Resend Messages Job trigger";
-
-    /**
      * Default constructor. Should be called only once, since this class in a singleton.
-     * 
-     * @param scheduler
-     *            scheduler injected by Spring
      */
-    public EventNotificationService(Scheduler scheduler) {
+    public EventNotificationService() {
 	if (EventNotificationService.instance == null) {
 	    EventNotificationService.instance = this;
-	    this.scheduler = scheduler;
 	    EventNotificationService.availableDeliveryMethods.add(IEventNotificationService.DELIVERY_METHOD_MAIL);
-	    try {
-		JobDetail resendMessagesJobDetail = getScheduler().getJobDetail(
-			EventNotificationService.RESEND_MESSAGES_JOB_NAME, Scheduler.DEFAULT_GROUP);
-		if (resendMessagesJobDetail == null) {
-		    resendMessagesJobDetail = new JobDetail(EventNotificationService.RESEND_MESSAGES_JOB_NAME,
-			    Scheduler.DEFAULT_GROUP, ResendMessagesJob.class);
-		    resendMessagesJobDetail.setDescription("");
-		    Trigger resendMessageTrigger = new SimpleTrigger(
-			    EventNotificationService.RESEND_MESSAGES_TRIGGER_NAME, Scheduler.DEFAULT_GROUP, new Date(FIRST_RESEND_TIME), null, 
-			    SimpleTrigger.REPEAT_INDEFINITELY, EventNotificationService.RESEND_FREQUENCY);
-		    getScheduler().scheduleJob(resendMessagesJobDetail, resendMessageTrigger);
-		}
-		getScheduler().start();
-	    } catch (SchedulerException e) {
-		EventNotificationService.log.error(e.getMessage());
-	    }
-	}
+    }
     }
 
     /**
@@ -603,7 +554,8 @@ class EventNotificationService implements IEventNotificationService {
      * @param event
      *            event to be saved
      */
-    protected void saveEvent(Event event) {
+    @Override
+    public void saveEvent(Event event) {
 	event.referenceCounter--;
 	if (event.referenceCounter <= 0) {
 	    EventNotificationService.eventPool.remove(event);
@@ -631,10 +583,6 @@ class EventNotificationService implements IEventNotificationService {
 	this.userManagementService = userManagementService;
     }
 
-    private Scheduler getScheduler() {
-	return scheduler;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -658,4 +606,8 @@ class EventNotificationService implements IEventNotificationService {
     protected ILamsToolService getToolService() {
 	return toolService;
     }
+
+	public List<Event> getEventsToResend() {
+		return eventDAO.getEventsToResend();
+	}
 }
