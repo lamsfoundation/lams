@@ -60,6 +60,9 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.web.MonitoringAction;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -104,6 +107,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private static ILamsToolService toolService;
     private static IAuthoringService authoringService;
     private static ILearningDesignService learningDesignService;
+    private static ISecurityService securityService;
 
     private static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
 
@@ -460,6 +464,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Integer userID = getUserId();
+	    
+	try {
+	    getSecurityService().hasOrgRole(organisationID, userID, Role.MONITOR);
+	} catch (SecurityException e) {
+	    log.error("Cannot add a lesson", e);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+	    return null;
+	}
 
 	// get title from tool content
 	IToolVO tool = getToolService().getToolByID(toolID);
@@ -471,7 +484,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		contentFolderID, organisationID);
 	if (learningDesignID != null) {
-	    Integer userID = getUserId();
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
 		    null, false, false, true, false, false, true, true, false, null, null);
@@ -695,5 +707,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return AuthoringAction.learningDesignService;
+    }
+    
+    private ISecurityService getSecurityService() {
+	if (securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return securityService;
     }
 }

@@ -74,6 +74,8 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -141,7 +143,10 @@ public class MonitoringAction extends LamsDispatchAction {
     private static ITimezoneService timezoneService;
 
     private static ILessonService lessonService;
+    
+    private static ISecurityService securityService;
 
+    
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -365,9 +370,17 @@ public class MonitoringAction extends LamsDispatchAction {
 			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ")
 			+ "\"" + lessonInstanceName + "\"");
 	    }
-	    Lesson lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId,
-		    organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
-		    enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+
+	    Lesson lesson = null;
+	    try {
+		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
+			userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
+			enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+	    } catch (SecurityException e) {
+		log.error("Cannot add a lesson for LD: " + ldId, e);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+		return null;
+	    }
 
 	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation, learnerGroupInstanceName,
 		    lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -842,10 +855,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	monitoringService.checkOwnerOrStaffMember(user.getUserID(), lessonId, "monitor lesson");
+	
+	try {
+	    getSecurityService().checkIsLessonMonitor(lessonId, user.getUserID());
+	} catch (SecurityException e) {
+	    log.error("Cannot monitor lesson", e);
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+	    return null;
+	}
 
 	// should info box on Sequence tab be displayed?
 	Short sequenceTabInfoShowCount = (Short) ss.getAttribute("sequenceTabInfoShowCount");
@@ -1202,6 +1219,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return MonitoringAction.lessonService;
+    }
+    
+    private ISecurityService getSecurityService() {
+	if (MonitoringAction.securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    MonitoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return MonitoringAction.securityService;
     }
 
     /**

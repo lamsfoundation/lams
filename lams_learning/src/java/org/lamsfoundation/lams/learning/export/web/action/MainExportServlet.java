@@ -54,8 +54,10 @@ import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServiceProxy;
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -111,17 +113,33 @@ public class MainExportServlet extends HttpServlet {
 	IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this
 		.getServletContext());
 	ILessonService lessonService = ExportPortfolioServiceProxy.getLessonService(this.getServletContext());
+	ISecurityService securityService = ExportPortfolioServiceProxy.getSecurityService(this
+		.getServletContext());
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (mode.equals(ToolAccessMode.LEARNER.toString())) {
 	    if (!lesson.getLearnerExportAvailable()) {
-		throw new ExportPortfolioException("This lesson does not allow export portfolio for learners");
+		throw new ExportPortfolioException("Lesson with ID: " + lesson.getLessonId()
+			+ " does not allow export portfolio for learners");
 	    }
 	    ToolAccessMode accessMode = ToolAccessMode.TEACHER.toString().equals(role) ? ToolAccessMode.TEACHER : null;
-	    boolean canExport = isPartOfClass(lesson, currentUserId, accessMode != null);
-	    if (!canExport) {
-		throw new ExportPortfolioException("User " + currentUserId + " is not a participant in lesson "
-			+ lessonID + " and may not export portfolio");
+
+	    try {
+		if (accessMode == null) {
+		    securityService.checkIsLessonLearner(lesson.getLessonId(), currentUserId);
+		    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
+			    lesson.getLessonId());
+		    if (learnerProgress == null || !learnerProgress.isComplete()) {
+			throw new ExportPortfolioException("Learner with ID: " + currentUserId
+				+ " has not finished lesson with ID: " + lesson.getLessonId());
+		    }
+		} else {
+		    securityService.checkIsLessonMonitor(lesson.getLessonId(), currentUserId);
+		}
+	    } catch (SecurityException e) {
+		log.error("Cannot export portfolion", e);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return;
 	    }
 
 	    portfolios = exportService.exportPortfolioForStudent(userIdParam == null ? currentUserId : userIdParam,
@@ -131,10 +149,12 @@ public class MainExportServlet extends HttpServlet {
 	    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + " "
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
-	    boolean canExport = isPartOfClass(lesson, currentUserId, true);
-	    if (!canExport) {
-		throw new ExportPortfolioException("User " + currentUserId + " is not a participant in lesson "
-			+ lessonID + " and may not export portfolio");
+	    try {
+		securityService.checkIsLessonMonitor(lesson.getLessonId(), currentUserId);
+	    } catch (SecurityException e) {
+		log.error("Cannot export portfolion", e);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return;
 	    }
 	    
 	    // done in the monitoring environment
@@ -300,24 +320,5 @@ public class MainExportServlet extends HttpServlet {
 	} catch (IOException e) {
 	    MainExportServlet.log.error("Unable to correct imagefolder links in file " + filename, e);
 	}
-    }
-
-    private boolean isPartOfClass(Lesson lesson, Integer userId, boolean isTeacher) {
-	Set<User> users = null;
-	if (isTeacher) {
-	    users = lesson.getLessonClass().getStaffGroup().getUsers();
-	} else {
-	    users = lesson.getLessonClass().getLearnersGroup().getUsers();
-	}
-
-	// slightly easier than getting user from some other service and using collection methods, like contains()
-	boolean result = false;
-	for (User user : users) {
-	    if (user.getUserId().equals(userId)) {
-		result = true;
-		break;
-	    }
-	}
-	return result;
     }
 }

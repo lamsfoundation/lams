@@ -23,11 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,11 +45,11 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -75,6 +73,8 @@ public class DisplayGroupAction extends Action {
     private static IUserManagementService service;
     private static LessonService lessonService;
     private static ILearningDesignService learningDesignService;
+    private static ISecurityService securityService;
+
     private Integer stateId = OrganisationState.ACTIVE;
 
     @Override
@@ -91,6 +91,16 @@ public class DisplayGroupAction extends Action {
 	}
 
 	if (org != null) {
+	    User user = getUser(request.getRemoteUser());
+	    try {
+		getSecurityService().hasOrgRole(orgId, user.getUserId(), Role.LEARNER, Role.MONITOR, Role.AUTHOR,
+			Role.GROUP_MANAGER);
+	    } catch (SecurityException e) {
+		log.error("Cannot display group", e);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a part of the organisation");
+		return null;
+	    }
+	    
 	    boolean allowSorting = false;
 	    List<Integer> roles = new ArrayList<Integer>();
 	    List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(orgId,
@@ -211,10 +221,9 @@ public class DisplayGroupAction extends Action {
     @SuppressWarnings("unchecked")
     private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles,
 	    String username, boolean isSysAdmin) throws SQLException, NamingException {
-	User user = (User) getService().findByProperty(User.class, "login", username).get(0);
-
 	// set lesson beans
-	Map<Long, IndexLessonBean> map = populateLessonBeans(user.getUserId(), org.getOrganisationId(), roles);
+	Map<Long, IndexLessonBean> map = populateLessonBeans(getUser(username).getUserId(), org.getOrganisationId(),
+		roles);
 	List<IndexLessonBean> lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
 
 	orgBean.setLessons(lessonBeans);
@@ -364,6 +373,10 @@ public class DisplayGroupAction extends Action {
 	return map;
     }
 
+    private User getUser(String login) {
+	return (User) getService().findByProperty(User.class, "login", login).get(0);
+    }
+    
     private IUserManagementService getService() {
 	if (DisplayGroupAction.service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -389,5 +402,14 @@ public class DisplayGroupAction extends Action {
 	    DisplayGroupAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return DisplayGroupAction.learningDesignService;
+    }
+    
+    private ISecurityService getSecurityService() {
+	if (securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return securityService;
     }
 }

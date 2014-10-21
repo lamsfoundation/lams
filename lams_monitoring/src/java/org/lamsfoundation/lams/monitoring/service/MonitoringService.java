@@ -88,6 +88,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -180,6 +181,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ILamsCoreToolService lamsCoreToolService;
 
     private IUserManagementService userManagementService;
+    
+    private ISecurityService securityService;
 
     private Scheduler scheduler;
 
@@ -227,6 +230,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      */
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+    
+    public void setSecurityService(ISecurityService securityService) {
+	this.securityService = securityService;
     }
 
     /**
@@ -388,6 +395,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
+	securityService.hasOrgRole(organisationId, userID, Role.MONITOR);
+	
 	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException("Learning design for id=" + learningDesignId
@@ -441,7 +450,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    + " is missing. Unable to initialize lesson.");
 	}
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
-
+	
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, false, learnerPresenceAvailable,
 		learnerImAvailable, liveEditEnabled, true, false, null, null);
@@ -472,7 +481,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
-
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign, new Integer(
 		copyType), user, workspaceFolder, true, null, customCSV);
@@ -554,7 +562,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userId) {
 	Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
