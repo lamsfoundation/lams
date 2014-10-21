@@ -66,10 +66,10 @@ public class FLAPage extends AbstractPage {
 	@FindBy(id = "openDropButton")
 	private WebElement openDropButton;
 	
-	@FindBy(id = "importDesignButton")
+	@FindBy(id = "importSequenceButton")
 	private WebElement importDesignButton;
 
-	@FindBy(id = "importPartDesignButton")
+	@FindBy(id = "importPartSequenceButton")
 	private WebElement importPartDesignButton;
 
 	@FindBy(id = "saveButton")
@@ -887,6 +887,16 @@ public class FLAPage extends AbstractPage {
 		dropBranch.perform();
 		
 		return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	
+	public ImportDesignPage importDesign() {
+		
+		openDropButton.click();
+		importDesignButton.click();
+		driver.switchTo().window("Import");
+		
+		return PageFactory.initElements(driver, ImportDesignPage.class);
 	}
 	
 	
