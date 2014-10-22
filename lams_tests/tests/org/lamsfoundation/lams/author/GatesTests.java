@@ -66,9 +66,9 @@ public class GatesTests {
 	private static final String GATE_TYPE_PERMISSION = "permission";
 	
 	
-	private static final String randomInt = LamsUtil.randInt(0, 9999);
+	private static final String RANDOM_INT = LamsUtil.randInt(0, 9999);
 
-	private String randomDesignName = "Design-" + randomInt;
+	private String randomDesignName = "Design-" + RANDOM_INT;
 	private int randomInteger = Integer.parseInt(LamsUtil.randInt(0, 5));
 	
 	private LoginPage onLogin;
@@ -91,7 +91,7 @@ public class GatesTests {
 
 	@AfterClass
 	public void afterClass() {
-		// driver.quit();
+		driver.quit();
 	}
 	
 	

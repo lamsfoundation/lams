@@ -55,11 +55,13 @@ import org.testng.annotations.Test;
 public class BranchingTests {
 
 	// Branching constants 
-	private static final String BRANCHING_TYPE_INSTRUCTOR = "chosen";
-	private static final String BRANCHING_TYPE_GROUP = "group";
-	private static final String BRANCHING_TYPE_LEARNER_OUTPUT = "tool";
-	private static final String BRANCHING_TYPE_LEARNER_CHOICE = "optional";
-	private static final String randomInt = LamsUtil.randInt(0, 9999);
+	public static final String BRANCHING_TYPE_INSTRUCTOR = "chosen";
+	public static final String BRANCHING_TYPE_GROUP = "group";
+	public static final String BRANCHING_TYPE_LEARNER_OUTPUT = "tool";
+	public static final String BRANCHING_TYPE_LEARNER_CHOICE = "optional";
+	
+	
+	private static final String RANDOM_INT = LamsUtil.randInt(0, 9999);
 	
 	// Learner choice constants
 	private static final String MAXNUMBERSEQUENCES = "2";
@@ -74,8 +76,8 @@ public class BranchingTests {
 	
 
 	
-	private String randomDesignName = "Design-" + randomInt;
-	private String randomBranchingName = "Branch" + randomInt;
+	private String randomDesignName = "Design-" + RANDOM_INT;
+	private String randomBranchingName = "Branch" + RANDOM_INT;
 
 	private LoginPage onLogin;
 	private IndexPage index;
@@ -97,7 +99,7 @@ public class BranchingTests {
 
 	@AfterClass
 	public void afterClass() {
-		driver.quit();
+		//driver.quit();
 	}
 
 	/**
@@ -138,8 +140,7 @@ public class BranchingTests {
 
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		// Assert that all of them are in the design
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.NOTICEBOARD_TITLE), 
 				"The title " + AuthorConstants.NOTICEBOARD_TITLE + " was not found as an activity in the design");
@@ -159,8 +160,7 @@ public class BranchingTests {
 
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
 				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
@@ -175,8 +175,6 @@ public class BranchingTests {
 		// the activities better on the screen)
 		Point startBranchingPosition = fla.getActivityLocation(AuthorConstants.BRANCHING_START_TITLE);
 
-		System.out.println("Branching start position:" + startBranchingPosition);
-
 		fla.dragActivityToCanvasPosition(AuthorConstants.PIXLR_TITLE, 
 				(startBranchingPosition.x + 50), (startBranchingPosition.y - 100));
 
@@ -189,8 +187,7 @@ public class BranchingTests {
 		/// Assertions
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.PIXLR_TITLE), 
 				"The title " + AuthorConstants.PIXLR_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.COMMON_CARTRIDGE_TITLE), 
@@ -215,8 +212,7 @@ public class BranchingTests {
 		/// Assertions 
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains("Branch 1"), 
 				"Branch 1 was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains("Branch 2"), 
@@ -351,7 +347,7 @@ public class BranchingTests {
 	@Test(dependsOnMethods="saveDesign")
 	public void clearCanvas() {
 		
-		fla.newDesign();
+		fla.newDesign().getAlertText();
 
 	}
 
@@ -403,9 +399,7 @@ public class BranchingTests {
 		// Get position for branching start point (we'll use this to present 
 		// the activities better on the screen)
 		Point startBranchingPosition = fla.getActivityLocation(AuthorConstants.BRANCHING_START_TITLE);
-
-		System.out.println("Branching start position:" + startBranchingPosition);
-
+		
 		fla
 		.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 
 				(startBranchingPosition.x + 50), (startBranchingPosition.y - 200))
@@ -468,8 +462,7 @@ public class BranchingTests {
 		/// Assertions now
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
 				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
@@ -602,8 +595,7 @@ public class BranchingTests {
 		
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
 				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
@@ -742,8 +734,7 @@ public class BranchingTests {
 		
 		// Now get all the activity titles
 		List<String> allActivityTitles = fla.getAllActivityNames();
-		System.out.println("All activities:" + allActivityTitles);
-
+		
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCHING_START_TITLE), 
 				"The title " + AuthorConstants.BRANCHING_START_TITLE + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(AuthorConstants.BRANCH_END_TITLE), 
@@ -834,6 +825,8 @@ public class BranchingTests {
 				"Error " + conditionOneRange + " doesn't match with " + branchOne);
 		Assert.assertTrue(assertAllMappings.contains(conditionZeroRange + " matches " + branchTwo), 
 				"Error " + conditionZeroRange + " doesn't match with " + branchTwo);
+		
+		clearCanvas();
 		
 	}
 	
