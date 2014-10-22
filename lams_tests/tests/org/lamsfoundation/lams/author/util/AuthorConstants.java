@@ -29,6 +29,18 @@ public class AuthorConstants {
 	public static final String FLA_TITLE = "Flashless Authoring";
 	public static final String SAVE_SEQUENCE_SUCCESS_MSG = "Congratulations";
 	public static final String SAVE_SEQUENCE_INVALID_MSG = "validation issues";
+	public static final String SAVE_SEQUENCE_NO_GROUPS_ASSIGNED = "Grouping : Grouping is not used in any of activities";
+	public static final String SAVE_OVERWRITE_MSG = "want to overwrite";
+	public static final String SAVE_MUST_HAVE_ONE_ACTIVITY_MSG = "at least one activity in the sequence";
+	public static final String CLEAR_ON_UNSAVED_DESIGN = "Are you sure you want to remove all existing elements?";
+	public static final String RECURSIVE_TRANSITION_MSG = "Transition to this activity already exists";
+	public static final String CIRCULAR_DESIGN_MSG = "You are not allowed to have a circular sequence";
+	public static final String ADD_SYSTEM_ACT_TO_OPTIONAL_MSG = "You can not add this type of activity to an optional/support activity";
+	public static final String BRANCHING_MUST_HAVE_AT_LEAST_MSG = "A Branching Activity must have at least one";
+	public static final String BRANCHING_MUST_HAVE_GROUPS_TO_BRANCHES_MSG = "Group Based Branching Activity must have all Groups assigned to Branches";
+	public static final String BRANCHING_MUST_HAVE_ONE_CONDITION_MSG = "Learner's Output Branching Activity must have at least one condition";
+	public static final String OPTIONAL_MUST_HAVE_ONE_ACTIVITY_MSG = "An Optional Activity must have one or more activities";
+	public static final String SUPPORT_MUST_HAVE_ONE_ACTIVITY_MSG = "at least one support activity in the container";
 	
 	
 	/// LAMS Activities (in English only)
@@ -72,8 +84,8 @@ public class AuthorConstants {
 	public static final String BRANCHING_START_TITLE = "Branching start";
 	public static final String BRANCH_END_TITLE = "Branching end";
 	
-	public static final String OPTIONAL_ACTIVITY_TITLE = "Activity";
-	public static final String SUPPORT_ACTIVITY_TITLE = "Support";
+	public static final String OPTIONAL_ACTIVITY_TITLE = "Optional Activity";
+	public static final String SUPPORT_ACTIVITY_TITLE = "Support Activity";
 	
 	
 }
