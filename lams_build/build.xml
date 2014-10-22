@@ -128,7 +128,7 @@
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_wiki_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
-        	<ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="copy-tags" inheritAll="false"/>
 		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS:
 			  Kaltura and other public and private tools</echo>
@@ -487,6 +487,42 @@
 		</copy>
 					
 		<ant antfile="../${lams_common}/build.xml" target="deploy-libraries" inheritAll="false"/>
+	</target>
+	
+	
+	<target name="explode-all" description="Explode WARs of all standard modules.">
+		<ant antfile="../${lams_learning}/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../${lams_monitoring}/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../${lams_admin}/build.xml"             target="explode-war" inheritAll="false" />
+		<ant antfile="../${lams_gradebook}/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../${tool_assessment_dir}/build.xml"    target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_bbb_dir}/build.xml"           target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_chat_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_daco_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_eadventure_dir}/build.xml"    target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_forum_dir}/build.xml"         target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_gmap_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_images_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_imscc_dir}/build.xml"         target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_lamc_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_laqa_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_larsrc_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_leader_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_lanb_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_notebook_dir}/build.xml"      target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_pixlr_dir}/build.xml"         target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_sbmt_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_scratchie_dir}/build.xml"     target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_scribe_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_spreadsheet_dir}/build.xml"   target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_task_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_vote_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_wiki_dir}/build.xml"          target="explode-war" inheritAll="false"/>
+        <ant antfile="../${tool_wookie_dir}/build.xml"        target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="explode-war" inheritAll="false"/>
+		<ant antfile="../${tool_mindmap_dir}/build.xml"       target="explode-war" inheritAll="false" />
 	</target>
 	
 	
