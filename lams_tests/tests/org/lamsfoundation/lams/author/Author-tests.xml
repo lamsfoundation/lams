@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Authoring Tests Suite" parallel="false">
+  <test name="Author Tests">
+    <classes>
+      <class name="org.lamsfoundation.lams.author.AuthorErrorsTests"/>
+      <class name="org.lamsfoundation.lams.author.AuthorTests"/>
+      <class name="org.lamsfoundation.lams.author.GatesTests"/>
+      <class name="org.lamsfoundation.lams.author.BranchingTests"/>
+      <class name="org.lamsfoundation.lams.author.ImportDesignTests"/>
+    </classes>
+  </test> <!-- Author Tests -->
+</suite> <!-- Authoring Tests Suite -->

@@ -59,6 +59,7 @@ public class FLAPage extends AbstractPage {
 
 	@FindBy(id = "newButton")
 	private WebElement newButton;
+	
 
 	@FindBy(id = "openButton")
 	private WebElement openButton;
@@ -72,6 +73,7 @@ public class FLAPage extends AbstractPage {
 	@FindBy(id = "importPartSequenceButton")
 	private WebElement importPartDesignButton;
 
+	
 	@FindBy(id = "saveButton")
 	private WebElement saveButton;
 
@@ -91,9 +93,24 @@ public class FLAPage extends AbstractPage {
 	@FindBy(id = "pasteButton")
 	private WebElement pasteButton;
 
+	
 	@FindBy(id = "transitionButton")
 	private WebElement transitionButton;
-
+	
+	
+	@FindBy(id = "optionalButton")
+	private WebElement optionalButton;
+	
+	@FindBy(id = "optionalDropButton")
+	private WebElement optionalDropButton;
+	
+	@FindBy(id = "optionalActivityButton")
+	private WebElement optionalActivityButton;
+	
+	@FindBy(id = "floatingActivityButton")
+	private WebElement supportActivityButton;
+	
+	
 	@FindBy(id = "flowButton")
 	private WebElement flowButton;
 	
@@ -106,8 +123,10 @@ public class FLAPage extends AbstractPage {
 	@FindBy(id = "branchingButton")
 	private WebElement branchingButton;
 
+	
 	@FindBy(id = "groupButton")
 	private WebElement groupButton;
+	
 
 	@FindBy(id = "annotateButton")
 	private WebElement annotateButton;
@@ -124,6 +143,7 @@ public class FLAPage extends AbstractPage {
 	@FindBy(id = "arrangeButton")
 	private WebElement arrangeButton;
 
+	
 	@FindBy(id = "previewButton")
 	private WebElement previewButton;
 
@@ -215,11 +235,11 @@ public class FLAPage extends AbstractPage {
 	public FLAPage newDesign() {
 
 		newButton.click();
-		checkAlert();
 		
 		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
+	
 	/**
 	 * Drops a group activity into the canvas. 
 	 *  
@@ -424,9 +444,7 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage changeActivityTitle(String activityTitle, String newActivityTitle)  {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
-
-		WebElement activity = getActivityElement(svg, activityTitle);
+		WebElement activity = getActivityElement(activityTitle);
 
 		// select the activity
 		activity.click();
@@ -457,9 +475,7 @@ public class FLAPage extends AbstractPage {
 	 */
 	public AbstractPage openSpecificActivity(String activityName) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
-
-		WebElement act = getActivityElement(svg, activityName);
+		WebElement act = getActivityElement(activityName);
 
 		Actions openAct = new Actions(driver);
 		openAct.doubleClick(act).build().perform();;
@@ -496,6 +512,36 @@ public class FLAPage extends AbstractPage {
 
 	}
 
+	/**
+	 * Given a design on canvas, it overwrites the existing one
+	 * 
+	 * This method is different from saveAsDesign, as this one has to 
+	 * deal with two consecutive popups. One that prompts if you are 
+	 * sure to overwrite and the second one that gives the "Congratulations! 
+	 * your design is saved".
+	 * 
+	 * We concatenate both alert txts and send them back
+	 *
+	 * @param designName	design name to reuse. It must exist in folder.
+	 * @return 				msg from alert
+	 */
+	public String overWriteDesign(String designName) {
+
+		String saveAsResult = null;
+		saveDropButton.click();
+		saveAsButton.click();
+		ldStoreDialogNameField.click();
+		ldStoreDialogNameField.clear();
+		ldStoreDialogNameField.sendKeys(designName);
+		saveLdStoreButton.click();
+		saveAsResult = getAlertText();
+		saveAsResult = saveAsResult + getAlertText();
+
+		return saveAsResult;
+
+	}
+
+	
 	/**
 	 *	Gets the activity names into a list.
 	 *
@@ -535,9 +581,7 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage setGroupForActivity(String groupName, String activityName) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
-
-		WebElement activity = getActivityElement(svg, activityName);
+		WebElement activity = getActivityElement(activityName);
 
 		activity.click();
 
@@ -560,17 +604,13 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage drawTransitionFromTo(String fromActivity, String toActivity) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
-
-		WebElement fromActivityElement = getActivityElement(svg, fromActivity);
-		WebElement toActivityElement = getActivityElement(svg, toActivity);
+		WebElement fromActivityElement = getActivityElement(fromActivity);
+		WebElement toActivityElement = getActivityElement(toActivity);
 
 		transitionButton.click();
 		fromActivityElement.click();
 		toActivityElement.click();
 		
-		canvas.click();
-
 		return PageFactory.initElements(driver, FLAPage.class);
 	}
 
@@ -585,14 +625,11 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage drawBranchingFromActivity(String fromActivity, List<String> toActivities) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
-
-		WebElement fromActivityElement = getActivityElement(svg, fromActivity);
-		
+		WebElement fromActivityElement = getActivityElement(fromActivity);
 		
 		for (String toActivity : toActivities) {
 			
-			WebElement toActivityElement = getActivityElement(svg, toActivity);
+			WebElement toActivityElement = getActivityElement(toActivity);
 			
 			transitionButton.click();
 			fromActivityElement.click();
@@ -611,9 +648,8 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage copyPasteActivity(String activity) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
 		// Select activity
-		getActivityElement(svg, activity).click();
+		getActivityElement(activity).click();
 
 		copyButton.click();
 
@@ -648,7 +684,7 @@ public class FLAPage extends AbstractPage {
 		WebElement svg = driver.findElement(By.tagName("svg"));
 		
 		// Select activity
-		WebElement activityToDelete = getActivityElement(svg, activity);
+		WebElement activityToDelete = getActivityElement(activity);
 
 		//activityToDelete.click();
 		
@@ -685,9 +721,8 @@ public class FLAPage extends AbstractPage {
 	public void setGroups(String groupActivityName, String groupType, boolean isGroupsOrLearners, 
 			int numberOfGroups, String groupNames, String groupOptions) {
 
-		WebElement svg = driver.findElement(By.tagName("svg"));
 		// Select activity
-		WebElement groupActivity = getActivityElement(svg, groupActivityName);
+		WebElement groupActivity = getActivityElement(groupActivityName);
 
 		groupActivity.click();
 
@@ -787,8 +822,8 @@ public class FLAPage extends AbstractPage {
 	public BranchingPropertiesPage branchingProperties(String branchingName) {
 		
 		branchingName = branchingName + " start";
-		WebElement svg = driver.findElement(By.tagName("svg"));
-		WebElement branchingActivity = getActivityElement(svg, branchingName);
+
+		WebElement branchingActivity = getActivityElement(branchingName);
 
 		branchingActivity.click();
 		
@@ -803,9 +838,7 @@ public class FLAPage extends AbstractPage {
 	 */
 	public GatePropertyPage gateProperties() {
 		
-
-		WebElement svg = driver.findElement(By.tagName("svg"));
-		WebElement gateActivity = getActivityElement(svg, AuthorConstants.GATE_TITLE);
+		WebElement gateActivity = getActivityElement(AuthorConstants.GATE_TITLE);
 		
 		gateActivity.click();
 		return PageFactory.initElements(driver, GatePropertyPage.class);
@@ -816,9 +849,8 @@ public class FLAPage extends AbstractPage {
 		final String selectGroupDropDownXpath = 
 				"/html/body/div[14]/div[2]/div/table/tbody/tr[2]/td[2]/select";
 		
-		WebElement svg = driver.findElement(By.tagName("svg"));
 		// Select activity
-		WebElement groupActivity = getActivityElement(svg, groupActivityName);
+		WebElement groupActivity = getActivityElement(groupActivityName);
 
 		groupActivity.click();
 
@@ -840,13 +872,18 @@ public class FLAPage extends AbstractPage {
 	 * @return Point location for the activity
 	 */
 	public Point getActivityLocation(String activityTitle) {
-		WebElement svg = driver.findElement(By.tagName("svg"));
+
 		// Select activity
-		WebElement activity = getActivityElement(svg, activityTitle);
+		WebElement activity = getActivityElement(activityTitle);
 		
 		return activity.getLocation();
 	}
 
+	/**
+	 * Inserts a gate activity into the canvas.
+	 * 
+	 * @return 
+	 */
 	public FLAPage dragGateToCanvas() {
 
 		flowDropButton.click();
@@ -889,7 +926,55 @@ public class FLAPage extends AbstractPage {
 		return PageFactory.initElements(driver, FLAPage.class);
 	}
 	
+	/**
+	 * Drags a optional activity into the canvas 
+	 * 
+	 */
+	public FLAPage dragOptionalActivityToCanvas() {
+		
+		dragContainerActivityToCanvas("optional", 200, 180);
+		
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
 	
+	
+	/**
+	 * Drags an support activity into the canvas 
+	 * 
+	 */
+	public FLAPage dragSupportActivityToCanvas() {
+		
+		dragContainerActivityToCanvas("support", 200, 250);
+
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	
+	/**
+	 * Drags an activity into the optional activity
+	 */
+	public FLAPage dragActivityIntoOptionalActivity(String containerActivity, String activityName) {
+		
+		dragActivityInToContainerActivity(containerActivity, activityName);
+		
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	/**
+	 * Drags an activity into support activity
+	 */
+	public FLAPage dragActivityIntoSupportActivity(String containerActivity, String activityName) {
+		
+		dragActivityInToContainerActivity(containerActivity, activityName);
+		
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	/**
+	 * Opens the Import design UI
+	 * 
+	 * @return {@link ImportDesignPage}
+	 */
 	public ImportDesignPage importDesign() {
 		
 		openDropButton.click();
@@ -899,6 +984,27 @@ public class FLAPage extends AbstractPage {
 		return PageFactory.initElements(driver, ImportDesignPage.class);
 	}
 	
+	/**
+	 *  Clicks OK on the alert javascript popup and returns text
+	 *  
+	 * @return text from popup
+	 */
+	public String getAlertText() {
+
+		String txt = null;
+
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, 2);
+			wait.until(ExpectedConditions.alertIsPresent());
+			Alert alert = driver.switchTo().alert();
+			txt = alert.getText();
+			//driver.switchTo().defaultContent();
+			alert.accept();
+		} catch (Exception e) {
+			//exception handling
+		}
+		return txt;
+	}
 	
 	/**
 	 * Returns the correct popup id
@@ -933,27 +1039,7 @@ public class FLAPage extends AbstractPage {
 		}
 	}
 
-	/**
-	 *  Clicks OK on the alert javascript popup and returns text
-	 *  
-	 * @return text from popup
-	 */
-	private String getAlertText() {
 
-		String txt = null;
-
-		try {
-			WebDriverWait wait = new WebDriverWait(driver, 2);
-			wait.until(ExpectedConditions.alertIsPresent());
-			Alert alert = driver.switchTo().alert();
-			txt = alert.getText();
-			//driver.switchTo().defaultContent();
-			alert.accept();
-		} catch (Exception e) {
-			//exception handling
-		}
-		return txt;
-	}
 
 	/**
 	 * Parses thru the SVG design to find the WebElement for the activity name. 
@@ -962,7 +1048,9 @@ public class FLAPage extends AbstractPage {
 	 * @param activityName the name of the activity
 	 * @return 
 	 */
-	private WebElement getActivityElement(WebElement svg, String activityName) {
+	private WebElement getActivityElement(String activityName) {
+		
+		WebElement svg = driver.findElement(By.tagName("svg"));
 
 		WebElement activityElement = null;
 
@@ -1102,6 +1190,65 @@ public class FLAPage extends AbstractPage {
 		// set numb groups
 		inputNumGroups.clear();
 		inputNumGroups.sendKeys(Integer.toString(numberOfGroups));
+	}
+	
+
+	/**
+	 *  Drags a container activity into the canvas.
+	 * 
+	 * @param containerType ie: "optional" or "support"
+	 * @param x
+	 * @param y 
+	 */
+	private void dragContainerActivityToCanvas(String containerType, int x, int y) {
+		
+		optionalDropButton.click();
+		
+		if (containerType.equals("support")) {
+			supportActivityButton.click();
+		} else {
+			optionalActivityButton.click();
+		}
+		
+		// Prepare the dragAndDrop action
+		Actions builder = new Actions(driver);  // Configure the Action
+		Action dropBranch = builder
+				.moveToElement(canvas, x, y)
+				.click()
+				.moveByOffset(600, 0)
+				.click()
+				.build();  
+
+		// Execute the Action
+		dropBranch.perform();
+		
+	}
+	
+	
+	/**
+	 * Drags an activity into a container (support/optional) activity.
+	 *
+	 * @param containerActivity name container activity
+	 * @param activityName 
+	 */
+	private void dragActivityInToContainerActivity(String containerActivity, String activityName) {
+		
+		WebElement optional  = getActivityElement(containerActivity);
+		WebElement activityToDrop =  getActivityElement(activityName);
+		
+		Actions builder = new Actions(driver);  // Configure the Action
+		@SuppressWarnings("deprecation")
+		Action dropActivityInsideOptional = builder
+				.moveToElement(activityToDrop)
+				.clickAndHold()
+				.pause(500) // for some reason we need this pause otherwise it doesn't work
+				.moveToElement(optional)
+				.release()
+				.build();  // Get the action
+
+		// Execute the Action
+		dropActivityInsideOptional.perform();
+		
 	}
 
 	
