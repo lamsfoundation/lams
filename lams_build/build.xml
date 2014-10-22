@@ -792,6 +792,43 @@
 	</target>
 	
 	
+	<target name="explode-all" description="Explode WARs of all standard modules.">
+		<ant antfile="../lams_learning/build.xml"           target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_monitoring/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_admin/build.xml"              target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_gradebook/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_assessment/build.xml"    target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_eadventure/build.xml"    target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="explode-war" inheritAll="false" />
+  		<ant antfile="../lams_tool_survey/build.xml"        target="explode-war" inheritAll="false" />
+  		<ant antfile="../lams_tool_task/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_videorecorder/build.xml" target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_wookie/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_kaltura/build.xml"       target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="explode-war" inheritAll="false" />
+	</target>
+	
+	
 	<!-- cruise control task : build lams -->
 	<target name="lams-cruise" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools"
 		    description="Builds entire LAMS (used for CruiseControl instance)" />
