@@ -1379,7 +1379,12 @@ GeneralLib = {
 			
 			if (!isReadOnlyMode) {
 				$('#ldDescriptionFieldTitle').text('Untitled');
-				CKEDITOR.instances['ldDescriptionFieldDescription'].setData(null);
+				var editor = CKEDITOR.instances['ldDescriptionFieldDescription'];
+				editor.once('dataReady', function(){
+					// do nothing
+					// this listener is just for saveLearningDesign() to detect that data was already cleared
+				});
+				editor.setData(null);
 				$('#ldDescriptionLicenseSelect').val(0);
 				$('#ldDescriptionLicenseText').text('');
 				GeneralLib.setModified(true);
@@ -1438,7 +1443,17 @@ GeneralLib = {
 				
 				if (!isReadOnlyMode) {
 					$('#ldDescriptionFieldTitle').html(GeneralLib.escapeHtml(ld.title));
-					CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
+					var editor = CKEDITOR.instances['ldDescriptionFieldDescription'];
+					if (editor.hasListeners('dataReady')) {
+						// data was not cleared yet by newLearningDesign, so queue the current change
+						editor.once('dataReady', function(eventInfo){
+							editor.setData(ld.description);
+						});
+					} else {
+						// data was already cleared, so just set the description
+						editor.setData(ld.description);
+					}
+					
 					if (ld.licenseID) {
 						$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
 						$('#ldDescriptionLicenseText').text(ld.licenseText);
@@ -2364,8 +2379,7 @@ GeneralLib = {
 					if (!layout.ld.contentFolderID) {
 						layout.ld.contentFolderID = response.ld.contentFolderID;
 					}
-					$('#ldDescriptionFieldTitle').text(title);
-					$('#ldDescriptionFieldDescription').text(description);
+					$('#ldDescriptionFieldTitle').html(GeneralLib.escapeHtml(title));
 					
 					// assign database-generated properties to activities
 					$.each(response.ld.activities, function() {
