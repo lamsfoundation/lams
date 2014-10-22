@@ -849,6 +849,23 @@ ActivityLib = {
 			return;
 		}
 		
+		// check for circular sequences
+		var candidate = fromActivity;
+		do {
+			if (candidate.transitions && candidate.transitions.to.length > 0) {
+				candidate = candidate.transitions.to[0].fromActivity;
+			} else if (candidate.branchingActivity && !candidate.isStart) {
+				candidate = candidate.branchingActivity.start;
+			} else {
+				candidate = null;
+			}
+			
+			if (toActivity == candidate) {
+				alert(LABELS.CIRCULAR_SEQUENCE_ERROR);
+				return;
+			}
+		} while (candidate != null);
+		
 		// branchData can be either an existing branch or a title for the new branch
 		var branch = branchData && branchData instanceof ActivityDefs.BranchActivity ? branchData : null,
 			transition = null;

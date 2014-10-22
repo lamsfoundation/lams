@@ -52,6 +52,7 @@
 				REMOVE_ACTIVITY_CONFIRM : '<fmt:message key="authoring.fla.remove.activity.confirm" />',
 				BRANCHING_CREATE_CONFIRM : '<fmt:message key="authoring.fla.branching.create.confirm" />',
 				TRANSITION_TO_EXISTS_ERROR : '<fmt:message key="authoring.fla.transition.to.exists.error" />',
+				CIRCULAR_SEQUENCE_ERROR : '<fmt:message key="authoring.fla.circular.sequence.error" />',
 				
 				// DecorationLib
 				DEFAULT_ANNOTATION_LABEL_TITLE : '<fmt:message key="authoring.fla.default.annotation.label.title" />',
