@@ -127,18 +127,22 @@ var HandlerLib = {
 		// finally transform the dragged elements
 		var transformation = object.items.shape.attr('transform');
 		object.items.transform('');
-		if (transformation.length > 0) {
-			// find new X and Y and redraw the object
-			var box = object.items.shape.getBBox(),
-				x = box.x,
+		
+		var box = object.items.shape.getBBox(),
+			originalCoordinates = {
+				x : box.x,
 				// adjust this coordinate for annotation labels
-				y = box.y + (object instanceof DecorationDefs.Label ? 6 : 0);
-			object.draw(x + transformation[0][1],
-						y + transformation[0][2]);
+				y : box.y + (object instanceof DecorationDefs.Label ? 6 : 0)
+			};
+		
+		if (transformation.length > 0) {
+			object.draw(originalCoordinates.x + transformation[0][1],
+						originalCoordinates.y + transformation[0][2]);
 		}
 		
 		// add space if dropped object is next to border
 		GeneralLib.resizePaper();
+		return originalCoordinates;
 	},
 	
 	
@@ -244,12 +248,18 @@ HandlerActivityLib = {
 					ActivityLib.removeActivity(activity);
 				} else {
 					// finalise movement - rewrite coordinates, see if the activity was not added to a container
-					HandlerLib.dropObject(activity);
+					
 
-					var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+					var originalCoordinates = HandlerLib.dropObject(activity),
+						translatedEvent = GeneralLib.translateEventOnCanvas(event),
 						endX = translatedEvent[0],
-						endY = translatedEvent[1];
-					ActivityLib.dropActivity(activity, endX, endY);
+						endY = translatedEvent[1],
+						dropAllowed = ActivityLib.dropActivity(activity, endX, endY);
+					
+					if (!dropAllowed) {
+						// dropping the activity in this place is forbidden, revert the changes
+						activity.draw(originalCoordinates.x, originalCoordinates.y);
+					}
 				}
 			}
 			// start dragging the activity

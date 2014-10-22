@@ -987,6 +987,14 @@ ActivityLib = {
 				});
 			}
 			if (container) {
+				// system activities can not be added to optional and support activities
+				if (activity instanceof ActivityDefs.GateActivity
+					|| activity instanceof ActivityDefs.GroupingActivity
+					|| activity instanceof ActivityDefs.BranchingEdgeActivity){
+					alert(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
+					return false;
+				}
+				
 				if ($.inArray(activity, container.childActivities) == -1) {
 					$.each(activity.transitions.from, function(){
 						ActivityLib.removeTransition(this);
@@ -1013,6 +1021,7 @@ ActivityLib = {
 		});
 		
 		GeneralLib.setModified(true);
+		return true;
 	},
 	
 
