@@ -70,9 +70,10 @@ import org.testng.annotations.Test;
 public class AuthorTests {
 	
 	
-	private static final String randomInt = LamsUtil.randInt(0, 9999);
+	private static final String RANDOM_INT = LamsUtil.randInt(0, 9999);
+	private static final String GROUP_ACTIVITY_NAME = "New Group";
 
-	private String randomDesignName = "Design-" + randomInt;
+	private String randomDesignName = "Design-" + RANDOM_INT;
 	private int randomInteger = Integer.parseInt(LamsUtil.randInt(0, 5));
 	
 	private LoginPage onLogin;
@@ -146,7 +147,6 @@ public class AuthorTests {
 	 */
 	@Test(dependsOnMethods={"createDesign"})
 	public void nameAndSaveDesign() {
-		System.out.println("design name: " + randomDesignName);
 		String saveResult = fla.saveDesign(randomDesignName);
 		// System.out.println(saveResult);
 		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
@@ -159,7 +159,7 @@ public class AuthorTests {
 	 */
 	@Test(dependsOnMethods={"nameAndSaveDesign"})
 	public void cleanCanvas() {
-		fla.newDesign();
+		fla.newDesign().getAlertText();
 		
 		// Check that the design titled is back to untitled
 		String newTitle = fla.getDesignName();
@@ -197,8 +197,10 @@ public class AuthorTests {
 	public void saveAsDesign() {
 		
 		String newDesignName = "Re" + randomDesignName;
-		fla.saveAsDesign(newDesignName);
-		Assert.assertEquals(fla.getDesignName(), newDesignName);
+		String saveResult = fla.saveAsDesign(newDesignName);
+		
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG));
+		Assert.assertEquals(fla.getDesignName(), newDesignName, "The design name saved is incorrect");
 	}
 	
 	
@@ -215,8 +217,6 @@ public class AuthorTests {
 		fla.changeActivityTitle(AuthorConstants.KALTURA_TITLE, kalturaNewTitle);
 		List<String> allActivityTitles = fla.getAllActivityNames();
 		
-		System.out.println("All Activites: "+ allActivityTitles);
-
 		Assert.assertTrue(allActivityTitles.contains(forumNewTitle), 
 				"The title " + forumNewTitle + " was not found as an activity in the design");
 		Assert.assertTrue(allActivityTitles.contains(kalturaNewTitle), 
@@ -240,10 +240,10 @@ public class AuthorTests {
 		
 		fla.drawTransitionBtwActivities();
 		
-		String newGroupTitle = "New Group"; // + GROUP_TITLE; 
+		String newGroupTitle = GROUP_ACTIVITY_NAME; // + GROUP_TITLE; 
 		fla.changeActivityTitle(AuthorConstants.GROUP_TITLE, newGroupTitle);
 		
-		fla.setGroupForActivity("New Group", AuthorConstants.FORUM_TITLE);
+		fla.setGroupForActivity(GROUP_ACTIVITY_NAME, AuthorConstants.FORUM_TITLE);
 		
 		String designName = randomDesignName + "-" + AuthorConstants.GROUP_TITLE;
 		
@@ -319,15 +319,17 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"saveDesign"})
 	public void changeGroupSettingsToRandom() {
 		
-		final String groupActivityName = "New Group";
+		
 		final String groupTypeRandom = "random";
 		
 		// set random grouping and number of learners to 3
-		fla.setGroups(groupActivityName, groupTypeRandom, true, 3, "", "");
+		fla.setGroups(GROUP_ACTIVITY_NAME, groupTypeRandom, true, 3, "", "");
 		
 		/// Get assertions
-		String testGroupType = fla.getGroupType(groupActivityName);
+		String testGroupType = fla.getGroupType(GROUP_ACTIVITY_NAME);
 		Assert.assertEquals(testGroupType, groupTypeRandom, "The group type returned is incorrect");
+		
+		saveDesign();
 		
 	}
 	
@@ -339,16 +341,17 @@ public class AuthorTests {
 	 */
 	@Test(dependsOnMethods={"changeGroupSettingsToRandom"})
 	public void changeGroupSettingsToMonitor() {
-
-		final String groupActivityName = "New Group";
+		
 		final String groupTypeMonitor = "monitor";
 		
 		// set teacher selection (monitor) 4 groups and pass names
-		fla.setGroups(groupActivityName, groupTypeMonitor, true, 4, "Group Blue, Group Yellow, Group Red, Group Orange", "");
+		fla.setGroups(GROUP_ACTIVITY_NAME, groupTypeMonitor, true, 4, "Group Blue, Group Yellow, Group Red, Group Orange", "");
 				
 		/// Get assertions
-		String testGroupType = fla.getGroupType(groupActivityName);
+		String testGroupType = fla.getGroupType(GROUP_ACTIVITY_NAME);
 		Assert.assertEquals(testGroupType, groupTypeMonitor, "The group type returned is incorrect");
+		
+		saveDesign();
 		
 	}
 	
@@ -361,16 +364,17 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"changeGroupSettingsToMonitor"})
 	public void changeGroupSettingsToLearner() {
 
-		final String groupActivityName = "New Group";
 		final String groupTypeLearner = "learner";
 		
 		// set learner choice, 5 groups, equal group sizes, view learners before select
-		fla.setGroups(groupActivityName, groupTypeLearner, false, 5, "", "true,true");
+		fla.setGroups(GROUP_ACTIVITY_NAME, groupTypeLearner, false, 5, "", "true,true");
 				
 		/// Get assertions
-		String testGroupType = fla.getGroupType(groupActivityName);
+		String testGroupType = fla.getGroupType(GROUP_ACTIVITY_NAME);
 		Assert.assertEquals(testGroupType, groupTypeLearner, "The group type returned is incorrect");
 		
+		saveDesign();
+	
 	}
 	
 	
@@ -392,6 +396,15 @@ public class AuthorTests {
 		fla.designDescription()
 		.addDesignDescription(designDescription);
 		
+		
+		saveDesign();
+
+		String designName = fla.getDesignName();
+		
+		cleanCanvas();
+		
+		fla.openDesign(designName);
+		
 		String assertDesignDescription  = fla.designDescription().getDesignDescription();
 				
 		Assert.assertTrue((assertDesignDescription.contains(designDescription)),
@@ -410,8 +423,13 @@ public class AuthorTests {
 		
 		final String licenseText = "LAMS Recommended: CC Attribution-Noncommercial-ShareAlike 2.5";
 		
+		// opens dialog
+		fla.designDescription()
+		.openDesignDescriptionDialog();
+		
 		int licenseId = 1;
 		// sets license
+		
 		String assertLicense = fla.designDescription().addDesignLicense(licenseId);
 
 		// close description UI component
@@ -467,8 +485,7 @@ public class AuthorTests {
 	/**
 	 * Delete an activity
 	 * 
-	 * This method is disabled as it seems that we can't drag and drop
-	 * svg elements from one another
+	 *  Deletes a given activity by throwing it in the trash bin. 
 	 *  
 	 */
 	@Test(dependsOnMethods={"arrangeDesign"})
@@ -488,6 +505,6 @@ public class AuthorTests {
 	
 	
 
-
+	
 	
 }
