@@ -852,8 +852,27 @@ GeneralInitLib = {
 							null, activity.uiid, activity.learningLibraryID, 0, 0, activity.title
 							);
 				} else if (activity instanceof frameActivityDefs.ToolActivity) {
+					// copy tool content
+					var toolContentID = null;
+					// tool content ID can be null if the activity had the default content, i.e. was not edited yet
+					if (activity.toolContentID) {
+						$.ajax({
+							cache : false,
+							async : false,
+							url : LAMS_URL + "authoring/author.do",
+							data : {
+								'method'        : 'copyToolContentPlain',
+								'toolContentID' : activity.toolContentID
+							},
+							dataType : 'text',
+							success : function(response) {
+								toolContentID = response;
+							}
+						});
+					}
+					
 					addActivity = new ActivityDefs.ToolActivity(
-							null, activity.uiid, null, activity.toolID, activity.learningLibraryID, null, 0, 0, activity.title
+							null, activity.uiid, toolContentID, activity.toolID, activity.learningLibraryID, null, 0, 0, activity.title
 							);
 				}
 				
