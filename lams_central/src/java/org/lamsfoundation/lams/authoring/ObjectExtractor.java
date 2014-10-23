@@ -3078,7 +3078,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    learnerChoiceGrouping.setLearnersPerGroup(null);
 
 	    Boolean equalNumberOfLearnersPerGroup = (Boolean) JsonUtil.opt(groupingDetails,
-		    AuthoringJsonTags.NUMBER_OF_GROUPS);
+		    AuthoringJsonTags.EQUAL_NUMBER_OF_LEARNERS_PER_GROUP);
 	    if (equalNumberOfLearnersPerGroup != null) {
 		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(equalNumberOfLearnersPerGroup);
 	    }

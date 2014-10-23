@@ -308,8 +308,15 @@ var PropertyDefs = {
 					.add($('.propertiesContentFieldLearnerCount', content).closest('tr'))
 					.css('display', activity.groupingType == 'monitor' ? 'none' : '');
 				
-				$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', content)
+				// show "equal group sizes" only for Learner's Choice type and Number of Groups selected
+				$('.propertiesContentFieldEqualSizes', content)
+				   .closest('tr').css('display', activity.groupingType == 'learner' 
+					   && $('.propertiesContentFieldGroupCountEnable', content).is(':checked') ? '' : 'none');
+				
+				// show "view learners before selection" only for Learner's Choice type
+				$('.propertiesContentFieldViewLearners', content)
 					.closest('tr').css('display', activity.groupingType == 'learner' ? '' : 'none');
+				
 				
 				activity.groupDivide = activity.groupingType == 'monitor'
 									   || $('.propertiesContentFieldGroupCountEnable', content).is(':checked')
@@ -348,14 +355,12 @@ var PropertyDefs = {
 			
 			// create groups/learners spinners
 			$('.propertiesContentFieldGroupCount', content).spinner({
-				'min' : 2,
-				'disabled' : activity.groupDivide == 'learners'
+				'min' : 2
 			}).spinner('value', activity.groupCount)
 			  .on('spinchange', changeFunction);
 			
 			$('.propertiesContentFieldLearnerCount', content).spinner({
-				'min' 	   : 1,
-				'disabled' : activity.groupDivide == 'groups'
+				'min' 	   : 1
 			}).spinner('value', activity.learnerCount)
 			  .on('spinchange', changeFunction);
 			
