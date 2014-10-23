@@ -83,7 +83,8 @@ var PropertyDefs = {
 					groupingRow.hide();
 				}
 				$('.propertiesContentFieldMatchGroups', content).closest('tr')
-					.css('display', branchingActivity.grouping && branchingActivity.branches.length > 0 ? '' : 'none');
+					.css('display', branchingActivity.branchingType == 'group' && branchingActivity.grouping
+							&& branchingActivity.branches.length > 0 ? '' : 'none');
 				
 				// show/hide conditions define/match buttons
 				var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
