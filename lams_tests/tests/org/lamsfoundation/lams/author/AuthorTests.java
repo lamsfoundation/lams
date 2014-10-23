@@ -367,7 +367,7 @@ public class AuthorTests {
 		final String groupTypeLearner = "learner";
 		
 		// set learner choice, 5 groups, equal group sizes, view learners before select
-		fla.setGroups(GROUP_ACTIVITY_NAME, groupTypeLearner, false, 5, "", "true,true");
+		fla.setGroups(GROUP_ACTIVITY_NAME, groupTypeLearner, false, 5, "", "false,true");
 				
 		/// Get assertions
 		String testGroupType = fla.getGroupType(GROUP_ACTIVITY_NAME);
