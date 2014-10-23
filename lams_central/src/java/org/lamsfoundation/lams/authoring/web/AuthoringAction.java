@@ -345,12 +345,33 @@ public class AuthoringAction extends LamsDispatchAction {
 	String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
 	try {
 	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
-	    wddxPacket = authoringService.copyToolContent(toolContentID, customCSV);
+	    Long newToolContentID = authoringService.copyToolContent(toolContentID, customCSV);
+	    FlashMessage flashMessage = new FlashMessage("copyToolContent", newToolContentID);
+	    wddxPacket = flashMessage.serializeMessage();
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "copyToolContent", authoringService, true).serializeMessage();
 	}
 	return outputPacket(mapping, request, response, wddxPacket, "details");
+    }
 
+    /**
+     * Copy some existing content. Used when the user copies an activity in authoring. Expects one parameters -
+     * toolContentId (the content to be copied)
+     */
+    public ActionForward copyToolContentPlain(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IAuthoringService authoringService = getAuthoringService();
+	try {
+	    String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
+	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
+	    Long newToolContentID = authoringService.copyToolContent(toolContentID, customCSV);
+	    response.setContentType("text/plain;charset=utf-8");
+	    response.getWriter().write(newToolContentID.toString());
+	} catch (Exception e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+	
+	return null;
     }
 
     /**
@@ -430,10 +451,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
-	// generate the next unique content ID for the tool
-	Long toolContentID = authoringService.insertToolContentID(toolID);
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
+	if (toolContentID == null) {
+	    // if the tool content ID was not provided, generate the next unique content ID for the tool
+	    toolContentID = authoringService.insertToolContentID(toolID);
+	}
+	
 	if (toolContentID != null) {
-
 	    String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	    if (StringUtils.isBlank(contentFolderID)) {
 		contentFolderID = FileUtil.generateUniqueContentFolderID();

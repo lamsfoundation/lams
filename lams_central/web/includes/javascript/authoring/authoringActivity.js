@@ -1039,11 +1039,15 @@ ActivityLib = {
 				data : {
 					'method'          : 'createToolContent',
 					'toolID'          : activity.toolID,
+					// if toolContentID exists, a new content will not be created, only authorURL will be fetched
+					'toolContentID'   : activity.toolContentID,
 					'contentFolderID' : layout.ld.contentFolderID
 				},
 				success : function(response) {
 					activity.authorURL = response.authorURL;
-					activity.toolContentID = response.toolContentID;
+					if (!activity.toolContentID) {
+						activity.toolContentID = response.toolContentID;
+					}
 					if (!layout.ld.contentFolderID) {
 						// if LD did not have contentFolderID, it was just generated
 						// so remember it

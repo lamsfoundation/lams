@@ -751,10 +751,28 @@ var MenuLib = {
 			}
 		};
 		
+		var toolContentID = null;
+		// tool content ID can be null if the activity had the default content, i.e. was not edited yet
+		if (activity.toolContentID) {
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "authoring/author.do",
+				data : {
+					'method'        : 'copyToolContentPlain',
+					'toolContentID' : activity.toolContentID
+				},
+				dataType : 'text',
+				success : function(response) {
+					toolContentID = response;
+				}
+			});
+		}
+		
 		// draw the new activity next to the existing one
 		var x = activity.items.shape.getBBox().x + 10,
 			y = activity.items.shape.getBBox().y + 10,
-			newActivity = new ActivityDefs.ToolActivity(null, null, null, activity.toolID, activity.learningLibraryID,
+			newActivity = new ActivityDefs.ToolActivity(null, null, toolContentID, activity.toolID, activity.learningLibraryID,
 													   null, x, y, title);
 		layout.activities.push(newActivity);
 		
