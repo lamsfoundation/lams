@@ -1539,7 +1539,8 @@ GeneralLib = {
 											groupingData.groupingUIID,
 											groupingType,
 											groupingData.learnersPerGroup ? 'learners' : 'groups',
-											groupingData.numberOfGroups,
+											groupingType == 'monitor' ? 
+													groupingData.maxNumberOfGroups : groupingData.numberOfGroups,
 											groupingData.learnersPerGroup,
 											groupingData.equalNumberOfLearnersPerGroup,
 											groupingData.viewStudentsBeforeSelection,
@@ -2102,11 +2103,13 @@ GeneralLib = {
 				groupings.push({
 					'groupingUIID'   				: activity.groupingUIID,
 					'groupingTypeID' 				: groupingType,
-					'learnersPerGroup' 				: activity.learnerCount,
-					'equalNumberOfLearnersPerGroup' : activity.equalSizes,
-					'viewStudentsBeforeSelection'   : activity.viewLearners,
-					'maxNumberOfGroups' 			: activity.groupCount,
-					'numberOfGroups' 				: groups.length,
+					'learnersPerGroup' 				: activity.groupDivide == 'learners' ? activity.learnerCount : null,
+					'equalNumberOfLearnersPerGroup' : activity.groupingType == 'learner' && activity.groupDivide == 'groups' 
+													  ? activity.equalSizes : null,
+					'viewStudentsBeforeSelection'   : activity.groupingType == 'learner' ? activity.viewLearners : 0,
+					'maxNumberOfGroups' 			: activity.groupingType == 'monitor' ? activity.groupCount : null,
+					'numberOfGroups' 				: activity.groupingType != 'monitor' && activity.groupDivide == 'groups'
+													  ? activity.groupCount : null,
 					'groups' 						: groups
 				});
 				
