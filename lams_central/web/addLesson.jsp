@@ -64,16 +64,16 @@
 	
 	<!-- Tab names -->
 	<ul>
-		<li><a href="#tabLesson"><fmt:message key="label.tab.lesson" /></a></li>
-		<li><a href="#tabClass"><fmt:message key="label.tab.class" /></a></li>
-		<li><a href="#tabAdvanced"><fmt:message key="label.tab.advanced" /></a></li>
-		<li><a href="#tabConditions"><fmt:message key="label.tab.conditions" /></a></li>
+		<li><a id="tabLessonLink" href="#tabLesson"><fmt:message key="label.tab.lesson" /></a></li>
+		<li><a id="tabClassLink" href="#tabClass"><fmt:message key="label.tab.class" /></a></li>
+		<li><a id="tabAdvanceHeader" href="#tabAdvanced"><fmt:message key="label.tab.advanced" /></a></li>
+		<li><a id="tabConditionsLink" href="#tabConditions"><fmt:message key="label.tab.conditions" /></a></li>
 	</ul>
 	
 	<!-- Tab contents -->
 	
 	<div id="tabLesson" class="tabContent">
-		<div class="tabTitle"><fmt:message key="label.tab.lesson.title" /></div>
+		<div id="tabLessonTitle" class="tabTitle"><fmt:message key="label.tab.lesson.title" /></div>
 		<table class="tabTable">
 			<tr>
 				<td id="learningDesignTreeCell" rowspan="3">
@@ -102,7 +102,7 @@
 	
 	
 	<div id="tabClass" class="tabContent">
-		<div class="tabTitle"><fmt:message key="label.tab.class.title" /></div>
+		<div id="tabClassTitle" class="tabTitle"><fmt:message key="label.tab.class.title" /></div>
 		<table id="classTable" class="tabTable">
 			<tr>
 				<td class="userContainerCell" rowspan="2">
@@ -113,7 +113,7 @@
 					<div id="unselected-monitors" class="userContainer"></div>
 				</td>
 				<td class="userConainterTransferCell userConainterTransferTopCell">
-					<img src="images/css/blue_arrow_right.gif"
+					<img id="monitorMoveToRight" src="images/css/blue_arrow_right.gif"
 					     onClick="javascript:transferUsers('selected-monitors')" />
 				</td>
 				<td class="userContainerCell" rowspan="2">
@@ -126,7 +126,7 @@
 			</tr>
 			<tr>
 				<td class="userConainterTransferCell">
-					<img src="images/blue_arrow_left.gif" 
+					<img id="monitorMoveToLeft" src="images/blue_arrow_left.gif" 
 					     onClick="javascript:transferUsers('unselected-monitors')" />	
 				</td>
 			</tr>
@@ -139,7 +139,7 @@
 					<div id="unselected-learners" class="userContainer"></div>
 				</td>
 				<td class="userConainterTransferCell userConainterTransferTopCell" >
-					<img src="images/css/blue_arrow_right.gif"
+					<img id="learnerMoveToRight" src="images/css/blue_arrow_right.gif"
 					     onClick="javascript:transferUsers('selected-learners')" />
 				</td>
 				<td class="userContainerCell" rowspan="2">
@@ -152,7 +152,7 @@
 			</tr>
 			<tr>
 				<td class="userConainterTransferCell">
-					<img src="images/blue_arrow_left.gif" 
+					<img id="learnerMoveToLeft" src="images/blue_arrow_left.gif" 
 					     onClick="javascript:transferUsers('unselected-learners')" />
 				</td>
 			</tr>
