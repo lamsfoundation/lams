@@ -107,6 +107,10 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private String toolVersion;
+    
+    /** persistent field */
+    private Long learningLibraryId;
+
 
     /**
      * Name of the file (including the package) that contains the text strings for this activity. e.g.
@@ -394,6 +398,14 @@ public class Tool implements Serializable {
 
     public void setToolVersion(String toolVersion) {
 	this.toolVersion = toolVersion;
+    }
+    
+    public Long getLearningLibraryId() {
+        return learningLibraryId;
+    }
+
+    public void setLearningLibraryId(Long learningLibraryId) {
+        this.learningLibraryId = learningLibraryId;
     }
 
     public String getLanguageFile() {
