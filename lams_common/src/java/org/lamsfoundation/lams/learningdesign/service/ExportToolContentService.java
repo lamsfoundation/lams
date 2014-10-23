@@ -1371,9 +1371,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    for (AuthoringActivityDTO activity : activities) {
-		fillLearningLibraryID(activity);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
+		    fillLearningLibraryID(activity);
 		    continue;
 		}
 
@@ -1394,6 +1394,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    removedActMap.put(activity.getActivityID(), activity);
 		    continue;
 		}
+		
+		// imported Learning Library ID and one stored in current DB may not match, so fix it here
+		activity.setLearningLibraryID(newTool.getLearningLibraryId());
+		
 		// save Tool into lams_tool table.
 		ToolContent newContent = new ToolContent(newTool);
 		toolContentDAO.saveToolContent(newContent);
@@ -2620,32 +2624,27 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setStartYcoord(actDto.getStartYCoord());
 	act.setEndYcoord(actDto.getEndYCoord());
     }
-    
+
     /**
-     * Guess missing Learning Library ID based on activity tool ID or description. Old exported LDs may not contain this
-     * value.
+     * Guess missing Learning Library ID based on activity description. Old exported LDs may not contain this value.
      */
-    @SuppressWarnings("unchecked")
     private void fillLearningLibraryID(AuthoringActivityDTO activity) {
-	if (activity.getLearningLibraryID() == null) {
-	    if (activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
-		activity.setLearningLibraryID(activity.getToolID());
-	    } else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
-		String description = activity.getDescription();
-		// recognise learning libraries by their word description
-		for (LearningLibrary library : (List<LearningLibrary>) learningLibraryDAO.getAllLearningLibraries()) {
-		    for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
-			boolean found = false;
-			for (String keyWord : keyWords) {
-			    found = description.contains(keyWord) && library.getDescription().contains(keyWord);
-			    if (!found) {
-				break;
-			    }
+	if (activity.getLearningLibraryID() == null
+		&& activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
+	    String description = activity.getDescription();
+	    // recognise learning libraries by their word description
+	    for (LearningLibrary library : (List<LearningLibrary>) learningLibraryDAO.getAllLearningLibraries()) {
+		for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
+		    boolean found = false;
+		    for (String keyWord : keyWords) {
+			found = description.contains(keyWord) && library.getDescription().contains(keyWord);
+			if (!found) {
+			    break;
 			}
-			if (found) {
-			    activity.setLearningLibraryID(library.getLearningLibraryId());
-			    return;
-			}
+		    }
+		    if (found) {
+			activity.setLearningLibraryID(library.getLearningLibraryId());
+			return;
 		    }
 		}
 	    }

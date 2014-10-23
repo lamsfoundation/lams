@@ -68,6 +68,13 @@
     </property>
     
     <property
+        name="learningLibraryId"
+        type="java.lang.Long"
+        column="learning_library_id"
+        length="20"
+    />
+    
+    <property
         name="learnerUrl"
         type="java.lang.String"
         column="learner_url"
