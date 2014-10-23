@@ -271,8 +271,7 @@ public interface IAuthoringService {
     public Long insertToolContentID(Long toolID);
 
     /**
-     * Calls an appropriate tool to copy the content indicated by toolContentId. Returns a string representing the new
-     * tool content id in WDDX format.
+     * Calls an appropriate tool to copy the content indicated by toolContentId. Returns the new tool content id.
      * 
      * The is called when the user copies and pastes a tool activity icon in authoring. It should only be called on a
      * ToolActivity - never a Gate or Grouping or Complex activity.
@@ -281,9 +280,9 @@ public interface IAuthoringService {
      *            The toolContentID indicating the content to copy
      * @param customCSV
      *            The customCSV if this is a tool adapter tool.
-     * @return String The new tool content id in WDDX Format
+     * @return Long the new content id
      */
-    public String copyToolContent(Long toolContentID, String customCSV) throws IOException;
+    public Long copyToolContent(Long toolContentID, String customCSV) throws IOException;
 
     /**
      * Calls an appropriate tools to copy the content indicated by toolContentIds. Batch version of String

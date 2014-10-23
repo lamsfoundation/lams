@@ -1796,12 +1796,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return contentIDGenerator.getNextToolContentIDFor(tool);
     }
 
-    /** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyToolContent(java.lang.Long) */
     @Override
-    public String copyToolContent(Long toolContentID, String customCSV) throws IOException {
-	Long newContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
-	FlashMessage flashMessage = new FlashMessage("copyToolContent", newContentID);
-	return flashMessage.serializeMessage();
+    public Long copyToolContent(Long toolContentID, String customCSV) throws IOException {
+	return lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
     }
 
     /**
