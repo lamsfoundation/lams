@@ -23,10 +23,14 @@
 package org.lamsfoundation.lams.pages;
 
 import org.lamsfoundation.lams.pages.author.FLAPage;
+import org.lamsfoundation.lams.pages.monitor.addlesson.AddLessonPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * IndexPage 
@@ -42,6 +46,10 @@ public class IndexPage extends AbstractPage {
 	@FindBy(id = "My Profile")
 	private WebElement myProfileTab; 
 	
+	@FindBy(className = "add-lesson-button")
+	private WebElement addLessonButton; 
+
+	
 	public IndexPage(WebDriver driver) {
 		super(driver);
 	}
@@ -52,5 +60,20 @@ public class IndexPage extends AbstractPage {
 		return PageFactory.initElements(driver, FLAPage.class);		
 	}
 	
-
+	public AddLessonPage addLesson() {
+		
+		addLessonButton.click();
+		WebDriverWait wait = new WebDriverWait(driver, 2);
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("dialogFrame")));
+		
+		return PageFactory.initElements(driver, AddLessonPage.class);		
+	}
+	
+	public Boolean isLessonPresent(String lessonName) {
+		
+		return ((driver.findElements(By.linkText(lessonName)).size() > 0) ? true : false);
+		
+	
+	}
+	
 }
