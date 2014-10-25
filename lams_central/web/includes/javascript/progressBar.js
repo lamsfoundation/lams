@@ -790,16 +790,17 @@ var ActivityUtils = {
 		// hide any boxes obstructing the view
 		ActivityUtils.hideOtherComplexContent();
 
-		var activityShift = branchActivities.length - 1;
-		// how many pixels move subsequent activities down
-		var pixelShift = 60 * activityShift;
-		// activity just after branching
-		var afterBranchActivity = null;
+		var branchActivity = bar.activities[branchIndex], 
+			activityShift = branchActivities.length - 1,
+			// how many pixels move subsequent activities down
+			pixelShift = 60 * activityShift,
+			// activity just after branching
+			afterBranchActivity = null,
+			activities = bar.activities.slice(0, branchIndex);
 		// move down/right existing activities that come after Branching
 		// start with the last one
-		var activities = bar.activities;
-		for ( var activityIndex = activities.length - 1; activityIndex > branchIndex; activityIndex--) {
-			afterBranchActivity = activities[activityIndex];
+		for (var activityIndex = bar.activities.length - 1; activityIndex > branchIndex; activityIndex--) {
+			afterBranchActivity = bar.activities[activityIndex];
 			activities[activityIndex + activityShift] = afterBranchActivity;
 			var transform = null;
 			if (isHorizontalBar) {
@@ -837,9 +838,11 @@ var ActivityUtils = {
 				});
 			});
 		}
+		
+		bar.activities = activities;
 
 		// smoothly remove Branching activity
-		activities[branchIndex].elements.forEach(function(elem) {
+		branchActivity.elements.forEach(function(elem) {
 			elem.animate({
 				'opacity' : 0
 			}, 2000, "linear", function() {
@@ -847,29 +850,32 @@ var ActivityUtils = {
 			});
 		});
 
-		// create branch activities structures
-		for ( var activityIndex = 0; activityIndex < branchActivities.length; activityIndex++) {
-			var activityData = branchActivities[activityIndex];
-			var activity = new Activity(bar, activityIndex + branchIndex,
-					activityData.id, activityData.type, activityData.name,
-					activityData.status, activityData.url,
-					activityData.childActivities);
-			activities[activityIndex + branchIndex] = activity;
-			if (activity.status == 0) {
-				currentActivityIndex = activityIndex;
-			}
-		}
-
-		// smoothly draw branch activities
-		setTimeout(function() {
+		// check if it was an empty branch
+		if (branchActivities.length > 0) {
+			// create branch activities structures
 			for (var activityIndex = 0; activityIndex < branchActivities.length; activityIndex++) {
-						ActivityUtils.drawActivity(
-							activities[activityIndex + branchIndex],
-							false,
-							!afterBranchActivity && activityIndex == branchActivities.length - 1
-						);
-					}
-				}, 2000);
+				var activityData = branchActivities[activityIndex],
+					activity = new Activity(bar, activityIndex + branchIndex,
+						activityData.id, activityData.type, activityData.name,
+						activityData.status, activityData.url,
+						activityData.childActivities);
+				activities[activityIndex + branchIndex] = activity;
+				if (activity.status == 0) {
+					currentActivityIndex = activityIndex;
+				}
+			}
+	
+			// smoothly draw branch activities
+			setTimeout(function() {
+				for (var activityIndex = 0; activityIndex < branchActivities.length; activityIndex++) {
+							ActivityUtils.drawActivity(
+								activities[activityIndex + branchIndex],
+								false,
+								!afterBranchActivity && activityIndex == branchActivities.length - 1
+							);
+						}
+					}, 2000);
+		}
 	},
 	
 	// break string into several lines if it is too long
@@ -1055,8 +1061,7 @@ function fillProgressBar(barId) {
 
 				for (var activityIndex = 0; activityIndex < result.activities.length; activityIndex++) {
 					var activityData = result.activities[activityIndex],
-					// prepare the Activity descriptor, but do not draw
-					// yet
+					// prepare the Activity descriptor, but do not draw yet
 						activity = new Activity(bar, activityIndex,
 							activityData.id, activityData.type,
 							activityData.name, activityData.status,
@@ -1075,47 +1080,51 @@ function fillProgressBar(barId) {
 					if (existingActivity) {
 						// if in preview mode, always display all inner
 						// activities, i.e. never expand
-						if (!isPreview && existingActivity.type == 'b'
-								&& existingActivity.id != activity.id) {
-
+						if (!isPreview && existingActivity.type == 'b' && existingActivity.id != activity.id) {
 							var branchActivityId = activityIndex,
-								afterBranchActivityId = activityIndex + 1 < activities.length ? activities[activityIndex + 1].id
-									: null,
-								branchActivities = [ activity ];
-							activityIndex++;
-
-							// find which activities are new (branch)
-							// and which ones already existed
-							while (activityIndex < result.activities.length) {
-								activityData = result.activities[activityIndex];
-								var activity = new Activity(bar,
-										activityIndex, activityData.id,
-										activityData.type,
-										activityData.name,
-										activityData.status,
-										activityData.url,
-										activityData.childActivities);
-								if (activity.id == afterBranchActivityId) {
-									// prepare for the next big loop
-									// iteration, which executes
-									// normally
-									activityIndex--;
-									break;
+								afterBranchActivityId = activityIndex + 1 < activities.length ?
+										activities[activityIndex + 1].id : null,
+								branchActivities = [];
+										
+							// check if it is an empty branch
+							if (activity.id != afterBranchActivityId) {
+								branchActivities.push(activity);
+								activityIndex++;
+	
+								// find which activities are new (branch)
+								// and which ones already existed
+								while (activityIndex < result.activities.length) {
+									activityData = result.activities[activityIndex];
+									var activity = new Activity(bar,
+											activityIndex,
+											activityData.id,
+											activityData.type,
+											activityData.name,
+											activityData.status,
+											activityData.url,
+											activityData.childActivities);
+									if (activity.id == afterBranchActivityId) {
+										// prepare for the next big loop
+										// iteration, which executes
+										// normally
+										activityIndex--;
+										break;
+									} else {
+										branchActivities.push(activity);
+										activityIndex++;
+									}
+								}
+	
+								// resize main paper to accomodate new activities
+								if (isHorizontalBar) {
+									paper.setSize(40 + 60 * (activities.length
+											+ branchActivities.length - 1), 60);
 								} else {
-									branchActivities.push(activity);
-									activityIndex++;
+									paper.setSize(140, 60 * (activities.length
+											+ branchActivities.length - 1) + 25);
 								}
 							}
-
-							// resize main paper to accomodate new activities
-							if (isHorizontalBar) {
-								paper.setSize(40 + 60 * (activities.length
-										+ branchActivities.length - 1), 60);
-							} else {
-								paper.setSize(140, 60 * (activities.length
-										+ branchActivities.length - 1) + 25);
-							}
-
+							
 							ActivityUtils.expandBranch(bar,
 									branchActivityId, branchActivities);
 						} else {
@@ -1126,11 +1135,7 @@ function fillProgressBar(barId) {
 						}
 					} else {
 						// draw new activity
-						ActivityUtils
-								.drawActivity(
-										activity,
-										true,
-										activityIndex == result.activities.length - 1);
+						ActivityUtils.drawActivity(activity, true, activityIndex == result.activities.length - 1);
 					}
 				}
 
