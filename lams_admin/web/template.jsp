@@ -3,7 +3,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
 <lams:head>
-	<html:base/>
 	<c:set var="title" scope="session"><tiles:getAsString name="title"/></c:set>
 	<title><fmt:message key="${title}"/></title>
 	<lams:css style="learner"/>
