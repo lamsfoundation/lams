@@ -1119,10 +1119,8 @@ GeneralLib = {
 		// find the longes branch to find the new paper size
 		$.each(activities, function(){
 			if (this instanceof ActivityDefs.BranchingEdgeActivity && this.isStart) {
-				// refresh branching metadata
-				ActivityLib.updateBranchesLength(this.branchingActivity);
-				// add start and end edges to the result
-				var longestBranchLength = this.branchingActivity.longestBranchLength + 2;
+				// add start and end edges to the longest branch length in the branching
+				var longestBranchLength = ActivityLib.updateBranchesLength(this.branchingActivity) + 2;
 				if (longestBranchLength > subsequenceMaxLength) {
 					subsequenceMaxLength = longestBranchLength;
 				}
@@ -1628,6 +1626,7 @@ GeneralLib = {
 							layout.activities.push(branchingEdge);
 							// for later reference
 							activityData.activity = branchingEdge;
+							activity = branchingEdge.branchingActivity;
 							
 							branchingEdge = new ActivityDefs.BranchingEdgeActivity(
 									null, null,
@@ -1678,7 +1677,8 @@ GeneralLib = {
 						return true;
 					}
 					
-					if (!(activity instanceof ActivityDefs.FloatingActivity)) {
+					if (!(activity instanceof ActivityDefs.FloatingActivity)
+						&& !(activity instanceof ActivityDefs.BranchingActivity)) {
 						layout.activities.push(activity);
 					}
 					
@@ -1870,14 +1870,22 @@ GeneralLib = {
 						
 						$.each(branches, function(){
 							var branch = this,
-								branchData = branchToActivityDefs[branch.id];
+								branchData = branchToActivityDefs[branch.id],
+								firstActivity = branchData.firstActivity || branchingActivity.end,
+								lastActivity = branchData.stopAfterActivity ? null : branchData.lastActivity;
+							
+							// check for nested branching
+							if (firstActivity instanceof ActivityDefs.BranchingActivity) {
+								firstActivity = firstActivity.start;
+							}
+							if (lastActivity && lastActivity instanceof ActivityDefs.BranchingActivity){
+								lastActivity = lastActivity.end;
+							}
 							
 							// add reference to the transition inside branch
-							ActivityLib.addTransition(branchingActivity.start,
-									branchData.firstActivity || branchingActivity.end,
-									true, null, null, branch);
-							if (branchData.lastActivity && !branchData.stopAfterActivity) {
-								ActivityLib.addTransition(branchData.lastActivity, branchingActivity.end, true);
+							ActivityLib.addTransition(branchingActivity.start, firstActivity, true, null, null, branch);
+							if (lastActivity) {
+								ActivityLib.addTransition(lastActivity, branchingActivity.end, true);
 							}
 						});
 					}
@@ -1925,7 +1933,7 @@ GeneralLib = {
 				
 				
 				if (arrangeNeeded) {
-					GeneralLib.arrangeActivities();
+				 	GeneralLib.arrangeActivities();
 				} else {
 					GeneralLib.resizePaper();
 				}
@@ -2040,7 +2048,13 @@ GeneralLib = {
 						var childActivity = this.transitionFrom.toActivity,
 							orderID = 1;
 						while (!(childActivity instanceof ActivityDefs.BranchingEdgeActivity
-								&& !childActivity.isStart)) {
+								&& !childActivity.isStart
+								&& childActivity.branchingActivity == branchingActivity)) {
+							if (childActivity instanceof ActivityDefs.BranchingEdgeActivity) {
+								// it's a nested branching
+								childActivity = childActivity.branchingActivity;
+							}
+							
 							childActivity.parentActivity = this;
 							childActivity.orderID = orderID;
 							if (orderID == 1){
@@ -2048,6 +2062,10 @@ GeneralLib = {
 							}
 							orderID++;
 							
+							if (childActivity instanceof ActivityDefs.BranchingActivity){
+								// it is a nested branching, so move to the end
+								childActivity = childActivity.end;
+							}
 							if (childActivity.transitions.from.length == 0) {
 								this.stopAfterActivity = true;
 								break;
