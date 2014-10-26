@@ -53,7 +53,7 @@ public class AddLessonTests {
 	@BeforeClass
 	public void beforeClass() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 		
 		onLogin = PageFactory.initElements(driver, LoginPage.class);
 		index = PageFactory.initElements(driver, IndexPage.class);
@@ -76,6 +76,7 @@ public class AddLessonTests {
 		final String addButton= "Add now";
 		
 		AddLessonPage addLesson = new AddLessonPage(driver);
+		addLesson.maximizeWindows();
 		addLesson = openDialog(index);
 		
 		String assertFrameOpen = addLesson.checkAddLessonButton();
@@ -236,25 +237,43 @@ public class AddLessonTests {
 		boolean wasLessonCreated = index.isLessonPresent(lessonName);
 		
 		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+		
+		
 	}
 	
 
-	private void selectRandomDesign(AddLessonPage addLesson, String lessonName) {
-		
-		// Gets all the nodes in the user's folder
-		List<WebElement> designs = addLesson.openLessontab().getFolderNodes("user");
-		
-		int randomDesign = Integer.parseInt(LamsUtil.randInt(1, designs.size()-1));
-		
-		addLesson
-		.openLessontab()
-		.clickDesign(designs.get(randomDesign))
-		.setLessonName(lessonName);
-		
-	}
 
 	@Test(dependsOnMethods="createLessonWithAllMonitors")
 	public void createLessonWithOnlyOneLearner() {
+
+		String lessonName = "Only one learner " + RANDOM_INT;
+		
+		addLesson = openDialog(index);
+
+		selectRandomDesign(addLesson, "Only one learner " + RANDOM_INT);
+
+		// Remove all learners
+		addLesson.openClasstab().removeAllLearnersFromLesson();
+
+		// Now just add one
+		addLesson.openClasstab().addOneLearnerToLesson();
+		
+		// Assert
+		int numberSelectedLearners = addLesson.openClasstab().getNumberSelectedLearners();
+		Assert.assertEquals(numberSelectedLearners, 1, 
+				"There seems to be more than one student in this lesson");
+		
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
 		
 	}
 
@@ -263,8 +282,76 @@ public class AddLessonTests {
 	 * Advanced tab tests
 	 */
 	
+	/**
+	 * Checks the default tab settings
+	 * 
+	 * Only Live Edit & lesson notification enabled. 
+	 * 
+	 */
 	@Test(dependsOnMethods="createLessonWithOnlyOneLearner")
+	public void checksDefaultAdvancedSettings() {
+	
+		addLesson = openDialog(index);
+	
+		Boolean isLessonIntroEnabled  = addLesson.openAdvancedTab().isEnableLessonIntro();
+		Boolean isStartInMonitor = addLesson.openAdvancedTab().isStartInMonitor();
+		Boolean isLearnerStartBeginning  = addLesson.openAdvancedTab().isLearnerRestart();
+		Boolean isEnableLiveEdit = addLesson.openAdvancedTab().isEnableLiveEdit();
+		Boolean isEnableLessonNotifications = addLesson.openAdvancedTab().isEnableLessonNotifications();
+		Boolean isExportPortfolio = addLesson.openAdvancedTab().isEnablePortfolio();
+		Boolean isEnablePresence = addLesson.openAdvancedTab().isEnablePresence();
+		Boolean isEnableIM  = addLesson.openAdvancedTab().isEnableIM();
+		Boolean isSplitLearners = addLesson.openAdvancedTab().isSplitLearners();
+		Boolean isScheduledEnable = addLesson.openAdvancedTab().isScheduledEnable();
+		
+		// Assertions now
+		
+		Assert.assertFalse(isLessonIntroEnabled, "Lesson intro should be OFF");
+		Assert.assertFalse(isStartInMonitor, "Start in monitor should be OFF");
+		Assert.assertFalse(isLearnerStartBeginning, "Learner start from the beginning should be OFF");
+		Assert.assertTrue(isEnableLiveEdit, "Live edit should be ON");
+		Assert.assertTrue(isEnableLessonNotifications, "Lesson notifications should be ON");
+		Assert.assertFalse(isExportPortfolio, "Export portfolio should be  OFF");
+		Assert.assertFalse(isEnablePresence, "Presence should be OFF");
+		Assert.assertFalse(isEnableIM, "IM should be OFF");
+		Assert.assertFalse(isSplitLearners, "Split learners into lessons should be OFF");
+		Assert.assertFalse(isScheduledEnable, "Scheduling should be OFF");
+		
+		
+	}
+	
+	@Test(dependsOnMethods="checksDefaultAdvancedSettings")
 	public void createLessonWithIntro() {
+		String introHTMLTxt = "<strong>Hi!</strong> <i>This is a new lesson</i><p>Try to have a go at it</p>";
+		
+		addLesson = openDialog(index);
+
+		String lessonName = "Lesson with Intro " + RANDOM_INT;
+		selectRandomDesign(addLesson, lessonName);
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnableLessonIntro()
+		.setIntroText(introHTMLTxt)
+		.setDisplayDesign();
+		
+		String assertIntroTxt = addLesson
+				.openAdvancedTab()
+				.getIntroText();
+		
+		// Assert lesson with intro 
+		Assert.assertTrue(assertIntroTxt.contains(introHTMLTxt), "Intro text doesn't match");
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
 		
 	}
 	
@@ -319,6 +406,30 @@ public class AddLessonTests {
 		//driver.switchTo().frame("dialogFrame");
 		
 		return addLesson;
+	}
+	
+	private void selectRandomDesign(AddLessonPage addLesson, String lessonName) {
+		
+		// Gets all the nodes in the user's folder
+		List<WebElement> designs = addLesson.openLessontab().getFolderNodes("user");
+		
+		System.out.println("# of designs:" + designs.size());
+		
+		int randomDesign = Integer.parseInt(LamsUtil.randInt(1, designs.size()-1));
+		
+		System.out.println("randomDesign : " + randomDesign );
+		
+		addLesson
+		.openLessontab()
+		.clickDesign(designs.get(randomDesign));
+		
+		Assert.assertTrue(addLesson.openLessontab().isDesignImageDisplayed(), 
+				"Design image is not displayed");		
+		addLesson
+		.openLessontab()
+		.setLessonName(lessonName);
+		
+		
 	}
 
 	

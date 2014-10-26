@@ -44,7 +44,7 @@ public class AddLessonPage extends AbstractPage {
 	private WebElement tabClassLink;
 	
 	@FindBy(id = "tabAdvanceHeader")
-	private WebElement tabAdvanceHeader;
+	private WebElement tabAdvancedLink;
 	
 	@FindBy(id = "tabConditionsLink")
 	private WebElement tabConditionsLink;
@@ -98,6 +98,14 @@ public class AddLessonPage extends AbstractPage {
 		closeButton.click();
 		driver.switchTo().defaultContent();
 		return PageFactory.initElements(driver, IndexPage.class);
+		
+	}
+
+	public AdvancedTab openAdvancedTab() {
+
+		tabAdvancedLink.click();
+
+		return PageFactory.initElements(driver, AdvancedTab.class);
 		
 	}
 }

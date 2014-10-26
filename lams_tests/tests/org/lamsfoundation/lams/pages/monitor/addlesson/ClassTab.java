@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.pages.monitor.addlesson;
 import java.util.List;
 
 import org.lamsfoundation.lams.pages.AbstractPage;
+import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -86,6 +87,34 @@ public class ClassTab extends AbstractPage {
 		return PageFactory.initElements(driver, ClassTab.class);
 	}
 	
+	public ClassTab removeAllLearnersFromLesson() {
+	
+		List<WebElement> choosenLearners = selectedLearners.findElements(By.tagName("div"));
+		
+		for (WebElement learner : choosenLearners) {
+			
+			learner.click();
+			learnerMoveToLeft.click();
+			
+			
+		}
+		
+		return PageFactory.initElements(driver, ClassTab.class);
+	}
+	
+	public ClassTab addOneLearnerToLesson() {
+		
+		List<WebElement> availableLearners = unselectedLearners.findElements(By.tagName("div"));
+		
+		int randomLearner = Integer.parseInt(LamsUtil.randInt(1, availableLearners.size()-1));
+	
+		availableLearners.get(randomLearner).click();
+		learnerMoveToRight.click();
+		
+		return PageFactory.initElements(driver, ClassTab.class);
+	}
+	
+	
 	public int getNumberSelectedMonitors() {
 		
 		return selectedMonitors.findElements(By.tagName("div")).size();
@@ -106,6 +135,8 @@ public class ClassTab extends AbstractPage {
 
 		return unselectedLearners.findElements(By.tagName("div")).size();
 	}
+
+
 	
 	
 }
