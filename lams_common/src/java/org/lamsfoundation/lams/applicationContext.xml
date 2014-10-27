@@ -17,13 +17,14 @@
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 			<prop key="hibernate.c3p0.timeout">1800</prop>
 			<prop key="hibernate.c3p0.max_statement">50</prop>
-			
+			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
 		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
             <!-- <prop key="hibernate.cache.use_query_cache">true</prop> -->     
             <prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
-            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>       
-			<prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
-			
+            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
+            <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
+            <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>   
+            <!-- <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>--> 
 			<!--
 			<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jbc2.SharedJBossCacheRegionFactory</prop>
 			 For JBoss Cache 2 and 3, and for Hibernate 3 there is a different idea of accessing Cache,
@@ -51,14 +52,8 @@
 		<property name="jndiName"><value>java:jboss/datasources/lams-ds</value></property>
 	</bean>
 
-	<!--  Transaction manager for all transactions involving the core classes or the content repository. 
-		  For JBoss 5, it has been changed to Hibernate Transaction Manager, instead of JTA.
-	
-		  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	
-	  	  But remember all application servers do not have the same JNDI name for their transaction manager!
-	 -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+		<!-- <property name="sessionFactory"><ref bean="coreSessionFactory"/></property> -->
 	</bean>
 
 </beans>
