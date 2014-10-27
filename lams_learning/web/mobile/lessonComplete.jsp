@@ -81,5 +81,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div> 
 
 <c:if test="${not empty lessonFinishUrl}">
-	<iframe width="0" height="0" src="${lessonFinishUrl}"></iframe>
+	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
 </c:if>
