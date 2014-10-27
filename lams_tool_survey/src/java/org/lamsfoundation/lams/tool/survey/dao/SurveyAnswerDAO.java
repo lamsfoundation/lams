@@ -24,18 +24,26 @@ package org.lamsfoundation.lams.tool.survey.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 
 public interface SurveyAnswerDAO extends DAO {
 
-	SurveyAnswer getAnswer(Long uid, Long userUid);
-	
-	/**
-	 * Get all answers from same session for same question. 
-	 * @param sessionId
-	 * @param questionUid
-	 * @return
-	 */
-	List<SurveyAnswer> getSessionAnswer(Long sessionId,Long questionUid);
-	List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId);
+    SurveyAnswer getAnswer(Long uid, Long userUid);
+
+    /**
+     * Get all answers from same session for same question.
+     * 
+     * @param sessionId
+     * @param questionUid
+     * @return
+     */
+    List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid, Long excludeUserId);
+
+    List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId);
+
+    List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid,
+	    final Long excludeUserId, int page, int size, int sorting);
+
+    int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId, final Long excludeUserId);
 }

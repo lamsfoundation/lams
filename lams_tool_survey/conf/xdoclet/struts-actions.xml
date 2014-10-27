@@ -188,6 +188,23 @@
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
 		
+		<action path="/learning/showOtherUsersAnswers"
+			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			scope="request" 
+			validate="false"			
+			parameter="showOtherUsersAnswers" >
+			<forward name="success" path="/pages/learning/resultOtherUsers.jsp" />
+		</action>
+		
+		<action path="/learning/getOpenResponses"
+			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			scope="request" 
+			validate="false"			
+			parameter="getOpenResponses" >
+		</action>
+		
 		<action path="/learning/doSurvey"
 			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"

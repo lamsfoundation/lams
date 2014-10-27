@@ -54,7 +54,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ChartAction extends Action {
 
-    static Logger logger = Logger.getLogger(ChartAction.class);
+    private static Logger logger = Logger.getLogger(ChartAction.class);
 
     private static ISurveyService surveyService;
     private MessageResources resource;
@@ -66,8 +66,11 @@ public class ChartAction extends Action {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
+	Long excludeUserId = WebUtil.readLongParam(request, SurveyConstants.ATTR_USER_ID, true);
 
-	AnswerDTO answer = getSurveyService().getQuestionResponse(sessionId, questionUid);
+	// if excludeUserId received exclude this user's answers
+	AnswerDTO answer = (excludeUserId == null) ? getSurveyService().getQuestionResponse(sessionId, questionUid)
+		: getSurveyService().getQuestionResponse(sessionId, questionUid, excludeUserId);
 	if (answer.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    ChartAction.logger.error("Error question type : Text entry can not generate chart.");
 	    response.getWriter().print(resource.getMessage(SurveyConstants.ERROR_MSG_CHART_ERROR));
@@ -94,7 +97,7 @@ public class ChartAction extends Action {
 	} catch (JSONException e) {
 	    ChartAction.logger.error("Error while generating pie chart for Survey Tool: " + sessionId);
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;

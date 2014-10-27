@@ -35,83 +35,91 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.SurveyOptionComparator;
 
+public class AnswerDTO extends SurveyQuestion {
 
+    private static final int SHORT_TITLE_LENGTH = 60;
 
-public class AnswerDTO extends SurveyQuestion{
+    // ***********************************************
+    // DTO fields:
+    // this is DTO field. For answer, which is user and session level. For question, which is content level.
+    private SurveyAnswer answer;
+    // Open text entry response percentage if this question has open text entry.
+    private double openResponse;
+    private String openResponseFormatStr;
+    private int openResponseCount;
 
-	private static final int SHORT_TITLE_LENGTH = 60;
-	
-	//***********************************************
-	//DTO fields:
-	//this is DTO field. For answer, which is user and session level. For question, which is content level.
-	private SurveyAnswer answer;
-	//Open text entry response percentage  if this question has open text entry.
-	private double openResponse; 
-	private String openResponseFormatStr;
-	private int openResponseCount; 
-	
-	//this field could have value even this user does not reply this question (the answer is null)
-	private SurveyUser replier;
-	
-	static Logger logger = Logger.getLogger(AnswerDTO.class.getName());
-	public AnswerDTO(SurveyQuestion question){
-		try {
-			PropertyUtils.copyProperties(this, question);
-		} catch (Exception e) {
-			logger.error("Error occurs during creating AnswerDTO");
-		}
-		
-		//clone options 
-		Set<SurveyOption> optList = question.getOptions();
-		if(optList != null){
-			SortedSet<SurveyOption> newOptions = new TreeSet<SurveyOption>(new SurveyOptionComparator());
-			for (SurveyOption option : optList) {
-				SurveyOption newOption = (SurveyOption) option.clone();
-				//clone does not copy the UID, here copy it back
-				newOption.setUid(option.getUid());
-				newOptions.add(newOption);
-			}
-			this.setOptions(newOptions);
-		}
-		
-		String desc = this.getDescription();
-		desc = desc.replaceAll("<(.|\n)*?>", "");
-		this.setShortTitle(StringUtils.abbreviate(desc,SHORT_TITLE_LENGTH));
+    // this field could have value even this user does not reply this question (the answer is null)
+    private SurveyUser replier;
 
+    private static Logger logger = Logger.getLogger(AnswerDTO.class.getName());
+
+    public AnswerDTO(SurveyQuestion question) {
+	try {
+	    PropertyUtils.copyProperties(this, question);
+	} catch (Exception e) {
+	    logger.error("Error occurs during creating AnswerDTO");
 	}
-	//****************************************************************
-	// DTO fields
-	//****************************************************************
-	public SurveyAnswer getAnswer() {
-		return answer;
+
+	// clone options
+	Set<SurveyOption> optList = question.getOptions();
+	if (optList != null) {
+	    SortedSet<SurveyOption> newOptions = new TreeSet<SurveyOption>(new SurveyOptionComparator());
+	    for (SurveyOption option : optList) {
+		SurveyOption newOption = (SurveyOption) option.clone();
+		// clone does not copy the UID, here copy it back
+		newOption.setUid(option.getUid());
+		newOptions.add(newOption);
+	    }
+	    this.setOptions(newOptions);
 	}
-	public void setAnswer(SurveyAnswer answer) {
-		this.answer = answer;
-	}
-	public double getOpenResponse() {
-		return openResponse;
-	}
-	public void setOpenResponse(double openResponse) {
-		this.openResponse = openResponse;
-	}
-	public int getOpenResponseCount() {
-		return openResponseCount;
-	}
-	public void setOpenResponseCount(int openResponseCount) {
-		this.openResponseCount = openResponseCount;
-	}
-	public String getOpenResponseFormatStr() {
-		return openResponseFormatStr;
-	}
-	public void setOpenResponseFormatStr(String openResponseFormatStr) {
-		this.openResponseFormatStr = openResponseFormatStr;
-	}
-	
-	public SurveyUser getReplier() {
-		return replier;
-	}
-	public void setReplier(SurveyUser replier) {
-		this.replier = replier;
-	}
+
+	String desc = this.getDescription();
+	desc = desc.replaceAll("<(.|\n)*?>", "");
+	this.setShortTitle(StringUtils.abbreviate(desc, SHORT_TITLE_LENGTH));
+
+    }
+
+    // ****************************************************************
+    // DTO fields
+    // ****************************************************************
+    public SurveyAnswer getAnswer() {
+	return answer;
+    }
+
+    public void setAnswer(SurveyAnswer answer) {
+	this.answer = answer;
+    }
+
+    public double getOpenResponse() {
+	return openResponse;
+    }
+
+    public void setOpenResponse(double openResponse) {
+	this.openResponse = openResponse;
+    }
+
+    public int getOpenResponseCount() {
+	return openResponseCount;
+    }
+
+    public void setOpenResponseCount(int openResponseCount) {
+	this.openResponseCount = openResponseCount;
+    }
+
+    public String getOpenResponseFormatStr() {
+	return openResponseFormatStr;
+    }
+
+    public void setOpenResponseFormatStr(String openResponseFormatStr) {
+	this.openResponseFormatStr = openResponseFormatStr;
+    }
+
+    public SurveyUser getReplier() {
+	return replier;
+    }
+
+    public void setReplier(SurveyUser replier) {
+	this.replier = replier;
+    }
 
 }

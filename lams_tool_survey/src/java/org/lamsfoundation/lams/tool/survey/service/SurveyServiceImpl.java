@@ -321,14 +321,20 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    surveyAnswerDao.saveObject(ans);
 	}
     }
-
+    
     @Override
     public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid) {
+	//pass -1 as exclude userId to skip no users
+	return getQuestionResponse(sessionId, questionUid, -1L);
+    }
+
+    @Override
+    public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid, Long excludeUserId) {
 	SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
 	AnswerDTO answerDto = new AnswerDTO(question);
 
 	// get question all answer from this session
-	List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
+	List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid, excludeUserId);
 
 	// create a map to hold Option UID and sequenceID(start from 0);
 	Map<String, Integer> optMap = new HashMap<String, Integer>();
@@ -340,54 +346,66 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	// initial a array to hold how many time chose has been done for a option or open text.
-	int optSize = options.size();
+	int numberAvailableOptions = options.size();
 	// for appendText and open Text Entry will be the last one of choose[] array.
 	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    optSize++;
+	    numberAvailableOptions++;
 	}
 
-	int[] choose = new int[optSize];
-	Arrays.fill(choose, 0);
+	int[] choiceArray = new int[numberAvailableOptions];
+	Arrays.fill(choiceArray, 0);
 
 	// sum up all option and open text (if has) have been selected count list
-	int answerSum = 0;
+	int numberAnswers = 0;
 	if (answsers != null) {
 	    for (SurveyAnswer answer : answsers) {
-		String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
-		for (String optUid : choseOpt) {
+		String[] choiceList = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
+		for (String optUid : choiceList) {
 		    // if option has been chosen, the relative index of choose[] array will increase.
 		    if (optMap.containsKey(optUid)) {
-			choose[optMap.get(optUid)]++;
-			answerSum++;
+			choiceArray[optMap.get(optUid)]++;
+			numberAnswers++;
 		    }
 		}
 		// handle appendText or Open Text Entry
 		if ((answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
 			&& !StringUtils.isBlank(answer.getAnswerText())) {
-		    choose[optSize - 1]++;
-		    answerSum++;
+		    choiceArray[numberAvailableOptions - 1]++;
+		    numberAnswers++;
 		}
 	    }
 	}
 	// caculate the percentage of answer response
 	idx = 0;
-	if (answerSum == 0) {
-	    answerSum = 1;
+	if (numberAnswers == 0) {
+	    numberAnswers = 1;
 	}
 	for (SurveyOption option : options) {
-	    option.setResponse((double) choose[idx] / (double) answerSum * 100d);
-	    option.setResponseFormatStr(new Long(Math.round(option.getResponse())).toString());
-	    option.setResponseCount(choose[idx]);
+	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	    option.setResponse(percentage);
+	    option.setResponseFormatStr(new Long(Math.round(percentage)).toString());
+	    option.setResponseCount(choiceArray[idx]);
 	    idx++;
 	}
 	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    answerDto.setOpenResponse((double) choose[idx] / (double) answerSum * 100d);
-	    answerDto.setOpenResponseFormatStr(new Long(Math.round(answerDto.getOpenResponse())).toString());
-	    answerDto.setOpenResponseCount(choose[idx]);
+	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	    answerDto.setOpenResponse(percentage);
+	    answerDto.setOpenResponseFormatStr(new Long(Math.round(percentage)).toString());
+	    answerDto.setOpenResponseCount(choiceArray[idx]);
 	}
 
 	return answerDto;
-
+    }
+    
+    @Override
+    public List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    int page, int size, int sorting) {
+	return surveyAnswerDao.getOpenResponsesForTablesorter(qaSessionId, questionId, excludeUserId, page, size, sorting);
+    }    
+    
+    @Override
+    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
+	return surveyAnswerDao.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId);
     }
 
     @Override

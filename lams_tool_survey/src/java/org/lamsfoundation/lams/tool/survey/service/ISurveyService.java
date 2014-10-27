@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
@@ -39,7 +38,6 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -117,6 +115,21 @@ public interface ISurveyService {
      * @return
      */
     AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
+
+    /**
+     * Get question's answer with response percentage infromation.
+     * 
+     * @param sessionId
+     * @param questionUid
+     * @param excludeUserId exclude this user's answers from result list. 
+     * @return
+     */
+    AnswerDTO getQuestionResponse(Long sessionId, Long questionUid, Long excludeUserId);
+    
+    List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId,
+	    final Long excludeUserId, int page, int size, int sorting);
+
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId);
 
     /**
      * Commit answers for a group of question together.

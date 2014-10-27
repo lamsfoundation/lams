@@ -10,10 +10,10 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	         function submitForm(methodName){
-	                var f = document.getElementById('messageForm');
-	                f.submit();
-	        }
+		function submitForm(methodName){
+			var f = document.getElementById('messageForm');
+			f.submit();
+		}
 	</script>	
 </lams:head>
 <body class="stripes">

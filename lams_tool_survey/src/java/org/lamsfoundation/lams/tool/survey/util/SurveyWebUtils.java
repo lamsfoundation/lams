@@ -21,53 +21,49 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
-import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction;
-
-
 
 /**
  * Contains helper methods used by the Action Servlets
  * 
  * @author Anthony Sukkar
- *
  */
 public class SurveyWebUtils {
 
-	public static boolean isSurveyEditable(Survey survey) {
-	        if ( (survey.isDefineLater() == true) && (survey.isContentInUse()==true) )
-	        {
-	//            throw new SurveyApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	        	 MonitoringAction.log.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-	             return false;
-	        }
-	        else if ( (survey.isDefineLater() == true) && (survey.isContentInUse() == false))
-	            return true;
-	        else if ( (survey.isDefineLater() == false) && (survey.isContentInUse() == false))
-	            return true;
-	        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-	            return false;
-		}
+    public static boolean isSurveyEditable(Survey survey) {
+	if ((survey.isDefineLater() == true) && (survey.isContentInUse() == true)) {
+	    // throw new
+	    // SurveyApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+	    MonitoringAction.log
+		    .error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+	    return false;
+	} else if ((survey.isDefineLater() == true) && (survey.isContentInUse() == false))
+	    return true;
+	else if ((survey.isDefineLater() == false) && (survey.isContentInUse() == false))
+	    return true;
+	else
+	    // (content.isContentInUse()==true && content.isDefineLater() == false)
+	    return false;
+    }
 
-	public static String getChoicesStr(String[] choiceList) {
-		String choices = "";
-		if(choiceList == null)
-			return choices;
-		
-		for(String c: choiceList)
-			choices = choices + c + "&";
-		return choices;
-	}
-	
-	public static String[] getChoiceList(String choiceList) {
-		if(choiceList == null)
-			return new String[]{};
-		
-		return choiceList.split("&");
-	}
+    public static String getChoicesStr(String[] choiceList) {
+	String choices = "";
+	if (choiceList == null)
+	    return choices;
+
+	for (String c : choiceList)
+	    choices = choices + c + "&";
+	return choices;
+    }
+
+    public static String[] getChoiceList(String choiceList) {
+	if (choiceList == null)
+	    return new String[] {};
+
+	return choiceList.split("&");
+    }
 }

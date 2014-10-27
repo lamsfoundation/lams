@@ -24,30 +24,79 @@ package org.lamsfoundation.lams.tool.survey.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyAnswerDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 
 public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements SurveyAnswerDAO {
-	private static final String GET_LEARNER_ANSWER = "from "+SurveyAnswer.class.getName()+" as a where a.surveyQuestion.uid=? and a.user.uid=?";
-	private static final String GET_SESSION_ANSWER = "from "+SurveyAnswer.class.getName()+" as a " +
-							" where a.user.session.sessionId=? and a.surveyQuestion.uid=?";
-	private static final String GET_BY_TOOL_CONTENT_ID_AND_USER_ID = "from "+SurveyAnswer.class.getName()+" as a " +
-		" where a.user.session.survey.contentId = ? and a.user.userId = ?";
-	
-	public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
-		List list = getHibernateTemplate().find(GET_LEARNER_ANSWER,new Object[]{questionUid,userUid});
-		if(list.size() > 0)
-			return (SurveyAnswer) list.get(0);
-		else
-			return null;
-	}
+    private static final String GET_LEARNER_ANSWER = "FROM " + SurveyAnswer.class.getName()
+	    + " AS a WHERE a.surveyQuestion.uid=? AND a.user.uid=?";
+    private static final String GET_SESSION_ANSWER = "FROM " + SurveyAnswer.class.getName() + " AS a "
+	    + " WHERE a.user.session.sessionId=? AND a.surveyQuestion.uid=? AND a.user.userId!=?";
+    private static final String GET_BY_TOOL_CONTENT_ID_AND_USER_ID = "FROM " + SurveyAnswer.class.getName() + " AS a "
+	    + " WHERE a.user.session.survey.contentId = ? AND a.user.userId = ?";
 
-	public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid) {
-		return getHibernateTemplate().find(GET_SESSION_ANSWER,new Object[]{sessionId,questionUid});
-	}
-	
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT = "SELECT r.answerText FROM "
+	    + SurveyAnswer.class.getName()
+	    + " AS r "
+	    + "WHERE r.user.session.sessionId=:sessionId AND r.surveyQuestion.uid=:questionUid AND r.user.userId!=:excludeUserId AND r.answerText<>'' order by ";
+
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION = "SELECT COUNT(*) FROM "
+	    + SurveyAnswer.class.getName() + " AS r "
+	    + "WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? AND r.user.userId!=? AND r.answerText<>''";
+
+    @Override
+    public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
+	List list = getHibernateTemplate().find(GET_LEARNER_ANSWER, new Object[] { questionUid, userUid });
+	if (list.size() > 0)
+	    return (SurveyAnswer) list.get(0);
+	else
+	    return null;
+    }
+
+    @Override
+    public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid, Long excludeUserId) {
+	return getHibernateTemplate().find(GET_SESSION_ANSWER, new Object[] { sessionId, questionUid, excludeUserId});
+    }
+
     @SuppressWarnings("unchecked")
+    @Override
     public List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId) {
 	return getHibernateTemplate().find(GET_BY_TOOL_CONTENT_ID_AND_USER_ID, new Object[] { toolContentId, userId });
+    }
+
+    @Override
+    public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid,
+	    final Long excludeUserId, int page, int size, int sorting) {
+	String sortingOrder = "";
+	switch (sorting) {
+	case SurveyConstants.SORT_BY_DEAFAULT:
+	    sortingOrder = "r.updateDate";
+	    break;
+	case SurveyConstants.SORT_BY_ANSWER_ASC:
+	    sortingOrder = "r.answerText ASC";
+	    break;
+	case SurveyConstants.SORT_BY_ANSWER_DESC:
+	    sortingOrder = "r.answerText DESC";
+	    break;
+	}
+	String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
+
+	return getSession().createQuery(sqlQuery)
+		.setLong("sessionId", sessionId.longValue()).setLong("questionUid", questionUid.longValue())
+		.setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size).setMaxResults(size)
+		.list();
+    }
+
+    @Override
+    public int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId,
+	    final Long excludeUserId) {
+
+	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
+		new Object[] { sessionId, questionId, excludeUserId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
     }
 }

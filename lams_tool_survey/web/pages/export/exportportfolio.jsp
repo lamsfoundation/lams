@@ -1,6 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
@@ -9,8 +7,9 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <lams:html>
 <lams:head>
-	    <%@ include file="/common/header.jsp" %>
+	<%@ include file="/common/header.jsp" %>
 </lams:head>
+
 <body class="stripes">
 		<div id="content">
 		<h1>
