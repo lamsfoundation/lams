@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.SendKeysAction;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -828,6 +829,65 @@ public class BranchingTests {
 		
 		clearCanvas();
 		
+	}
+	
+	@Test(dependsOnMethods="reOpenAndVerifyToolOutputDesign")
+	public void createBranchingWithinBranching() {
+		
+		String firstBranching = "Branching1";
+		String secondBranching = "Branching2";
+		
+		// Drop activities in canvas
+		fla
+		 .dragActivityToCanvasPosition(AuthorConstants.NOTICEBOARD_TITLE, 200, 150);
+
+		// draw branching
+		fla.dragBranchToCanvas();
+
+		// draw transition
+		fla.drawTransitionFromTo(AuthorConstants.NOTICEBOARD_TITLE, AuthorConstants.BRANCHING_START_TITLE);
+		
+		// rename branching
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setBranchingType(BRANCHING_TYPE_INSTRUCTOR)
+		.setBranchingTitle(firstBranching);
+		
+		fla.dragActivityToCanvasPosition(AuthorConstants.CHAT_TITLE, 300, 250)
+		.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 450, 450);
+		
+		fla.drawTransitionFromTo(firstBranching + " start", AuthorConstants.CHAT_TITLE)
+		.drawTransitionFromTo(firstBranching + " start", AuthorConstants.FORUM_TITLE);
+		
+		fla.dragBranchesToCanvasPosition(400, 580)
+		.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+		.setBranchingTitle(secondBranching)
+		.setBranchingType(BRANCHING_TYPE_INSTRUCTOR);
+		
+		fla.dragActivityToCanvasPosition(AuthorConstants.GMAP_TITLE, 300, 100)
+		.dragActivityToCanvasPosition(AuthorConstants.IMAGE_GALLERY_TITLE, 400, 350);
+		
+		fla.drawTransitionFromTo(secondBranching + " start", AuthorConstants.GMAP_TITLE)
+		.drawTransitionFromTo(secondBranching + " start", AuthorConstants.IMAGE_GALLERY_TITLE);
+		
+		fla.drawTransitionFromTo(AuthorConstants.FORUM_TITLE, secondBranching + " start")
+		.drawTransitionFromTo(AuthorConstants.CHAT_TITLE, firstBranching + " end")
+		.drawTransitionFromTo(AuthorConstants.IMAGE_GALLERY_TITLE, secondBranching + " end")
+		.drawTransitionFromTo(AuthorConstants.GMAP_TITLE, secondBranching + " end"); 
+		
+		fla.arrangeDesign();
+		
+	}
+	
+	/**
+	 * Gives a name and saves the designs 
+	 */
+	@Test(dependsOnMethods="createBranchingWithinBranching")
+	public void nameAndSaveDesignBranchingWithinBranching() {
+
+		String saveResult = fla.saveAsDesign(randomDesignName + "- Branching within Branching");
+
+		Assert.assertTrue(saveResult.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG), 
+				"Save error. Returned: " + saveResult);
 	}
 	
 }

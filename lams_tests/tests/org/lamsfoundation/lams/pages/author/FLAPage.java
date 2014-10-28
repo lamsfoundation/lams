@@ -908,13 +908,26 @@ public class FLAPage extends AbstractPage {
 	 */
 	public FLAPage dragBranchToCanvas() {
 		
+		dragBranchesToCanvasPosition(200, 280);
+		
+		return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	/**
+	 * Drags a branching activity into the canvas in a particular canvas position
+	 * @param x 
+	 * @param y
+	 * @return {@link FLAPage}
+	 */
+	public FLAPage dragBranchesToCanvasPosition(int x, int y) {
+
 		flowDropButton.click();
 		branchingButton.click();
 		
 		// Prepare the dragAndDrop action
 		Actions builder = new Actions(driver);  // Configure the Action
 		Action dropBranch = builder
-				.moveToElement(canvas, 200, 280)
+				.moveToElement(canvas, x, y)
 				.click()
 				.moveByOffset(600, 0)
 				.click()
@@ -923,8 +936,13 @@ public class FLAPage extends AbstractPage {
 		// Execute the Action
 		dropBranch.perform();
 		
+		
+
+		
+		
 		return PageFactory.initElements(driver, FLAPage.class);
 	}
+	
 	
 	/**
 	 * Drags a optional activity into the canvas 
