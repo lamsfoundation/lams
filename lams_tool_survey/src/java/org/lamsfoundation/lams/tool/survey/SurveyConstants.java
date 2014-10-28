@@ -63,7 +63,7 @@ public class SurveyConstants {
 
     public static final String ATTR_USER_UID = "userUid";
     
-    public static final String ATTR_USER_ID = "userId";
+    public static final String ATTR_USER = "user";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.survey.item.title.blank";
@@ -167,6 +167,8 @@ public class SurveyConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    
+    public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
     
     public static final int SORT_BY_DEAFAULT = 0;
     public static final int SORT_BY_ANSWER_ASC = 1;

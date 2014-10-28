@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
@@ -148,14 +149,15 @@ public class LearningAction extends Action {
 	AnswerForm answerForm = (AnswerForm) form;
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	answerForm.setSessionMapID(sessionMap.getSessionID());
+	String sessionMapID = sessionMap.getSessionID();
+	request.getSession().setAttribute(sessionMapID, sessionMap);
+	answerForm.setSessionMapID(sessionMapID);
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 	// it will be use when submissionDeadline or lock on finish page.
-	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	// get back the survey and question list and display them on page
 	ISurveyService service = getSurveyService();
@@ -174,8 +176,6 @@ public class LearningAction extends Action {
 	List<AnswerDTO> answers = service.getQuestionAnswers(sessionId, surveyUser.getUid());
 	Survey survey = service.getSurveyBySessionId(sessionId);
 
-	// check whehter finish lock is on/off
-	boolean lock = survey.getLockWhenFinished() && surveyUser.isSessionFinished();
 
 	// get notebook entry
 	String entryText = new String();
@@ -192,12 +192,14 @@ public class LearningAction extends Action {
 	// basic information
 	sessionMap.put(SurveyConstants.ATTR_TITLE, survey.getTitle());
 	sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION, survey.getInstructions());
+	// check whehter finish lock is on/off
+	boolean lock = survey.getLockWhenFinished() && surveyUser.isSessionFinished();
 	sessionMap.put(SurveyConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SurveyConstants.ATTR_LOCK_ON_FINISH, survey.getLockWhenFinished());
 	sessionMap.put(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE, survey.isShowOnePage());
 	sessionMap.put(SurveyConstants.ATTR_SHOW_OTHER_USERS_ANSWERS, survey.isShowOtherUsersAnswers());
 	sessionMap.put(SurveyConstants.ATTR_USER_FINISHED, surveyUser.isSessionFinished());
-	sessionMap.put(SurveyConstants.ATTR_USER_ID, surveyUser.getUserId());
+	sessionMap.put(SurveyConstants.ATTR_USER, surveyUser);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -260,11 +262,20 @@ public class LearningAction extends Action {
 	} else {
 	    answerForm.setPosition(SurveyConstants.POSITION_FIRST);
 	}
-	// if page is locked, only go to result pages.
-	if (lock) {
+	
+	// if session is finished go to result pages.
+	if (surveyUser.isSessionFinished() && !survey.isShowOtherUsersAnswers()) {
 	    return mapping.findForward(SurveyConstants.FORWARD_RESULT);
+	 
+	//if show other users is ON and response is finalized - show results page with other users answers
+	} else if (survey.isShowOtherUsersAnswers() && surveyUser.isResponseFinalized()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("resultOtherUsers"));
+	    redirect.addParameter(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	    return redirect;
+	    
+	}  else {
+	    return mapping.findForward(SurveyConstants.SUCCESS);    
 	}
-	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
     private ActionForward nextQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -369,16 +380,21 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
 		sessionMapID);
 
-	Long excludeUserId = (Long) sessionMap.get(SurveyConstants.ATTR_USER_ID);
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	List<AnswerDTO> answerDtos = new ArrayList<AnswerDTO>();
 	for (SurveyQuestion question : surveyItemMap.values()) {
-	    AnswerDTO answerDto = service.getQuestionResponse(sessionId, question.getUid(), excludeUserId);
+	    AnswerDTO answerDto = service.getQuestionResponse(sessionId, question.getUid());
 	    answerDtos.add(answerDto);
 	}
 	request.setAttribute("answerDtos", answerDtos);
+
+	SurveyUser surveyLearner = (SurveyUser) sessionMap.get(SurveyConstants.ATTR_USER);
+	service.setResponseFinalized(surveyLearner.getUid());
+	
+	int countFinishedUser = service.getCountFinishedUsers(sessionId);
+	request.setAttribute(SurveyConstants.ATTR_COUNT_FINISHED_USERS, countFinishedUser);
 
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
@@ -392,7 +408,6 @@ public class LearningAction extends Action {
 	
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
-	Long excludeUserId = WebUtil.readLongParam(request, "userId");
 	
 	//paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
@@ -406,13 +421,13 @@ public class LearningAction extends Action {
 	    sorting = SurveyConstants.SORT_BY_ANSWER_DESC;
 	}
 	
-	List<String> responses = service.getOpenResponsesForTablesorter(sessionId, questionUid, excludeUserId, page, size,
+	List<String> responses = service.getOpenResponsesForTablesorter(sessionId, questionUid, page, size,
 		sorting);
 	
 	JSONArray rows = new JSONArray();
 
 	JSONObject responcedata = new JSONObject();
-	responcedata.put("total_rows", service.getCountResponsesBySessionAndQuestion(sessionId, questionUid, excludeUserId));
+	responcedata.put("total_rows", service.getCountResponsesBySessionAndQuestion(sessionId, questionUid));
 	
 	for (String response : responses) {
 	    //JSONArray cell=new JSONArray();
@@ -444,14 +459,8 @@ public class LearningAction extends Action {
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
 
-	SurveyUser surveyLearner = null;
+	SurveyUser surveyLearner = (SurveyUser) sessionMap.get(SurveyConstants.ATTR_USER);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, true);
-	if ((userID != null) && (userID != 0)) {
-	    surveyLearner = service.getUserByIDAndSession(userID, sessionId);
-	    request.setAttribute(AttributeNames.PARAM_USER_ID, userID);
-	}
 
 	ActionErrors errors;
 	if ((questionSeqID == null) || questionSeqID.equals(0)) {
@@ -466,9 +475,7 @@ public class LearningAction extends Action {
 	List<SurveyAnswer> answerList = new ArrayList<SurveyAnswer>();
 	for (AnswerDTO question : surveyItemList) {
 	    if (question.getAnswer() != null) {
-		if ((userID != null) && (userID != 0)) {
-		    question.getAnswer().setUser(surveyLearner);
-		}
+		question.getAnswer().setUser(surveyLearner);
 		answerList.add(question.getAnswer());
 	    }
 	}
@@ -479,9 +486,6 @@ public class LearningAction extends Action {
 
 	Survey survey = service.getSurveyBySessionId(sessionId);
 	if (survey.isNotifyTeachersOnAnswerSumbit()) {
-	    if (surveyLearner == null) {
-		surveyLearner = getCurrentUser(service, sessionId);
-	    }
 	    service.notifyTeachersOnAnswerSumbit(sessionId, surveyLearner);
 	}
 

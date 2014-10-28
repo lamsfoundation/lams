@@ -45,8 +45,7 @@
 
 	<c:if test="${question.type == 3}">
 		<p>
-			<textarea name="optionText${question.uid}" rows="7" cols="50" class="text-area"
-				type="_moz">${answerText}</textarea>
+			<lams:textarea name="optionText${question.uid}" rows="7" cols="50" class="text-area">${answerText}</lams:textarea>
 		</p>
 	</c:if>
 	<c:if test="${question.appendText}">

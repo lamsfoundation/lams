@@ -38,12 +38,12 @@ public interface SurveyAnswerDAO extends DAO {
      * @param questionUid
      * @return
      */
-    List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid, Long excludeUserId);
+    List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid);
 
     List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId);
 
-    List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid,
-	    final Long excludeUserId, int page, int size, int sorting);
+    List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, int page, int size,
+	    int sorting);
 
-    int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId, final Long excludeUserId);
+    int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId);
 }

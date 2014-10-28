@@ -28,30 +28,42 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 
+public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUserDAO {
 
-public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUserDAO{
-	
-	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + SurveyUser.class.getName() + " as u where u.userId =? and u.survey.contentId=?";
-	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + SurveyUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
-	private static final String FIND_BY_SESSION_ID = "from " + SurveyUser.class.getName() + " as u where u.session.sessionId=?";
+    private static final String FIND_BY_USER_ID_CONTENT_ID = "FROM " + SurveyUser.class.getName()
+	    + " AS u WHERE u.userId =? AND u.survey.contentId=?";
+    private static final String FIND_BY_USER_ID_SESSION_ID = "FROM " + SurveyUser.class.getName()
+	    + " AS u WHERE u.userId =? AND u.session.sessionId=?";
+    private static final String FIND_BY_SESSION_ID = "FROM " + SurveyUser.class.getName()
+	    + " AS u WHERE u.session.sessionId=?";
+    private static final String GET_COUNT_FINISHED_USERS_FOR_SESSION = "SELECT COUNT(*) FROM "
+	    + SurveyUser.class.getName()
+	    + " AS u WHERE u.session.sessionId=? AND (u.sessionFinished is true OR u.responseFinalized is true)";
 
-	public SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
-		if(list == null || list.size() == 0)
-			return null;
-		return (SurveyUser) list.get(0);
+    public SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (SurveyUser) list.get(0);
+    }
+
+    public SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (SurveyUser) list.get(0);
+    }
+
+    public List<SurveyUser> getBySessionID(Long sessionId) {
+	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+    }
+
+    public int getCountFinishedUsers(Long sessionId) {
+	List list = getHibernateTemplate().find(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
+	if (list == null || list.size() == 0) {
+	    return 0;
 	}
-
-	public SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
-		if(list == null || list.size() == 0)
-			return null;
-		return (SurveyUser) list.get(0);
-	}
-
-	public List<SurveyUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
-	}
-
+	return ((Number) list.get(0)).intValue();
+    }
 
 }

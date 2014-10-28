@@ -66,11 +66,9 @@ public class ChartAction extends Action {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
-	Long excludeUserId = WebUtil.readLongParam(request, SurveyConstants.ATTR_USER_ID, true);
 
 	// if excludeUserId received exclude this user's answers
-	AnswerDTO answer = (excludeUserId == null) ? getSurveyService().getQuestionResponse(sessionId, questionUid)
-		: getSurveyService().getQuestionResponse(sessionId, questionUid, excludeUserId);
+	AnswerDTO answer = getSurveyService().getQuestionResponse(sessionId, questionUid);
 	if (answer.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    ChartAction.logger.error("Error question type : Text entry can not generate chart.");
 	    response.getWriter().print(resource.getMessage(SurveyConstants.ERROR_MSG_CHART_ERROR));

@@ -6,7 +6,8 @@
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-
+	
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript">
 		function previousQuestion(sessionMapID){
 			$("surveyForm").action = '<c:url value="/learning/previousQuestion.do"/>';
@@ -32,13 +33,11 @@
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="position" />
 		<html:hidden property="currentIdx" />
-		<html:hidden property="userID" />
 		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="position" value="${formBean.position}" />
 		<c:set var="questionSeqID" value="${formBean.questionSeqID}" />
 		<c:set var="currentIdx" value="${formBean.currentIdx}" />
-		<c:set var="userID" value="${formBean.userID}" />
 
 		<div id="content">
 			<h1>

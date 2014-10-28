@@ -32,18 +32,18 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
     private static final String GET_LEARNER_ANSWER = "FROM " + SurveyAnswer.class.getName()
 	    + " AS a WHERE a.surveyQuestion.uid=? AND a.user.uid=?";
     private static final String GET_SESSION_ANSWER = "FROM " + SurveyAnswer.class.getName() + " AS a "
-	    + " WHERE a.user.session.sessionId=? AND a.surveyQuestion.uid=? AND a.user.userId!=?";
+	    + " WHERE a.user.session.sessionId=? AND a.surveyQuestion.uid=?";
     private static final String GET_BY_TOOL_CONTENT_ID_AND_USER_ID = "FROM " + SurveyAnswer.class.getName() + " AS a "
 	    + " WHERE a.user.session.survey.contentId = ? AND a.user.userId = ?";
 
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT = "SELECT r.answerText FROM "
 	    + SurveyAnswer.class.getName()
 	    + " AS r "
-	    + "WHERE r.user.session.sessionId=:sessionId AND r.surveyQuestion.uid=:questionUid AND r.user.userId!=:excludeUserId AND r.answerText<>'' order by ";
+	    + "WHERE r.user.session.sessionId=:sessionId AND r.surveyQuestion.uid=:questionUid AND r.answerText<>'' order by ";
 
     private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION = "SELECT COUNT(*) FROM "
 	    + SurveyAnswer.class.getName() + " AS r "
-	    + "WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? AND r.user.userId!=? AND r.answerText<>''";
+	    + "WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? AND r.answerText<>''";
 
     @Override
     public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
@@ -55,8 +55,8 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
     }
 
     @Override
-    public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid, Long excludeUserId) {
-	return getHibernateTemplate().find(GET_SESSION_ANSWER, new Object[] { sessionId, questionUid, excludeUserId});
+    public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid) {
+	return getHibernateTemplate().find(GET_SESSION_ANSWER, new Object[] { sessionId, questionUid});
     }
 
     @SuppressWarnings("unchecked")
@@ -66,8 +66,8 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
     }
 
     @Override
-    public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid,
-	    final Long excludeUserId, int page, int size, int sorting) {
+    public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, int page,
+	    int size, int sorting) {
 	String sortingOrder = "";
 	switch (sorting) {
 	case SurveyConstants.SORT_BY_DEAFAULT:
@@ -82,18 +82,15 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 	}
 	String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
 
-	return getSession().createQuery(sqlQuery)
-		.setLong("sessionId", sessionId.longValue()).setLong("questionUid", questionUid.longValue())
-		.setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size).setMaxResults(size)
-		.list();
+	return getSession().createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
+		.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size).list();
     }
 
     @Override
-    public int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId,
-	    final Long excludeUserId) {
+    public int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId) {
 
 	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
-		new Object[] { sessionId, questionId, excludeUserId });
+		new Object[] { sessionId, questionId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

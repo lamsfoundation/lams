@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 
 	<script type="text/javascript">
-		var chartDataUrl = '<lams:WebAppURL />showChart.do?userId=${sessionMap.userId}';
+		var chartDataUrl = '<lams:WebAppURL />showChart.do';
 		var alwaysFetchChartValues = true;
 	
 		$(document).ready(function(){
@@ -50,7 +50,7 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='/learning/getOpenResponses.do'/>?page={page}&size={size}&{sortList:column}&sessionId=${sessionMap.toolSessionID}&userId=${sessionMap.userId}&questionUid=" + $(this).attr('data-question-uid'),
+					ajaxUrl : "<c:url value='/learning/getOpenResponses.do'/>?page={page}&size={size}&{sortList:column}&sessionId=${sessionMap.toolSessionID}&questionUid=" + $(this).attr('data-question-uid'),
 					ajaxProcessing: function (data) {
 						
 				    	if (data && data.hasOwnProperty('rows')) {
@@ -108,7 +108,7 @@
 		}
 		
 		function retakeSurvey(){
-			document.location.href='<c:url value="/learning/start.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&userID=${userID}"/>';
+			document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}"/>';
 		}
     </script>
 </lams:head>
@@ -171,7 +171,7 @@
 
 				</p>
 				<c:if test="${question.type == 3}">
-					<lams:out value="${answerText}" escapeHtml="true"/>
+					<lams:out value="${answerText}" escapeHtml="false"/>
 				</c:if>
 
 				<c:if test="${question.appendText && (not empty answerText)}">
@@ -218,6 +218,12 @@
 			<h2 id="other-users-answers-title">
 				<fmt:message key="label.other.answers" />
 			</h2>
+			
+			<div>
+				<fmt:message key="label.total.responses" >
+					<fmt:param>${countFinishedUser}</fmt:param>
+				</fmt:message>
+			</div>
 		
 			<c:forEach var="question" items="${answerDtos}" varStatus="queStatus">
 			<table class="alternative-color">
@@ -278,8 +284,7 @@
 				</c:if>
 				<c:if test="${question.type == 3}">
 					<tr>
-						<td><fmt:message key="label.open.response"/></td>
-						<td>
+						<td colspan="2">
 							<table class="tablesorter" data-question-uid="${question.uid}">
 								<thead>
 									<tr>

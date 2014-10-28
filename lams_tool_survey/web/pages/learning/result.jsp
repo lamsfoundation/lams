@@ -25,7 +25,7 @@
 		function retakeSurvey(questionSeqId){
 			//retake for all questions
 			if(questionSeqId == -1) {
-				document.location.href='<c:url value="/learning/start.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&userID=${userID}"/>';
+				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}"/>';
 			} else {
 				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}&questionSeqID="/>' +questionSeqId ;
 			}
@@ -42,7 +42,7 @@
 			<c:out value="${sessionMap.instructions}" escapeXml="false" />
 		</p>
 
-		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
+		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher' and !sessionMap.showOtherUsersAnswers}">
 			<div class="info">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
@@ -96,7 +96,7 @@
 
 				</p>
 				<c:if test="${question.type == 3}">
-					<lams:out value="${answerText}" escapeHtml="true"/>
+					<lams:out value="${answerText}" escapeHtml="false"/>
 				</c:if>
 
 				<c:if test="${question.appendText && (not empty answerText)}">

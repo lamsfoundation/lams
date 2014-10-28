@@ -157,6 +157,7 @@
 			<forward name="definelater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />	
 			<forward name="result" path="/pages/learning/result.jsp" />	
+			<forward name="resultOtherUsers" path="/learning/showOtherUsersAnswers.do" />
 		</action>
 		
 		<action path="/learning/nextQuestion"

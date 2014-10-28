@@ -45,6 +45,7 @@ public class SurveyUser implements Cloneable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
+    private boolean responseFinalized;
 
     private SurveySession session;
     private Survey survey;
@@ -60,6 +61,7 @@ public class SurveyUser implements Cloneable {
 	this.session = session;
 	this.survey = null;
 	this.sessionFinished = false;
+	this.responseFinalized = false;
     }
 
     public SurveyUser(UserDTO user, Survey content) {
@@ -69,7 +71,7 @@ public class SurveyUser implements Cloneable {
 	this.loginName = user.getLogin();
 	this.session = null;
 	this.survey = content;
-	this.sessionFinished = false;
+	this.responseFinalized = false;
     }
 
     /**
@@ -195,6 +197,22 @@ public class SurveyUser implements Cloneable {
 
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
+    }
+    
+    /**
+     * @hibernate.property column="response_finalized"
+     * @return Returns the responseFinalized.
+     */
+    public boolean isResponseFinalized() {
+	return responseFinalized;
+    }
+
+    /**
+     * @param responseFinalized
+     *                The responseFinalized to set.
+     */
+    public void setResponseFinalized(boolean responseFinalized) {
+	this.responseFinalized = responseFinalized;
     }
 
     public boolean equals(Object obj) {
