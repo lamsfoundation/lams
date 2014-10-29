@@ -53,19 +53,6 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Manpreet Minhas
  */
 public interface IMonitoringService {
-
-    /**
-     * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
-     * not, throws a UserAccessDeniedException exception
-     */
-    void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription);
-
-    /**
-     * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
-     * not, throws a UserAccessDeniedException exception
-     */
-    void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription);
-
     /** Get the message service, which gives access to the I18N text */
     MessageService getMessageService();
 
@@ -383,19 +370,6 @@ public interface IMonitoringService {
     GateActivity closeGate(Long gateId);
 
     /**
-     * This method returns the details for the given Lesson in WDDX format. Object inside the packet is a
-     * LessonDetailsDTO.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson for which the details have to be fetched
-     * @param userID
-     *            The user who is fetching the Lesson details
-     * @return String The requested details in wddx format
-     * @throws IOException
-     */
-    String getLessonDetails(Long lessonID, Integer userID) throws IOException;
-
-    /**
      * Returns a list of learners participating in the given Lesson
      * 
      * @param lessonID
@@ -502,20 +476,6 @@ public interface IMonitoringService {
     String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException;
 
     /**
-     * This method changes the name of an existing Lesson to the one specified.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose name has to be changed
-     * @param newName
-     *            The new name of the Lesson
-     * @param userID
-     *            The user_id of the User who has requested this operation
-     * @return String The acknowledgement message/error in WDDX format
-     * @throws IOException
-     */
-    String renameLesson(Long lessonID, String newName, Integer userID) throws IOException;
-
-    /**
      * Return an activity object based on the requested id.
      * 
      * @param activityId
@@ -583,26 +543,6 @@ public interface IMonitoringService {
      * @return Lesson
      */
     abstract Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
-
-    /**
-     * Remove all the details for a particular preview lessons. The transaction handling for this method should be
-     * REQUIRES_NEW, which allows each lesson to be deleted separately.
-     * 
-     * @param lessonID
-     *            ID of the lesson which is the preview session. Mandatory.
-     */
-    abstract void deletePreviewLesson(long lessonID);
-
-    /**
-     * Remove all the "old" preview lessons. Removes all preview lessons older than the number of days specified in the
-     * configuration file.
-     * <p>
-     * Calls deletePreviewLesson(long lessonID) to do the actual deletion, so if one lesson throws a database exception
-     * when deleting, the other lessons should delete okay (as deletePreviewLesson uses a REQUIRES_NEW transaction)
-     * 
-     * @return number of lessons deleted.
-     */
-    abstract int deleteAllOldPreviewLessons();
 
     /* Supports the Chosen Groupings and Branching */
     /**
@@ -743,27 +683,8 @@ public interface IMonitoringService {
      */
     void setGroupName(Long groupID, String name);
 
-    /** Open Time Chart */
-    Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
-
     /** Get Organisation by organisationId */
     Organisation getOrganisation(Integer organisationId);
-
-    /**
-     * If the activity is not grouped and not in a branch, then it create lams tool session for all the learners in the
-     * lesson. After the creation of lams tool session, it delegates to the tool instances to create tool's own tool
-     * session. Can't create it for a grouped activity or an activity in a branch as it may not be applicable to all
-     * users.
-     * <p>
-     * 
-     * @param activity
-     *            the tool activity that all tool session reference to.
-     * @param lesson
-     *            the target lesson that these tool sessions belongs to.
-     * @throws LamsToolServiceException
-     *             the exception when lams is talking to tool.
-     */
-    void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson);
 
     /**
      * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff

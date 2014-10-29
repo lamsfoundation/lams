@@ -84,6 +84,18 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
     }
 
     @Override
+    public boolean isGroupManager(Integer orgId, Integer userId) {
+	Organisation organisation = (Organisation) find(Organisation.class, orgId);
+	if (organisation == null) {
+	    return false;
+	}
+	if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+	    organisation = organisation.getParentOrganisation();
+	}
+	return hasOrgRole(organisation.getOrganisationId(), userId, Role.GROUP_MANAGER);
+    }
+
+    @Override
     public boolean isLessonLearner(Long lessonId, Integer userId) {
 	SQLQuery query = getHibernateTemplate().getSessionFactory().getCurrentSession()
 		.createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
@@ -93,25 +105,13 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
     }
 
     @Override
-    public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted, boolean groupManagerAccepted) {
+    public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted) {
 	boolean result = !getHibernateTemplate().find(SecurityDAO.CHECK_LESSON_MONITOR,
 		new Object[] { lessonId, userId }).isEmpty();
 	Lesson lesson = null;
 	if (!result && ownerAccepted) {
 	    lesson = (Lesson) find(Lesson.class, lessonId);
-	    result = lesson != null && userId.equals(lesson.getUser().equals(userId));
-	}
-	if (!result && groupManagerAccepted) {
-	    if (lesson == null) {
-		lesson = (Lesson) find(Lesson.class, lessonId);
-	    }
-	    if (lesson != null) {
-		Organisation organisation = lesson.getOrganisation();
-		if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
-		    organisation = organisation.getParentOrganisation();
-		}
-		result = hasOrgRole(organisation.getOrganisationId(), userId, Role.GROUP_MANAGER);
-	    }
+	    result = (lesson != null) && userId.equals(lesson.getUser().getUserId());
 	}
 	return result;
     }

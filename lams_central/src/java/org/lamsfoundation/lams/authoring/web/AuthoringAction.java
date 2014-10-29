@@ -60,9 +60,7 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.web.MonitoringAction;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -489,12 +487,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Integer userID = getUserId();
-	    
-	try {
-	    getSecurityService().hasOrgRole(organisationID, userID, Role.MONITOR);
-	} catch (SecurityException e) {
-	    log.error("Cannot add a lesson", e);
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+
+	if (!getSecurityService().isGroupMonitor(organisationID, userID, "create single activity lesson", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
 

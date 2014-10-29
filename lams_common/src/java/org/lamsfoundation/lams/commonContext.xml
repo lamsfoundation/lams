@@ -326,6 +326,7 @@
 	<!-- Security service -->
 	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
 		<property name="securityDAO"><ref bean="securityDAO"/></property>
+		<property name="auditService"><ref bean="auditService"/></property>
 	</bean>	
 	
 	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -334,7 +335,8 @@
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
-				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="has*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
 	</bean>

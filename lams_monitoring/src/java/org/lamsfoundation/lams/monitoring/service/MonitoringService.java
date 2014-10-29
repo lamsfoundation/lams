@@ -47,6 +47,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -89,6 +90,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -181,7 +183,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ILamsCoreToolService lamsCoreToolService;
 
     private IUserManagementService userManagementService;
-    
+
     private ISecurityService securityService;
 
     private Scheduler scheduler;
@@ -231,7 +233,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
-    
+
     public void setSecurityService(ISecurityService securityService) {
 	this.securityService = securityService;
     }
@@ -362,40 +364,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     // ---------------------------------------------------------------------
 
     @Override
-    public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription) {
-	checkOwnerOrStaffMember(userId, lessonDAO.getLesson(lessonId), actionDescription);
-    }
-
-    @Override
-    public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
-	User user = (User) baseDAO.find(User.class, userId);
-
-	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(userId)) {
-	    return;
-	}
-
-	Organisation course = lesson.getOrganisation();
-	if (OrganisationType.CLASS_TYPE.equals(course.getOrganisationType().getOrganisationTypeId())) {
-	    course = course.getParentOrganisation();
-	}
-	boolean isUserGroupManager = userManagementService.isUserInRole(userId, course.getOrganisationId(),
-		Role.GROUP_MANAGER);
-
-	if ((lesson == null) || (lesson.getLessonClass() == null)
-		|| (!lesson.getLessonClass().isStaffMember(user) && !isUserGroupManager)) {
-	    throw new UserAccessDeniedException("User " + userId + " may not " + actionDescription + " for lesson "
-		    + lesson.getLessonId());
-	}
-    }
-
-    @Override
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
-	securityService.hasOrgRole(organisationId, userID, Role.MONITOR);
+	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 	
 	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
@@ -450,7 +425,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    + " is missing. Unable to initialize lesson.");
 	}
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
-	
+
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, false, learnerPresenceAvailable,
 		learnerImAvailable, liveEditEnabled, true, false, null, null);
@@ -565,25 +540,22 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userId) {
 	Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (newLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to create class for lesson.");
-	}
-	checkOwnerOrStaffMember(userId, newLesson, "create lesson class");
-
 	// if lesson isn't started recreate the lesson class
 	if (newLesson.isLessonStarted()) {
+	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
 	    lessonService.setLearners(newLesson, organizationUsers);
 	    lessonService.setStaffMembers(newLesson, staffs);
-
 	} else {
+	    newLesson.setOrganisation(organisation);
+	    // security check needs organisation to be set
+	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
+
 	    LessonClass oldLessonClass = newLesson.getLessonClass();
 
 	    LessonClass newLessonClass = this.createLessonClass(organisation, learnerGroupName, organizationUsers,
 		    staffGroupName, staffs, newLesson);
 	    newLessonClass.setLesson(newLesson);
 	    newLesson.setLessonClass(newLessonClass);
-	    newLesson.setOrganisation(organisation);
 
 	    lessonDAO.updateLesson(newLesson);
 
@@ -597,14 +569,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
-
+	securityService.isLessonMonitor(lessonId, userId, "start lesson on schedule", true);
+	
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to start lesson.");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "start lesson on schedule");
-
 	if (requestedLesson.isLessonStarted()) {
 	    // can't schedule it as it is already started. If the UI is correct,
 	    // this should never happen.
@@ -654,13 +622,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
+	
 	// we get the lesson want to finish
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to start lesson.");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "finish lesson on schedule");
-
 	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
 	boolean alreadyScheduled = false;
 	try {
@@ -739,31 +704,20 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void startLesson(long lessonId, Integer userId) {
-	// System.out.println(messageService.getMessage("NO.SUCH.LESSON",new
-	// Object[]{new Long(lessonId)}));
-	// System.out.println(messageService.getMessage("INVALID.ACTIVITYID.TYPE",
-	// new Object[]{ "activityID"}));
-	// System.out.println(messageService.getMessage("INVALID.ACTIVITYID.LESSONID",new
-	// Object[]{ "activityID","lessonID"}));
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Starting Lesson " + lessonId + "==============");
 	}
+	securityService.isLessonMonitor(lessonId, userId, "start lesson", true);
 
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to start lesson.");
-	}
-
 	if (requestedLesson.isLessonStarted()) {
 	    MonitoringService.log
-		    .warn("Lesson for id="
+		    .warn("Lesson "
 			    + lessonId
 			    + " has been started. No need to start the lesson. The lesson was probably scheduled, and then the staff used \"Start now\". This message would have then been created by the schedule start");
 	    return;
 	}
-
-	checkOwnerOrStaffMember(userId, requestedLesson, "create lesson class");
 
 	Date lessonStartTime = new Date();
 	// initialize tool sessions if necessary
@@ -881,23 +835,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void finishLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set lesson to finished");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "finish lesson");
 	setLessonState(requestedLesson, Lesson.FINISHED_STATE);
     }
 
     @Override
     public void archiveLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "archive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set lesson to archived");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "archive lesson");
 	if (!Lesson.ARCHIVED_STATE.equals(requestedLesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(requestedLesson.getLessonStateId())) {
 	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE);
@@ -906,23 +852,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void unarchiveLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "unarchive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set lesson to archived");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "unarchive lesson");
 	revertLessonState(requestedLesson);
-
     }
 
     @Override
     public void suspendLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "suspend lesson", true);
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
-	checkOwnerOrStaffMember(userId, lesson, "suspend lesson");
-	if (lesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to suspend lesson.");
-	}
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId())
 		&& !Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())) {
 	    setLessonState(lesson, Lesson.SUSPENDED_STATE);
@@ -931,15 +869,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void unsuspendLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "unsuspend lesson", true);
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
-	checkOwnerOrStaffMember(userId, lesson, "unsuspend lesson");
 	Integer state = lesson.getLessonStateId();
 	// only suspend started lesson
 	if (!Lesson.SUSPENDED_STATE.equals(state)) {
 	    throw new MonitoringServiceException("Lesson is not suspended lesson. It can not be unsuspended.");
-	}
-	if (lesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to suspend lesson.");
 	}
 	revertLessonState(lesson);
     }
@@ -951,7 +886,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param status
      */
     private void setLessonState(Lesson requestedLesson, Integer status) {
-
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
@@ -966,7 +900,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param status
      */
     private void revertLessonState(Lesson requestedLesson) {
-
 	Integer currentStatus = requestedLesson.getLessonStateId();
 	if (requestedLesson.getPreviousLessonStateId() != null) {
 	    if (requestedLesson.getPreviousLessonStateId().equals(Lesson.NOT_STARTED_STATE)
@@ -1001,46 +934,31 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public void removeLesson(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to remove lesson.");
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "remove lesson");
-
-	// TODO give sysadmin rights to do this too!
-
 	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
     }
 
     @Override
     public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean isLearnerExportAvailable) {
-	isLearnerExportAvailable = (isLearnerExportAvailable != null) ? isLearnerExportAvailable : Boolean.FALSE;
-
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
-	if (lesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set learner portfolio available to " + isLearnerExportAvailable);
-	}
-	checkOwnerOrStaffMember(userId, lesson, "set learner portfolio available");
+	securityService.isLessonMonitor(lessonId, userId, "set learner portfolio available", true);
 	
+	isLearnerExportAvailable = (isLearnerExportAvailable != null) ? isLearnerExportAvailable : Boolean.FALSE;
+	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	lesson.setLearnerExportAvailable(isLearnerExportAvailable);
 	lessonDAO.updateLesson(lesson);
 
-	//audit log enabling/disabling export portfolio
-	writeAuditLog(MonitoringService.AUDIT_LEARNER_PORTFOLIO_SET, new Object[] { lesson.getLessonName(),
-		lesson.getLearnerExportAvailable() });
-	
+	// audit log enabling/disabling export portfolio
+	writeAuditLog(MonitoringService.AUDIT_LEARNER_PORTFOLIO_SET,
+		new Object[] { lesson.getLessonName(), lesson.getLearnerExportAvailable() });
+
 	return lesson.getLearnerExportAvailable();
     }
 
     @Override
     public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
+	securityService.isLessonMonitor(lessonId, userId, "set presence available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set learner presence available to " + presenceAvailable);
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "set presence available");
 	requestedLesson.setLearnerPresenceAvailable(presenceAvailable != null ? presenceAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
 	return requestedLesson.getLearnerPresenceAvailable();
@@ -1048,12 +966,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
+	securityService.isLessonMonitor(lessonId, userId, "set presence instant messaging available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set learner im to " + presenceImAvailable);
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "set presence available");
 	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
 	return requestedLesson.getLearnerImAvailable();
@@ -1061,12 +975,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
+	securityService.isLessonMonitor(lessonId, userId, "set live edit available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId
-		    + " is missing. Unable to set live edit enabled to " + liveEditEnabled);
-	}
-	checkOwnerOrStaffMember(userId, requestedLesson, "set live edit available");
 	requestedLesson.setLiveEditEnabled(liveEditEnabled != null ? liveEditEnabled : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
 	return requestedLesson.getLiveEditEnabled();
@@ -1100,18 +1010,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public Boolean openTimeChart(long lessonId, Integer userId) {
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson == null) {
-	    throw new MonitoringServiceException("Lesson for id=" + lessonId + " is missing. Unable to open.");
-	}
-
-	checkOwnerOrStaffMember(userId, requestedLesson, "open the time chart");
-
-	return true;
-    }
-
-    @Override
     public GateActivity openGateForSingleUser(Long gateId, Integer userId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if ((gate != null) && (userId != null) && (userId >= 0)) {
@@ -1133,9 +1031,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent) {
+	securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
-	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
-
 	User learner = (User) baseDAO.find(User.class, learnerId);
 
 	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
@@ -1166,7 +1063,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			    .getCompletedActivities().containsKey(parentActivity) || ((parentActivity
 			    .getParentActivity() != null) && learnerProgress.getCompletedActivities().containsKey(
 			    parentActivity.getParentActivity())))))) {
-		
+
 		return forceUncompleteActivity(learnerProgress, stopActivity, removeLearnerContent);
 	    }
 	}
@@ -1346,7 +1243,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		stopReason = messageService.getMessage(
 			MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,
 			new Object[] { activity.getTitle() });
-		
+
 		// without this, there are errors when target is in branching
 		learnerService.createToolSessionsIfNecessary(stopActivity, learnerProgress);
 	    } else {
@@ -1571,51 +1468,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public String getLessonDetails(Long lessonID, Integer userID) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
-	checkOwnerOrStaffMember(userID, lesson, "get lesson deatils");
-
-	User user = (User) baseDAO.find(User.class, userID);
-	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
-
-	Locale userLocale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
-	TimeZone tz = TimeZone.getTimeZone(user.getTimeZone());
-
-	/* Date Format for Chat room append */
-	DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-	if ((dto.getCreateDateTime() != WDDXTAGS.DATE_NULL_VALUE) && (dto.getCreateDateTime() != null)) {
-	    dto.setCreateDateTimeStr(sfm.format(dto.getCreateDateTime()));
-	}
-
-	DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
-	if ((dto.getStartDateTime() != WDDXTAGS.DATE_NULL_VALUE) && (dto.getStartDateTime() != null)) {
-	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(tz, dto.getStartDateTime());
-	    dto.setStartDateTimeStr(indfm.format(tzStartDate) + " " + tz.getDisplayName(userLocale));
-	}
-
-	if ((dto.getScheduleStartDate() != WDDXTAGS.DATE_NULL_VALUE) && (dto.getScheduleStartDate() != null)) {
-	    Date tzScheduleDate = DateUtil.convertToTimeZoneFromDefault(tz, dto.getScheduleStartDate());
-	    dto.setScheduleStartDateStr(indfm.format(tzScheduleDate) + " " + tz.getDisplayName(userLocale));
-	}
-
-	MonitoringService.log.debug(dto.toString());
-	MonitoringService.log.debug(dto.getLiveEditEnabled());
-
-	FlashMessage flashMessage;
-	if (dto != null) {
-	    flashMessage = new FlashMessage("getLessonDetails", dto);
-	} else {
-	    flashMessage = new FlashMessage("getLessonDetails", messageService.getMessage("NO.SUCH.LESSON",
-		    new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-
-	return flashMessage.serializeMessage();
-    }
-
-    @Override
     public String getLessonLearners(Long lessonID, Integer userID) throws IOException {
+	securityService.isLessonMonitor(lessonID, userID, "get lesson learners", true);
 	Lesson lesson = lessonDAO.getLesson(lessonID);
-	checkOwnerOrStaffMember(userID, lesson, "get lesson learners");
 
 	Vector lessonLearners = new Vector();
 	FlashMessage flashMessage;
@@ -1635,8 +1490,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
     @Override
     public String getLessonStaff(Long lessonID, Integer userID) throws IOException {
+	securityService.isLessonMonitor(lessonID, userID, "get lesson staff", true);
 	Lesson lesson = lessonDAO.getLesson(lessonID);
-	checkOwnerOrStaffMember(userID, lesson, "get lesson staff");
 
 	Vector lessonStaff = new Vector();
 	FlashMessage flashMessage;
@@ -1844,8 +1699,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException {
+	securityService.isLessonMonitor(lessonID, requestingUserId, "get learner activity URL", true);
 	Lesson lesson = lessonDAO.getLesson(lessonID);
-	checkOwnerOrStaffMember(requestingUserId, lesson, "get monitoring learner progress url");
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
 	User learner = (User) baseDAO.find(User.class, learnerUserID);
@@ -1870,8 +1725,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException {
+	securityService.isLessonMonitor(lessonID, userID, "get activity monitor URL", true);
 	Lesson lesson = lessonDAO.getLesson(lessonID);
-	checkOwnerOrStaffMember(userID, lesson, "get activity define later url");
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
 
@@ -1911,25 +1766,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	return flashMessage.serializeMessage();
 
-    }
-
-    @Override
-    public String renameLesson(Long lessonID, String newName, Integer userID) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	FlashMessage flashMessage;
-	if (lesson != null) {
-	    if (lesson.getUser().getUserId().equals(userID)) {
-		lesson.setLessonName(newName);
-		lessonDAO.updateLesson(lesson);
-		flashMessage = new FlashMessage("renameLesson", newName);
-	    } else {
-		flashMessage = FlashMessage.getUserNotAuthorized("renameLesson", userID);
-	    }
-	} else {
-	    flashMessage = new FlashMessage("renameLesson", messageService.getMessage("NO.SUCH.LESSON",
-		    new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-	return flashMessage.serializeMessage();
     }
 
     @Override
@@ -2091,41 +1927,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     // ---------------------------------------------------------------------
-    // Helper Methods - start lesson
-    // ---------------------------------------------------------------------
-
-    @Override
-    public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) {
-	if (activity.getApplyGrouping().equals(Boolean.FALSE) && (activity.getParentBranch() == null)) {
-	    activity.setToolSessions(new HashSet());
-	    try {
-
-		Set newToolSessions = lamsCoreToolService.createToolSessions(lesson.getAllLearners(), activity, lesson);
-		Iterator iter = newToolSessions.iterator();
-		while (iter.hasNext()) {
-		    // core has set up a new tool session, we need to ask tool
-		    // to create their own
-		    // tool sessions using the given id and attach the session
-		    // to the activity.
-		    ToolSession toolSession = (ToolSession) iter.next();
-		    lamsCoreToolService.notifyToolsToCreateSession(toolSession, activity);
-		    activity.getToolSessions().add(toolSession);
-		}
-	    } catch (LamsToolServiceException e) {
-		String error = "Unable to initialise tool session. Fail to call tool services. Error was "
-			+ e.getMessage();
-		MonitoringService.log.error(error, e);
-		throw new MonitoringServiceException(error, e);
-	    } catch (ToolException e) {
-		String error = "Unable to initialise tool session. Tool encountered an error. Error was "
-			+ e.getMessage();
-		MonitoringService.log.error(error, e);
-		throw new MonitoringServiceException(error, e);
-	    }
-	}
-    }
-
-    // ---------------------------------------------------------------------
     // Helper Methods - scheduling
     // ---------------------------------------------------------------------
 
@@ -2162,7 +1963,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     // ---------------------------------------------------------------------
     // Preview related methods
     // ---------------------------------------------------------------------
-    
+
     @Override
     public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
@@ -2179,96 +1980,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	staffs.add(user);
 
 	return createLessonClassForLesson(lessonID, null, "Learner Group", learners, "Staff Group", staffs, userID);
-
-    }
-
-    /**
-     * {@inheritDoc}<br><br>
-     * 
-     * Delete a preview lesson and all its contents. Warning: can only delete preview lessons. Can't guarentee data
-     * integrity if it is done to any other type of lesson. See removeLesson() for hiding lessons from a teacher's view
-     * without removing them from the database. TODO remove the related tool data.
-     */
-    @Override
-    public void deletePreviewLesson(long lessonID) {
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
-	deletePreviewLesson(lesson);
-    }
-
-    private void deletePreviewLesson(Lesson lesson) {
-	if (lesson != null) {
-	    if (lesson.isPreviewLesson()) {
-
-		// get all the tool sessions for this lesson and remove all the
-		// tool session data
-		List toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
-		if ((toolSessions != null) && (toolSessions.size() > 0)) {
-		    Iterator iter = toolSessions.iterator();
-		    while (iter.hasNext()) {
-			ToolSession toolSession = (ToolSession) iter.next();
-			lamsCoreToolService.deleteToolSession(toolSession);
-		    }
-		} else {
-		    MonitoringService.log.debug("deletePreviewLesson: Removing tool sessions - none exist");
-		}
-
-		// lesson has learning design as a foriegn key, so need to
-		// remove lesson before learning design
-		LearningDesign ld = lesson.getLearningDesign();
-		lessonDAO.deleteLesson(lesson);
-		authoringService.deleteLearningDesign(ld);
-
-	    } else {
-		MonitoringService.log
-			.warn("Unable to delete lesson as lesson is not a preview lesson. Learning design copy type was "
-				+ lesson.getLearningDesign().getCopyTypeID());
-	    }
-	}
-    }
-
-    @Override
-    public int deleteAllOldPreviewLessons() {
-
-	int numDays = Configuration.getAsInt(ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS);
-
-	// Contract checking
-	if (numDays <= 0) {
-	    MonitoringService.log.error("deleteAllOldPreviewSessions: number of days invalid (" + numDays
-		    + "). See configuration file (option " + ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS
-		    + " Unable to delete any preview lessons");
-	    return 0;
-	}
-
-	int numDeleted = 0;
-
-	// calculate comparison date
-	long newestDateToKeep = System.currentTimeMillis() - (numDays * MonitoringService.numMilliSecondsInADay);
-	Date date = new Date(newestDateToKeep);
-	// convert data to UTC
-	MonitoringService.log.info("Deleting all preview lessons before " + date.toString() + " (server time) ("
-		+ newestDateToKeep + ")");
-
-	// get all the preview sessions older than a particular date.
-	List sessions = lessonDAO.getPreviewLessonsBeforeDate(date);
-	Iterator iter = sessions.iterator();
-	while (iter.hasNext()) {
-	    Lesson lesson = (Lesson) iter.next();
-	    try {
-		deletePreviewLesson(lesson);
-		numDeleted++;
-	    } catch (Exception e) {
-		MonitoringService.log
-			.error("Unable to delete lesson " + lesson.getLessonId() + " due to exception.", e);
-	    }
-	}
-
-	return numDeleted;
     }
 
     /* Grouping and branching related calls */
 
     @Override
-    //TODO Optimise the database query. Do a single query rather then large collection access
+    // TODO Optimise the database query. Do a single query rather then large collection access
     public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping) {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, useCreateGrouping, "getClassMembersNotGrouped");

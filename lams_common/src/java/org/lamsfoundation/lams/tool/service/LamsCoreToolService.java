@@ -156,23 +156,6 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
-    public Set createToolSessions(Set learners, ToolActivity activity, Lesson lesson) throws LamsToolServiceException {
-	Iterator iter = learners.iterator();
-	Set newToolSessions = new HashSet();
-	while (iter.hasNext()) {
-	    // set up the new tool session. createToolSession() will see if it really
-	    // needs to be created - if not will return an existing session.
-	    User learner = (User) iter.next();
-	    ToolSession toolSession = createToolSession(learner, activity, lesson);
-	    if (toolSession != null) {
-		newToolSessions.add(toolSession);
-	    }
-	}
-
-	return newToolSessions;
-    }
-
-    @Override
     public ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException {
 	return toolSessionDAO.getToolSessionByLearner(learner, activity);
     }
