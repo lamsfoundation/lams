@@ -179,12 +179,12 @@
 				</td>
 				<td class="linksCell">
 					<c:if test="${not empty orgDTOs}">
-						<div class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
+						<div id="refreshButton" class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
 							 onClick="javascript:loadOrgTab(null, true)">
 								<fmt:message key="index.refresh" />
 						</div>
 					</c:if>
-					<div class="ui-button" onClick="javascript:closeAllChildren();document.location.href='home.do?method=logout'">
+					<div id="logoutButton" class="ui-button" onClick="javascript:closeAllChildren();document.location.href='home.do?method=logout'">
 							<fmt:message key="index.logout" />
 					</div>
 				</td>
