@@ -30,6 +30,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 public class ClassTab extends AbstractPage {
@@ -56,9 +57,6 @@ public class ClassTab extends AbstractPage {
 	@FindBy(id = "selected-monitors")
 	private WebElement selectedMonitors;
 
-	@FindBy(id = "unselected-learners")
-	private WebElement unselectedLearners;
-
 	@FindBy(id = "learnerMoveToRight")
 	private WebElement learnerMoveToRight;
 
@@ -68,6 +66,13 @@ public class ClassTab extends AbstractPage {
 	@FindBy(id = "selected-learners")
 	private WebElement selectedLearners;
 
+	@FindBys({
+		@FindBy(id = "unselected-learners"), 
+		@FindBy(id = "div")
+	})
+	private List<WebElement> allUnselectedLearners;
+
+	
 	public ClassTab(WebDriver driver) {
 		super(driver);
 		
@@ -104,7 +109,7 @@ public class ClassTab extends AbstractPage {
 	
 	public ClassTab addOneLearnerToLesson() {
 		
-		List<WebElement> availableLearners = unselectedLearners.findElements(By.tagName("div"));
+		List<WebElement> availableLearners = allUnselectedLearners;
 		
 		int randomLearner = Integer.parseInt(LamsUtil.randInt(1, availableLearners.size()-1));
 	
@@ -132,8 +137,9 @@ public class ClassTab extends AbstractPage {
 	}
 	
 	public int getNumberUnselectedLearners() {
-
-		return unselectedLearners.findElements(By.tagName("div")).size();
+		
+		return allUnselectedLearners.size();
+		
 	}
 
 
