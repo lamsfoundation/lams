@@ -618,6 +618,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    if (mark > maxMark) {
 		mark = maxMark;
+	
+	    // in case options have negative grades (<0), their total mark can't be less than -maxMark
+	    } else if (mark < -maxMark) {
+		mark = -maxMark;
 	    }
 
 	    // calculate penalty
@@ -628,22 +632,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
 			userId, question.getUid());
 
-		// calculate penalty itdelf
+		// calculate penalty itself
 		float penalty = question.getPenaltyFactor() * numberWrongAnswers;
 		mark -= penalty;
 		if (penalty > maxMark) {
 		    penalty = maxMark;
 		}
 		questionAnswer.setPenalty(penalty);
+		
+		//don't let penalty make mark less than 0
+		if (mark < 0) {
+		    mark = 0;
+		}
 	    }
-
-	    if (mark < 0) {
-		mark = 0;
-	    }
-
+	    
 	    questionAnswer.setMark(mark);
 	    questionAnswer.setMaxMark(maxMark);
-
 	}
 	
 	return mark;
