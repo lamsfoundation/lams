@@ -90,7 +90,7 @@ public class AdvancedTab  extends AbstractPage {
 	
 	public Boolean isEnableLessonIntro() {
 		
-		return introEnableField.isEnabled();
+		return introEnableField.isSelected();
 		
 	}
 	
@@ -123,7 +123,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isDisplayDesign() {
 		
-		return introImageField.isEnabled();
+		return introImageField.isSelected();
 		
 	}
 	
@@ -136,7 +136,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isStartInMonitor() {
 		
-		return startMonitorField.isEnabled();
+		return startMonitorField.isSelected();
 		
 	}
 	
@@ -149,7 +149,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isLearnerRestart() {
 		
-		return learnerRestart.isEnabled();
+		return learnerRestart.isSelected();
 		
 	}
 	
@@ -162,7 +162,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isEnableLiveEdit() {
 		
-		return liveEditEnable.isEnabled();
+		return liveEditEnable.isSelected();
 		
 	}
 	
@@ -175,7 +175,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isEnableLessonNotifications() {
 		
-		return notificationsEnable.isEnabled();
+		return notificationsEnable.isSelected();
 		
 	}
 	
@@ -188,7 +188,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isEnablePortfolio() {
 		
-		return portfolioEnable.isEnabled();
+		return portfolioEnable.isSelected();
 		
 	}
 	
@@ -201,7 +201,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isEnablePresence() {
 		
-		return presenceEnableField.isEnabled();
+		return presenceEnableField.isSelected();
 		
 	}
 	
@@ -214,7 +214,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isEnableIM() {
 		
-		return imEnableField.isEnabled();
+		return imEnableField.isSelected();
 		
 	}
 	
@@ -227,7 +227,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isSplitLearners() {
 		
-		return splitLearnersField.isEnabled();
+		return splitLearnersField.isSelected();
 		
 	}
 	
@@ -253,7 +253,7 @@ public class AdvancedTab  extends AbstractPage {
 		
 	public Boolean isScheduledEnable() {
 		
-		return schedulingEnableField.isEnabled();
+		return schedulingEnableField.isSelected();
 		
 	}
 	
