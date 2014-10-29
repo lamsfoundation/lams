@@ -546,9 +546,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    lessonService.setLearners(newLesson, organizationUsers);
 	    lessonService.setStaffMembers(newLesson, staffs);
 	} else {
-	    newLesson.setOrganisation(organisation);
-	    // security check needs organisation to be set
-	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
+	    if (organisation != null) {
+		// security check needs organisation to be set
+		// it is not set for lesson preview, so it still needs improvement
+		newLesson.setOrganisation(organisation);
+		securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
+	    }
 
 	    LessonClass oldLessonClass = newLesson.getLessonClass();
 
@@ -707,10 +710,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Starting Lesson " + lessonId + "==============");
 	}
-	securityService.isLessonMonitor(lessonId, userId, "start lesson", true);
-
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson.getOrganisation() != null) {
+	    // preview does not have organisation set, so this security check still needs improvement
+	    securityService.isLessonMonitor(lessonId, userId, "start lesson", true);
+	}
 	if (requestedLesson.isLessonStarted()) {
 	    MonitoringService.log
 		    .warn("Lesson "
