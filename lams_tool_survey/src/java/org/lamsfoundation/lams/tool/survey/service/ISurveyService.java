@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
@@ -39,12 +38,11 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
  * 
- * Interface that defines the contract that all Survey service provider must follow.
+ *         Interface that defines the contract that all Survey service provider must follow.
  */
 public interface ISurveyService {
 
@@ -118,6 +116,11 @@ public interface ISurveyService {
      */
     AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
 
+    List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, int page, int size,
+	    int sorting);
+
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId);
+
     /**
      * Commit answers for a group of question together.
      * 
@@ -165,6 +168,14 @@ public interface ISurveyService {
      * @return
      */
     List<SurveyUser> getSessionUsers(Long sessionId);
+    
+    /**
+     * Get number of finished users.
+     * 
+     * @param sessionId
+     * @return
+     */
+    int getCountFinishedUsers(Long sessionId);
 
     // ******************************************************************************************
     // ********** Session methods ***********************
@@ -193,6 +204,13 @@ public interface ISurveyService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException;
+    
+    /**
+     * Mark user as finalized response which will signify he has submitted response.
+     * 
+     * @param user
+     */
+    void setResponseFinalized(Long userUid);
 
     // ******************************************************************************************
     // Monitoring summary /statistic methods
@@ -261,7 +279,7 @@ public interface ISurveyService {
      * @return
      */
     Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
-    
+
     void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
@@ -269,13 +287,13 @@ public interface ISurveyService {
      * positive integer number.
      * 
      * @param existingConditions
-     *                existing conditions; required to check if a condition with the same name does not exist.
+     *            existing conditions; required to check if a condition with the same name does not exist.
      * @return unique SurveyCondition name
      */
     String createConditionName(Collection<SurveyCondition> existingConditions);
 
     void deleteCondition(SurveyCondition condition);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
      * 

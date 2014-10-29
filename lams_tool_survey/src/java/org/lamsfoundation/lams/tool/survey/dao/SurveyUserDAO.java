@@ -29,9 +29,11 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 
 public interface SurveyUserDAO extends DAO {
 
-	SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+    SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
 
-	SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId);
+    SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
-	List<SurveyUser> getBySessionID(Long sessionId);
+    List<SurveyUser> getBySessionID(Long sessionId);
+    
+    int getCountFinishedUsers(Long sessionId);
 }

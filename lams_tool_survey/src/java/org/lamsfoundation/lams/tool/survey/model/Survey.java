@@ -23,21 +23,16 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.survey.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
 
 /**
  * Survey
@@ -59,6 +54,7 @@ public class Survey implements Cloneable {
     private String instructions;
     // advance
     private boolean showOnePage;
+    private boolean showOtherUsersAnswers;
     private boolean lockWhenFinished;
 
     private boolean reflectOnActivity;
@@ -383,6 +379,18 @@ public class Survey implements Cloneable {
 
     public void setShowOnePage(boolean showOnePage) {
 	this.showOnePage = showOnePage;
+    }
+    
+    /**
+     * @hibernate.property column="show_other_users_answers"
+     * @return
+     */
+    public boolean isShowOtherUsersAnswers() {
+	return showOtherUsersAnswers;
+    }
+
+    public void setShowOtherUsersAnswers(boolean showOtherUsersAnswers) {
+	this.showOtherUsersAnswers = showOtherUsersAnswers;
     }
 
     /**

@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.model;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 /**
  * @hibernate.class table="tl_lasurv11_option"

@@ -157,6 +157,7 @@
 			<forward name="definelater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />	
 			<forward name="result" path="/pages/learning/result.jsp" />	
+			<forward name="resultOtherUsers" path="/learning/showOtherUsersAnswers.do" />
 		</action>
 		
 		<action path="/learning/nextQuestion"
@@ -186,6 +187,23 @@
 			validate="false"			
 			parameter="retake" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		
+		<action path="/learning/showOtherUsersAnswers"
+			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			scope="request" 
+			validate="false"			
+			parameter="showOtherUsersAnswers" >
+			<forward name="success" path="/pages/learning/resultOtherUsers.jsp" />
+		</action>
+		
+		<action path="/learning/getOpenResponses"
+			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			scope="request" 
+			validate="false"			
+			parameter="getOpenResponses" >
 		</action>
 		
 		<action path="/learning/doSurvey"

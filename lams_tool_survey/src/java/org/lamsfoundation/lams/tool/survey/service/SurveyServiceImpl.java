@@ -174,6 +174,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public SurveyUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return surveyUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
+    
+    @Override
+    public int getCountFinishedUsers(Long sessionId) {
+	return surveyUserDao.getCountFinishedUsers(sessionId);
+    }
 
     @Override
     public void saveOrUpdateSurvey(Survey survey) {
@@ -218,6 +223,13 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    throw new SurveyApplicationException(e);
 	}
 	return nextUrl;
+    }
+    
+    @Override
+    public void setResponseFinalized(Long userUid) {
+	SurveyUser user = (SurveyUser) surveyUserDao.getObject(SurveyUser.class, userUid);
+	user.setResponseFinalized(true);
+	surveyUserDao.saveObject(user);
     }
 
     @Override
@@ -340,54 +352,67 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	// initial a array to hold how many time chose has been done for a option or open text.
-	int optSize = options.size();
+	int numberAvailableOptions = options.size();
 	// for appendText and open Text Entry will be the last one of choose[] array.
 	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    optSize++;
+	    numberAvailableOptions++;
 	}
 
-	int[] choose = new int[optSize];
-	Arrays.fill(choose, 0);
+	int[] choiceArray = new int[numberAvailableOptions];
+	Arrays.fill(choiceArray, 0);
 
 	// sum up all option and open text (if has) have been selected count list
-	int answerSum = 0;
+	int numberAnswers = 0;
 	if (answsers != null) {
 	    for (SurveyAnswer answer : answsers) {
-		String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
-		for (String optUid : choseOpt) {
+		String[] choiceList = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
+		for (String optUid : choiceList) {
 		    // if option has been chosen, the relative index of choose[] array will increase.
 		    if (optMap.containsKey(optUid)) {
-			choose[optMap.get(optUid)]++;
-			answerSum++;
+			choiceArray[optMap.get(optUid)]++;
+			numberAnswers++;
 		    }
 		}
 		// handle appendText or Open Text Entry
 		if ((answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
 			&& !StringUtils.isBlank(answer.getAnswerText())) {
-		    choose[optSize - 1]++;
-		    answerSum++;
+		    choiceArray[numberAvailableOptions - 1]++;
+		    numberAnswers++;
 		}
 	    }
 	}
 	// caculate the percentage of answer response
 	idx = 0;
-	if (answerSum == 0) {
-	    answerSum = 1;
+	if (numberAnswers == 0) {
+	    numberAnswers = 1;
 	}
 	for (SurveyOption option : options) {
-	    option.setResponse((double) choose[idx] / (double) answerSum * 100d);
-	    option.setResponseFormatStr(new Long(Math.round(option.getResponse())).toString());
-	    option.setResponseCount(choose[idx]);
+	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	    option.setResponse(percentage);
+	    option.setResponseFormatStr(new Long(Math.round(percentage)).toString());
+	    option.setResponseCount(choiceArray[idx]);
 	    idx++;
 	}
 	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    answerDto.setOpenResponse((double) choose[idx] / (double) answerSum * 100d);
-	    answerDto.setOpenResponseFormatStr(new Long(Math.round(answerDto.getOpenResponse())).toString());
-	    answerDto.setOpenResponseCount(choose[idx]);
+	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	    answerDto.setOpenResponse(percentage);
+	    answerDto.setOpenResponseFormatStr(new Long(Math.round(percentage)).toString());
+	    answerDto.setOpenResponseCount(choiceArray[idx]);
 	}
 
 	return answerDto;
+    }
 
+    @Override
+    public List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, int page,
+	    int size, int sorting) {
+	return surveyAnswerDao.getOpenResponsesForTablesorter(qaSessionId, questionId, page, size,
+		sorting);
+    }
+
+    @Override
+    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId) {
+	return surveyAnswerDao.getCountResponsesBySessionAndQuestion(qaSessionId, questionId);
     }
 
     @Override
@@ -502,11 +527,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
 	return summary;
     }
-    
+
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String createConditionName(Collection<SurveyCondition> existingConditions) {
 	String uniqueNumber = null;
@@ -531,15 +556,15 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getSurveyOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser) {
-	
-	//it appears surveyUser can be null (?)
+
+	// it appears surveyUser can be null (?)
 	if (surveyUser == null) {
 	    return;
 	}
-	
+
 	String userName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
 	String message = getLocalisedMessage("event.answer.submit.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
@@ -633,7 +658,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(SurveyImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, surveyToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Survey)) {
@@ -719,11 +744,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    }
 	}
     }
-    
+
     public String getToolContentTitle(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
@@ -732,7 +757,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 	survey.setDefineLater(false);
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).isDefineLater();
@@ -837,31 +862,33 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /*
-     * Sample content for import: <struct> <var name='objectType'><string>content</string></var> <var name='id'><number>34.0</number></var>
-     * <var name='questions'><array length='3'> <struct> <var name='order'><number>1.0</number></var> <var
-     * name='isOptional'><boolean value='true'/></var> <var name='question'><string>Sample Multiple choice - only one
-     * response allowed?</string></var> <var name='questionType'><string>simpleChoice</string></var> <var
-     * name='isTextBoxEnabled'><boolean value='false'/></var> <var name='candidates'><array length='3'> <struct> <var
-     * name='order'><number>1.0</number></var> <var name='answer'><string>Option 1</string></var> </struct>
-     * <struct> <var name='order'><number>2.0</number></var> <var name='answer'><string>Option 2</string></var>
-     * </struct> <struct> <var name='order'><number>3.0</number></var> <var name='answer'><string>Option 3</string></var>
+     * Sample content for import: <struct> <var name='objectType'><string>content</string></var> <var
+     * name='id'><number>34.0</number></var> <var name='questions'><array length='3'> <struct> <var
+     * name='order'><number>1.0</number></var> <var name='isOptional'><boolean value='true'/></var> <var
+     * name='question'><string>Sample Multiple choice - only one response allowed?</string></var> <var
+     * name='questionType'><string>simpleChoice</string></var> <var name='isTextBoxEnabled'><boolean
+     * value='false'/></var> <var name='candidates'><array length='3'> <struct> <var
+     * name='order'><number>1.0</number></var> <var name='answer'><string>Option 1</string></var> </struct> <struct>
+     * <var name='order'><number>2.0</number></var> <var name='answer'><string>Option 2</string></var> </struct>
+     * <struct> <var name='order'><number>3.0</number></var> <var name='answer'><string>Option 3</string></var>
      * </struct> </array></var> </struct> <struct> <var name='order'><number>2.0</number></var> <var
-     * name='isOptional'><boolean value='false'/></var> <var name='question'><string>Sample Multiple choice -
-     * multiple response allowed?</string></var> <var name='questionType'><string>choiceMultiple</string></var>
-     * <var name='isTextBoxEnabled'><boolean value='true'/></var> <var name='candidates'><array length='3'> <struct>
-     * <var name='order'><number>1.0</number></var> <var name='answer'><string>Option 1</string></var> </struct><struct>
-     * <var name='order'><number>2.0</number></var> <var name='answer'><string>Option 2</string></var> </struct><struct>
-     * <var name='order'><number>3.0</number></var> <var name='answer'><string>Option 3</string></var> </struct>
+     * name='isOptional'><boolean value='false'/></var> <var name='question'><string>Sample Multiple choice - multiple
+     * response allowed?</string></var> <var name='questionType'><string>choiceMultiple</string></var> <var
+     * name='isTextBoxEnabled'><boolean value='true'/></var> <var name='candidates'><array length='3'> <struct> <var
+     * name='order'><number>1.0</number></var> <var name='answer'><string>Option 1</string></var> </struct><struct> <var
+     * name='order'><number>2.0</number></var> <var name='answer'><string>Option 2</string></var> </struct><struct> <var
+     * name='order'><number>3.0</number></var> <var name='answer'><string>Option 3</string></var> </struct>
      * </array></var> </struct> <struct> <var name='order'><number>3.0</number></var> <var name='isOptional'><boolean
      * value='true'/></var> <var name='question'><string>Sample Free text question?</string></var> <var
      * name='questionType'><string>textEntry</string></var> <var name='isTextBoxEnabled'><boolean value='false'/></var>
      * <var name='candidates'><array length='0'></array></var> </struct> </array></var> <var
-     * name='contentDefineLater'><boolean value='false'/></var> <var name='body'><string>Put instructions here.</string></var>
-     * <var name='contentShowUser'><boolean value='false'/></var> <var name='isHTML'><boolean value='false'/></var>
-     * <var name='summary'><string>Thank you for your participation!</string></var> xxxxxxxxxx <var name='title'><string>Put
-     * Title Here</string></var> <var name='description'><string>Survey Questions</string></var> <var
-     * name='contentType'><string>surveycontent</string></var> <var name='isReusable'><boolean value='false'/></var>
-     * </struct></array></var> <var name='firstActivity'><number>31.0</number></var>
+     * name='contentDefineLater'><boolean value='false'/></var> <var name='body'><string>Put instructions
+     * here.</string></var> <var name='contentShowUser'><boolean value='false'/></var> <var name='isHTML'><boolean
+     * value='false'/></var> <var name='summary'><string>Thank you for your participation!</string></var> xxxxxxxxxx
+     * <var name='title'><string>Put Title Here</string></var> <var name='description'><string>Survey
+     * Questions</string></var> <var name='contentType'><string>surveycontent</string></var> <var
+     * name='isReusable'><boolean value='false'/></var> </struct></array></var> <var
+     * name='firstActivity'><number>31.0</number></var>
      */
 
     /**

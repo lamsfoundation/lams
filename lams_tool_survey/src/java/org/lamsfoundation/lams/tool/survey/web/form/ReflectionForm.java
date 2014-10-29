@@ -24,12 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.survey.web.form;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.validator.ValidatorForm;
 
 /**

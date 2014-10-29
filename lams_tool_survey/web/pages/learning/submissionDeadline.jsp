@@ -8,7 +8,6 @@
 	<%@ include file="/common/header.jsp"%>
 
 	<script type="text/javascript">
-	<!--
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
@@ -16,9 +15,7 @@
 		}
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-		
-	-->        
+		} 
     </script>
 </lams:head>
 

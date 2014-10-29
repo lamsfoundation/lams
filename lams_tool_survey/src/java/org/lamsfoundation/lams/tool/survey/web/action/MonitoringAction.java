@@ -27,14 +27,14 @@ package org.lamsfoundation.lams.tool.survey.web.action;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.Date;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,12 +66,12 @@ import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -456,8 +456,7 @@ public class MonitoringAction extends Action {
      * @param string
      * @return
      */
-    private String removeHTMLTags(String string)
-    {
+    private String removeHTMLTags(String string) {
 	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 

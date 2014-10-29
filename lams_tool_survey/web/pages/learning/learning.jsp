@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
@@ -7,42 +6,38 @@
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-
+	
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript">
-	<!--
-		
 		function previousQuestion(sessionMapID){
 			$("surveyForm").action = '<c:url value="/learning/previousQuestion.do"/>';
 			$("surveyForm").submit();
 		}
+		
 		function nextQuestion(sessionMapID){
 			$("surveyForm").action = '<c:url value="/learning/nextQuestion.do"/>';
 			$("surveyForm").submit();
 		}
+		
 		function singleChoice(choiceName){
 			var rs = document.getElementsByName(choiceName);
 			for(idx=0;idx<rs.length;idx++)
 				rs[idx].checked=false;
-		}
-	-->        
+		}  
     </script>
 </lams:head>
 <body class="stripes">
-	<html:form action="/learning/doSurvey" method="post"
-		styleId="surveyForm">
-		<c:set var="formBean"
-			value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm">
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<html:hidden property="questionSeqID" />
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="position" />
 		<html:hidden property="currentIdx" />
-		<html:hidden property="userID" />
 		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="position" value="${formBean.position}" />
 		<c:set var="questionSeqID" value="${formBean.questionSeqID}" />
 		<c:set var="currentIdx" value="${formBean.currentIdx}" />
-		<c:set var="userID" value="${formBean.userID}" />
 
 		<div id="content">
 			<h1>
@@ -60,16 +55,14 @@
 			</c:if>	
 			<c:choose>
 				<%-- Show on one page or when learner does not choose edit one question --%>
-				<c:when
-					test="${sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)}">
+				<c:when test="${sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)}">
 					<c:forEach var="element" items="${sessionMap.questionList}">
 						<c:set var="question" value="${element.value}" />
 						<%@ include file="/pages/learning/question.jsp"%>
 					</c:forEach>
 				</c:when>
 				<c:otherwise>
-					<c:set var="question"
-						value="${sessionMap.questionList[questionSeqID]}" />
+					<c:set var="question" value="${sessionMap.questionList[questionSeqID]}" />
 					<fmt:message key="label.question" /> ${currentIdx} <fmt:message
 						key="label.of" /> ${sessionMap.totalQuestions}
 						<%@ include file="/pages/learning/question.jsp"%>

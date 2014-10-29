@@ -62,6 +62,8 @@ public class SurveyConstants {
     public static final String PARAM_TITLE = "title";
 
     public static final String ATTR_USER_UID = "userUid";
+    
+    public static final String ATTR_USER = "user";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.survey.item.title.blank";
@@ -143,6 +145,8 @@ public class SurveyConstants {
     public static final String FORWARD_CHOICE_QUESTION = "question";
 
     public static final String ATTR_SHOW_ON_ONE_PAGE = "showOnOnePage";
+    
+    public static final String ATTR_SHOW_OTHER_USERS_ANSWERS = "showOtherUsersAnswers";
 
     public static final String PREFIX_QUESTION_CHOICE = "optionChoice";
 
@@ -163,6 +167,12 @@ public class SurveyConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    
+    public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
+    
+    public static final int SORT_BY_DEAFAULT = 0;
+    public static final int SORT_BY_ANSWER_ASC = 1;
+    public static final int SORT_BY_ANSWER_DESC = 2;
     
     // POSITION
     public static int POSITION_INSIDE = 0;
