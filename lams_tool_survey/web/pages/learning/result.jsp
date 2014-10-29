@@ -42,14 +42,35 @@
 			<c:out value="${sessionMap.instructions}" escapeXml="false" />
 		</p>
 
-		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher' and !sessionMap.showOtherUsersAnswers}">
-			<div class="info">
+		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
+			<div class="info space-bottom">
 				<c:choose>
+					<c:when test="${sessionMap.showOtherUsersAnswers}">
+						<c:set var="buttonLabel"><fmt:message key="label.view.all.responses" /></c:set>
+						<fmt:message key="message.warnLockOnFinish" >
+							<fmt:param>${buttonLabel}</fmt:param>
+						</fmt:message>
+					</c:when>
+								
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" />
 					</c:when>
+					
 					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
+						<c:set var="buttonLabel">
+							<c:choose>
+							 	<c:when test="${sessionMap.activityPosition.last}">
+							 		<fmt:message key="label.submit" />
+							 	</c:when>
+							 					
+							 	<c:otherwise>
+							 		 <fmt:message key="label.finished" />
+							 	</c:otherwise>
+							 </c:choose>
+						</c:set>
+						<fmt:message key="message.warnLockOnFinish" >
+							<fmt:param>${buttonLabel}</fmt:param>
+						</fmt:message>
 					</c:otherwise>
 				</c:choose>
 			</div>

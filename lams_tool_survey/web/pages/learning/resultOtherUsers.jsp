@@ -124,14 +124,7 @@
 
 		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
 			<div class="info">
-				<c:choose>
-					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
-					</c:otherwise>
-				</c:choose>
+				<fmt:message key="message.activityLocked" />
 			</div>
 		</c:if>
 		
@@ -181,7 +174,7 @@
 			</div>
 		</c:forEach>
 
-		<c:if test="${not sessionMap.finishedLock}">
+		<c:if test="${not sessionMap.lockOnFinish}">
 			<html:button property="RetakeButton" onclick="return retakeSurvey()" styleClass="button">
 				<fmt:message key="label.retake.survey" />
 			</html:button>
