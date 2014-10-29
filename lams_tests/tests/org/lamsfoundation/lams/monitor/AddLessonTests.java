@@ -183,14 +183,10 @@ public class AddLessonTests {
 	@Test(dependsOnMethods="checkOnlyOneMonitorSelected")
 	public void checkOnlyAllLearnersSelected() {
 		
-		int expectedUnselectedLearners = 0;
-		
-		int unSelectedLearners = addLesson
-				.openClasstab()
-				.getNumberUnselectedLearners();
-		
+		Boolean emptyUnselectedLearners = addLesson.openClasstab().isUnselectedLearnersEmpty();
+
 		// Assert
-		Assert.assertEquals(unSelectedLearners, expectedUnselectedLearners, 
+		Assert.assertTrue(emptyUnselectedLearners, 
 				"There shouldn't be any unselected learners");
 		
 		// addLesson.closeDialog();
@@ -249,8 +245,6 @@ public class AddLessonTests {
 		String lessonName = "Only one learner " + RANDOM_INT;
 		
 		addLesson = openDialog(index);
-
-		selectRandomDesign(addLesson, "Only one learner " + RANDOM_INT);
 
 		// Remove all learners
 		addLesson.openClasstab().removeAllLearnersFromLesson();
@@ -318,14 +312,14 @@ public class AddLessonTests {
 		Assert.assertFalse(isScheduledEnable, "Scheduling should be OFF");
 		
 		
+		//addLesson.closeDialog();
+		
 	}
 	
 	@Test(dependsOnMethods="checksDefaultAdvancedSettings")
 	public void createLessonWithIntro() {
 		String introHTMLTxt = "<strong>Hi!</strong> <i>This is a new lesson</i><p>Try to have a go at it</p>";
 		
-		addLesson = openDialog(index);
-
 		String lessonName = "Lesson with Intro " + RANDOM_INT;
 		selectRandomDesign(addLesson, lessonName);
 
@@ -357,46 +351,227 @@ public class AddLessonTests {
 	
 	@Test(dependsOnMethods="createLessonWithIntro")
 	public void createLessonStartInMonitor() {
+		addLesson = openDialog(index);
 		
+		String lessonName = "Lesson start in monitor " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setStartInMonitor();
+		
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
 	}
 
 	@Test(dependsOnMethods="createLessonStartInMonitor")
 	public void createLessonStartAlwaysFirstActivity() {
 		
+		addLesson = openDialog(index);
+		
+		String lessonName = "Lesson always start from 1st act " + RANDOM_INT;
+		selectRandomDesign(addLesson, lessonName);
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setLearnerRestart();
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
 	}
 
 	@Test(dependsOnMethods="createLessonStartInMonitor")
 	public void createLessonWithOutLiveEdit() {
 		
+		addLesson = openDialog(index);
+		
+		String lessonName = "Without live edit " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnableLiveEdit();
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
+		
 	}
 
 	@Test(dependsOnMethods="createLessonWithOutLiveEdit")
 	public void createLessonStartWithOutLessonNotifications() {
+		addLesson = openDialog(index);
+		
+		String lessonName = "Without notifications " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnableLessonNotifications();
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+
 		
 	}
 	
 	@Test(dependsOnMethods="createLessonStartWithOutLessonNotifications")
 	public void createLessonEnableExportPortfolio() {
+		addLesson = openDialog(index);
+		
+		String lessonName = "Enable Export Portfolio " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnablePortfolio();
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 		
 	}
 
 	@Test(dependsOnMethods="createLessonEnableExportPortfolio")
 	public void createLessonEnableWhosOnline() {
+		addLesson = openDialog(index);
+		
+		String lessonName = "Enable presence " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnablePresence();
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 		
 	}
 
 	@Test(dependsOnMethods="createLessonEnableWhosOnline")
 	public void createLessonEnableIM() {
+		addLesson = openDialog(index);
 		
+		String lessonName = "Enable IM " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setEnablePresence()
+		.setEnableIM();
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 	}
 	
 	@Test(dependsOnMethods="createLessonEnableIM")
 	public void createLessonSplitInMultiple() {
+		addLesson = openDialog(index);
 		
+		String lessonName = "Split " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setSplitLearners()
+		.setSplitCounter("2");
+
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		
+		for (int i = 1; i < 4; i++) {
+
+			boolean wasLessonCreated = index.isLessonPresent(lessonName + " " + i);
+			
+			Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
+			
+		}
+
+	
 	}
 	
-	@Test(dependsOnMethods="createLessonEnableIM")
+	@Test(dependsOnMethods="createLessonSplitInMultiple")
 	public void createLessonScheduleStart() {
+		addLesson = openDialog(index);
+		
+		String lessonName = "Scheduled " + RANDOM_INT;
+
+		// 
+		addLesson
+		.openAdvancedTab()
+		.setScheduleEnable();
+		
+		selectRandomDesign(addLesson, lessonName);
+		
+		// Add lesson
+		addLesson
+		.addLessonNow();
+		
+		// Assert that lesson was created
+		boolean wasLessonCreated = index.isLessonPresent(lessonName);
+		
+		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 		
 	}
 	
@@ -425,6 +600,7 @@ public class AddLessonTests {
 		
 		Assert.assertTrue(addLesson.openLessontab().isDesignImageDisplayed(), 
 				"Design image is not displayed");		
+		
 		addLesson
 		.openLessontab()
 		.setLessonName(lessonName);

@@ -68,7 +68,7 @@ public class ClassTab extends AbstractPage {
 
 	@FindBys({
 		@FindBy(id = "unselected-learners"), 
-		@FindBy(id = "div")
+		@FindBy(tagName = "div")
 	})
 	private List<WebElement> allUnselectedLearners;
 
@@ -139,6 +139,14 @@ public class ClassTab extends AbstractPage {
 	public int getNumberUnselectedLearners() {
 		
 		return allUnselectedLearners.size();
+		
+	}
+	
+	public Boolean isUnselectedLearnersEmpty() {
+		WebElement uLearners = driver.findElement(By.id("unselected-learners"));
+		String uLearnersTxt = uLearners.getAttribute("innerHTML");
+		
+		return ((uLearnersTxt.isEmpty() ? true : false));
 		
 	}
 

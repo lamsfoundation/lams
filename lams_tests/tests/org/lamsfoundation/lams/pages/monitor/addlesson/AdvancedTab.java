@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.pages.monitor.addlesson;
 
 import org.lamsfoundation.lams.pages.AbstractPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -72,6 +73,9 @@ public class AdvancedTab  extends AbstractPage {
 	
 	@FindBy(id = "schedulingDatetime")
 	private WebElement schedulingDatetime;
+	
+	@FindBy(id = "schedulingDatetimeField")
+	private WebElement schedulingDatetimeField;
 	
 	
 	public AdvancedTab(WebDriver driver) {
@@ -231,9 +235,11 @@ public class AdvancedTab  extends AbstractPage {
 		
 	}
 	
-	public AdvancedTab setSplitCounter() {
+	public AdvancedTab setSplitCounter(String numberOfLearners) {
 		
 		splitLearnersCountField.click();
+		splitLearnersCountField.clear();
+		splitLearnersCountField.sendKeys(numberOfLearners);
 		
 		return PageFactory.initElements(driver, AdvancedTab.class);
 	}
@@ -247,6 +253,8 @@ public class AdvancedTab  extends AbstractPage {
 	public AdvancedTab setScheduleEnable() {
 		
 		schedulingEnableField.click();
+		schedulingDatetimeField.click();
+		driver.findElement(By.className("ui-datepicker-today")).click();
 		
 		return PageFactory.initElements(driver, AdvancedTab.class);
 	}
