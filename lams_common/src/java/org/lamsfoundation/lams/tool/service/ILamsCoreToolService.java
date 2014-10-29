@@ -77,23 +77,7 @@ public interface ILamsCoreToolService {
      */
     ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
 	    throws DataIntegrityViolationException, RequiredGroupMissingException;
-
-    /**
-     * Creates LAMS ToolSessions for a set of learners and activity. Checks to see if an appropriate tool session exists
-     * for each learner before creating the tool session.
-     * <p>
-     * If an appropriate tool session already exists for a learner, then it does not include the tool session in the
-     * returned set.
-     * <p>
-     * 
-     * @param learners
-     *                the learners who are running the activity.
-     * @param activity
-     *                the requested activity.
-     * @return toolSessions set of newly created ToolSessions
-     */
-    Set createToolSessions(Set learners, ToolActivity activity, Lesson lesson) throws LamsToolServiceException;
-
+    
     /**
      * Returns the previously created ToolSession for a learner and activity. It is queried base on learner.
      * 

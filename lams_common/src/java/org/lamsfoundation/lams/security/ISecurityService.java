@@ -26,34 +26,39 @@ package org.lamsfoundation.lams.security;
 public interface ISecurityService {
 
     /**
+     * Checks if the is a manager of the class or ogranisation.
+     */
+    boolean isGroupManager(Integer orgId, Integer userId, String action, boolean escalate) throws SecurityException;
+
+    /**
+     * Checks if the is a manager or monitor in the organisation.
+     */
+    boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate) throws SecurityException;
+
+    /**
      * Checks if the user is a learner in the given lesson.
      */
-    void checkIsLessonLearner(Long lessonId, Integer userId) throws SecurityException;
+    boolean isLessonLearner(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
 
     /**
-     * Checks if the user is a staff member in the given lesson.
+     * Checks if the user is a monitor or owner of the given lesson, or a group manager of the organisation.
      */
-    void checkIsLessonMonitor(Long lessonId, Integer userId) throws SecurityException;
-
-    /**
-     * Checks if the user is a staff member or optionally the owner of the given lesson, or a group manager of the
-     * organisation the lesson belongs to.
-     */
-    void checkIsLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted, boolean groupManagerAccepted)
-	    throws SecurityException;
+    boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
 
     /**
      * Checks if the user is either a learner or a staff member in the given lesson.
      */
-    void checkIsLessonParticipant(Long lessonId, Integer userId) throws SecurityException;
+    boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean escalate)
+	    throws SecurityException;
 
     /**
      * Checks if the user has a global role of SYSADMIN.
      */
-    void checkIsSysadmin(Integer userId);
+    boolean isSysadmin(Integer userId, String action, boolean escalate);
 
     /**
      * Checks if the user has any of the given roles in the given organisation.
      */
-    void hasOrgRole(Integer orgId, Integer userId, String... roles) throws SecurityException;
+    boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean escalate)
+	    throws SecurityException;
 }

@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.web.action; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.web.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,8 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -47,115 +46,83 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author lfoxton
  * 
- * Handles the learner interfaces for gradebook
+ *         Handles the learner interfaces for gradebook
  * 
- * This is where marking for an activity/lesson takes place
+ *         This is where marking for an activity/lesson takes place
  * 
  * 
- * @struts.action path="/gradebookLearning" parameter="dispatch"
- *                scope="request" validate="false"
+ * @struts.action path="/gradebookLearning" parameter="dispatch" scope="request" validate="false"
  * 
- * @struts:action-forward name="learnercoursegradebook"
- *                        path="/gradebookCourseLearner.jsp"
+ * @struts:action-forward name="learnercoursegradebook" path="/gradebookCourseLearner.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
  */
-public class GradebookLearningAction extends LamsDispatchAction{
-    
-    private static Logger logger = Logger.getLogger(GradebookLearningAction.class);
-    
-    private static IGradebookService gradebookService;
-    private static IUserManagementService userService;
-    private static ILessonService lessonService;
+public class GradebookLearningAction extends LamsDispatchAction {
 
+    private static Logger logger = Logger.getLogger(GradebookLearningAction.class);
+
+    private static IUserManagementService userService;
+    private static ISecurityService securityService;
+
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	return null;
     }
-    
-    @SuppressWarnings("unchecked")
+
     public ActionForward courseLearner(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	try {
-	    initServices();
 	    Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    
-	    logger.debug("request learnerGradebook for organisation: " + oranisationID.toString());
 	    UserDTO user = getUser();
 	    if (user == null) {
-		logger.error("User missing from session. ");
+		GradebookLearningAction.logger.error("User missing from session. ");
 		return mapping.findForward("error");
-	    } else {
-		
-		Organisation organisation = (Organisation)userService.findById(Organisation.class, oranisationID);
-		if (organisation == null) {
-		    logger.error("Organisation " + oranisationID + " does not exist. Unable to load gradebook");
-		    return mapping.findForward("error");
-		}
-		
-		// Validate whether this user is a monitor for this organisation
-		if (!userService.isUserInRole(user.getUserID(), oranisationID, Role.LEARNER)) {
-		    logger.error("User " + user.getLogin()
-			    + " is not a learner in the requested course. Cannot access the course for gradebook.");
-		    return displayMessage(mapping, request, "error.authorisation");
-		}
-
-		request.setAttribute("organisationID", oranisationID);
-		request.setAttribute("organisationName", organisation.getName());
-		request.setAttribute("fullName",user.getFirstName() + " "  + user.getLastName());
-		
-		
-		return mapping.findForward("learnercoursegradebook");
 	    }
+	    if (!getSecurityService().isGroupMonitor(oranisationID, user.getUserID(), "get learner course gradebook",
+		    false)
+		    && !getSecurityService().hasOrgRole(oranisationID, user.getUserID(), new String[] { Role.LEARNER },
+			    "get course gradebook for learner", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+		return null;
+	    }
+	    if (LamsDispatchAction.log.isDebugEnabled()) {
+		GradebookLearningAction.logger.debug("Getting learner gradebook for organisation: " + oranisationID);
+	    }
+
+	    Organisation organisation = (Organisation) getUserService().findById(Organisation.class, oranisationID);
+	    request.setAttribute("organisationID", oranisationID);
+	    request.setAttribute("organisationName", organisation.getName());
+	    request.setAttribute("fullName", user.getFirstName() + " " + user.getLastName());
+
+	    return mapping.findForward("learnercoursegradebook");
 	} catch (Exception e) {
-	    logger.error("Failed to load gradebook monitor", e);
+	    GradebookLearningAction.logger.error("Failed to load learner gradebook", e);
 	    return mapping.findForward("error");
 	}
     }
-    
+
     private UserDTO getUser() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
-    
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
-	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
-    }
 
-    private void initServices() {
-	getUserService();
-	getLessonService();
-	getGradebookService();
-    }
-    
     private IUserManagementService getUserService() {
-	if (userService == null) {
+	if (GradebookLearningAction.userService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    userService = (IUserManagementService) ctx.getBean("userManagementService");
+	    GradebookLearningAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return userService;
+	return GradebookLearningAction.userService;
     }
 
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
+    private ISecurityService getSecurityService() {
+	if (GradebookLearningAction.securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	    GradebookLearningAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
-	return lessonService;
+	return GradebookLearningAction.securityService;
     }
-    
-    private IGradebookService getGradebookService() {
-	if (gradebookService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    gradebookService = (IGradebookService) ctx.getBean("gradebookService");
-	}
-	return gradebookService;
-    }
-
 }
- 

@@ -36,7 +36,6 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +58,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -124,22 +122,26 @@ public class MainExportServlet extends HttpServlet {
 	    }
 	    ToolAccessMode accessMode = ToolAccessMode.TEACHER.toString().equals(role) ? ToolAccessMode.TEACHER : null;
 
-	    try {
-		if (accessMode == null) {
-		    securityService.checkIsLessonLearner(lesson.getLessonId(), currentUserId);
-		    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
-			    lesson.getLessonId());
-		    if (learnerProgress == null || !learnerProgress.isComplete()) {
-			throw new ExportPortfolioException("Learner with ID: " + currentUserId
-				+ " has not finished lesson with ID: " + lesson.getLessonId());
-		    }
-		} else {
-		    securityService.checkIsLessonMonitor(lesson.getLessonId(), currentUserId);
+	    if (accessMode == null) {
+		if (!securityService.isLessonLearner(lesson.getLessonId(), currentUserId, "export portfolio",
+			false)) {
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
+		    return;
 		}
-	    } catch (SecurityException e) {
-		log.error("Cannot export portfolion", e);
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
-		return;
+		LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
+			lesson.getLessonId());
+		if (learnerProgress == null || !learnerProgress.isComplete()) {
+		    log.error("Learner with ID: " + currentUserId + " has not finished lesson with ID: "
+			    + lesson.getLessonId());
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The learner has not finished the lesson");
+		    return;
+		}
+	    } else {
+		if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio",
+			false)) {
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
+		    return;
+		}
 	    }
 
 	    portfolios = exportService.exportPortfolioForStudent(userIdParam == null ? currentUserId : userIdParam,
@@ -149,10 +151,7 @@ public class MainExportServlet extends HttpServlet {
 	    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + " "
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
-	    try {
-		securityService.checkIsLessonMonitor(lesson.getLessonId(), currentUserId);
-	    } catch (SecurityException e) {
-		log.error("Cannot export portfolion", e);
+	    if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return;
 	    }
@@ -218,10 +217,10 @@ public class MainExportServlet extends HttpServlet {
 	File tempDir = new File(exportTmpDir);
 
 	// finds all the html extension files
-	Collection jspFiles = FileUtils.listFiles(tempDir, new String[] { "html" }, true);
+	Collection<File> jspFiles = FileUtils.listFiles(tempDir, new String[] { "html" }, true);
 
 	// iterates thru the collection and sends this
-	for (Iterator it = jspFiles.iterator(); it.hasNext();) {
+	for (Iterator<File> it = jspFiles.iterator(); it.hasNext();) {
 	    Object element = it.next();
 	    MainExportServlet.log.debug("Correcting links in file " + element.toString());
 	    replaceImageFolderLinks(element.toString(), contentFolderID, learnerContentFolder);

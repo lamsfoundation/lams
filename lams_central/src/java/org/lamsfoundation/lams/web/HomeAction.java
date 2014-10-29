@@ -58,7 +58,6 @@ import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonDTOComparator;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -337,11 +336,8 @@ public class HomeAction extends DispatchAction {
 	UserDTO userDTO = getUser();
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 
-	try {
-	    getSecurityService().hasOrgRole(organisationID, userDTO.getUserID(), Role.MONITOR, Role.GROUP_MANAGER);
-	} catch (SecurityException e) {
-	    HomeAction.log.error("Cannot add lesson", e);
-	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+	if (!getSecurityService().isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
+	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 

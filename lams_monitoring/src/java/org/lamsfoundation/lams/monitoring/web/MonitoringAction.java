@@ -224,9 +224,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
 		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
 	} else {
-	    newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), customCSV,
-		    false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		    liveEditEnabled, false, learnerRestart, null, null);
+	    try {
+		newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(),
+			customCSV, false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+			liveEditEnabled, false, learnerRestart, null, null);
+	    } catch (SecurityException e) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
+		return null;
+	    }
 	}
 
 	PrintWriter writer = response.getWriter();
@@ -258,9 +263,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	monitoringService.startLesson(lessonId, getUserId());
+	try {
+	    monitoringService.startLesson(lessonId, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
 
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().write("true");
@@ -285,8 +294,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	List<User> learners = parseUserList(request, "learners", allUsers);
 	List<User> staff = parseUserList(request, "monitors", allUsers);
 
-	monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
-		staffGroupName, staff, userID);
+	try {
+	    monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
+		    staffGroupName, staff, userID);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+	    return null;
+	}
 
 	return null;
     }
@@ -376,26 +390,30 @@ public class MonitoringAction extends LamsDispatchAction {
 		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
 			userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
 			enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+
+		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 	    } catch (SecurityException e) {
-		log.error("Cannot add a lesson for LD: " + ldId, e);
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation or lesson");
 		return null;
 	    }
 
-	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation, learnerGroupInstanceName,
-		    lessonInstanceLearners, staffGroupInstanceName, staff, userId);
-
 	    if (!startMonitor) {
-		if (schedulingDatetime == null) {
-		    monitoringService.startLesson(lesson.getLessonId(), userId);
-		} else {
-		    // if lesson should start in few days, set it here
-		    monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
-		}
+		try {
+		    if (schedulingDatetime == null) {
+			monitoringService.startLesson(lesson.getLessonId(), userId);
+		    } else {
+			// if lesson should start in few days, set it here
+			monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+		    }
 
-		// if lesson should finish in few days, set it here
-		if (timeLimitLesson != null) {
-		    monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
+		    // if lesson should finish in few days, set it here
+		    if (timeLimitLesson != null) {
+			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
+		    }
+		} catch (SecurityException e) {
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		    return null;
 		}
 	    }
 	}
@@ -404,13 +422,18 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     public ActionForward startOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ParseException {
+	    HttpServletResponse response) throws ParseException, IOException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
 	Date startDate = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
-	monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
+	try {
+	    monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
+
 	return null;
     }
 
@@ -438,7 +461,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	monitoringService.archiveLesson(lessonId, getUserId());
+	try {
+	    monitoringService.unsuspendLesson(lessonId, getUserId());
+	} catch (SecurityException e) {
+	    monitoringService.archiveLesson(lessonId, getUserId());
+	}
 	return null;
     }
 
@@ -466,7 +493,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	monitoringService.unarchiveLesson(lessonId, getUserId());
+	try {
+	    monitoringService.unarchiveLesson(lessonId, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
 	return null;
     }
 
@@ -488,7 +519,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	monitoringService.suspendLesson(lessonId, getUserId());
+	try {
+	    monitoringService.suspendLesson(lessonId, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
 	return null;
     }
 
@@ -509,7 +544,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	monitoringService.unsuspendLesson(lessonId, getUserId());
+	try {
+	    monitoringService.unsuspendLesson(lessonId, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
 	return null;
     }
 
@@ -535,21 +574,14 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
-	JSONObject jsonObject = new JSONObject();
-	Object removeLessonResult = Boolean.TRUE.toString();
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	// if this method throws an Exception, there will be no removeLesson=true in the JSON reply
+	monitoringService.removeLesson(lessonId, getUserId());
 
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.removeLesson(lessonId, getUserId());
-
-	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "removeLesson", monitoringService);
-	    removeLessonResult = flashMessage.getMessageValue();
-	}
-
-	jsonObject.put("removeLesson", removeLessonResult);
+	JSONObject jsonObject = new JSONObject();
+	jsonObject.put("removeLesson", true);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(jsonObject);
 	return null;
@@ -593,8 +625,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
-	String message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
-		removeLearnerContent);
+	String message = null;
+	try {
+	    message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
+		    removeLearnerContent);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
 	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
@@ -731,6 +769,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	    getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", true);
 	    wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getLearningDesignDetails", monitoringService).serializeMessage();
@@ -804,9 +843,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer learnerUserID = new Integer(WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID));
 	Long activityID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
-
-	String url = monitoringService.getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
-	return redirectToURL(mapping, response, url);
+	try {
+	    String url = monitoringService.getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
+	    return redirectToURL(mapping, response, url);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
     }
 
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
@@ -817,9 +860,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
-	String url = monitoringService.getActivityMonitorURL(lessonID, activityID, contentFolderID, getUserId());
-
-	return redirectToURL(mapping, response, url);
+	try {
+	    String url = monitoringService.getActivityMonitorURL(lessonID, activityID, contentFolderID, getUserId());
+	    return redirectToURL(mapping, response, url);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
     }
 
     public ActionForward moveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -855,12 +902,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
-	
-	try {
-	    getSecurityService().checkIsLessonMonitor(lessonId, user.getUserID());
-	} catch (SecurityException e) {
-	    log.error("Cannot monitor lesson", e);
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the given lesson");
+
+	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
@@ -954,14 +998,20 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
+	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "get lesson details", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+	
 	JSONObject responseJSON = new JSONObject();
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
 	String contentFolderId = lessonDetails.getContentFolderID();
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
 	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, lessonDetails.getLearningDesignID());
@@ -995,12 +1045,16 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Integer monitorUserId = getUserId();
+	if (!getSecurityService().isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
 	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	Integer monitorUserId = getUserId();
 	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
 	String contentFolderId = lessonDetails.getContentFolderID();
 
@@ -1149,15 +1203,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	     * Preview.
 	     */
 
-	    if (new Long(lessonID) != null) {
-
+	    try {
 		monitoringService.createPreviewClassForLesson(userID, lessonID);
 		monitoringService.startLesson(lessonID, getUserId());
-
-		flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
-
+	    } catch (SecurityException e) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		return null;
 	    }
-
+	    
+	    flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
 	} catch (Exception e) {
 	    flashMessage = handleException(e, "startPreviewSession", monitoringService);
 	}
@@ -1241,7 +1295,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-	monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
+	try {
+	    monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
 	return null;
     }
 
@@ -1258,12 +1316,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer userID = getUserId();
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
-	monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
+	try {
+	    monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
 
-	if (!presenceAvailable) {
-	    monitoringService.setPresenceImAvailable(lessonID, userID, false);
+	    if (!presenceAvailable) {
+		monitoringService.setPresenceImAvailable(lessonID, userID, false);
+	    }
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-
 	return null;
     }
 
@@ -1278,7 +1339,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
-	monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
+
+	try {
+	    monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	}
 	return null;
     }
 
@@ -1294,7 +1360,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");
 
 	    // check monitor privledges
-	    monitoringService.openTimeChart(lessonID, getUserId());
+	    if (!getSecurityService().isLessonMonitor(lessonID, getUserId(), "open time chart", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		return null;
+	    }
 
 	    request.setAttribute("lessonID", lessonID);
 	    request.setAttribute("learnerID", WebUtil.readLongParam(request, "learnerID", true));

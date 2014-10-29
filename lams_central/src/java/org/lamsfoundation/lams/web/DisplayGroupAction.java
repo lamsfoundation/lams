@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -92,15 +91,13 @@ public class DisplayGroupAction extends Action {
 
 	if (org != null) {
 	    User user = getUser(request.getRemoteUser());
-	    try {
-		getSecurityService().hasOrgRole(orgId, user.getUserId(), Role.LEARNER, Role.MONITOR, Role.AUTHOR,
-			Role.GROUP_MANAGER);
-	    } catch (SecurityException e) {
-		log.error("Cannot display group", e);
+	    if (!getSecurityService().hasOrgRole(orgId, user.getUserId(),
+		    new String[] { Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group", false)
+		    && !getSecurityService().isGroupManager(orgId, user.getUserId(), "display group", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a part of the organisation");
 		return null;
 	    }
-	    
+
 	    boolean allowSorting = false;
 	    List<Integer> roles = new ArrayList<Integer>();
 	    List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(orgId,
