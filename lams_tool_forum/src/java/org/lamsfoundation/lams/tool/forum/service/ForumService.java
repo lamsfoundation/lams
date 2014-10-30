@@ -514,7 +514,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		report.setDateMarksReleased(new Date());
 		if (notifyLearnersOnMarkRelease) {
 		    ForumUser user = msg.getCreatedBy();
-		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId());
+		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
 		    if (notificationMessage == null) {
 			notificationMessage = new StringBuilder();
 		    }
