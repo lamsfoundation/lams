@@ -30,11 +30,15 @@
 			var id = '-' + itemUid + '-' + answerUid;
 			
 	        $.ajax({
-	            url: '<c:url value="/learning/isAnswerCorrect.do"/>',
-	            data: 'answerUid=' + answerUid,
+	            url: '<c:url value="/learning/recordItemScratched.do"/>',
+	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
+	            	if (json == null) {
+	            		return false;
+	            	}
+	            	
 	            	if (json.answerCorrect) {
 	            		//show animation
 	            		$('#image' + id).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
@@ -52,13 +56,6 @@
 	            		$('#imageLink' + id).css('cursor','default');
 	            	}
 	            }
-	       	});
-	        
-	        $.ajax({
-	            url: '<c:url value="/learning/recordItemScratched.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
-	            dataType: 'json',
-	            type: 'post'
 	       	});
 		}
 
