@@ -58,7 +58,7 @@ CKEDITOR.config.toolbar_LessonDescription = [
 
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css' ;
-//CKEDITOR.config.skin = 'office2003' ;
+//CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
