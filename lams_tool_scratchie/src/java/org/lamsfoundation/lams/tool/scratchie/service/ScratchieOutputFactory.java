@@ -34,30 +34,50 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieOutputFactory extends OutputFactory {
 
     /**
-     * {@inheritDoc}
+     * Returns null. Use @see org.lamsfoundation.lams.tool.OutputFactory#getToolOutputDefinitions(java.lang.Object, int)
+     * instead.
      */
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
+	return null;
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.tool.OutputFactory#getToolOutputDefinitions(java.lang.Object, int)
+     * 
+     * @param scratchieService
+     * @param toolContentObject
+     * @param definitionType
+     * @return
+     * @throws ToolException
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(IScratchieService scratchieService,
+	    Object toolContentObject, int definitionType) throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
 	if (toolContentObject != null) {
-
-	    // calculate totalMarksPossible
+	    
 	    Scratchie scratchie = (Scratchie) toolContentObject;
-	    Set<ScratchieItem> items = scratchie.getScratchieItems();
-	    Long totalMarksPossible = 0L;
-	    for (ScratchieItem item : items) {
-		totalMarksPossible += item.getAnswers().size();
-	    }
+	    int itemsNumber = scratchie.getScratchieItems().size();
+	
+	    // calculate totalMarksPossible
+	    String presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
+	    String[] presetMarksArray = presetMarks.split(",");
+	    long totalMarksPossible = (presetMarksArray.length > 0) ? itemsNumber
+		    * Integer.parseInt(presetMarksArray[0]) : 0;
+
+	    // count in extra point if this option is ON
+
 	    if (scratchie.isExtraPoint()) {
-		totalMarksPossible += items.size();
+		totalMarksPossible += itemsNumber;
 	    }
 
 	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
@@ -70,8 +90,7 @@ public class ScratchieOutputFactory extends OutputFactory {
     }
 
     /**
-     * Follows {@link PixlrService#getToolOutput(List, Long, Long)}.
-     * 
+     * Follows {@link ScratchieService#getToolOutput(List, Long, Long)}.
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IScratchieService scratchieService,
 	    Long toolSessionId, Long learnerId) {
