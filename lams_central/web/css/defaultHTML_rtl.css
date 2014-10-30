@@ -388,6 +388,9 @@ Layout of main content section
 #content a.cke_button {
 	border-bottom: none;
 }
+#content a.cke_combo_button{
+	border-bottom: 1px solid #e1e1e1;
+}
 
 /*layout of authoring buttons*/
 

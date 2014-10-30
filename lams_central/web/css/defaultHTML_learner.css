@@ -37,6 +37,9 @@ a:hover {
 a.cke_button {
 	border-bottom: none;
 }
+a.cke_combo_button{
+	border-bottom: 1px solid #e1e1e1;
+}
 
 .row {
 	voice-family: "\"}\""; /* hide the following rules from IE5 */
