@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -197,7 +198,7 @@ public class LearningAction extends Action {
 
 	// basic information
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, imageGallery.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
 	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED,
@@ -238,21 +239,31 @@ public class LearningAction extends Action {
 	if (mode.isLearner()) {
 	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
+		
 		// initialize login name to avoid session close error in proxy object
 		if (image.getCreateBy() != null) {
 		    image.getCreateBy().getLoginName();
 		}
+		
 		// remove hidden items
 		if (!image.isHide()) {
 		    images.add(image);
-		}
+		}	
 	    }
 	} else {
 	    images.addAll(imageGallery.getImageGalleryItems());
 	}
+	
+	// escape characters
+	for (ImageGalleryItem image : images) {
+	    String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
+	    image.setTitleEscaped(titleEscaped);
+	    String descriptionEscaped = StringEscapeUtils.escapeJavaScript(image.getDescription());
+	    image.setDescriptionEscaped(descriptionEscaped);
+	}
 
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, images);
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_LIST, images);
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, imageGallery);
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
@@ -732,7 +743,7 @@ public class LearningAction extends Action {
     private IImageGalleryService getImageGalleryService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
+	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
 
     private ImageGalleryUser getCurrentUser(IImageGalleryService service, Long sessionId) {

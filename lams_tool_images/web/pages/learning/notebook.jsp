@@ -1,7 +1,6 @@
-<%@ include file="/common/taglibs.jsp"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
+<%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
@@ -12,10 +11,10 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	         function submitForm(methodName){
-        	        var f = document.getElementById('messageForm');
-	                f.submit();
-	        }
+		function submitForm(methodName){
+			var f = document.getElementById('messageForm');
+			f.submit();
+		}
 	</script>
 </lams:head>
 <body class="stripes">
@@ -38,8 +37,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<html:textarea cols="60" rows="8" property="entryText"	styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
 				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">

@@ -1,7 +1,6 @@
-<%@ include file="/common/taglibs.jsp"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
+<%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
@@ -9,40 +8,40 @@
 </lams:head>
 <body class="stripes">
 		
-			<div id="content">
-				<h1>
-					<fmt:message key="page.title.monitoring.view.reflection"/>
-				</h1>
-				<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
-				<table class="alternative-color" cellspacing="0">
-					<tr>
-						<th class="first">
-							<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
-						</th>
-					</tr>
-					<tr>
-						<td>
-							<c:choose>
-								<c:when test="${userDTO.finishReflection}">
-									<lams:out value="${userDTO.reflect}" escapeHtml="true"/>
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="message.no.reflection.available" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</table>
-				<table cellpadding="0">
-					<tr>
-						<td>
-							<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-						</td>
-					</tr>
-				</table>
-			</div>
-		<div id="footer">
-		</div>
-		<!--closes footer-->
+	<div id="content">
+		<h1>
+			<fmt:message key="page.title.monitoring.view.reflection"/>
+		</h1>
+		
+		<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
+		<table class="alternative-color" cellspacing="0">
+			<tr>
+				<th class="first">
+					<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<c:choose>
+						<c:when test="${userDTO.finishReflection}">
+							<lams:out value="${userDTO.reflect}" escapeHtml="true"/>
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="message.no.reflection.available" />
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</table>
+		<table cellpadding="0">
+			<tr>
+				<td>
+					<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
+				</td>
+			</tr>
+		</table>
+	</div>
+			
+	<div id="footer"></div><!--closes footer-->
 </body>
 </lams:html>

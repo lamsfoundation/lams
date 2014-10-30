@@ -170,7 +170,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// put it into HTTPSession
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, content);
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, content);
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_EXPORT_IMAGE_LIST, exportImageList);
@@ -207,7 +207,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// put it into HTTPSession
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, content);	
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, content);	
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_EXPORT_IMAGE_LIST, exportImageList);

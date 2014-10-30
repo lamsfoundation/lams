@@ -150,7 +150,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(ImageGalleryConstants.ATTR_SUMMARY_LIST, groupList);
 	sessionMap.put(ImageGalleryConstants.PAGE_EDITABLE, imageGallery.isContentInUse());
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, imageGallery);
 	sessionMap.put(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, reflectList);
 
@@ -283,7 +283,7 @@ public class MonitoringAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long contentId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID);
-	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE);
+	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image =getImageGalleryService().getImageGalleryItemByUid(imageUid);
 	
@@ -292,7 +292,7 @@ public class MonitoringAction extends Action {
 	    request.setAttribute(ImageGalleryConstants.ATTR_IMAGE_SUMMARY, imageSummary);
 	}
 	request.setAttribute(ImageGalleryConstants.ATTR_IMAGE, image);
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_UID, imageUid);
+	sessionMap.put(ImageGalleryConstants.ATTR_ITEM_UID, imageUid);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());	
 	
 	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
@@ -469,7 +469,7 @@ public class MonitoringAction extends Action {
 	Long commentUid = new Long(request.getParameter(ImageGalleryConstants.ATTR_COMMENT_UID));
 	ImageComment comment = service.getImageCommentByUid(commentUid);
 	
-	Long imageUid = (Long) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_UID);
+	Long imageUid = (Long) sessionMap.get(ImageGalleryConstants.ATTR_ITEM_UID);
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
 	Set<ImageComment> dbComments = image.getComments();
 	dbComments.remove(comment);
@@ -513,7 +513,7 @@ public class MonitoringAction extends Action {
     private IImageGalleryService getImageGalleryService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
+	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
     
     /**

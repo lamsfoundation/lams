@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.imageGallery;
 
 public class ImageGalleryConstants {
     public static final String TOOL_SIGNATURE = "laimag10";
-    public static final String RESOURCE_SERVICE = "laimagImageGalleryService";
+    public static final String IMAGE_GALLERY_SERVICE = "laimagImageGalleryService";
     public static final String TOOL_CONTENT_HANDLER_NAME = "laimagImageGalleryToolContentHandler";
     public static final int COMPLETED = 1;
 
@@ -53,21 +53,20 @@ public class ImageGalleryConstants {
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
-    public static final String ATTR_RESOURCE_ITEM_LIST = "imageGalleryList";
-    public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteImageGalleryList";
-    public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
-    public static final String ATTR_RESOURCE = "imageGallery";
+    public static final String ATTR_IMAGE_LIST = "imageGalleryList";
+    public static final String ATTR_DELETED_IMAGE_LIST = "deleteImageGalleryList";
+    public static final String ATTR_DELETED_IMAGE_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
+    public static final String ATTR_IMAGE_GALLERY = "imageGallery";
     public static final String ATTR_IMAGE = "image";
-    public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
+    public static final String ATTR_ITEM_UID = "itemUid";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_SUMMARY_LIST = "summaryList";
     public static final String ATTR_EXPORT_IMAGE_LIST = "exportImageList";
     public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
-    public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
     public static final String ATTR_FINISH_LOCK = "finishedLock";
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
-    public static final String ATTR_RESOURCE_FORM = "imageGalleryForm";
+    public static final String ATTR_IMAGE_GALLERY_FORM = "imageGalleryForm";
     public static final String ATTR_NEXT_IMAGE_TITLE = "nextImageTitle";
     public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
     public static final String ATTR_TITLE = "title";

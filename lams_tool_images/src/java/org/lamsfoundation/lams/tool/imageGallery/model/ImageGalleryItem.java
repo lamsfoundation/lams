@@ -80,16 +80,19 @@ public class ImageGalleryItem implements Cloneable {
     
     //Set of user comments
     private Set comments;
-    
-    //*************** NON Persist Field (only for exporting) ********************
+
+    // *************** NON Persist Fields  ********************
     private String attachmentLocalUrl;
 
-    // *************** NON Persist Fields (used only for export needs) ********************
     private ImageGalleryAttachment originalFile;
 
     private ImageGalleryAttachment mediumFile;
 
     private ImageGalleryAttachment thumbnailFile;
+    
+    private String titleEscaped;
+
+    private String descriptionEscaped;
     
     /**
      * Default contruction method.
@@ -383,7 +386,7 @@ public class ImageGalleryItem implements Cloneable {
 	this.comments = comments;
     }
     
-    // *************** NON Persist Fields (used only for export needs) ********************
+    // *************** NON Persist Fields ********************
     
     public ImageGalleryAttachment getOriginalFile() {
 	return originalFile;
@@ -414,5 +417,21 @@ public class ImageGalleryItem implements Cloneable {
     }
     public void setAttachmentLocalUrl(String attachmentLocalUrl) {
         this.attachmentLocalUrl = attachmentLocalUrl;
+    }
+    
+    public String getTitleEscaped() {
+	return titleEscaped;
+    }
+
+    public void setTitleEscaped(String titleEscaped) {
+	this.titleEscaped = titleEscaped;
+    }
+
+    public String getDescriptionEscaped() {
+	return descriptionEscaped;
+    }
+
+    public void setDescriptionEscaped(String descriptionEscaped) {
+	this.descriptionEscaped = descriptionEscaped;
     }
 }
