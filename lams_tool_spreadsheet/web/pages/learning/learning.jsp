@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
@@ -8,6 +7,7 @@
 		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">

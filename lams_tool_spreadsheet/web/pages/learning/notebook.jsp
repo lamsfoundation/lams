@@ -1,21 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
 	<script type="text/javascript">
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	         function submitForm(methodName){
-	                var f = document.getElementById('messageForm');
-	                f.submit();
-	        }
+		
+		function submitForm(methodName){
+			var f = document.getElementById('messageForm');
+			f.submit();
+		}
 	</script>
 </lams:head>
 <body class="stripes">
