@@ -817,6 +817,15 @@ ActivityLib = {
 	 * Draws a transition between two activities.
 	 */
 	addTransition : function(fromActivity, toActivity, redraw, id, uiid, branchData) {
+		// check if a branching's start does not connect with another branching's end
+		if (fromActivity instanceof ActivityDefs.BranchingEdgeActivity
+				&& toActivity instanceof ActivityDefs.BranchingEdgeActivity
+				&& fromActivity.isStart && !toActivity.isStart
+				&& fromActivity.branchingActivity != toActivity.branchingActivity) {
+			alert(LABELS.CROSS_BRANCHING_ERROR);
+			return;
+		}
+		
 		// if a child activity was detected, use the parent activity as the target
 		if (toActivity.parentActivity && toActivity.parentActivity instanceof DecorationDefs.Container){
 			toActivity = toActivity.parentActivity;
@@ -838,33 +847,34 @@ ActivityLib = {
 			return;
 		}
 
+		// check for circular sequences
+		var activity = fromActivity;
+		do {
+			if (activity.transitions && activity.transitions.to.length > 0) {
+				activity = activity.transitions.to[0].fromActivity;
+			} else if (activity.branchingActivity && !activity.isStart) {
+				activity = activity.branchingActivity.start;
+			} else {
+				activity = null;
+			}
+			
+			if (toActivity == activity) {
+				alert(LABELS.CIRCULAR_SEQUENCE_ERROR);
+				return;
+			}
+		} while (activity);
+
 		// user chose to create outbound transition from an activity that already has one
 		if (!redraw
 				&& fromActivity.transitions.from.length > 0
-				&& !(fromActivity instanceof ActivityDefs.BranchingEdgeActivity && fromActivity.isStart)
-				&& !(toActivity instanceof ActivityDefs.BranchingEdgeActivity  && toActivity.isStart)) {
+				&& !(fromActivity instanceof ActivityDefs.BranchingEdgeActivity && fromActivity.isStart)) {
 			if (confirm(LABELS.BRANCHING_CREATE_CONFIRM)) {
 				ActivityLib.addBranching(fromActivity, toActivity);
 			}
 			return;
 		}
 		
-		// check for circular sequences
-		var candidate = fromActivity;
-		do {
-			if (candidate.transitions && candidate.transitions.to.length > 0) {
-				candidate = candidate.transitions.to[0].fromActivity;
-			} else if (candidate.branchingActivity && !candidate.isStart) {
-				candidate = candidate.branchingActivity.start;
-			} else {
-				candidate = null;
-			}
-			
-			if (toActivity == candidate) {
-				alert(LABELS.CIRCULAR_SEQUENCE_ERROR);
-				return;
-			}
-		} while (candidate != null);
+		// start building the transition
 		
 		// branchData can be either an existing branch or a title for the new branch
 		var branch = branchData && branchData instanceof ActivityDefs.BranchActivity ? branchData : null,
@@ -915,8 +925,106 @@ ActivityLib = {
 			}
 		}
 		
+		
+		// after adding the transition, check for self-nested branching
+		activity = fromActivity;
+		var branchingActivity = null;
+		// find the top-most enveloping branching activity, if any
+		do {
+			if (activity.transitions && activity.transitions.to.length > 0) {
+				activity = activity.transitions.to[0].fromActivity;
+				
+				if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+					if (activity.isStart) {
+						// found the top branching the activity belongs to
+						branchingActivity = activity.branchingActivity;
+					} else {
+						// jump over nested branching
+						activity = activity.branchingActivity.start;
+					}
+				}
+			} else {
+				activity = null;
+			}
+		} while (activity);
+		
+		
+		if (branchingActivity) {
+			// look for all nested branchings
+			var nestedBranchings = ActivityLib.findNestedBranching(branchingActivity);
+			// check each of them
+			$.each(nestedBranchings, function(){
+				var branching = this;
+				// check if one branching's end does not match with another branching's start
+				$.each(branching.end.transitions.to, function(){
+					// crawl from end to start
+					var activity = this.fromActivity;
+					while (activity) {
+						if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+							if (activity.isStart) {
+								// this branching's end matches with its own start, all OK
+								if (activity.branchingActivity == branching) {
+									break;
+								}
+								// this branching's end does not match with own start, error
+								alert(LABELS.CROSS_BRANCHING_ERROR);
+								// remove the just added transition
+								ActivityLib.removeTransition(transition);
+								// tell the outer iteration loop to quit
+								transition = null;
+								return false;
+							}
+							// a nested branching encountered when crawling, just jump over it
+							activity = activity.branchingActivity.start;
+						}
+						// keep crawling
+						if (activity.transitions && activity.transitions.to.length > 0) {
+							activity = activity.transitions.to[0].fromActivity;
+						} else {
+							activity = null;
+						}
+					}
+				});
+				
+				if (!transition) {
+					// there was an error, do not carry on
+					return false;
+				}
+			});
+		}
+		
 		GeneralLib.setModified(true);
 		return transition;
+	},
+	
+	
+	findNestedBranching : function(branchingActivity) {
+		var nestedBranching = [];
+		$.each(branchingActivity.branches, function(){
+			var activity = this.transitionFrom.toActivity;
+			while (activity) {
+				if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+					if (activity.branchingActivity == branchingActivity){
+						break;
+					}
+					if (nestedBranching.indexOf(activity.branchingActivity) == -1) {
+						nestedBranching.push(activity.branchingActivity);
+					}
+					if (activity.isStart) {
+						nestedBranching = nestedBranching.concat(ActivityLib.findNestedBranching(activity.branchingActivity));
+						activity = activity.branchingActivity.end;
+					}
+				}
+				
+				if (activity.transitions && activity.transitions.from.length > 0) {
+					activity = activity.transitions.from[0].toActivity;
+				} else {
+					activity = null;
+				}
+			}
+		});
+		
+		return nestedBranching;
 	},
 
 	
