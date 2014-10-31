@@ -75,7 +75,6 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;

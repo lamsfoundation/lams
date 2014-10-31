@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;

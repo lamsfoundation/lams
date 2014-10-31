@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -38,7 +36,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -47,7 +44,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -74,7 +70,6 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -82,7 +77,6 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -90,13 +84,10 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Workspace;
@@ -105,8 +96,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.AuditService;
@@ -371,7 +360,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
-	
+
 	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException("Learning design for id=" + learningDesignId
@@ -573,7 +562,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "start lesson on schedule", true);
-	
+
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson.isLessonStarted()) {
@@ -626,7 +615,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "finish lesson on schedule", true);
-	
+
 	// we get the lesson want to finish
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
@@ -947,7 +936,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean isLearnerExportAvailable) {
 	securityService.isLessonMonitor(lessonId, userId, "set learner portfolio available", true);
-	
+
 	isLearnerExportAvailable = (isLearnerExportAvailable != null) ? isLearnerExportAvailable : Boolean.FALSE;
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	lesson.setLearnerExportAvailable(isLearnerExportAvailable);
@@ -1236,7 +1225,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// be set.
 	if (stopReason == null) {
 	    LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-	    if (stopActivity != null && learnerProgress.getCompletedActivities().containsKey(stopActivity)) {
+	    if ((stopActivity != null) && learnerProgress.getCompletedActivities().containsKey(stopActivity)) {
 		// we have reached the stop activity. It may have been the
 		// activity we just processed
 		// or it may have been a parent activity (e.g. an optional
@@ -1256,7 +1245,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 		// now where?
 		if ((nextActivity == null)
-			|| (activity != null && nextActivity.getActivityId().equals(activity.getActivityId()))) {
+			|| ((activity != null) && nextActivity.getActivityId().equals(activity.getActivityId()))) {
 		    // looks like we have reached the end of the sequence?
 		    stopReason = messageService
 			    .getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END);
