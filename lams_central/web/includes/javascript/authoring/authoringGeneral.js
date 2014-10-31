@@ -2030,8 +2030,8 @@ GeneralLib = {
 		$.each(layout.activities, function(){
 			// add all branch activities for iteration and saving
 			if (this instanceof ActivityDefs.BranchingEdgeActivity){
+				var branchingActivity = this.branchingActivity;
 				if (this.isStart){
-					var branchingActivity = this.branchingActivity;
 					branchingActivity.defaultActivityUIID = null;
 					layoutActivityDefs.push(branchingActivity);
 					
@@ -2078,11 +2078,54 @@ GeneralLib = {
 						branchingActivity.defaultActivityUIID = branchingActivity.branches[0].uiid;
 						branchingActivity.branches[0].defaultBranch = true;
 					}
+				} else {
+					// validate if all branches start and end in the same branching
+					$.each(this.transitions.to, function(){
+						error = true;
+						var activity = this.fromActivity;
+						do {
+							if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+								if (activity.isStart) {
+									if (branchingActivity == activity.branchingActivity) {
+										// found out that the branch starts in the proper point
+										error = false;
+										break;
+									}
+									// the branch is shared between two branchings
+									// it should have been detected when adding a transition
+									alert(LABELS.CROSS_BRANCHING_ERROR);
+									return false;
+								}
+								// a nested branching encountered when crawling, just jump over it
+								activity = activity.branchingActivity.start;
+							}
+							
+							// keep crawling
+							if (activity.transitions && activity.transitions.to.length > 0) {
+								activity = activity.transitions.to[0].fromActivity;
+							} else {
+								activity = null;
+							}
+						} while (activity);
+						
+						if (error) {
+							alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+							return false;
+						}
+					});
+					
+					if (error) {
+						return false;
+					}
 				}
 			} else {
 				layoutActivityDefs.push(this);
 			}
 		});
+		
+		if (error) {
+			return false;
+		}
 		
 		if (layout.floatingActivity){
 			layoutActivityDefs.push(layout.floatingActivity);
