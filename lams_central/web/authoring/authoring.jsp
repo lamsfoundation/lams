@@ -112,6 +112,8 @@
 				PASTE_ERROR : '<fmt:message key="authoring.fla.paste.error" />',
 				PREVIEW_ERROR : '<fmt:message key="authoring.fla.preview.error" />',
 				CROSS_BRANCHING_ERROR : '<fmt:message key="authoring.fla.cross.branching.error" />',
+				END_MATCH_ERROR : '<fmt:message key="authoring.fla.end.match.error" />',
+				
 				
 				// PropertyLib
 				OK_BUTTON : '<fmt:message key="authoring.fla.ok.button" />',
