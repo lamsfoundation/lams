@@ -102,7 +102,7 @@
 				RUN_SEQUENCES_FOLDER : '<fmt:message key="label.tab.lesson.sequence.folder" />',
 				ARRANGE_CONFIRM : '<fmt:message key="authoring.fla.arrange.confirm" />',
 				CLEAR_CANVAS_CONFIRM : '<fmt:message key="authoring.fla.clear.canvas.confirm" />',
-				BRANCHING_START_PLACE_PROMPT : '<fmt:message key="authoring.fla.range.condition.description" />',
+				BRANCHING_START_PLACE_PROMPT : '<fmt:message key="authoring.fla.branching.start.place.prompt" />',
 				BRANCHING_END_PLACE_PROMPT : '<fmt:message key="authoring.fla.branching.end.place.prompt" />',
 				ANNOTATION_REGION_PLACE_PROMPT : '<fmt:message key="authoring.fla.annotation.region.place.prompt" />',
 				ANNOTATION_LABEL_PLACE_PROMPT : '<fmt:message key="authoring.fla.annotation.label.place.prompt" />',
@@ -111,6 +111,7 @@
 				TRANSITION_PLACE_PROMPT : '<fmt:message key="authoring.fla.transition.place.prompt" />',
 				PASTE_ERROR : '<fmt:message key="authoring.fla.paste.error" />',
 				PREVIEW_ERROR : '<fmt:message key="authoring.fla.preview.error" />',
+				CROSS_BRANCHING_ERROR : '<fmt:message key="authoring.fla.cross.branching.error" />',
 				
 				// PropertyLib
 				OK_BUTTON : '<fmt:message key="authoring.fla.ok.button" />',
