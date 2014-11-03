@@ -23,10 +23,15 @@
 
 package org.lamsfoundation.lams.security;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -39,6 +44,10 @@ public class SecurityService implements ISecurityService {
     private static Logger log = Logger.getLogger(SecurityService.class);
 
     private static final String SECURITY_MODULE_NAME = "security";
+    private static final String[] GROUP_MONITOR_ROLES = new String[] { Role.GROUP_MANAGER, Role.MONITOR };
+    private static final List<String> GROUP_SUPER_ROLES = Collections.unmodifiableList(Arrays.asList(Role.GROUP_ADMIN,
+	    Role.GROUP_MANAGER));
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private ISecurityDAO securityDAO;
     private IAuditService auditService;
@@ -157,6 +166,56 @@ public class SecurityService implements ISecurityService {
     }
 
     @Override
+    public boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean escalate)
+	    throws SecurityException {
+	if (lessonId == null) {
+	    String error = "Missing lesson ID when checking if user " + userId + " is owner and can \"" + action + "\"";
+	    SecurityService.log.error(error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+	if (userId == null) {
+	    String error = "Missing user ID when checking if is owner of lesson " + lessonId + " and can \"" + action
+		    + "\"";
+	    SecurityService.log.error(error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+
+	Lesson lesson = (Lesson) securityDAO.find(Lesson.class, lessonId);
+	if (lesson == null) {
+	    String error = "Could not find lesson " + lessonId + " when checking if user " + userId
+		    + " is owner and can \"" + action + "\"";
+	    SecurityService.log.error(error);
+	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+
+	if (!lesson.getUser().getUserId().equals(userId)) {
+	    String error = "User " + userId + " is not owner of lesson " + lessonId + " and can not \"" + action + "\"";
+	    SecurityService.log.error(error);
+	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	    if (escalate) {
+		throw new SecurityException(error);
+	    } else {
+		return false;
+	    }
+	}
+
+	return true;
+    }
+
+    @Override
     public boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean escalate)
 	    throws SecurityException {
 	if (lessonId == null) {
@@ -239,82 +298,9 @@ public class SecurityService implements ISecurityService {
     }
 
     @Override
-    public boolean isGroupManager(Integer orgId, Integer userId, String action, boolean escalate)
-	    throws SecurityException {
-	if (orgId == null) {
-	    String error = "Missing organisation ID when checking if user is a manager of organisation " + orgId
-		    + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-	if (userId == null) {
-	    String error = "Missing user ID when checking if user is a manager of organisation " + orgId
-		    + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-
-	if (!securityDAO.isSysadmin(userId) && !securityDAO.isGroupManager(orgId, userId)) {
-	    String error = "User " + userId + " is not a manager of organisation " + orgId + " and can not \"" + action
-		    + "\"";
-	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-
-	return true;
-    }
-
-    @Override
     public boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate)
 	    throws SecurityException {
-	if (orgId == null) {
-	    String error = "Missing organisation ID when checking if user is a monitor in organisation " + orgId
-		    + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-	if (userId == null) {
-	    String error = "Missing user ID when checking if user is a monitor in organisation " + orgId
-		    + " and can \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-
-	if (!securityDAO.isSysadmin(userId) && !securityDAO.isGroupManager(orgId, userId)
-		&& !securityDAO.hasOrgRole(orgId, userId, Role.MONITOR)) {
-	    String error = "User " + userId + " is not a monitor in organisation " + orgId + " and can not \"" + action
-		    + "\"";
-	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
-	    }
-	}
-
-	return true;
+	return hasOrgRole(orgId, userId, SecurityService.GROUP_MONITOR_ROLES, action, escalate);
     }
 
     @Override
@@ -341,19 +327,38 @@ public class SecurityService implements ISecurityService {
 	    }
 	}
 
-	if (!securityDAO.isSysadmin(userId) && !securityDAO.hasOrgRole(orgId, userId, roles)) {
-	    String error = "User " + userId + " does not have any of " + Arrays.toString(roles)
-		    + " roles in organisation " + orgId + " and can not \"" + action + "\"";
-	    SecurityService.log.error(error);
-	    auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
-	    if (escalate) {
-		throw new SecurityException(error);
-	    } else {
-		return false;
+	try {
+	    if (securityDAO.isSysadmin(userId) || securityDAO.hasOrgRole(orgId, userId, roles)) {
+		return true;
 	    }
+
+	    // check for super roles in the parent organisations
+	    List<String> roleList = new ArrayList<String>(Arrays.asList(roles));
+	    roleList.retainAll(SecurityService.GROUP_SUPER_ROLES);
+	    if (!roleList.isEmpty()) {
+		Organisation organisation = (Organisation) securityDAO.find(Organisation.class, orgId);
+		if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+		    organisation = organisation.getParentOrganisation();
+		}
+
+		if (securityDAO.hasOrgRole(organisation.getOrganisationId(), userId,
+			roleList.toArray(SecurityService.EMPTY_STRING_ARRAY))) {
+		    return true;
+		}
+	    }
+	} catch (Exception e) {
+	    SecurityService.log.error("Error while checking user " + userId + " role in organisation " + orgId, e);
 	}
 
-	return true;
+	String error = "User " + userId + " does not have any of " + Arrays.toString(roles) + " roles in organisation "
+		+ orgId + " and can not \"" + action + "\"";
+	SecurityService.log.error(error);
+	auditService.log(SecurityService.SECURITY_MODULE_NAME, error);
+	if (escalate) {
+	    throw new SecurityException(error);
+	} else {
+	    return false;
+	}
     }
 
     public void setSecurityDAO(ISecurityDAO securityDAO) {

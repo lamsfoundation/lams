@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,7 +55,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -87,22 +88,25 @@ public class LessonConditionsAction extends DispatchAction {
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
     private static IGroupUserDAO groupUserDAO;
+    private static ISecurityService securityService;
 
     /**
      * Prepares data for thickbox displayed on Index page.
+     * 
+     * @throws IOException
      * 
      * @throws InvalidParameterException
      */
     @SuppressWarnings("unchecked")
     public ActionForward getIndexLessonConditions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
+	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	if (lesson == null) {
-	    throw new IllegalArgumentException("Lesson with ID: " + lessonId + " does not exist.");
+	if (!getSecurityService().isLessonMonitor(lessonId, getUser().getUserID(), "show lesson conditions", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
 	}
 
+	Lesson lesson = getLessonService().getLesson(lessonId);
 	List<IndexLessonBean> precedingLessons = new ArrayList<IndexLessonBean>(lesson.getPrecedingLessons().size());
 	for (Lesson precedingLesson : lesson.getPrecedingLessons()) {
 	    IndexLessonBean precedingLessonBean = new IndexLessonBean(precedingLesson.getLessonId(),
@@ -146,7 +150,7 @@ public class LessonConditionsAction extends DispatchAction {
 	    request.setAttribute(LessonConditionsAction.PARAM_INDIVIDUAL_FINISH, false);
 	}
 
-	request.setAttribute(CentralConstants.PARAM_EDIT, canEdit(request, lesson));
+	request.setAttribute(CentralConstants.PARAM_EDIT, lesson.getUser().getUserId().equals(getUser().getUserID()));
 
 	return mapping.findForward(LessonConditionsAction.FORWARD_INDEX_LESSON_CONDITION);
     }
@@ -154,15 +158,22 @@ public class LessonConditionsAction extends DispatchAction {
     /**
      * Removes given lesson from dependecies and displays updated list in thickbox.
      * 
+     * @throws IOException
+     * 
      * @throws InvalidParameterException
      */
     public ActionForward removeLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
+	if (!getSecurityService().isLessonOwner(lessonId, getUser().getUserID(), "remove lesson dependency", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
+	    return null;
+	}
+
 	Long removedPrecedingLessonId = WebUtil.readLongParam(request,
 		LessonConditionsAction.PARAM_PRECEDING_LESSON_ID, false);
 
-	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
+	Lesson lesson = getLessonService().getLesson(lessonId);
 	Iterator<Lesson> precedingLessonIter = lesson.getPrecedingLessons().iterator();
 	while (precedingLessonIter.hasNext()) {
 	    if (precedingLessonIter.next().getLessonId().equals(removedPrecedingLessonId)) {
@@ -178,15 +189,21 @@ public class LessonConditionsAction extends DispatchAction {
     /**
      * Adds given lesson to dependecies and displays updated list in thickbox.
      * 
+     * @throws IOException
+     * 
      * @throws InvalidParameterException
      */
     public ActionForward addLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
+	if (!getSecurityService().isLessonOwner(lessonId, getUser().getUserID(), "add lesson dependency", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
+	    return null;
+	}
+
 	Long addedPrecedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
 		false);
-
-	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
+	Lesson lesson = getLessonService().getLesson(lessonId);
 	Lesson addedPrecedingLesson = getLessonService().getLesson(addedPrecedingLessonId);
 	if (addedPrecedingLesson == null) {
 	    throw new IllegalArgumentException("Preceding lesson with ID: " + lessonId + " does not exist.");
@@ -200,17 +217,25 @@ public class LessonConditionsAction extends DispatchAction {
 
     /**
      * Sets lesson finish date, either for individuals or lesson as a whole. If days<=0, schedule is removed.
+     * 
+     * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     public ActionForward setDaysToLessonFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
+	if (!getSecurityService().isLessonOwner(lessonId, getUser().getUserID(), "set days to lesson finish", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not the owner of the lesson");
+	    return null;
+	}
+
 	int daysToLessonFinish = WebUtil.readIntParam(request, LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH,
 		false);
 	boolean individualFinish = WebUtil.readBooleanParam(request, LessonConditionsAction.PARAM_INDIVIDUAL_FINISH,
 		false);
 	ActionMessages errors = new ActionMessages();
 
-	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
+	Lesson lesson = getLessonService().getLesson(lessonId);
 	HttpSession session = SessionManager.getSession();
 	UserDTO currentUser = (UserDTO) session.getAttribute(AttributeNames.USER);
 	try {
@@ -278,27 +303,9 @@ public class LessonConditionsAction extends DispatchAction {
 	return getIndexLessonConditions(mapping, form, request, response);
     }
 
-    private Lesson getLessonAndCheckPermissions(HttpServletRequest request, Long lessonId) {
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	if (lesson == null) {
-	    throw new IllegalArgumentException("Lesson with ID: " + lessonId + " does not exist.");
-	}
-	if (!canEdit(request, lesson)) {
-	    throw new SecurityException("Current user can not edit lesson conditions");
-	}
-	return lesson;
-    }
-
-    /**
-     * Checks if user is allowed to edit lesson conditions.
-     */
-    private boolean canEdit(HttpServletRequest request, Lesson lesson) {
-	HttpSession session = SessionManager.getSession();
-	UserDTO currentUser = (UserDTO) session.getAttribute(AttributeNames.USER);
-	if (currentUser == null) {
-	    throw new DataMissingException("User DTO missing from session.");
-	}
-	return currentUser.getUserID().equals(lesson.getUser().getUserId());
+    private UserDTO getUser() {
+	HttpSession ss = SessionManager.getSession();
+	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 
     private ILessonService getLessonService() {
@@ -317,6 +324,16 @@ public class LessonConditionsAction extends DispatchAction {
 	    LessonConditionsAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
 	}
 	return LessonConditionsAction.monitoringService;
+    }
+
+    private ISecurityService getSecurityService() {
+	if (LessonConditionsAction.securityService == null) {
+	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    LessonConditionsAction.securityService = (ISecurityService) webContext.getBean("securityService");
+	}
+
+	return LessonConditionsAction.securityService;
     }
 
     private IGroupUserDAO getGroupUserDAO() {

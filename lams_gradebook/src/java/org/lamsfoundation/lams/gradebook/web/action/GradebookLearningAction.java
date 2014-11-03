@@ -80,10 +80,9 @@ public class GradebookLearningAction extends LamsDispatchAction {
 		GradebookLearningAction.logger.error("User missing from session. ");
 		return mapping.findForward("error");
 	    }
-	    if (!getSecurityService().isGroupMonitor(oranisationID, user.getUserID(), "get learner course gradebook",
-		    false)
-		    && !getSecurityService().hasOrgRole(oranisationID, user.getUserID(), new String[] { Role.LEARNER },
-			    "get course gradebook for learner", false)) {
+	    if (!getSecurityService().hasOrgRole(oranisationID, user.getUserID(),
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER },
+		    "get course gradebook for learner", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 		return null;
 	    }

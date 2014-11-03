@@ -92,8 +92,8 @@ public class DisplayGroupAction extends Action {
 	if (org != null) {
 	    User user = getUser(request.getRemoteUser());
 	    if (!getSecurityService().hasOrgRole(orgId, user.getUserId(),
-		    new String[] { Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group", false)
-		    && !getSecurityService().isGroupManager(orgId, user.getUserId(), "display group", false)) {
+		    new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group",
+		    false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a part of the organisation");
 		return null;
 	    }
