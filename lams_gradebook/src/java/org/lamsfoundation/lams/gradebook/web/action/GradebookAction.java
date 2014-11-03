@@ -318,10 +318,9 @@ public class GradebookAction extends LamsDispatchAction {
 	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	    user = (User) getUserService().findById(User.class, userID);
 	} else {
-	    if (!getSecurityService().isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook for learner",
-		    false)
-		    && !getSecurityService().hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.LEARNER },
-			    "get course gradebook for learner", false)) {
+	    if (!getSecurityService().hasOrgRole(courseID, viewer.getUserId(),
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER },
+		    "get course gradebook for learner", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 		return null;
 	    }

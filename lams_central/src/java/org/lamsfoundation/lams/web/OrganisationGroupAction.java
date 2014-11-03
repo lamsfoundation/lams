@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,12 +55,12 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -139,16 +140,19 @@ public class OrganisationGroupAction extends DispatchAction {
 
     private static IUserManagementService userManagementService;
     private static ILessonService lessonService;
+    private static ISecurityService securityService;
 
     private static final String MAPPING_VIEW_GROUPINGS = "viewGroupings";
     private static final String MAPPING_VIEW_GROUPS = "viewGroups";
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.
+     * 
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public ActionForward viewGroupings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException {
+	    HttpServletResponse response) throws JSONException, IOException {
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	boolean lessonGroupsExist = getLessonGrouping(request, activityID, false) != null;
 	if (lessonGroupsExist) {
@@ -164,14 +168,17 @@ public class OrganisationGroupAction extends DispatchAction {
 	    organisationId = ((Lesson) getUserManagementService().findById(Lesson.class, lessonId)).getOrganisation()
 		    .getOrganisationId();
 	}
+
 	// check if user is allowed to view and edit groups
+	if (!getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
+		"view organisation groupings", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+	    return null;
+	}
+
 	boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
 		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	if (!isGroupSuperuser && !getUserManagementService().isUserInRole(userId, organisationId, Role.AUTHOR)
-		&& !getUserManagementService().isUserInRole(userId, organisationId, Role.MONITOR)) {
-	    throw new UserAccessDeniedException("User " + userId + " may not view groupings for course "
-		    + organisationId);
-	}
 
 	if (OrganisationGroupAction.log.isDebugEnabled()) {
 	    OrganisationGroupAction.log.debug("Displaying course groupings for user " + userId + " and organisation "
@@ -193,10 +200,12 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * View groups of the given grouping.
+     * 
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public ActionForward viewGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException {
+	    HttpServletResponse response) throws JSONException, IOException {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
@@ -208,12 +217,15 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
 
 	// check if user is allowed to view and edit groups
+	if (!getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
+		"view organisation groups", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+	    return null;
+	}
+
 	boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
 		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	if (!isGroupSuperuser && !getUserManagementService().isUserInRole(userId, organisationId, Role.AUTHOR)
-		&& !getUserManagementService().isUserInRole(userId, organisationId, Role.MONITOR)) {
-	    throw new UserAccessDeniedException("User " + userId + " may not view groups for course " + organisationId);
-	}
 
 	if (OrganisationGroupAction.log.isDebugEnabled()) {
 	    OrganisationGroupAction.log.debug("Displaying course groups for user " + userId + " and organisation "
@@ -291,17 +303,19 @@ public class OrganisationGroupAction extends DispatchAction {
      * Saves a course grouping.
      * 
      * @throws InvalidParameterException
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, InvalidParameterException {
+	    HttpServletResponse response) throws JSONException, InvalidParameterException, IOException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
-		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	if (!isGroupSuperuser) {
-	    throw new UserAccessDeniedException("User " + userId + " may not edit groups for course " + organisationId);
+	// check if user is allowed to save grouping
+	if (!getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER }, "save organisation grouping", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
+	    return null;
 	}
 
 	if (OrganisationGroupAction.log.isDebugEnabled()) {
@@ -372,7 +386,6 @@ public class OrganisationGroupAction extends DispatchAction {
 	    } else {
 		throw new InvalidParameterException("Grouping with name \"" + orgGroupingName + "\" already exists");
 	    }
-
 	}
 
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
@@ -381,17 +394,18 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Deletes course grouping with the given ID.
+     * 
+     * @throws IOException
      */
     public ActionForward removeGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException {
+	    HttpServletResponse response) throws JSONException, IOException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
-		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	if (!isGroupSuperuser) {
-	    throw new UserAccessDeniedException("User " + userId + " may not remove groupings for course "
-		    + organisationId);
+	if (!getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER }, "remove organisation grouping", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
+	    return null;
 	}
 
 	Long groupingId = WebUtil.readLongParam(request, "groupingId");
@@ -399,7 +413,6 @@ public class OrganisationGroupAction extends DispatchAction {
 	    OrganisationGroupAction.log.debug("Removing grouping " + groupingId + " for user " + userId
 		    + " and organisation " + organisationId);
 	}
-
 	getUserManagementService().deleteById(OrganisationGrouping.class, groupingId);
 
 	return viewGroupings(mapping, form, request, response);
@@ -534,5 +547,14 @@ public class OrganisationGroupAction extends DispatchAction {
 	    OrganisationGroupAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return OrganisationGroupAction.lessonService;
+    }
+
+    private ISecurityService getSecurityService() {
+	if (OrganisationGroupAction.securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    OrganisationGroupAction.securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return OrganisationGroupAction.securityService;
     }
 }

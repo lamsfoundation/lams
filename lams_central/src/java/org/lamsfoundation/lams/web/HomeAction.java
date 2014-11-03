@@ -136,105 +136,97 @@ public class HomeAction extends DispatchAction {
      */
     public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
-
 	try {
-	    HomeAction.log.debug("request learner");
-
 	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
-	    String mode = WebUtil.readStrParam(req, AttributeNames.PARAM_MODE, true);
-
 	    UserDTO user = getUser();
 	    if (user == null) {
 		HomeAction.log.error("learner: User missing from session. ");
 		return mapping.findForward("error");
-	    } else {
-		Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
-		if ((lesson == null) || !lesson.isLessonStarted()) {
-		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
-		}
-		if (!getLessonService().checkLessonReleaseConditions(lessonId, user.getUserID())) {
-		    return displayMessage(mapping, req, "message.preceding.lessons.not.finished.cannot.participate");
-		}
+	    }
 
-		if ((lesson.getLessonClass() == null)
-			|| !lesson.getLessonClass().getLearners().contains(getRealUser(user))) {
-		    HomeAction.log.error("learner: User " + user.getLogin()
-			    + " is not a learner in the requested lesson. Cannot access the lesson.");
-		    return displayMessage(mapping, req, "error.authorisation");
-		}
-
-		// check if the lesson is scheduled to be finished to individual users
-		if (lesson.isScheduledToCloseForIndividuals()) {
-		    GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, user.getUserID());
-		    if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null)
-			    && groupUser.getScheduledLessonEndDate().before(new Date())) {
-			HomeAction.log.error("learner: User " + user.getLogin()
-				+ " cannot access the lesson due to lesson end date has passed.");
-			return displayMessage(mapping, req, "error.finish.date.passed");
-
-		    }
-		}
-
-		// check lesson's state if its suitable for learner's access
-		if (!lesson.isLessonAccessibleForLearner()) {
-		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
-		}
-
-		// show lesson intro page if required and it's not been shown already
-		boolean isLessonIntroWatched = WebUtil.readBooleanParam(req, "isLessonIntroWatched", false);
-		if (lesson.isEnableLessonIntro() && !isLessonIntroWatched) {
-		    req.setAttribute("learnerURL", "learnerURL");
-		    req.setAttribute("lesson", lesson);
-		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
-		    req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
-
-		    // check if we need to create learning design SVG
-		    if (lesson.isDisplayDesignImage()) {
-			Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
-			req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
-
-			if (lesson.getLearnerProgresses().isEmpty()) {
-			    // create svg, png files on the server
-			    getLearningDesignService().createLearningDesignSVG(learningDesignId,
-				    SVGGenerator.OUTPUT_FORMAT_SVG);
-			    getLearningDesignService().createLearningDesignSVG(learningDesignId,
-				    SVGGenerator.OUTPUT_FORMAT_PNG);
-			}
-		    }
-		    return mapping.findForward("lessonIntro");
-		}
-
-		if (lesson.getLearnerRestart()) {
-		    // start the lesson from the beginning each time
-		    getLessonService().removeLearnerProgress(lessonId, user.getUserID());
-		}
-
-		if (mode != null) {
-		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
-		}
-
-		req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
-		req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(lesson
-			.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE));
-		req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
-			String.valueOf(lesson.getLearnerPresenceAvailable()));
-		req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED,
-			String.valueOf(lesson.getLearnerImAvailable()));
-		req.setAttribute(AttributeNames.PARAM_TITLE, URLEncoder.encode(lesson.getLessonName(), "UTF8"));
-
-		/* Date Format for Chat room append */
-		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
-
-		// forward to /lams/learning/main.jsp
-		String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
-		serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/"
-			+ serverURLContextPath;
-		serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-		getServlet().getServletContext().getContext(serverURLContextPath + "learning")
-			.getRequestDispatcher("/main.jsp").forward(req, res);
+	    if (!getSecurityService().isLessonLearner(lessonId, user.getUserID(), "access lesson", false)) {
+		res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 		return null;
 	    }
+
+	    String mode = WebUtil.readStrParam(req, AttributeNames.PARAM_MODE, true);
+	    Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
+	    if (!lesson.isLessonStarted()) {
+		return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
+	    }
+	    if (!getLessonService().checkLessonReleaseConditions(lessonId, user.getUserID())) {
+		return displayMessage(mapping, req, "message.preceding.lessons.not.finished.cannot.participate");
+	    }
+
+	    // check if the lesson is scheduled to be finished to individual users
+	    if (lesson.isScheduledToCloseForIndividuals()) {
+		GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, user.getUserID());
+		if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null)
+			&& groupUser.getScheduledLessonEndDate().before(new Date())) {
+		    HomeAction.log.error("learner: User " + user.getLogin()
+			    + " cannot access the lesson due to lesson end date has passed.");
+		    return displayMessage(mapping, req, "error.finish.date.passed");
+		}
+	    }
+
+	    // check lesson's state if its suitable for learner's access
+	    if (!lesson.isLessonAccessibleForLearner()) {
+		return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
+	    }
+
+	    // show lesson intro page if required and it's not been shown already
+	    boolean isLessonIntroWatched = WebUtil.readBooleanParam(req, "isLessonIntroWatched", false);
+	    if (lesson.isEnableLessonIntro() && !isLessonIntroWatched) {
+		req.setAttribute("learnerURL", "learnerURL");
+		req.setAttribute("lesson", lesson);
+		req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
+		req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
+
+		// check if we need to create learning design SVG
+		if (lesson.isDisplayDesignImage()) {
+		    Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
+		    req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
+
+		    if (lesson.getLearnerProgresses().isEmpty()) {
+			// create svg, png files on the server
+			getLearningDesignService().createLearningDesignSVG(learningDesignId,
+				SVGGenerator.OUTPUT_FORMAT_SVG);
+			getLearningDesignService().createLearningDesignSVG(learningDesignId,
+				SVGGenerator.OUTPUT_FORMAT_PNG);
+		    }
+		}
+		return mapping.findForward("lessonIntro");
+	    }
+
+	    if (lesson.getLearnerRestart()) {
+		// start the lesson from the beginning each time
+		getLessonService().removeLearnerProgress(lessonId, user.getUserID());
+	    }
+
+	    if (mode != null) {
+		req.setAttribute(AttributeNames.PARAM_MODE, mode);
+	    }
+
+	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
+	    req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(lesson
+		    .getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE));
+	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
+		    String.valueOf(lesson.getLearnerPresenceAvailable()));
+	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));
+	    req.setAttribute(AttributeNames.PARAM_TITLE, URLEncoder.encode(lesson.getLessonName(), "UTF8"));
+
+	    /* Date Format for Chat room append */
+	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
+	    req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
+
+	    // forward to /lams/learning/main.jsp
+	    String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
+	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/"
+		    + serverURLContextPath;
+	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
+	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
+		    .getRequestDispatcher("/main.jsp").forward(req, res);
+	    return null;
 
 	} catch (Exception e) {
 	    HomeAction.log.error("Failed to load learner", e);
@@ -247,54 +239,51 @@ public class HomeAction extends DispatchAction {
      */
     public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
-
 	try {
-	    HomeAction.log.debug("request author");
 	    UserDTO user = getUser();
 	    if (user == null) {
 		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
-	    } else {
-		Long learningDesignID = null;
-		String layout = null;
-		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		req.setAttribute("serverUrl", serverUrl);
+	    }
+	    
+	    Long learningDesignID = null;
+	    String layout = null;
+	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	    req.setAttribute("serverUrl", serverUrl);
 
-		String requestSrc = req.getParameter("requestSrc");
-		String notifyCloseURL = req.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
-		String isPostMessageToParent = req.getParameter("isPostMessageToParent");
-		String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
-		String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
+	    String requestSrc = req.getParameter("requestSrc");
+	    String notifyCloseURL = req.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
+	    String isPostMessageToParent = req.getParameter("isPostMessageToParent");
+	    String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
+	    String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
 
-		if (req.getParameter("learningDesignID") != null) {
-		    learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
-		}
-
-		if (req.getParameter("layout") != null) {
-		    layout = WebUtil.readStrParam(req, "layout");
-		}
-
-		if (layout != null) {
-		    req.setAttribute("layout", layout);
-		}
-
-		if (req.getParameter("learningDesignID") != null) {
-		    learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
-		}
-
-		if (learningDesignID != null) {
-		    req.setAttribute("learningDesignID", learningDesignID);
-		}
-
-		req.setAttribute("requestSrc", requestSrc);
-		req.setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
-		req.setAttribute("isPostMessageToParent", isPostMessageToParent);
-		req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
-		req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
-
-		return mapping.findForward("author");
+	    if (req.getParameter("learningDesignID") != null) {
+		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
 	    }
 
+	    if (req.getParameter("layout") != null) {
+		layout = WebUtil.readStrParam(req, "layout");
+	    }
+
+	    if (layout != null) {
+		req.setAttribute("layout", layout);
+	    }
+
+	    if (req.getParameter("learningDesignID") != null) {
+		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+	    }
+
+	    if (learningDesignID != null) {
+		req.setAttribute("learningDesignID", learningDesignID);
+	    }
+
+	    req.setAttribute("requestSrc", requestSrc);
+	    req.setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	    req.setAttribute("isPostMessageToParent", isPostMessageToParent);
+	    req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
+	    req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
+
+	    return mapping.findForward("author");
 	} catch (Exception e) {
 	    HomeAction.log.error("Failed to load author", e);
 	    return mapping.findForward("error");
@@ -306,27 +295,24 @@ public class HomeAction extends DispatchAction {
      */
     public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws IOException, ServletException {
-	if (HomeAction.log.isDebugEnabled()) {
-	    HomeAction.log.debug("Requested Lesson Monitor");
-	}
-	
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	UserDTO user = getUser();
 	if (user == null) {
 	    HomeAction.log.error("User missing from session. Can not open Lesson Monitor.");
 	    return mapping.findForward("error");
-	} else {
-	    Lesson lesson = lessonId == null ? null : getLessonService().getLesson(lessonId);
-	    if (lesson == null) {
-		HomeAction.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
-		return mapping.findForward("error");
-	    }
-
-	    String url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "monitoring/monitoring.do?method=monitorLesson&lessonID=" + lessonId;
-	    res.sendRedirect(url);
-	    return null;
 	}
+	
+	Lesson lesson = lessonId == null ? null : getLessonService().getLesson(lessonId);
+	if (lesson == null) {
+	    HomeAction.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
+	    return mapping.findForward("error");
+	}
+
+	// security check will be done there
+	String url = Configuration.get(ConfigurationKeys.SERVER_URL)
+		+ "monitoring/monitoring.do?method=monitorLesson&lessonID=" + lessonId;
+	res.sendRedirect(url);
+	return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -337,7 +323,7 @@ public class HomeAction extends DispatchAction {
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 
 	if (!getSecurityService().isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
-	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
 

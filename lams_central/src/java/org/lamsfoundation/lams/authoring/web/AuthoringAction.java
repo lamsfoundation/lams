@@ -124,7 +124,7 @@ public class AuthoringAction extends LamsDispatchAction {
     public ActionForward openAuthoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
-	
+
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
 	// build list of existing learning library groups
 	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
@@ -368,7 +368,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
-	
+
 	return null;
     }
 
@@ -454,7 +454,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // if the tool content ID was not provided, generate the next unique content ID for the tool
 	    toolContentID = authoringService.insertToolContentID(toolID);
 	}
-	
+
 	if (toolContentID != null) {
 	    String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	    if (StringUtils.isBlank(contentFolderID)) {
@@ -727,13 +727,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	return AuthoringAction.learningDesignService;
     }
-    
+
     private ISecurityService getSecurityService() {
-	if (securityService == null) {
+	if (AuthoringAction.securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
+	    AuthoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
-	return securityService;
+	return AuthoringAction.securityService;
     }
 }

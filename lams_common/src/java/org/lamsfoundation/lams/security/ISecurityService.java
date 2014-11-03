@@ -26,12 +26,8 @@ package org.lamsfoundation.lams.security;
 public interface ISecurityService {
 
     /**
-     * Checks if the is a manager of the class or ogranisation.
-     */
-    boolean isGroupManager(Integer orgId, Integer userId, String action, boolean escalate) throws SecurityException;
-
-    /**
-     * Checks if the is a manager or monitor in the organisation.
+     * Checks if the is a manager or monitor in the organisation. This is just a convenience method for hasOrgRole()
+     * with MONITOR and GROUP_MANAGER.
      */
     boolean isGroupMonitor(Integer orgId, Integer userId, String action, boolean escalate) throws SecurityException;
 
@@ -46,6 +42,11 @@ public interface ISecurityService {
     boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
 
     /**
+     * Checks if the user is the owner of the given lesson.
+     */
+    boolean isLessonOwner(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
+
+    /**
      * Checks if the user is either a learner or a staff member in the given lesson.
      */
     boolean isLessonParticipant(Long lessonId, Integer userId, String action, boolean escalate)
@@ -57,7 +58,8 @@ public interface ISecurityService {
     boolean isSysadmin(Integer userId, String action, boolean escalate);
 
     /**
-     * Checks if the user has any of the given roles in the given organisation.
+     * Checks if the user has any of the given roles in the given organisation. If GROUP_MANAGER and/or GROUP_ADMIN are
+     * given for class type organisation, their parent organisations are checked.
      */
     boolean hasOrgRole(Integer orgId, Integer userId, String[] roles, String action, boolean escalate)
 	    throws SecurityException;
