@@ -34,9 +34,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  *  LAMS Authoring common errors
@@ -465,12 +465,70 @@ public class AuthorErrorsTests {
 	
 	
 	/**
+	 * Attempts to create a cross branching transition
+	 * 
+	 */
+	@Test(dependsOnMethods="attemptSaveNoConditionsBranchesSet")
+	public void attempCrossBranchingTransition() {
+		
+		String branchingOne = "Branching1";
+		
+		cleanCanvas();
+		
+		fla.dragActivityToCanvasPosition(AuthorConstants.MULTIPLE_CHOICE_TITLE, 250, -10);
+		fla.dragBranchToCanvas();
+		
+		fla.drawTransitionFromTo(AuthorConstants.MULTIPLE_CHOICE_TITLE, 
+				AuthorConstants.BRANCHING_START_TITLE);
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, 
+				AuthorConstants.BRANCH_END_TITLE);
+		
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE)
+			.setBranchingType(BranchingTests.BRANCHING_TYPE_INSTRUCTOR);
+		
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 250, 200)
+		.dragActivityToCanvasPosition(AuthorConstants.COMMON_CARTRIDGE_TITLE, 450, 400);
+		
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE,
+				AuthorConstants.FORUM_TITLE);
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, 
+				AuthorConstants.COMMON_CARTRIDGE_TITLE);
+		
+		fla.drawTransitionFromTo(AuthorConstants.FORUM_TITLE,
+				AuthorConstants.BRANCH_END_TITLE);
+
+		fla.branchingProperties(AuthorConstants.BRANCHING_TITLE).setBranchingTitle(branchingOne);
+
+		fla.dragBranchesToCanvasPosition(150, 350);
+		
+		// fla.branchingProperties(AuthorConstants.BRANCHING_TITLE).setBranchingTitle(branchingTwo);
+		
+		fla.drawTransitionFromTo(AuthorConstants.COMMON_CARTRIDGE_TITLE, AuthorConstants.BRANCHING_START_TITLE);
+		
+		fla.dragActivityToCanvasPosition(AuthorConstants.NOTEBOOK_TITLE, 300, 500);
+		fla.dragActivityToCanvasPosition(AuthorConstants.IMAGE_GALLERY_TITLE, 350, 600);
+		
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, AuthorConstants.NOTEBOOK_TITLE);
+		fla.drawTransitionFromTo(AuthorConstants.BRANCHING_START_TITLE, AuthorConstants.IMAGE_GALLERY_TITLE);
+		
+		fla.drawTransitionFromTo(AuthorConstants.IMAGE_GALLERY_TITLE, AuthorConstants.BRANCH_END_TITLE);
+		fla.arrangeDesign();
+		
+		String txt = fla.drawTransitionFromTo(AuthorConstants.NOTEBOOK_TITLE, branchingOne + " end").getAlertText();
+		
+		Assert.assertEquals(txt, AuthorConstants.BRANCHING_CROSSBRANCHING_NOT_ALLOWED, 
+				"It should have been given an error when attempting to do a cross branching transtion!");
+		
+	}
+	
+	
+	/**
 	 * Save invalid design: no activities inside the optional
 	 * 
 	 *  Attempts to save a design that has no activities within the optional activity.
 	 *  
 	 */
-	@Test(dependsOnMethods={"attemptSaveNoConditionsBranchesSet"})
+	@Test(dependsOnMethods={"attempCrossBranchingTransition"})
 	public void attemptSaveNoActivitiesInsideOptional() {
 		
 		cleanCanvas();

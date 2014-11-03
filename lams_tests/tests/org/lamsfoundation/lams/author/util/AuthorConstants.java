@@ -39,6 +39,7 @@ public class AuthorConstants {
 	public static final String BRANCHING_MUST_HAVE_AT_LEAST_MSG = "A Branching Activity must have at least one";
 	public static final String BRANCHING_MUST_HAVE_GROUPS_TO_BRANCHES_MSG = "Group Based Branching Activity must have all Groups assigned to Branches";
 	public static final String BRANCHING_MUST_HAVE_ONE_CONDITION_MSG = "Learner's Output Branching Activity must have at least one condition";
+	public static final String BRANCHING_CROSSBRANCHING_NOT_ALLOWED = "Cross-branching transitions are not allowed";
 	public static final String OPTIONAL_MUST_HAVE_ONE_ACTIVITY_MSG = "An Optional Activity must have one or more activities";
 	public static final String SUPPORT_MUST_HAVE_ONE_ACTIVITY_MSG = "at least one support activity in the container";
 	
