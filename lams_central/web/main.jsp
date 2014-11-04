@@ -170,7 +170,7 @@
 				<td class="linksCell">
 					<c:if test="${not empty adminLinks}">
 						<c:forEach var="adminlink" items="${adminLinks}">
-							<div class="ui-button" title="<fmt:message key="${adminlink.name}"/>" 
+							<div class="ui-button" id="<fmt:message key="${adminlink.name}"/>" 
 							     onClick='<c:out value="${adminlink.url}"/>'>
 									<fmt:message key="${adminlink.name}"/>
 							</div> 

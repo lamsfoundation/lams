@@ -41,10 +41,10 @@ p {
 	<form>
 	
 	<div class="floatRight">
-		<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
-		<input class="button" type="button" value="<fmt:message key="admin.user.find"/>" onclick=javascript:document.location='usersearch.do' />
+		<input id="userCreate" class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
+		<input id="findUsers" class="button" type="button" value="<fmt:message key="admin.user.find"/>" onclick=javascript:document.location='usersearch.do' />
 		<logic:equal name="manageGlobalRoles" value="true">
-			<input class="button" type="button" value="<fmt:message key="admin.global.roles.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+			<input id="manageGlobalRoles" class="button" type="button" value="<fmt:message key="admin.global.roles.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 		</logic:equal>
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
@@ -55,7 +55,7 @@ p {
 				<c:param name="typeId" value="2" />
 				<c:param name="parentId" value="${OrgManageForm.parentId}" />
 			</c:url>
-			<input class="button" type="button" value="<fmt:message key="admin.course.add"/>" onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+			<input id="createCourse" class="button" type="button" value="<fmt:message key="admin.course.add"/>" onclick=javascript:document.location='<c:out value="${editaction}"/>' />
 		</logic:equal>
 	</div>
 	</form>
@@ -78,10 +78,10 @@ p {
 	
 	<table cellspacing="7" class="infoDisplay">
 		<tr>
-			<td align="right"><fmt:message key="admin.organisation.name"/>:</td>
+			<td id="courseName" align="right"><fmt:message key="admin.organisation.name"/>:</td>
 			<td><c:out value="${org.name}" /></td>
 			<td align="right"><fmt:message key="admin.organisation.status"/>:</td>
-			<td width="10%"><c:out value="${org.organisationState.description}" /></td>
+			<td id="courseStatus" width="10%"><c:out value="${org.organisationState.description}" /></td>
 		</tr>
 		<tr>
 			<td align="right"><fmt:message key="admin.organisation.code"/>:</td>
@@ -107,7 +107,7 @@ p {
 	
 	<p>
 	<logic:equal name="editGroup" value="true">
-		<input class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input id="editCourse" class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</logic:equal>
 	</p>
 	
@@ -216,7 +216,7 @@ p {
 		<tr>
 			<td><bean:write name="orgManageBean" property="organisationId" /></td>
 			<td>
-				<a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
+				<a id="<bean:write name='orgManageBean' property='organisationId'/>" href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
 			</td>
 			<td>
 				<bean:write name="orgManageBean" property="code" />
