@@ -541,7 +541,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	processor.parseLearningDesign();
 
-	Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
+	Activity lastReadOnlyActivity = processor.lastReadOnlyActivity;
 
 	// check if system gate already exists
 	if ((lastReadOnlyActivity == null) || !lastReadOnlyActivity.isGateActivity()
@@ -586,7 +586,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 		processor.parseLearningDesign();
 
-		Activity lastReadOnlyActivity = processor.getLastReadOnlyActivity();
+		Activity lastReadOnlyActivity = processor.lastReadOnlyActivity;
+		Long firstAddedActivityId = processor.firstAddedActivity == null ? null : processor.firstAddedActivity
+			.getActivityId();
 
 		// open and release waiting list on system gate
 		if ((lastReadOnlyActivity != null) && lastReadOnlyActivity.isGateActivity()
@@ -598,11 +600,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
 		    lesson.setLockedForEdit(false);
 
-		    // LDEV-1899 only mark learners uncompleted if a change was saved
-		    if (!cancelled) {
+		    // LDEV-1899 only mark learners uncompleted if a change was saved and an activity added
+		    if (!cancelled && firstAddedActivityId != null) {
 			// the lesson may now have additional activities on the end,
 			// so clear any completed flags
-			lessonService.performMarkLessonUncompleted(lesson.getLessonId());
+			lessonService.performMarkLessonUncompleted(lesson.getLessonId(), firstAddedActivityId);
 		    }
 
 		    initialiseToolActivityForRuntime(design, lesson);
