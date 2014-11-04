@@ -839,17 +839,176 @@
 	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
 	
 	
+
+
+	<target name="slim-wildfly" description="Makes a backup and removes unnecessary files from Wildfly 8.1; do not run twice!">
+		<!-- Backup -->
+		<copy todir="${server.home}/wildfly-slim/modules/system/layers/base/">
+			<fileset dir="${server.home}/modules/system/layers/base/">
+				<include name="com/fasterxml/jackson/**"/>
+				<include name="com/h2database/**"/>
+				<include name="gnu/**"/>
+				<include name="org/apache/avro/**"/>
+				<include name="org/apache/lucene/main/**"/>
+				<include name="org/apache/openjpa/**"/>
+				<include name="org/codehaus/jackson/**"/>
+				<include name="org/codehaus/jettison/**"/>
+				<include name="org/eclipse/**"/>
+				<include name="org/hibernate/3/**"/>
+				<include name="org/hibernate/4.1/**"/>
+				<include name="org/hibernate/envers/**"/>
+				<include name="org/hibernate/hql/**"/>
+				<include name="org/hibernate/search/**"/>
+				<include name="org/infinispan/lucene/**"/>
+				<include name="org/infinispan/query/main/**"/>
+				<include name="org/jberet/**"/>
+				<include name="org/jboss/as/aggregate/**"/>
+				<include name="org/jboss/as/appclient/**"/>
+				<include name="org/jboss/as/clustering/ejb3/**"/>
+				<include name="org/jboss/as/clustering/web/**"/>
+				<include name="org/jboss/as/cmp/**"/>
+				<include name="org/jboss/as/domain-add-user/**"/>
+				<include name="org/jboss/as/jaxr/**"/>
+				<include name="org/jboss/as/jaxrs/**"/>
+				<include name="org/jboss/as/jdr/**"/>
+				<include name="org/jboss/as/jpa/hibernate/**"/>
+				<include name="org/jboss/as/jsr77/**"/>
+				<include name="org/jboss/as/mail/**"/>
+				<include name="org/jboss/as/modcluster/**"/>
+				<include name="org/jboss/as/pojo/**"/>
+				<include name="org/jboss/as/sar/**"/>
+				<include name="org/jboss/as/security-api/**"/>
+				<include name="org/jboss/as/vault-tool/**"/>
+				<include name="org/jboss/as/version/main/jboss-as-version-8.1.0.Final.jar/**"/>
+				<include name="org/jboss/as/xts/**"/>
+				<include name="org/jboss/genericjms/**"/>
+				<include name="org/jboss/integration/**"/>
+				<include name="org/jboss/mod_cluster/**"/>
+				<include name="org/jboss/narayana/rts/**"/>
+				<include name="org/jboss/remoting3/**"/>
+				<include name="org/jboss/resteasy/jose-jwt/**"/>
+				<include name="org/jboss/resteasy/resteasy-atom-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-crypto/**"/>
+				<include name="org/jboss/resteasy/resteasy-jackson2-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-jackson-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-jettison-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-jsapi/**"/>
+				<include name="org/jboss/resteasy/resteasy-json-p-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-multipart-provider/**"/>
+				<include name="org/jboss/resteasy/resteasy-spring/**"/>
+				<include name="org/jboss/resteasy/resteasy-yaml-provider/**"/>
+				<include name="org/jboss/shrinkwrap/**"/>
+				<include name="org/jboss/ws/saaj-impl/**"/>
+				<include name="org/jboss/ws/tools/**"/>
+				<include name="org/jboss/xb/**"/>
+				<include name="org/osgi/**"/>
+				<include name="org/picketlink/**"/>
+				<include name="org/wildfly/extension/batch/**"/>
+				<include name="org/wildfly/extension/mod_cluster/**"/>
+				<include name="org/wildfly/extension/rts/**"/>
+				<include name="org/wildfly/jberet/**"/>
+				<include name="org/wildfly/mod_cluster/**"/>
+				<include name="org/yaml/**"/>
+			</fileset>
+		</copy>
+
+		<!-- Backup -->
+		<copy overwrite="yes" todir="${server.home}/wildfly-slim/welcome-content/" verbose="true">
+			<fileset dir="${server.home}/welcome-content/">
+				<include name="*/**" />
+			</fileset>
+		</copy>
+
+		<!-- Delete files -->
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${server.home}/modules/system/layers/base/">
+				<include name="com/fasterxml/jackson/"/>
+				<include name="com/h2database/"/>
+				<include name="gnu/"/>
+				<include name="org/apache/avro/"/>
+				<include name="org/apache/lucene/main/"/>
+				<include name="org/apache/openjpa/"/>
+				<include name="org/codehaus/jackson/"/>
+				<include name="org/codehaus/jettison/"/>
+				<include name="org/eclipse/"/>
+				<include name="org/hibernate/3/"/>
+				<include name="org/hibernate/4.1/"/>
+				<include name="org/hibernate/envers/"/>
+				<include name="org/hibernate/hql/"/>
+				<include name="org/hibernate/search/"/>
+				<include name="org/infinispan/lucene/"/>
+				<include name="org/infinispan/query/main/"/>
+				<include name="org/jberet/"/>
+				<include name="org/jboss/as/aggregate/"/>
+				<include name="org/jboss/as/appclient/"/>
+				<include name="org/jboss/as/clustering/ejb3/"/>
+				<include name="org/jboss/as/clustering/web/"/>
+				<include name="org/jboss/as/cmp/"/>
+				<include name="org/jboss/as/domain-add-user/"/>
+				<include name="org/jboss/as/jaxr/"/>
+				<include name="org/jboss/as/jaxrs/"/>
+				<include name="org/jboss/as/jdr/"/>
+				<include name="org/jboss/as/jpa/hibernate/"/>
+				<include name="org/jboss/as/jsr77/"/>
+				<include name="org/jboss/as/mail/"/>
+				<include name="org/jboss/as/modcluster/"/>
+				<include name="org/jboss/as/pojo/"/>
+				<include name="org/jboss/as/sar/"/>
+				<include name="org/jboss/as/security-api/"/>
+				<include name="org/jboss/as/vault-tool/"/>
+				<include name="org/jboss/as/version/main/jboss-as-version-8.1.0.Final.jar/"/>
+				<include name="org/jboss/as/xts/"/>
+				<include name="org/jboss/genericjms/"/>
+				<include name="org/jboss/integration/"/>
+				<include name="org/jboss/mod_cluster/"/>
+				<include name="org/jboss/narayana/rts/"/>
+				<include name="org/jboss/remoting3/"/>
+				<include name="org/jboss/resteasy/jose-jwt/"/>
+				<include name="org/jboss/resteasy/resteasy-atom-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-crypto/"/>
+				<include name="org/jboss/resteasy/resteasy-jackson2-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jackson-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jettison-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jsapi/"/>
+				<include name="org/jboss/resteasy/resteasy-json-p-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-multipart-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-spring/"/>
+				<include name="org/jboss/resteasy/resteasy-yaml-provider/"/>
+				<include name="org/jboss/shrinkwrap/"/>
+				<include name="org/jboss/ws/saaj-impl/"/>
+				<include name="org/jboss/ws/tools/"/>
+				<include name="org/jboss/xb/"/>
+				<include name="org/osgi/"/>
+				<include name="org/picketlink/"/>
+				<include name="org/wildfly/extension/batch/"/>
+				<include name="org/wildfly/extension/mod_cluster/"/>
+				<include name="org/wildfly/extension/rts/"/>
+				<include name="org/wildfly/jberet/"/>
+				<include name="org/wildfly/mod_cluster/"/>
+				<include name="org/yaml/"/>
+			</fileset>
+		</delete>
+
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${server.home}">
+				<include name="welcome-content/" />
+			</fileset>
+		</delete>
+	</target>
+
+
+
 	<target name="slim-jboss" description="Makes a backup and removes unnecessary files from JBoss 5.1; do not run twice!">
 		<!-- Fail until it's ready for WildFly -->
 		<fail />
-		
+
 		<!-- Backup -->
 		<copy todir="${server.home}server/default/slim-backup/server/default/deploy">
 			<fileset dir="${server.home}/standalone/deployments/">
-				<include name="ejb*.xml"/>
-				<include name="jms-ra.rar"/>
-				<include name="quartz-ra.rar"/>
-				<include name="mail*"/>
+				<include name="ejb*.xml" />
+				<include name="jms-ra.rar" />
+				<include name="quartz-ra.rar" />
+				<include name="mail*" />
 				<include name="schedule*.xml"/>
 				<include name="hsqldb-ds.xml"/>
 				<include name="hdscanner-jboss-beans.xml"/>
@@ -860,21 +1019,21 @@
 				<include name="monitoring-service.xml"/>
 				<include name="profileservice-jboss-beans.xml"/>
 				<include name="transaction-service.xml"/>
-				
+
 				<include name="profileservice-secured.jar/"/>
 				<include name="uuid-key-generator.sar/"/>
 				<include name="messaging/"/>
-				<include name="jbossws.sar/"/>	
+				<include name="jbossws.sar/"/>
 				<include name="admin-console.war/"/>
 				<include name="jmx-remoting.sar/"/>
-                <include name="jmx-console.war/"/>	
+				<include name="jmx-console.war/"/>
 				<include name="xnio-provider.jar/"/>
 				<include name="http-invoker.sar/"/>
-                <include name="management/"/>
+				<include name="management/"/>
 				<include name="ROOT.war/"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/default/deployers">
 			<fileset dir="${server.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
@@ -885,7 +1044,7 @@
 				<include name="jsr77-deployers-jboss-beans.xml"/>
 				<include name="logbridge-jboss-beans.xml"/>
 				<include name="clustering-deployer-jboss-beans.xml"/>
-				
+
 				<include name="bsh.deployer/"/>
 				<include name="jbossws.deployer/"/>
 				<include name="seam.deployer/"/>
@@ -893,34 +1052,34 @@
 				<include name="webbeans.deployer/"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer"
 			  file="${server.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
 		<copy todir="${server.home}server/default/slim-backup/server/default/deployers/jbossweb.deployer/META-INF"
 			  file="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/default/conf">
 			<fileset dir="${server.home}/standalone/configuration">
 				<include name="bootstrap.xml"/>
 				<include name="standardjboss.xml"/>
 				<include name="jax-ws-catalog.xml"/>
-				<include name="chap8.keystore"/>	
+				<include name="chap8.keystore"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/default/conf/props">
 			<fileset dir="${server.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
 				<include name="jbossws-*.properties"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/default/conf/bootstrap">
 			<fileset dir="${server.home}/standalone/configuration/bootstrap">
 				<include name="deployers.xml"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/server/">
 			<fileset dir="${jboss.server}">
 				<include name="all/"/>
@@ -929,7 +1088,7 @@
 				<include name="web"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/bin/">
 			<fileset dir="${server.home}/bin">
 				<include name="password_tool.sh"/>
@@ -938,7 +1097,7 @@
 				<include name="ws*"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/common/lib/">
 			<fileset dir="${server.home}/common/lib">
 				<include name="antlr.jar"/>
@@ -975,7 +1134,7 @@
 				<include name="xnio-api.jar"/>
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${server.home}server/default/slim-backup/">
 			<fileset dir="${server.home}/">
 				<include name="jar-versions.xml"/>
@@ -983,7 +1142,7 @@
 				<include name="docs/"/>
 			</fileset>
 		</copy>
-		
+
 		<!-- Reconfiguration -->
 		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${server.home}/standalone/configuration/bootstrap.xml"/>
 		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${server.home}/standalone/configuration/standardjboss.xml"/>
@@ -993,10 +1152,10 @@
 			                  tofile="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
 		<copy overwrite="yes" file="conf/slim/web.xml"
 				              tofile="${server.home}/standalone/deploymentsers/jbossweb.deployer/web.xml"/>
-		
+
 		<!-- Delete files -->
 		<delete includeemptydirs="true" verbose="true">
-		    <fileset dir="${server.home}/standalone/deployments">
+			<fileset dir="${server.home}/standalone/deployments">
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
@@ -1010,19 +1169,19 @@
 				<include name="monitoring-service.xml"/>
 				<include name="profileservice-jboss-beans.xml"/>
 				<include name="transaction-service.xml"/>
-				
+
 				<include name="profileservice-secured.jar/"/>
 				<include name="uuid-key-generator.sar/"/>
 				<include name="messaging/"/>
-				<include name="jbossws.sar/"/>	
+				<include name="jbossws.sar/"/>
 				<include name="admin-console.war/"/>
 				<include name="jmx-remoting.sar/"/>
-                <include name="jmx-console.war/"/>	
+				<include name="jmx-console.war/"/>
 				<include name="xnio-provider.jar/"/>
 				<include name="http-invoker.sar/"/>
-                <include name="management/"/>
+				<include name="management/"/>
 				<include name="ROOT.war/"/>
-		    </fileset>
+			</fileset>
 			<fileset dir="${server.home}/standalone/deploymentsers">
 				<include name="ejb3-timerservice-jboss-beans.xml"/>
 				<include name="jboss-ejb3-endpoint-deployer.jar"/>
@@ -1032,7 +1191,7 @@
 				<include name="jsr77-deployers-jboss-beans.xml"/>
 				<include name="logbridge-jboss-beans.xml"/>
 				<include name="clustering-deployer-jboss-beans.xml"/>
-				
+
 				<include name="bsh.deployer/"/>
 				<include name="jbossws.deployer/"/>
 				<include name="seam.deployer/"/>
@@ -1041,7 +1200,7 @@
 			</fileset>
 			<fileset dir="${server.home}/standalone/configuration">
 				<include name="jax-ws-catalog.xml"/>
-				<include name="chap8.keystore"/>	
+				<include name="chap8.keystore"/>
 			</fileset>
 			<fileset dir="${server.home}/standalone/configuration/props">
 				<include name="messaging-*.properties"/>
@@ -1053,12 +1212,12 @@
 				<include name="standard/"/>
 				<include name="web/"/>
 			</fileset>
-		    <fileset dir="${server.home}/bin">
+			<fileset dir="${server.home}/bin">
 				<include name="password_tool.sh"/>
 				<include name="probe*"/>
 				<include name="twiddle*"/>
 				<include name="ws*"/>
-		    </fileset>
+			</fileset>
 			<fileset dir="${server.home}/common/lib">
 				<include name="antlr.jar"/>
 				<include name="autonumber-plugin.jar"/>
@@ -1093,23 +1252,36 @@
 				<include name="scheduler-*.jar"/>
 				<include name="xnio-api.jar"/>
 			</fileset>
-		    <fileset dir="${server.home}">
+			<fileset dir="${server.home}">
 				<include name="docs/"/>
 				<include name="jar-versions.xml"/>
 				<include name="readme.html"/>
-		    </fileset>
+			</fileset>
 		</delete>
 	</target>
-	
-	
+
+
 	<target name="slim-jboss-revert" description="Reverts changes made by slim-jboss task">
 		<!-- Fail until it's ready for WildFly -->
 		<fail />
-			
+
 		<copy overwrite="yes" todir="${server.home}" verbose="true">
 			<fileset dir="${server.home}server/default/slim-backup/">
 				<include name="*/**"/>
 			</fileset>
 		</copy>
+	</target>
+
+	<target name="slim-wildfly-revert" description="Reverts changes made by slim-wildfly task">
+		<copy overwrite="yes" todir="${server.home}/modules/system/layers/base/" verbose="true">
+			<fileset dir="${server.home}/wildfly-slim/modules/system/layers/base/">
+				<include name="*/**"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${server.home}/welcome-content/" verbose="true">
+			<fileset dir="${server.home}/wildfly-slim/welcome-content/">
+				<include name="*/**"/>
+			</fileset>
+		</copy>		
 	</target>
 </project>
