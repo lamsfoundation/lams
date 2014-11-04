@@ -374,7 +374,7 @@ public class LessonService implements ILessonService {
 	    LessonService.log.debug("Added " + numAdded + " learners to lessonClass " + lessonClass.getGroupingId());
 	}
     }
-    
+
     @Override
     public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
 	LessonClass lessonClass = lesson.getLessonClass();
@@ -450,7 +450,7 @@ public class LessonService implements ILessonService {
 		    + lessonClass.getGroupingId());
 	}
     }
-    
+
     @Override
     public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
 
@@ -515,7 +515,7 @@ public class LessonService implements ILessonService {
 	    }
 	}
     }
-    
+
     /**
      * Completely removes learner progress as if the user has not started the lesson yet.
      */
@@ -527,24 +527,29 @@ public class LessonService implements ILessonService {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException {
-	int count = 0;
-	if (lessonId != null) {
+    public void performMarkLessonUncompleted(Long lessonId, Long firstAddedActivityId) throws LessonServiceException {
+	if (log.isDebugEnabled()) {
 	    LessonService.log.debug("Setting learner progress to uncompleted for lesson " + lessonId);
+	}
+	int count = 0;
+	List<LearnerProgress> progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId);
+	Activity firstAddedActivity = (Activity) baseDAO.find(Activity.class, firstAddedActivityId);
 
-	    List progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId);
-	    if (progresses != null && progresses.size() > 0) {
-		Iterator iter = progresses.iterator();
-		while (iter.hasNext()) {
-		    LearnerProgress progress = (LearnerProgress) iter.next();
-		    if (progress.getLessonComplete() == LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE) {
-			progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
-		    }
-		    count++;
-		}
+	for (LearnerProgress progress : progresses) {
+	    if (progress.getLessonComplete() == LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE) {
+		progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
+		progress.setFinishDate(null);
+		// set the next activity user will take
+		// previous activity should also be set, but it is not vital
+		progress.setCurrentActivity(firstAddedActivity);
+		progress.setNextActivity(firstAddedActivity);
+
+		count++;
 	    }
 	}
+
 	if (LessonService.log.isDebugEnabled()) {
 	    LessonService.log.debug("Reset completed flag for " + count + " learners for lesson " + lessonId);
 	}
@@ -586,7 +591,8 @@ public class LessonService implements ILessonService {
 		Boolean lessonCompleted = (Boolean) tuple[4];
 		lessonCompleted = lessonCompleted == null ? false : lessonCompleted.booleanValue();
 		Boolean enableLessonNotifications = (Boolean) tuple[5];
-		enableLessonNotifications = enableLessonNotifications == null ? false : enableLessonNotifications.booleanValue();
+		enableLessonNotifications = enableLessonNotifications == null ? false : enableLessonNotifications
+			.booleanValue();
 		Boolean dependent = (Boolean) tuple[6];
 		dependent = dependent == null ? false : dependent.booleanValue();
 		Boolean scheduledFinish = (Boolean) tuple[7];
@@ -603,7 +609,7 @@ public class LessonService implements ILessonService {
 	List<Lesson> list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
 	return list;
     }
-    
+
     @Override
     public List<Lesson> getLessonsByGroup(Integer organisationId) {
 	List<Lesson> list = lessonDAO.getLessonsByGroup(organisationId);
@@ -614,13 +620,13 @@ public class LessonService implements ILessonService {
     public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId) {
 	return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     }
-    
+
     @Override
     public List<LearnerProgress> getUserProgressForLesson(Long lessonId) {
 	List<LearnerProgress> list = learnerProgressDAO.getLearnerProgressForLesson(lessonId);
 	return list;
     }
-    
+
     @Override
     public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {
 	return lessonDAO.getLessonsByOriginalLearningDesign(ldId, orgId);
@@ -635,16 +641,16 @@ public class LessonService implements ILessonService {
     public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
 	return lessonDAO.getActiveLessonsForLearner(learnerId, organisationId);
     }
-    
+
     @Override
     public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID) {
 	Lesson lesson = this.lessonDAO.getLessonFromSessionID(toolSessionID);
 	if (lesson != null) {
-	    return lesson.getLessonDetails(); 
+	    return lesson.getLessonDetails();
 	}
 	return null;
     }
-    
+
     @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
@@ -658,7 +664,7 @@ public class LessonService implements ILessonService {
 	}
 	return true;
     }
-    
+
     @Override
     public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId) {
 	Set<Lesson> releasedSucceedingLessons = new HashSet<Lesson>();

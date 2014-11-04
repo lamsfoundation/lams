@@ -306,7 +306,7 @@ public interface ILessonService {
      * @param lessonId
      *            The lesson for which learner progress entries should be updated.
      */
-    void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException;
+    void performMarkLessonUncompleted(Long lessonId, Long firstAddedActivityId) throws LessonServiceException;
 
     /**
      * Get the list of users who have attempted an activity. This is based on the progress engine records. This will

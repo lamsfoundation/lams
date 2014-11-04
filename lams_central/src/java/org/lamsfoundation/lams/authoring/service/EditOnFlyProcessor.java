@@ -34,11 +34,11 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 
 public class EditOnFlyProcessor extends LearningDesignProcessor {
-
     private static Logger log = Logger.getLogger(EditOnFlyProcessor.class);
 
-    private Activity lastReadOnlyActivity = null;
-
+    public Activity lastReadOnlyActivity = null;
+    // were there any activities added after the Gate?
+    public Activity firstAddedActivity = null;
 
     public EditOnFlyProcessor(LearningDesign design, IActivityDAO activityDAO) {
 	super(design, activityDAO);
@@ -53,6 +53,8 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
     public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
 	if (activity.isActivityReadOnly()) {
 	    lastReadOnlyActivity = activity;
+	} else if (firstAddedActivity == null) {
+	    firstAddedActivity = activity;
 	}
     }
 
@@ -66,14 +68,8 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
     public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
 	if (activity.isActivityReadOnly()) {
 	    lastReadOnlyActivity = activity;
+	} else if (firstAddedActivity == null) {
+	    firstAddedActivity = activity;
 	}
-    }
-
-    /**
-     * Get the last activities in the sequence which are read-only, may contain more than one Activity due to branching
-     * paths
-     */
-    public Activity getLastReadOnlyActivity() {
-	return lastReadOnlyActivity;
     }
 }
