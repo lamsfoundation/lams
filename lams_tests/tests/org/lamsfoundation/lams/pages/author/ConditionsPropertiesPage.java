@@ -287,7 +287,7 @@ public class ConditionsPropertiesPage extends AbstractPage {
 	public ConditionsPropertiesPage setConditionName(String conditionName, String order) {
 		
 		String inputXpath = RANGE_CONDITIONS_OPTION_LABEL.replace(" ", order);
-		System.out.println("inputXpath: " + inputXpath);
+		//System.out.println("inputXpath: " + inputXpath);
 		
 		WebElement input = driver.findElement(By.xpath(inputXpath));
 		
@@ -362,7 +362,7 @@ public class ConditionsPropertiesPage extends AbstractPage {
 			String name = condition.getText();
 		
 			if (conditionName.equals(name.trim())) {
-				System.out.print("condition name: " + name);
+				//System.out.print("condition name: " + name);
 				condition.click();
 				break;
 			}
@@ -381,7 +381,7 @@ public class ConditionsPropertiesPage extends AbstractPage {
 			// that it matches even when we don't know which one is the default branch
 			
 			if (branchName.equals(name.replace("(default)", "").trim())) {
-				System.out.println(" matching with  branch name: " + name);
+				//System.out.println(" matching with  branch name: " + name);
 				branch.click();
 				break;
 			}

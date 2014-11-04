@@ -588,11 +588,11 @@ public class AddLessonTests {
 		// Gets all the nodes in the user's folder
 		List<WebElement> designs = addLesson.openLessontab().getFolderNodes("user");
 		
-		System.out.println("# of designs:" + designs.size());
+		// System.out.println("# of designs:" + designs.size());
 		
 		int randomDesign = Integer.parseInt(LamsUtil.randInt(1, designs.size()-1));
 		
-		System.out.println("randomDesign : " + randomDesign );
+		//System.out.println("randomDesign : " + randomDesign );
 		
 		addLesson
 		.openLessontab()

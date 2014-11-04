@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.util.LamsUtil;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.SendKeysAction;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -100,7 +99,7 @@ public class BranchingTests {
 
 	@AfterClass
 	public void afterClass() {
-		//driver.quit();
+		driver.quit();
 	}
 
 	/**
@@ -289,6 +288,8 @@ public class BranchingTests {
 		// Assert
 		String assertBranchingTitle = fla.branchingProperties(randomBranchingName).getBranchingTitle();
 
+		//System.out.println("assertBranchingTitle: " + assertBranchingTitle + " " + randomBranchingName);
+		
 		Assert.assertEquals(assertBranchingTitle.trim(), randomBranchingName, "Branching title is wrong");
 
 	}
