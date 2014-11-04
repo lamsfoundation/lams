@@ -24,11 +24,15 @@ package org.lamsfoundation.lams.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.lamsfoundation.lams.pages.admin.CourseManagementPage;
 import org.lamsfoundation.lams.pages.author.FLAPage;
 import org.lamsfoundation.lams.pages.monitor.MonitorPage;
 import org.lamsfoundation.lams.pages.monitor.addlesson.AddLessonPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -46,6 +50,9 @@ public class IndexPage extends AbstractPage {
 
 	@FindBy(id = "openFla")
 	private WebElement flaLink;	
+	
+	@FindBy(id = "Author") // Eventually this will be replace by FLA only!
+	private WebElement flashAuthor;
 
 	@FindBy(id = "My Profile")
 	private WebElement myProfileTab; 
@@ -62,6 +69,9 @@ public class IndexPage extends AbstractPage {
 	@FindBy(className = "lesson-table")
 	private WebElement lessonTable;
 
+	@FindBy(id = "Course Mgt")
+	private WebElement courseMgtButton;
+	
 	public IndexPage(WebDriver driver) {
 		super(driver);
 	}
@@ -71,7 +81,22 @@ public class IndexPage extends AbstractPage {
 		driver.switchTo().window("FlashlessAuthoring");
 		return PageFactory.initElements(driver, FLAPage.class);		
 	}
+	
+	/**
+	 * Checks if the link to Author UI is visible
+	 * @return boolean
+	 */
+	public boolean isAuthorLinkVisible() {
+		
+		return isElementPresent(driver, flashAuthor);
+			}
+	
 
+	/**
+	 * Opens the AddLesson UI
+	 * 
+	 * @return {@link AddLessonPage}
+	 */
 	public AddLessonPage addLesson() {
 
 		addLessonButton.click();
@@ -83,7 +108,25 @@ public class IndexPage extends AbstractPage {
 
 	public Boolean isLessonPresent(String lessonName) {
 		
-		return ((driver.findElements(By.linkText(lessonName)).size() > 0) ? true : false);
+		Boolean present = false;
+		
+		int isLessonIn = driver.findElements(By.linkText(lessonName)).size();
+		
+		if (isLessonIn > 0) {
+			present = true;
+		}
+		
+		return present;
+		
+/*		List<String> allLessons = getAllLessonNames();
+		
+		
+		Boolean isLessonInCourse = allLessons.contains(lessonName);
+		System.out.println("All lessons: "+ allLessons);
+		System.out.println("Is it true? :" + isLessonInCourse);
+		return isLessonInCourse;
+		*/
+		// return ((driver.findElements(By.linkText(lessonName)).size() > 0) ? true : false);
 
 	}
 
@@ -180,6 +223,12 @@ public class IndexPage extends AbstractPage {
 		return lessonActions;
 	}
 
+	/**
+	 * Checks if the lesson displays as completed
+	 * 
+	 * @param lessonName
+	 * @return 
+	 */
 	public Boolean isLessonCompleted(String lessonName) {
 		
 		WebElement lesson = getLessonRowByName(lessonName);
@@ -190,6 +239,11 @@ public class IndexPage extends AbstractPage {
 		
 	}
 	
+	/**
+	 * Refreshes index page with button
+	 * 
+	 * @return {@link IndexPage}
+	 */
 	public IndexPage refresh() {
 		
 		refreshButton.click();
@@ -203,6 +257,12 @@ public class IndexPage extends AbstractPage {
 		
 	}
 	
+	/**
+	 * Checks if the lesson is available to jump as learner 
+	 * 
+	 * @param lessonName
+	 * @return true/false
+	 */
 	public Boolean isLessonAvailableAsLearner(String lessonName) {
 		
 		WebElement lesson = getLessonRowByName(lessonName);
@@ -215,6 +275,183 @@ public class IndexPage extends AbstractPage {
 		
 	}
 	
+	
+	/**
+	 * Course Management 
+	 * 
+	 */
+	public CourseManagementPage openCourseManagement() {
+
+		courseMgtButton.click();
+		driver.switchTo().window("omWindow");
+		return PageFactory.initElements(driver, CourseManagementPage.class);
+	}
+	
+	
+	/**
+	 * Logs out
+	 * @return {@link LoginPage}
+	 */
+	public LoginPage logOut() {
+		
+		logoutButton.click();
+	
+		return PageFactory.initElements(driver, LoginPage.class);
+	}
+	
+	
+	
+	/**
+	 * Javascript methods
+	 * 
+	 * We use this javascript methods to execute js on the testing browser just as if we click on an actual
+	 * web element. 
+	 * 
+	 * The main reason we use this is to test JS but also to simulate access. For instance we can test if a
+	 * learner user can open sysadmin menus. We can't do this by clicking as the web elements aren't there, 
+	 * but thru JS we can. (see AccessControlTests.java) 
+	 * 
+	 */
+	
+	/**
+	 * Uses javascript to open author
+	 */
+	public FLAPage openFlaJS() {
+		
+        ((JavascriptExecutor) 
+                driver).executeScript("window.open('authoring/author.do?method=openAuthoring', 'FlashlessAuthoring','resizable=yes,scrollbars=yes,left=10,top=10,width=1280,height=800');");
+		
+        return PageFactory.initElements(driver, FLAPage.class);
+	}
+	
+	
+	/**
+	 * Attempts to open monitor lesson via Javascript
+	 * @param string 
+	 */
+	public MonitorPage openMonitorLessonJS(String lessonName) {
+
+		String lessonId = getLessonId(lessonName);
+		((JavascriptExecutor) 
+                driver).executeScript("showMonitorLessonDialog(" + lessonId +")");
+		
+		
+		return PageFactory.initElements(driver, MonitorPage.class);
+		
+	}
+	
+	
+	/**
+	 * Attempts to open monitor lesson notifications
+	 * 
+	 * Currently we return {@link AbstractPage} but one we have a page for notifications, this must
+	 * be changed to it. 
+	 * 
+	 * @param lessonName
+	 * @return {@link AbstractPage}
+	 */
+	public AbstractPage openMonitorNotificationsJS(String lessonName) {
+		
+		String lessonId = getLessonId(lessonName);
+		((JavascriptExecutor) 
+                driver).executeScript("showNotificationsDialog(null," + lessonId +")");
+		
+		return PageFactory.initElements(driver, MonitorPage.class);
+		
+	}
+	
+	
+	
+	/**
+	 * Attempts to open monitor lesson gradebook
+	 * 
+	 * Currently we return {@link AbstractPage} but one we have a page for lesson gradebook, this must
+	 * be changed to it. 
+	 * 
+	 * @param lessonName
+	 * @return 
+	 */
+	public AbstractPage openMonitorGradebookJS(String lessonName) {
+
+		String lessonId = getLessonId(lessonName);
+		((JavascriptExecutor) 
+                driver).executeScript("showGradebookLessonDialog(" + lessonId +")");
+		
+		return PageFactory.initElements(driver, MonitorPage.class);
+		
+		
+	}
+
+
+	/**
+	 * Attempts to open monitor lesson conditions
+	 * 
+	 * Currently we return {@link AbstractPage} but one we have a page for lesson conditions, this must
+	 * be changed to it. 
+	 * 
+	 * @param lessonName
+	 * @return 
+	 */
+	public AbstractPage openMonitorConditionsJS(String lessonName) {
+
+		String lessonId = getLessonId(lessonName);
+		((JavascriptExecutor) 
+                driver).executeScript("showConditionsDialog(" + lessonId +")");
+		
+		return PageFactory.initElements(driver, MonitorPage.class);
+		
+		
+	}
+	
+	
+	/**
+	 * Attempts to open sysadmin menu
+	 * 
+	 * @return {@link AbstractPage}
+	 */
+	public AbstractPage openSysadminJS() {
+
+		((JavascriptExecutor) 
+                driver).executeScript("openSysadmin()");
+		
+		return PageFactory.initElements(driver, AbstractPage.class);
+	}
+	
+	
+	/**
+	 * Attempts to open course management
+	 * 
+	 * @return {@link CourseManagementPage} 
+	 */
+	public CourseManagementPage openCourseManagementJS() {
+
+		((JavascriptExecutor) 
+                driver).executeScript("openOrgManagement(1)");
+		
+		return PageFactory.initElements(driver, CourseManagementPage.class);
+	}
+
+	/**
+	 * Attempts to open a lesson via JS
+	 * 
+	 * @return {@link AbstractPage}
+	 */
+	public AbstractPage openLessonAsLearnerJS(String lessonName) {
+
+		String lessonId = getLessonId(lessonName);
+		((JavascriptExecutor) 
+                driver).executeScript("openLearner(" + lessonId +")");
+		
+		
+		return PageFactory.initElements(driver, AbstractPage.class);
+
+		
+	}
+
+	
+	
+	
+	
 	/**
 	 * Returns all the lesson nodes found on the page
 	 * 
@@ -225,6 +462,8 @@ public class IndexPage extends AbstractPage {
 		return lessonTable.findElements(By.className("j-single-lesson"));
 
 	}
+
+	
 
 
 	/**
@@ -242,7 +481,7 @@ public class IndexPage extends AbstractPage {
 		for (WebElement lesson : allLessons) {
 
 			String name = lesson.findElement(By.tagName("a")).getText().trim();
-
+			
 			if (name.equals(lessonName.trim())) {
 				
 				lessonId = lesson.getAttribute("id");
@@ -251,7 +490,7 @@ public class IndexPage extends AbstractPage {
 			
 
 		}
-
+		
 		return lessonId;
 
 	}
@@ -275,6 +514,33 @@ public class IndexPage extends AbstractPage {
 		return lessonTable.findElement(By.id(lessonId));
 		
 	}
+
+	
+	private static boolean isElementPresent(WebDriver webdriver, WebElement webelement) {	
+		boolean exists = false;
+
+		webdriver.manage().timeouts().implicitlyWait(0, TimeUnit.MILLISECONDS);
+		
+		try {
+			webelement.getTagName();
+			exists = true;
+		} catch (NoSuchElementException e) {
+			// nothing to do.
+		}
+
+		webdriver.manage().timeouts().implicitlyWait(10000, TimeUnit.MILLISECONDS);
+		return exists;
+	}
+
+
+
+
+
+
+
+
+
+
 	
 
 }
