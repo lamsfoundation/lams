@@ -120,7 +120,7 @@ public class AccessControlTests {
 	/**
 	 * Opens Course management interface
 	 */
-	@Test
+	@Test(description="Opens Course management interface")
 	public void openCourseMgt() {
 
 		CourseManagementPage cMgt = new CourseManagementPage(driver);
@@ -134,7 +134,7 @@ public class AccessControlTests {
 	/**
 	 * Creates a new course 
 	 */
-	@Test(dependsOnMethods="openCourseMgt")
+	@Test(dependsOnMethods="openCourseMgt", description="Creates a new course")
 	public void createCourse() {
 		
 		String courseCode = "CF" + RANDOM_INT;
@@ -185,7 +185,7 @@ public class AccessControlTests {
 	 * @param lastName
 	 * @param email 
 	 */
-	@Test(dependsOnMethods="createCourse", dataProvider="Users")
+	@Test(dependsOnMethods="createCourse", dataProvider="Users", description="Creates users based on data provider")
 	public void createUser(String login, String firstName, String lastName, String email) {
 		
 		cMgt.createEditUser()
@@ -223,7 +223,7 @@ public class AccessControlTests {
 	 * @param login username
 	 * @param roles List of roles
 	 */
-	@Test(dependsOnMethods="createUser", dataProvider="UsersRoles")
+	@Test(dependsOnMethods="createUser", dataProvider="UsersRoles", description="Add users to course with specific roles")
 	public void addUserToCourse(String login, String roles) {
 		
 		List<String> roleList = new ArrayList<String>();
@@ -243,7 +243,7 @@ public class AccessControlTests {
 	 * Logins as Author and creates a one activity design
 	 */
 	
-	@Test(dependsOnMethods="addUserToCourse")
+	@Test(dependsOnMethods="addUserToCourse", description="Logins as Author and creates a one activity design")
 	public void createDesign() {
 		
 		cMgt.closeWindow();
@@ -271,7 +271,7 @@ public class AccessControlTests {
 	/**
 	 *  Starts lesson based on design
 	 */
-	@Test(dependsOnMethods="createDesign")
+	@Test(dependsOnMethods="createDesign", description="Starts lesson based on previously created design")
 	public void startLesson() {
 		
 		String windowHandle = getPopUpWindowId(driver);
@@ -301,7 +301,7 @@ public class AccessControlTests {
 	 *  Author test if it can access lesson as learner via JS
 	 *  
 	 */
-	@Test(dependsOnMethods="startLesson")
+	@Test(dependsOnMethods="startLesson", description="Author test if it can access lesson as learner via JS")
 	public void authorAccessLesson() {
 		
 		// This checks if the lesson is available to Author in the page 
@@ -345,6 +345,7 @@ public class AccessControlTests {
 	 *    + Notifications
 	 *    + Conditions
 	 *    + Sysadmin menus
+	 *    + Course admin
 	 *  
 	 */
 
@@ -352,7 +353,7 @@ public class AccessControlTests {
 	/**
 	 *  Is lesson accessible to learner? 
 	 */
-	@Test(dependsOnMethods="startLesson")
+	@Test(dependsOnMethods="startLesson", description="Is lesson accessible to learner?")
 	public void learnerLessonAccess() {
 		
 		//index.logOut();
@@ -375,7 +376,7 @@ public class AccessControlTests {
 	/**
 	 *  Learner able to jump as Author
 	 */
-	@Test(dependsOnMethods="learnerLessonAccess")
+	@Test(dependsOnMethods="learnerLessonAccess", description="Learner able to jump as Author")
 	public void learnerAuthorAccess() {
 
 		// we check first if the author tab is visible
@@ -400,7 +401,10 @@ public class AccessControlTests {
 		
 	}
 
-	@Test(dependsOnMethods="learnerAuthorAccess")
+	/**
+	 *  Learner able to jump as Monitor in a lesson
+	 */
+	@Test(dependsOnMethods="learnerAuthorAccess", description="Learner able to jump as Monitor in a lesson")
 	public void leanerMonitorAccess() {
 		
 		String windowHandle = getPopUpWindowId(driver);
@@ -421,7 +425,10 @@ public class AccessControlTests {
 		
 	}
 
-	@Test(dependsOnMethods="leanerMonitorAccess")
+	/**
+	 * Learner able to jump into lesson's notifications
+	 */
+	@Test(dependsOnMethods="leanerMonitorAccess", description="Learner able to jump into lesson's notifications")
 	public void leanerMonitorNotifications() {
 		
 		index.openMonitorNotificationsJS(DESIGN_NAME);
@@ -440,7 +447,10 @@ public class AccessControlTests {
 		
 	}
 	
-	@Test(dependsOnMethods="leanerMonitorNotifications")
+	/**
+	 * Learner able to jump into lesson's gradebook
+	 */
+	@Test(dependsOnMethods="leanerMonitorNotifications", description="Learner able to jump into lesson's gradebook")
 	public void leanerMonitorGradebook() {
 		
 		index.openMonitorGradebookJS(DESIGN_NAME);
@@ -459,12 +469,14 @@ public class AccessControlTests {
 		
 	}
 	
-	@Test(dependsOnMethods="leanerMonitorGradebook")
+	/**
+	 * Learner able to jump into lesson's conditions
+	 */
+	@Test(dependsOnMethods="leanerMonitorGradebook", description="Learner able to jump into lesson's conditions")
 	public void leanerMonitorConditions() {
 		
 		index.openMonitorConditionsJS(DESIGN_NAME);
 		
-		//String windowHandle = getPopUpWindowId(driver);
 		driver.switchTo().frame("dialogFrame");
 		
 		String assertError = driver.findElement(By.tagName("h1")).getText();
@@ -475,14 +487,25 @@ public class AccessControlTests {
 		
 		driver.navigate().refresh();
 	
+		index.logOut();
 		
 	}
-	
-	
-	
-	@Test(dependsOnMethods="leanerMonitorGradebook")
-	public void learnerSysadmin() {
 		
+	
+	/**
+	 *  Access control to Sysadmin and course management
+	 *  
+	 *  - attempt to access as Author, Monitor and Learner to:
+	 *    + Sysadmin menus
+	 *    + Course admin
+	 */
+	
+	
+	@Test(dependsOnMethods="leanerMonitorConditions", dataProvider="UsersRoles", 
+			description="Access control test for Sysadmin and course management pages as Author, Learner, Monitor")
+	public void adminAccessTests(String login, String roles) {
+		
+		onLogin.loginAs(login, RANDOM_INT);
 		sysAdmin = index.openSysadminJS();
 		
 		String windowHandle = getPopUpWindowId(driver);
@@ -499,18 +522,12 @@ public class AccessControlTests {
 		windowHandle = getPopUpWindowId(driver);
 		driver.switchTo().window(windowHandle);
 		
-	}
-	
-	
-	@Test(dependsOnMethods="learnerSysadmin")
-	public void learnerCourseManagement() {
-		
 		sysAdmin = index.openCourseManagementJS();
 		
-		String windowHandle = getPopUpWindowId(driver);
+		windowHandle = getPopUpWindowId(driver);
 		driver.switchTo().window(windowHandle);
 		
-		String assertError = driver.findElement(By.tagName("h1")).getText();
+		assertError = driver.findElement(By.tagName("h1")).getText();
 		
 		Assert.assertTrue(assertError.contains(NO_ROLE_RESPONSE), 
 				"Course Management access didn't return the correct error message");
@@ -520,8 +537,13 @@ public class AccessControlTests {
 		
 		windowHandle = getPopUpWindowId(driver);
 		driver.switchTo().window(windowHandle);
+		index.logOut();
 		
 	}
+	
+	
+	
+	
 	
 	
 	
