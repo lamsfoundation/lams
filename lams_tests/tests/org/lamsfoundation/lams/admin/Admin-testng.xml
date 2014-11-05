@@ -11,6 +11,7 @@
       <class name="org.lamsfoundation.lams.admin.ToolManagement"/>
       <class name="org.lamsfoundation.lams.admin.ConfigurationSettings"/>
       <class name="org.lamsfoundation.lams.admin.MaintainIntegrations"/>
+      <class name="org.lamsfoundation.lams.admin.AccessControlTests"/>
     </classes>
   </test> <!-- Admin Tests -->
 </suite> <!-- Admin Tests Suite -->
