@@ -89,9 +89,10 @@ public class SecurityService implements ISecurityService {
 	    }
 	}
 
-	Integer orgId = lesson.getOrganisation().getOrganisationId();
+	Organisation org = lesson.getOrganisation();
+	Integer orgId = org == null ? null : org.getOrganisationId();
 	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
-	boolean hasOrgRole = securityDAO.hasOrgRole(orgId, userId, Role.LEARNER);
+	boolean hasOrgRole = orgId == null || securityDAO.hasOrgRole(orgId, userId, Role.LEARNER);
 
 	if (!hasSysadminRole && !(hasOrgRole && securityDAO.isLessonLearner(lessonId, userId))) {
 	    String error = "User " + userId + " is not learner in lesson " + lessonId + " and can not \"" + action
@@ -145,10 +146,13 @@ public class SecurityService implements ISecurityService {
 	    }
 	}
 
-	Integer orgId = lesson.getOrganisation().getOrganisationId();
+
+	Organisation org = lesson.getOrganisation();
+	Integer orgId = org == null ? null : org.getOrganisationId();
 	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
-	boolean hasGroupManagerRole = hasSysadminRole || securityDAO.isGroupManager(orgId, userId);
-	boolean hasMonitorRole = hasGroupManagerRole || securityDAO.hasOrgRole(orgId, userId, Role.MONITOR);
+	boolean hasGroupManagerRole = hasSysadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
+	boolean hasMonitorRole = hasGroupManagerRole || orgId == null
+		|| securityDAO.hasOrgRole(orgId, userId, Role.MONITOR);
 
 	if (!hasGroupManagerRole && !(hasMonitorRole && securityDAO.isLessonMonitor(lessonId, userId, true))) {
 	    String error = "User " + userId + " is not monitor in lesson " + lessonId + " and can not \"" + action
@@ -253,10 +257,12 @@ public class SecurityService implements ISecurityService {
 	    }
 	}
 
-	Integer orgId = lesson.getOrganisation().getOrganisationId();
+	Organisation org = lesson.getOrganisation();
+	Integer orgId = org == null ? null : org.getOrganisationId();
 	boolean hasSysadminRole = securityDAO.isSysadmin(userId);
-	boolean hasGroupManagerRole = hasSysadminRole || securityDAO.isGroupManager(orgId, userId);
-	boolean hasRole = hasGroupManagerRole || securityDAO.hasOrgRole(orgId, userId, Role.LEARNER, Role.MONITOR);
+	boolean hasGroupManagerRole = hasSysadminRole || (orgId != null && securityDAO.isGroupManager(orgId, userId));
+	boolean hasRole = hasGroupManagerRole || orgId == null
+		|| securityDAO.hasOrgRole(orgId, userId, Role.LEARNER, Role.MONITOR);
 
 	if (!hasGroupManagerRole
 		&& !(hasRole && (securityDAO.isLessonLearner(lessonId, userId) || securityDAO.isLessonMonitor(lessonId,
