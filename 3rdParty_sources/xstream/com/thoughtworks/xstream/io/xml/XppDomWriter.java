@@ -1,60 +1,89 @@
+/*
+ * Copyright (C) 2004, 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 07. March 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.io.xml;
 
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.xml.xppdom.Xpp3Dom;
+import com.thoughtworks.xstream.io.naming.NameCoder;
+import com.thoughtworks.xstream.io.xml.xppdom.XppDom;
 
-import java.util.LinkedList;
 
-public class XppDomWriter implements HierarchicalStreamWriter {
-    private LinkedList elementStack = new LinkedList();
-
-    private Xpp3Dom configuration;
-
+public class XppDomWriter extends AbstractDocumentWriter {
     public XppDomWriter() {
+        this(null, new XmlFriendlyNameCoder());
     }
 
-    public Xpp3Dom getConfiguration() {
-        return configuration;
+    /**
+     * @since 1.2.1
+     */
+    public XppDomWriter(final XppDom parent) {
+        this(parent, new XmlFriendlyNameCoder());
     }
 
-    public void startNode(String name) {
-        Xpp3Dom configuration = new Xpp3Dom(name);
+    /**
+     * @since 1.4
+     */
+    public XppDomWriter(final NameCoder nameCoder) {
+        this(null, nameCoder);
+    }
 
-        if (this.configuration == null) {
-            this.configuration = configuration;
-        } else {
-            top().addChild(configuration);
+    /**
+     * @since 1.4
+     */
+    public XppDomWriter(final XppDom parent, final NameCoder nameCoder) {
+        super(parent, nameCoder);
+    }
+
+    /**
+     * @since 1.2
+     * @deprecated As of 1.4 use {@link XppDomWriter#XppDomWriter(NameCoder)} instead
+     */
+    @Deprecated
+    public XppDomWriter(final XmlFriendlyReplacer replacer) {
+        this(null, replacer);
+    }
+
+    /**
+     * @since 1.2.1
+     * @deprecated As of 1.4 use {@link XppDomWriter#XppDomWriter(XppDom, NameCoder)} instead.
+     */
+    @Deprecated
+    public XppDomWriter(final XppDom parent, final XmlFriendlyReplacer replacer) {
+        this(parent, (NameCoder)replacer);
+    }
+
+    public XppDom getConfiguration() {
+        return (XppDom)getTopLevelNodes().get(0);
+    }
+
+    @Override
+    protected Object createNode(final String name) {
+        final XppDom newNode = new XppDom(encodeNode(name));
+        final XppDom top = top();
+        if (top != null) {
+            top().addChild(newNode);
         }
-
-        elementStack.addLast(configuration);
+        return newNode;
     }
 
-    public void setValue(String text) {
+    @Override
+    public void setValue(final String text) {
         top().setValue(text);
     }
 
-    public void addAttribute(String key, String value) {
-        top().setAttribute(key, value);
+    @Override
+    public void addAttribute(final String key, final String value) {
+        top().setAttribute(encodeAttribute(key), value);
     }
 
-    public void endNode() {
-        elementStack.removeLast();
+    private XppDom top() {
+        return (XppDom)getCurrent();
     }
-
-    private Xpp3Dom top() {
-        return (Xpp3Dom) elementStack.getLast();
-    }
-
-    public void flush() {
-        // don't need to do anything
-    }
-
-    public void close() {
-        // don't need to do anything
-    }
-
-    public HierarchicalStreamWriter underlyingWriter() {
-        return this;
-    }
-    
 }

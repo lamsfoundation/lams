@@ -1,97 +1,106 @@
+/*
+ * Copyright (C) 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 06. February 2005 by Joe Walnes
+ */
 package com.thoughtworks.xstream.core.util;
 
-import com.thoughtworks.xstream.converters.Converter;
-
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 
 /**
  * List that allows items to be added with a priority that will affect the order in which they are later iterated over.
- *
  * Objects with a high priority will appear before objects with a low priority in the list. If two objects of the same
- * priority are added to the list, the most recently added one will be iterated over first.
- *
+ * priority are added to the list, the most recently added one will be iterated over first. Implementation uses a
+ * TreeSet, which has a guaranteed add time of O(log(n)).
+ * 
  * @author Joe Walnes
+ * @author Guilherme Silveira
  */
-public class PrioritizedList {
+public class PrioritizedList<E> implements Iterable<E> {
 
-    /**
-     * Start of forward only linked list. Each item contains a value, priority and pointer to next item.
-     * The first item does not contain a value, rather just a pointer to the next real item. This makes
-     * the add() algorithm easier as there is no special case for adding to the beginning of the list.
-     */
-    private final LinkedItem pointerToFirst = new LinkedItem(null, 0, null);
-
+    private final Set<PrioritizedItem<E>> set = new TreeSet<PrioritizedItem<E>>();
     private int lowestPriority = Integer.MAX_VALUE;
+    private int lastId = 0;
 
-    /**
-     * Add an item with a default priority of zero.
-     */
-    public void add(Object item) {
-        add(item, 0);
-    }
-
-    public void add(Object item, int priority) {
-        // Note: this is quite efficient if the client tends to add low priority items before high priority items
-        // as it will not have to iterate over much of the list. However for the other way round, maybe some
-        // optimizations can be made? -joe
-        LinkedItem current = pointerToFirst;
-        while(current.next != null && priority < current.next.priority) {
-            current = current.next;
+    public void add(final E item, final int priority) {
+        if (this.lowestPriority > priority) {
+            this.lowestPriority = priority;
         }
-        current.next = new LinkedItem(item, priority, current.next);
-        if (priority < lowestPriority) {
-            lowestPriority = priority;
-        }
+        this.set.add(new PrioritizedItem<E>(item, priority, ++lastId));
     }
 
-    public Iterator iterator() {
-        return new LinkedItemIterator(pointerToFirst.next);
+    @Override
+    public Iterator<E> iterator() {
+        return new PrioritizedItemIterator<E>(this.set.iterator());
     }
 
-    public Object firstOfLowestPriority() {
-        for(LinkedItem current = pointerToFirst.next; current != null; current = current.next) {
-            if (current.priority == lowestPriority) {
-                return current.value;
-            }
-        }
-        return null;
-    }
+    private static class PrioritizedItem<V> implements Comparable<PrioritizedItem<V>> {
 
-    private static class LinkedItem {
-
-        final Object value;
+        final V value;
         final int priority;
+        final int id;
 
-        LinkedItem next;
-
-        public LinkedItem(Object value, int priority, LinkedItem next) {
+        public PrioritizedItem(final V value, final int priority, final int id) {
             this.value = value;
             this.priority = priority;
-            this.next = next;
+            this.id = id;
+        }
+
+        @Override
+        public int compareTo(final PrioritizedItem<V> other) {
+            if (this.priority != other.priority) {
+                return other.priority - this.priority;
+            }
+            return other.id - this.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Integer.valueOf(id).hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (!(obj instanceof PrioritizedItem)) {
+                return false;
+            }
+            @SuppressWarnings("unchecked")
+            final PrioritizedItem<V> other = (PrioritizedItem<V>)obj;
+            return this.id == other.id;
         }
 
     }
 
-    private static class LinkedItemIterator implements Iterator {
+    private static class PrioritizedItemIterator<V> implements Iterator<V> {
 
-        private LinkedItem current;
+        private final Iterator<PrioritizedItem<V>> iterator;
 
-        public LinkedItemIterator(LinkedItem current) {
-            this.current = current;
+        public PrioritizedItemIterator(final Iterator<PrioritizedItem<V>> iterator) {
+            this.iterator = iterator;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean hasNext() {
-            return current != null;
+            return iterator.hasNext();
         }
 
-        public Object next() {
-            Object result = current.value;
-            current = current.next;
-            return result;
+        @Override
+        public V next() {
+            return iterator.next().value;
         }
 
     }

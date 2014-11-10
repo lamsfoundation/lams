@@ -1,55 +1,82 @@
+/*
+ * Copyright (C) 2004, 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 07. March 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.core;
 
-import com.thoughtworks.xstream.alias.ClassMapper;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
-import com.thoughtworks.xstream.converters.basic.NullConverter;
+import com.thoughtworks.xstream.converters.ConverterRegistry;
 import com.thoughtworks.xstream.core.util.PrioritizedList;
-import com.thoughtworks.xstream.XStream;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-public class DefaultConverterLookup implements ConverterLookup {
+/**
+ * The default implementation of converters lookup.
+ * 
+ * @author Joe Walnes
+ * @author J&ouml;rg Schaible
+ * @author Guilherme Silveira
+ */
+public class DefaultConverterLookup implements ConverterLookup, ConverterRegistry, Caching {
 
-    private final PrioritizedList converters = new PrioritizedList();
-    private final Converter nullConverter = new NullConverter();
-    private final Map typeToConverterMap = Collections.synchronizedMap(new HashMap());
-    private final ClassMapper classMapper;
+    private final PrioritizedList<Converter> converters = new PrioritizedList<Converter>();
+    private transient Map<Class<?>, Converter> typeToConverterMap;
 
-    public DefaultConverterLookup(ClassMapper classMapper) {
-        this.classMapper = classMapper;
+    public DefaultConverterLookup() {
+        readResolve();
     }
 
-    /**
-     * @deprecated As of 1.1.1 you can register Converters with priorities, making the need for a default converter redundant.
-     */
-    public Converter defaultConverter() {
-        return (Converter) converters.firstOfLowestPriority();
-    }
-
-    public Converter lookupConverterForType(Class type) {
-        if (type == null) {
-            return nullConverter;
+    @Override
+    public Converter lookupConverterForType(final Class<?> type) {
+        final Converter cachedConverter = typeToConverterMap.get(type);
+        if (cachedConverter != null) {
+            return cachedConverter;
         }
-        Converter cachedConverter = (Converter) typeToConverterMap.get(type);
-        if (cachedConverter != null) return cachedConverter;
-        Class mapType = classMapper.defaultImplementationOf(type);
-        Iterator iterator = converters.iterator();
-        while (iterator.hasNext()) {
-            Converter converter = (Converter) iterator.next();
-            if (converter.canConvert(mapType)) {
-                typeToConverterMap.put(type, converter);
+        for (final Converter converter : converters) {
+            if (converter.canConvert(type)) {
                 return converter;
             }
         }
         throw new ConversionException("No converter specified for " + type);
     }
-    public void registerConverter(Converter converter, int priority) {
+
+    @Override
+    public void registerConverter(final Converter converter, final int priority) {
         converters.add(converter, priority);
+        for (final Iterator<Class<?>> iter = typeToConverterMap.keySet().iterator(); iter.hasNext();) {
+            final Class<?> type = iter.next();
+            if (converter.canConvert(type)) {
+                iter.remove();
+            }
+        }
     }
 
+    @Override
+    public void flushCache() {
+        typeToConverterMap.clear();
+        for (final Converter converter : converters) {
+            if (converter instanceof Caching) {
+                ((Caching)converter).flushCache();
+            }
+        }
+    }
+
+    private Object readResolve() {
+        // TODO: Use ConcurrentMap
+        typeToConverterMap = Collections.synchronizedMap(new WeakHashMap<Class<?>, Converter>());
+        return this;
+    }
 }

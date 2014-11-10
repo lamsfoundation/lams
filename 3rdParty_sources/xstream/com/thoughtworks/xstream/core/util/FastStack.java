@@ -1,15 +1,41 @@
+/*
+ * Copyright (C) 2004, 2005 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2009, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 02. September 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.core.util;
 
-public final class FastStack {
+import java.util.Arrays;
 
-    private Object[] stack;
+
+/**
+ * An array-based stack implementation.
+ * 
+ * @author Joe Walnes
+ * @author J&ouml;rg Schaible
+ */
+public final class FastStack<T> {
+
+    private T[] stack;
     private int pointer;
 
-    public FastStack(int initialCapacity) {
-        stack = new Object[initialCapacity];
+    public FastStack(final int initialCapacity) {
+        @SuppressWarnings("unchecked")
+        final T[] array = getArray(initialCapacity);
+        stack = array;
     }
 
-    public Object push(Object value) {
+    private T[] getArray(final int capacity, final T... t) {
+        return Arrays.copyOf(t, capacity);
+    }
+
+    public T push(final T value) {
         if (pointer + 1 >= stack.length) {
             resizeStack(stack.length * 2);
         }
@@ -21,14 +47,24 @@ public final class FastStack {
         stack[--pointer] = null;
     }
 
-    public Object pop() {
-        final Object result = stack[--pointer]; 
-        stack[pointer] = null; 
+    public T pop() {
+        final T result = stack[--pointer];
+        stack[pointer] = null;
         return result;
     }
 
-    public Object peek() {
+    public T peek() {
         return pointer == 0 ? null : stack[pointer - 1];
+    }
+
+    public Object replace(final T value) {
+        final T result = stack[pointer - 1];
+        stack[pointer - 1] = value;
+        return result;
+    }
+
+    public void replaceSilently(final T value) {
+        stack[pointer - 1] = value;
     }
 
     public int size() {
@@ -39,18 +75,20 @@ public final class FastStack {
         return pointer > 0;
     }
 
-    public Object get(int i) {
+    public T get(final int i) {
         return stack[i];
     }
 
-    private void resizeStack(int newCapacity) {
-        Object[] newStack = new Object[newCapacity];
-        System.arraycopy(stack, 0, newStack, 0, Math.min(stack.length, newCapacity));
+    private void resizeStack(final int newCapacity) {
+        @SuppressWarnings("unchecked")
+        final T[] newStack = getArray(newCapacity);
+        System.arraycopy(stack, 0, newStack, 0, Math.min(pointer, newCapacity));
         stack = newStack;
     }
 
+    @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("[");
+        final StringBuffer result = new StringBuffer("[");
         for (int i = 0; i < pointer; i++) {
             if (i > 0) {
                 result.append(", ");

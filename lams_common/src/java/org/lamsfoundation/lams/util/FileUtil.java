@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * General File Utilities
@@ -740,6 +741,8 @@ public class FileUtil {
 
 	Reader file = null;
 	XStream conversionXml = xStream != null ? xStream : new XStream();
+	// allow parsing all classes
+	conversionXml.addPermission(AnyTypePermission.ANY);
 	ConversionException finalException = null;
 	String lastFieldRemoved = "";
 	ToolContentVersionFilter contentFilter = null;

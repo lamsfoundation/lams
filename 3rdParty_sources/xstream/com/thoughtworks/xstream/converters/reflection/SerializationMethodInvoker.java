@@ -1,41 +1,70 @@
+/*
+ * Copyright (C) 2004, 2005 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 23. August 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.converters.reflection;
 
-import com.thoughtworks.xstream.converters.ConversionException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.core.Caching;
+import com.thoughtworks.xstream.core.util.FastField;
+
 
 /**
  * Convenience wrapper to invoke special serialization methods on objects (and perform reflection caching).
- *
+ * 
  * @author Joe Walnes
+ * @author J&ouml;rg Schaible
  */
-public class SerializationMethodInvoker {
+public class SerializationMethodInvoker implements Caching {
 
-    private Map cache = Collections.synchronizedMap(new HashMap());
-    private static final Object NO_METHOD = new Object();
-    private static final Object[] EMPTY_ARGS = new Object[0];
+    private static final Method NO_METHOD = new Object() {
+        @SuppressWarnings("unused")
+        private void noMethod() {
+        }
+    }.getClass().getDeclaredMethods()[0];
+    private static final FastField[] OBJECT_TYPE_FIELDS = new FastField[]{
+        new FastField(Object.class, "readResolve"), new FastField(Object.class, "writeReplace"),
+        new FastField(Object.class, "readObject"), new FastField(Object.class, "writeObject")};
+    private final Map<FastField, Method> cache = Collections.synchronizedMap(new HashMap<FastField, Method>());
+    {
+        for (final FastField element : OBJECT_TYPE_FIELDS) {
+            cache.put(element, NO_METHOD);
+        }
+    }
 
     /**
      * Resolves an object as native serialization does by calling readResolve(), if available.
      */
-    public Object callReadResolve(Object result) {
+    public Object callReadResolve(final Object result) {
         if (result == null) {
             return null;
         } else {
-            Method readResolveMethod = getMethod(result.getClass(), "readResolve", null, true);
+            final Method readResolveMethod = getMethod(result.getClass(), "readResolve", true);
             if (readResolveMethod != null) {
                 try {
-                    return readResolveMethod.invoke(result, EMPTY_ARGS);
-                } catch (IllegalAccessException e) {
-                    throw new ObjectAccessException("Could not call " + result.getClass().getName() + ".readResolve()", e);
-                } catch (InvocationTargetException e) {
-                    throw new ObjectAccessException("Could not call " + result.getClass().getName() + ".readResolve()", e);
+                    return readResolveMethod.invoke(result);
+                } catch (final IllegalAccessException e) {
+                    throw new ObjectAccessException("Could not call " + result.getClass().getName() + ".readResolve()",
+                        e);
+                } catch (final InvocationTargetException e) {
+                    throw new ObjectAccessException("Could not call " + result.getClass().getName() + ".readResolve()",
+                        e.getTargetException());
                 }
             } else {
                 return result;
@@ -43,19 +72,20 @@ public class SerializationMethodInvoker {
         }
     }
 
-    public Object callWriteReplace(Object object) {
+    public Object callWriteReplace(final Object object) {
         if (object == null) {
             return null;
         } else {
-            Method writeReplaceMethod = getMethod(object.getClass(), "writeReplace", null, true);
+            final Method writeReplaceMethod = getMethod(object.getClass(), "writeReplace", true);
             if (writeReplaceMethod != null) {
                 try {
-                    Object[] EMPTY_ARGS = new Object[0];
-                    return writeReplaceMethod.invoke(object, EMPTY_ARGS);
-                } catch (IllegalAccessException e) {
-                    throw new ObjectAccessException("Could not call " + object.getClass().getName() + ".writeReplace()", e);
-                } catch (InvocationTargetException e) {
-                    throw new ObjectAccessException("Could not call " + object.getClass().getName() + ".writeReplace()", e);
+                    return writeReplaceMethod.invoke(object);
+                } catch (final IllegalAccessException e) {
+                    throw new ObjectAccessException(
+                        "Could not call " + object.getClass().getName() + ".writeReplace()", e);
+                } catch (final InvocationTargetException e) {
+                    throw new ObjectAccessException(
+                        "Could not call " + object.getClass().getName() + ".writeReplace()", e.getTargetException());
                 }
             } else {
                 return object;
@@ -63,66 +93,67 @@ public class SerializationMethodInvoker {
         }
     }
 
-    public boolean supportsReadObject(Class type, boolean includeBaseClasses) {
-        return getMethod(type, "readObject", new Class[]{ObjectInputStream.class}, includeBaseClasses) != null;
+    public boolean supportsReadObject(final Class<?> type, final boolean includeBaseClasses) {
+        return getMethod(type, "readObject", includeBaseClasses, ObjectInputStream.class) != null;
     }
 
-    public void callReadObject(Class type, Object object, ObjectInputStream stream) {
+    public void callReadObject(final Class<?> type, final Object object, final ObjectInputStream stream) {
         try {
-            Method readObjectMethod = getMethod(type, "readObject", new Class[]{ObjectInputStream.class}, false);
-            readObjectMethod.invoke(object, new Object[]{stream});
-        } catch (IllegalAccessException e) {
+            final Method readObjectMethod = getMethod(type, "readObject", false, ObjectInputStream.class);
+            readObjectMethod.invoke(object, stream);
+        } catch (final IllegalAccessException e) {
             throw new ConversionException("Could not call " + object.getClass().getName() + ".readObject()", e);
-        } catch (InvocationTargetException e) {
-            throw new ConversionException("Could not call " + object.getClass().getName() + ".readObject()", e);
+        } catch (final InvocationTargetException e) {
+            throw new ConversionException("Could not call " + object.getClass().getName() + ".readObject()", e
+                .getTargetException());
         }
     }
 
-    public boolean supportsWriteObject(Class type, boolean includeBaseClasses) {
-        return getMethod(type, "writeObject", new Class[]{ObjectOutputStream.class}, includeBaseClasses) != null;
+    public boolean supportsWriteObject(final Class<?> type, final boolean includeBaseClasses) {
+        return getMethod(type, "writeObject", includeBaseClasses, ObjectOutputStream.class) != null;
     }
 
-    public void callWriteObject(Class type, Object instance, ObjectOutputStream stream) {
+    public void callWriteObject(final Class<?> type, final Object instance, final ObjectOutputStream stream) {
         try {
-            Method readObjectMethod = getMethod(type, "writeObject", new Class[]{ObjectOutputStream.class}, false);
-            readObjectMethod.invoke(instance, new Object[]{stream});
-        } catch (IllegalAccessException e) {
+            final Method readObjectMethod = getMethod(type, "writeObject", false, ObjectOutputStream.class);
+            readObjectMethod.invoke(instance, stream);
+        } catch (final IllegalAccessException e) {
             throw new ConversionException("Could not call " + instance.getClass().getName() + ".writeObject()", e);
-        } catch (InvocationTargetException e) {
-            throw new ConversionException("Could not call " + instance.getClass().getName() + ".writeObject()", e);
+        } catch (final InvocationTargetException e) {
+            throw new ConversionException("Could not call " + instance.getClass().getName() + ".writeObject()", e
+                .getTargetException());
         }
     }
 
-    private Method getMethod(Class type, String name, Class[] parameterTypes, boolean includeBaseclasses) {
-        Object key = type.getName() + "." + name + "." + includeBaseclasses;
-        if (cache.containsKey(key)) {
-            Object result = cache.get(key);
-            return (Method) (result == NO_METHOD ? null : result);
-        }
-        if (includeBaseclasses) {
-            while (type != null) {
-                try {
-                    Method result = type.getDeclaredMethod(name, parameterTypes);
-                    result.setAccessible(true);
-                    cache.put(key, result);
-                    return result;
-                } catch (NoSuchMethodException e) {
-                    type = type.getSuperclass();
-                }
-            }
-            cache.put(key, NO_METHOD);
+    private Method getMethod(final Class<?> type, final String name, final boolean includeBaseclasses,
+            final Class<?>... parameterTypes) {
+        final Method method = getMethod(type, name, parameterTypes);
+        return method == NO_METHOD || !includeBaseclasses && !method.getDeclaringClass().equals(type) ? null : method;
+    }
+
+    private Method getMethod(final Class<?> type, final String name, final Class<?>... parameterTypes) {
+        if (type == null) {
             return null;
-        } else {
-            try {
-                Method result = type.getDeclaredMethod(name, parameterTypes);
-                result.setAccessible(true);
-                cache.put(key, result);
-                return result;
-            } catch (NoSuchMethodException e) {
-                cache.put(key, NO_METHOD);
-                return null;
-            }
         }
+        final FastField method = new FastField(type, name);
+        Method result = cache.get(method);
+
+        if (result == null) {
+            try {
+                result = type.getDeclaredMethod(name, parameterTypes);
+                if (!result.isAccessible()) {
+                    result.setAccessible(true);
+                }
+            } catch (final NoSuchMethodException e) {
+                result = getMethod(type.getSuperclass(), name, parameterTypes);
+            }
+            cache.put(method, result);
+        }
+        return result;
     }
 
+    @Override
+    public void flushCache() {
+        cache.keySet().retainAll(Arrays.asList(OBJECT_TYPE_FIELDS));
+    }
 }

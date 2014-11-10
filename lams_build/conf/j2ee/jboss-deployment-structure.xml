@@ -35,6 +35,7 @@
       <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
       <module name="org.apache.xmlcommons" export="true" />
+  	  <module name="org.apache.xerces" export="true" />
       <module name="org.infinispan" export="true" />
       <module name="org.hibernate" export="true" />
       <module name="org.jboss.jbossweb" export="true" />
@@ -52,6 +53,7 @@
       <module name="com.thoughtworks.xstream" export="true" />
       <module name="io.undertow.core" export="true" />
   	  <module name="io.undertow.servlet" export="true" />
+  	  <module name="org.joda.time" slot="2.1" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

@@ -1,69 +1,141 @@
+/*
+ * Copyright (C) 2004, 2005 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2010, 2011, 2013, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 08. May 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.converters.collections;
 
-import com.thoughtworks.xstream.alias.ClassMapper;
+import java.lang.reflect.Field;
+import java.util.AbstractList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.core.JVM;
+import com.thoughtworks.xstream.core.util.Fields;
+import com.thoughtworks.xstream.core.util.PresortedSet;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
-import java.util.Comparator;
-import java.util.TreeSet;
 
 /**
- * Converts a java.util.TreeSet to XML, and serializes
- * the associated java.util.Comparator.
- *
+ * Converts a {@link TreeSet} to XML, and serializes the associated {@link Comparator}.
+ * <p>
+ * The converter assumes that the elements in the XML are already sorted according the comparator.
+ * </p>
+ * 
  * @author Joe Walnes
+ * @author J&ouml;rg Schaible
  */
 public class TreeSetConverter extends CollectionConverter {
+    private transient TreeMapConverter treeMapConverter;
+    private final static Field sortedMapField = JVM.hasOptimizedTreeSetAddAll() ? Fields.locate(TreeSet.class,
+        SortedMap.class, false) : null;
 
-    /**
-     * @deprecated As of 1.1.1, use other constructor.
-     */
-    public TreeSetConverter(ClassMapper classMapper, String classAttributeIdentifier) {
-        super(classMapper, classAttributeIdentifier);
+    public TreeSetConverter(final Mapper mapper) {
+        super(mapper, TreeSet.class);
+        readResolve();
     }
 
-    public TreeSetConverter(Mapper mapper) {
-        super(mapper);
-    }
-
-    public boolean canConvert(Class type) {
-        return type.equals(TreeSet.class);
-    }
-
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        TreeSet treeSet = (TreeSet) source;
-        Comparator comparator = treeSet.comparator();
-        if (comparator == null) {
-            writer.startNode("no-comparator");
-            writer.endNode();
-        } else {
-            writer.startNode("comparator");
-            writer.addAttribute("class", mapper().serializedClass(comparator.getClass()));
-            context.convertAnother(comparator);
-            writer.endNode();
-        }
+    @Override
+    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
+        final SortedSet<?> sortedSet = (SortedSet<?>)source;
+        treeMapConverter.marshalComparator(sortedSet.comparator(), writer, context);
         super.marshal(source, writer, context);
     }
 
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        reader.moveDown();
-        TreeSet result;
-        if (reader.getNodeName().equals("comparator")) {
-            String comparatorClass = reader.getAttribute("class");
-            Comparator comparator = (Comparator) context.convertAnother(null, mapper().realClass(comparatorClass));
-            result = new TreeSet(comparator);
-        } else if (reader.getNodeName().equals("no-comparator")) {
-            result = new TreeSet();
+    @Override
+    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+        TreeSet<Object> result = null;
+        final TreeMap<?, ?> treeMap;
+        final Comparator<?> unmarshalledComparator = treeMapConverter.unmarshalComparator(reader, context, null);
+        final boolean inFirstElement = unmarshalledComparator instanceof Mapper.Null;
+        @SuppressWarnings("unchecked")
+        final Comparator<Object> comparator = inFirstElement ? null : (Comparator<Object>)unmarshalledComparator;
+        if (sortedMapField != null) {
+            final TreeSet<Object> possibleResult = comparator == null ? new TreeSet<Object>() : new TreeSet<Object>(
+                comparator);
+            Object backingMap = null;
+            try {
+                backingMap = sortedMapField.get(possibleResult);
+            } catch (final IllegalAccessException e) {
+                throw new ConversionException("Cannot get backing map of TreeSet", e);
+            }
+            if (backingMap instanceof TreeMap) {
+                treeMap = (TreeMap<?, ?>)backingMap;
+                result = possibleResult;
+            } else {
+                treeMap = null;
+            }
         } else {
-            throw new ConversionException("TreeSet does not contain <comparator> element");
+            treeMap = null;
         }
-        reader.moveUp();
-        super.populateCollection(reader, context, result);
+        if (treeMap == null) {
+            final PresortedSet<Object> set = new PresortedSet<Object>(comparator);
+            result = comparator == null ? new TreeSet<Object>() : new TreeSet<Object>(comparator);
+            if (inFirstElement) {
+                // we are already within the first element
+                addCurrentElementToCollection(reader, context, result, set);
+                reader.moveUp();
+            }
+            populateCollection(reader, context, result, set);
+            if (set.size() > 0) {
+                result.addAll(set); // comparator will not be called if internally optimized
+            }
+        } else {
+            treeMapConverter.populateTreeMap(reader, context, treeMap, unmarshalledComparator);
+        }
         return result;
     }
 
+    private Object readResolve() {
+        treeMapConverter = new TreeMapConverter(mapper()) {
+
+            @Override
+            protected void populateMap(final HierarchicalStreamReader reader, final UnmarshallingContext context,
+                    final Map<?, ?> map, final Map<?, ?> target) {
+                populateCollection(reader, context, new AbstractList<Object>() {
+                    @Override
+                    public boolean add(final Object object) {
+                        @SuppressWarnings("unchecked")
+                        final Map<Object, Object> collectionTarget = (Map<Object, Object>)target;
+                        return collectionTarget.put(object, object) != null;
+                    }
+
+                    @Override
+                    public Object get(final int location) {
+                        return null;
+                    }
+
+                    @Override
+                    public int size() {
+                        return target.size();
+                    }
+                });
+            }
+
+            @Override
+            protected void putCurrentEntryIntoMap(final HierarchicalStreamReader reader,
+                    final UnmarshallingContext context, final Map<?, ?> map, final Map<?, ?> target) {
+                final Object key = readItem(reader, context, map);
+                @SuppressWarnings("unchecked")
+                final Map<Object, Object> checkedTarget = (Map<Object, Object>)target;
+                checkedTarget.put(key, key);
+            }
+        };
+        return this;
+    }
 }

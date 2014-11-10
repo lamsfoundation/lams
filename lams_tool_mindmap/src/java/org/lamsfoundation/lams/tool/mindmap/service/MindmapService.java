@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * An implementation of the IMindmapService interface. As a requirement, all LAMS tool's service bean must implement
@@ -528,6 +529,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		MindmapUser mindmapUser = null;
 
 		XStream xstream = new XStream();
+		// allow parsing all classes
+		xstream.addPermission(AnyTypePermission.ANY);
 		xstream.alias("branch", NodeModel.class);
 		NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
 		NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();

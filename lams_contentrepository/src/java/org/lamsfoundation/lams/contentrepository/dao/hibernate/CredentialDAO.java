@@ -24,15 +24,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.ScrollableResults;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -49,27 +44,46 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
  * 
  */
 public class CredentialDAO extends BaseDAO implements ICredentialDAO {
+    private Logger log = Logger.getLogger(CredentialDAO.class);
 
-    protected Logger log = Logger.getLogger(CredentialDAO.class);
+    private static final String GET_CREDENTIAL = "FROM " + CrCredential.class.getName() + " AS cr WHERE cr.name = ?";
+    private static final String CHECK_CREDENTIAL = "SELECT COUNT(*) FROM " + CrCredential.class.getName()
+	    + " AS cr WHERE cr.name = ? AND cr.password = ?";
+    private static final String CHECK_CREDENTIAL_WITH_WORKSPACE = "SELECT COUNT(*) FROM "
+	    + CrCredential.class.getName()
+	    + " AS cr INNER JOIN cr.crWorkspaceCredentials AS wcr WHERE cr.name = ? AND cr.password = ? AND wcr.crWorkspace.workspaceId = ?";
 
     /**
      * Checks whether a user can login to this workspace. The Credential must include the password.
      */
+    @Override
     public boolean checkCredential(ICredentials credential, IWorkspace workspace) throws RepositoryRuntimeException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Checking credential " + credential + " for workspace " + workspace);
 	}
-
-	if (credential == null || workspace == null || workspace.getWorkspaceId() == null) {
+	if ((credential == null) || (workspace == null) || (workspace.getWorkspaceId() == null)) {
 	    return false;
 	}
 
-	return checkCredentialInternal(credential, workspace);
+	Session hibernateSession = getSessionFactory().getCurrentSession();
+	Query query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL_WITH_WORKSPACE);
+	query.setString(0, credential.getName());
+	query.setString(1, String.valueOf(credential.getPassword()));
+	query.setLong(2, workspace.getWorkspaceId());
+
+	Long count = (Long) query.uniqueResult();
+	if (count > 2) {
+	    log.warn("More than one credential found for workspace " + workspace.getWorkspaceId() + " and credential "
+		    + credential.getName());
+	}
+
+	return count > 0;
     }
 
     /**
      * Checks whether a user can login to the repository. The Credential must include the password.
      */
+    @Override
     public boolean checkCredential(ICredentials credential) throws RepositoryRuntimeException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Checking credential " + credential);
@@ -79,68 +93,27 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 	    return false;
 	}
 
-	return checkCredentialInternal(credential, null);
-    }
-
-    /**
-     * Checks whether a user can login to the repository. The Credential must include the password.
-     * 
-     * If workspace defined then checks workspace, otherwise just checks password
-     */
-    public boolean checkCredentialInternal(ICredentials credential, IWorkspace workspace)
-	    throws RepositoryRuntimeException {
-
-	// given the input credential, is there a credential matching
-	// in the database? why go to so much trouble in this code? I'm trying
-	// to avoid converting the char[] to a string.
-	// There will be better ways to do this, but this will do for starters
-	// until I get more familiar with Spring.
-
-	StringBuffer buf = new StringBuffer(200);
-	buf.append("select count(*) num from lams_cr_credential c");
-	if (workspace != null) {
-	    buf.append(", lams_cr_workspace_credential wc ");
-	}
-	buf.append(" where c.name = \"");
-	buf.append(credential.getName());
-	buf.append("\" and c.password = \"");
-	buf.append(credential.getPassword());
-	buf.append("\"");
-	if (workspace != null) {
-	    buf.append(" and wc.credential_id = c.credential_id ");
-	    buf.append(" and wc.workspace_id = ");
-	    buf.append(workspace.getWorkspaceId());
-	}
-
-	boolean credentialMatched = false;
 	Session hibernateSession = getSessionFactory().getCurrentSession();
-	ScrollableResults result = hibernateSession.createSQLQuery(buf.toString()).scroll();
-	if (result.next()) {
-	    long val = result.getLong(0);
-	    if (val > 0) {
-		credentialMatched = true;
-		if (val > 1) {
-		    log.warn("More than one credential found for workspace " + workspace.getWorkspaceId()
-			    + " credential name " + credential.getName());
-		}
-	    }
-	}
+	Query query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL);
+	query.setString(0, credential.getName());
+	query.setString(1, String.valueOf(credential.getPassword()));
 
-	return credentialMatched;
+	Long count = (Long) query.uniqueResult();
+	if (count > 2) {
+	    log.warn("More than one credential found for name " + credential.getName());
+	}
+	return count > 0;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public CrCredential findByName(String name) {
-
-	log.debug("Getting credential for name " + name);
-
-	String queryString = "from CrCredential as c where c.name = ?";
-	List credentials = getHibernateTemplate().find(queryString, name);
-
-	if (credentials.size() == 0) {
-	    log.debug("No credentials found");
-	    return null;
-	} else {
-	    return (CrCredential) credentials.get(0);
+	if (log.isDebugEnabled()) {
+	    log.debug("Getting credential for name " + name);
 	}
+
+	List<CrCredential> credentials = (List<CrCredential>) getHibernateTemplate().find(CredentialDAO.GET_CREDENTIAL,
+		name);
+	return credentials.size() == 0 ? null : credentials.get(0);
     }
 }

@@ -711,19 +711,20 @@
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/xmlpull/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">
-				<include name="xpp3-*.jar" />
+				<include name="xmlpull-*.jar" />
+				<include name="xpp*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/xmlpull/main/module.xml"
-			  file="lib/xstream/xpp.module.xml" overwrite="true" verbose="true" />
-		
+			  file="lib/xstream/xmlpull.module.xml" overwrite="true" verbose="true" />
+				
 		<copy todir="${server.home}/modules/system/layers/base/org/joda/time/2.1" overwrite="true" verbose="true">
-			<fileset dir="lib/xstream">
+			<fileset dir="lib/joda">
 				<include name="joda-time-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/joda/time/2.1/module.xml"
-			  file="lib/xstream/joda.module.xml" overwrite="true" verbose="true" />
+			  file="lib/joda/joda.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main" overwrite="true" verbose="true">
 			<fileset dir="lib/xstream">

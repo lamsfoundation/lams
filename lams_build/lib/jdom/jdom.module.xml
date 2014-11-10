@@ -26,4 +26,14 @@
   <resources>
     <resource-root path="jdom.jar"/>
   </resources>
+  
+  <dependencies>
+  	<system>
+  		<paths>
+  			<path name="org/xml/sax" />
+  			<path name="org/xml/sax/ext" />
+  			<path name="org/xml/sax/helpers" />
+  		</paths>
+  	</system>
+  </dependencies>
 </module>

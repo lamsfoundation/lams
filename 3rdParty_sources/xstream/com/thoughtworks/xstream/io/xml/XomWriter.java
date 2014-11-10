@@ -1,44 +1,72 @@
+/*
+ * Copyright (C) 2004, 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 03. September 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.io.xml;
 
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import nu.xom.Element;
+import com.thoughtworks.xstream.io.naming.NameCoder;
+
 import nu.xom.Attribute;
+import nu.xom.Element;
 
-public class XomWriter implements HierarchicalStreamWriter {
 
-    private Element node;
+public class XomWriter extends AbstractDocumentWriter {
 
-    public XomWriter(Element parentElement) {
-        this.node = parentElement;
+    /**
+     * @since 1.2.1
+     */
+    public XomWriter() {
+        this(null);
     }
 
-    public void startNode(String name) {
-        Element newNode = new Element(name);
-        node.appendChild(newNode);
-        node = newNode;
+    public XomWriter(final Element parentElement) {
+        this(parentElement, new XmlFriendlyNameCoder());
     }
 
-    public void addAttribute(String name, String value) {
-        node.addAttribute(new Attribute(name, value));
+    /**
+     * @since 1.4
+     */
+    public XomWriter(final Element parentElement, final NameCoder nameCoder) {
+        super(parentElement, nameCoder);
     }
 
-    public void setValue(String text) {
-        node.appendChild(text);
+    /**
+     * @since 1.2
+     * @deprecated As of 1.4 use {@link XomWriter#XomWriter(Element, NameCoder)} instead
+     */
+    @Deprecated
+    public XomWriter(final Element parentElement, final XmlFriendlyReplacer replacer) {
+        this(parentElement, (NameCoder)replacer);
     }
 
-    public void endNode() {
-        node = (Element) node.getParent();
+    @Override
+    protected Object createNode(final String name) {
+        final Element newNode = new Element(encodeNode(name));
+        final Element top = top();
+        if (top != null) {
+            top().appendChild(newNode);
+        }
+        return newNode;
     }
 
-    public void flush() {
-        // don't need to do anything
+    @Override
+    public void addAttribute(final String name, final String value) {
+        top().addAttribute(new Attribute(encodeAttribute(name), value));
     }
 
-    public void close() {
-        // don't need to do anything
+    @Override
+    public void setValue(final String text) {
+        top().appendChild(text);
     }
 
-    public HierarchicalStreamWriter underlyingWriter() {
-        return this;
+    private Element top() {
+        return (Element)getCurrent();
     }
 }

@@ -1,52 +1,94 @@
+/*
+ * Copyright (C) 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 09. April 2005 by Joe Walnes
+ */
 package com.thoughtworks.xstream.mapper;
 
-import com.thoughtworks.xstream.alias.ClassMapper;
-
-import java.util.Map;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+
+import com.thoughtworks.xstream.core.util.Primitives;
+
 
 /**
- * Mapper that allows a fully qualified class name to be replaced with a shorter alias.
- *
+ * Mapper that allows a fully qualified class name to be replaced with an alias.
+ * 
  * @author Joe Walnes
+ * @author J&ouml;rg Schaible
  */
 public class ClassAliasingMapper extends MapperWrapper {
 
-    protected final Map typeToNameMap = Collections.synchronizedMap(new HashMap());
-    protected final Map nameToTypeMap = Collections.synchronizedMap(new HashMap());
+    private final Map<Class<?>, String> typeToName = new HashMap<Class<?>, String>();
+    private final Map<String, String> classToName = new HashMap<String, String>();
+    private transient Map<String, String> nameToType = new HashMap<String, String>();
 
-    public ClassAliasingMapper(ClassMapper wrapped) {
+    public ClassAliasingMapper(final Mapper wrapped) {
         super(wrapped);
     }
 
-    public void addClassAlias(String name, Class type) {
-        nameToTypeMap.put(name, type.getName());
-        typeToNameMap.put(type.getName(), name);
+    public void addClassAlias(final String name, final Class<?> type) {
+        nameToType.put(name, type.getName());
+        classToName.put(type.getName(), name);
     }
 
-    public String serializedClass(Class type) {
-        String name = super.serializedClass(type);
-        String alias = (String) typeToNameMap.get(type.getName());
+    public void addTypeAlias(final String name, final Class<?> type) {
+        nameToType.put(name, type.getName());
+        typeToName.put(type, name);
+    }
+
+    @Override
+    public String serializedClass(final Class<?> type) {
+        final String alias = classToName.get(type.getName());
         if (alias != null) {
             return alias;
         } else {
-            return name;
+            for (final Class<?> compatibleType : typeToName.keySet()) {
+                if (compatibleType.isAssignableFrom(type)) {
+                    return typeToName.get(compatibleType);
+                }
+            }
+            return super.serializedClass(type);
         }
     }
 
-    public Class realClass(String elementName) {
-        if (elementName.equals("null")) { // TODO: This is probably the wrong place for this.
-            return null;
-        }
-
-        String mappedName = (String) nameToTypeMap.get(mapNameFromXML(elementName));
+    @Override
+    public Class<?> realClass(String elementName) {
+        final String mappedName = nameToType.get(elementName);
 
         if (mappedName != null) {
+            final Class<?> type = Primitives.primitiveType(mappedName);
+            if (type != null) {
+                return type;
+            }
             elementName = mappedName;
         }
 
         return super.realClass(elementName);
     }
 
+    public boolean itemTypeAsAttribute(final Class<?> clazz) {
+        return classToName.containsKey(clazz);
+    }
+
+    public boolean aliasIsAttribute(final String name) {
+        return nameToType.containsKey(name);
+    }
+
+    private Object readResolve() {
+        nameToType = new HashMap<String, String>();
+        for (final String type : classToName.keySet()) {
+            nameToType.put(classToName.get(type), type);
+        }
+        for (final Class<?> type : typeToName.keySet()) {
+            nameToType.put(typeToName.get(type), type.getName());
+        }
+        return this;
+    }
 }

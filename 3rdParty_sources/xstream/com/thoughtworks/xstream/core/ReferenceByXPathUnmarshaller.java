@@ -1,46 +1,50 @@
+/*
+ * Copyright (C) 2004, 2005, 2006 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 03. April 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.core;
 
-import com.thoughtworks.xstream.alias.ClassMapper;
 import com.thoughtworks.xstream.converters.ConverterLookup;
-import com.thoughtworks.xstream.core.util.FastStack;
+import com.thoughtworks.xstream.io.AbstractReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.path.Path;
 import com.thoughtworks.xstream.io.path.PathTracker;
 import com.thoughtworks.xstream.io.path.PathTrackingReader;
+import com.thoughtworks.xstream.mapper.Mapper;
 
-import java.util.HashMap;
-import java.util.Map;
 
-public class ReferenceByXPathUnmarshaller extends TreeUnmarshaller {
+public class ReferenceByXPathUnmarshaller extends AbstractReferenceUnmarshaller<Path> {
 
-    private Map values = new HashMap();
-    private FastStack parentPathStack = new FastStack(16);
-    private PathTracker pathTracker = new PathTracker();
+    private final PathTracker pathTracker = new PathTracker();
+    protected boolean isNameEncoding;
 
-    public ReferenceByXPathUnmarshaller(Object root, HierarchicalStreamReader reader,
-                                        ConverterLookup converterLookup, ClassMapper classMapper) {
-        super(root, reader, converterLookup, classMapper);
+    public ReferenceByXPathUnmarshaller(
+            final Object root, final HierarchicalStreamReader reader, final ConverterLookup converterLookup,
+            final Mapper mapper) {
+        super(root, reader, converterLookup, mapper);
         this.reader = new PathTrackingReader(reader, pathTracker);
+        isNameEncoding = reader.underlyingReader() instanceof AbstractReader;
     }
 
-    public Object convertAnother(Object parent, Class type) {
-        if (parentPathStack.size() > 0) { // handles circular references
-            Object parentPath = parentPathStack.peek();
-            if (!values.containsKey(parentPath)) { // see AbstractCircularReferenceTest.testWeirdCircularReference()
-                values.put(parentPath, parent);
-            }
-        }
-        String relativePathOfReference = reader.getAttribute("reference");
-        Path currentPath = pathTracker.getPath();
-        if (relativePathOfReference != null) {
-            return values.get(currentPath.apply(new Path(relativePathOfReference)));
-        } else {
-            parentPathStack.push(currentPath);
-            Object result = super.convertAnother(parent, type);
-            values.put(currentPath, result);
-            parentPathStack.popSilently();
-            return result;
-        }
+    @Override
+    protected Path getReferenceKey(final String reference) {
+        final Path path = new Path(isNameEncoding
+            ? ((AbstractReader)reader.underlyingReader()).decodeNode(reference)
+            : reference);
+        // We have absolute references, if path starts with '/'
+        return reference.charAt(0) != '/' ? pathTracker.getPath().apply(path) : path;
+    }
+
+    @Override
+    protected Path getCurrentReferenceKey() {
+        return pathTracker.getPath();
     }
 
 }

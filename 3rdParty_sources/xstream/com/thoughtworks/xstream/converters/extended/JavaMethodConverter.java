@@ -1,51 +1,93 @@
+/*
+ * Copyright (C) 2004, 2005 Joe Walnes.
+ * Copyright (C) 2006, 2007, 2009, 2013, 2014 XStream Committers.
+ * All rights reserved.
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * Created on 04. April 2004 by Joe Walnes
+ */
 package com.thoughtworks.xstream.converters.extended;
-
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.InitializationException;
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.core.ClassLoaderReference;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
+
 /**
- * Converts a java.lang.reflect.Method to XML.
- *
+ * Converts a {@link Method}.
+ * 
  * @author Aslak Helles&oslash;y
+ * @author J&ouml;rg Schaible
  */
 public class JavaMethodConverter implements Converter {
 
-    private final ClassLoader classLoader;
+    private final SingleValueConverter javaClassConverter;
 
-    public JavaMethodConverter() {
-        this(JavaMethodConverter.class.getClassLoader());
+    /**
+     * Construct a JavaMethodConverter.
+     * 
+     * @param classLoaderReference the reference to the {@link ClassLoader} of the XStream instance
+     * @since 1.4.5
+     */
+    public JavaMethodConverter(final ClassLoaderReference classLoaderReference) {
+        this(new JavaClassConverter(classLoaderReference));
     }
 
-    public JavaMethodConverter(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+    /**
+     * @deprecated As of 1.4.5 use {@link #JavaMethodConverter(ClassLoaderReference)}
+     */
+    @Deprecated
+    public JavaMethodConverter(final ClassLoader classLoader) {
+        this(new ClassLoaderReference(classLoader));
     }
 
-    public boolean canConvert(Class type) {
+    /**
+     * Construct a JavaMethodConverter.
+     * 
+     * @param javaClassConverter the converter to use
+     * @since 1.4.5
+     */
+    protected JavaMethodConverter(final SingleValueConverter javaClassConverter) {
+        if (!javaClassConverter.canConvert(Class.class)) {
+            throw new InitializationException("Java Class Converter cannot handle Class types");
+        }
+        this.javaClassConverter = javaClassConverter;
+    }
+
+    @Override
+    public boolean canConvert(final Class<?> type) {
         return type.equals(Method.class) || type.equals(Constructor.class);
     }
 
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+    @Override
+    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
         if (source instanceof Method) {
-            Method method = (Method) source;
-            String declaringClassName = method.getDeclaringClass().getName();
+            final Method method = (Method)source;
+            final String declaringClassName = javaClassConverter.toString(method.getDeclaringClass());
             marshalMethod(writer, declaringClassName, method.getName(), method.getParameterTypes());
         } else {
-            Constructor method = (Constructor) source;
-            String declaringClassName = method.getDeclaringClass().getName();
+            final Constructor<?> method = (Constructor<?>)source;
+            final String declaringClassName = javaClassConverter.toString(method.getDeclaringClass());
             marshalMethod(writer, declaringClassName, null, method.getParameterTypes());
         }
     }
 
-    private void marshalMethod(HierarchicalStreamWriter writer, String declaringClassName, String methodName, Class[] parameterTypes) {
+    private void marshalMethod(final HierarchicalStreamWriter writer, final String declaringClassName,
+            final String methodName, final Class<?>[] parameterTypes) {
 
         writer.startNode("class");
         writer.setValue(declaringClassName);
@@ -59,22 +101,22 @@ public class JavaMethodConverter implements Converter {
         }
 
         writer.startNode("parameter-types");
-        for (int i = 0; i < parameterTypes.length; i++) {
-            Class parameterType = parameterTypes[i];
+        for (final Class<?> parameterType : parameterTypes) {
             writer.startNode("class");
-            writer.setValue(parameterType.getName());
+            writer.setValue(javaClassConverter.toString(parameterType));
             writer.endNode();
         }
         writer.endNode();
     }
 
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    @Override
+    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
         try {
-            boolean isMethodNotConstructor = context.getRequiredType().equals(Method.class);
+            final boolean isMethodNotConstructor = context.getRequiredType().equals(Method.class);
 
             reader.moveDown();
-            String declaringClassName = reader.getValue();
-            Class declaringClass = loadClass(declaringClassName);
+            final String declaringClassName = reader.getValue();
+            final Class<?> declaringClass = (Class<?>)javaClassConverter.fromString(declaringClassName);
             reader.moveUp();
 
             String methodName = null;
@@ -85,14 +127,14 @@ public class JavaMethodConverter implements Converter {
             }
 
             reader.moveDown();
-            List parameterTypeList = new ArrayList();
+            final List<Class<?>> parameterTypeList = new ArrayList<Class<?>>();
             while (reader.hasMoreChildren()) {
                 reader.moveDown();
-                String parameterTypeName = reader.getValue();
-                parameterTypeList.add(loadClass(parameterTypeName));
+                final String parameterTypeName = reader.getValue();
+                parameterTypeList.add((Class<?>)javaClassConverter.fromString(parameterTypeName));
                 reader.moveUp();
             }
-            Class[] parameterTypes = (Class[]) parameterTypeList.toArray(new Class[parameterTypeList.size()]);
+            final Class<?>[] parameterTypes = parameterTypeList.toArray(new Class[parameterTypeList.size()]);
             reader.moveUp();
 
             if (isMethodNotConstructor) {
@@ -100,34 +142,8 @@ public class JavaMethodConverter implements Converter {
             } else {
                 return declaringClass.getDeclaredConstructor(parameterTypes);
             }
-        } catch (ClassNotFoundException e) {
-            throw new ConversionException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             throw new ConversionException(e);
         }
-    }
-
-    private Class loadClass(String className) throws ClassNotFoundException {
-        Class primitiveClass = primitiveClassForName(className);
-        if( primitiveClass != null ){
-            return primitiveClass;
-        }
-        return classLoader.loadClass(className);
-    }
-
-    /**
-     * Lookup table for primitive types.
-     */
-    private Class primitiveClassForName(String name) {
-        return  name.equals("void") ? Void.TYPE :
-                name.equals("boolean") ? Boolean.TYPE :
-                name.equals("byte") ? Byte.TYPE :
-                name.equals("char") ? Character.TYPE :
-                name.equals("short") ? Short.TYPE :
-                name.equals("int") ? Integer.TYPE :
-                name.equals("long") ? Long.TYPE :
-                name.equals("float") ? Float.TYPE :
-                name.equals("double") ? Double.TYPE :
-                null;
     }
 }
