@@ -18,138 +18,158 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.dao.hibernate;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
- 
+import org.springframework.orm.hibernate4.HibernateCallback;
+
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
-    
-    private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " 
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? ORDER BY r.startDate DESC LIMIT 1";
-    
-    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
-    
-    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
 
-    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
-    
-    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
+	private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId = ? AND r.assessment.uid=? ORDER BY r.startDate DESC";
 
-    private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-    
-    private static final String FIND_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-    
-    private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+	private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
+	private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC";
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
-	return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
-    }
+	private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    @Override    
-    @SuppressWarnings("unchecked")
-    public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
-	return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
-    }
-    
-    @Override
-    public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;
-	} else {
-	    return (AssessmentResult) list.get(0);
-	}
-    }
-    
-    @Override
-    public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;
-	} else {
-	    return (AssessmentResult) list.get(0);
-	}
-    }
-    
-    @Override
-    public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_GRADE, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;   
-	} else {
-	    return ((Number) list.get(0)).floatValue();
-	}
-    }
-    
-    @Override
-    public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
-	
-	String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
-		    + AssessmentResult.class.getName()
-		    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-	
-	
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_TIME_TAKEN, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;   
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
-    }
-    
-    @Override
-    public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1, new Object[] { userId, sessionId });
-	if (list == null || list.size() == 0) {
-	    return null;
-	} else {
-	    return (AssessmentResult) list.get(0);
-	}
-    }
+	private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate DESC";
 
-    @Override
-    public int getAssessmentResultCount(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return 0;   
-	} else {
-	    return ((Number) list.get(0)).intValue();
+	private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+
+	private static final String FIND_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+
+	private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
+			+ AssessmentResult.class.getName()
+			+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+
+	private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
+		return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED,
+				new Object[] { userId, assessmentUid });
 	}
-    }
-    
-    @Override
-    public AssessmentResult getAssessmentResultByUid(Long assessmentResultUid) {
-	List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { assessmentResultUid });
-	if (list == null || list.size() == 0)
-	    return null;
-	return (AssessmentResult) list.get(0);
-    }
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
+		return (List<AssessmentResult>) getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED,
+				new Object[] { userId, sessionId });
+	}
+
+	@Override
+	public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
+		
+		return getHibernateTemplate().execute(new HibernateCallback<AssessmentResult>() {
+			@Override
+			public AssessmentResult doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery(FIND_BY_ASSESSMENT_AND_USER);
+				q.setParameter(0, userId);
+				q.setParameter(1, assessmentUid);
+				q.setMaxResults(1);
+				return (AssessmentResult) q.uniqueResult();
+			}
+		});
+	}
+
+	@Override
+	public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
+		
+		return getHibernateTemplate().execute(new HibernateCallback<AssessmentResult>() {
+			@Override
+			public AssessmentResult doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1);
+				q.setParameter(0, userId);
+				q.setParameter(1, assessmentUid);
+				q.setMaxResults(1);
+				return (AssessmentResult) q.uniqueResult();
+			}
+		});
+		
+	}
+
+	@Override
+	public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
+		List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_GRADE, new Object[] { userId, assessmentUid });
+		if (list == null || list.size() == 0) {
+			return null;
+		} else {
+			return ((Number) list.get(0)).floatValue();
+		}
+	}
+
+	@Override
+	public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
+
+		String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
+				+ AssessmentResult.class.getName()
+				+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+
+		List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_TIME_TAKEN,
+				new Object[] { userId, assessmentUid });
+		if (list == null || list.size() == 0) {
+			return null;
+		} else {
+			return ((Number) list.get(0)).intValue();
+		}
+	}
+
+	@Override
+	public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
+		
+		return getHibernateTemplate().execute(new HibernateCallback<AssessmentResult>() {
+			@Override
+			public AssessmentResult doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery(FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1);
+				q.setParameter(0, userId);
+				q.setParameter(1, sessionId);
+				q.setMaxResults(1);
+				return (AssessmentResult) q.uniqueResult();
+			}
+		});
+		
+	}
+
+	@Override
+	public int getAssessmentResultCount(Long assessmentUid, Long userId) {
+		List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER,
+				new Object[] { userId, assessmentUid });
+		if (list == null || list.size() == 0) {
+			return 0;
+		} else {
+			return ((Number) list.get(0)).intValue();
+		}
+	}
+
+	@Override
+	public AssessmentResult getAssessmentResultByUid(Long assessmentResultUid) {
+		List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { assessmentResultUid });
+		if (list == null || list.size() == 0)
+			return null;
+		return (AssessmentResult) list.get(0);
+	}
 
 }
-
- 

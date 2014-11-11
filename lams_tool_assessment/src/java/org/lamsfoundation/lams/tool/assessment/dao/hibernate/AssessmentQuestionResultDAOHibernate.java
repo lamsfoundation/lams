@@ -25,67 +25,81 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate implements AssessmentQuestionResultDAO {
 
-    private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
-	    + " AS r WHERE r.uid = ?";
+	private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
+			+ " AS r WHERE r.uid = ?";
 
-    private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
-	    + AssessmentQuestionResult.class.getName()
-	    + " AS q, "
-	    + AssessmentResult.class.getName()
-	    + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? ORDER BY r.startDate ASC";
+	private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
+			+ AssessmentQuestionResult.class.getName()
+			+ " AS q, "
+			+ AssessmentResult.class.getName()
+			+ " AS r "
+			+ " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? ORDER BY r.startDate ASC";
 
-    private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
-	    + AssessmentQuestionResult.class.getName()
-	    + " AS q, "
-	    + AssessmentResult.class.getName()
-	    + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade";
-    
-    private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
-	    + AssessmentQuestionResult.class.getName()
-	    + " AS q, "
-	    + AssessmentResult.class.getName()
-	    + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND (r.finishDate != null) AND r.user.userId =? AND q.assessmentQuestion.sequenceId =? ORDER BY r.startDate DESC LIMIT 1";
+	private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
+			+ AssessmentQuestionResult.class.getName()
+			+ " AS q, "
+			+ AssessmentResult.class.getName()
+			+ " AS r "
+			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade";
 
-    @Override
-    public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
-	List list = getHibernateTemplate().find(FIND_WRONG_ANSWERS_NUMBER, new Object[] { assessmentUid, userId, questionUid });
-	if (list == null || list.size() == 0) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
+	private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
+			+ AssessmentQuestionResult.class.getName()
+			+ " AS q, "
+			+ AssessmentResult.class.getName()
+			+ " AS r "
+			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND (r.finishDate != null) AND r.user.userId =? AND q.assessmentQuestion.sequenceId =? ORDER BY r.startDate DESC";
+
+	@Override
+	public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
+		List list = getHibernateTemplate().find(FIND_WRONG_ANSWERS_NUMBER,
+				new Object[] { assessmentUid, userId, questionUid });
+		if (list == null || list.size() == 0) {
+			return 0;
+		} else {
+			return ((Number) list.get(0)).intValue();
+		}
 	}
-    }
-    
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
-	return (List<Object[]>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { assessmentUid, userId, questionUid });
-    }
-    
-    @Override
-    public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
-	List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { questionResultUid });
-	if (list == null || list.size() == 0)
-	    return null;
-	return (AssessmentQuestionResult) list.get(0);
-    }
 
-    @Override
-    public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
-	List list = getHibernateTemplate().find(GET_ANSWER_MARK, new Object[] { assessmentUid, userId, questionSequenceId });
-	if (list == null || list.size() == 0) {
-	    return null;
-	} else {
-	    return ((Number) list.get(0)).floatValue();
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+		return (List<Object[]>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER,
+				new Object[] { assessmentUid, userId, questionUid });
 	}
-    }
+
+	@Override
+	public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
+		List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { questionResultUid });
+		if (list == null || list.size() == 0)
+			return null;
+		return (AssessmentQuestionResult) list.get(0);
+	}
+
+	@Override
+	public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
+		
+		return getHibernateTemplate().execute(new HibernateCallback<Float>() {
+			@Override
+			public Float doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery(GET_ANSWER_MARK);
+				q.setParameter(0, assessmentUid);
+				q.setParameter(1, userId);
+				q.setParameter(2, questionSequenceId);
+				q.setMaxResults(1);
+				Object result = q.uniqueResult();
+				return result != null ? ((Number) result).floatValue() : null;
+			}
+		});
+		
+	}
 }

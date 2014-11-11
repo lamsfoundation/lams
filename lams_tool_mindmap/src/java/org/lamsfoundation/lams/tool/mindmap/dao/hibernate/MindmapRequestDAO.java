@@ -26,59 +26,69 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapRequestDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 /**
  * MindmapRequestDAO
+ * 
  * @author Ruslan Kazakov
  */
 public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
-    private static final String SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID =
-	" from " + MindmapRequest.class.getName() + " mr where mr.globalId > ? and " +
-	" mr.mindmap.uid = ? and mr.user.uid <> ? and mr.user.mindmapSession.sessionId = ? order by mr.globalId ";
-    
-    private static final String SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID =
-	" from " + MindmapRequest.class.getName() + " mr where mr.uniqueId = ? and mr.user.uid = ? and " +
-	" mr.mindmap.uid = ? and mr.globalId > ? ";
-    
-    private static final String SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP =
-	" select mr.globalId from " + MindmapRequest.class.getName() + " mr where mr.mindmap.uid = ? and " +
-	" mr.user.mindmapSession.sessionId = ? order by mr.globalId desc limit 1 ";
-    
-    private static final String SQL_QUERY_FIND_REQUESTS_BY_USER_ID =
-		" from " + MindmapRequest.class.getName() + " mr where mr.user.userId = ? ";
-    
-    public void saveOrUpdate(MindmapRequest mindmapRequest) {
-	this.getHibernateTemplate().saveOrUpdate(mindmapRequest);
-    }
-    
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID, 
-		new Object[]{globalId, mindmapId, userId, sessionId});
-    }
-    
-    public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID, 
-		new Object[]{uniqueId, userId, mindmapId, globalId}); 
-	if (list != null && list.size() > 0)
-	    return (MindmapRequest) list.get(list.size()-1);
-	else
-	    return null;
-    }
-    
-    public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP, 
-		new Object[]{mindmapId, sessionId}); 
-	if (list != null && list.size() > 0)
-	    return ((Number) list.get(0)).longValue();
-	else
-	    return 0l;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<MindmapRequest> getRequestsByUserId(Long userId) {
-	return (List<MindmapRequest>) this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
-    }
+	private static final String SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID = " from " + MindmapRequest.class.getName()
+			+ " mr where mr.globalId > ? and "
+			+ " mr.mindmap.uid = ? and mr.user.uid <> ? and mr.user.mindmapSession.sessionId = ? order by mr.globalId ";
+
+	private static final String SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID = " from " + MindmapRequest.class.getName()
+			+ " mr where mr.uniqueId = ? and mr.user.uid = ? and " + " mr.mindmap.uid = ? and mr.globalId > ? ";
+
+	private static final String SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP = " select mr.globalId from "
+			+ MindmapRequest.class.getName() + " mr where mr.mindmap.uid = ? and "
+			+ " mr.user.mindmapSession.sessionId = ? order by mr.globalId desc";
+
+	private static final String SQL_QUERY_FIND_REQUESTS_BY_USER_ID = " from " + MindmapRequest.class.getName()
+			+ " mr where mr.user.userId = ? ";
+
+	public void saveOrUpdate(MindmapRequest mindmapRequest) {
+		this.getHibernateTemplate().saveOrUpdate(mindmapRequest);
+	}
+
+	public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID,
+				new Object[] { globalId, mindmapId, userId, sessionId });
+	}
+
+	public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID,
+				new Object[] { uniqueId, userId, mindmapId, globalId });
+		if (list != null && list.size() > 0)
+			return (MindmapRequest) list.get(list.size() - 1);
+		else
+			return null;
+	}
+
+	public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId) {
+		return getHibernateTemplate().execute(new HibernateCallback<Long>() {
+			@Override
+			public Long doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP);
+				q.setParameter(0, mindmapId);
+				q.setParameter(1, sessionId);
+				q.setMaxResults(1);
+				Object result = q.uniqueResult();
+				return result != null ? ((Number) result).longValue() : null;
+			}
+		});
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<MindmapRequest> getRequestsByUserId(Long userId) {
+		return (List<MindmapRequest>) this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
+	}
 }
