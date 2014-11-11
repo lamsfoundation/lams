@@ -90,6 +90,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * @author Andrey Balan
@@ -1259,7 +1260,7 @@ public class AuthoringAction extends Action {
 		    questionsToExport.add(clonedQuestion);
 		}
 		// exporting XML
-		XStream designXml = new XStream();
+		XStream designXml = new XStream(new SunUnsafeReflectionProvider());
 		String resultedXml = designXml.toXML(questionsToExport);
 
 		response.setContentType("application/x-download");

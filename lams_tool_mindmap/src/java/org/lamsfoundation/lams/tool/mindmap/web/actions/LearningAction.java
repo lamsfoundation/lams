@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * @author Ruslan Kazakov
@@ -309,7 +310,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionId);
 
-	XStream xstream = new XStream();
+	XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	xstream.alias("action", NotifyRequestModel.class);
 	NotifyRequestModel notifyRequestModel = (NotifyRequestModel) xstream.fromXML(requestAction);
 	int requestType = notifyRequestModel.getType();
@@ -465,7 +466,7 @@ public class LearningAction extends LamsDispatchAction {
 	if (data != null)
 	    nodeResponseModel.setData(data);
 
-	XStream xstream = new XStream();
+	XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	xstream.alias("response", NotifyResponseModel.class);
 
 	return xstream.toXML(nodeResponseModel);
@@ -558,7 +559,7 @@ public class LearningAction extends LamsDispatchAction {
 	    pollResponseModel.addNotifyRequest(notifyRequestModel);
 	}
 
-	XStream xstream = new XStream();
+	XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	xstream.alias("action", NotifyRequestModel.class);
 	xstream.alias("pollResponse", PollResponseModel.class);
 	String pollResponse = xstream.toXML(pollResponseModel);
@@ -621,7 +622,7 @@ public class LearningAction extends LamsDispatchAction {
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
 		    mindmapId, rootNodeModel, mindmapUser);
 
-	    XStream xstream = new XStream();
+	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	    xstream.alias("branch", NodeModel.class);
 	    String mindmapContent = xstream.toXML(currentNodeModel);
 
@@ -675,7 +676,7 @@ public class LearningAction extends LamsDispatchAction {
     public void saveMindmapXML(Mindmap mindmap, MindmapUser mindmapUser, String mindmapContent,
 	    MindmapSession mindmapSession) {
 	// Saving Mindmap data to XML
-	XStream xstream = new XStream();
+	XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	xstream.alias("branch", NodeModel.class);
 	NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
 	NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();

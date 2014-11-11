@@ -27,6 +27,11 @@
     <resource-root path="xstream-1.5.0-SNAPSHOT.jar"/>
   </resources>
   <dependencies>
+  	<system>
+  		<paths>
+  			<path name="sun/misc" />
+  		</paths>
+  	</system>
     <module name="org.xmlpull"/>
   </dependencies>
 </module>

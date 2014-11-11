@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -740,7 +741,7 @@ public class FileUtil {
     public static Object getObjectFromXML(XStream xStream, String fullFilePath) throws JDOMException, IOException {
 
 	Reader file = null;
-	XStream conversionXml = xStream != null ? xStream : new XStream();
+	XStream conversionXml = xStream != null ? xStream : new XStream(new SunUnsafeReflectionProvider());
 	// allow parsing all classes
 	conversionXml.addPermission(AnyTypePermission.ANY);
 	ConversionException finalException = null;

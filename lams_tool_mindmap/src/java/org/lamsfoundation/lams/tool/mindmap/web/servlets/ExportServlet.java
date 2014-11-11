@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
@@ -175,7 +176,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), 
 		    mindmap.getUid(), rootNodeModel, mindmapUser);
 
-	    XStream xstream = new XStream();
+	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	    xstream.alias("branch", NodeModel.class);
 	    String mindmapContent = xstream.toXML(currentNodeModel);
 

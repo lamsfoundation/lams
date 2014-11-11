@@ -57,6 +57,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * Handles the admin page for question and answer which includes the settings
@@ -301,7 +302,7 @@ public class QaAdminAction extends LamsDispatchAction {
 	}
 
 	// exporting XML
-	XStream designXml = new XStream();
+	XStream designXml = new XStream(new SunUnsafeReflectionProvider());
 	String exportXml = designXml.toXML(exportCategories);
 
 	response.setContentType("application/x-download");
@@ -368,7 +369,7 @@ public class QaAdminAction extends LamsDispatchAction {
 	// Now perform the import
 	try {
 	    String xml = new String(adminForm.getImportFile().getFileData());
-	    XStream conversionXml = new XStream();
+	    XStream conversionXml = new XStream(new SunUnsafeReflectionProvider());
 	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>) conversionXml.fromXML(xml);
 
 	    qaService.deleteAllWizardCategories();

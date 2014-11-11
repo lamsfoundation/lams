@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -486,7 +487,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmap.getUid(),
 		    rootNodeModel, null);
 
-	    XStream xstream = new XStream();
+	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	    xstream.alias("branch", NodeModel.class);
 	    mindmapContent = xstream.toXML(currentNodeModel);
 	}
@@ -528,7 +529,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    if (mindmapContent != null) {
 		MindmapUser mindmapUser = null;
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 		// allow parsing all classes
 		xstream.addPermission(AnyTypePermission.ANY);
 		xstream.alias("branch", NodeModel.class);

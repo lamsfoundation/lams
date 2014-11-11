@@ -123,6 +123,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * Action managing Pedagogical Planner base page and non-tool activities.
@@ -1201,7 +1202,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    // exporting XML
-	    XStream designXml = new XStream();
+	    XStream designXml = new XStream(new SunUnsafeReflectionProvider());
 	    // do not serialize node's owner
 	    designXml.omitField(PedagogicalPlannerSequenceNode.class, "user");
 	    designXml.toXML(node, nodeFile);

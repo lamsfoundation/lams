@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * @author Ruslan Kazakov
@@ -153,7 +154,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .getText(), rootMindmapNode.getColor(), mindmapUserName));
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
 		    mindmapId, rootNodeModel, null);
-	    XStream xstream = new XStream();
+	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	    xstream.alias("branch", NodeModel.class);
 	    String mindmapContent = xstream.toXML(currentNodeModel);
 
@@ -298,7 +299,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	
 	if (!mindmap.isMultiUserMode()) {
 	    // Saving Mindmap data to XML
-	    XStream xstream = new XStream();
+	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
 	    xstream.alias("branch", NodeModel.class);
 	    NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
 	    NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();

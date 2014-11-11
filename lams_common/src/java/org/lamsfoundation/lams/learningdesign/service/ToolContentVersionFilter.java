@@ -19,6 +19,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 
 /**
  * Super class for all Import content Version Filter. The child class method must follow name conversion.
@@ -156,7 +157,7 @@ public class ToolContentVersionFilter {
 	for (AddedField added : addedFieldList) {
 	    if (StringUtils.equals(root.getName(), added.ownerClass.getName())) {
 		Writer eleWriter = new StringWriter();
-		XStream eleX = new XStream();
+		XStream eleX = new XStream(new SunUnsafeReflectionProvider());
 		eleX.toXML(added.defaultValue, eleWriter);
 
 		SAXBuilder eleBuilder = new SAXBuilder();
