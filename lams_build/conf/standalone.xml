@@ -441,7 +441,7 @@
                 </host>
             </server>
             <servlet-container name="default">
-                <jsp-config/>
+                <jsp-config development="true" />
             </servlet-container>
             <filters>
                 <response-header name="server-header" header-name="Server" header-value="WildFly/8"/>
