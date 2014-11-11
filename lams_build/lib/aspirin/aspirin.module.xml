@@ -27,7 +27,9 @@
     <resource-root path="aspirin.jar"/>
   </resources>
   <dependencies>
-    <module name="org.xbill.dns"/>
-    <module name="org.apache.commons.pool"/>
+    <module name="javax.mail.api" />
+    <module name="org.xbill.dns" />
+  	<module name="org.apache.commons.logging" />
+    <module name="org.apache.commons.pool" />
   </dependencies>
 </module>
