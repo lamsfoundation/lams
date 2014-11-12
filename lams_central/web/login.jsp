@@ -30,17 +30,18 @@ j_security_login_page
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script type="text/javascript" src="includes/javascript/browser_detect.js"></script>
 	<script type="text/javascript" src="includes/javascript/sha1.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		var password = '${param.password}',
 			// if password came as a parameter, it is already encrypted
 			encrypt = password ? false : ${encrypt};
 
 		function submitForm() {
-			var password = document.loginForm.j_password.value;
+			var password = $('#j_password').val();
 			if (encrypt) {
-				document.loginForm.j_password.value = hex_sha1(password);
+				$('#j_password').val(hex_sha1(password));
 			}
-			document.loginForm.submit();
+			$('#loginForm').submit();
 		}
 
 		function onEnter(event) {
@@ -49,11 +50,15 @@ j_security_login_page
 				submitForm();
 			}
 		}
+		
+		$(document).ready(function(){
+			$('#j_username').focus();
+			$('#news').load('<lams:LAMSURL/>www/news.html');
+		});
 	</script>
 </lams:head>
 
-<body class="stripes"
-	onLoad="self.focus();document.loginForm.j_username.focus()">
+<body class="stripes">
 	<div id="login-page">
 		<!--main box 'page'-->
 		<h1 class="no-tabs-below">&nbsp;</h1>
@@ -88,15 +93,9 @@ j_security_login_page
 						else return true;
 					}
 				</script>
-				<%
-				    try {
-				%>
-				<c:import context="/lams/www" url="/news.html" charEncoding="utf-8" />
-				<%
-				    } catch (Exception e) {
-						e.printStackTrace();
-					}
-				%>
+				
+				<!-- Placeholder for customised login page part -->
+				<div id="news"></div>
 			</div>
 			<!--closes left col-->
 
@@ -118,7 +117,7 @@ j_security_login_page
 					
 					<p class="first">
 						<fmt:message key="label.username" />
-						: <input name="j_username" type="text" size="16"
+						: <input id="j_username" name="j_username" type="text" size="16"
 							style="width: 125px" tabindex="1"
 							value="${param.login}"
 							onkeypress="onEnter(event)" />
@@ -126,7 +125,7 @@ j_security_login_page
 					
 					<p>
 						<fmt:message key="label.password" />
-						: <input name="j_password" type="password" size="16"
+						: <input id="j_password" name="j_password" type="password" size="16"
 							style="width: 125px" autocomplete="off" tabindex="2"
 							value="${param.password}"
 							onkeypress="onEnter(event)" />
