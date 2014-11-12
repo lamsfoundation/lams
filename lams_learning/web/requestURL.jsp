@@ -20,35 +20,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-<html:html locale="true" xhtml="true">
-
+<!DOCTYPE HTML>
+<lams:html>
 	<lams:head>
-	</lams:head>
-	
 		<c:if test="${empty url}">
-			<bean:parameter id="url" name="url" />
+			<c:set var="url" value="${param.url}" />
 		</c:if>
-	
-		<script language="JavaScript" type="text/JavaScript"><!--
+		
+		<script type="text/javascript">
 			function doRedirect() {
 				var contentFrame = parent.frames['contentFrame'];
-				
 				if (contentFrame == null) {
 					// This means we are in a parallel activity.
 					// We need to move two levels up to reach 'contentFrame'
 					contentFrame = parent.parent.frames['contentFrame'];
 				}	
-			
-				contentFrame.location.href = "<c:out value='${url}' escapeXml='false' />";
+				contentFrame.location.href = decodeURIComponent("<c:out value='${url}' escapeXml='false' />");
 			}
 			window.onload = doRedirect;
-			//-->
 		</script>
-		
-</html:html>
+	</lams:head>
+</lams:html>
