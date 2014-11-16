@@ -19,27 +19,17 @@
 			<prop key="hibernate.c3p0.max_statement">50</prop>
 			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
 		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
-            <!-- <prop key="hibernate.cache.use_query_cache">true</prop> -->     
             <prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
             <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
             <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
             <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>   
-            <!-- <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>--> 
-			<!--
-			<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jbc2.SharedJBossCacheRegionFactory</prop>
-			 For JBoss Cache 2 and 3, and for Hibernate 3 there is a different idea of accessing Cache,
-				called Region Factory Class. Currently, Hibernate gets the Cache configuration from "treecache.xml" file
-				located in LAMS EAR and creates a local instance for its own use.
-				In the future, this may be changed to a JNDI exposed instance, for lams_admin to access.
-				It is impossible now, though - JBoss 5.1.0.GA does not support it yet.
-				
-				This statement will be used for JNDI exposed Cache:
-		 		<prop key="hibernate.cache.region.jbc2.cfg.shared">java:LamsCache</prop>
-		 		
-		 		This statement has been used in previously used approach:			
-				<prop key="hibernate.treecache.objectName">jboss.cache:service=TreeCache</prop>
-			-->
-			
+            
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.crNodeVersions.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.crNodeVersionProperties.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrWorkspace.cfg">contentrepository-entity</prop>			
 		</props>
 		</property>
   	</bean>
