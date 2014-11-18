@@ -3,18 +3,14 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
 	version="3.1">
-	<display-name>Shared Spreadsheet</display-name>
-	<description>
-		Shared Spreadsheet tool
-	</description>
 	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-		<param-value>org.lamsfoundation.lams.tool.spreadsheet.ApplicationResources</param-value>
+		<param-value>org.lamsfoundation.lams.tool.wiki.ApplicationResources</param-value>
 	</context-param>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/tool/spreadsheet/dbupdates/autopatchContext.xml</param-value>
+		<param-value>classpath:/org/lamsfoundation/lams/tool/wiki/dbupdates/autopatchContext.xml</param-value>
 	</context-param>
 	<context-param>
 		<param-name>locatorFactorySelector</param-name>
@@ -25,23 +21,6 @@
 		<param-value>context.central</param-value>
 	</context-param>
 
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
-
-	<filter>
-		<filter-name>hibernateFilter</filter-name>
-		<filter-class>
-			org.springframework.orm.hibernate4.support.OpenSessionInViewFilter
-		</filter-class>
-		<init-param>
-			<param-name>sessionFactoryBeanName</param-name>
-			<param-value>coreSessionFactory</param-value>
-		</init-param>
-	</filter>
-	<!-- System session filter -->
 	<filter>
 		<filter-name>SystemSessionFilter</filter-name>
 		<filter-class>
@@ -49,36 +28,45 @@
 		</filter-class>
 	</filter>
 	<filter>
+		<filter-name>hibernateFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter
+		</filter-class>
+		<init-param>
+			<param-name>sessionFactoryBeanName</param-name>
+			<param-value>coreSessionFactory</param-value>
+		</init-param>
+	</filter>
+	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
 	</filter>
 
-	<filter-mapping>
-		<filter-name>hibernateFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- To use non XDoclet listeners, create a listeners.xml file that contains 
-		the additional listeners and place it in your project's merge dir. -->
-
-	<servlet>
-		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.spreadsheet.web.servlet.ExportServlet</servlet-class>
-	</servlet>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+		</listener-class>
+	</listener>
 
 	<servlet>
 		<servlet-name>action</servlet-name>
@@ -93,14 +81,16 @@
 		</init-param>
 		<init-param>
 			<param-name>detail</param-name>
-			<param-value>1</param-value>
+			<param-value>2</param-value>
 		</init-param>
 		<init-param>
 			<param-name>validate</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
+
+	<!-- CKEditor Connector Configuration -->
 
 	<servlet>
 		<servlet-name>Connector</servlet-name>
@@ -118,15 +108,20 @@
 
 	<!-- The download servlet, reused from the content repository jar -->
 	<servlet>
-		<description>Instructions Download</description>
-		<display-name>Instructions Download</display-name>
+		<description>Attachment Download</description>
+		<display-name>Attachment Download</display-name>
 		<servlet-name>download</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 		<init-param>
 			<param-name>toolContentHandlerBeanName</param-name>
-			<param-value>spreadsheetToolContentHandler</param-value>
+			<param-value>wikiToolContentHandler</param-value>
 		</init-param>
 		<load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.wiki.web.servlets.ExportServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -134,6 +129,7 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 
+	<!-- CKEditor Connector Configuration -->
 	<servlet-mapping>
 		<servlet-name>Connector</servlet-name>
 		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
@@ -149,7 +145,27 @@
 		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
+	<session-config>
+		<cookie-config>
+			<path>/lams</path>
+		</cookie-config>
+	</session-config>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+
 	<jsp-config>
+
 		<!-- ======================================================== -->
 		<!-- Struts Tag Library Descriptors -->
 		<!-- ======================================================== -->
@@ -169,7 +185,6 @@
 			<taglib-uri>tags-tiles</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
 		</taglib>
-
 		<taglib>
 			<taglib-uri>tags-bean-el</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
@@ -206,6 +221,17 @@
 			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		</taglib>
 		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
 		<!-- Customized Tag Library -->
 		<!-- ======================================================== -->
 		<taglib>
@@ -232,8 +258,9 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Authoring content</web-resource-name>
-			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/pages/authoring/*</url-pattern>
+			<url-pattern>/authoring.do</url-pattern>
+			<url-pattern>/pedagogicalPlanner.do</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -244,9 +271,8 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Staff content</web-resource-name>
-			<url-pattern>/monitoring/*</url-pattern>
 			<url-pattern>/pages/monitoring/*</url-pattern>
-			<url-pattern>/definelater.do</url-pattern>
+			<url-pattern>/monitoring.do</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
@@ -274,12 +300,10 @@
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-
 	<security-role>
 		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
@@ -294,23 +318,4 @@
 			<form-error-page>/login.jsp?failed=y</form-error-page>
 		</form-login-config>
 	</login-config>
-
-	<error-page>
-		<error-code>500</error-code>
-		<location>/error.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>403</error-code>
-		<location>/403.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>404</error-code>
-		<location>/404.jsp</location>
-	</error-page>
-
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
 </web-app>

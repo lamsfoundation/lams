@@ -3,18 +3,17 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
 	version="3.1">
-	<display-name>Shared Spreadsheet</display-name>
-	<description>
-		Shared Spreadsheet tool
-	</description>
-	<context-param>
-		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-		<param-value>org.lamsfoundation.lams.tool.spreadsheet.ApplicationResources</param-value>
-	</context-param>
+	<display-name>LAMS</display-name>
+
+	<description>Learning Activity Management System</description>
 
 	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>org.lamsfoundation.lams.admin.ApplicationResources</param-value>
+	</context-param>
+	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/tool/spreadsheet/dbupdates/autopatchContext.xml</param-value>
+		<param-value>classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml</param-value>
 	</context-param>
 	<context-param>
 		<param-name>locatorFactorySelector</param-name>
@@ -25,28 +24,45 @@
 		<param-value>context.central</param-value>
 	</context-param>
 
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
+	<context-param>
+		<param-name>migration.systemname</param-name>
+		<param-value>lams</param-value>
+	</context-param>
+	<context-param>
+		<param-name>migration.databasetype</param-name>
+		<param-value>mysql</param-value>
+	</context-param>
+	<context-param>
+		<param-name>migration.patchpath</param-name>
+		<param-value>org/lamsfoundation/lams/dbupdates</param-value>
+	</context-param>
+	<context-param>
+		<param-name>migration.datasource</param-name>
+		<param-value>java:jboss/datasources/lams-ds</param-value>
+	</context-param>
 
-	<filter>
-		<filter-name>hibernateFilter</filter-name>
-		<filter-class>
-			org.springframework.orm.hibernate4.support.OpenSessionInViewFilter
-		</filter-class>
-		<init-param>
-			<param-name>sessionFactoryBeanName</param-name>
-			<param-value>coreSessionFactory</param-value>
-		</init-param>
-	</filter>
-	<!-- System session filter -->
+	<mime-mapping>
+		<extension>xls</extension>
+		<mime-type>excel/ms-excel</mime-type>
+	</mime-mapping>
+
 	<filter>
 		<filter-name>SystemSessionFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.session.SystemSessionFilter
 		</filter-class>
+	</filter>
+	<filter>
+		<filter-name>HibernateFilter</filter-name>
+		<filter-class>org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter</filter-class>
+		<init-param>
+			<param-name>sessionFactoryBeanName</param-name>
+			<param-value>coreSessionFactory</param-value>
+		</init-param>
+		<init-param>
+			<param-name>singleSession</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
@@ -60,10 +76,6 @@
 	</filter>
 
 	<filter-mapping>
-		<filter-name>hibernateFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
@@ -71,14 +83,24 @@
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	<filter-mapping>
+		<filter-name>HibernateFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-	<!-- To use non XDoclet listeners, create a listeners.xml file that contains 
-		the additional listeners and place it in your project's merge dir. -->
-
-	<servlet>
-		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.spreadsheet.web.servlet.ExportServlet</servlet-class>
-	</servlet>
+	<listener>
+		<listener-class>org.lamsfoundation.lams.dbupdates.WebAppJNDIMigrationLauncherSynchronizer</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+		</listener-class>
+	</listener>
 
 	<servlet>
 		<servlet-name>action</servlet-name>
@@ -93,13 +115,13 @@
 		</init-param>
 		<init-param>
 			<param-name>detail</param-name>
-			<param-value>1</param-value>
+			<param-value>2</param-value>
 		</init-param>
 		<init-param>
 			<param-name>validate</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet>
@@ -116,19 +138,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<!-- The download servlet, reused from the content repository jar -->
-	<servlet>
-		<description>Instructions Download</description>
-		<display-name>Instructions Download</display-name>
-		<servlet-name>download</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
-		<init-param>
-			<param-name>toolContentHandlerBeanName</param-name>
-			<param-value>spreadsheetToolContentHandler</param-value>
-		</init-param>
-		<load-on-startup>3</load-on-startup>
-	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
@@ -139,17 +148,31 @@
 		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>download</servlet-name>
-		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
+	<session-config>
+		<cookie-config>
+			<path>/lams</path>
+		</cookie-config>
+	</session-config>
 
-	<servlet-mapping>
-		<servlet-name>exportPortfolio</servlet-name>
-		<url-pattern>/exportPortfolio</url-pattern>
-	</servlet-mapping>
+	<!-- To specify mime mappings, create a file named mime-mappings.xml, put 
+		it in your project's mergedir. Organize mime-mappings.xml following this 
+		DTD slice: <!ELEMENT mime-mapping (extension, mime-type)> -->
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
 
 	<jsp-config>
+
 		<!-- ======================================================== -->
 		<!-- Struts Tag Library Descriptors -->
 		<!-- ======================================================== -->
@@ -169,7 +192,6 @@
 			<taglib-uri>tags-tiles</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
 		</taglib>
-
 		<taglib>
 			<taglib-uri>tags-bean-el</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
@@ -206,6 +228,17 @@
 			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		</taglib>
 		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
 		<!-- Customized Tag Library -->
 		<!-- ======================================================== -->
 		<taglib>
@@ -218,41 +251,25 @@
 	<!-- Security Constraint -->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>Secure content</web-resource-name>
+			<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>LEARNER</role-name>
-			<role-name>MONITOR</role-name>
-			<role-name>AUTHOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>GROUP ADMIN</role-name>
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
 
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Authoring content</web-resource-name>
-			<url-pattern>/authoring/*</url-pattern>
-			<url-pattern>/pages/authoring/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>AUTHOR</role-name>
-			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Staff content</web-resource-name>
-			<url-pattern>/monitoring/*</url-pattern>
-			<url-pattern>/pages/monitoring/*</url-pattern>
-			<url-pattern>/definelater.do</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>MONITOR</role-name>
-			<role-name>SYSADMIN</role-name>
-		</auth-constraint>
-	</security-constraint>
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
 
 	<!-- Security Roles -->
 	<security-role>
@@ -274,43 +291,12 @@
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-
 	<security-role>
 		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
 	</security-role>
-
-	<!-- Login Configuration -->
-	<login-config>
-		<auth-method>FORM</auth-method>
-		<realm-name>LAMS</realm-name>
-		<form-login-config>
-			<form-login-page>/login.jsp</form-login-page>
-			<form-error-page>/login.jsp?failed=y</form-error-page>
-		</form-login-config>
-	</login-config>
-
-	<error-page>
-		<error-code>500</error-code>
-		<location>/error.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>403</error-code>
-		<location>/403.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>404</error-code>
-		<location>/404.jsp</location>
-	</error-page>
-
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
 </web-app>

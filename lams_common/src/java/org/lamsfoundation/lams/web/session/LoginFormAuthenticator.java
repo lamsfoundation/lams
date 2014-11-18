@@ -47,7 +47,7 @@ public class LoginFormAuthenticator extends FormAuthenticator{
 		//only when URI is j_security_check, execute the shared session initialize. 
 		//Otherwise, the shared session initializtion will run in Filter.
 		if(uri.endsWith("j_security_check")){
-			SessionManager.startSession(request,response);
+			SessionManager.startSession(request);
 			result = super.authenticate(request, response, config);
 			SessionManager.endSession();
 		}else

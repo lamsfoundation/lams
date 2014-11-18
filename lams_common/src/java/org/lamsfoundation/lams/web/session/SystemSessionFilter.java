@@ -45,31 +45,24 @@ import javax.servlet.http.HttpServletResponse;
  * @version $Revision$
  */
 public class SystemSessionFilter implements Filter {
-
-    // The session name to trace shared session
+    // The session cookie name to trace shared session
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-
-    public static final String SSO_SESSION_COOKIE = "JSESSIONIDSSO";
 
     public void init(FilterConfig config) throws ServletException {
     }
 
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 	    ServletException {
-
 	// Skip non-http request/response
-	if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
-	    chain.doFilter(req, res);
+	if (!(request instanceof HttpServletRequest && response instanceof HttpServletResponse)) {
+	    chain.doFilter(request, response);
 	    return;
 	}
 
-	SessionManager.startSession(req, res);
-
+	SessionManager.startSession((HttpServletRequest)request);
 	// do following part of chain
-	chain.doFilter(req, res);
-
+	chain.doFilter(request, response);
 	SessionManager.endSession();
-
     }
 
     public void destroy() {

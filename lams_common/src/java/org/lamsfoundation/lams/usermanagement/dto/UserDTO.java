@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dto;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -32,8 +33,10 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
  */
-public class UserDTO {
+public class UserDTO implements Serializable{
 
+    private static final long serialVersionUID = 5299784226270953691L;
+    
     private Integer userID;
     private String firstName;
     private String lastName;

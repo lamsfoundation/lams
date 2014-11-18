@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+	version="3.1">
 
- 	<context-param>
+	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-  		<param-value>org.lamsfoundation.lams.central.ApplicationResources</param-value>
+		<param-value>org.lamsfoundation.lams.central.ApplicationResources</param-value>
 	</context-param>
 
-	<context-param> 
+	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath:/org/lamsfoundation/lams/applicationContext.xml
@@ -16,162 +19,155 @@
 		</param-value>
 	</context-param>
 
-    <filter>
+	<filter>
 		<filter-name>SystemSessionFilter</filter-name>
 		<filter-class>org.lamsfoundation.lams.web.session.SystemSessionFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
-		<url-pattern>/*</url-pattern> 
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
-	         <filter-class>
-			   org.lamsfoundation.lams.web.filter.LocaleFilter
-	         </filter-class>
+		<filter-class>
+			org.lamsfoundation.lams.web.filter.LocaleFilter
+		</filter-class>
 	</filter>
-  	<filter-mapping>
-   	 	<filter-name>LocaleFilter</filter-name>
-   	 	<url-pattern>*.jsp</url-pattern>
-  	 </filter-mapping>
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
 
-   <!--
-   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
-   Organize mime-mappings.xml following this DTD slice:
-
-   <!ELEMENT mime-mapping (extension, mime-type)>
-   -->
-
-    <error-page>
-        <error-code>500</error-code>
-        <location>/error.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>403</error-code>
-        <location>/403.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>404</error-code>
-        <location>/404.jsp</location>
-    </error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
 
 	<jsp-config>
 
-		<!--  ======================================================== -->	
+		<!-- ======================================================== -->
 		<!-- Struts Tag Library Descriptors -->
-		<!--  ======================================================== -->	
+		<!-- ======================================================== -->
 		<taglib>
-		    <taglib-uri>tags-bean</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
+			<taglib-uri>tags-bean</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
 		</taglib>
-		
+
 		<taglib>
-		    <taglib-uri>tags-html</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
+			<taglib-uri>tags-html</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
 		</taglib>
-		
+
 		<taglib>
-		    <taglib-uri>tags-logic</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
+			<taglib-uri>tags-logic</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
 		</taglib>
-		
+
 		<taglib>
-		    <taglib-uri>tags-tiles</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
+			<taglib-uri>tags-tiles</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
 		</taglib>
-				
+
 		<taglib>
-		    <taglib-uri>tags-bean-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-		    <taglib-uri>tags-html-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
+			<taglib-uri>tags-bean-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-logic-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
+			<taglib-uri>tags-html-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-tiles-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
+			<taglib-uri>tags-logic-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
 		</taglib>
-		
-		<!--  ======================================================== -->	
-		<!--  JSTL 1.2 Tag Library 									   -->
-		<!--  ======================================================== -->	
-		  <taglib>
-		    <taglib-uri>tags-fmt</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
-		  </taglib>
-		
-		  <taglib>
-		    <taglib-uri>tags-core</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
-		  </taglib>
-		
-		  <taglib>
-		    <taglib-uri>tags-function</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
-		  </taglib>
-		
-		  <taglib>
-		    <taglib-uri>tags-xml</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
-		  </taglib>
-		
-		<!--  ======================================================== -->	
-		<!--  JSTL 1.2 Tag Library: Apache implementation of TLV	   -->
-		<!--  ======================================================== -->	
-		  <taglib>
-		    <taglib-uri>tags-permittedTaglibs</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
-		  </taglib>
-		
-		  <taglib>
-		    <taglib-uri>tags-scriptfree</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
-		  </taglib>
-		   
-		<!--  ======================================================== -->	
-		<!--   Customized Tag Library -->
-		<!--  ======================================================== -->	
-		
-		 <taglib>
-		   <taglib-uri>tags-lams</taglib-uri>
-		   <taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		<taglib>
+			<taglib-uri>tags-tiles-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
+		</taglib>
+
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+		</taglib>
+
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
 		</taglib>
 
 	</jsp-config>
-		
-  	<!--  Security Constraint -->
-	<security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Secure Content</web-resource-name>
-    		<url-pattern>/secure/*</url-pattern>
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>LEARNER</role-name>
-    		<role-name>MONITOR</role-name>
-    		<role-name>AUTHOR</role-name>
-    	    <role-name>GROUP MANAGER</role-name>
-    		<role-name>GROUP ADMIN</role-name>
-    		<role-name>SYSADMIN</role-name>
-    	</auth-constraint>
-    </security-constraint>
 
-	<!--  Login Configuration -->
-  	<login-config>
-   		<auth-method>FORM</auth-method>
+	<!-- Security Constraint -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/secure/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>LEARNER</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>AUTHOR</role-name>
+			<role-name>GROUP MANAGER</role-name>
+			<role-name>GROUP ADMIN</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
 		<realm-name>LAMS</realm-name>
-   		<form-login-config>
-    		<form-login-page>/login.jsp</form-login-page>
-    		<form-error-page>/login.jsp?failed=y</form-error-page>
-   		</form-login-config>
-   	</login-config>
-   	
-    <!--  Security Roles -->
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<!-- Security Roles -->
 	<security-role>
 		<description>Student</description>
 		<role-name>LEARNER</role-name>
@@ -191,15 +187,20 @@
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-	
+
 	<security-role>
 		<description>Group Administrator</description>
 		<role-name>GROUP ADMIN</role-name>
 	</security-role>
-	
+
 	<security-role>
 		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
 	</security-role>
 
+	<session-config>
+		<cookie-config>
+			<path>/lams</path>
+		</cookie-config>
+	</session-config>
 </web-app>

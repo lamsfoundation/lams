@@ -544,7 +544,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    boolean createdTemporarySession = false;
 	    if (ss == null) {
 		// import requires a session containing the user details, so dummy it up here.
-		SessionManager.startSession(request, response);
+		SessionManager.startSession(request);
 		ss = SessionManager.getSession();
 		ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 		createdTemporarySession = true;

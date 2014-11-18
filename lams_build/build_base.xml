@@ -26,8 +26,8 @@
 			 that are also present in lams_build/lib.
 		-->
 		<fileset dir="${server.home}/modules/system/layers/base">
-			<include name="io/undertow/core/main/undertow-core-1.0.15.Final.jar" />
-			<include name="io/undertow/servlet/main/undertow-servlet-1.0.15.Final.jar" />
+			<include name="io/undertow/core/main/undertow-core-*.jar" />
+			<include name="io/undertow/servlet/main/undertow-servlet-*.jar" />
 			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
 			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
 			<include name="javax/servlet/jstl/api/main/jboss-jstl-api*.jar" />
@@ -203,7 +203,6 @@
 				<include name="**/*.java" />
 				<exclude name="**/*Skeleton.java" />
 			</fileset>
-			<deploymentdescriptor sessiontimeout="120" servletspec="2.4" distributable="false" />
 			<strutsconfigxml version="1.2" validateXML="true" />
 			<strutsdynaformvalidationxml version="1.1.3"  />
 		</webdoclet>
@@ -273,14 +272,6 @@
 		</copy>
 	</target>
 	
-	<target name="_add-sso">
-		<!-- Internal target: Creates a config file for WildFly to exectute module SSO -->
-		<echo>${ant.project.name}: Preparing SSO config file</echo>
-		<mkdir dir="${basedir}/build/war/assembly/META-INF/services" />
-		<echo message="${ssoClass}"
-			  file="${basedir}/build/war/assembly/META-INF/services/io.undertow.servlet.ServletExtension"/>
-	</target>
-	
 	
 	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
@@ -293,7 +284,7 @@
 
 	
 	<target name="_build-war" 
-		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile, _add-sso">
+		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
