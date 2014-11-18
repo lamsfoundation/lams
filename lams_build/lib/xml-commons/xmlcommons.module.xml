@@ -27,8 +27,8 @@
   	<resource-root path="xml-apis.jar">
   		<filter>
   			<exclude-set>
-				<path name="javax" />
-				<path name="org/xml" />
+				<path name="javax/xml/parsers" />
+				<path name="org/xml/sax" />
 				<path name="org/w3c/dom" />
 				<path name="org/w3c/dom/stylesheets" />
   			</exclude-set>
