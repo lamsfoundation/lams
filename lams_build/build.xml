@@ -219,12 +219,22 @@
 		</copy>
 
 		<echo>Copying EAR configuration files</echo>
-		<copy tofile="assembly/lams.ear/META-INF/MANIFEST.MF" verbose="true">
+		<copy todir="assembly/lams.ear/META-INF" overwrite="true" verbose="true">
 			<fileset dir="${conf.dir}/j2ee">
-				<include name="MANIFEST-template.MF" />
+				<include name="*.xml" />
+				<exclude name="jboss-all.xml" />
 			</fileset>
+		</copy>
+		<copy tofile="assembly/lams.ear/META-INF/MANIFEST.MF" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/j2ee/MANIFEST-template.MF" />
 	        <filterset>
 	        	<filter token="version" value="${project.version}"/>
+	        </filterset>
+		</copy>
+		<copy todir="assembly/lams.ear/META-INF" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/j2ee/jboss-all.xml" />
+	        <filterset>
+	        	<filter token="secure.cookie" value="${secure.cookie}"/>
 	        </filterset>
 		</copy>
 		
@@ -233,12 +243,6 @@
 			<!-- copy autopatcher-->
 			<fileset dir="lib/autopatch">
 				<include name="*.jar" />
-			</fileset>
-		</copy>
-		
-		<copy todir="assembly/lams.ear/META-INF" verbose="true">
-			<fileset dir="${conf.dir}/j2ee">
-				<include name="*.xml" />
 			</fileset>
 		</copy>
 	</target>
@@ -443,17 +447,7 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/aspirin/main/module.xml"
 			  file="lib/aspirin/aspirin.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<!--<copy todir="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main" overwrite="true" verbose="true">
-			<fileset dir="lib/autopatch">
-				<include name="tk-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/com/tacitknowledge/autopatch/main/module.xml"
-			  file="lib/autopatch/autopatch.module.xml" overwrite="true" verbose="true" />-->
-		
+
 		
 		
 		<copy todir="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
@@ -737,9 +731,7 @@
 
 		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}">
-				<include name="standalone.xml" />
-			</fileset>
+			<fileset file="${conf.dir}/standalone.xml" />
 	        <filterset>
 	        	<filter token="db.url.run" value="${db.url.run}"/>
 	        	<filter token="db.location" value="${db.location}"/>
@@ -763,12 +755,6 @@
 	        <filterset>
 	                <filter token="confdir" value="${server.home}/standalone/configuration" />
 	        </filterset>
-		</copy>
-		
-		<copy todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true">
-			<fileset dir="${conf.dir}/${osPropertiesName}/jboss/service">
-				<include name="treecache.xml" />
-			</fileset>
 		</copy>
 		
 		<copy todir="${server.home}/standalone/deploymentsers/jbossweb.deployer/META-INF" overwrite="true" verbose="true">

@@ -3,7 +3,10 @@
         <session-config>
             <cookie-config>
                 <path>/lams</path>
+                <http-only>true</http-only>
+                <secure>@secure.cookie@</secure>
             </cookie-config>
+            <session-timeout>120</session-timeout>
         </session-config>
     </shared-session-config>
 </jboss>

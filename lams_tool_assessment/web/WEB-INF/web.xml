@@ -323,10 +323,4 @@
 		<error-code>404</error-code>
 		<location>/404.jsp</location>
 	</error-page>
-	
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
 </web-app>

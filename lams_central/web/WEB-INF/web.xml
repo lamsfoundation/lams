@@ -573,10 +573,6 @@
 		<url-pattern>/BogoPogo</url-pattern>
 	</servlet-mapping>
 
-	<session-config>
-		<session-timeout>120</session-timeout>
-	</session-config>
-
 	<mime-mapping>
 		<extension>csv</extension>
 		<mime-type>text/plain</mime-type>

@@ -149,12 +149,6 @@
 		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
-
 	<error-page>
 		<error-code>500</error-code>
 		<location>/error.jsp</location>

@@ -351,10 +351,4 @@
 			<form-error-page>/login.jsp?failed=y</form-error-page>
 		</form-login-config>
 	</login-config>
-
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
 </web-app>

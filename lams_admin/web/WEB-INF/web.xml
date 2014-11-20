@@ -147,17 +147,7 @@
 		<servlet-name>Connector</servlet-name>
 		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
-
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
-
-	<!-- To specify mime mappings, create a file named mime-mappings.xml, put 
-		it in your project's mergedir. Organize mime-mappings.xml following this 
-		DTD slice: <!ELEMENT mime-mapping (extension, mime-type)> -->
-
+	
 	<error-page>
 		<error-code>500</error-code>
 		<location>/error.jsp</location>

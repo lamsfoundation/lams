@@ -197,10 +197,4 @@
 		<description>LAMS System Adminstrator</description>
 		<role-name>SYSADMIN</role-name>
 	</security-role>
-
-	<session-config>
-		<cookie-config>
-			<path>/lams</path>
-		</cookie-config>
-	</session-config>
 </web-app>
