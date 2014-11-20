@@ -95,13 +95,14 @@ public class ConfigAction extends LamsDispatchAction {
 		
 		for(int i=0; i<keys.length; i++) {
 			ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
+	
 			
-			// return to ldap page if that's where we came from
-			if (StringUtils.contains(item.getHeaderName(), "config.header.ldap")) {
-			    errorForward = "ldap";
-			}
-			
-			if (item!=null) {
+			if (item!=null) {		
+				// return to ldap page if that's where we came from
+				if (StringUtils.contains(item.getHeaderName(), "config.header.ldap")) {
+				    errorForward = "ldap";
+				}
+				
 				if (item.getRequired()) {
 					if (!(values[i]!=null && values[i].length()>0)) {
 						request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
