@@ -45,7 +45,6 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.cookies.Cookie;
 import com.sun.net.ssl.HostnameVerifier;
 import com.sun.net.ssl.HttpsURLConnection;
 
@@ -222,10 +221,10 @@ public class Call {
 		resp = wc.getResponse(req);
 		end = System.currentTimeMillis();
 	    }
-
+	    
 	    httpStatusCode = resp.getResponseCode();
 	    if (httpStatusCode >= 400) {
-		Call.log.debug("Got " + httpStatusCode + " HTTP code. Retrying call: " + callee);
+		log.debug("Got " + httpStatusCode + " HTTP code. Retrying call: " + callee);
 		resp = wc.getResponse(req);
 		end = System.currentTimeMillis();
 		httpStatusCode = resp.getResponseCode();
@@ -234,37 +233,18 @@ public class Call {
 		    throw new TestHarnessException(test.testName + " got HTTP code " + httpStatusCode);
 		}
 	    }
-
+	    
 	    message = resp.getResponseMessage();
 	    for (String headerFieldName : resp.getHeaderFieldNames()) {
 		if (headerFieldName.equalsIgnoreCase("SET-COOKIE")) {
-		    String cookieName = null;
-		    String cookieValue = null;
-		    String path = null;
 		    for (String headerFieldValue : resp.getHeaderFields(headerFieldName)) {
 			String[] headerFieldSplit = headerFieldValue.split("=|;");
-			for (int index = 0; index < headerFieldSplit.length; index++) {
-			    String name = headerFieldSplit[index].trim();
-			    if (name.startsWith("JSESSIONID")) {
-				cookieName = headerFieldSplit[index];
-				cookieValue = headerFieldSplit[index + 1].trim();
-			    } else if (name.equalsIgnoreCase("path")) {
-				path = headerFieldSplit[index + 1].trim();
-			    }
+			String cookieName = headerFieldSplit[0];
+			if ("JSESSIONID".equalsIgnoreCase(cookieName) && (wc.getCookieValue(cookieName) == null)) {
+			    String cookieValue = headerFieldSplit[1];
+			    Call.log.debug("Manually setting cookie: " + cookieName + "=" + cookieValue);
+			    wc.putCookie(cookieName, cookieValue);
 			}
-		    }
-
-		    String currentCookieValue = wc.getCookieValue(cookieName);
-		    Cookie cookie = wc.getCookieDetails(cookieName);
-		    String currentCookiePath = wc.getCookieDetails(cookieName).getPath();
-		    Call.log.debug("Cookie " + cookie.getName() + " value " + currentCookieValue + " (" + cookieValue
-			    + ") and path " + currentCookiePath + " (" + path + ")");
-		    // either JSESSIONID or JSESSIONIDSSO
-		    if ((cookieName != null) && currentCookiePath.equals(path)
-			    && !cookieValue.equals(currentCookieValue)) {
-			Call.log.debug("Manually setting cookie " + cookieName + " with path " + path + " from value "
-				+ currentCookieValue + " to " + cookieValue);
-			wc.putCookie(cookieName, cookieValue);
 		    }
 		}
 	    }
