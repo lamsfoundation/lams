@@ -137,7 +137,7 @@ public class MockLearner extends MockUser implements Runnable {
 	int max = maxValues == null ? values.length : Math.min(maxValues, values.length);
 	int length = min + TestUtil.generateRandomNumber(max);
 	String[] answers = new String[length];
-	
+
 	for (int i = 0; i < length; i++) {
 	    answers[i] = values[TestUtil.generateRandomNumber(values.length)];
 
@@ -279,8 +279,8 @@ public class MockLearner extends MockUser implements Runnable {
 			MockLearner.log.debug(username + " uploaded file " + file.getName() + " for form field "
 				+ param);
 		    } else if (form.isMultiValuedParameter(param)) {
-			String minValuesParam = form.getParameterValue(VOTE_MIN_NOMINATION_PARAM);
-			String maxValuesParam = form.getParameterValue(VOTE_MAX_NOMINATION_PARAM);
+			String minValuesParam = form.getParameterValue(MockLearner.VOTE_MIN_NOMINATION_PARAM);
+			String maxValuesParam = form.getParameterValue(MockLearner.VOTE_MAX_NOMINATION_PARAM);
 			Integer minValues = minValuesParam == null ? null : Integer.parseInt(minValuesParam);
 			Integer maxValues = maxValuesParam == null ? null : Integer.parseInt(maxValuesParam);
 
@@ -585,7 +585,7 @@ public class MockLearner extends MockUser implements Runnable {
 		    + "&answerUid=";
 	    refreshQuestionsURL = "/lams/tool/lascrt11/learning/refreshQuestionList.do?sessionMapID=" + sessionMapID;
 	} else {
-	    MockLearner.log.warn("Session map ID was not found in Scratchie Tool");
+	    throw new TestHarnessException("Session map ID was not found in Scratchie Tool");
 	}
 
 	if (isLeader) {
@@ -602,29 +602,24 @@ public class MockLearner extends MockUser implements Runnable {
 		answerUids.add(Long.valueOf(m.group(2)));
 	    }
 
-	    String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
 	    Random generator = new Random();
-
 	    // start scratching random answers
 	    while (!uids.isEmpty()) {
 		Long questionID = uids.keySet().iterator().next();
 		List<Long> answerUids = uids.get(questionID);
 
+		if (answerUids.isEmpty()) {
+		    throw new TestHarnessException("No correct answer was found for scratchie question " + questionID);
+		}
 		int index = generator.nextInt(answerUids.size());
 		Long answerUid = answerUids.get(index);
 		answerUids.remove(index);
 		MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
-		WebResponse scratchResponse = (WebResponse) new Call(wc, test,
-			username + " checks answer in Scratchie", scratchURL + answerUid).execute();
+		WebResponse scratchResponse = (WebResponse) new Call(wc, test, username
+			+ " scratches answer in Scratchie", recordScratchedURL + answerUid).execute();
 		boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
 		MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID
 			+ " and it was " + (answerCorrect ? "correct" : "incorrect"));
-
-		if (recordScratchedURL != null) {
-		    MockLearner.log.debug("Recording scratched answer UID " + answerUid);
-		    new Call(wc, test, username + " records answer in Scratchie", recordScratchedURL + answerUid)
-			    .execute();
-		}
 
 		if (answerCorrect) {
 		    uids.remove(questionID);
@@ -634,9 +629,8 @@ public class MockLearner extends MockUser implements Runnable {
 		}
 	    }
 	} else {
-	    while ((refreshQuestionsURL != null)
-		    && !(asText.contains(MockLearner.SCRATCHIE_FINISH_AVAILABLE) || asText
-			    .contains(MockLearner.SCRATCHIE_REFLECTION_AVAILABLE))) {
+	    while (!(asText.contains(MockLearner.SCRATCHIE_FINISH_AVAILABLE) || asText
+		    .contains(MockLearner.SCRATCHIE_REFLECTION_AVAILABLE))) {
 		MockLearner.log.debug("Waiting for leader to finish scratchie");
 		try {
 		    Thread.sleep(3000);
