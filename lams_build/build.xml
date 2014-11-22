@@ -725,6 +725,26 @@
 				<include name="xstream-*.jar" />
 			</fileset>
 		</copy>
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/wildfly/clustering/ee/infinispan/main" overwrite="true" verbose="true">
+			<fileset dir="lib/wildfly">
+				<include name="wildfly-clustering-ee-infinispan-*.jar" />
+			</fileset>
+		</copy>		
+		<copy todir="${server.home}/modules/system/layers/base/org/wildfly/clustering/ee/spi/main" overwrite="true" verbose="true">
+			<fileset dir="lib/wildfly">
+				<include name="wildfly-clustering-ee-spi-*.jar" />
+			</fileset>
+		</copy>				
+		<copy todir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow/main" overwrite="true" verbose="true">
+			<fileset dir="lib/wildfly">
+				<include name="wildfly-clustering-web-undertow-*.jar" />
+			</fileset>
+		</copy>				
+		
+		
 		<copy tofile="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main/module.xml"
 			  file="lib/xstream/xstream.module.xml" overwrite="true" verbose="true" />
 		
