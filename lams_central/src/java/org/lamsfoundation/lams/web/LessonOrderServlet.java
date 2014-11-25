@@ -67,7 +67,7 @@ public class LessonOrderServlet extends HttpServlet {
 		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 		String ids = request.getParameter("ids");
 		
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession().getServletContext());
+		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
 		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 		
 		if (orgId != null && ids != null) {

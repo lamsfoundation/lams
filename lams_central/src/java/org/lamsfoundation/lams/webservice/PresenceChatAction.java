@@ -229,7 +229,7 @@ public class PresenceChatAction extends LamsDispatchAction {
 
     private IPresenceChatService getPresenceChatService() {
 	if (PresenceChatAction.presenceChatService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
 		    .getServletContext());
 	    PresenceChatAction.presenceChatService = (IPresenceChatService) ctx.getBean("presenceChatService");
 	}

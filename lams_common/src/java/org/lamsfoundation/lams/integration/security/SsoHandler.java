@@ -60,6 +60,9 @@ public class SsoHandler implements ServletExtension {
 
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
+	// expose servlet context so other classes can use it
+	SessionManager.setServletContext(servletContext);
+
 	// run when request and response were already parsed, but before security handlers
 	deploymentInfo.addOuterHandlerChainWrapper(new HandlerWrapper() {
 	    @Override

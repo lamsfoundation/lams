@@ -25,109 +25,105 @@ package org.lamsfoundation.lams.util;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 
 /**
  * Various internationalisation (internationalization) utilities for numbers
- *  
+ * 
  * @author Fiona Malikoff
  *
  */
 public class NumberUtil {
 
-	private static Locale getServerLocale() {
-		String defaults[] = LanguageUtil.getDefaultLangCountry();
-    	return new Locale(defaults[0]!=null?defaults[0]:"", defaults[1]!=null?defaults[1]:"");
-	}
-	
-	/** Format a given float or double to the I18N format specified by the locale. If no locale supplied, uses LAMS server's default locale.
-	 * @param mark
-	 * @param locale
-	 * @param numFractionDigits
-	 * @return
-	 */
-	public static String formatLocalisedNumber(Number number, Locale locale, int numFractionDigits) {
-		NumberFormat format = null;
-		if ( locale == null ) {
-			format = NumberFormat.getInstance(getServerLocale());
-		} else {
-			format = NumberFormat.getInstance(locale);
-		}
-		return formatLocalisedNumber(number, format, numFractionDigits);
-	}
+    private static Locale getServerLocale() {
+	String defaults[] = LanguageUtil.getDefaultLangCountry();
+	return new Locale(defaults[0] != null ? defaults[0] : "", defaults[1] != null ? defaults[1] : "");
+    }
 
-	/** Format a given float or double to the I18N format specified by the numberFormat. If no numberFormat supplied, 
-	 * uses LAMS server's default numberFormat based on the server locale.
-	 * @param mark
-	 * @param locale
-	 * @param numFractionDigits
-	 * @return
-	 */
-	public static String formatLocalisedNumber(Number number, NumberFormat numberFormat, int numFractionDigits) {
-		NumberFormat format = numberFormat != null ? numberFormat : NumberFormat.getInstance();
-		format.setMaximumFractionDigits(numFractionDigits);
-		return format.format(number);
+    /**
+     * Format a given float or double to the I18N format specified by the locale. If no locale supplied, uses LAMS
+     * server's default locale.
+     * 
+     * @param mark
+     * @param locale
+     * @param numFractionDigits
+     * @return
+     */
+    public static String formatLocalisedNumber(Number number, Locale locale, int numFractionDigits) {
+	NumberFormat format = null;
+	if (locale == null) {
+	    format = NumberFormat.getInstance(NumberUtil.getServerLocale());
+	} else {
+	    format = NumberFormat.getInstance(locale);
 	}
+	return NumberUtil.formatLocalisedNumber(number, format, numFractionDigits);
+    }
 
-	/** Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
-	 * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it 
-	 * will use the server's locale
-	 * 
-	 * Need to strip out any spaces as spaces are valid group separators in some European locales (e.g. Polish) 
-	 * but they seem to come back from Firefox as a plain space rather than the special separating space.
-	 */
-	public static Float getLocalisedFloat(String inputStr, Locale locale)  {
-		String numberStr = inputStr;
-		if ( numberStr != null ) 
-			numberStr = numberStr.replace(" ", "");
-		if ( numberStr != null && numberStr.length() > 0 ) {
-			Locale useLocale = locale != null ? locale : getServerLocale();
-			NumberFormat format = NumberFormat.getInstance(useLocale);
-			ParsePosition pp = new ParsePosition(0);
-			Number num = format.parse(numberStr, pp);
-			if ( num != null && pp.getIndex() == numberStr.length() ) {
-				return num.floatValue();
-			}
-		}
-		throw new NumberFormatException("Unable to convert number "+numberStr+"to float using locale "+locale.getCountry()+" "+locale.getLanguage());
-	}
+    /**
+     * Format a given float or double to the I18N format specified by the numberFormat. If no numberFormat supplied,
+     * uses LAMS server's default numberFormat based on the server locale.
+     * 
+     * @param mark
+     * @param locale
+     * @param numFractionDigits
+     * @return
+     */
+    public static String formatLocalisedNumber(Number number, NumberFormat numberFormat, int numFractionDigits) {
+	NumberFormat format = numberFormat != null ? numberFormat : NumberFormat.getInstance();
+	format.setMaximumFractionDigits(numFractionDigits);
+	return format.format(number);
+    }
 
-	/** Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
-	 * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it 
-	 * will use the server's locale.
-	 * 
-	 * Need to strip out any spaces as spaces are valid group separators in some European locales  (e.g. Polish) 
-	 * but they seem to come back from Firefox as a plain space rather than the special separating space.
-	 */
-	public static Double getLocalisedDouble(String inputStr, Locale locale)  {
-		String numberStr = inputStr;
-		if ( numberStr != null ) 
-			numberStr = numberStr.replace(" ", "");
-		if ( numberStr != null && numberStr.length() > 0 ) {
-			Locale useLocale = locale != null ? locale : getServerLocale();
-			NumberFormat format = NumberFormat.getInstance(useLocale);
-			ParsePosition pp = new ParsePosition(0);
-			Number num = format.parse(numberStr, pp);
-			if ( num != null && pp.getIndex() == numberStr.length() ) {
-				return num.doubleValue();
-			}
-		}
-		throw new NumberFormatException("Unable to convert number "+numberStr+"to double using locale "+locale.getCountry()+" "+locale.getLanguage());
+    /**
+     * Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
+     * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it will
+     * use the server's locale
+     * 
+     * Need to strip out any spaces as spaces are valid group separators in some European locales (e.g. Polish) but they
+     * seem to come back from Firefox as a plain space rather than the special separating space.
+     */
+    public static Float getLocalisedFloat(String inputStr, Locale locale) {
+	String numberStr = inputStr;
+	if (numberStr != null) {
+	    numberStr = numberStr.replace(" ", "");
 	}
+	if ((numberStr != null) && (numberStr.length() > 0)) {
+	    Locale useLocale = locale != null ? locale : NumberUtil.getServerLocale();
+	    NumberFormat format = NumberFormat.getInstance(useLocale);
+	    ParsePosition pp = new ParsePosition(0);
+	    Number num = format.parse(numberStr, pp);
+	    if ((num != null) && (pp.getIndex() == numberStr.length())) {
+		return num.floatValue();
+	    }
+	}
+	throw new NumberFormatException("Unable to convert number " + numberStr + "to float using locale "
+		+ locale.getCountry() + " " + locale.getLanguage());
+    }
+
+    /**
+     * Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
+     * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it will
+     * use the server's locale.
+     * 
+     * Need to strip out any spaces as spaces are valid group separators in some European locales (e.g. Polish) but they
+     * seem to come back from Firefox as a plain space rather than the special separating space.
+     */
+    public static Double getLocalisedDouble(String inputStr, Locale locale) {
+	String numberStr = inputStr;
+	if (numberStr != null) {
+	    numberStr = numberStr.replace(" ", "");
+	}
+	if ((numberStr != null) && (numberStr.length() > 0)) {
+	    Locale useLocale = locale != null ? locale : NumberUtil.getServerLocale();
+	    NumberFormat format = NumberFormat.getInstance(useLocale);
+	    ParsePosition pp = new ParsePosition(0);
+	    Number num = format.parse(numberStr, pp);
+	    if ((num != null) && (pp.getIndex() == numberStr.length())) {
+		return num.doubleValue();
+	    }
+	}
+	throw new NumberFormatException("Unable to convert number " + numberStr + "to double using locale "
+		+ locale.getCountry() + " " + locale.getLanguage());
+    }
 
 }

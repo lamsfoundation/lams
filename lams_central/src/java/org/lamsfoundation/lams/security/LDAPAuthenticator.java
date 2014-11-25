@@ -63,7 +63,7 @@ public class LDAPAuthenticator {
 
     private UserManagementService getService() {
 	if (LDAPAuthenticator.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
 		    .getServletContext());
 	    LDAPAuthenticator.service = (UserManagementService) ctx.getBean("userManagementService");
 	}
@@ -72,7 +72,7 @@ public class LDAPAuthenticator {
 
     private LdapService getLdapService() {
 	if (LDAPAuthenticator.ldapService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
 		    .getServletContext());
 	    LDAPAuthenticator.ldapService = (LdapService) ctx.getBean("ldapService");
 	}

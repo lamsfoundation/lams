@@ -23,31 +23,48 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web;
 
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import javax.servlet.jsp.jstl.core.Config;
 
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
- * Listens for the creation and destruction of http sessions.
+ * Listens for creation of HTTP sessions. Sets inactive timeout and default locale.
  */
-/* Should come out in web.xml as:
- * <!-- Listeners -->
- *	<listener>
- *		<listener-class>
- *		org.lamsfoundation.lams.web.SessionListener
- *		</listener-class>
- *	</listener>
- */
-public class SessionListener implements HttpSessionListener {
 
-    /** HttpSessionListener interface */
-    @Override
-    public void sessionCreated(HttpSessionEvent se) {
-	HttpSessionManager.sessionCreated(se);
+public class SessionListener implements HttpSessionListener {
+    private static int timeout; //in seconds
+
+    static {
+	SessionListener.timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
     }
 
     /** HttpSessionListener interface */
+    @Override
+    public void sessionCreated(HttpSessionEvent sessionEvent) {
+	if (sessionEvent == null) {
+	    return;
+	}
+	HttpSession session = sessionEvent.getSession();
+	session.setMaxInactiveInterval(SessionListener.timeout);
+
+	//set server default locale for STURTS and JSTL. This value should be overwrite 
+	//LocaleFilter class. But this part code can cope with login.jsp Locale.
+	if (session != null) {
+	    Locale preferredLocale = new Locale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
+	    if (preferredLocale != null) {
+		session.setAttribute(LocaleFilter.PREFERRED_LOCALE_KEY, preferredLocale);
+		Config.set(session, Config.FMT_LOCALE, preferredLocale);
+	    }
+	}
+    }
+
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
 	//nothing to do

@@ -54,7 +54,7 @@ public class LanguageUtil {
 
     private static IUserManagementService getService() {
 	if (LanguageUtil.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
 		    .getServletContext());
 	    LanguageUtil.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}

@@ -109,7 +109,7 @@ public class UserManagementService implements IUserManagementService {
 
     private IAuditService getAuditService() {
 	if (UserManagementService.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
 		    .getServletContext());
 	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
 	}

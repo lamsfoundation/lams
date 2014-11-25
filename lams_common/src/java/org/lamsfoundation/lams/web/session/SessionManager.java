@@ -26,31 +26,20 @@ package org.lamsfoundation.lams.web.session;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 public class SessionManager {
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-    
+
     // singleton
     private static SessionManager sessionManager;
     private static final Map<String, HttpSession> sessionContainer = new ConcurrentHashMap<String, HttpSession>();
     private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<String>();
 
-    /**
-     * Get system level HttpSession by current session id.
-     */
-    public static HttpSession getSession() {
-	String sessionId = SessionManager.sessionManager.currentSessionIdContainer.get();
-	return SessionManager.getSession(sessionId);
-    }
-
-    /**
-     * Get system session by given session id.
-     */
-    public static HttpSession getSession(String sessionId) {
-	return sessionId == null ? null : SessionManager.sessionContainer.get(sessionId);
-    }
+    // various classes need to have to access to it
+    private static ServletContext servletContext;
 
     /**
      * This class initialize method called by Spring framework.
@@ -85,5 +74,28 @@ public class SessionManager {
      */
     public static void endSession() {
 	SessionManager.sessionManager.currentSessionIdContainer.set(null);
+    }
+
+    /**
+     * Get system level HttpSession by current session id.
+     */
+    public static HttpSession getSession() {
+	String sessionId = SessionManager.sessionManager.currentSessionIdContainer.get();
+	return SessionManager.getSession(sessionId);
+    }
+
+    /**
+     * Get system session by given session id.
+     */
+    public static HttpSession getSession(String sessionId) {
+	return sessionId == null ? null : SessionManager.sessionContainer.get(sessionId);
+    }
+
+    public static void setServletContext(ServletContext servletContext) {
+	SessionManager.servletContext = servletContext;
+    }
+
+    public static ServletContext getServletContext() {
+	return SessionManager.servletContext;
     }
 }
