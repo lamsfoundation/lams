@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 public class SessionManager {
+    public static final String SYS_SESSION_COOKIE = "JSESSIONID";
+    
     // singleton
     private static SessionManager sessionManager;
     private static final Map<String, HttpSession> sessionContainer = new ConcurrentHashMap<String, HttpSession>();

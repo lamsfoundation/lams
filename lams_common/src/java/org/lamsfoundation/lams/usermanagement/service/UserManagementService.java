@@ -73,7 +73,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -110,8 +109,8 @@ public class UserManagementService implements IUserManagementService {
 
     private IAuditService getAuditService() {
 	if (UserManagementService.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+		    .getServletContext());
 	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return UserManagementService.auditService;
@@ -151,6 +150,7 @@ public class UserManagementService implements IUserManagementService {
 	this.userOrganisationDAO = userOrganisationDAO;
     }
 
+    @Override
     public void save(Object object) {
 	try {
 	    if (object instanceof User) {
@@ -187,6 +187,7 @@ public class UserManagementService implements IUserManagementService {
 	return user;
     }
 
+    @Override
     public void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups) {
 	if (grouping.getGroupingId() == null) {
 	    grouping.setGroups(new HashSet<OrganisationGroup>());
@@ -227,6 +228,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public void saveAll(Collection objects) {
 	for (Object o : objects) {
 	    if (o instanceof User) {
@@ -238,54 +240,67 @@ public class UserManagementService implements IUserManagementService {
 	baseDAO.insertOrUpdateAll(objects);
     }
 
+    @Override
     public void delete(Object object) {
 	baseDAO.delete(object);
     }
 
+    @Override
     public void deleteAll(Class clazz) {
 	baseDAO.deleteAll(clazz);
     }
 
+    @Override
     public void deleteAll(Collection objects) {
 	baseDAO.deleteAll(objects);
     }
 
+    @Override
     public void deleteById(Class clazz, Serializable id) {
 	baseDAO.deleteById(clazz, id);
     }
 
+    @Override
     public void deleteByProperty(Class clazz, String name, Object value) {
 	baseDAO.deleteByProperty(clazz, name, value);
     }
 
+    @Override
     public void deleteByProperties(Class clazz, Map<String, Object> properties) {
 	baseDAO.deleteByProperties(clazz, properties);
     }
 
+    @Override
     public void deleteAnythingLike(Object object) {
 	baseDAO.deleteAnythingLike(object);
     }
 
+    @Override
     public Object findById(Class clazz, Serializable id) {
 	return baseDAO.find(clazz, id);
     }
 
+    @Override
     public List findAll(Class clazz) {
 	return baseDAO.findAll(clazz);
     }
 
+    @Override
     public List findByProperty(Class clazz, String name, Object value) {
 	return baseDAO.findByProperty(clazz, name, value);
     }
 
+    @Override
     public List findByProperties(Class clazz, Map<String, Object> properties) {
 	return baseDAO.findByProperties(clazz, properties);
     }
 
+    @Override
     public List findAnythingLike(Object object) {
 	return baseDAO.findAnythingLike(object);
     }
 
+    @Override
     public List searchByStringProperties(Class clazz, Map<String, String> properties) {
 	return baseDAO.searchByStringProperties(clazz, properties);
     }
@@ -294,6 +309,7 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService
      *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>)
      */
+    @Override
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
 	List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
 	Iterator i = user.getUserOrganisations().iterator();
@@ -314,6 +330,7 @@ public class UserManagementService implements IUserManagementService {
      *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>,
      *      java.util.Integer)
      */
+    @Override
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId,
 	    List<Integer> restrictToClassIds) {
 	List<OrganisationDTO> dtolist = new ArrayList<OrganisationDTO>();
@@ -385,6 +402,7 @@ public class UserManagementService implements IUserManagementService {
      * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations. Will not
      * return the organisation if there isn't any roles for this user.
      */
+    @Override
     public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
 	if ((user != null) && (organisationId != null)) {
 	    Map<String, Object> map = new HashMap<String, Object>();
@@ -403,6 +421,7 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRolesForUserByOrganisation(org.lamsfoundation.lams.usermanagement.User,
      *      java.lang.Integer)
      */
+    @Override
     public List<Role> getRolesForUserByOrganisation(User user, Integer orgId) {
 	List<Role> list = new ArrayList<Role>();
 	Map<String, Object> map = new HashMap<String, Object>();
@@ -423,6 +442,7 @@ public class UserManagementService implements IUserManagementService {
     /**
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisation(int)
      */
+    @Override
     public List<User> getUsersFromOrganisation(Integer orgId) {
 	String query = "select uo.user from UserOrganisation uo" + " where uo.organisation.organisationId=" + orgId
 		+ " order by uo.user.login";
@@ -433,6 +453,7 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
      *      java.lang.String)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
 	    boolean getUser) {
@@ -448,8 +469,8 @@ public class UserManagementService implements IUserManagementService {
 	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
 	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
 		+ organisationID + " AND r.role.name= '" + roleName + "'";
-	List<User> queryResult = (List<User>) baseDAO.find(query);
-	
+	List<User> queryResult = baseDAO.find(query);
+
 	for (User user : queryResult) {
 	    if (isFlashCall && !getUser) {
 		users.add(user.getUserFlashDTO());
@@ -459,15 +480,17 @@ public class UserManagementService implements IUserManagementService {
 		users.add(user.getUserDTO());
 	    }
 	}
-	
+
 	return users;
     }
 
+    @Override
     public Organisation getRootOrganisation() {
 	return (Organisation) baseDAO.findByProperty(Organisation.class, "organisationType.organisationTypeId",
 		OrganisationType.ROOT_TYPE).get(0);
     }
 
+    @Override
     public boolean isUserInRole(Integer userId, Integer orgId, String roleName) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("userOrganisation.user.userId", userId);
@@ -479,6 +502,7 @@ public class UserManagementService implements IUserManagementService {
 	return true;
     }
 
+    @Override
     public List getOrganisationsByTypeAndStatus(Integer typeId, Integer stateId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("organisationType.organisationTypeId", typeId);
@@ -486,6 +510,7 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.findByProperties(Organisation.class, properties);
     }
 
+    @Override
     public List getUserOrganisationRoles(Integer orgId, String login) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("userOrganisation.organisation.organisationId", orgId);
@@ -493,6 +518,7 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.findByProperties(UserOrganisationRole.class, properties);
     }
 
+    @Override
     public List getUserOrganisationsForUserByTypeAndStatus(String login, Integer typeId, Integer stateId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("user.login", login);
@@ -501,6 +527,7 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.findByProperties(UserOrganisation.class, properties);
     }
 
+    @Override
     public List getUserOrganisationsForUserByTypeAndStatusAndParent(String login, Integer typeId, Integer stateId,
 	    Integer parentOrgId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
@@ -511,11 +538,13 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.findByProperties(UserOrganisation.class, properties);
     }
 
+    @Override
     public User getUserByLogin(String login) {
 	List results = baseDAO.findByProperty(User.class, "login", login);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
 
+    @Override
     public void updatePassword(String login, String password) {
 	try {
 	    User user = getUserByLogin(login);
@@ -526,6 +555,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public UserOrganisation getUserOrganisation(Integer userId, Integer orgId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("user.userId", userId);
@@ -574,6 +604,7 @@ public class UserManagementService implements IUserManagementService {
 	return workspace;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Organisation saveOrganisation(Organisation organisation, Integer userID) {
 
@@ -650,6 +681,7 @@ public class UserManagementService implements IUserManagementService {
 	return organisation;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void updateOrganisationandWorkspaceNames(Organisation organisation) {
 	baseDAO.update(organisation);
@@ -689,6 +721,7 @@ public class UserManagementService implements IUserManagementService {
 	return runSeqName;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<UserManageBean> getUserManageBeans(Integer orgId) {
 	String query = "select u.userId,u.login,u.title,u.firstName,u.lastName, r "
@@ -721,6 +754,7 @@ public class UserManagementService implements IUserManagementService {
      * 
      * @param userId
      */
+    @Override
     public void removeUser(Integer userId) throws Exception {
 
 	User user = (User) findById(User.class, userId);
@@ -765,6 +799,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public Boolean userHasData(User user) {
 	if (user.getLearnerProgresses() != null) {
 	    if (!user.getLearnerProgresses().isEmpty()) {
@@ -798,6 +833,7 @@ public class UserManagementService implements IUserManagementService {
 	return false;
     }
 
+    @Override
     public void disableUser(Integer userId) {
 
 	User user = (User) findById(User.class, userId);
@@ -820,6 +856,7 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRolesForUserOrganisation(org.lamsfoundation.lams.usermanagement.User,
      *      java.lang.Integer, java.util.List)
      */
+    @Override
     public void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList) {
 
 	// Don't pass in the org from the web layer. The import for roles
@@ -965,6 +1002,7 @@ public class UserManagementService implements IUserManagementService {
 	return uo;
     }
 
+    @Override
     public List<Role> filterRoles(List<Role> rolelist, Boolean isSysadmin, OrganisationType orgType) {
 	List<Role> allRoles = new ArrayList<Role>();
 	allRoles.addAll(rolelist);
@@ -991,10 +1029,12 @@ public class UserManagementService implements IUserManagementService {
 	return allRoles;
     }
 
+    @Override
     public boolean hasRoleInOrganisation(User user, Integer roleId) {
 	return hasRoleInOrganisation(user, roleId, getRootOrganisation());
     }
 
+    @Override
     public boolean hasRoleInOrganisation(User user, Integer roleId, Organisation organisation) {
 	if (roleDAO.getUserByOrganisationAndRole(user.getUserId(), roleId, organisation) != null) {
 	    return true;
@@ -1003,6 +1043,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public void deleteChildUserOrganisations(User user, Organisation org) {
 	if (!org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
 	    return;
@@ -1027,6 +1068,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public void deleteUserOrganisation(User user, Organisation org) {
 	UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
 	if (uo != null) {
@@ -1045,18 +1087,21 @@ public class UserManagementService implements IUserManagementService {
 	return userDTO != null ? userDTO.getUserID() : null;
     }
 
+    @Override
     public boolean isUserGlobalGroupAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
     }
 
+    @Override
     public boolean isUserSysAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false;
     }
 
+    @Override
     public Integer getCountRoleForSystem(Integer roleId) {
 	Integer count = roleDAO.getCountRoleForSystem(roleId);
 	if (count != null) {
@@ -1066,6 +1111,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public Integer getCountRoleForOrg(Integer orgId, Integer roleId) {
 	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId);
 	if (count != null) {
@@ -1075,18 +1121,21 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public Theme getDefaultFlashTheme() {
 	String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 	List list = findByProperty(Theme.class, "name", flashName);
 	return list != null ? (Theme) list.get(0) : null;
     }
 
+    @Override
     public Theme getDefaultHtmlTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
 	List list = findByProperty(Theme.class, "name", htmlName);
 	return list != null ? (Theme) list.get(0) : null;
     }
 
+    @Override
     public void auditPasswordChanged(User user, String moduleName) {
 	String[] args = new String[1];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
@@ -1094,6 +1143,7 @@ public class UserManagementService implements IUserManagementService {
 	getAuditService().log(moduleName, message);
     }
 
+    @Override
     public void auditUserCreated(User user, String moduleName) {
 	String[] args = new String[2];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
@@ -1102,11 +1152,13 @@ public class UserManagementService implements IUserManagementService {
 	getAuditService().log(moduleName, message);
     }
 
+    @Override
     public Integer getCountUsers() {
 	String query = "select count(u) from User u";
 	return getFindIntegerResult(query);
     }
 
+    @Override
     public Integer getCountUsers(Integer authenticationMethodId) {
 	String query = "select count(u) from User u " + "where u.authenticationMethod.authenticationMethodId="
 		+ authenticationMethodId;
@@ -1121,11 +1173,13 @@ public class UserManagementService implements IUserManagementService {
 	return null;
     }
 
+    @Override
     public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
 	List list = organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
 	return populateCollapsedOrgDTOs(list, isSysadmin);
     }
 
+    @Override
     public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin) {
 	List list = organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
 	return populateCollapsedOrgDTOs(list, isSysadmin);
@@ -1157,6 +1211,7 @@ public class UserManagementService implements IUserManagementService {
 	return dtoList;
     }
 
+    @Override
     public List searchUserSingleTerm(String term) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
@@ -1166,6 +1221,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
@@ -1176,6 +1232,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select uo.user from UserOrganisation uo where (uo.user.login like '%" + term + "%'"
@@ -1188,6 +1245,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs) {
 	term = StringEscapeUtils.escapeSql(term);
 	String whereClause = "";
@@ -1203,11 +1261,13 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List getAllUsers() {
 	String query = "from User u where u.disabledFlag=0 order by u.login";
 	return baseDAO.find(query);
     }
 
+    @Override
     public List getAllUsers(Integer filteredOrgId) {
 	String query = "from User u where u.disabledFlag=0 and u.userId not in"
 		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
@@ -1215,11 +1275,13 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.find(query);
     }
 
+    @Override
     public List getAllUsersWithEmail(String email) {
 	String query = "from User u where u.email=\'" + email + "\' order by u.login";
 	return baseDAO.find(query);
     }
 
+    @Override
     public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId) {
 	String query = "select uo.user from UserOrganisation uo where uo.organisation.organisationId=" + orgId
 		+ " and uo.user.userId not in (select uo.user.userId from UserOrganisation uo"
@@ -1227,6 +1289,7 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.find(query);
     }
 
+    @Override
     public boolean canEditGroup(Integer userId, Integer orgId) {
 	if (isUserSysAdmin() || isUserGlobalGroupAdmin()) {
 	    return true;
@@ -1242,17 +1305,20 @@ public class UserManagementService implements IUserManagementService {
 	return false;
     }
 
+    @Override
     public ForgotPasswordRequest getForgotPasswordRequest(String key) {
 	List results = baseDAO.findByProperty(ForgotPasswordRequest.class, "requestKey", key);
 	return results.isEmpty() ? null : (ForgotPasswordRequest) results.get(0);
     }
 
+    @Override
     public int removeUserFromOtherGroups(Integer userId, Integer orgId) {
 	List uos = userOrganisationDAO.userOrganisationsNotById(userId, orgId);
 	deleteAll(uos);
 	return uos.size();
     }
 
+    @Override
     public User getUserDTOByOpenidURL(String openidURL) {
 	List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);

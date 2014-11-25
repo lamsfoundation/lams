@@ -22,23 +22,13 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.security.auth.login.FailedLoginException;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
-import org.apache.catalina.authenticator.Constants;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -49,6 +39,7 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -56,8 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * The LoginRequestServlet handles login request by an integrated external system. This servlet checks for the UserId,
- * Timestamp, Hash and ServerId if it's valid it fetch the password from database and pass it to j_security_check for
- * authentication
+ * Timestamp, Hash and ServerId if it's valid it passes it to login.jsp
  * 
  * @author Fei Yang, Anthony Xiao
  */
@@ -67,10 +57,6 @@ public class LoginRequestServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LoginRequestServlet.class);
 
     private static IntegrationService integrationService = null;
-
-    private static final String JNDI_DATASOURCE = "java:jboss/datasources/lams-ds";
-
-    private static final String PASSWORD_QUERY = "select password from lams_user where login=?";
 
     /**
      * The doGet method of the servlet. <br>
@@ -149,15 +135,12 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
-	    // The "extUser" attribute works as a flag to indicate if the user has logged in
-	    String loginRequestUsername = (String) hses.getAttribute("extUser");
-	    if ((loginRequestUsername != null) && loginRequestUsername.equals(login)) {
+	    UserDTO loggedInUserDTO = (UserDTO) hses.getAttribute(AttributeNames.USER);
+	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
+	    if ((loggedInLogin != null) && loggedInLogin.equals(login)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));
 		return;
-	    } else if (loginRequestUsername == null ? request.getRemoteUser() != null : !loginRequestUsername
-		    .equals(login)) {
-		hses = recreateSession(request, response);
 	    }
 
 	    if (extCourseId != null) {
@@ -165,10 +148,6 @@ public class LoginRequestServlet extends HttpServlet {
 		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
 			courseName, method, prefix);
 	    }
-
-	    // connect to DB and get password here
-	    String pass = getUserPassword(userMap.getUser().getLogin());
-	    hses.setAttribute("extUser", login);
 
 	    // check if there is a redirect URL parameter already
 	    String redirectURL = request.getParameter("redirectURL");
@@ -178,7 +157,11 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 
-	    response.sendRedirect("login.jsp?login=" + login + "&password=" + pass + "&redirectURL=" + redirectURL);
+	    // login.jsp knows what to do with these
+	    hses.setAttribute("login", login);
+	    hses.setAttribute("password", user.getPassword());
+
+	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error");
@@ -189,15 +172,6 @@ public class LoginRequestServlet extends HttpServlet {
 	} catch (UserInfoValidationException e) {
 	    LoginRequestServlet.log.error("User validation error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-	} catch (FailedLoginException e) {
-	    LoginRequestServlet.log.error("Login error: ", e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - user was not found");
-	} catch (NamingException e) {
-	    LoginRequestServlet.log.error("Naming error: ", e);
-	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-	} catch (SQLException e) {
-	    LoginRequestServlet.log.error("Database error: ", e);
-	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
 
@@ -218,54 +192,6 @@ public class LoginRequestServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    // using JDBC connection to prevent the caching of passwords by hibernate
-    private String getUserPassword(String username) throws FailedLoginException, NamingException, SQLException {
-	InitialContext ctx = new InitialContext();
-
-	DataSource ds = (DataSource) ctx.lookup(LoginRequestServlet.JNDI_DATASOURCE);
-	Connection conn = null;
-	String password = null;
-	try {
-	    conn = ds.getConnection();
-	    PreparedStatement ps = conn.prepareStatement(LoginRequestServlet.PASSWORD_QUERY);
-	    ps.setString(1, username);
-	    ResultSet rs = ps.executeQuery();
-
-	    // check if there is any result
-	    if (rs.next() == false) {
-		throw new FailedLoginException("invalid username");
-	    }
-
-	    password = rs.getString(1);
-	    rs.close();
-	} finally {
-	    if ((conn != null) && !conn.isClosed()) {
-		conn.close();
-	    }
-	}
-	return password;
-    }
-
-    private HttpSession recreateSession(HttpServletRequest request, HttpServletResponse response) {
-	HttpSession hses = request.getSession(false);
-	hses.invalidate();
-	hses = request.getSession(true);
-
-	Cookie cookies[] = request.getCookies();
-	if (cookies != null) {
-	    for (int i = 0; i < cookies.length; i++) {
-		if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
-		    Cookie cookie = new Cookie(cookies[i].getName(), "");
-		    cookie.setPath("/");
-		    cookie.setMaxAge(0);
-		    response.addCookie(cookie);
-		    break;
-		}
-	    }
-	}
-	return hses;
     }
 
     private IntegrationService getService() {

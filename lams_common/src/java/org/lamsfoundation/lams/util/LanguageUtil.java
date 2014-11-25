@@ -32,7 +32,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -53,21 +53,20 @@ public class LanguageUtil {
     private static IUserManagementService service;
 
     private static IUserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	if (LanguageUtil.service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+		    .getServletContext());
+	    LanguageUtil.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return service;
+	return LanguageUtil.service;
     }
-    
+
     public static void setService(IUserManagementService service) {
 	LanguageUtil.service = service;
     }
 
     /**
-     * Get the default language, country, based on entries in the server
-     * configuration file.
+     * Get the default language, country, based on entries in the server configuration file.
      * 
      * @return String[language, country]
      */
@@ -79,32 +78,36 @@ public class LanguageUtil {
 	String serverLang = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	if (serverLang != null) {
 	    // assume either "en" or "en_AU" formats
-	    if (serverLang.length() >= 2)
+	    if (serverLang.length() >= 2) {
 		languageIsoCode = serverLang.substring(0, 2);
-	    if (serverLang.length() >= 5)
+	    }
+	    if (serverLang.length() >= 5) {
 		countryIsoCode = serverLang.substring(3, 5);
+	    }
 	}
 
 	// fallback to en_AU
-	if (languageIsoCode == null)
-	    languageIsoCode = DEFAULT_LANGUAGE;
-	if (countryIsoCode == null)
-	    languageIsoCode = DEFAULT_COUNTRY;
+	if (languageIsoCode == null) {
+	    languageIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
+	}
+	if (countryIsoCode == null) {
+	    languageIsoCode = LanguageUtil.DEFAULT_COUNTRY;
+	}
 
 	return new String[] { languageIsoCode, countryIsoCode };
 
     }
 
     /**
-     * Get the default direction, based on the values in the server
-     * configuration file.
+     * Get the default direction, based on the values in the server configuration file.
      * 
      * @return direction
      */
     public static String getDefaultDirection() {
 	String direction = Configuration.get(ConfigurationKeys.SERVER_PAGE_DIRECTION);
-	if (direction == null)
-	    direction = DEFAULT_DIRECTION;
+	if (direction == null) {
+	    direction = LanguageUtil.DEFAULT_DIRECTION;
+	}
 	return direction;
     }
 
@@ -122,49 +125,48 @@ public class LanguageUtil {
      */
     public static SupportedLocale getDefaultLocale() {
 	String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-	String langIsoCode = DEFAULT_LANGUAGE;
-	String countryIsoCode = DEFAULT_COUNTRY;
-	if (StringUtils.isNotBlank(localeName) && localeName.length() > 2) {
+	String langIsoCode = LanguageUtil.DEFAULT_LANGUAGE;
+	String countryIsoCode = LanguageUtil.DEFAULT_COUNTRY;
+	if (StringUtils.isNotBlank(localeName) && (localeName.length() > 2)) {
 	    langIsoCode = localeName.substring(0, 2);
 	    countryIsoCode = localeName.substring(3);
 	}
 
 	SupportedLocale locale = null;
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getSupportedLocaleOrNull(DEFAULT_LANGUAGE, DEFAULT_COUNTRY);
+	    locale = LanguageUtil.getSupportedLocaleOrNull(LanguageUtil.DEFAULT_LANGUAGE, LanguageUtil.DEFAULT_COUNTRY);
 	}
 
 	return locale;
     }
 
     /**
-     * Searches for a locale based on language, then country, matching the
-     * single input string. Otherwise returns server default locale.
+     * Searches for a locale based on language, then country, matching the single input string. Otherwise returns server
+     * default locale.
      */
     public static SupportedLocale getSupportedLocale(String input) {
-	List list = getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
-	if (list != null && list.size() > 0) {
+	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+	if ((list != null) && (list.size() > 0)) {
 	    return (SupportedLocale) list.get(0);
 	} else {
-	    list = getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
-	    if (list != null && list.size() > 0) {
+	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+	    if ((list != null) && (list.size() > 0)) {
 		return (SupportedLocale) list.get(0);
 	    }
 	}
-	return getDefaultLocale();
+	return LanguageUtil.getDefaultLocale();
     }
 
     /**
-     * Finds a locale based on language and/or country, use server locale if
-     * invalid.
+     * Finds a locale based on language and/or country, use server locale if invalid.
      */
     public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getDefaultLocale();
+	    locale = LanguageUtil.getDefaultLocale();
 	}
 
 	return locale;
@@ -188,8 +190,8 @@ public class LanguageUtil {
 	    return null;
 	}
 
-	List list = getService().findByProperties(SupportedLocale.class, properties);
-	if (list != null && list.size() > 0) {
+	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties);
+	if ((list != null) && (list.size() > 0)) {
 	    Collections.sort(list);
 	    locale = (SupportedLocale) list.get(0);
 	} else {

@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -62,21 +62,21 @@ public class LDAPAuthenticator {
     }
 
     private UserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
-	    service = (UserManagementService) ctx.getBean("userManagementService");
+	if (LDAPAuthenticator.service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+		    .getServletContext());
+	    LDAPAuthenticator.service = (UserManagementService) ctx.getBean("userManagementService");
 	}
-	return service;
+	return LDAPAuthenticator.service;
     }
 
     private LdapService getLdapService() {
-	if (ldapService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
-	    ldapService = (LdapService) ctx.getBean("ldapService");
+	if (LDAPAuthenticator.ldapService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+		    .getServletContext());
+	    LDAPAuthenticator.ldapService = (LdapService) ctx.getBean("ldapService");
 	}
-	return ldapService;
+	return LDAPAuthenticator.ldapService;
     }
 
     public Attributes getAttrs() {
@@ -95,9 +95,9 @@ public class LDAPAuthenticator {
 	Properties env = new Properties();
 
 	// setup initial connection to search for user's dn
-	env.setProperty(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY_VALUE);
-	env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration
-		.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+	env.setProperty(Context.INITIAL_CONTEXT_FACTORY, LDAPAuthenticator.INITIAL_CONTEXT_FACTORY_VALUE);
+	env.setProperty(Context.SECURITY_AUTHENTICATION,
+		Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 	env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
 
 	String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
@@ -130,10 +130,10 @@ public class LDAPAuthenticator {
 	    NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, filterArgs, ctrl);
 	    while (results.hasMore()) {
 		SearchResult result = results.next();
-		if (log.isDebugEnabled()) {
-		    log.debug("===> found matching object...");
-		    log.debug("name: " + result.getName());
-		    log.debug("namespace name: " + result.getNameInNamespace());
+		if (LDAPAuthenticator.log.isDebugEnabled()) {
+		    LDAPAuthenticator.log.debug("===> found matching object...");
+		    LDAPAuthenticator.log.debug("name: " + result.getName());
+		    LDAPAuthenticator.log.debug("namespace name: " + result.getNameInNamespace());
 		}
 		Attributes attrs = result.getAttributes();
 		Attribute attr = attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR));
@@ -153,33 +153,33 @@ public class LDAPAuthenticator {
 		}
 	    }
 	    if (StringUtils.isBlank(login)) {
-		log.error("===> No LDAP user found with username: " + username
+		LDAPAuthenticator.log.error("===> No LDAP user found with username: " + username
 			+ ". This could mean that the the login attribute is incorrect,"
 			+ " the user doesn't exist, or that an initial bind user is required.");
 		return false;
 	    }
-	    
+
 	    // authenticate
 	    env.setProperty(Context.SECURITY_PRINCIPAL, dn);
 	    env.setProperty(Context.SECURITY_CREDENTIALS, credential.toString());
 	    ctx = new InitialLdapContext(env, null);
 
 	    // if no exception, success
-	    log.debug("===> LDAP context created using DN: " + dn);
+	    LDAPAuthenticator.log.debug("===> LDAP context created using DN: " + dn);
 	    isValid = true;
 
 	    // start checking whether we need to update user depending on its
 	    // attributes
-	    if (log.isDebugEnabled()) {
+	    if (LDAPAuthenticator.log.isDebugEnabled()) {
 		NamingEnumeration enumAttrs = this.attrs.getAll();
 		while (enumAttrs.hasMoreElements()) {
-		    log.debug(enumAttrs.next());
+		    LDAPAuthenticator.log.debug(enumAttrs.next());
 		}
 	    }
 
 	    // check user is disabled in ldap
 	    if (getLdapService().getDisabledBoolean(this.attrs)) {
-		log.debug("===> User is disabled in LDAP.");
+		LDAPAuthenticator.log.debug("===> User is disabled in LDAP.");
 		User user = getService().getUserByLogin(username);
 		if (user != null) {
 		    getService().disableUser(user.getUserId());
@@ -198,19 +198,20 @@ public class LDAPAuthenticator {
 
 	    return true;
 	} catch (AuthenticationNotSupportedException e) {
-	    log.error("===> Authentication mechanism not supported.  Check your "
+	    LDAPAuthenticator.log.error("===> Authentication mechanism not supported.  Check your "
 		    + ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION + " parameter: "
 		    + Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 	} catch (AuthenticationException e) {
-	    log.info("===> Incorrect username (" + dn + ") or password. " + e.getMessage());
+	    LDAPAuthenticator.log.info("===> Incorrect username (" + dn + ") or password. " + e.getMessage());
 	} catch (Exception e) {
-	    log.error("===> LDAP exception: " + e, e);
+	    LDAPAuthenticator.log.error("===> LDAP exception: " + e, e);
 	} finally {
 	    try {
-		if (ctx != null)
+		if (ctx != null) {
 		    ctx.close();
+		}
 	    } catch (Exception e) {
-		log.error("===> gettting problem when closing context. Exception: " + e);
+		LDAPAuthenticator.log.error("===> gettting problem when closing context. Exception: " + e);
 	    }
 	}
 

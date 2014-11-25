@@ -1,6 +1,4 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy"%>
-<%@ page import="org.lamsfoundation.lams.web.util.HttpSessionManager"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -9,10 +7,6 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
-<%-- If you change this file, remember to update the copy made for CNG-21 --%>
-
-<%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
-<%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
 <!DOCTYPE HTML>
 <lams:html>
 <lams:head>

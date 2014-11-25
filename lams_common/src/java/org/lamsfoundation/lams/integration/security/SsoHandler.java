@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -72,16 +71,17 @@ public class SsoHandler implements ServletExtension {
 			ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 			HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
 
-			// LoginRequestServlet (integrations) sets this parameter
+			// get session here in case it was invalidated in login.jsp 
+			HttpSession session = request.getSession();
+
+			// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
 			String redirectURL = request.getParameter("redirectURL");
 			if (!StringUtils.isBlank(redirectURL)) {
 			    SsoHandler.handleRedirectBack(context, redirectURL);
 			}
 
 			// store session so UniversalLoginModule can access it
-			HttpSession session = request.getSession();
 			SessionManager.startSession(request);
-			HttpSessionManager.getInstance().setServletContext(session.getServletContext());
 			// do the logging in UniversalLoginModule
 			handler.handleRequest(exchange);
 			SessionManager.endSession();
@@ -110,7 +110,7 @@ public class SsoHandler implements ServletExtension {
      * ServletFormAuthenticationMechanism method.
      */
     protected static void handleRedirectBack(ServletRequestContext context, String redirectURL) {
-	HttpSessionImpl httpSession = context.getCurrentServletContext().getSession(context.getExchange(), false);
+	HttpSessionImpl httpSession = context.getCurrentServletContext().getSession(context.getExchange(), true);
 	if (httpSession != null) {
 	    Session session;
 	    if (System.getSecurityManager() == null) {

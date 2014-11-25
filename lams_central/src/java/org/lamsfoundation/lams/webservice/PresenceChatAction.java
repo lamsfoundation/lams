@@ -48,8 +48,8 @@ import org.lamsfoundation.lams.presence.model.PresenceChatUser;
 import org.lamsfoundation.lams.presence.service.IPresenceChatService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -88,13 +88,13 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    // roster is used also to get messages by other users, so we need to synchronise on it
 	    synchronized (roster) {
 		Date currentDate = new Date(currentTime);
-		
+
 		if (!StringUtils.isBlank(nickname)) {
 		    // blank nickname means this is just check but user is not really using chat
 		    activeUsers.put(nickname, currentDate);
 		}
 
-		if (currentTime - lastCheckTime > IPresenceChatService.PRESENCE_IDLE_TIMEOUT) {
+		if ((currentTime - lastCheckTime) > IPresenceChatService.PRESENCE_IDLE_TIMEOUT) {
 		    // store active users
 		    getPresenceChatService().updateUserPresence(lessonId, activeUsers);
 		    activeUsers.clear();
@@ -130,7 +130,7 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    boolean getMessages = Boolean.parseBoolean(request.getParameter("getMessages"));
 	    // this is the current user
 	    String nickname = request.getParameter("to");
- 
+
 	    JSONObject responseJSON = new JSONObject();
 	    // no need to fetch messages if presence is collapsed
 	    if (getMessages && !StringUtils.isBlank(nickname)) {
@@ -229,8 +229,8 @@ public class PresenceChatAction extends LamsDispatchAction {
 
     private IPresenceChatService getPresenceChatService() {
 	if (PresenceChatAction.presenceChatService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession()
+		    .getServletContext());
 	    PresenceChatAction.presenceChatService = (IPresenceChatService) ctx.getBean("presenceChatService");
 	}
 	return PresenceChatAction.presenceChatService;

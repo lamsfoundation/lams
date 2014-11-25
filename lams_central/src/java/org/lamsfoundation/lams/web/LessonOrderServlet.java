@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
  
@@ -67,7 +67,7 @@ public class LessonOrderServlet extends HttpServlet {
 		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 		String ids = request.getParameter("ids");
 		
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager.getSession().getServletContext());
 		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 		
 		if (orgId != null && ids != null) {

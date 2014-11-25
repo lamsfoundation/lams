@@ -28,12 +28,8 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 
-
 /**
- * Listens for the creation and destruction of http sessions, and reports back to 
- * the ClientSessionInfoManager.
- *
- * @web.listener 
+ * Listens for the creation and destruction of http sessions.
  */
 /* Should come out in web.xml as:
  * <!-- Listeners -->
@@ -43,19 +39,17 @@ import org.lamsfoundation.lams.web.util.HttpSessionManager;
  *		</listener-class>
  *	</listener>
  */
-public class SessionListener implements HttpSessionListener
-{
+public class SessionListener implements HttpSessionListener {
 
-	/** HttpSessionListener interface */
-	public void sessionCreated(HttpSessionEvent se)
-	{
-		HttpSessionManager.getInstance().sessionCreated(se);
-	}
+    /** HttpSessionListener interface */
+    @Override
+    public void sessionCreated(HttpSessionEvent se) {
+	HttpSessionManager.sessionCreated(se);
+    }
 
-	/** HttpSessionListener interface */
-	public void sessionDestroyed(HttpSessionEvent se)
-	{
-		//nothing to do
-	}
-
+    /** HttpSessionListener interface */
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+	//nothing to do
+    }
 }

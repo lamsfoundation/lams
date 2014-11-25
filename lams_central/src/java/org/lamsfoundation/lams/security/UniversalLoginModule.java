@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -107,8 +108,8 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 		String username = getUsername();
 		UniversalLoginModule.log.debug("===> authenticating user: " + username);
 
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-			.getInstance().getServletContext());
+		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
+			.getSession().getServletContext());
 
 		if (service == null) {
 		    service = (UserManagementService) ctx.getBean("userManagementService");

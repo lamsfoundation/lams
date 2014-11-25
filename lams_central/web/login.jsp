@@ -3,15 +3,22 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-21 --%>
-
+<%-- Attributes in request come from sysadmin LoginAs action
+	 while in session from LoginRequestServlet
+--%>
+<c:if test="${empty requestScope.login}">
+	<c:set var="login" value="${sessionScope.login}" />
+	<c:set var="password" value="${sessionScope.password}" />
+</c:if>
+<%-- If credentials came from attributes, no need for encrypting --%>
+<c:set var="encrypt"><%= request.getAttribute("login") == null && session.getAttribute("login") == null && Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER) %></c:set>
 <%
-    if (JspRedirectStrategy.loginPageRedirected(request, response)) {
-		return;
+    if (request.getAttribute("login") != null || session.getAttribute("login") != null) {
+		// invalidate session so a new user can be logged in
+		session.invalidate();
 	}
 %>
 
@@ -22,7 +29,6 @@ flash is searching for this string, so leave it!:
 j_security_login_page
 -->
 
-<c:set var="encrypt"><%= Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER) %></c:set>
 <lams:head>
 	<title><fmt:message key="title.login.window" /></title>
 	<lams:css style="core" />
@@ -32,13 +38,9 @@ j_security_login_page
 	<script type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-		var password = '${param.password}',
-			// if password came as a parameter, it is already encrypted
-			encrypt = password ? false : ${encrypt};
-
 		function submitForm() {
 			var password = $('#j_password').val();
-			if (encrypt) {
+			if (${encrypt}) {
 				$('#j_password').val(hex_sha1(password));
 			}
 			$('#loginForm').submit();
@@ -119,7 +121,7 @@ j_security_login_page
 						<fmt:message key="label.username" />
 						: <input id="j_username" name="j_username" type="text" size="16"
 							style="width: 125px" tabindex="1"
-							value="${param.login}"
+							value="${login}"
 							onkeypress="onEnter(event)" />
 					</p>
 					
@@ -127,7 +129,7 @@ j_security_login_page
 						<fmt:message key="label.password" />
 						: <input id="j_password" name="j_password" type="password" size="16"
 							style="width: 125px" autocomplete="off" tabindex="2"
-							value="${param.password}"
+							value="${password}"
 							onkeypress="onEnter(event)" />
 					</p>
 					
@@ -169,7 +171,7 @@ j_security_login_page
 	
 	<script type="text/javascript">
 		// if login was set as a parameter, do auto-submit right away
-		if ('${param.login}') {
+		if (${not empty login}) {
 			submitForm();
 		}
 	</script>

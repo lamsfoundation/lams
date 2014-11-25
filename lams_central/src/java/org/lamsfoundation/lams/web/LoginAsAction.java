@@ -30,6 +30,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -61,8 +62,8 @@ public class LoginAsAction extends Action {
 
 	if (service.isUserSysAdmin()) {
 	    if ((login != null) && (login.trim().length() > 0)) {
-		if (service.getUserByLogin(login) != null) {
-
+		User user = service.getUserByLogin(login);
+		if (user != null) {
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    IAuditService auditService = (IAuditService) ctx.getBean("auditService");
@@ -70,12 +71,11 @@ public class LoginAsAction extends Action {
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    auditService.log(CentralConstants.MODULE_NAME, message);
 
-		    // logout, but not the LAMS shared session; needed by UniversalLoginModule
-		    // to check for sysadmin role
-		    request.getSession().invalidate();
-
+		    // login.jsp knows what to do with these
+		    request.setAttribute("login", login);
+		    request.setAttribute("password", user.getPassword());
 		    // redirect to login page
-		    return (new ActionForward("/login.jsp?login=" + login + "&password=dummy"));
+		    return (new ActionForward("/login.jsp?redirectURL=/lams/index.jsp"));
 		}
 	    }
 	} else {

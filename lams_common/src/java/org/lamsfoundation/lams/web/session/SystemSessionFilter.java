@@ -35,19 +35,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml
+ * because LocaleFilter need get value from SystemSession.
  * 
- * @author Steve.Ni Create and manage system wide (across multiple webapps in JBOSS) session.
- * 
- * <p>
- * <b>NOTICE: This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml
- * because LocaleFilter need get value from SystemSession .</b>
- * 
- * @version $Revision$
+ * @author Steve.Ni
  */
 public class SystemSessionFilter implements Filter {
-    // The session cookie name to trace shared session
-    public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-
     public void init(FilterConfig config) throws ServletException {
     }
 
